@@ -8,8 +8,8 @@ Repositório do meu **projeto de software anual e final do curso**. É aqui que 
 
 ## Estrutura atual
 
-| Pasta / arquivo | Uso |
-|-----------------|-----|
-| ANOTAÇÕES/ | Rascunhos de design, tarefas e ideias do projeto |
+| Pasta / arquivo | Uso                                              |
+| --------------- | ------------------------------------------------ |
+| ANOTAÇÕES/      | Rascunhos de design, tarefas e ideias do projeto |
 
 Mais pastas (código, documentação, assets etc.) serão adicionadas conforme a implementação começar.
