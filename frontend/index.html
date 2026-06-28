@@ -6,21 +6,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BOOSTio</title>
   <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 </head>
 
 <body>
   <header id="header">
     <div id="logo"></div>
-    <nav id="nav">
+    <nav id="header-nav">
       <ul id="nav-list">
         <li class="nav-item"><a href="#" class="nav-link font-1-xs">Início</a></li>
         <li class="nav-item"><a href="#" class="nav-link font-1-xs">Sobre</a></li>
         <li class="nav-item"><a href="#" class="nav-link font-1-xs">Serviços</a></li>
         <li class="nav-item"><a href="#" class="nav-link font-1-xs">Monte o seu</a></li>
+        <span id="divider"></span>
         <li class="nav-item"><a href="#" class="nav-link font-1-xs">Suas Builds</a></li>
     </nav>
     <div id="profile">
-      <i id="pfp-icon"></i>
+      <input type="checkbox" name="profile" id="profile-check">
+      <div id="profile-options">
+        <nav id="profile-nav">
+          <ul id="profile-nav-list">
+            <li class="profile-item"><a href="" class="profile-link"><i class="fa-regular fa-user"></i>
+                <p>Builds</p>
+              </a></li>
+            <li class="profile-item"><a href="" class="profile-link"><i class="fa-regular fa-floppy-disk"></i>
+                <p>Configurações</p>
+              </a></li>
+            <li class="profile-item"><a href="" class="profile-link"><i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <p>Sair</p>
+              </a></li>
+          </ul>
+        </nav>
+      </div>
+      <i class="fa-solid fa-user" id="profile-icon"></i>
     </div>
   </header>
 </body>
