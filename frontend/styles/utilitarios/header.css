@@ -98,10 +98,22 @@ header {
   box-shadow: inset 0px 0px 10px rgba(255, 255, 255, 0.3);
   border: 1px solid #59a7fb;
   position: relative;
+  transition: 0.3s cubic-bezier(0.81, 0.19, 0.16, 0.87);
+  cursor: pointer;
 }
+#profile:hover > #profile-icon {
+  transform: scale(1.1);
+}
+#profile:hover {
+  background-color: var(--cor-p4);
+  box-shadow: inset 0px 0px 10px rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--cor-p2);
+}
+
 #profile-icon {
   font-size: 1.2rem;
   color: var(--cor-5);
+  transition: 0.3s cubic-bezier(0.81, 0.19, 0.16, 0.87);
 }
 
 #profile-check {
@@ -109,6 +121,11 @@ header {
   height: 100%;
   position: absolute;
   opacity: 0;
+  cursor: pointer;
+  z-index: 3;
+}
+#profile-check:active {
+  transform: scale(0.9);
 }
 
 #profile-options {
@@ -116,16 +133,19 @@ header {
   right: 0;
   top: calc(100%);
   background-color: #1c1c1e7e;
-  border: 1px solid #29292e;
-  border-radius: 24px;
-  padding: 16px;
+  padding: 8px;
+  border-radius: 16px;
+  background:
+    linear-gradient(#1c1c1e, #1c1c1e) padding-box,
+    linear-gradient(to bottom, #ffffff56, #ffffff00) border-box;
+  border: 1px solid transparent;
   box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.5);
   z-index: 10;
   transform: scale(0);
   transition:
     transform 0.5s cubic-bezier(0.81, 0.19, 0.16, 0.87),
     top 0.5s cubic-bezier(0.81, 0.19, 0.16, 0.87);
-  transform-origin: 180px 0px;
+  transform-origin: 160px 0px;
 }
 #profile-item {
   width: 100%;
