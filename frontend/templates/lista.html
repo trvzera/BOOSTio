@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista de Usuários</title>
+</head>
+<body>
+
+  <h1>Usuários</h1>
+  <a href="{{ url_for('usuario.criar_usuario') }}">Cadastrar Novo Usuário</a>
+  
+  <hr>
+
+  <ul>
+    {% for usuario in usuarios %}
+      <li>
+        {{ usuario.nome }} ({{ usuario.email }}) 
+        
+        | <a href="{{ url_for('usuario.alterar_usuario', usuario_id=usuario.id) }}">Editar</a>
+        
+        | <form action="{{ url_for('usuario.excluir_usuario', usuario_id=usuario.id) }}" method="POST">
+            <button type="submit">Excluir</button>
+          </form>
+      </li>
+    {% endfor %}
+  </ul>
+
+</body>
+</html>
