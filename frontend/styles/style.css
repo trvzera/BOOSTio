@@ -5,7 +5,11 @@
 @import "./utilitarios/tipografia.css";
 @import "./utilitarios/cores.css";
 @import "./utilitarios/espacamentos.css";
+@import "./utilitarios/botoes.css";
 
 /* HEADER */
 @import "./header/header.css";
 @import "./header/profile-header.css";
+
+/* MAIN */
+@import "./home/home.css";

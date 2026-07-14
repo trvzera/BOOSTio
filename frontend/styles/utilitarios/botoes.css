@@ -1,0 +1,19 @@
+.btn-primary {
+  font-family: Lexend;
+  font-weight: bold;
+  color: var(--cor-6);
+  padding: 15px 20px;
+  background:
+    linear-gradient(var(--cor-p1), var(--cor-p4)) padding-box,
+    linear-gradient(to bottom, #ffffff, #ffffff00) border-box;
+  border: 1px solid transparent;
+  border-radius: 50px;
+  box-shadow: inset 3px 3px 10px rgba(255, 255, 255, 0.3);
+  transition: 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87);
+}
+
+.btn-primary:hover {
+  transform: translateY(-5px);
+  color: var(--cor-5);
+  background-color: #ffffff;
+}
