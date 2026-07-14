@@ -12,36 +12,49 @@
 
 <body>
   <header id="header">
-    <a href="#" id="logo"></a>
-    <nav id="header-nav">
-      <ul id="nav-list">
-        <li class="nav-item"><a href="#" class="nav-link font-1-xs">Início</a></li>
-        <li class="nav-item"><a href="#" class="nav-link font-1-xs">Sobre</a></li>
-        <li class="nav-item"><a href="#" class="nav-link font-1-xs">Serviços</a></li>
-        <li class="nav-item"><a href="#" class="nav-link font-1-xs">Monte o seu</a></li>
-        <span id="divider"></span>
-        <li class="nav-item"><a href="#" class="nav-link font-1-xs">Suas Builds</a></li>
-    </nav>
-    <div id="profile">
-      <input type="checkbox" name="profile" id="profile-check">
-      <div id="profile-options">
-        <nav id="profile-nav">
-          <ul id="profile-nav-list">
-            <li class="profile-item"><a href="" class="profile-link font-1-s"><i class="fa-regular fa-user"></i>
-                <p>Builds</p>
-              </a></li>
-            <li class="profile-item"><a href="" class="profile-link font-1-s"><i class="fa-regular fa-floppy-disk"></i>
-                <p>Configurações</p>
-              </a></li>
-            <li class="profile-item"><a href="" class="profile-link font-1-s"><i class="fa-solid fa-arrow-right-from-bracket"></i>
-                <p>Sair</p>
-              </a></li>
-          </ul>
-        </nav>
+    <div id="header-container">
+      <a href="#" id="logo"></a>
+      <nav id="header-nav">
+        <ul id="nav-list">
+          <li class="nav-item"><a href="#" class="nav-link font-1-xs">Início</a></li>
+          <li class="nav-item"><a href="#" class="nav-link font-1-xs">Sobre</a></li>
+          <li class="nav-item"><a href="#" class="nav-link font-1-xs">Serviços</a></li>
+          <li class="nav-item"><a href="#" class="nav-link font-1-xs">Monte o seu</a></li>
+          <span id="divider"></span>
+          <li class="nav-item"><a href="#" class="nav-link font-1-xs">Suas Builds</a></li>
+      </nav>
+      <div id="profile">
+        <input type="checkbox" name="profile" id="profile-check">
+        <div id="profile-options">
+          <nav id="profile-nav">
+            <ul id="profile-nav-list">
+              <li class="profile-item"><a href="" class="profile-link font-1-s"><i class="fa-regular fa-user"></i>
+                  <p>Builds</p>
+                </a></li>
+              <li class="profile-item"><a href="" class="profile-link font-1-s"><i class="fa-regular fa-floppy-disk"></i>
+                  <p>Configurações</p>
+                </a></li>
+              <li class="profile-item"><a href="" class="profile-link font-1-s"><i class="fa-solid fa-arrow-right-from-bracket"></i>
+                  <p>Sair</p>
+                </a></li>
+            </ul>
+          </nav>
+        </div>
+        <i class="fa-solid fa-user" id="profile-icon"></i>
       </div>
-      <i class="fa-solid fa-user" id="profile-icon"></i>
     </div>
   </header>
+  <section id="main-page">
+    <video autoplay muted loop playsinline>
+      <source src="./video/background.webm">
+      Seu navegador não suporta vídeos.
+    </video>
+    <h1 id="main-title" class="font-1-xxl">Menos Dúvidas, Mais <span>Desempenho</span> <br> - Vamos montar juntos!</h1>
+    <p id="main-description" class="font-2-s">A Boostio é uma plataforma que simplifica a montagem de computadores,
+      ajudando você a escolher as peças ideais com base no seu objetivo,
+      orçamento e necessidade — tudo com precisão e confiança.</p>
+    <a href="#" class="btn-primary">Monte o seu</a>
+  </section>
 </body>
 
 </html>
