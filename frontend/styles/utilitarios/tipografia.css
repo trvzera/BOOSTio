@@ -22,7 +22,7 @@
 .font-1-xl {
   font-family: "Lexend";
   font-weight: 600;
-  font-size: 2rem;
+  font-size: 3rem;
   line-height: 1.25;
 }
 
@@ -73,14 +73,14 @@
 .font-1-s {
   font-family: "Lexend";
   font-weight: 400;
-  font-size: 1rem;
+  font-size: 1.2rem;
   line-height: 1.5;
 }
 
 .font-2-s {
   font-family: "Poppins";
   font-weight: 400;
-  font-size: 1rem;
+  font-size: 1.2rem;
   line-height: 1.5;
 }
 
