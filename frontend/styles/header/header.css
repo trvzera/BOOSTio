@@ -5,7 +5,7 @@ header {
   justify-content: space-between;
   margin-top: var(--espacamento-16);
   padding: 0px var(--espacamento-32);
-  position: absolute;
+  position: fixed;
   left: 50%;
   top: 0;
   transform: translateX(-50%);
