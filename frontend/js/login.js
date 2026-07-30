@@ -14,17 +14,16 @@ senhaInput.addEventListener('input',compara)
 function compara(){
     let textoInput = senhaInput.value
     let total = 0
+    const caracteres = (textoInput.length >= 8)
+
     if (textoInput.length >= 8){
         total += 20
-        caracteres.style.backgroundcolor = grenn
     }
     if (/[A-Z]/.test(textoInput)){
         total += 20
-        caracteres.style.backgroundcolor = grenn
     }
     if (/[a-z]/.test(textoInput)){
         total += 20
-        caracteres.style.backgroundcolor = grenn
     }
     if (/\d/.test(textoInput)){
         total += 20
@@ -32,7 +31,6 @@ function compara(){
     }
     if(/[\^£¢¬§@%&#!$*+?.()|[\]{}\\]/.test(textoInput)){
         total += 20
-        caracteres.style.backgroundcolor = grenn
     }
 
     

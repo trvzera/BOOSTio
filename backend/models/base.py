@@ -6,3 +6,4 @@ class ModeloBase(db.Model):
   __abstract__ = True
   id = db.Column(db.Integer,primary_key = True)
   criado_em = db.Column(db.DateTime,default = datetime.now())
+  atualizado_em = db.Column( db.DateTime,default=datetime.now,onupdate=datetime.now)
