@@ -1,16 +1,18 @@
-from flask import Blueprint, redirect, render_template, request, url_for
-from services.usuario_service import UsuarioService
+from flask import Blueprint,request,jsonify,get_json
+from services.usuario_service.criar_usuario_service import UsuarioService
 
-usuario_bp = Blueprint("usuario", __name__, url_prefix="/usuario", template_folder='../../frontend/templates')
+
+usuario_bp = Blueprint("usuario", __name__, url_prefix="/usuario")
 
 @usuario_bp.route("/criar", methods=['GET','POST'])
 def criar_usuario():
     if request.method == 'GET':
-        return render_template('index.html')
- 
-    nome = request.form.get('nome')
-    email = request.form.get('email')
-    senha = request.form.get('senha')
+        return 
+    
+    try:
+        dados = request.get_json() or {}
+        service = UsuarioService.cria
+    
     
     repo = UsuarioService()
     usuario = repo.criar_usuario(nome, email, senha)
