@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 class CriarUsuarioService:
   #Adicionar verificação de senha sendo menor que 8 caracteres e etc...
   #Adicionar verificação do formato do email
-  #Após cadastrar, logar o usuario direto? Ou exigir login
+  #Após cadastrar, logar o usuario direto? Ou exigir login (logar direto.)
   
   def executar(self,dados):
     campos_obrigatorios = ["nome","email","senha"]
@@ -32,4 +32,5 @@ class CriarUsuarioService:
 
     Usuario.salvar(usuario)
 
-    return usuario.to_dict()
+    #Retornar a instancia pois irei usar o flask-login no controller    
+    return usuario
