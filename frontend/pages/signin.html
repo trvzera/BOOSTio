@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="../styles/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+  <script src="./js/login.js" defer></script>
+</head>
+
+<body>
+  <header id="header">
+    <div id="header-container">
+      <a href="#" id="logo"></a>
+      <nav id="header-nav">
+        <ul id="nav-list">
+          <li class="nav-item"><a href="#main-page" class="nav-link font-1-xs">Início</a></li>
+          <li class="nav-item"><a href="#about-page" class="nav-link font-1-xs">Sobre</a></li>
+          <li class="nav-item"><a href="#" class="nav-link font-1-xs">Serviços</a></li>
+          <li class="nav-item"><a href="#" class="nav-link font-1-xs">Monte o seu</a></li>
+          <span id="divider"></span>
+          <li class="nav-item"><a href="#" class="nav-link font-1-xs">Suas Builds</a></li>
+      </nav>
+      <div id="profile">
+        <input type="checkbox" name="profile" id="profile-check">
+        <div id="profile-options">
+          <nav id="profile-nav">
+            <ul id="profile-nav-list">
+              <li class="profile-item"><a href="" class="profile-link font-1-s"><i class="fa-regular fa-user"></i>
+                  <p>Builds</p>
+                </a></li>
+              <li class="profile-item"><a href="" class="profile-link font-1-s"><i class="fa-regular fa-floppy-disk"></i>
+                  <p>Configurações</p>
+                </a></li>
+              <li class="profile-item"><a href="" class="profile-link font-1-s"><i class="fa-solid fa-arrow-right-from-bracket"></i>
+                  <p>Sair</p>
+                </a></li>
+            </ul>
+          </nav>
+        </div>
+        <i class="fa-solid fa-user" id="profile-icon"></i>
+      </div>
+    </div>
+  </header>
+  <main id="signin-page">
+    <div id="signin-container">
+      <img src="../imgs/logo.png" alt="Logo">
+      <h1 id="signin-title" class="font-1-l">Vamos criar a sua conta!</h1>
+      <p id="signin-description" class="font-2-xs">Já possui uma conta? <a href="./login.html">Entrar com sua conta.</a></p>
+      <form id="signin-form">
+        <input type="text" placeholder="Seu nome de usuário" class="input-text">
+        <input type="email" placeholder="Seu melhor email" class="input-text">
+        <input type="password" placeholder="Uma senha forte" class="input-text">
+        <div id="verificacao-senha">
+          <div id="barrinha">
+
+          </div>
+        </div>
+        <input type="password" placeholder="Confirme sua senha" class="input-text">
+        <div id="campo-check">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" name="terms" id="terms" class="input-check">
+            <i class="fa-solid fa-check" id="icone-check"></i>
+          </div>
+          <label for="terms" class="font-1-xs">
+            Li e concordo com os <a href="#">Termos e Condições</a>
+          </label>
+        </div>
+        <button type="submit" class="btn-login">Criar conta</button>
+      </form>
+    </div>
+  </main>
+</body>
+
+</html>
