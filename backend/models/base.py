@@ -16,10 +16,3 @@ class ModeloBase(db.Model):
     db.delete(self)
     db.session.commit()
 
-  @staticmethod
-  def listar_todos():
-    return Professor.query.all()
-  
-  @staticmethod
-  def buscar_por_id(id):
-    return Professor.query.get(id)

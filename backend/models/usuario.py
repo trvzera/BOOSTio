@@ -22,6 +22,13 @@ class Usuario(ModeloBase):
       "email": self.email,
     }
 
+  @staticmethod
+  def listar_todos():
+    return Usuario.query.all()
+  
+  @staticmethod
+  def buscar_por_id(id):
+    return Usuario.query.get(id)
 
 
 
