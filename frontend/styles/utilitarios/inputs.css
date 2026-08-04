@@ -1,14 +1,16 @@
 .input-text {
-  width: calc(100% + 30px);
+  width: 100%;
   padding: 10px;
   border: 1px solid var(--cor-2);
   font-size: 16px;
   background-color: var(--cor-1);
+  color: var(--cor-p1);
   outline: none;
   border-radius: 10px;
 }
 .input-text::placeholder {
   color: var(--cor-3);
+  font-size: 0.9rem;
 }
 .input-text:focus {
   border: 1px solid var(--cor-p1);
@@ -71,4 +73,53 @@
 
 .input-check:checked + #icone-check {
   color: var(--cor-p1);
+}
+.input-text {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--cor-2);
+  font-size: 1rem;
+  background-color: var(--cor-1);
+  color: var(--cor-p1);
+  outline: none;
+  border-radius: 10px;
+}
+
+
+.input-text::placeholder {
+  color: var(--cor-3);
+  font-size: 0.9rem;
+}
+
+.input-text:focus {
+  border: 1px solid var(--cor-p1);
+  box-shadow: 0px 0px 15px var(--cor-p1);
+}
+
+.input-text:focus::placeholder {
+  color: var(--cor-p1);
+}
+
+.input-senha-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-senha-wrapper .input-text {
+  padding-right: 45px;
+}
+
+.toggle-senha {
+  position: absolute;
+  right: 16px;
+  color: var(--cor-4);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.toggle-senha:hover {
+  color: var(--cor-6);
 }

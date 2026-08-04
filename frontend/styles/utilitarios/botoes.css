@@ -19,15 +19,26 @@
 }
 
 .btn-login {
+  width: 100%;
   font-family: Lexend;
   font-weight: bold;
+  font-size: 0.8rem;
   color: var(--cor-6);
   padding: 15px 100px;
-  background:
-    linear-gradient(var(--cor-p1), var(--cor-p4)) padding-box,
-    linear-gradient(to bottom, #ffffff, #ffffff00) border-box;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  box-shadow: inset 3px 3px 10px rgba(255, 255, 255, 0.3);
+  background: linear-gradient(var(--cor-p1), var(--cor-p4));
+  border: 1px solid var(--cor-p1);
+  border-radius: 15px;
   transition: 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87);
+  cursor: pointer;
+}
+
+.btn-login:hover:not(:disabled) {
+  transform: translateY(-5px);
+  border: 1px solid var(--cor-6);
+}
+
+.btn-login:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
 }

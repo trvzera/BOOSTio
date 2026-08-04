@@ -41,7 +41,7 @@
   margin-bottom: var(--espacamento-16);
 }
 #text-about > p:last-of-type {
-  margin-bottom: var(--espacamento-32) ;
+  margin-bottom: var(--espacamento-32);
 }
 
 #about-line {
@@ -54,7 +54,7 @@
 
 #pc-video {
   position: relative;
-  width: 600px;
-  height: 600px;
+  width: 500px;
+  height: 500px;
   object-fit: cover;
 }

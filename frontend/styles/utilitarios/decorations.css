@@ -13,6 +13,18 @@
 #about-container > .decoration:first-child {
   left: 0;
 }
-#about-container > .decoration:last-child {
-  left: 100%;
+
+.decoration-1 {
+  top: 10%;
+  left: 15%;
+  transform: translate(-50%, -50%);
+}
+
+.decoration-2 {
+  width: 400px;
+  height: 400px;
+  background-color: var(--cor-p3);
+  top: 90%;
+  left: 85%;
+  transform: translate(-50%, -50%);
 }

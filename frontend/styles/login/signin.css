@@ -1,18 +1,23 @@
+/* SIGNIN */
 #signin-page {
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  height: 100vh;
+  position: relative;
+  overflow: hidden;
   img {
     width: 200px;
   }
 }
 
 #signin-container {
+  width: 380px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
 
 #signin-title {
@@ -30,8 +35,203 @@
 }
 
 #signin-form {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 26px;
+  gap: var(--espacamento-24);
+}
+
+#verificacao-senha {
+  width: 100%;
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-top: calc(-1 * var(--espacamento-24));
+  transition:
+    grid-template-rows 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87),
+    margin-top 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87);
+}
+
+#verificacao-senha.aberto {
+  grid-template-rows: 1fr;
+  margin-top: 0;
+}
+
+#verificacao-senha-inner {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#status-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+#fundo-barra {
+  width: 100%;
+  height: 10px;
+  background-color: var(--cor-1);
+  border-radius: 50px;
+  position: relative;
+}
+
+.barra {
+  width: 0%;
+  height: 100%;
+  position: absolute;
+  background-color: var(--cor-d1);
+  border-radius: 50px;
+  transition:
+    width 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87),
+    background-color 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87);
+}
+
+#status-text {
+  font-weight: bold;
+  font-size: 0.9rem;
+  min-width: 60px;
+}
+
+#condicoes-container {
+  width: 100%;
+  height: max-content;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  justify-items: self-start;
+  margin-top: var(--espacamento-16);
+  gap: var(--espacamento-8);
+  p {
+    font-size: 1rem;
+  }
+}
+
+.condicao-bloco {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  gap: var(--espacamento-8);
+  background-color: transparent;
+  border: none;
+  color: var(--cor-4);
+  transition: color 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87);
+}
+
+.condicao-bloco.certo {
+  color: var(--cor-d5);
+}
+
+.condicao-bloco.errado {
+  color: var(--cor-d1);
+}
+
+.condicao-status {
+  width: 25px;
+  height: 25px;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  transition:
+    background-color 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87),
+    border-color 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87);
+}
+
+.condicao-bloco.certo .condicao-status {
+  background-color: #07190b;
+}
+
+.condicao-bloco.certo .condicao-status i:first-of-type {
+  display: none;
+}
+
+.condicao-bloco .condicao-status i:last-of-type {
+  display: none;
+}
+
+.condicao-bloco.certo .condicao-status i:last-of-type {
+  display: inline-block;
+}
+
+#senha-match-text {
+  width: 100%;
+  min-height: 1.2em;
+  text-align: left;
+  font-size: 0.85rem;
+  transition: color 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87);
+}
+
+#senha-match-text.igual {
+  color: var(--cor-d5);
+}
+
+#senha-match-text.diferente {
+  color: var(--cor-d1);
+}
+
+/* LOGIN */
+#login-page {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  img {
+    width: 200px;
+  }
+}
+
+#login-container {
+  width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#login-title {
+  color: var(--cor-6);
+  margin-bottom: var(--espacamento-8);
+}
+
+#login-description {
+  text-align: center;
+  color: var(--cor-4);
+  margin-bottom: var(--espacamento-32);
+  a {
+    color: var(--cor-6);
+  }
+}
+
+#login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacamento-24);
+}
+
+#login-form .btn-login {
+  width: 100%;
+  padding: 14px 0;
+}
+
+#esqueceu-senha {
+  color: var(--cor-6);
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: opacity 0.2s ease;
+}
+
+#esqueceu-senha:hover {
+  opacity: 0.7;
 }
