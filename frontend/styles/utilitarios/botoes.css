@@ -17,3 +17,28 @@
   color: var(--cor-5);
   background-color: #ffffff;
 }
+
+.btn-login {
+  width: 100%;
+  font-family: Lexend;
+  font-weight: bold;
+  font-size: 0.8rem;
+  color: var(--cor-6);
+  padding: 15px 100px;
+  background: linear-gradient(var(--cor-p1), var(--cor-p4));
+  border: 1px solid var(--cor-p1);
+  border-radius: 15px;
+  transition: 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87);
+  cursor: pointer;
+}
+
+.btn-login:hover:not(:disabled) {
+  transform: translateY(-5px);
+  border: 1px solid var(--cor-6);
+}
+
+.btn-login:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}

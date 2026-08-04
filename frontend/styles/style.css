@@ -7,6 +7,8 @@
 @import "./utilitarios/espacamentos.css";
 @import "./utilitarios/botoes.css";
 @import "./utilitarios/decorations.css";
+@import "./utilitarios/inputs.css";
+
 /* HEADER */
 @import "./header/header.css";
 @import "./header/profile-header.css";
@@ -16,3 +18,6 @@
 
 /* ABOUT */
 @import "./about/about.css";
+
+/* SIGNIN */
+@import "./login/signin.css";
