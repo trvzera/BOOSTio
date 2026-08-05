@@ -21,3 +21,6 @@
 
 /* SIGNIN */
 @import "./login/signin.css";
+
+/* RESPONSIVIDADE */
+@import "./responsividades/r-home.css";

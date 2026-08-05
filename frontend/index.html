@@ -7,34 +7,38 @@
   <title>BOOSTio</title>
   <link rel="stylesheet" href="styles/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+  <meta name="description" content="A Boostio é uma plataforma que simplifica a montagem de computadores,
+  ajudando você a escolher as peças ideais com base no seu objetivo,
+  orçamento e necessidade, tudo com precisão e confiança.">
   <script src="./js/scripts.js" defer></script>
 </head>
 
 <body>
   <header id="header">
     <div id="header-container">
-      <a href="#" id="logo"></a>
+      <a href="../index.html" id="logo" aria-label="Logo da BOOSTio"></a>
       <nav id="header-nav">
         <ul id="nav-list">
-          <li class="nav-item"><a href="#main-page" class="nav-link font-1-xs">Início</a></li>
-          <li class="nav-item"><a href="#about-page" class="nav-link font-1-xs">Sobre</a></li>
-          <li class="nav-item"><a href="#" class="nav-link font-1-xs">Serviços</a></li>
-          <li class="nav-item"><a href="#" class="nav-link font-1-xs">Monte o seu</a></li>
-          <span id="divider"></span>
-          <li class="nav-item"><a href="#" class="nav-link font-1-xs">Suas Builds</a></li>
+          <li class="nav-item"><a href="../index.html" class="nav-link font-1-xs" aria-label="Ir para sessão de inicial">Início</a></li>
+          <li class="nav-item"><a href="#about-page" class="nav-link font-1-xs" aria-label="Ir para sessão sobre">Sobre</a></li>
+          <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para sessão de serviços">Serviços</a></li>
+          <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para sessão de montagem do computador">Monte o seu</a></li>
+          <li role="presentation" aria-hidden="true"><span id="divider"></span></li>
+          <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página contendo suas builds">Suas Builds</a></li>
+        </ul>
       </nav>
       <div id="profile">
-        <input type="checkbox" name="profile" id="profile-check">
+        <input type="checkbox" name="profile" id="profile-check" aria-label="Abrir menu do perfil">
         <div id="profile-options">
           <nav id="profile-nav">
             <ul id="profile-nav-list">
-              <li class="profile-item"><a href="./pages/signin.html" class="profile-link font-1-s"><i class="fa-regular fa-user"></i>
+              <li class="profile-item"><a href="" class="profile-link font-1-s" aria-label="Ir para suas builds"><i class="fa-regular fa-user"></i>
                   <p>Builds</p>
                 </a></li>
-              <li class="profile-item"><a href="" class="profile-link font-1-s"><i class="fa-regular fa-floppy-disk"></i>
+              <li class="profile-item"><a href="" class="profile-link font-1-s" aria-label="Ir para as Configurações do seu perfil"><i class="fa-regular fa-floppy-disk"></i>
                   <p>Configurações</p>
                 </a></li>
-              <li class="profile-item"><a href="" class="profile-link font-1-s"><i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <li class="profile-item"><a href="" class="profile-link font-1-s" aria-label="Sair da sua conta"><i class="fa-solid fa-arrow-right-from-bracket"></i>
                   <p>Sair</p>
                 </a></li>
             </ul>
@@ -44,17 +48,40 @@
       </div>
     </div>
   </header>
+
+  <header id="header-mobile">
+    <div id="burger-menu">
+      <input type="checkbox" id="burger-check" aria-label="Abrir menu de navegação">
+      <label for="burger-check" id="burger-icon">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
+
+      <nav id="mobile-nav">
+        <ul id="mobile-nav-list">
+          <li class="mobile-nav-item"><a href="#main-page" class="nav-link font-1-xs" aria-label="Ir para sessão de Início">Início</a></li>
+          <li class="mobile-nav-item"><a href="#about-page" class="nav-link font-1-xs" aria-label="Ir para sessão Sobre">Sobre</a></li>
+          <li class="mobile-nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para sessão de Serviços">Serviços</a></li>
+          <li class="mobile-nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para sessão montar o computador">Monte o seu</a></li>
+          <li class="mobile-nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página das suas builds">Suas Builds</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
   <section id="main-page">
     <video autoplay muted loop playsinline>
-      <source src="./video/background2.webm">
+      <source src="./video/background.webm">
       Seu navegador não suporta vídeos.
     </video>
     <h1 id="main-title" class="font-1-xxl">Menos Dúvidas, Mais <span>Desempenho</span> <br>Vamos montar juntos!</h1>
     <p id="main-description" class="font-2-s">A Boostio é uma plataforma que simplifica a montagem de computadores,
       ajudando você a escolher as peças ideais com base no seu objetivo,
       orçamento e necessidade, tudo com precisão e confiança.</p>
-    <a href="#" class="btn-primary">Monte o seu</a>
+    <a href="#" class="btn-primary" aria-label="Botão para montar a sua build">Monte o seu</a>
   </section>
+
   <section id="about-page">
     <div id="about-container">
       <div class="decoration"></div>
@@ -62,8 +89,7 @@
         <h1 class="font-1-xl">Nós somos a <span>BOOSTio.</span><br> Seja muito bem vindo(a)!</h1>
         <p class="font-2-s">A BOOSTio é uma plataforma desenvolvida para simplificar a montagem e o upgrade de computadores. Através de uma interface intuitiva e formulários inteligentes, selecionamos para você a <span>sua máquina ideal.</span></p>
         <p class="font-2-s">Nosso objetivo é democratizar o acesso ao hardware de alta performance, permitindo que usuários com qualquer nível de conhecimento configurem o setup ideal de forma segura, visual e eficiente.</p>
-        <a href="#" class="btn-primary">Monte o seu</a>
-
+        <a href="#" class="btn-primary" aria-label="Botão para montar a sua build">Monte o seu</a>
       </div>
       <span id="about-line"></span>
       <video id="pc-video" autoplay muted loop playsinline>
