@@ -1,12 +1,12 @@
 from models import Usuario
 
-class DeletarUsuarioService():
+class DeletarUsuarioService:
   def executar(self,id):
 
     usuario = Usuario.buscar_por_id(id)
 
     if not usuario:
-      raise ValueError("Esse usuario não existe")
+      return False
 
     usuario.deletar()
     return True
