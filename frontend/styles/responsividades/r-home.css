@@ -88,17 +88,20 @@
 
 @media (max-width: 580px) {
   #main-page {
-    padding: 30px;
+    padding: 10px;
   }
   #main-title {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
   }
   #main-description {
-    width: 60%;
-    font-size: 0.6rem;
+    width: 80%;
+    font-size: 0.8rem;
   }
   #main-page .btn-primary {
     transform: scale(0.7);
+  }
+  #about-page {
+    height: max-content;
   }
   #text-about {
     h1 {

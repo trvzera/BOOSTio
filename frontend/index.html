@@ -19,11 +19,11 @@
       <a href="../index.html" id="logo" aria-label="Logo da BOOSTio"></a>
       <nav id="header-nav">
         <ul id="nav-list">
-          <li class="nav-item"><a href="../index.html" class="nav-link font-1-xs" aria-label="Ir para sessão de inicial">Início</a></li>
+          <li class="nav-item"><a href="#main-page" class="nav-link font-1-xs" aria-label="Ir para sessão de inicial">Início</a></li>
           <li class="nav-item"><a href="#about-page" class="nav-link font-1-xs" aria-label="Ir para sessão sobre">Sobre</a></li>
           <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para sessão de serviços">Serviços</a></li>
           <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para sessão de montagem do computador">Monte o seu</a></li>
-          <li role="presentation" aria-hidden="true"><span id="divider"></span></li>
+          <li id="divider"></li>
           <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página contendo suas builds">Suas Builds</a></li>
         </ul>
       </nav>
@@ -32,7 +32,7 @@
         <div id="profile-options">
           <nav id="profile-nav">
             <ul id="profile-nav-list">
-              <li class="profile-item"><a href="" class="profile-link font-1-s" aria-label="Ir para suas builds"><i class="fa-regular fa-user"></i>
+              <li class="profile-item"><a href="./pages/login.html" class="profile-link font-1-s" aria-label="Ir para suas builds"><i class="fa-regular fa-user"></i>
                   <p>Builds</p>
                 </a></li>
               <li class="profile-item"><a href="" class="profile-link font-1-s" aria-label="Ir para as Configurações do seu perfil"><i class="fa-regular fa-floppy-disk"></i>
@@ -95,6 +95,46 @@
       <video id="pc-video" autoplay muted loop playsinline>
         <source src="./video/pc.webm">
       </video>
+    </div>
+  </section>
+
+  <section id="services-page">
+    <div class="services-decoration d1"></div>
+    <div class="services-decoration d2"></div>
+
+    <div id="services-container">
+      <h1 id="services-h1" class="font-1-xl">Você está a <span>3 etapas</span><br> do seu setup dos senhos.</h1>
+      <p id="services-p" class="font-2-s">
+        Do formulário à montagem final, cada etapa foi pensada pra eliminar dúvidas técnicas e te dar controle total sobre o resultado.
+      </p>
+      <div id="cards-grid">
+        <div class="card-service">
+          <div class="card-container">
+            <h1 class="card-index font-1-xxl">01</h1>
+            <h2 class="card-title font-1-xl">Responda o formulário</h2>
+            <p class="card-desc font-2-s">O primeiro passo é entender o que você precisa. Através de um formulário inteligente, você define seu orçamento disponível e o objetivo do setup — seja para jogos, trabalho profissional ou uso cotidiano. Se você já tem preferência por algum componente específico, pode selecionar peças manualmente para que o sistema as integre à sugestão final.</p>
+          </div>
+        </div>
+        <div class="card-service">
+          <div class="card-container">
+            <h1 class="card-index font-1-xxl">02</h1>
+            <h2 class="card-title font-1-xl">Refine seu setup</h2>
+            <p class="card-desc font-2-s">Com base nas suas respostas, nossa plataforma gera uma configuração otimizada e compatível. Nesta etapa, você tem total controle: visualize o hardware sugerido e sinta-se livre para alterar, adicionar ou remover peças. Assim que o setup estiver perfeito, salve-o em seu perfil e compartilhe o link com amigos ou comunidades para receber feedbacks.</p>
+          </div>
+        </div>
+        <div class="card-service">
+          <div class="card-container">
+            <h1 class="card-index font-1-xxl">03</h1>
+            <h2 class="card-title font-1-xl">Aproveite!</h2>
+            <p class="card-desc font-2-s">Após a escolha e aquisição das peças, a jornada chega ao objetivo final. Com a garantia de ter selecionado componentes compatíveis e equilibrados para o seu bolso, basta realizar a montagem e desfrutar do desempenho total da sua nova máquina. O BOOSTio elimina as dúvidas para que você foque apenas na diversão e na produtividade.</p>
+          </div>
+        </div>
+      </div>
+      <div class="scroll-dots">
+        <span class="dot active" data-index="0"></span>
+        <span class="dot" data-index="1"></span>
+        <span class="dot" data-index="2"></span>
+      </div>
     </div>
   </section>
 </body>

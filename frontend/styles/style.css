@@ -19,8 +19,12 @@
 /* ABOUT */
 @import "./about/about.css";
 
+/* SERVICES */
+@import "./services/services.css";
+
 /* SIGNIN */
 @import "./login/signin.css";
 
 /* RESPONSIVIDADE */
 @import "./responsividades/r-home.css";
+@import "./responsividades/r-services.css";

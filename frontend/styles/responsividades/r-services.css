@@ -1,0 +1,82 @@
+@media (max-width: 1370px) {
+  .card-index {
+    font-size: 4rem;
+  }
+  .card-title {
+    font-size: 2rem;
+  }
+  .card-desc {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 1150px) {
+  #cards-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 40px 24px;
+    margin-left: -24px;
+    margin-right: -24px;
+  }
+
+  #cards-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .card-service {
+    flex: 0 0 82%;
+    max-width: none;
+    scroll-snap-align: center;
+  }
+}
+
+@media (max-width: 1150px) and (min-width: 701px) {
+  .card-service {
+    cursor: pointer;
+  }
+
+  .scroll-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: var(--espacamento-16);
+  }
+
+  .scroll-dots .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--cor-2);
+    cursor: pointer;
+    transition: 0.2s var(--ease);
+  }
+
+  .scroll-dots .dot.active {
+    background: var(--cor-p1);
+    width: 20px;
+    border-radius: 4px;
+  }
+}
+
+@media (max-width: 700px) {
+  #services-page {
+    height: max-content;
+  }
+  #services-container {
+    padding: 20px;
+  }
+  #cards-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  #services-h1 {
+    font-size: 2.4rem;
+  }
+  #services-p {
+    font-size: 0.9rem;
+  }
+}
