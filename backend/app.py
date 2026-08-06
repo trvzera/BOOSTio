@@ -1,11 +1,26 @@
 from flask import Flask, render_template
-from models import db 
-from controllers.usuario_controller import usuario_bp
-from flask import Flask
 from flask_cors import CORS
+from models import db 
+from models import lm
+from controllers.usuario_controller import usuario_bp
+import os
+from dotenv import load_dotenv
+
+#Mais para frente fazer um arquivo configs.py para colocar as configurações do flask em um arquivo separado.
+
+#Carrega as variaveis de ambiente
+load_dotenv()
+
+app = Flask(__name__,)
+
+#Necessario para o flask-login
+#Puxo das variaveis de ambiente
+app.secret_key = os.getenv("SECRET_KEY")
+
+#Iniciar o login manager e passar o app como parametro
+lm.init_app(app)
 
 #flask cors permite o fornt consumir a api do back
-app = Flask(__name__,)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../database/banco.db'
 

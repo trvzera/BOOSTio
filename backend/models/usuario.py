@@ -1,7 +1,8 @@
 from . import db
 from .base import ModeloBase
+from flask_login import UserMixin
 
-class Usuario(ModeloBase):
+class Usuario(ModeloBase,UserMixin):
   __tablename__ = "usuario"
 
   nome = db.Column(db.String(30),nullable = False)
@@ -25,7 +26,8 @@ class Usuario(ModeloBase):
       
     if senha is not None:
       self.senha = senha
-
+    
+    db.session.commit()
 
   @staticmethod
   def buscar_por_email(email:str):

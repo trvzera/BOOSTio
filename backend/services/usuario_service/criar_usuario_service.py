@@ -9,18 +9,24 @@ class CriarUsuarioService:
   
   def executar(self,dados):
     campos_obrigatorios = ["nome","email","senha"]
+    campos_obrigatorios_resp = []
 
     #Verificar se os campos obrigatorios estão preenchidos
     for campo in campos_obrigatorios:
       if not dados.get(campo):
-        raise ValueError(f"O campo '{campo}' é obrigatório.")
-    
+        campos_obrigatorios_resp.append(campo)
+
+    if len(campos_obrigatorios_resp) > 0:
+      raise ValueError(f"O(s) campos '{"','".join(campos_obrigatorios_resp)}' {verbo_txt}")
+
 
     usuario_existente = Usuario.buscar_por_email(dados['email'])
 
     if usuario_existente:
       raise ValueError("Esse Usuario já existe,experimente fazer login")
 
+    self.validar_senha(dados['senha'])
+    
     senha_protegida = generate_password_hash(dados["senha"])
 
     usuario = Usuario(
@@ -29,13 +35,13 @@ class CriarUsuarioService:
       senha = senha_protegida,
     )
 
-    Usuario.salvar(usuario)
+    usuario.salvar()
 
     #Retornar a instancia pois irei usar o flask-login no controller    
     return usuario
 
   #any percorre todos e se um for true, retorna true
-  def validar_senha(senha):
+  def validar_senha(self,senha):
     if len(senha) < 8:
       raise ValueError("A senha deve ter no minimo oito caracteres")
 

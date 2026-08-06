@@ -1,7 +1,8 @@
 from flask import Blueprint,request,jsonify
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from models import db
+from models import db,Usuario
 from sqlalchemy.exc import SQLAlchemyError
+from models import lm
 
 from services.usuario_service.criar_usuario_service import CriarUsuarioService
 from services.usuario_service.entrar_usuario_service import EntrarUsuarioService
@@ -11,11 +12,17 @@ from services.usuario_service.listar_usuario_id_service import ListarUsuarioIdSe
 from services.usuario_service.atualizar_usuario_service import AtualizarUsuarioService
 
 
-usuario_bp = Blueprint("usuario", __name__, url_prefix="/usuario")
+usuario_bp = Blueprint("usuario", __name__, url_prefix="/usuarios")
+
+#Funcão obrigatória para o login buscar informações do usuario pelo id
+@lm.user_loader
+def user_loader(id):
+    usuario = Usuario.buscar_por_id(id)
+    return usuario
 
 #Faltando buscar por Email e finalizar criar usuario na service.
 
-@usuario_bp.post("/criar")
+@usuario_bp.post("/")
 def criar_usuario():
     try:
         dados = request.get_json() or {}
@@ -34,21 +41,21 @@ def criar_usuario():
     
     #Capturo erros
     except ValueError as erro:
-        return jsonify({f"Erro: {str(erro)}"}),400
+        return jsonify({f"erro": f"Erro: {str(erro)}"}),400
 
     except SQLAlchemyError:
         db.session.rollback()
         return jsonify({"erro": "Erro ao salvar o usuario no banco de dados."}), 500
 
 
-@usuario_bp.delete("/excluir/<int:usuario_id>") 
+@usuario_bp.delete("/<int:usuario_id>") 
 def excluir_usuario(usuario_id):
     try:
         service = DeletarUsuarioService()
         usuario = service.executar(usuario_id)
 
         if usuario is False:
-            return jsonify({"erro": "Professor não encontrado."}), 404
+            return jsonify({"erro": "Usuario não encontrado."}), 404
 
         return jsonify({"mensagem":"Usuario excluido com sucesso"}),204
 
@@ -57,7 +64,7 @@ def excluir_usuario(usuario_id):
         return jsonify({"erro":"Erro ao excluir o usuario do banco de dados"}),500
 
 
-@usuario_bp.get("/listar")
+@usuario_bp.get("/")
 def listar_usuarios():
     service = ListarUsuariosService()
     usuarios = service.executar()
@@ -68,7 +75,7 @@ def listar_usuarios():
         }),200
 
 
-@usuario_bp.get("/listar/<int:usuario_id>")
+@usuario_bp.get("/<int:usuario_id>")
 def listar_usuario_id(usuario_id):
     try:
         service = ListarUsuarioIdService()
@@ -83,7 +90,7 @@ def listar_usuario_id(usuario_id):
         return jsonify({"erro":f"Erro: {str(erro)}"}),404
 
 
-@usuario_bp.put("/atualizar/<int:usuario_id>")
+@usuario_bp.put("/<int:usuario_id>")
 def atualizar_usuario(usuario_id):
     try:
         dados = request.get_json() or {}
