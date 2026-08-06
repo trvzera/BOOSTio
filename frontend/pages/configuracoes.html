@@ -21,13 +21,13 @@
         <ul id="nav-list">
           <li class="nav-item"><a href="../index.html" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de inicial">Início</a></li>
           <li class="nav-item"><a href="../index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão sobre">Sobre</a></li>
-          <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de serviços">Serviços</a></li>
+          <li class="nav-item"><a href="../index.html#services-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de serviços">Serviços</a></li>
           <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de montagem do computador">Monte o seu</a></li>
           <li id="divider"></li>
           <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página contendo suas builds">Suas Builds</a></li>
       </nav>
       <div id="profile">
-        <input type="checkbox" name="profile" id="profile-check">
+        <input type="checkbox" name="profile" id="profile-check" label="Abrir menu do perfil">
         <div id="profile-options">
           <nav id="profile-nav">
             <ul id="profile-nav-list">
@@ -63,13 +63,15 @@
           <li class="mobile-nav-item"><a href="../index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão Sobre">>Sobre</a></li>
           <li class="mobile-nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de Serviços">>Serviços</a></li>
           <li class="mobile-nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão montar o computador">>Monte o seu</a></li>
-          <li class="mobile-nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página das suas builds">>Suas Builds</a></li>
+          <li class="mobile-nav-it  em"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página das suas builds">>Suas Builds</a></li>
         </ul>
       </nav>
     </div>
   </header>
 
   <main id="settings-page">
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
     <div class="settings-header">
       <h1 class="font-1-l">Configurações da conta</h1>
       <p class="font-2-s">Gerencie suas informações pessoais e a segurança do seu perfil.</p>
@@ -112,7 +114,7 @@
         <label for="current-password" class="font-1-m">Senha atual</label>
         <div class="field-password-wrap">
           <input type="password" id="current-password" placeholder="••••••••">
-          <button type="button" class="toggle-password" data-target="current-password"><i class="fa-solid fa-eye"></i></button>
+          <button type="button" class="toggle-password" data-target="current-password" aria-label="Mudar visibilidade da senha"><i class="fa-solid fa-eye"></i></button>
         </div>
       </div>
 
@@ -120,7 +122,7 @@
         <label for="new-password" class="font-1-m">Nova senha</label>
         <div class="field-password-wrap">
           <input type="password" id="new-password" placeholder="••••••••">
-          <button type="button" class="toggle-password" data-target="new-password"><i class="fa-solid fa-eye"></i></button>
+          <button type="button" class="toggle-password" data-target="new-password" aria-label="Mudar visibilidade da senha"><i class="fa-solid fa-eye"></i></button>
         </div>
         <div class="password-strength">
           <div class="strength-bar" data-bar="1"></div>
@@ -134,13 +136,13 @@
         <label for="confirm-password" class="font-1-m">Confirmar nova senha</label>
         <div class="field-password-wrap">
           <input type="password" id="confirm-password" placeholder="••••••••">
-          <button type="button" class="toggle-password" data-target="confirm-password"><i class="fa-solid fa-eye"></i></button>
+          <button type="button" class="toggle-password" data-target="confirm-password" aria-label="Mudar visibilidade da senha"><i class="fa-solid fa-eye"></i></button>
         </div>
         <div class="field-hint font-1-l" id="password-match-hint"></div>
       </div>
 
       <div class="form-actions">
-        <button class="btn-primary" id="save-password-btn" disabled>Atualizar senha</button>
+        <button class="btn-primary" id="save-password-btn" disabled aria-label="Atualizar a senha">Atualizar senha</button>
       </div>
     </div>
 
@@ -153,7 +155,7 @@
           <h3 class="font-1-m">Excluir minha conta</h3>
           <p class="font-1-s">Todos os seus dados, builds salvas e histórico serão removidos permanentemente.</p>
         </div>
-        <button class="btn-danger" id="open-delete-modal">Excluir conta</button>
+        <button class="btn-danger" id="open-delete-modal" aria-label="Excluir a conta">Excluir conta</button>
       </div>
     </div>
 
@@ -170,8 +172,8 @@
         </div>
 
         <div class="modal-actions">
-          <button class="btn-ghost" id="cancel-delete-btn">Cancelar</button>
-          <button class="btn-danger" id="confirm-delete-btn" disabled>Excluir permanentemente</button>
+          <button class="btn-ghost" id="cancel-delete-btn" aria-label="Cancelar exclusão">Cancelar</button>
+          <button class="btn-danger" id="confirm-delete-btn" aria-label="Confirma exclusão de conta" disabled>Excluir permanentemente</button>
         </div>
       </div>
   </main>
