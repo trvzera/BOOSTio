@@ -1,17 +1,18 @@
 from flask import Flask, render_template
 from models import db 
-from controllers.usuario import usuario_bp 
+from controllers.usuario_controller import usuario_bp
+from flask import Flask
+from flask_cors import CORS
 
-app = Flask(__name__, template_folder='../../frontend/templates')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///text.db'
+#flask cors permite o fornt consumir a api do back
+app = Flask(__name__,)
+CORS(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../database/banco.db'
 
 
 db.init_app(app)
 app.register_blueprint(usuario_bp)
 
-@app.route("/")
-def home():
-    return render_template('index.html')
 
 if __name__ == '__main__':
     with app.app_context():

@@ -1,7 +1,10 @@
-from flask import Blueprint,request,jsonify,get_json
+from flask import Blueprint,request,jsonify
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from models import db
+from sqlalchemy.exc import SQLAlchemyError
 
 from services.usuario_service.criar_usuario_service import CriarUsuarioService
+from services.usuario_service.entrar_usuario_service import EntrarUsuarioService
 from services.usuario_service.deletar_usuario_service import DeletarUsuarioService
 from services.usuario_service.listar_usuarios_service import ListarUsuariosService
 from services.usuario_service.listar_usuario_id_service import ListarUsuarioIdService
@@ -56,7 +59,7 @@ def excluir_usuario(usuario_id):
 
 @usuario_bp.get("/listar")
 def listar_usuarios():
-    service = ListarUsuarioService()
+    service = ListarUsuariosService()
     usuarios = service.executar()
 
     return jsonify({
@@ -73,10 +76,11 @@ def listar_usuario_id(usuario_id):
 
         return jsonify({
             "mensagem":"Usuario encontrado com sucesso",
+            "usuario": usuario,
             }),200
 
     except ValueError as erro:
-        return jsonify({"erro":erro}),404
+        return jsonify({"erro":f"Erro: {str(erro)}"}),404
 
 
 @usuario_bp.put("/atualizar/<int:usuario_id>")
@@ -93,7 +97,24 @@ def atualizar_usuario(usuario_id):
 
     except ValueError as erro:
         db.session.rollback()
-        return jsonify({"erro":erro}),400
+        return jsonify({"erro":f"Erro: {str(erro)}"}),400
     
     except SQLAlchemyError:
         return jsonify({"erro":"Erro ao atualizar o usuario no banco de dados"})
+
+
+@usuario_bp.post("/entrar")
+def entrar_usuario():
+    try:
+        dados = request.get_json()
+
+        service = EntrarUsuarioService()
+        usuario = service.executar(dados)
+
+        return jsonify({
+            "mensagem":"Usuario logado com sucesso",
+            "usuario": usuario
+        }),200
+    
+    except ValueError as erro:
+        return jsonify({"erro":f"Erro: {str(erro)}"}),400

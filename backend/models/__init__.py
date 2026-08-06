@@ -1,12 +1,17 @@
 from flask_sqlalchemy import SQLAlchemy
 
-from .peca import Peca
-from .usuario import Usuario
-from .peca import Peca
-from .peca import Peca
-
+#Importante iniciar antes de importar
 db = SQLAlchemy()
 
+#Importar em ordem de heranca
 from .base import ModeloBase
+from .peca import Peca
+from .usuario import Usuario
+from .fonte import Fonte
+from .setup import Setup
 
-all = ['Peca','Usuario']
+
+
+
+
+__all__ = ['db','Peca','Usuario','ModeloBase','Fonte','Setup']

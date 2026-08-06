@@ -1,9 +1,9 @@
 from models import Usuario
 
 class DeletarUsuarioService:
-  def executar(self,id):
+  def executar(self,usuario_id):
 
-    usuario = Usuario.buscar_por_id(id)
+    usuario = Usuario.buscar_por_id(usuario_id)
 
     if not usuario:
       return False
