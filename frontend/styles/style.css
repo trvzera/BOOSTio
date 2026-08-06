@@ -8,6 +8,7 @@
 @import "./utilitarios/botoes.css";
 @import "./utilitarios/decorations.css";
 @import "./utilitarios/inputs.css";
+@import "./utilitarios/transition.css";
 
 /* HEADER */
 @import "./header/header.css";
@@ -23,7 +24,8 @@
 @import "./services/services.css";
 
 /* SIGNIN */
-@import "./login/signin.css";
+@import "./conta/signin.css";
+@import "./conta/configuracoes.css";
 
 /* RESPONSIVIDADE */
 @import "./responsividades/r-home.css";
