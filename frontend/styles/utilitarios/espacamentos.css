@@ -15,4 +15,6 @@
   --espacamento-120: 120px;
   --espacamento-160: 160px;
   --espacamento-200: 200px;
+
+  --ease: cubic-bezier(0.81, 0.19, 0.16, 0.87);
 }

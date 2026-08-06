@@ -8,14 +8,14 @@
     linear-gradient(to bottom, #ffffff, #ffffff00) border-box;
   border: 1px solid transparent;
   border-radius: 50px;
-  box-shadow: inset 3px 3px 10px rgba(255, 255, 255, 0.3);
   transition: 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87);
+  cursor: pointer;
 }
 
 .btn-primary:hover {
   transform: translateY(-5px);
   color: var(--cor-5);
-  background-color: #ffffff;
+  background-color: var(--cor-6);
 }
 
 .btn-login {
@@ -41,4 +41,44 @@
   opacity: 0.4;
   cursor: not-allowed;
   transform: none;
+}
+
+.btn-ghost {
+  font-family: Lexend;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--cor-4);
+  padding: 13px 20px;
+  background: transparent;
+  border: 1px solid var(--cor-2);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: 0.2s var(--ease);
+}
+.btn-ghost:hover {
+  color: var(--cor-6);
+  border-color: var(--cor-4);
+}
+
+.btn-danger {
+  font-family: Lexend;
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: var(--cor-6);
+  padding: 13px 24px;
+  background: var(--cor-d1);
+  border: 1px solid var(--cor-d1);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: 0.2s var(--ease);
+}
+.btn-danger:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.1);
+}
+.btn-danger:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
 }

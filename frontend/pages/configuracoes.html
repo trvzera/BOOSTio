@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="../styles/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+  <meta name="description" content="A Boostio é uma plataforma que simplifica a montagem de computadores,
+  ajudando você a escolher as peças ideais com base no seu objetivo,
+  orçamento e necessidade, tudo com precisão e confiança.">
+  <script src="../js/config.js" defer></script>
+</head>
+
+<body>
+  <header id="header">
+    <div id="header-container">
+      <a href="../index.html" id="logo" aria-label="Logo da BOOSTio"></a>
+      <nav id="header-nav">
+        <ul id="nav-list">
+          <li class="nav-item"><a href="../index.html" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de inicial">Início</a></li>
+          <li class="nav-item"><a href="../index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão sobre">Sobre</a></li>
+          <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de serviços">Serviços</a></li>
+          <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de montagem do computador">Monte o seu</a></li>
+          <li id="divider"></li>
+          <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página contendo suas builds">Suas Builds</a></li>
+      </nav>
+      <div id="profile">
+        <input type="checkbox" name="profile" id="profile-check">
+        <div id="profile-options">
+          <nav id="profile-nav">
+            <ul id="profile-nav-list">
+              <li class="profile-item"><a href="#" class="profile-link font-1-s" aria-label="Ir para suas builds"><i class="fa-regular fa-user"></i>
+                  <p>Builds</p>
+                </a></li>
+              <li class="profile-item"><a href="" class="profile-link font-1-s" aria-label="Ir para as Configurações do seu perfil"><i class="fa-regular fa-floppy-disk"></i>
+                  <p>Configurações</p>
+                </a></li>
+              <li class="profile-item"><a href="" class="profile-link font-1-s" aria-label="Sair da sua conta"><i class="fa-solid fa-arrow-right-from-bracket"></i>
+                  <p>Sair</p>
+                </a></li>
+            </ul>
+          </nav>
+        </div>
+        <i class="fa-solid fa-user" id="profile-icon"></i>
+      </div>
+    </div>
+  </header>
+
+  <header id="header-mobile">
+    <div id="burger-menu">
+      <input type="checkbox" id="burger-check">
+      <label for="burger-check" id="burger-icon">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
+
+      <nav id="mobile-nav">
+        <ul id="mobile-nav-list">
+          <li class="mobile-nav-item"><a href="../index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de Início">Início</a></li>
+          <li class="mobile-nav-item"><a href="../index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão Sobre">>Sobre</a></li>
+          <li class="mobile-nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de Serviços">>Serviços</a></li>
+          <li class="mobile-nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão montar o computador">>Monte o seu</a></li>
+          <li class="mobile-nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página das suas builds">>Suas Builds</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="settings-page">
+    <div class="settings-header">
+      <h1 class="font-1-l">Configurações da conta</h1>
+      <p class="font-2-s">Gerencie suas informações pessoais e a segurança do seu perfil.</p>
+    </div>
+    <div class="settings-card">
+      <div class="card-heading"><i class="fa-solid fa-user"></i><span class="font-1-l">Perfil</span></div>
+      <p class="card-subtext font-1-m">Suas informações de login.</p>
+
+      <div class="profile-row">
+        <div class="profile-info">
+          <h2 id="display-username" class="font-1-l">Lorem Ipsum</h2>
+          <span id="display-email" class="font-1-m">loremipsum@lorem.ipsum</span>
+        </div>
+      </div>
+      <div class="profile-meta">
+        <div class="meta-pill font-1-m"><i class="fa-solid fa-calendar"></i>Membro desde Mar 2025</div>
+        <div class="meta-pill font-1-m"><i class="fa-solid fa-desktop"></i>2 builds salvas</div>
+      </div>
+
+      <div class="field">
+        <label for="username-input" class="font-1-m">Nome de usuário</label>
+        <input type="text" id="username-input" value="Lorem ipsum" placeholder="Seu nome de usuário">
+      </div>
+
+      <div class="field">
+        <label for="email-input" class="font-1-m">E-mail</label>
+        <input type="email" id="email-input" value="joao.silva@email.com" placeholder="seu@email.com">
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-primary" id="save-profile-btn">Salvar alterações</button>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <div class="card-heading"><i class="fa-solid fa-lock"></i><span class="font-1-m-b">Alterar senha</span></div>
+      <p class="card-subtext font-1-m">Utilize esse campo para alterar a sua senha.</p>
+
+      <div class="field">
+        <label for="current-password" class="font-1-m">Senha atual</label>
+        <div class="field-password-wrap">
+          <input type="password" id="current-password" placeholder="••••••••">
+          <button type="button" class="toggle-password" data-target="current-password"><i class="fa-solid fa-eye"></i></button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="new-password" class="font-1-m">Nova senha</label>
+        <div class="field-password-wrap">
+          <input type="password" id="new-password" placeholder="••••••••">
+          <button type="button" class="toggle-password" data-target="new-password"><i class="fa-solid fa-eye"></i></button>
+        </div>
+        <div class="password-strength">
+          <div class="strength-bar" data-bar="1"></div>
+          <div class="strength-bar" data-bar="2"></div>
+          <div class="strength-bar" data-bar="3"></div>
+        </div>
+        <div class="field-hint font-1-m">Mínimo de 8 caracteres, com letras (maiúsculas e minúsculas), números e símbolos.</div>
+      </div>
+
+      <div class="field">
+        <label for="confirm-password" class="font-1-m">Confirmar nova senha</label>
+        <div class="field-password-wrap">
+          <input type="password" id="confirm-password" placeholder="••••••••">
+          <button type="button" class="toggle-password" data-target="confirm-password"><i class="fa-solid fa-eye"></i></button>
+        </div>
+        <div class="field-hint font-1-l" id="password-match-hint"></div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-primary" id="save-password-btn" disabled>Atualizar senha</button>
+      </div>
+    </div>
+
+    <div class="settings-card danger">
+      <div class="card-heading"><i class="fa-solid fa-triangle-exclamation"></i><span class="font-1-m-b">Zona de perigo</span></div>
+      <p class="card-subtext font-1-l">Ações abaixo são permanentes e não podem ser desfeitas.</p>
+
+      <div class="danger-row">
+        <div class="danger-row-text">
+          <h3 class="font-1-m">Excluir minha conta</h3>
+          <p class="font-1-s">Todos os seus dados, builds salvas e histórico serão removidos permanentemente.</p>
+        </div>
+        <button class="btn-danger" id="open-delete-modal">Excluir conta</button>
+      </div>
+    </div>
+
+    </div>
+
+    <div class="modal-overlay" id="delete-modal">
+      <div class="modal-box">
+        <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <h3 class="font-1-m">Tem certeza que quer excluir sua conta?</h3>
+        <p class="font-1-m">Essa ação é <strong>permanente</strong> e não pode ser desfeita. Todas as suas builds, preferências e dados de perfil serão apagados. Para confirmar, digite <strong id="confirm-username-target">seu nome de usuário</strong> abaixo.</p>
+
+        <div class="field" style="margin-bottom: 0;">
+          <input type="text" id="delete-confirm-input" placeholder="Digite seu nome de usuário">
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-ghost" id="cancel-delete-btn">Cancelar</button>
+          <button class="btn-danger" id="confirm-delete-btn" disabled>Excluir permanentemente</button>
+        </div>
+      </div>
+  </main>
+
+  <div class="toast" id="toast">
+    <i class="fa-solid fa-circle-check" id="toast-icon"></i>
+    <span id="toast-text" class="font-1-m">Alterações salvas com sucesso.</span>
+  </div>
+
+</body>
+
+</html>

@@ -15,16 +15,16 @@
 }
 
 .decoration-1 {
-  top: 10%;
-  left: 15%;
+  top: 0%;
+  left: 0%;
   transform: translate(-50%, -50%);
 }
 
 .decoration-2 {
-  width: 400px;
-  height: 400px;
-  background-color: var(--cor-p3);
-  top: 90%;
-  left: 85%;
+  top: 100%;
+  left: 100%;
   transform: translate(-50%, -50%);
 }
+
+
+

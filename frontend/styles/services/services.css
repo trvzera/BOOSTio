@@ -1,0 +1,107 @@
+#services-page {
+  height: 100vh;
+  width: 100%;
+  background-color: var(--cor-0);
+  position: relative;
+  overflow: hidden;
+}
+
+.services-decoration {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.15;
+  z-index: 0;
+  pointer-events: none;
+}
+.services-decoration.d1 {
+  background: var(--cor-p1);
+  top: 5%;
+  left: -5%;
+}
+.services-decoration.d2 {
+  background: var(--cor-s1);
+  bottom: 5%;
+  right: -5%;
+  opacity: 0.1;
+}
+
+#services-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#services-h1 {
+  color: var(--cor-6);
+  text-align: center;
+  margin-bottom: var(--espacamento-32);
+  span {
+    color: var(--cor-p1);
+  }
+}
+
+#services-p {
+  max-width: 560px;
+  text-align: center;
+  color: var(--cor-4);
+  margin-bottom: var(--espacamento-40);
+}
+
+#cards-grid {
+  max-width: 100%;
+  display: grid;
+  padding: 80px;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: stretch;
+  justify-items: stretch;
+  gap: var(--espacamento-24);
+  overflow-y: auto;
+}
+
+.card-service {
+  width: 100%;
+  max-width: 650px;
+  padding: 30px 30px 30px 20px;
+  background-color: var(--cor-1);
+  color: var(--cor-6);
+  border-radius: 20px;
+  transition: 0.2s var(--ease);
+  border: 1px solid var(--cor-1);
+  z-index: 1;
+}
+
+.card-service:hover {
+  filter: brightness(120%);
+  transform: translateY(-5px);
+  border: 1px solid var(--cor-p1);
+}
+.card-container {
+  width: 100%;
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.card-index {
+  margin-bottom: var(--espacamento-12);
+  font-size: 5rem;
+}
+
+.card-title {
+  margin-bottom: var(--espacamento-20);
+  background: linear-gradient(45deg, var(--cor-p1), var(--cor-s1));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.card-desc {
+  width: 90%;
+  color: var(--cor-4);
+}

@@ -29,7 +29,7 @@
   }
   p {
     width: 60%;
-    color: var(--cor-3);
+    color: var(--cor-4);
     span {
       color: var(--cor-p1);
       opacity: 1;
@@ -60,21 +60,4 @@
   object-fit: cover;
   opacity: 1;
   z-index: -2;
-}
-
-.decoration {
-  width: 500px;
-  height: 500px;
-  background-color: var(--cor-p1);
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  filter: blur(100px);
-  z-index: -1;
-  opacity: 0.2;
-}
-
-#about-container > .decoration:first-child {
-  left: 0;
 }
