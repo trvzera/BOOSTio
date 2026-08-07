@@ -1,5 +1,5 @@
 @view-transition {
-  navigation: auto; /* Enables native cross-page transitions */
+  navigation: auto;
 }
 
 ::view-transition-old(root) {

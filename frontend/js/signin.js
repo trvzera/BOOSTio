@@ -1,14 +1,5 @@
 import { criar_usuario } from "./api/usuarios_api/usuarios_singin_api.js";
 
-const containerProfile = document.querySelector("#profile");
-const profileCheck = document.querySelector("#profile-check");
-
-document.addEventListener("click", (e) => {
-  if (!containerProfile.contains(e.target)) {
-    profileCheck.checked = false;
-  }
-});
-
 const nomeInput = document.querySelector("#nome-usuario");
 const emailInput = document.querySelector("#email");
 const senhaInput = document.querySelector("#senha1");
@@ -175,10 +166,9 @@ formCriarConta.addEventListener("submit", async (e) => {
       return;
     }
 
-    if (resposta.mensagem){
-      window.location.href = "../pages/configuracoes.html";
+    if (resposta.mensagem) {
+      window.location.href = "./login.html";
     }
-
   } catch (erro) {
     console.error("Falha ao criar conta:", erro);
     alert("Não foi possível criar a conta. Tente novamente mais tarde.");

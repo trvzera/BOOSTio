@@ -10,6 +10,7 @@
   <meta name="description" content="A Boostio é uma plataforma que simplifica a montagem de computadores,
   ajudando você a escolher as peças ideais com base no seu objetivo,
   orçamento e necessidade, tudo com precisão e confiança.">
+  <script type="module" src="../js/scripts.js" defer></script>
   <script type="module" src="../js/signin.js" defer></script>
 </head>
 
@@ -27,18 +28,27 @@
           <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página contendo suas builds">Suas Builds</a></li>
       </nav>
       <div id="profile">
-        <input type="checkbox" name="profile" id="profile-check" label="Abrir menu do perfil">
+        <input type="checkbox" name="profile" id="profile-check" aria-label="Abrir menu do perfil">
         <div id="profile-options">
           <nav id="profile-nav">
-            <ul id="profile-nav-list">
+            <ul class="profile-nav-list" id="profile-nav-list-logado">
               <li class="profile-item"><a href="#" class="profile-link font-1-s" aria-label="Ir para suas builds"><i class="fa-regular fa-user"></i>
                   <p>Builds</p>
                 </a></li>
               <li class="profile-item"><a href="./configuracoes.html" class="profile-link font-1-s" aria-label="Ir para as Configurações do seu perfil"><i class="fa-regular fa-floppy-disk"></i>
                   <p>Configurações</p>
                 </a></li>
-              <li class="profile-item"><a href="" class="profile-link font-1-s" aria-label="Sair da sua conta"><i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <li class="profile-item sair"><a href="#" class="profile-link font-1-s" id="btn-sair" aria-label="Sair da sua conta"><i class="fa-solid fa-arrow-right-from-bracket"></i>
                   <p>Sair</p>
+                </a></li>
+            </ul>
+
+            <ul class="profile-nav-list" id="profile-nav-list-deslogado">
+              <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" aria-label="Entrar na sua conta"><i class="fa-solid fa-arrow-right-to-bracket"></i>
+                  <p>Entrar</p>
+                </a></li>
+              <li class="profile-item"><a href="./signin.html" class="profile-link font-1-s" aria-label="Criar uma conta"><i class="fa-regular fa-user"></i>
+                  <p>Criar conta</p>
                 </a></li>
             </ul>
           </nav>
