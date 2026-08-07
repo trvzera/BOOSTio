@@ -7,8 +7,8 @@ document.addEventListener("click", (e) => {
   }
 });
 
-const burgerMenu = document.querySelector("#burger-menu");
-const burgerCheck = document.querySelector("#burger-check");
+let burgerMenu = document.querySelector("#burger-menu");
+let burgerCheck = document.querySelector("#burger-check");
 
 document.addEventListener("click", (e) => {
   if (!burgerMenu.contains(e.target)) {
@@ -81,8 +81,8 @@ document.addEventListener("click", (e) => {
   }
 });
 
-const burgerMenu = document.querySelector("#burger-menu");
-const burgerCheck = document.querySelector("#burger-check");
+burgerMenu = document.querySelector("#burger-menu");
+burgerCheck = document.querySelector("#burger-check");
 
 document.addEventListener("click", (e) => {
   if (!burgerMenu.contains(e.target)) {

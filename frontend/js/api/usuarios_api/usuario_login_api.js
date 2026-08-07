@@ -4,6 +4,7 @@ export async function logar_usuario(email,senha) {
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify({
       "email":email,
       "senha":senha

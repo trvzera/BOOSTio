@@ -1,8 +1,10 @@
 import os
 from dotenv import load_dotenv
 
+load_dotenv()
+
 class Config:
-    secret_key = os.getenv("SECRET_KEY")
+    SECRET_KEY = os.getenv("SECRET_KEY") #Sempre maiuscula, ate os nomes das variaveis se não o flask não reconhece
     SQLALCHEMY_DATABASE_URI = os.getenv("URL_DATABASE")
 
 
