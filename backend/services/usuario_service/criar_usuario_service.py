@@ -17,7 +17,7 @@ class CriarUsuarioService:
         campos_obrigatorios_resp.append(campo)
 
     if len(campos_obrigatorios_resp) > 0:
-      raise ValueError(f"O(s) campos '{"','".join(campos_obrigatorios_resp)}' {verbo_txt}")
+      raise ValueError(f"O(s) campos '{"','".join(campos_obrigatorios_resp)}'")
 
 
     usuario_existente = Usuario.buscar_por_email(dados['email'])
@@ -25,7 +25,7 @@ class CriarUsuarioService:
     if usuario_existente:
       raise ValueError("Esse Usuario já existe,experimente fazer login")
 
-    self.validar_senha(dados['senha'])
+
     
     senha_protegida = generate_password_hash(dados["senha"])
 
@@ -45,10 +45,10 @@ class CriarUsuarioService:
     if len(senha) < 8:
       raise ValueError("A senha deve ter no minimo oito caracteres")
 
-    if any(c.isUpper for c in senha):
+    if not any(c.isupper for c in senha):
       raise ValueError("A senha deve ter no minimo uma letra maiuscula")
 
-    if any(c.isLower for c in senha):
+    if not any(c.islower for c in senha):
       raise ValueError("A senha deve ter no minimo uma letra minuscula")
     
     if not any(c.isdigit() for c in senha):

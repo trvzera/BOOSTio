@@ -1,3 +1,5 @@
+import { criar_usuario } from "./api/usuarios_api/usuarios_singin_api.js";
+
 const containerProfile = document.querySelector("#profile");
 const profileCheck = document.querySelector("#profile-check");
 
@@ -153,3 +155,34 @@ function validarFormulario() {
 }
 
 validarFormulario();
+
+const formCriarConta = document.querySelector("#signin-form");
+
+formCriarConta.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const userValue = nomeInput.value.trim();
+  const emailValue = emailInput.value.trim();
+  const senhaValue = senhaInput.value.trim();
+
+  botaoCriarConta.disabled = true;
+
+  try {
+    const resposta = await criar_usuario(userValue, emailValue, senhaValue);
+
+    if (resposta.erro) {
+      alert(resposta.erro);
+      return;
+    }
+
+    if (resposta.mensagem){
+      window.location.href = "../pages/configuracoes.html";
+    }
+
+  } catch (erro) {
+    console.error("Falha ao criar conta:", erro);
+    alert("Não foi possível criar a conta. Tente novamente mais tarde.");
+  } finally {
+    botaoCriarConta.disabled = false;
+  }
+});
