@@ -22,7 +22,7 @@
 }
 
 #signin-title {
-  color: var(--cor-6);
+  color: var(--cor-p1);
   margin-bottom: var(--espacamento-8);
 }
 
@@ -30,6 +30,7 @@
   text-align: center;
   color: var(--cor-4);
   margin-bottom: var(--espacamento-32);
+  font-size: 0.9rem;
   a {
     color: var(--cor-6);
   }
@@ -201,14 +202,16 @@
 }
 
 #login-title {
-  color: var(--cor-6);
+  color: var(--cor-p1);
   margin-bottom: var(--espacamento-8);
+  font-size: 1.5rem;
 }
 
 #login-description {
   text-align: center;
   color: var(--cor-4);
   margin-bottom: var(--espacamento-32);
+  font-size: 0.9rem;
   a {
     color: var(--cor-6);
   }
@@ -230,8 +233,8 @@
 #esqueceu-senha {
   color: var(--cor-6);
   text-decoration: none;
-  font-size: 0.8rem;
-  transition: opacity 0.2s ease;
+  font-size: 0.9rem;
+  transition: opacity 0.2s var(--ease);
 }
 
 #esqueceu-senha:hover {
