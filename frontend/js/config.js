@@ -1,3 +1,5 @@
+export const API_BASE_URL = "http://127.0.0.1:5000";
+
 const toast = document.getElementById("toast");
 const toastText = document.getElementById("toast-text");
 const toastIcon = document.getElementById("toast-icon");
