@@ -1,18 +1,12 @@
+// Atenção: usei resposta.token porque é o padrão mais comum, mas não sei o formato real da resposta do seu endpoint /usuarios/entrar ainda. Quando implementar esse retorno no backend, ajuste esse campo pro nome exato que a API devolve.
 
-const containerProfile = document.querySelector("#profile");
-const profileCheck = document.querySelector("#profile-check");
 import { logar_usuario } from "./api/usuarios_api/usuario_login_api.js";
-
-document.addEventListener("click", (e) => {
-  if (!containerProfile.contains(e.target)) {
-    profileCheck.checked = false;
-  }
-});
-
+import { setToken } from "./auth.js";
 
 const emailInput = document.querySelector("#email");
 const senhaInput = document.querySelector("#senha");
 const botaoEntrar = document.querySelector("#btn-entrar");
+const formLogin = document.querySelector("#login-form");
 
 document.querySelectorAll(".toggle-senha").forEach((icone) => {
   icone.addEventListener("click", () => {
@@ -25,7 +19,6 @@ document.querySelectorAll(".toggle-senha").forEach((icone) => {
   });
 });
 
-
 function validarFormulario() {
   const camposPreenchidos = emailInput.value.trim() !== "" && senhaInput.value !== "";
   botaoEntrar.disabled = !camposPreenchidos;
@@ -36,31 +29,30 @@ senhaInput.addEventListener("input", validarFormulario);
 
 validarFormulario();
 
-
-formCriarConta.addEventListener("submit", async (e) => {
+formLogin.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const emailValue = emailInput.value.trim();
   const senhaValue = senhaInput.value.trim();
 
-  botaoCriarConta.disabled = true;
+  botaoEntrar.disabled = true;
 
   try {
-    const resposta = await criar_usuario(emailValue, senhaValue);
+    const resposta = await logar_usuario(emailValue, senhaValue);
 
     if (resposta.erro) {
       alert(resposta.erro);
       return;
     }
 
-    if (resposta.mensagem){
-      window.location.href = "../pages/configuracoes.html";
+    if (resposta.token) {
+      setToken(resposta.token);
+      window.location.href = "../index.html";
     }
-
   } catch (erro) {
-    console.error("Falha ao criar conta:", erro);
-    alert("Não foi possível criar a conta. Tente novamente mais tarde.");
+    console.error("Falha ao entrar:", erro);
+    alert("Não foi possível entrar. Tente novamente mais tarde.");
   } finally {
-    botaoCriarConta.disabled = false;
+    botaoEntrar.disabled = false;
   }
 });

@@ -221,13 +221,3 @@
   background-color: var(--cor-1);
   color: var(--cor-p1);
 }
-
-@media (max-width: 768px) {
-  #header-nav {
-    display: none;
-  }
-
-  #header-mobile {
-    display: flex;
-  }
-}
