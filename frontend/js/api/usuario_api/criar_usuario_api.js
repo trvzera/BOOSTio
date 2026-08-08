@@ -6,10 +6,11 @@ export async function criar_usuario(usuario, email, senha) {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify({
-      nome: usuario,
-      email,
-      senha,
+      "nome": usuario,
+      "email":email,
+      "senha":senha,
     }),
   });
 

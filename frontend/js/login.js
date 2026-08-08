@@ -1,7 +1,4 @@
-// Atenção: usei resposta.token porque é o padrão mais comum, mas não sei o formato real da resposta do seu endpoint /usuarios/entrar ainda. Quando implementar esse retorno no backend, ajuste esse campo pro nome exato que a API devolve.
-
-import { logar_usuario } from "./api/usuarios_api/usuario_login_api.js";
-import { setToken } from "./auth.js";
+import { logar_usuario } from "./api/usuario_api/logar_usuario_api.js";
 
 const emailInput = document.querySelector("#email");
 const senhaInput = document.querySelector("#senha");
@@ -45,8 +42,7 @@ formLogin.addEventListener("submit", async (e) => {
       return;
     }
 
-    if (resposta.token) {
-      setToken(resposta.token);
+    if (resposta.mensagem) {
       window.location.href = "../index.html";
     }
   } catch (erro) {

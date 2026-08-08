@@ -1,4 +1,4 @@
-import { criar_usuario } from "./api/usuarios_api/usuarios_singin_api.js";
+import { criar_usuario } from "./api/usuario_api/criar_usuario_api.js";
 
 const nomeInput = document.querySelector("#nome-usuario");
 const emailInput = document.querySelector("#email");
@@ -167,7 +167,7 @@ formCriarConta.addEventListener("submit", async (e) => {
     }
 
     if (resposta.mensagem) {
-      window.location.href = "./login.html";
+      window.location.href = "./index.html";
     }
   } catch (erro) {
     console.error("Falha ao criar conta:", erro);

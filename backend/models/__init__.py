@@ -14,8 +14,11 @@ from .usuario import Usuario
 from .fonte import Fonte
 from .setup import Setup
 
-
-
+#Funcão obrigatória para o login buscar informações do usuario pelo id
+@lm.user_loader
+def user_loader(id):
+    usuario = Usuario.buscar_por_id(id)
+    return usuario
 
 
 __all__ = ['lm','db','Peca','Usuario','ModeloBase','Fonte','Setup']
