@@ -79,7 +79,7 @@
 
 .profile-nav-list {
   display: none;
-  width: 100%;
+  width: max-content;
   align-items: stretch;
   flex-direction: column;
   gap: var(--espacamento-4);

@@ -25,14 +25,14 @@ def entrar_usuario():
         }),200
     
     except ValueError as erro:
-        return jsonify({"erro":f"Erro: {str(erro)}"}),400
+        return jsonify({"erro":f"{str(erro)}"}),400
 
 #Rota de logout
 @auth_bp.post("/sair")
 def sair_usuario():
     logout_user()
     return jsonify({
-        "mensagem":"Usuario delogado com sucesso"
+        "mensagem":"Usuario deslogado com sucesso"
     }),200
 
 #Rota para teste do front se esta logado

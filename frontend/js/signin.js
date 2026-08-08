@@ -7,6 +7,8 @@ const confirmarSenhaInput = document.querySelector("#senha2");
 const senhaMatchText = document.querySelector("#senha-match-text");
 const termosCheck = document.querySelector("#terms");
 const botaoCriarConta = document.querySelector("#btn-criar-conta");
+const erroTexto = document.querySelector("#signin-erro"); // <-- ADICIONAR AQUI
+
 
 const barra = document.querySelector(".barra");
 const textoStatus = document.querySelector("#status-text");
@@ -152,6 +154,8 @@ const formCriarConta = document.querySelector("#signin-form");
 formCriarConta.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  erroTexto.textContent = "";
+
   const userValue = nomeInput.value.trim();
   const emailValue = emailInput.value.trim();
   const senhaValue = senhaInput.value.trim();
@@ -162,16 +166,16 @@ formCriarConta.addEventListener("submit", async (e) => {
     const resposta = await criar_usuario(userValue, emailValue, senhaValue);
 
     if (resposta.erro) {
-      alert(resposta.erro);
+      erroTexto.textContent = resposta.erro;
       return;
     }
 
     if (resposta.mensagem) {
-      window.location.href = "./index.html";
+      window.location.href = "../index.html";
     }
   } catch (erro) {
     console.error("Falha ao criar conta:", erro);
-    alert("Não foi possível criar a conta. Tente novamente mais tarde.");
+    erroTexto.textContent = "Não foi possível criar a conta. Tente novamente mais tarde.";
   } finally {
     botaoCriarConta.disabled = false;
   }
