@@ -7,13 +7,25 @@ const menuComLogin = document.querySelector("#profile-nav-list-logado");
 const menuSemLogin = document.querySelector("#profile-nav-list-deslogado");
 const btnSair = document.querySelector("#btn-sair");
 
-function caminhoLogin() {
+export function caminhoLogin() {
   const estaEmPages = window.location.pathname.includes("/pages/");
   return estaEmPages ? "./login.html" : "./pages/login.html";
 }
 
 async function confirmaUsuario() {
   const resposta = await confirmaLogin();
+
+  if (document.body.id === "login" || document.body.id === "signin" || document.body.id === "inicio") {
+    if (resposta.auth) {
+      window.location.href = caminhoDashboard();
+      return;
+    }
+  } else {
+    if (!resposta.auth) {
+      window.location.href = caminhoLogin();
+      return;
+    }
+  }
 
   menuComLogin.classList.toggle("ativo", resposta.auth);
   menuSemLogin.classList.toggle("ativo", !resposta.auth);
