@@ -167,7 +167,7 @@ formCriarConta.addEventListener("submit", async (e) => {
     }
 
     if (resposta.mensagem) {
-      window.location.href = "./login.html";
+      window.location.href = "./index.html";
     }
   } catch (erro) {
     console.error("Falha ao criar conta:", erro);

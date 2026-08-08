@@ -4,9 +4,10 @@ from flask import Flask, render_template
 from flask_cors import CORS
 from models import db 
 from models import lm
-from controllers.usuario_controller import usuario_bp
 import os
 
+from controllers.usuario_controller import usuario_bp
+from controllers.auth_controller import auth_bp
 
 load_dotenv()
 
@@ -19,11 +20,11 @@ app.config.from_object(ambientes[os.getenv('APP_ENV')])
 lm.init_app(app)
 db.init_app(app)
 
-#flask cors permite o fornt consumir a api do back
-CORS(app)
+#flask cors permite o fornt consumir a api do back, e salvar os cookies, quando o front estiver nessas urls
+CORS(app, supports_credentials=True, origins=["http://localhost:5500", "http://127.0.0.1:5500"])
 
 app.register_blueprint(usuario_bp)
-
+app.register_blueprint(auth_bp)
 
 if __name__ == '__main__':
     with app.app_context():
