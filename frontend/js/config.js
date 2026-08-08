@@ -22,20 +22,22 @@ const confirmUsernameTarget = document.getElementById(
   "confirm-username-target",
 );
 
-document.getElementById("save-profile-btn").addEventListener("click", () => {
-  const newUsername = usernameInput.value.trim();
-  const newEmail = emailInput.value.trim();
-  if (!newUsername || !newEmail) {
-    showToast("Preencha nome e e-mail antes de salvar.", false);
+if (document.querySelector("#configs")){
+  document.getElementById("save-profile-btn").addEventListener("click", () => {
+    const newUsername = usernameInput.value.trim();
+    const newEmail = emailInput.value.trim();
+    if (!newUsername || !newEmail) {
+      showToast("Preencha nome e e-mail antes de salvar.", false);
+      return;
+    }
+    displayUsername.textContent = newUsername;
+    displayEmail.textContent = newEmail;
+    confirmUsernameTarget.textContent = newUsername;
+    showToast("Perfil atualizado com sucesso.", true);
     return;
-  }
-  displayUsername.textContent = newUsername;
-  displayEmail.textContent = newEmail;
-  confirmUsernameTarget.textContent = newUsername;
-  showToast("Perfil atualizado com sucesso.", true);
-  return;
-  //todo
-});
+    //todo
+  });
+}
 
 document.querySelectorAll(".toggle-password").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -95,7 +97,7 @@ function validatePasswordForm() {
 
   savePasswordBtn.disabled = !(hasCurrent && strongEnough && match);
 }
-
+if (document.querySelector("#configs")){
 newPassword.addEventListener("input", () => {
   const score = checkPasswordStrength(newPassword.value);
   updateStrengthBars(score);
@@ -114,7 +116,7 @@ savePasswordBtn.addEventListener("click", () => {
   savePasswordBtn.disabled = true;
   showToast("Senha atualizada com sucesso.", true);
 });
-
+}
 const deleteModal = document.getElementById("delete-modal");
 const openDeleteModalBtn = document.getElementById("open-delete-modal");
 const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
@@ -130,7 +132,7 @@ function openModal() {
 function closeModal() {
   deleteModal.classList.remove("open");
 }
-
+if (document.querySelector("#configs")){
 openDeleteModalBtn.addEventListener("click", openModal);
 cancelDeleteBtn.addEventListener("click", closeModal);
 deleteModal.addEventListener("click", (e) => {
@@ -149,3 +151,4 @@ confirmDeleteBtn.addEventListener("click", () => {
   showToast("Conta excluída. Redirecionando...", true);
   // window.location.href = '/index.html';
 });
+}

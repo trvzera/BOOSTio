@@ -12,7 +12,7 @@ class Usuario(ModeloBase,UserMixin):
   #Excluir o campo senha para segurança(mesmo com hash é um dado sensível)
   def to_dict(self):
     return {
-      "id":self.senha,
+      "id":self.id,
       "nome": self.nome,
       "email": self.email,
     }
