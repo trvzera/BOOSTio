@@ -116,16 +116,6 @@ if (document.querySelector("#configs")) {
   currentPassword.addEventListener("input", validatePasswordForm);
   confirmPassword.addEventListener("input", validatePasswordForm);
 
-  savePasswordBtn.addEventListener("click", () => {
-    // aqui entraria a chamada real pra API de troca de senha
-    currentPassword.value = "";
-    newPassword.value = "";
-    confirmPassword.value = "";
-    strengthBars.forEach((bar) => (bar.className = "strength-bar"));
-    matchHint.textContent = "";
-    savePasswordBtn.disabled = true;
-    showToast("Senha atualizada com sucesso.", true);
-  });
 }
 const deleteModal = document.getElementById("delete-modal");
 const openDeleteModalBtn = document.getElementById("open-delete-modal");
@@ -134,10 +124,12 @@ const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
 const deleteConfirmInput = document.getElementById("delete-confirm-input");
 
 function openModal() {
+  confirmUsernameTarget.textContent = displayUsername.textContent;
   deleteModal.classList.add("open");
   deleteConfirmInput.value = "";
   confirmDeleteBtn.disabled = true;
   setTimeout(() => deleteConfirmInput.focus(), 250);
+
 }
 function closeModal() {
   deleteModal.classList.remove("open");
@@ -154,11 +146,95 @@ if (document.querySelector("#configs")) {
       deleteConfirmInput.value.trim() !== displayUsername.textContent.trim();
   });
 
-  confirmDeleteBtn.addEventListener("click", () => {
-    // aqui entraria a chamada real pra API de exclusão de conta, ex:
-    // await fetch('/api/account', { method: 'DELETE' })
+  confirmDeleteBtn.addEventListener("click", async () => {
+    const dadosExclusao = await confirmaLogin() 
+    await excuir_usuario(dadosExclusao.usuario.id)
     closeModal();
     showToast("Conta excluída. Redirecionando...", true);
-    // window.location.href = '/index.html';
+    window.location.href = '../index.html';
   });
 }
+
+
+const nomeConfigs = document.querySelector("#display-username")
+const emailConfigs = document.querySelector("#display-email")
+const inputNome = document.querySelector("#username-input")
+const inputEmail = document.querySelector("#email-input")
+const criadoEm = document.querySelector("#criado-em")
+const btnSalvar = document.querySelector("#save-profile-btn")
+import { confirmaLogin } from "./api/auth_api/me_auth.js";
+import { atualizar_usuario } from "./api/usuario_api/atualizar_usuario_api.js";
+
+
+
+
+async function trocarDadosConfigs(){
+  const resposta = await confirmaLogin()
+  const dataString = resposta.usuario.criado_em;
+  const data = new Date(dataString);
+  const opcoes = { month: "short", year: "numeric" };
+  const dataFormatada = data.toLocaleDateString("pt-BR", opcoes);
+  
+
+  nomeConfigs.textContent = resposta.usuario.nome
+  emailConfigs.textContent = resposta.usuario.email
+  inputNome.value = resposta.usuario.nome
+  inputEmail.value = resposta.usuario.email
+  criadoEm.textContent = `Membro desde ${dataFormatada}`
+
+}
+
+
+btnSalvar.addEventListener("click", ()=>{
+  atualizaDados()
+})
+
+async function atualizaDados(){
+  const dados = await confirmaLogin()
+  const valorEmail = inputEmail.value
+  const valorNome = inputNome.value
+
+  if (dados.usuario.email == valorEmail){
+    const resposta = await atualizar_usuario(valorNome,undefined,undefined,dados.usuario.id)
+    console.log(resposta)
+  }
+  else{
+    const resposta = await atualizar_usuario(valorNome,valorEmail,undefined,dados.usuario.id)
+    console.log(resposta)
+  }
+  
+}
+
+const btnAtualizarSenha = document.querySelector("#save-password-btn")
+
+async function atualizaSenha(){
+  const valorSenhaAtual = currentPassword.value
+  const valorSenhaNova = newPassword.value
+  const dados = await confirmaLogin()
+
+  const resposta = await atualizar_usuario(undefined,undefined,valorSenhaNova,dados.usuario.id,valorSenhaAtual)
+
+  if (resposta.erro){
+    showToast(resposta.erro, false)
+    return
+  }
+
+  currentPassword.value = "";
+  newPassword.value = "";
+  confirmPassword.value = "";
+  strengthBars.forEach((bar) => (bar.className = "strength-bar"));
+  matchHint.textContent = "";
+  savePasswordBtn.disabled = true;
+  showToast("Senha atualizada com sucesso.", true);
+}
+
+btnAtualizarSenha.addEventListener("click", ()=>{
+  atualizaSenha()
+})
+
+const btnExcluirUsuario = document.querySelector("#confirm-delete-btn")
+import { caminhoLogin } from "./scripts.js";
+import { excuir_usuario } from "./api/usuario_api/excluir_usuario_api.js";
+
+
+trocarDadosConfigs()

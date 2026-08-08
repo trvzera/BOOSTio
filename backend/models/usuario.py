@@ -15,6 +15,7 @@ class Usuario(ModeloBase,UserMixin):
       "id":self.id,
       "nome": self.nome,
       "email": self.email,
+      "criado_em":self.criado_em
     }
 
   def atualizar_dados(self,nome=None,email=None,senha=None):

@@ -1,5 +1,5 @@
 from models import Usuario
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash,check_password_hash
 
 class AtualizarUsuarioService:
   def executar(self,usuario_id,dados):
@@ -11,20 +11,32 @@ class AtualizarUsuarioService:
     if novo_email:
       usuario_existente = Usuario.buscar_por_email(novo_email)
 
-      if usuario_existente:
+      if usuario_existente and usuario_existente.id != usuario.id:
         raise ValueError("Já existe um usuario com esse email")
-    
+
     senha = dados.get("senha")
 
     if senha:
-      senha = generate_password_hash(senha)
+      verificacao = self._confirma_senha(dados,usuario.senha)
+      if verificacao:
+        senha = generate_password_hash(senha)
+      else:
+        raise ValueError("Digite a senha atual correta")
 
     usuario.atualizar_dados(
-      dados.get("usuario"),
+      dados.get("nome"),
       dados.get("email"),
       senha,
     )
-    
+
     return usuario.to_dict()
 
+  @staticmethod
+  def _confirma_senha(dados,senha_atual_hash):
+    senha_atual_informada = dados.get("senha_atual")
+
+    if not senha_atual_informada:
+      return False
+
+    return check_password_hash(senha_atual_hash,senha_atual_informada)
     
