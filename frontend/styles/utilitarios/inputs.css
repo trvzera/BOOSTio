@@ -123,3 +123,10 @@
 .toggle-senha:hover {
   color: var(--cor-6);
 }
+
+.erro-form {
+  width: 100%;
+  min-height: 1.2em;
+  color: var(--cor-d1);
+  text-align: left;
+}

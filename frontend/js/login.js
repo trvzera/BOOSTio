@@ -4,6 +4,7 @@ const emailInput = document.querySelector("#email");
 const senhaInput = document.querySelector("#senha");
 const botaoEntrar = document.querySelector("#btn-entrar");
 const formLogin = document.querySelector("#login-form");
+const erroTexto = document.querySelector("#login-erro");
 
 document.querySelectorAll(".toggle-senha").forEach((icone) => {
   icone.addEventListener("click", () => {
@@ -17,7 +18,8 @@ document.querySelectorAll(".toggle-senha").forEach((icone) => {
 });
 
 function validarFormulario() {
-  const camposPreenchidos = emailInput.value.trim() !== "" && senhaInput.value !== "";
+  const camposPreenchidos =
+    emailInput.value.trim() !== "" && senhaInput.value !== "";
   botaoEntrar.disabled = !camposPreenchidos;
 }
 
@@ -29,6 +31,8 @@ validarFormulario();
 formLogin.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  erroTexto.textContent = "";
+
   const emailValue = emailInput.value.trim();
   const senhaValue = senhaInput.value.trim();
 
@@ -38,7 +42,7 @@ formLogin.addEventListener("submit", async (e) => {
     const resposta = await logar_usuario(emailValue, senhaValue);
 
     if (resposta.erro) {
-      alert(resposta.erro);
+      erroTexto.textContent = resposta.erro;
       return;
     }
 
@@ -47,7 +51,8 @@ formLogin.addEventListener("submit", async (e) => {
     }
   } catch (erro) {
     console.error("Falha ao entrar:", erro);
-    alert("Não foi possível entrar. Tente novamente mais tarde.");
+    erroTexto.textContent =
+      "Não foi possível entrar. Tente novamente mais tarde.";
   } finally {
     botaoEntrar.disabled = false;
   }

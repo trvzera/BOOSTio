@@ -52,7 +52,6 @@
   font-size: 0.9rem;
 }
 
-
 .profile-row {
   display: flex;
   align-items: center;
@@ -307,4 +306,7 @@
   margin-top: var(--espacamento-24);
 }
 
-
+#email-input.invalido {
+  border: 1px solid var(--cor-d1);
+  box-shadow: 0px 0px 15px rgba(255, 59, 48, 0.3);
+}
