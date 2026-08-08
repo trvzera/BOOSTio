@@ -33,7 +33,7 @@ def criar_usuario():
     
     #Capturo erros
     except ValueError as erro:
-        return jsonify({f"erro": f"Erro: {str(erro)}"}),400
+        return jsonify({f"erro": f"{str(erro)}"}),400
 
     except SQLAlchemyError:
         db.session.rollback()
@@ -49,7 +49,7 @@ def excluir_usuario(usuario_id):
         if usuario is False:
             return jsonify({"erro": "Usuario não encontrado."}), 404
 
-        return jsonify({"mensagem":"Usuario excluido com sucesso"}),204
+        return jsonify({"mensagem":"Usuario excluído com sucesso"}),204
 
     except SQLAlchemyError:
         db.session.rollback()
@@ -79,7 +79,7 @@ def listar_usuario_id(usuario_id):
             }),200
 
     except ValueError as erro:
-        return jsonify({"erro":f"Erro: {str(erro)}"}),404
+        return jsonify({"erro":f"{str(erro)}"}),404
 
 @login_required
 @usuario_bp.put("/<int:usuario_id>")
@@ -96,7 +96,7 @@ def atualizar_usuario(usuario_id):
 
     except ValueError as erro:
         db.session.rollback()
-        return jsonify({"erro":f"Erro: {str(erro)}"}),400
+        return jsonify({"erro":f"{str(erro)}"}),400
     
     except SQLAlchemyError:
         return jsonify({"erro":"Erro ao atualizar o usuario no banco de dados"})

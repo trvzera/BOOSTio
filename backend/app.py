@@ -14,8 +14,7 @@ load_dotenv()
 
 #Inicio o app e passo as configurações do app.
 app = Flask(__name__,)
-app.config.from_object(ambientes[os.getenv('APP_ENV')])
-
+app.config.from_object(ambientes[os.getenv('APP_ENV', 'desenvolvimento')])
 #Iniciar o login manager e passar o app como parametro
 lm.init_app(app)
 db.init_app(app)

@@ -23,20 +23,30 @@ const confirmUsernameTarget = document.getElementById(
   "confirm-username-target",
 );
 
-if (document.querySelector("#configs")){
+emailInput.addEventListener("input", () => {
+  emailInput.classList.toggle("invalido", emailInput.value.length > 0 && !emailInput.checkValidity());
+});
+
+if (document.querySelector("#configs")) {
   document.getElementById("save-profile-btn").addEventListener("click", () => {
     const newUsername = usernameInput.value.trim();
     const newEmail = emailInput.value.trim();
+
     if (!newUsername || !newEmail) {
       showToast("Preencha nome e e-mail antes de salvar.", false);
       return;
     }
+
+    if (!emailInput.checkValidity()) {
+      showToast("Digite um e-mail válido.", false);
+      emailInput.focus();
+      return;
+    }
+
     displayUsername.textContent = newUsername;
     displayEmail.textContent = newEmail;
     confirmUsernameTarget.textContent = newUsername;
     showToast("Perfil atualizado com sucesso.", true);
-    return;
-    //todo
   });
 }
 
@@ -67,7 +77,6 @@ function checkPasswordStrength(value) {
 }
 
 function updateStrengthBars(score) {
-  // score vai de 0 a 3; com campo vazio, nenhuma barra acende
   const filledBars = newPassword.value.length > 0 ? Math.max(score, 1) : 0;
   const levelClass = ["weak", "weak", "medium", "strong"][score];
 
@@ -98,25 +107,25 @@ function validatePasswordForm() {
 
   savePasswordBtn.disabled = !(hasCurrent && strongEnough && match);
 }
-if (document.querySelector("#configs")){
-newPassword.addEventListener("input", () => {
-  const score = checkPasswordStrength(newPassword.value);
-  updateStrengthBars(score);
-  validatePasswordForm();
-});
-currentPassword.addEventListener("input", validatePasswordForm);
-confirmPassword.addEventListener("input", validatePasswordForm);
+if (document.querySelector("#configs")) {
+  newPassword.addEventListener("input", () => {
+    const score = checkPasswordStrength(newPassword.value);
+    updateStrengthBars(score);
+    validatePasswordForm();
+  });
+  currentPassword.addEventListener("input", validatePasswordForm);
+  confirmPassword.addEventListener("input", validatePasswordForm);
 
-savePasswordBtn.addEventListener("click", () => {
-  // aqui entraria a chamada real pra API de troca de senha
-  currentPassword.value = "";
-  newPassword.value = "";
-  confirmPassword.value = "";
-  strengthBars.forEach((bar) => (bar.className = "strength-bar"));
-  matchHint.textContent = "";
-  savePasswordBtn.disabled = true;
-  showToast("Senha atualizada com sucesso.", true);
-});
+  savePasswordBtn.addEventListener("click", () => {
+    // aqui entraria a chamada real pra API de troca de senha
+    currentPassword.value = "";
+    newPassword.value = "";
+    confirmPassword.value = "";
+    strengthBars.forEach((bar) => (bar.className = "strength-bar"));
+    matchHint.textContent = "";
+    savePasswordBtn.disabled = true;
+    showToast("Senha atualizada com sucesso.", true);
+  });
 }
 const deleteModal = document.getElementById("delete-modal");
 const openDeleteModalBtn = document.getElementById("open-delete-modal");
@@ -133,23 +142,23 @@ function openModal() {
 function closeModal() {
   deleteModal.classList.remove("open");
 }
-if (document.querySelector("#configs")){
-openDeleteModalBtn.addEventListener("click", openModal);
-cancelDeleteBtn.addEventListener("click", closeModal);
-deleteModal.addEventListener("click", (e) => {
-  if (e.target === deleteModal) closeModal();
-});
+if (document.querySelector("#configs")) {
+  openDeleteModalBtn.addEventListener("click", openModal);
+  cancelDeleteBtn.addEventListener("click", closeModal);
+  deleteModal.addEventListener("click", (e) => {
+    if (e.target === deleteModal) closeModal();
+  });
 
-deleteConfirmInput.addEventListener("input", () => {
-  confirmDeleteBtn.disabled =
-    deleteConfirmInput.value.trim() !== displayUsername.textContent.trim();
-});
+  deleteConfirmInput.addEventListener("input", () => {
+    confirmDeleteBtn.disabled =
+      deleteConfirmInput.value.trim() !== displayUsername.textContent.trim();
+  });
 
-confirmDeleteBtn.addEventListener("click", () => {
-  // aqui entraria a chamada real pra API de exclusão de conta, ex:
-  // await fetch('/api/account', { method: 'DELETE' })
-  closeModal();
-  showToast("Conta excluída. Redirecionando...", true);
-  // window.location.href = '/index.html';
-});
+  confirmDeleteBtn.addEventListener("click", () => {
+    // aqui entraria a chamada real pra API de exclusão de conta, ex:
+    // await fetch('/api/account', { method: 'DELETE' })
+    closeModal();
+    showToast("Conta excluída. Redirecionando...", true);
+    // window.location.href = '/index.html';
+  });
 }
