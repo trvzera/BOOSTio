@@ -9,6 +9,7 @@
 @import "./utilitarios/decorations.css";
 @import "./utilitarios/inputs.css";
 @import "./utilitarios/transition.css";
+@import "./utilitarios/loading.css";
 
 /* HEADER */
 @import "./header/header.css";
