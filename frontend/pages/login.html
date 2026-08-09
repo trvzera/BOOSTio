@@ -11,10 +11,17 @@
   <meta name="description" content="A Boostio é uma plataforma que simplifica a montagem de computadores,
   ajudando você a escolher as peças ideais com base no seu objetivo,
   orçamento e necessidade, tudo com precisão e confiança.">
+  <script type="module" src="../js/pages/loading.js" defer></script>
   <script type="module" src="../js/pages/login.js" defer></script>
 </head>
 
 <body id="login">
+  <div id="loading-screen">
+    <video id="loading-video" autoplay muted playsinline>
+      <source src="../video/loading-toggle.webm" type="video/webm">
+    </video>
+  </div>
+
   <header id="header">
     <div id="header-container">
       <a href="../index.html" id="logo" aria-label="Logo da BOOSTio"></a>
@@ -80,7 +87,7 @@
     </div>
   </header>
 
-  <main id="login-page" class="page-transition">
+  <main id="login-page">
     <div class="decoration decoration-1"></div>
     <div class="decoration decoration-2"></div>
 
@@ -91,7 +98,6 @@
 
       <form id="login-form">
         <input type="email" placeholder="Seu e-mail" class="input-text" id="email">
-
         <div class="input-senha-wrapper">
           <input type="password" placeholder="Sua senha" class="input-text" id="senha">
           <i class="fa-solid fa-eye-slash toggle-senha" data-target="senha"></i>
