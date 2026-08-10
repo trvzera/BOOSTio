@@ -1,0 +1,32 @@
+#build-page {
+  height: 100vh;
+  padding: 100px 20px 0px 20px;
+}
+
+#build-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#build-page-h1 {
+  color: var(--cor-6);
+  margin-bottom: var(--espacamento-16);
+  span {
+    background: linear-gradient(45deg, var(--cor-p1), var(--cor-s1));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+}
+
+#build-page-p {
+  width: 60%;
+  text-align: center;
+  color: var(--cor-3);
+}
+
