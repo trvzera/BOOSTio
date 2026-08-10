@@ -11,21 +11,23 @@ export function caminhoLogin() {
   return estaEmPages ? "./login.html" : "./pages/login.html";
 }
 
+export function caminhoDashboard() {
+  const estaEmPages = window.location.pathname.includes("/pages/");
+  return estaEmPages ? "../index.html" : "./index.html";
+}
+
 export async function confirmaUsuario() {
   const resposta = await buscarUsuarioLogado();
 
-  if (
-    document.body.id === "login" ||
-    document.body.id === "signin" ||
-    document.body.id === "inicio"
-  ) {
+  if (document.body.id === "login" || document.body.id === "signin") {
+    // Páginas só para visitante: se já está logado, manda pro dashboard.
     if (resposta.auth) {
-      // Atenção: caminhoDashboard() não existe em lugar nenhum do projeto
-      // (bug pré-existente em scripts.js). Mantido igual ao original.
       window.location.href = caminhoDashboard();
       return;
     }
-  } else {
+  } else if (document.body.id !== "inicio") {
+    // Páginas protegidas: se não está logado, manda pro login.
+    // "inicio" (index.html) é pública, não entra nessa checagem.
     if (!resposta.auth) {
       window.location.href = caminhoLogin();
       return;

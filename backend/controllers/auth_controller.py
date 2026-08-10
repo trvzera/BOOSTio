@@ -28,8 +28,8 @@ def entrar_usuario():
         return jsonify({"erro":f"{str(erro)}"}),400
 
 #Rota de logout
-@login_required
 @auth_bp.post("/sair")
+@login_required
 def sair_usuario():
     logout_user()
     return jsonify({

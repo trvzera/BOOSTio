@@ -4,6 +4,6 @@ import { fetchComErro } from "../_shared/fetchComErro.js";
 export async function deletarUsuario(id) {
   return fetchComErro(`/usuarios/${id}`, {
     method: "DELETE",
-    body: JSON.stringify({ id }),
+    body: JSON.stringify({ "id_usuario":id }),
   });
 }
