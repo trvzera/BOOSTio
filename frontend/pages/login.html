@@ -11,16 +11,10 @@
   <meta name="description" content="A Boostio é uma plataforma que simplifica a montagem de computadores,
   ajudando você a escolher as peças ideais com base no seu objetivo,
   orçamento e necessidade, tudo com precisão e confiança.">
-  <script type="module" src="../js/pages/loading.js" defer></script>
   <script type="module" src="../js/pages/login.js" defer></script>
 </head>
 
 <body id="login">
-  <div id="loading-screen">
-    <video id="loading-video" autoplay muted playsinline>
-      <source src="../video/loading-toggle.webm" type="video/webm">
-    </video>
-  </div>
 
   <header id="header">
     <div id="header-container">
@@ -40,10 +34,10 @@
         <div id="profile-options">
           <nav id="profile-nav">
             <ul class="profile-nav-list" id="profile-nav-list-logado">
-              <li class="profile-item"><a href="#" class="profile-link font-1-s" aria-label="Ir para suas builds"><i class="fa-regular fa-user"></i>
+              <li class="profile-item"><a href="#" class="profile-link font-1-s" aria-label="Ir para suas builds"><i class="fa-solid fa-floppy-disk"></i>
                   <p>Builds</p>
                 </a></li>
-              <li class="profile-item"><a href="./configuracoes.html" class="profile-link font-1-s" aria-label="Ir para as Configurações do seu perfil"><i class="fa-regular fa-floppy-disk"></i>
+              <li class="profile-item"><a href="./configuracoes.html" class="profile-link font-1-s" aria-label="Ir para as Configurações do seu perfil"><i class="fa-solid fa-user-gear"></i>
                   <p>Configurações</p>
                 </a></li>
               <li class="profile-item sair"><a href="#" class="profile-link font-1-s" id="btn-sair" aria-label="Sair da sua conta"><i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -55,7 +49,7 @@
               <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" aria-label="Entrar na sua conta"><i class="fa-solid fa-arrow-right-to-bracket"></i>
                   <p>Entrar</p>
                 </a></li>
-              <li class="profile-item"><a href="./signin.html" class="profile-link font-1-s" aria-label="Criar uma conta"><i class="fa-regular fa-user"></i>
+              <li class="profile-item"><a href="./pages/signin.html" class="profile-link font-1-s" aria-label="Criar uma conta"><i class="fa-solid fa-user-plus"></i>
                   <p>Criar conta</p>
                 </a></li>
             </ul>
@@ -97,9 +91,9 @@
       <p id="login-description" class="font-2-xs">Primeira vez aqui? <a href="./signin.html">Crie uma conta!</a></p>
 
       <form id="login-form">
-        <input type="email" placeholder="Seu e-mail" class="input-text" id="email">
+        <input type="email" placeholder="Seu e-mail" class="input-text" id="email" required>
         <div class="input-senha-wrapper">
-          <input type="password" placeholder="Sua senha" class="input-text" id="senha">
+          <input type="password" placeholder="Sua senha" class="input-text" id="senha" required>
           <i class="fa-solid fa-eye-slash toggle-senha" data-target="senha"></i>
         </div>
 

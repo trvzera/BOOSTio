@@ -20,7 +20,7 @@
 }
 
 #loading-video {
-  width: min(320px, 40vw);
+  width: min(420px, 40vw);
   height: auto;
   object-fit: contain;
 }
