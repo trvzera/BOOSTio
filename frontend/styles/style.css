@@ -10,6 +10,7 @@
 @import "./utilitarios/inputs.css";
 @import "./utilitarios/transition.css";
 @import "./utilitarios/loading.css";
+@import "./utilitarios/footer.css";
 
 /* HEADER */
 @import "./header/header.css";
@@ -23,6 +24,9 @@
 
 /* SERVICES */
 @import "./services/services.css";
+
+/* FOOTER */
+@import "./home/build-page.css";
 
 /* SIGNIN */
 @import "./conta/signin.css";
