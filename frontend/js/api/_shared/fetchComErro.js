@@ -15,7 +15,14 @@ export async function fetchComErro(caminho, opcoes = {}) {
     },
   });
 
+  if (resposta.status === 204) {
+    if (!resposta.ok) {
+      throw new Error("Erro ao comunicar com o servidor.");
+    }
+    return null;
+  }
   const dados = await resposta.json();
+
 
   if (!resposta.ok) {
     throw new Error(dados.erro || "Erro ao comunicar com o servidor.");

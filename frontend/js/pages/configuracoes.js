@@ -24,10 +24,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       setTimeout(() => toast.classList.remove("show"), 2600);
     }
 
-    const usernameInput = document.getElementById("username-input");
     const emailInput = document.getElementById("email-input");
     const displayUsername = document.getElementById("display-username");
-    const displayEmail = document.getElementById("display-email");
     const confirmUsernameTarget = document.getElementById(
       "confirm-username-target",
     );
@@ -35,29 +33,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     emailInput.addEventListener("input", () => {
       emailInput.classList.toggle("invalido", emailInput.value.length > 0 && !emailInput.checkValidity());
     });
-
-    if (document.querySelector("#configs")) {
-      document.getElementById("save-profile-btn").addEventListener("click", () => {
-        const newUsername = usernameInput.value.trim();
-        const newEmail = emailInput.value.trim();
-
-        if (!newUsername || !newEmail) {
-          showToast("Preencha nome e e-mail antes de salvar.", false);
-          return;
-        }
-
-        if (!emailInput.checkValidity()) {
-          showToast("Digite um e-mail válido.", false);
-          emailInput.focus();
-          return;
-        }
-
-        displayUsername.textContent = newUsername;
-        displayEmail.textContent = newEmail;
-        confirmUsernameTarget.textContent = newUsername;
-        showToast("Perfil atualizado com sucesso.", true);
-      });
-    }
 
     document.querySelectorAll(".toggle-password").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -191,18 +166,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     async function atualizaDados() {
+      const valorNome = inputNome.value.trim();
+      const valorEmail = inputEmail.value.trim();
+
+      if (!valorNome || !valorEmail) {
+        showToast("Preencha nome e e-mail antes de salvar.", false);
+        return;
+      }
+
+      if (!inputEmail.checkValidity()) {
+        showToast("Digite um e-mail válido.", false);
+        inputEmail.focus();
+        return;
+      }
+
       try {
         const dados = await buscarUsuarioLogado();
-        const valorEmail = inputEmail.value;
-        const valorNome = inputNome.value;
 
-        if (dados.usuario.email == valorEmail) {
-          const resposta = await atualizarUsuario(dados.usuario.id, valorNome, undefined, undefined);
-          console.log(resposta);
-        } else {
-          const resposta = await atualizarUsuario(dados.usuario.id, valorNome, valorEmail, undefined);
-          console.log(resposta);
-        }
+        const resposta =
+          dados.usuario.email == valorEmail
+            ? await atualizarUsuario(dados.usuario.id, valorNome, undefined, undefined)
+            : await atualizarUsuario(dados.usuario.id, valorNome, valorEmail, undefined);
+
+        nomeConfigs.textContent = valorNome;
+        emailConfigs.textContent = valorEmail;
+        confirmUsernameTarget.textContent = valorNome;
+        showToast(resposta.mensagem || "Perfil atualizado com sucesso.", true);
       } catch (erro) {
         console.error("Falha ao atualizar dados:", erro);
         showToast(erro.message || "Não foi possível atualizar o perfil.", false);

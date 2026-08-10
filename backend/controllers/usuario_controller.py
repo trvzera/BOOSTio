@@ -39,8 +39,8 @@ def criar_usuario():
         db.session.rollback()
         return jsonify({"erro": "Erro ao salvar o usuario no banco de dados."}), 500
 
+@usuario_bp.delete("/<int:usuario_id>")
 @login_required
-@usuario_bp.delete("/<int:usuario_id>") 
 def excluir_usuario(usuario_id):
     try:
         service = DeletarUsuarioService()
@@ -55,8 +55,8 @@ def excluir_usuario(usuario_id):
         db.session.rollback()
         return jsonify({"erro":"Erro ao excluir o usuario do banco de dados"}),500
 
-@login_required
 @usuario_bp.get("/")
+@login_required
 def listar_usuarios():
     service = ListarUsuariosService()
     usuarios = service.executar()
@@ -66,8 +66,8 @@ def listar_usuarios():
         "usuarios": usuarios
         }),200
 
-@login_required
 @usuario_bp.get("/<int:usuario_id>")
+@login_required
 def listar_usuario_id(usuario_id):
     try:
         service = ListarUsuarioIdService()
@@ -81,8 +81,8 @@ def listar_usuario_id(usuario_id):
     except ValueError as erro:
         return jsonify({"erro":f"{str(erro)}"}),404
 
-@login_required
 @usuario_bp.put("/<int:usuario_id>")
+@login_required
 def atualizar_usuario(usuario_id):
     try:
         dados = request.get_json() or {}
