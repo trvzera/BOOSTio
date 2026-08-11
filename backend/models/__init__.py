@@ -1,11 +1,17 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_mail import Mail
+
 
 #Importante iniciar antes de importar
 db = SQLAlchemy()
 
 #Iniciar o flask_login
 lm = LoginManager()
+
+#Iniciar o flask_mail
+mail = Mail()
+
 
 #Importar em ordem de heranca
 from .base import ModeloBase

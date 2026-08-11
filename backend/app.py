@@ -2,8 +2,8 @@ from dotenv import load_dotenv
 from configs import ambientes #Antes por esta com secret_key(IMPORTANTE)
 from flask import Flask, render_template
 from flask_cors import CORS
-from models import db 
-from models import lm
+from flask_mail import Mail, Message
+from models import db,lm,mail 
 import os
 
 from controllers.usuario_controller import usuario_bp
@@ -18,6 +18,7 @@ app.config.from_object(ambientes[os.getenv('APP_ENV', 'desenvolvimento')])
 #Iniciar o login manager e passar o app como parametro
 lm.init_app(app)
 db.init_app(app)
+mail.init_app(app)
 
 #flask cors permite o fornt consumir a api do back, e salvar os cookies, quando o front estiver nessas urls
 CORS(app, supports_credentials=True, origins=["http://localhost:5500", "http://127.0.0.1:5500"])
