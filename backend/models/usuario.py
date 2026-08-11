@@ -10,7 +10,7 @@ class Usuario(ModeloBase,UserMixin):
   senha = db.Column(db.String(100),nullable = False)
   
   #Excluir o campo senha para segurança(mesmo com hash é um dado sensível)
-  def to_dict(self):
+  def to_dict(self) -> dict:
     return {
       "id":self.id,
       "nome": self.nome,
@@ -18,30 +18,30 @@ class Usuario(ModeloBase,UserMixin):
       "criado_em":self.criado_em
     }
 
-  def atualizar_dados(self,nome=None,email=None,senha=None):
+  def atualizar_dados(self, nome: str | None = None, email: str | None = None, senha: str | None = None) -> None:
     if nome is not None:
       self.nome = nome
 
     if email is not None:
       self.email = email
-      
+
     if senha is not None:
       self.senha = senha
-    
+
     db.session.commit()
 
   @staticmethod
-  def buscar_por_email(email:str):
+  def buscar_por_email(email:str) -> "Usuario | None":
     usuario = Usuario.query.filter_by(email=email).first()
 
     return usuario
 
   @staticmethod
-  def listar_todos():
+  def listar_todos() -> list["Usuario"]:
     return Usuario.query.all()
-  
+
   @staticmethod
-  def buscar_por_id(id):
+  def buscar_por_id(id: int | str) -> "Usuario | None":
     return Usuario.query.get(id)
 
 
