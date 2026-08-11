@@ -1,6 +1,6 @@
 from flask_mail import Message
 from models import mail
-from smtplib import SMTPException, SMTPAuthenticationError, SMTPRecipientsRefused
+
 import random
 
 
@@ -15,7 +15,7 @@ class EnviarEmailService:
 
     codigo = self._gerar_codigo()
 
-    #Falta salvar no banco o codigo
+    #Falta salvar no banco o codigo 
     msg.body = f'Seu código de verificação é: {codigo}'
     msg.html = f'''
         <div style="font-family: Arial, sans-serif;">
@@ -25,15 +25,9 @@ class EnviarEmailService:
             <p>Esse código expira em 10 minutos.</p>
         </div>
     '''
-    #Se der erro lanca uma execao lembrar de tratar na controllers
     mail.send(msg)
 
-    # except SMTPAuthenticationError:
-    #     raise ValueError('Falha na autenticação do servidor de email')
-    # except SMTPRecipientsRefused:
-    #     raise ValueError('Endereço de email do destinatário foi recusado')
-    # except SMTPException as erro:
-    #     raise ValueError(f'Erro ao enviar email: {str(erro)}')
+
 
   @staticmethod
   def _gerar_codigo():
