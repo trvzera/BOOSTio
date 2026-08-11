@@ -8,8 +8,9 @@ class Usuario(ModeloBase,UserMixin):
   nome = db.Column(db.String(30),nullable = False)
   email = db.Column(db.String(150),nullable = False,unique = True)
   senha = db.Column(db.String(100),nullable = False)
-  
-  #Excluir o campo senha para segurança(mesmo com hash é um dado sensível)
+  verificado = db.Column(db.Boolean, default=False ,nullable= False)
+
+
   def to_dict(self) -> dict:
     return {
       "id":self.id,
@@ -43,6 +44,5 @@ class Usuario(ModeloBase,UserMixin):
   @staticmethod
   def buscar_por_id(id: int | str) -> "Usuario | None":
     return Usuario.query.get(id)
-
 
 

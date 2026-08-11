@@ -1,21 +1,21 @@
 from flask_mail import Message
 from models import mail
-
+from models import Codigo
 import random
 
 
 class EnviarEmailService:
-  def executar(self,dados:dict):
+  def executar(self,usuario):
     #Email ja vai estar validado pela funcao de cadastrar usuario,logo nao te necessidade de validar novamente
     
     msg = Message(
         subject='Confirme seu email - BOOSTio',
-        recipients=[dados.get("email")],       # lista, pode ter vários(Quem recebe)
+        recipients=[usuario.email], 
     )
 
     codigo = self._gerar_codigo()
 
-    #Falta salvar no banco o codigo 
+
     msg.body = f'Seu código de verificação é: {codigo}'
     msg.html = f'''
         <div style="font-family: Arial, sans-serif;">
@@ -27,7 +27,14 @@ class EnviarEmailService:
     '''
     mail.send(msg)
 
+    codigo = Codigo(
+      usuario_id = usuario.id,
+      codigo = codigo
+    )
 
+    codigo.salvar()
+
+    return True
 
   @staticmethod
   def _gerar_codigo():

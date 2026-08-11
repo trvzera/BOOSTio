@@ -11,7 +11,6 @@ class CriarUsuarioService:
     campos_obrigatorios = ["nome","email","senha"]
     campos_obrigatorios_resp = []
 
-    #Verificar se os campos obrigatorios estão preenchidos
     for campo in campos_obrigatorios:
       if not dados.get(campo):
         campos_obrigatorios_resp.append(campo)
@@ -38,7 +37,6 @@ class CriarUsuarioService:
 
     usuario.salvar()
 
-    #Retornar a instancia pois irei usar o flask-login no controller    
     return usuario
 
   #any percorre todos e se um for true, retorna true

@@ -3,12 +3,14 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from models import db,Usuario
 from sqlalchemy.exc import SQLAlchemyError
 from email_validator import EmailNotValidError
+from smtplib import SMTPException, SMTPAuthenticationError, SMTPRecipientsRefused
 
 from services.usuario_service.criar_usuario_service import CriarUsuarioService
 from services.usuario_service.deletar_usuario_service import DeletarUsuarioService
 from services.usuario_service.listar_usuarios_service import ListarUsuariosService
 from services.usuario_service.listar_usuario_id_service import ListarUsuarioIdService
 from services.usuario_service.atualizar_usuario_service import AtualizarUsuarioService
+from services.email_service.enviar_codigo_email_service import EnviarEmailService
 
 
 usuario_bp = Blueprint("usuario", __name__, url_prefix="/usuarios")
@@ -23,7 +25,7 @@ def criar_usuario():
         usuario = service.executar(dados)
         
         if usuario:
-            #Se o usuario existir,logo ele na aplicação
+            EnviarEmailService().executar(usuario)
             login_user(usuario)
 
         return jsonify({
@@ -33,7 +35,16 @@ def criar_usuario():
         ),201
     
     #Capturo erros
-
+    except SMTPAuthenticationError:
+        return jsonify({
+            "mensagem":'Falha na autenticação do servidor de email'
+            }),400
+    
+    except SMTPRecipientsRefused:
+        return jsonify({"mensagem": 'Endereço de email do destinatário foi recusado'}),400
+    
+    except SMTPException as erro:
+        return jsonify({"mensagem": f'Erro ao enviar email {str(erro)}'}),400
     except EmailNotValidError as e:
         return jsonify({"erro": "Email inexistente"}), 400
     
