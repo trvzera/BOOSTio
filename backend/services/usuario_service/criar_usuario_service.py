@@ -7,7 +7,7 @@ class CriarUsuarioService:
   #Adicionar verificação de senha sendo menor que 8 caracteres e etc...
   #Adicionar verificação do formato do email
   
-  def executar(self,dados):
+  def executar(self, dados: dict) -> Usuario:
     campos_obrigatorios = ["nome","email","senha"]
     campos_obrigatorios_resp = []
 
@@ -43,7 +43,7 @@ class CriarUsuarioService:
 
   #any percorre todos e se um for true, retorna true
   @staticmethod
-  def _validar_senha(senha:str):
+  def _validar_senha(senha:str) -> None:
     if len(senha) < 8:
         raise ValueError("A senha deve ter no minimo oito caracteres")
 
@@ -60,5 +60,5 @@ class CriarUsuarioService:
         raise ValueError("A senha deve conter ao menos um caractere especial")
 
   @staticmethod
-  def _validar_email(email:str):
+  def _validar_email(email:str) -> str:
     return validate_email(email,check_deliverability=False).normalized

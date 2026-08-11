@@ -1,7 +1,7 @@
 from models import Usuario
 
 class ListarUsuarioIdService:
-  def executar(usuario_id):
+  def executar(usuario_id: int) -> dict:
     usuario = Usuario.buscar_por_id(usuario_id)
     
     if usuario is None:

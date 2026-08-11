@@ -2,7 +2,7 @@ from models import Usuario
 from werkzeug.security import check_password_hash
 
 class EntrarUsuarioService:
-  def executar(self,dados):
+  def executar(self, dados: dict) -> Usuario:
     campos_obrigatorios = ["email","senha"]
 
     for campo in campos_obrigatorios:

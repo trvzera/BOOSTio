@@ -1,9 +1,9 @@
 from models import Usuario
 from werkzeug.security import generate_password_hash,check_password_hash
-from email_validator import validate_email
+from email_validator import validate_email, ValidatedEmail
 
 class AtualizarUsuarioService:
-  def executar(self,usuario_id,dados):
+  def executar(self, usuario_id: int, dados: dict) -> dict | None:
     usuario = Usuario.buscar_por_id(usuario_id)
     if usuario is None:
       return None
@@ -35,7 +35,7 @@ class AtualizarUsuarioService:
     return usuario.to_dict()
 
   @staticmethod
-  def _confirma_senha(dados,senha_atual_hash):
+  def _confirma_senha(dados: dict, senha_atual_hash: str) -> bool:
     senha_atual_informada = dados.get("senha_atual")
 
     if not senha_atual_informada:
@@ -44,7 +44,7 @@ class AtualizarUsuarioService:
     return check_password_hash(senha_atual_hash,senha_atual_informada)
 
   @staticmethod
-  def _validar_senha(senha:str):
+  def _validar_senha(senha:str) -> None:
     if len(senha) < 8:
       raise ValueError("A senha deve ter no minimo oito caracteres")
   
@@ -61,5 +61,5 @@ class AtualizarUsuarioService:
       raise ValueError("A senha deve conter ao menos um caractere especial")
 
   @staticmethod
-  def _validar_email(email):
+  def _validar_email(email: str) -> ValidatedEmail:
     return  validate_email(email,check_deliverability=False)

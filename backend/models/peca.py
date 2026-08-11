@@ -9,7 +9,7 @@ class Peca(ModeloBase):
   consumo_energia = db.Column(db.Float(),nullable = False)
   preco = db.Column(db.Float(),nullable = False)
 
-  def atualizar_preco(self, preco):
+  def atualizar_preco(self, preco: float) -> None:
     if preco < 0: 
       raise Exception("O preço não pode ser negativo")
       
