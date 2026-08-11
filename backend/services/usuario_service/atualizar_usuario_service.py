@@ -1,5 +1,6 @@
 from models import Usuario
 from werkzeug.security import generate_password_hash,check_password_hash
+from email_validator import validate_email
 
 class AtualizarUsuarioService:
   def executar(self,usuario_id,dados):
@@ -9,7 +10,8 @@ class AtualizarUsuarioService:
 
     novo_email = dados.get("email")
     if novo_email:
-      usuario_existente = Usuario.buscar_por_email(novo_email)
+      email_tratado = self._validar_email(novo_email).lower()
+      usuario_existente = Usuario.buscar_por_email(email_tratado)
 
       if usuario_existente and usuario_existente.id != usuario.id:
         raise ValueError("Já existe um usuario com esse email")
@@ -25,7 +27,7 @@ class AtualizarUsuarioService:
 
     usuario.atualizar_dados(
       dados.get("nome"),
-      dados.get("email"),
+      email_tratado,
       senha,
     )
 
@@ -39,4 +41,7 @@ class AtualizarUsuarioService:
       return False
 
     return check_password_hash(senha_atual_hash,senha_atual_informada)
-    
+
+  @staticmethod
+  def _validar_email(email):
+    return  validate_email(email,check_deliverability=False)

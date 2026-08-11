@@ -9,7 +9,7 @@ class EntrarUsuarioService:
       if dados.get(campo) is None:
         raise ValueError(f"O campo {campo} e obrigatorio")
 
-    usuario = Usuario.buscar_por_email(dados["email"])
+    usuario = Usuario.buscar_por_email(dados["email"].lower())
     
     if not usuario or not check_password_hash(usuario.senha,dados["senha"]):
       raise ValueError(f"Senha ou email invalidos")
