@@ -5,10 +5,22 @@ from sqlalchemy.exc import SQLAlchemyError
 from models import lm
 
 
-from services.email_service.enviar_codigo_email_service import EnviarEmailService
+from services.email_service.verificar_codigo_email_service import VerificarCodigoEmail
 
 email_bp = Blueprint("auth",__name__,url_prefix='/email')
 
 @email_bp.post("/check")
 def conferir_email():
+  try:
+    dados = request.get_json()
+    service = VerificarCodigoEmail()
+    usuario = service.executar(dados)
+    return jsonify({
+      "mensagem":"Email verificado com sucesso",
+      "usuario": usuario
+    }),200
+  except ValueError:
+    jsonify({"erro"})
+
+
     

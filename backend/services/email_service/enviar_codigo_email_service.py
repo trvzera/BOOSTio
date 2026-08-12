@@ -22,7 +22,7 @@ class EnviarEmailService:
             <h2>Confirme seu email</h2>
             <p>Seu código de verificação é:</p>
             <h1 style="letter-spacing: 4px;">{codigo}</h1>
-            <p>Esse código expira em 10 minutos.</p>
+            <p>Esse código expira em 5 minutos.</p>
         </div>
     '''
     mail.send(msg)

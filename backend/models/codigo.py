@@ -7,7 +7,7 @@ class Codigo(ModeloBase):
 
   usuario_id = db.Column(db.Integer, db.ForeignKey("usuario.id"),nullable = False)
   codigo = db.Column(db.String(4),nullable = False)
-  data_expiracao = db.Column(db.DateTime,default = lambda: datetime.utcnow() + timedelta(minutes=5))
+  data_expiracao = db.Column(db.DateTime,default = lambda: datetime.now(timezone.utc) + timedelta(minutes=5))
   usado = db.Column(db.Boolean, default=False ,nullable = False)
 
   usuario = db.relationship('Usuario', backref='codigo')
