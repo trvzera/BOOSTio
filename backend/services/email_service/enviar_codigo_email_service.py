@@ -1,30 +1,22 @@
 from flask_mail import Message
-from models import mail
-from models import Codigo
+from models import Codigo,mail,Usuario
+from utils.validacoes import validacao_campos
 import random
 
 
 class EnviarEmailService:
-  def executar(self,usuario):
-    #Email ja vai estar validado pela funcao de cadastrar usuario,logo nao te necessidade de validar novamente
-    
+  def executar(self,usuario:Usuario):
+    if not usuario:
+      raise ValueError("Nenhum usuario logado")
+
     msg = Message(
         subject='Confirme seu email - BOOSTio',
         recipients=[usuario.email], 
     )
 
     codigo = self._gerar_codigo()
+    self._monta_mensagem(msg,codigo)
 
-
-    msg.body = f'Seu código de verificação é: {codigo}'
-    msg.html = f'''
-        <div style="font-family: Arial, sans-serif;">
-            <h2>Confirme seu email</h2>
-            <p>Seu código de verificação é:</p>
-            <h1 style="letter-spacing: 4px;">{codigo}</h1>
-            <p>Esse código expira em 5 minutos.</p>
-        </div>
-    '''
     mail.send(msg)
 
     codigo = Codigo(
@@ -38,4 +30,16 @@ class EnviarEmailService:
 
   @staticmethod
   def _gerar_codigo():
-    return random.randint(1000,9999)
+    return str(random.randint(1000,9999))
+
+  @staticmethod
+  def _monta_mensagem(msg:Message,codigo:str):
+    msg.body = f'Seu código de verificação é: {codigo}'
+    msg.html = f'''
+        <div style="font-family: Arial, sans-serif;">
+            <h2>Confirme seu email</h2>
+            <p>Seu código de verificação é:</p>
+            <h1 style="letter-spacing: 4px;">{codigo}</h1>
+            <p>Esse código expira em 5 minutos.</p>
+        </div>
+    '''

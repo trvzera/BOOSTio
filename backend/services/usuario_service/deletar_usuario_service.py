@@ -1,8 +1,10 @@
 from models import Usuario
 
 class DeletarUsuarioService:
-  def executar(self, usuario_id: int) -> bool:
-    
+  def executar(self, usuario_id: int) -> bool:   
+    if not usuario_id:
+      return False
+
     usuario = Usuario.buscar_por_id(usuario_id)
 
     if not usuario:

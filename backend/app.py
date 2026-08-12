@@ -8,6 +8,7 @@ import os
 
 from controllers.usuario_controller import usuario_bp
 from controllers.auth_controller import auth_bp
+from controllers.email_controller import email_bp
 
 load_dotenv()
 
@@ -25,6 +26,7 @@ CORS(app, supports_credentials=True, origins=["http://localhost:5500", "http://1
 
 app.register_blueprint(usuario_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(email_bp)
 
 if __name__ == '__main__':
     with app.app_context():

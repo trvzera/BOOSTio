@@ -2,8 +2,7 @@ from flask import Blueprint,request,jsonify
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from models import db,Usuario
 from sqlalchemy.exc import SQLAlchemyError
-from email_validator import EmailNotValidError
-from smtplib import SMTPException, SMTPAuthenticationError, SMTPRecipientsRefused
+
 
 from services.usuario_service.criar_usuario_service import CriarUsuarioService
 from services.usuario_service.deletar_usuario_service import DeletarUsuarioService
@@ -25,7 +24,6 @@ def criar_usuario():
         usuario = service.executar(dados)
         
         if usuario:
-            EnviarEmailService().executar(usuario)
             login_user(usuario)
 
         return jsonify({
@@ -33,21 +31,7 @@ def criar_usuario():
             "usuario": usuario.to_dict()
             }
         ),201
-    
-    #Capturo erros
-    except SMTPAuthenticationError:
-        return jsonify({
-            "mensagem":'Falha na autenticação do servidor de email'
-            }),400
-    
-    except SMTPRecipientsRefused:
-        return jsonify({"mensagem": 'Endereço de email do destinatário foi recusado'}),400
-    
-    except SMTPException as erro:
-        return jsonify({"mensagem": f'Erro ao enviar email {str(erro)}'}),400
-    except EmailNotValidError as e:
-        return jsonify({"erro": "Email inexistente"}), 400
-    
+        
     except ValueError as erro:
         return jsonify({f"erro": f"{str(erro)}"}),400
     
@@ -114,8 +98,8 @@ def atualizar_usuario(usuario_id):
         return jsonify({"erro": "Email inexistente"}), 400
     
     except ValueError as erro:
-        db.session.rollback()
         return jsonify({"erro":f"{str(erro)}"}),400
     
     except SQLAlchemyError:
+        db.session.rollback()
         return jsonify({"erro":"Erro ao atualizar o usuario no banco de dados"})

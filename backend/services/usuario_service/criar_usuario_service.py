@@ -1,22 +1,12 @@
 from models import Usuario
-#Biblioteca para passar e verificar senha hash(segurança)
 from werkzeug.security import generate_password_hash
 from email_validator import validate_email
+from utils.validacoes import validacao_campos 
 
 class CriarUsuarioService:
-  #Adicionar verificação de senha sendo menor que 8 caracteres e etc...
-  #Adicionar verificação do formato do email
-  
   def executar(self, dados: dict) -> Usuario:
-    campos_obrigatorios = ["nome","email","senha"]
-    campos_obrigatorios_resp = []
 
-    for campo in campos_obrigatorios:
-      if not dados.get(campo):
-        campos_obrigatorios_resp.append(campo)
-
-    if campos_obrigatorios_resp:
-      raise ValueError(f"O(s) campos '{"','".join(campos_obrigatorios_resp)}'")
+    validacao_campos(dados,campos_obrigatorios = ["nome","email","senha"])
 
     email_tratado = self._validar_email(dados['email']).lower()
     
@@ -39,7 +29,6 @@ class CriarUsuarioService:
 
     return usuario
 
-  #any percorre todos e se um for true, retorna true
   @staticmethod
   def _validar_senha(senha:str) -> None:
     if len(senha) < 8:
