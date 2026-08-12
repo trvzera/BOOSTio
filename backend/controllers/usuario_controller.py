@@ -2,7 +2,7 @@ from flask import Blueprint,request,jsonify
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from models import db,Usuario
 from sqlalchemy.exc import SQLAlchemyError
-
+from utils.decorators import apenas_proprio_usuario
 
 from services.usuario_service.criar_usuario_service import CriarUsuarioService
 from services.usuario_service.deletar_usuario_service import DeletarUsuarioService
@@ -41,11 +41,9 @@ def criar_usuario():
 
 @usuario_bp.delete("/<int:usuario_id>")
 @login_required
+@apenas_proprio_usuario
 def excluir_usuario(usuario_id):
     try:
-        if usuario_id != current_user.id:
-            return jsonify({"erro":"Voçe não tem permissão para fazer isso"}),403
-
         service = DeletarUsuarioService()
         usuario = service.executar(usuario_id)
 
@@ -71,11 +69,9 @@ def listar_usuarios():
 
 @usuario_bp.get("/<int:usuario_id>")
 @login_required
+@apenas_proprio_usuario
 def listar_usuario_id(usuario_id):
     try:
-        if usuario_id != current_user.id:
-            return jsonify({"erro":"Voçe não tem permissão para fazer isso"}),403
-            
         service = ListarUsuarioIdService()
         usuario = service.buscar_por_id(usuario_id)
 
@@ -89,11 +85,9 @@ def listar_usuario_id(usuario_id):
 
 @usuario_bp.put("/<int:usuario_id>")
 @login_required
+@apenas_proprio_usuario
 def atualizar_usuario(usuario_id):
     try:
-        if usuario_id != current_user.id:
-            return jsonify({"erro":"Voçe não tem permissão para fazer isso"}),403
-
         dados = request.get_json() or {}
         service = AtualizarUsuarioService()
         usuario = service.executar(usuario_id,dados)

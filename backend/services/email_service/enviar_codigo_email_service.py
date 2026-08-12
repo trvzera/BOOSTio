@@ -5,10 +5,15 @@ import random
 
 
 class EnviarEmailService:
-  def executar(self,usuario:Usuario):
-    if not usuario:
-      raise ValueError("Nenhum usuario logado")
+  def executar(self,usuario_id:int):
+    if not usuario_id:
+      raise ValueError("Id do usuario invalido")
 
+    usuario = Usuario.buscar_por_id(usuario_id)
+
+    if not usuario:
+      raise ValueError("Nenhum usuario encontrado")
+    
     msg = Message(
         subject='Confirme seu email - BOOSTio',
         recipients=[usuario.email], 

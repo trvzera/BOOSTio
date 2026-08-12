@@ -4,18 +4,20 @@ from models import db
 from sqlalchemy.exc import SQLAlchemyError
 from smtplib import SMTPException, SMTPAuthenticationError, SMTPRecipientsRefused
 from email_validator import EmailNotValidError
+from utils.decorators import apenas_proprio_usuario
 
 from services.email_service.enviar_codigo_email_service import EnviarEmailService
 from services.email_service.verificar_codigo_email_service import VerificarCodigoEmail
 
 email_bp = Blueprint("email",__name__,url_prefix='/email')
 
-@email_bp.post("/enviar")
+@email_bp.post("/enviar/<int:id_usuario>")
 @login_required
-def enviar_email():
+@apenas_proprio_usuario
+def enviar_email(usuario_id):
   try:
     service = EnviarEmailService()
-    resposta = service.executar(current_user)
+    resposta = service.executar(usuario_id)
 
     return jsonify({
       "mensagem":"email enviado com sucesso",
@@ -42,13 +44,14 @@ def enviar_email():
     db.session.rollback()
     return jsonify({"erro": "Erro ao salvar o codigo no banco de dados."}), 500
 
-@email_bp.post("/verificar")
+@email_bp.post("/verificar/<int:usuario_id>")
 @login_required
-def conferir_email():
+@apenas_proprio_usuario
+def conferir_email(usuario_id):
   try:
     dados = request.get_json() or {}
     service = VerificarCodigoEmail()
-    usuario = service.executar(dados,current_user)
+    usuario = service.executar(dados,usuario_id)
     return jsonify({
       "mensagem":"Email verificado com sucesso",
       "usuario": usuario

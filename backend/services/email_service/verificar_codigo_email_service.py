@@ -4,13 +4,18 @@ from datetime import datetime
 from utils.validacoes import validacao_campos
 
 class VerificarCodigoEmail:
-  def executar(self,dados:dict,usuario:Usuario):
+  def executar(self,dados:dict,usuario_id:int):
     validacao_campos(dados,["codigo"])
-
-    codigo_informado = dados["codigo"]
-
+    
+    if not usuario_id:
+      raise ValueError("Id do usuario invalido")
+    
+    usuario = Usuario.buscar_por_id(usuario_id)
+    
     if not usuario:
-      raise ValueError("Nenhum usuario logado")
+      raise ValueError("Nenhum usuario encontrado")
+    
+    codigo_informado = dados["codigo"]
       
     codigo_recente = Codigo.buscar_codigo_recente(usuario.id)
 
