@@ -1,6 +1,6 @@
 from . import db
 from .base import ModeloBase
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta,timezone
 
 class Codigo(ModeloBase):
   __tablename__ = "codigo"
@@ -17,4 +17,4 @@ class Codigo(ModeloBase):
     db.session.commit()
 
   def esta_expirado(self):
-    return self.data_expiracao < datetime.utcnow()
+    return self.data_expiracao < datetime.now(timezone.utc)

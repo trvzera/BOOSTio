@@ -16,6 +16,7 @@ class Usuario(ModeloBase,UserMixin):
       "id":self.id,
       "nome": self.nome,
       "email": self.email,
+      "verificado": self.verificado,
       "criado_em":self.criado_em
     }
 
