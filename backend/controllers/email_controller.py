@@ -11,6 +11,7 @@ from services.email_service.verificar_codigo_email_service import VerificarCodig
 email_bp = Blueprint("email",__name__,url_prefix='/email')
 
 @email_bp.post("/enviar")
+@login_required
 def enviar_email():
   try:
     service = EnviarEmailService()
@@ -42,6 +43,7 @@ def enviar_email():
     return jsonify({"erro": "Erro ao salvar o codigo no banco de dados."}), 500
 
 @email_bp.post("/verificar")
+@login_required
 def conferir_email():
   try:
     dados = request.get_json() or {}

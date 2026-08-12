@@ -43,13 +43,16 @@ def criar_usuario():
 @login_required
 def excluir_usuario(usuario_id):
     try:
+        if usuario_id != current_user.id:
+            return jsonify({"erro":"Voçe não tem permissão para fazer isso"}),403
+
         service = DeletarUsuarioService()
         usuario = service.executar(usuario_id)
 
         if usuario is False:
             return jsonify({"erro": "Usuario não encontrado."}), 404
 
-        return jsonify({"mensagem":"Usuario excluído com sucesso"}),204
+        return jsonify(""),204
 
     except SQLAlchemyError:
         db.session.rollback()
@@ -70,6 +73,9 @@ def listar_usuarios():
 @login_required
 def listar_usuario_id(usuario_id):
     try:
+        if usuario_id != current_user.id:
+            return jsonify({"erro":"Voçe não tem permissão para fazer isso"}),403
+            
         service = ListarUsuarioIdService()
         usuario = service.buscar_por_id(usuario_id)
 
@@ -85,6 +91,9 @@ def listar_usuario_id(usuario_id):
 @login_required
 def atualizar_usuario(usuario_id):
     try:
+        if usuario_id != current_user.id:
+            return jsonify({"erro":"Voçe não tem permissão para fazer isso"}),403
+
         dados = request.get_json() or {}
         service = AtualizarUsuarioService()
         usuario = service.executar(usuario_id,dados)
