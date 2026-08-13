@@ -35,7 +35,11 @@
     width: 60%;
     color: var(--cor-4);
     span {
-      color: var(--cor-p1);
+      background: linear-gradient(45deg, var(--cor-p1), var(--cor-s1));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
       opacity: 1;
     }
   }
@@ -65,4 +69,3 @@
   opacity: 1;
   z-index: -2;
 }
-

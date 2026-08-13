@@ -1,4 +1,4 @@
-import lottie from "https://cdn.skypack.dev/lottie-web";
+import lottie from "lottie-web";
 
 const animacoesCarregadas = new Map();
 
