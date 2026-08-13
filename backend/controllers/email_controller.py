@@ -67,7 +67,7 @@ def conferir_email(usuario_id):
     return jsonify({"erro": str(e)}),400
 
 
-@email.post("/recuperar/enviar")
+@email_bp.post("/recuperar/enviar")
 def enviar_email_recuperar():
   try:
     dados = request.get_json() or {}
@@ -103,7 +103,7 @@ def enviar_email_recuperar():
 
 
 @email_bp.post("/recuperar/conferir")
-def conferir_email():
+def conferir_email_recuperar():
   try:
     dados = request.get_json() or {}
     usuario_buscado = Usuario.buscar_por_email(dados.get("email"))
