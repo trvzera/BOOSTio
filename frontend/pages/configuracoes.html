@@ -21,7 +21,7 @@
       <source src="../video/loading-toggle.webm" type="video/webm">
     </video>
   </div>
-  <header id="header">
+<header id="header">
     <div id="header-container">
       <a href="../index.html" id="logo" aria-label="Logo da BOOSTio"></a>
       <nav id="header-nav">
@@ -38,22 +38,30 @@
         <div id="profile-options">
           <nav id="profile-nav">
             <ul class="profile-nav-list" id="profile-nav-list-logado">
-              <li class="profile-item"><a href="./builds.html" class="profile-link font-1-s" aria-label="Ir para suas builds"><i class="fa-solid fa-floppy-disk"></i>
+              <li class="profile-item">
+                <a href="#" class="profile-link font-1-s" id="btn-build" aria-label="Ir para suas builds">
+                  <i id="lottie-build" class="lottie-header"></i>
                   <p>Builds</p>
-                </a></li>
-              <li class="profile-item"><a href="./configuracoes.html" class="profile-link font-1-s" aria-label="Ir para as Configurações do seu perfil"><i class="fa-solid fa-user-gear"></i>
+                </a>
+              </li>
+              <li class="profile-item">
+                <a href="./configuracoes.html" class="profile-link font-1-s" id="btn-user" aria-label="Ir para as Configurações do seu perfil">
+                  <i id="lottie-user" class="lottie-header"></i>
                   <p>Configurações</p>
-                </a></li>
-              <li class="profile-item sair"><a href="#" class="profile-link font-1-s" id="btn-sair" aria-label="Sair da sua conta"><i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </a>
+              </li>
+              <li class="profile-item sair">
+                <a href="#" class="profile-link font-1-s" id="btn-logout" aria-label="Sair da sua conta">
+                  <i id="lottie-logout" class="lottie-header"></i>
                   <p>Sair</p>
-                </a></li>
+                </a>
+              </li>
             </ul>
-
             <ul class="profile-nav-list" id="profile-nav-list-deslogado">
-              <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" aria-label="Entrar na sua conta"><i class="fa-solid fa-arrow-right-to-bracket"></i>
+              <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" id="btn-login" aria-label="Entrar na sua conta"><i id="lottie-login" class="lottie-header"></i>
                   <p>Entrar</p>
                 </a></li>
-              <li class="profile-item"><a href="./signin.html" class="profile-link font-1-s" aria-label="Criar uma conta"><i class="fa-regular fa-user"></i>
+              <li class="profile-item"><a href="./signin.html" class="profile-link font-1-s" id="btn-logon" aria-label="Criar uma conta"><i id="lottie-logon" class="lottie-header"></i>
                   <p>Criar conta</p>
                 </a></li>
             </ul>
@@ -105,6 +113,11 @@
       <div class="profile-meta">
         <div class="meta-pill font-1-m"><i class="fa-solid fa-calendar"></i><span id="criado-em"></span></div>
         <div class="meta-pill font-1-m"><i class="fa-solid fa-desktop"></i>X builds salvas</div>
+        <div class="meta-pill font-1-m" id="verificado-pill">
+          <i class="fa-solid" id="verificado-icone"></i>
+          <span id="verificado-texto"></span>
+          <button type="button" class="meta-pill-action" id="btn-verificar-agora" aria-label="Verificar meu e-mail">Verificar agora</button>
+        </div>
       </div>
 
       <div class="field">
@@ -192,6 +205,36 @@
           <button class="btn-danger" id="confirm-delete-btn" aria-label="Confirma exclusão de conta" disabled>Excluir permanentemente</button>
         </div>
       </div>
+    </div>
+
+    <div class="modal-overlay" id="verificar-email-modal">
+      <div class="modal-box" id="verificar-email-box">
+        <div class="modal-icon"><i class="fa-solid fa-envelope-circle-check"></i></div>
+        <h3 class="font-1-m">Confirme seu e-mail</h3>
+        <p class="font-1-m">Envie o código de verificação para <strong id="verificar-email-alvo">seu e-mail</strong> e digite os 4 dígitos recebidos abaixo.</p>
+
+        <div id="enviar-codigo-container">
+          <button type="button" class="btn-ghost" id="btn-enviar-codigo" aria-label="Enviar código de verificação para o e-mail">
+            <i class="fa-solid fa-paper-plane"></i>
+            Enviar código
+          </button>
+        </div>
+
+        <div class="codigo-inputs" id="codigo-inputs">
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="0" aria-label="Primeiro dígito do código" disabled>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="1" aria-label="Segundo dígito do código" disabled>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="2" aria-label="Terceiro dígito do código" disabled>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="3" aria-label="Quarto dígito do código" disabled>
+        </div>
+
+        <p id="verificar-email-erro" class="font-1-xs erro-form"></p>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-ghost" id="btn-fechar-verificacao" aria-label="Fechar verificação de e-mail">Fechar</button>
+          <button type="button" class="btn-primary" id="btn-confirmar-codigo" aria-label="Confirmar código de verificação" disabled>Confirmar</button>
+        </div>
+      </div>
+    </div>
   </main>
 
   <div class="toast" id="toast">
