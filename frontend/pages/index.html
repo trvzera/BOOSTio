@@ -5,9 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BOOSTio</title>
-  <link rel="icon" type="image/x-icon" href="./imgs/favicon.webp">
+  <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
   <link rel="stylesheet" href="../styles/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
   <meta name="description" content="A Boostio é uma plataforma que simplifica a montagem de computadores,
   ajudando você a escolher as peças ideais com base no seu objetivo,
   orçamento e necessidade, tudo com precisão e confiança.">
@@ -23,7 +22,7 @@
   </div>
   <header id="header">
     <div id="header-container">
-      <a href="../index.html" id="logo" aria-label="Logo da BOOSTio"></a>
+      <a href="../index.html" id="logo" aria-label="Logo da BOOSTio" width="100" height="20"></a>
       <nav id="header-nav">
         <ul id="nav-list">
           <li class="nav-item"><a href="#main-page" class="nav-link font-1-xs" aria-label="Ir para sessão de inicial">Início</a></li>
@@ -89,116 +88,117 @@
       </nav>
     </div>
   </header>
+  <main role="main">
 
-  <section id="main-page">
-    <video autoplay muted loop playsinline>
-      <source src="../video/background.webm">
-      Seu navegador não suporta vídeos.
-    </video>
-    <h1 id="main-title" class="font-1-xxl">Menos Dúvidas, Mais <span>Desempenho</span> <br>Vamos montar juntos!</h1>
-    <p id="main-description" class="font-2-s">A Boostio é uma plataforma que simplifica a montagem de computadores,
-      ajudando você a escolher as peças ideais com base no seu objetivo,
-      orçamento e necessidade, tudo com precisão e confiança.</p>
-    <a href="#" class="btn-primary" aria-label="Botão para montar a sua build">Monte o seu</a>
-  </section>
+    <section id="main-page">
+      <video autoplay muted loop playsinline>
+        <source src="../video/background.webm">
+        Seu navegador não suporta vídeos.
+      </video>
+      <h1 id="main-title" class="font-1-xxl">Menos Dúvidas, Mais <span>Desempenho</span> <br>Vamos montar juntos!</h1>
+      <p id="main-description" class="font-2-s">A Boostio é uma plataforma que simplifica a montagem de computadores,
+        ajudando você a escolher as peças ideais com base no seu objetivo,
+        orçamento e necessidade, tudo com precisão e confiança.</p>
+      <a href="#" class="btn-primary" aria-label="Botão para montar a sua build">Monte o seu</a>
+    </section>
 
-  <section id="about-page">
-    <div class="decoration"></div>
-    <div id="about-container">
-      <div id="text-about">
-        <h1 class="font-1-xl">Nós somos a <span>BOOSTio.</span><br> Seja muito bem vindo(a)!</h1>
-        <p class="font-2-s">A BOOSTio é uma plataforma desenvolvida para simplificar a montagem e o upgrade de computadores. Através de uma interface intuitiva e formulários inteligentes, selecionamos para você a <span>sua máquina ideal.</span></p>
-        <p class="font-2-s">Nosso objetivo é democratizar o acesso ao hardware de alta performance, permitindo que usuários com qualquer nível de conhecimento configurem o setup ideal de forma segura, visual e eficiente.</p>
+    <section id="about-page">
+      <div class="decoration"></div>
+      <div id="about-container">
+        <div id="text-about">
+          <h1 class="font-1-xl">Nós somos a <span>BOOSTio.</span><br> Seja muito bem vindo(a)!</h1>
+          <p class="font-2-s">A BOOSTio é uma plataforma desenvolvida para simplificar a montagem e o upgrade de computadores. Através de uma interface intuitiva e formulários inteligentes, selecionamos para você a <span>sua máquina ideal.</span></p>
+          <p class="font-2-s">Nosso objetivo é democratizar o acesso ao hardware de alta performance, permitindo que usuários com qualquer nível de conhecimento configurem o setup ideal de forma segura, visual e eficiente.</p>
+          <a href="#" class="btn-primary" aria-label="Botão para montar a sua build">Monte o seu</a>
+        </div>
+        <span id="about-line"></span>
+        <video id="pc-video" autoplay muted loop playsinline>
+          <source src="../video/pc.webm">
+        </video>
+      </div>
+    </section>
+
+    <section id="services-page">
+      <div class="services-decoration d1"></div>
+      <div class="services-decoration d2"></div>
+
+      <div id="services-container">
+        <h1 id="services-h1" class="font-1-xl">Você está a <span>3 etapas</span><br> do seu setup dos sonhos.</h1>
+        <p id="services-p" class="font-2-s">
+          Do formulário à montagem final, cada etapa foi pensada pra eliminar dúvidas técnicas e te dar controle total sobre o resultado.
+        </p>
+        <div id="cards-grid">
+          <div class="card-service">
+            <div class="card-container">
+              <h1 class="card-index font-1-xxl">01</h1>
+              <h2 class="card-title font-1-xl">Responda o formulário</h2>
+              <p class="card-desc font-2-s">O primeiro passo é entender o que você precisa. Através de um formulário inteligente, você define seu orçamento disponível e o objetivo do setup, seja para jogos, trabalho profissional ou uso cotidiano. Se você já tem preferência por algum componente específico, pode selecionar peças manualmente para que o sistema as integre à sugestão final.</p>
+            </div>
+          </div>
+          <div class="card-service">
+            <div class="card-container">
+              <h1 class="card-index font-1-xxl">02</h1>
+              <h2 class="card-title font-1-xl">Refine seu setup</h2>
+              <p class="card-desc font-2-s">Com base nas suas respostas, nossa plataforma gera uma configuração otimizada e compatível. Nesta etapa, você tem total controle: visualize o hardware sugerido e sinta-se livre para alterar, adicionar ou remover peças. Assim que o setup estiver perfeito, salve-o em seu perfil e compartilhe o link com amigos ou comunidades para receber feedbacks.</p>
+            </div>
+          </div>
+          <div class="card-service">
+            <div class="card-container">
+              <h1 class="card-index font-1-xxl">03</h1>
+              <h2 class="card-title font-1-xl">Aproveite!</h2>
+              <p class="card-desc font-2-s">Após a escolha e aquisição das peças, a jornada chega ao objetivo final. Com a garantia de ter selecionado componentes compatíveis e equilibrados para o seu bolso, basta realizar a montagem e desfrutar do desempenho total da sua nova máquina. O BOOSTio elimina as dúvidas para que você foque apenas na diversão e na produtividade.</p>
+            </div>
+          </div>
+        </div>
+        <div class="scroll-dots">
+          <span class="dot active" data-index="0"></span>
+          <span class="dot" data-index="1"></span>
+          <span class="dot" data-index="2"></span>
+        </div>
+      </div>
+    </section>
+
+    <section id="build-page">
+      <div class="decoration-4"></div>
+      <div class="decoration-3"></div>
+      <div id="build-container">
+        <h1 id="build-page-h1" class="font-1-xl">Monte da forma que <span>preferir.</span></h1>
+        <p class="font-1-m" id="build-page-p">Sabemos que cada usuário é único, por isso criamos um sistema que se adapta a você. Explore nosso configurador: use o formulário para um diagnóstico rápido, monte do zero com total liberdade. Aqui, o poder de escolha é sempre seu.</p>
         <a href="#" class="btn-primary" aria-label="Botão para montar a sua build">Monte o seu</a>
       </div>
-      <span id="about-line"></span>
-      <video id="pc-video" autoplay muted loop playsinline>
-        <source src="../video/pc.webm">
-      </video>
-    </div>
-  </section>
-
-  <section id="services-page">
-    <div class="services-decoration d1"></div>
-    <div class="services-decoration d2"></div>
-
-    <div id="services-container">
-      <h1 id="services-h1" class="font-1-xl">Você está a <span>3 etapas</span><br> do seu setup dos sonhos.</h1>
-      <p id="services-p" class="font-2-s">
-        Do formulário à montagem final, cada etapa foi pensada pra eliminar dúvidas técnicas e te dar controle total sobre o resultado.
-      </p>
-      <div id="cards-grid">
-        <div class="card-service">
-          <div class="card-container">
-            <h1 class="card-index font-1-xxl">01</h1>
-            <h2 class="card-title font-1-xl">Responda o formulário</h2>
-            <p class="card-desc font-2-s">O primeiro passo é entender o que você precisa. Através de um formulário inteligente, você define seu orçamento disponível e o objetivo do setup, seja para jogos, trabalho profissional ou uso cotidiano. Se você já tem preferência por algum componente específico, pode selecionar peças manualmente para que o sistema as integre à sugestão final.</p>
+      <footer>
+        <div id="top-footer">
+          <div id="footer-hero">
+            <img src="../imgs/logo.webp" alt="Logo BOOSTio">
+            <p class="font-2-s">A BOOSTio é uma plataforma desenvolvida para simplificar a montagem e o upgrade de computadores.</p>
+          </div>
+          <nav id="footer-nav">
+            <h2 class="font-1-l">Páginas</h2>
+            <ul id="footer-nav-ul">
+              <li class="footer-li"><a href="./index.html" aria-label="Ir para Landing page" class="font-2-s">Landing page</a></li>
+              <li class="footer-li"><a href="#" aria-label="Ir para página de montagem" class="font-2-s">Montagem</a></li>
+              <li class="footer-li"><a href="#" aria-label="Ir para suas builds" class="font-2-s">Suas Builds</a></li>
+            </ul>
+          </nav>
+          <div id="footer-extra">
+            <div id="contato">
+              <h2 class="font-1-l">Contato</h2>
+              <a href="#" aria-label="Email de contato BOOSTio" class="font-2-s">contato@boostio.com.br</a>
+            </div>
+            <div id="sobre">
+              <h2 class="font-1-l">Sobre Nós</h2>
+              <a href="#" aria-label="Ver sobre os Desenvolvedores" class="font-2-s">Desenvolvedores</a>
+            </div>
           </div>
         </div>
-        <div class="card-service">
-          <div class="card-container">
-            <h1 class="card-index font-1-xxl">02</h1>
-            <h2 class="card-title font-1-xl">Refine seu setup</h2>
-            <p class="card-desc font-2-s">Com base nas suas respostas, nossa plataforma gera uma configuração otimizada e compatível. Nesta etapa, você tem total controle: visualize o hardware sugerido e sinta-se livre para alterar, adicionar ou remover peças. Assim que o setup estiver perfeito, salve-o em seu perfil e compartilhe o link com amigos ou comunidades para receber feedbacks.</p>
-          </div>
+        <div id="footer-divider"></div>
+        <div id="bottom-footer">
+          <p class="font-2-s">&copy;2026 BOOSTio - Todos direitos reservados</p>
+          <a href="#" aria-label="Ver termos de uso" class="font-2-s">Termos de uso</a>
         </div>
-        <div class="card-service">
-          <div class="card-container">
-            <h1 class="card-index font-1-xxl">03</h1>
-            <h2 class="card-title font-1-xl">Aproveite!</h2>
-            <p class="card-desc font-2-s">Após a escolha e aquisição das peças, a jornada chega ao objetivo final. Com a garantia de ter selecionado componentes compatíveis e equilibrados para o seu bolso, basta realizar a montagem e desfrutar do desempenho total da sua nova máquina. O BOOSTio elimina as dúvidas para que você foque apenas na diversão e na produtividade.</p>
-          </div>
-        </div>
-      </div>
-      <div class="scroll-dots">
-        <span class="dot active" data-index="0"></span>
-        <span class="dot" data-index="1"></span>
-        <span class="dot" data-index="2"></span>
-      </div>
-    </div>
-  </section>
-
-  <section id="build-page">
-    <div class="decoration-4"></div>
-    <div class="decoration-3"></div>
-
-    <div id="build-container">
-      <h1 id="build-page-h1" class="font-1-xl">Monte da forma que <span>preferir.</span></h1>
-      <p class="font-1-m" id="build-page-p">Sabemos que cada usuário é único, por isso criamos um sistema que se adapta a você. Explore nosso configurador: use o formulário para um diagnóstico rápido, monte do zero com total liberdade. Aqui, o poder de escolha é sempre seu.</p>
-      <a href="#" class="btn-primary" aria-label="Botão para montar a sua build">Monte o seu</a>
-    </div>
-    <footer>
-      <div id="top-footer">
-        <div id="footer-hero">
-          <img src="../imgs/logo.webp" alt="Logo BOOSTio">
-          <p class="font-2-s">A BOOSTio é uma plataforma desenvolvida para simplificar a montagem e o upgrade de computadores.</p>
-        </div>
-        <nav id="footer-nav">
-          <h2 class="font-1-l">Páginas</h2>
-          <ul id="footer-nav-ul">
-            <li class="footer-li"><a href="" class="font-2-s">Landing page</a></li>
-            <li class="footer-li"><a href="" class="font-2-s">Montagem</a></li>
-            <li class="footer-li"><a href="" class="font-2-s">Suas Builds</a></li>
-          </ul>
-        </nav>
-        <div id="footer-extra">
-          <div id="contato">
-            <h2 class="font-1-l">Contato</h2>
-            <a href="" class="font-2-s">contato@boostio.com.br</a>
-          </div>
-          <div id="sobre">
-            <h2 class="font-1-l">Sobre Nós</h2>
-            <a href="" class="font-2-s">Desenvolvedores</a>
-          </div>
-        </div>
-      </div>
-      <div id="footer-divider"></div>
-      <div id="bottom-footer">
-        <p class="font-2-s">&copy;2026 BOOSTio - Todos direitos reservados</p>
-        <a href="" class="font-2-s">Termos de uso</a>
-      </div>
-    </footer>
-  </section>
+      </footer>
+    </section>
+  </main>
 </body>
 
 </html>
