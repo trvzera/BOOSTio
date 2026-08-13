@@ -6,6 +6,8 @@ const ltProfile = registrarAnimacao("profile", "../lottie/profile.json");
 document.addEventListener("click", (e) => {
   if (!containerProfile.contains(e.target)) {
     profileCheck.checked = false;
+    ltProfile.setDirection(-1);
+    ltProfile.play();
   }
 });
 
