@@ -1,0 +1,11 @@
+{
+  "liveServer.settings.ignoreFiles": [
+    ".vscode/**",
+    "**/*.scss",
+    "**/*.map",
+    "backend/**",
+    "venv/**",
+    "database/**",
+    "instance/**"
+  ]
+}
