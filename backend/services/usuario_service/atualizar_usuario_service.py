@@ -4,7 +4,11 @@ from email_validator import validate_email, ValidatedEmail
 
 class AtualizarUsuarioService:
   def executar(self, usuario_id: int, dados: dict) -> dict | None:
+    if not usuario_id:
+      return None
+
     usuario = Usuario.buscar_por_id(usuario_id)
+    
     if usuario is None:
       return None
 

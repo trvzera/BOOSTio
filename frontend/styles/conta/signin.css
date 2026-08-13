@@ -179,6 +179,56 @@
   color: var(--cor-d1);
 }
 
+/* MODAL VERIFICAÇÃO DE EMAIL */
+#verificar-email-box .modal-icon {
+  background: rgba(0, 123, 255, 0.12);
+  color: var(--cor-p1);
+}
+
+#verificar-email-box h3 {
+  color: var(--cor-p1);
+}
+
+#enviar-codigo-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--espacamento-20);
+}
+
+#btn-enviar-codigo {
+  display: flex;
+  align-items: center;
+  gap: var(--espacamento-8);
+}
+
+#btn-enviar-codigo:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.codigo-inputs {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: var(--espacamento-12);
+  margin-bottom: var(--espacamento-16);
+}
+
+.input-codigo {
+  width: 52px;
+  height: 60px;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: bold;
+  padding: 0;
+}
+
+.input-codigo:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 /* LOGIN */
 #login-page {
   height: 100vh;

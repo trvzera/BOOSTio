@@ -19,6 +19,7 @@ from .peca import Peca
 from .usuario import Usuario
 from .fonte import Fonte
 from .setup import Setup
+from .codigo import Codigo
 
 #Funcão obrigatória para o login buscar informações do usuario pelo id
 @lm.user_loader

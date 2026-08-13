@@ -23,7 +23,7 @@
         <ul id="nav-list">
           <li class="nav-item"><a href="../index.html" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de inicial">Início</a></li>
           <li class="nav-item"><a href="../index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão sobre">Sobre</a></li>
-          <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de serviços">Serviços</a></li>
+          <li class="nav-item"><a href="../index.html#services-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de serviços">Serviços</a></li>
           <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de montagem do computador">Monte o seu</a></li>
           <li id="divider"></li>
           <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página contendo suas builds">Suas Builds</a></li>
@@ -173,6 +173,35 @@
         <p id="signin-erro" class="font-1-xs erro-form"></p>
         <button type="submit" class="btn-login" id="btn-criar-conta" disabled>Criar conta</button>
       </form>
+    </div>
+
+    <div class="modal-overlay" id="verificar-email-modal">
+      <div class="modal-box" id="verificar-email-box">
+        <div class="modal-icon"><i class="fa-solid fa-envelope-circle-check"></i></div>
+        <h3 class="font-1-m">Confirme seu e-mail</h3>
+        <p class="font-1-m">Para ativar sua conta, envie o código de verificação para <strong id="verificar-email-alvo">seu e-mail</strong> e digite os 4 dígitos recebidos abaixo.</p>
+
+        <div id="enviar-codigo-container">
+          <button type="button" class="btn-ghost" id="btn-enviar-codigo" aria-label="Enviar código de verificação para o e-mail">
+            <i class="fa-solid fa-paper-plane"></i>
+            Enviar código
+          </button>
+        </div>
+
+        <div class="codigo-inputs" id="codigo-inputs">
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="0" aria-label="Primeiro dígito do código" disabled>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="1" aria-label="Segundo dígito do código" disabled>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="2" aria-label="Terceiro dígito do código" disabled>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="3" aria-label="Quarto dígito do código" disabled>
+        </div>
+
+        <p id="verificar-email-erro" class="font-1-xs erro-form"></p>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-ghost" id="btn-verificar-depois" aria-label="Verificar e-mail mais tarde">Fazer isso depois</button>
+          <button type="button" class="btn-primary" id="btn-confirmar-codigo" aria-label="Confirmar código de verificação" disabled>Confirmar</button>
+        </div>
+      </div>
     </div>
   </main>
 </body>

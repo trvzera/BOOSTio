@@ -1,3 +1,5 @@
 venv
 database
 .env
+echo "**/__pycache__/" >> .gitignore
+echo "**/*.pyc" >> .gitignore

@@ -104,6 +104,49 @@
   font-size: 1rem;
 }
 
+.meta-pill.verificado {
+  color: var(--cor-d5);
+  border-color: rgba(52, 199, 89, 0.35);
+  background: rgba(52, 199, 89, 0.08);
+}
+.meta-pill.verificado i {
+  color: var(--cor-d5);
+}
+
+.meta-pill.nao-verificado {
+  color: var(--cor-d2);
+  border-color: rgba(255, 149, 0, 0.35);
+  background: rgba(255, 149, 0, 0.08);
+}
+.meta-pill.nao-verificado i {
+  color: var(--cor-d2);
+}
+
+.meta-pill-action {
+  display: none;
+  font-family: Lexend;
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: var(--cor-p1);
+  background: transparent;
+  border: none;
+  border-left: 1px solid currentColor;
+  padding-left: 8px;
+  margin-left: 2px;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.2s var(--ease);
+}
+.meta-pill-action:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.meta-pill.nao-verificado .meta-pill-action {
+  display: inline;
+  color: var(--cor-d2);
+}
+
 .field {
   margin-bottom: var(--espacamento-20);
 }
