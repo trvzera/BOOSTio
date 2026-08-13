@@ -125,7 +125,7 @@
   display: none;
 }
 
-#burger-icon {
+#lottie-burger {
   width: 56px;
   height: 56px;
   display: flex;
@@ -142,28 +142,6 @@
   border: 1px solid var(--cor-2);
   position: relative;
   z-index: 101;
-}
-
-#burger-icon span {
-  width: 22px;
-  height: 2px;
-  background-color: var(--cor-6);
-  border-radius: 2px;
-  transition: 0.3s cubic-bezier(0.81, 0.19, 0.16, 0.87);
-  transform-origin: center;
-}
-
-#burger-check:checked ~ #burger-icon span:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
-}
-
-#burger-check:checked ~ #burger-icon span:nth-child(2) {
-  opacity: 0;
-  transform: scaleX(0);
-}
-
-#burger-check:checked ~ #burger-icon span:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
 }
 
 #mobile-nav {

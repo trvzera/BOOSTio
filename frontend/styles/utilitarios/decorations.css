@@ -26,5 +26,30 @@
   transform: translate(-50%, -50%);
 }
 
+.decoration-3 {
+  width: 800px;
+  height: 800px;
+  position: absolute;
+  background-color: var(--cor-p1);
+  border-radius: 50%;
+  filter: blur(200px);
+  z-index: -1;
+  opacity: 0.2;
+  top: 100%;
+  left: 0%;
+  transform: translate(-50%, -50%);
+}
 
-
+.decoration-4 {
+  width: 800px;
+  height: 800px;
+  position: absolute;
+  background-color: var(--cor-s1);
+  border-radius: 50%;
+  filter: blur(150px);
+  z-index: -1;
+  opacity: 0.1;
+  top: 100%;
+  left: 100%;
+  transform: translate(-50%, -50%);
+}

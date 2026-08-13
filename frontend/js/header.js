@@ -6,6 +6,8 @@ const ltProfile = registrarAnimacao("profile", "../lottie/profile.json");
 document.addEventListener("click", (e) => {
   if (!containerProfile.contains(e.target)) {
     profileCheck.checked = false;
+    ltProfile.setDirection(-1);
+    ltProfile.play();
   }
 });
 
@@ -49,6 +51,7 @@ const ltLogin = registrarAnimacao("lottie-login", "../lottie/login.json");
 const ltLogout = registrarAnimacao("lottie-logout", "../lottie/logout-lt.json");
 const ltUser = registrarAnimacao("lottie-user", "../lottie/user.json");
 const ltBuild = registrarAnimacao("lottie-build", "../lottie/build.json");
+const ltBurger = registrarAnimacao("lottie-burger", "../lottie/hamburger.json");
 
 const btnLogon = document.getElementById("btn-logon");
 
@@ -108,6 +111,18 @@ btnBuild.addEventListener("mouseenter", () => {
 btnBuild.addEventListener("mouseleave", () => {
   ltBuild.setDirection(-1);
   ltBuild.play();
+});
+
+const btnBurger = document.getElementById("burger-check");
+
+btnBurger.addEventListener("click", () => {
+  if (btnBurger.checked == true) {
+    ltBurger.setDirection(1);
+    ltBurger.play();
+  } else {
+    ltBurger.setDirection(-1);
+    ltBurger.play();
+  }
 });
 
 import { destruirTodas } from "./components/lottie-controller.js";
