@@ -1,30 +1,10 @@
-// Comportamento do header: menu de perfil e menu hambúrguer (mobile).
+import {
+  registrarAnimacao,
+  destruirTodas,
+} from "./components/lottie-controller.js";
+
 const containerProfile = document.querySelector("#profile");
 const profileCheck = document.querySelector("#profile-check");
-const ltProfile = registrarAnimacao("profile", "../lottie/profile.json");
-
-document.addEventListener("click", (e) => {
-  if (!containerProfile.contains(e.target)) {
-    profileCheck.checked = false;
-    ltProfile.setDirection(-1);
-    ltProfile.play();
-  }
-});
-
-containerProfile.addEventListener("mouseenter", () => {
-  if (!profileCheck.checked) {
-    ltProfile.setDirection(1);
-    ltProfile.play();
-  }
-});
-
-containerProfile.addEventListener("mouseleave", () => {
-  if (!profileCheck.checked) {
-    ltProfile.setDirection(-1);
-    ltProfile.play();
-  }
-});
-
 const burgerMenu = document.querySelector("#burger-menu");
 const burgerCheck = document.querySelector("#burger-check");
 
@@ -34,97 +14,119 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Sem controle de sessão no front (nada de token em localStorage), o menu de
-// perfil sempre mostra as opções de "Entrar" / "Criar conta".
 const listaDeslogado = document.querySelector("#profile-nav-list-deslogado");
 listaDeslogado.classList.add("ativo");
 
-// LOTTIE
+async function iniciarAnimacoes() {
+  const ltProfile = await registrarAnimacao(
+    "profile",
+    "../lottie/profile.json",
+  );
+  const ltLogon = await registrarAnimacao(
+    "lottie-logon",
+    "../lottie/logon.json",
+  );
+  const ltLogin = await registrarAnimacao(
+    "lottie-login",
+    "../lottie/login.json",
+  );
+  const ltLogout = await registrarAnimacao(
+    "lottie-logout",
+    "../lottie/logout-lt.json",
+  );
+  const ltUser = await registrarAnimacao("lottie-user", "../lottie/user.json");
+  const ltBuild = await registrarAnimacao(
+    "lottie-build",
+    "../lottie/build.json",
+  );
+  const ltBurger = await registrarAnimacao(
+    "lottie-burger",
+    "../lottie/hamburger.json",
+  );
 
-import {
-  registrarAnimacao,
-  obterAnimacao,
-} from "./components/lottie-controller.js";
+  document.addEventListener("click", (e) => {
+    if (!containerProfile.contains(e.target)) {
+      profileCheck.checked = false;
+      ltProfile.setDirection(-1);
+      ltProfile.play();
+    }
+  });
 
-const ltLogon = registrarAnimacao("lottie-logon", "../lottie/logon.json");
-const ltLogin = registrarAnimacao("lottie-login", "../lottie/login.json");
-const ltLogout = registrarAnimacao("lottie-logout", "../lottie/logout-lt.json");
-const ltUser = registrarAnimacao("lottie-user", "../lottie/user.json");
-const ltBuild = registrarAnimacao("lottie-build", "../lottie/build.json");
-const ltBurger = registrarAnimacao("lottie-burger", "../lottie/hamburger.json");
+  containerProfile.addEventListener("mouseenter", () => {
+    if (!profileCheck.checked) {
+      ltProfile.setDirection(1);
+      ltProfile.play();
+    }
+  });
 
-const btnLogon = document.getElementById("btn-logon");
+  containerProfile.addEventListener("mouseleave", () => {
+    if (!profileCheck.checked) {
+      ltProfile.setDirection(-1);
+      ltProfile.play();
+    }
+  });
 
-btnLogon.addEventListener("mouseenter", () => {
-  ltLogon.setDirection(1);
-  ltLogon.play();
-});
+  const btnLogon = document.getElementById("btn-logon");
+  btnLogon.addEventListener("mouseenter", () => {
+    ltLogon.setDirection(1);
+    ltLogon.play();
+  });
+  btnLogon.addEventListener("mouseleave", () => {
+    ltLogon.setDirection(-1);
+    ltLogon.play();
+  });
 
-btnLogon.addEventListener("mouseleave", () => {
-  ltLogon.setDirection(-1);
-  ltLogon.play();
-});
+  const btnLogin = document.getElementById("btn-login");
+  btnLogin.addEventListener("mouseenter", () => {
+    ltLogin.setDirection(1);
+    ltLogin.play();
+  });
+  btnLogin.addEventListener("mouseleave", () => {
+    ltLogin.setDirection(-1);
+    ltLogin.play();
+  });
 
-const btnLogin = document.getElementById("btn-login");
+  const btnLogout = document.getElementById("btn-logout");
+  btnLogout.addEventListener("mouseenter", () => {
+    ltLogout.setDirection(1);
+    ltLogout.play();
+  });
+  btnLogout.addEventListener("mouseleave", () => {
+    ltLogout.setDirection(-1);
+    ltLogout.play();
+  });
 
-btnLogin.addEventListener("mouseenter", () => {
-  ltLogin.setDirection(1);
-  ltLogin.play();
-});
+  const btnUser = document.getElementById("btn-user");
+  btnUser.addEventListener("mouseenter", () => {
+    ltUser.setDirection(1);
+    ltUser.play();
+  });
+  btnUser.addEventListener("mouseleave", () => {
+    ltUser.setDirection(-1);
+    ltUser.play();
+  });
 
-btnLogin.addEventListener("mouseleave", () => {
-  ltLogin.setDirection(-1);
-  ltLogin.play();
-});
+  const btnBuild = document.getElementById("btn-build");
+  btnBuild.addEventListener("mouseenter", () => {
+    ltBuild.setDirection(1);
+    ltBuild.play();
+  });
+  btnBuild.addEventListener("mouseleave", () => {
+    ltBuild.setDirection(-1);
+    ltBuild.play();
+  });
 
-const btnLogout = document.getElementById("btn-logout");
+  burgerCheck.addEventListener("click", () => {
+    if (burgerCheck.checked) {
+      ltBurger.setDirection(1);
+      ltBurger.play();
+    } else {
+      ltBurger.setDirection(-1);
+      ltBurger.play();
+    }
+  });
+}
 
-btnLogout.addEventListener("mouseenter", () => {
-  ltLogout.setDirection(1);
-  ltLogout.play();
-});
-
-btnLogout.addEventListener("mouseleave", () => {
-  ltLogout.setDirection(-1);
-  ltLogout.play();
-});
-
-const btnUser = document.getElementById("btn-user");
-
-btnUser.addEventListener("mouseenter", () => {
-  ltUser.setDirection(1);
-  ltUser.play();
-});
-
-btnUser.addEventListener("mouseleave", () => {
-  ltUser.setDirection(-1);
-  ltUser.play();
-});
-
-const btnBuild = document.getElementById("btn-build");
-
-btnBuild.addEventListener("mouseenter", () => {
-  ltBuild.setDirection(1);
-  ltBuild.play();
-});
-
-btnBuild.addEventListener("mouseleave", () => {
-  ltBuild.setDirection(-1);
-  ltBuild.play();
-});
-
-const btnBurger = document.getElementById("burger-check");
-
-btnBurger.addEventListener("click", () => {
-  if (btnBurger.checked == true) {
-    ltBurger.setDirection(1);
-    ltBurger.play();
-  } else {
-    ltBurger.setDirection(-1);
-    ltBurger.play();
-  }
-});
-
-import { destruirTodas } from "./components/lottie-controller.js";
+iniciarAnimacoes();
 
 window.addEventListener("beforeunload", destruirTodas);

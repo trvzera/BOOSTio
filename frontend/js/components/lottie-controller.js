@@ -1,14 +1,26 @@
-import lottie from "lottie-web";
+let lottiePromise = null;
+
+function carregarLottie() {
+  if (!lottiePromise) {
+    lottiePromise =
+      import("https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/+esm").then(
+        (mod) => mod.default,
+      );
+  }
+  return lottiePromise;
+}
 
 const animacoesCarregadas = new Map();
 
-export function registrarAnimacao(id, path, opcoes = {}) {
+export async function registrarAnimacao(id, path, opcoes = {}) {
   const container = document.querySelector(`#${id}`);
 
   if (!container) {
     console.warn(`Container #${id} não encontrado.`);
     return null;
   }
+
+  const lottie = await carregarLottie();
 
   const animacao = lottie.loadAnimation({
     container,
