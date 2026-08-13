@@ -12,10 +12,16 @@
   cursor: pointer;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   transform: translateY(-5px);
   color: var(--cor-5);
   background-color: var(--cor-6);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .btn-login {
