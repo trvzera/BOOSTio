@@ -171,13 +171,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         const resposta = await criarUsuario(userValue, emailValue, senhaValue);
 
         if (resposta.mensagem) {
-          window.location.href = "../index.html";
+          window.location.href = "./index.html";
           return;
         }
       } catch (erro) {
         console.error("Falha ao criar conta:", erro);
         erroTexto.textContent =
-          erro.message || "Não foi possível criar a conta. Tente novamente mais tarde.";
+          erro.message ||
+          "Não foi possível criar a conta. Tente novamente mais tarde.";
       } finally {
         botaoCriarConta.disabled = false;
       }

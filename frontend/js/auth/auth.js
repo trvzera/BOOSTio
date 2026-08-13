@@ -11,18 +11,13 @@ export function caminhoLogin() {
   return estaEmPages ? "./login.html" : "./pages/login.html";
 }
 
-export function caminhoDashboard() {
-  const estaEmPages = window.location.pathname.includes("/pages/");
-  return estaEmPages ? "../index.html" : "./index.html";
-}
-
 export async function confirmaUsuario() {
   const resposta = await buscarUsuarioLogado();
 
   if (document.body.id === "login" || document.body.id === "signin") {
     // Páginas só para visitante: se já está logado, manda pro dashboard.
     if (resposta.auth) {
-      window.location.href = caminhoDashboard();
+      window.location.href =  "./index.html";
       return;
     }
   } else if (document.body.id !== "inicio") {
@@ -45,9 +40,11 @@ async function sairSessao() {
   await logout();
 }
 
-const btnSair = document.querySelector("#btn-sair");
-btnSair.addEventListener("click", async (e) => {
-  e.preventDefault();
-  await sairSessao();
-  window.location.href = caminhoLogin();
-});
+const btnSair = document.querySelector("#btn-logout");
+if (btnSair) {
+  btnSair.addEventListener("click", async (e) => {
+    e.preventDefault();
+    await sairSessao();
+    window.location.href = caminhoLogin();
+  });
+}
