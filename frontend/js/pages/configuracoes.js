@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           await deletarUsuario(dadosExclusao.usuario.id);
           closeModal();
           showToast("Conta excluída. Redirecionando...", true);
-          window.location.href = "../index.html";
+          window.location.href = "./index.html";
         } catch (erro) {
           console.error("Falha ao excluir conta:", erro);
           showToast(erro.message || "Não foi possível excluir a conta.", false);

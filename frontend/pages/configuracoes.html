@@ -38,22 +38,30 @@
         <div id="profile-options">
           <nav id="profile-nav">
             <ul class="profile-nav-list" id="profile-nav-list-logado">
-              <li class="profile-item"><a href="./builds.html" class="profile-link font-1-s" aria-label="Ir para suas builds"><i class="fa-solid fa-floppy-disk"></i>
+              <li class="profile-item">
+                <a href="#" class="profile-link font-1-s" id="btn-build" aria-label="Ir para suas builds">
+                  <i id="lottie-build" class="lottie-header"></i>
                   <p>Builds</p>
-                </a></li>
-              <li class="profile-item"><a href="./configuracoes.html" class="profile-link font-1-s" aria-label="Ir para as Configurações do seu perfil"><i class="fa-solid fa-user-gear"></i>
+                </a>
+              </li>
+              <li class="profile-item">
+                <a href="./configuracoes.html" class="profile-link font-1-s" id="btn-user" aria-label="Ir para as Configurações do seu perfil">
+                  <i id="lottie-user" class="lottie-header"></i>
                   <p>Configurações</p>
-                </a></li>
-              <li class="profile-item sair"><a href="#" class="profile-link font-1-s" id="btn-sair" aria-label="Sair da sua conta"><i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </a>
+              </li>
+              <li class="profile-item sair">
+                <a href="#" class="profile-link font-1-s" id="btn-logout" aria-label="Sair da sua conta">
+                  <i id="lottie-logout" class="lottie-header"></i>
                   <p>Sair</p>
-                </a></li>
+                </a>
+              </li>
             </ul>
-
             <ul class="profile-nav-list" id="profile-nav-list-deslogado">
-              <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" aria-label="Entrar na sua conta"><i class="fa-solid fa-arrow-right-to-bracket"></i>
+              <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" id="btn-login" aria-label="Entrar na sua conta"><i id="lottie-login" class="lottie-header"></i>
                   <p>Entrar</p>
                 </a></li>
-              <li class="profile-item"><a href="./signin.html" class="profile-link font-1-s" aria-label="Criar uma conta"><i class="fa-regular fa-user"></i>
+              <li class="profile-item"><a href="./signin.html" class="profile-link font-1-s" id="btn-logon" aria-label="Criar uma conta"><i id="lottie-logon" class="lottie-header"></i>
                   <p>Criar conta</p>
                 </a></li>
             </ul>
@@ -114,7 +122,7 @@
 
       <div class="field">
         <label for="email-input" class="font-1-m">E-mail</label>
-        <input type="email" id="email-input" value="loremipsum@lorem.ipsum" placeholder="seu@email.com" required> 
+        <input type="email" id="email-input" value="loremipsum@lorem.ipsum" placeholder="seu@email.com" required>
       </div>
 
       <div class="form-actions">

@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const resposta = await login(emailValue, senhaValue);
 
         if (resposta.mensagem) {
-          window.location.href = "../index.html";
+          window.location.href = "./index.html";
           return;
         }
       } catch (erro) {
