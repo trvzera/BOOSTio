@@ -11,10 +11,12 @@ class AtualizarUsuarioService:
     
     if usuario is None:
       return None
-
+    
     novo_email = dados.get("email")
+    
+    email_tratado: str | None = None
     if novo_email:
-      email_tratado = self._validar_email(novo_email).lower()
+      email_tratado = self._validar_email(novo_email).normalized.lower()
       usuario_existente = Usuario.buscar_por_email(email_tratado)
 
       if usuario_existente and usuario_existente.id != usuario.id:

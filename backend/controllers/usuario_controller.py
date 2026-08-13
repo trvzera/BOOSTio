@@ -2,7 +2,9 @@ from flask import Blueprint,request,jsonify
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from models import db,Usuario
 from sqlalchemy.exc import SQLAlchemyError
+from email_validator import EmailNotValidError
 from utils.decorators import apenas_proprio_usuario
+
 
 from services.usuario_service.criar_usuario_service import CriarUsuarioService
 from services.usuario_service.deletar_usuario_service import DeletarUsuarioService
@@ -98,7 +100,7 @@ def atualizar_usuario(usuario_id):
 
         return jsonify({"mensagem":"Usuario atualizado com sucesso"}),200
 
-    except EmailNotValidError as e:
+    except EmailNotValidError:
         return jsonify({"erro": "Email inexistente"}), 400
     
     except ValueError as erro:
