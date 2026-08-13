@@ -164,8 +164,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const botaoEnviarCodigo = document.querySelector("#btn-enviar-codigo");
     const inputsCodigo = Array.from(document.querySelectorAll(".input-codigo"));
     const erroVerificacao = document.querySelector("#verificar-email-erro");
-    const botaoConfirmarCodigo = document.querySelector("#btn-confirmar-codigo");
-    const botaoVerificarDepois = document.querySelector("#btn-verificar-depois");
+    const botaoConfirmarCodigo = document.querySelector(
+      "#btn-confirmar-codigo",
+    );
+    const botaoVerificarDepois = document.querySelector(
+      "#btn-verificar-depois",
+    );
 
     let usuarioCriado = null;
     let temporizadorReenvio = null;
@@ -263,7 +267,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (inputsCodigo[i]) inputsCodigo[i].value = digito;
         });
 
-        const proximo = inputsCodigo[Math.min(colado.length, inputsCodigo.length - 1)];
+        const proximo =
+          inputsCodigo[Math.min(colado.length, inputsCodigo.length - 1)];
         proximo.focus();
         validarCodigoCompleto();
       });
@@ -284,7 +289,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       } catch (erro) {
         console.error("Falha ao verificar código:", erro);
         erroVerificacao.textContent =
-          erro.message || "Não foi possível verificar o código. Tente novamente.";
+          erro.message ||
+          "Não foi possível verificar o código. Tente novamente.";
         botaoConfirmarCodigo.disabled = false;
       }
     });
@@ -317,7 +323,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       } catch (erro) {
         console.error("Falha ao criar conta:", erro);
         erroTexto.textContent =
-          erro.message || "Não foi possível criar a conta. Tente novamente mais tarde.";
+          erro.message ||
+          "Não foi possível criar a conta. Tente novamente mais tarde.";
       } finally {
         botaoCriarConta.disabled = false;
       }

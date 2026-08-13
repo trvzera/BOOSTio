@@ -27,6 +27,7 @@ class VerificarCodigoEmail:
 
     codigo_recente.marcar_como_usado()
     usuario.verificado = True
+    usuario.salvar()
 
     return usuario.to_dict()
 

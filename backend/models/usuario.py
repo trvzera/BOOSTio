@@ -9,6 +9,7 @@ class Usuario(ModeloBase,UserMixin):
   email = db.Column(db.String(150),nullable = False,unique = True)
   senha = db.Column(db.String(100),nullable = False)
   verificado = db.Column(db.Boolean, default=False ,nullable= False)
+  ativo = db.Column(db.Boolean, default=False ,nullable= False)
 
 
   def to_dict(self) -> dict:
@@ -20,7 +21,7 @@ class Usuario(ModeloBase,UserMixin):
       "criado_em":self.criado_em
     }
 
-  def atualizar_dados(self, nome: str | None = None, email: str | None = None, senha: str | None = None) -> None:
+  def atualizar_dados(self, nome: str | None = None, email: str | None = None, senha: str | None = None,ativo = None) -> None:
     if nome is not None:
       self.nome = nome
 
@@ -30,6 +31,8 @@ class Usuario(ModeloBase,UserMixin):
     if senha is not None:
       self.senha = senha
 
+    if ativo is not None:
+      self.ativo = ativo
     db.session.commit()
 
   @staticmethod

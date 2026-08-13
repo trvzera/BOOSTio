@@ -1,4 +1,4 @@
-from models import Usuario
+from models import Usuario,Codigo,db
 
 class DeletarUsuarioService:
   def executar(self, usuario_id: int) -> bool:   
@@ -9,6 +9,9 @@ class DeletarUsuarioService:
 
     if not usuario:
       return False
-
-    usuario.deletar()
+    
+    Codigo.query.filter_by(usuario_id=usuario_id).delete()
+    usuario.ativo = False
+    
+    db.session.commit()
     return True

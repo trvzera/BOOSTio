@@ -52,8 +52,9 @@ def excluir_usuario(usuario_id):
 
         return jsonify(""),204
 
-    except SQLAlchemyError:
+    except SQLAlchemyError as e:
         db.session.rollback()
+        print(e)
         return jsonify({"erro":"Erro ao excluir o usuario do banco de dados"}),500
 
 @usuario_bp.get("/")

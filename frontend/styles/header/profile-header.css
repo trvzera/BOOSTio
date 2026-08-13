@@ -1,37 +1,21 @@
 #profile {
-  width: 40px;
-  height: 40px;
-  background-color: var(--cor-p1);
+  width: 60px;
+  height: 60px;
+  /* background-color: var(--cor-p1); */
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  box-shadow: inset 0px 0px 10px rgba(255, 255, 255, 0.3);
-  border: 1px solid #59a7fb;
+  /* box-shadow: inset 0px 0px 10px rgba(255, 255, 255, 0.3); */
+  /* border: 1px solid #59a7fb; */
   position: relative;
   transition: 0.3s cubic-bezier(0.81, 0.19, 0.16, 0.87);
   cursor: pointer;
 }
 
-#profile:hover > #profile-icon {
-  transform: scale(1.1);
-}
-
-#profile:hover {
-  background-color: var(--cor-p4);
-  box-shadow: inset 0px 0px 10px rgba(255, 255, 255, 0.1);
-  border: 1px solid var(--cor-p2);
-}
-
 #profile:hover > #profile-options {
   top: calc(100% + 12px);
   transform: scale(1);
-}
-
-#profile-icon {
-  font-size: 1.2rem;
-  color: var(--cor-5);
-  transition: 0.3s cubic-bezier(0.81, 0.19, 0.16, 0.87);
 }
 
 #profile-check {
@@ -99,20 +83,35 @@
   position: relative;
   padding: 5px 10px;
   transition: color 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87);
-  i {
-    transition: color 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87);
-    color: var(--cor-4);
-  }
+}
+
+.lottie-header {
+  padding: 0;
+  width: 26px;
+  height: 26px;
+  display: inline-block;
+  transition: 0.2s ease;
+}
+
+#lottie-user {
+  transform: scale(1.5);
+  padding: 0;
+  margin: 0;
+}
+
+.lottie-header path {
+  fill: var(--cor-4);
 }
 
 .profile-item.sair {
   color: var(--cor-d1);
   .profile-link {
     color: inherit;
-    i {
-      color: inherit;
-    }
   }
+}
+
+.profile-item.sair a > i path {
+  fill: var(--cor-d1);
 }
 
 .profile-link::before {
@@ -144,4 +143,8 @@
   i {
     color: var(--cor-p1);
   }
+}
+
+.profile-link:hover path {
+  fill: var(--cor-p1);
 }
