@@ -15,7 +15,7 @@ class VerificarCodigoEmail:
     codigo_recente = Codigo.buscar_codigo_recente(usuario.id)
 
     if codigo_recente.codigo != codigo_informado:
-      raise ValueError("O codigo digitado esta errado")
+      raise ValueError("O codigo digitado está errado")
     
     if codigo_recente.esta_expirado():
       raise ValueError("Esse codigo expirou")

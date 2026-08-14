@@ -128,5 +128,3 @@ async function iniciarAnimacoes() {
 }
 
 iniciarAnimacoes();
-
-window.addEventListener("beforeunload", destruirTodas);
