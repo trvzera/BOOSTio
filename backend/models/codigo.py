@@ -28,3 +28,9 @@ class Codigo(ModeloBase):
       usado = False).order_by(Codigo.criado_em.desc()).first()
     
     return codigo
+
+  @staticmethod
+  def deletar_codigos_usuario(usuario_id:int):
+    Codigo.query.filter_by(usuario_id = usuario_id).delete()
+
+    db.session.commit()

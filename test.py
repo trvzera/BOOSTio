@@ -1,9 +1,8 @@
 
 from email_validator import validate_email, EmailNotValidError
 
-def validar_email(email:str):
-  emailinfo = validate_email(email,check_deliverability=Fa)
-  return emailinfo.normalized
-
-
-print(validate_email("gugscla.000@gmail.com"))
+try:
+    validate_email("test@.com")
+    print("válido")
+except EmailNotValidError as e:
+    print("inválido:", e)
