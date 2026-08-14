@@ -23,13 +23,13 @@
   </div>
   <header id="header">
     <div id="header-container">
-      <a href="../index.html" id="logo" aria-label="Logo da BOOSTio"></a>
+      <a href="./index.html" id="logo" aria-label="Logo da BOOSTio"></a>
       <nav id="header-nav">
         <ul id="nav-list">
-          <li class="nav-item"><a href="./index.html" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de inicial">Início</a></li>
+          <li class="nav-item"><a href="./index.html#main-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de inicial">Início</a></li>
           <li class="nav-item"><a href="./index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão sobre">Sobre</a></li>
           <li class="nav-item"><a href="./index.html#services-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de serviços">Serviços</a></li>
-          <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de montagem do computador">Monte o seu</a></li>
+          <li class="nav-item"><a href="./index.html#build-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de montagem do computador">Monte o seu</a></li>
           <li id="divider"></li>
           <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página contendo suas builds">Suas Builds</a></li>
       </nav>
@@ -80,160 +80,161 @@
 
       <nav id="mobile-nav">
         <ul id="mobile-nav-list">
-          <li class="mobile-nav-item"><a href="../index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de Início">Início</a></li>
-          <li class="mobile-nav-item"><a href="../index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão Sobre">>Sobre</a></li>
-          <li class="mobile-nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de Serviços">>Serviços</a></li>
-          <li class="mobile-nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão montar o computador">>Monte o seu</a></li>
+          <li class="mobile-nav-item"><a href="./index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de Início">Início</a></li>
+          <li class="mobile-nav-item"><a href="./index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão Sobre">>Sobre</a></li>
+          <li class="mobile-nav-item"><a href="./index.html#services-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de Serviços">>Serviços</a></li>
+          <li class="mobile-nav-item"><a href="./index.html#build-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão montar o computador">>Monte o seu</a></li>
           <li class="mobile-nav-it  em"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página das suas builds">>Suas Builds</a></li>
         </ul>
       </nav>
     </div>
   </header>
+  <main role="main">
 
-  <main id="settings-page">
-    <div class="decoration decoration-1"></div>
-    <div class="decoration decoration-2"></div>
-    <div class="settings-header">
-      <h1 class="font-1-l">Configurações da conta</h1>
-      <p class="font-2-s">Gerencie suas informações pessoais e a segurança do seu perfil.</p>
-    </div>
-    <div class="settings-card">
-      <div class="card-heading"><i class="fa-solid fa-user"></i><span class="font-1-l">Perfil</span></div>
-      <p class="card-subtext font-1-m">Suas informações de login.</p>
+    <section id="settings-page">
+      <div class="decoration decoration-1"></div>
+      <div class="decoration decoration-2"></div>
+      <div class="settings-header">
+        <h1 class="font-1-l">Configurações da conta</h1>
+        <p class="font-2-s">Gerencie suas informações pessoais e a segurança do seu perfil.</p>
+      </div>
+      <div class="settings-card">
+        <div class="card-heading"><i class="fa-solid fa-user"></i><span class="font-1-l">Perfil</span></div>
+        <p class="card-subtext font-1-m">Suas informações de login.</p>
 
-      <div class="profile-row">
-        <div class="profile-info">
-          <h2 id="display-username" class="font-1-l"></h2>
-          <span id="display-email" class="font-1-m"></span>
+        <div class="profile-row">
+          <div class="profile-info">
+            <h2 id="display-username" class="font-1-l"></h2>
+            <span id="display-email" class="font-1-m"></span>
+          </div>
         </div>
-      </div>
-      <div class="profile-meta">
-        <div class="meta-pill font-1-m"><i class="fa-solid fa-calendar"></i><span id="criado-em"></span></div>
-        <div class="meta-pill font-1-m"><i class="fa-solid fa-desktop"></i>X builds salvas</div>
-        <div class="meta-pill font-1-m" id="verificado-pill">
-          <i class="fa-solid" id="verificado-icone"></i>
-          <span id="verificado-texto"></span>
-          <button type="button" class="meta-pill-action" id="btn-verificar-agora" aria-label="Verificar meu e-mail">Verificar agora</button>
+        <div class="profile-meta">
+          <div class="meta-pill font-1-m"><i class="fa-solid fa-calendar"></i><span id="criado-em"></span></div>
+          <div class="meta-pill font-1-m"><i class="fa-solid fa-desktop"></i>X builds salvas</div>
+          <div class="meta-pill font-1-m" id="verificado-pill">
+            <i class="fa-solid" id="verificado-icone"></i>
+            <span id="verificado-texto"></span>
+            <button type="button" class="meta-pill-action" id="btn-verificar-agora" aria-label="Verificar meu e-mail">Verificar agora</button>
+          </div>
         </div>
-      </div>
 
-      <div class="field">
-        <label for="username-input" class="font-1-m">Nome de usuário</label>
-        <input type="text" id="username-input" value="Lorem ipsum" placeholder="Seu nome de usuário" maxlength="15">
-      </div>
+        <div class="field">
+          <label for="username-input" class="font-1-m">Nome de usuário</label>
+          <input type="text" id="username-input" value="Lorem ipsum" placeholder="Seu nome de usuário" maxlength="15">
+        </div>
 
-      <div class="field">
-        <label for="email-input" class="font-1-m">E-mail</label>
-        <input type="email" id="email-input" value="loremipsum@lorem.ipsum" placeholder="seu@email.com" required>
-      </div>
+        <div class="field">
+          <label for="email-input" class="font-1-m">E-mail</label>
+          <input type="email" id="email-input" value="loremipsum@lorem.ipsum" placeholder="seu@email.com" required>
+        </div>
 
-      <div class="form-actions">
-        <button class="btn-primary" id="save-profile-btn">Salvar alterações</button>
-      </div>
-    </div>
-
-    <div class="settings-card">
-      <div class="card-heading"><i class="fa-solid fa-lock"></i><span class="font-1-m-b">Alterar senha</span></div>
-      <p class="card-subtext font-1-m">Utilize esse campo para alterar a sua senha.</p>
-
-      <div class="field">
-        <label for="current-password" class="font-1-m">Senha atual</label>
-        <div class="field-password-wrap">
-          <input type="password" id="current-password" placeholder="••••••••">
-          <button type="button" class="toggle-password" data-target="current-password" aria-label="Mudar visibilidade da senha"><i class="fa-solid fa-eye"></i></button>
+        <div class="form-actions">
+          <button class="btn-primary" id="save-profile-btn">Salvar alterações</button>
         </div>
       </div>
 
-      <div class="field">
-        <label for="new-password" class="font-1-m">Nova senha</label>
-        <div class="field-password-wrap">
-          <input type="password" id="new-password" placeholder="••••••••">
-          <button type="button" class="toggle-password" data-target="new-password" aria-label="Mudar visibilidade da senha"><i class="fa-solid fa-eye"></i></button>
-        </div>
-        <div class="password-strength">
-          <div class="strength-bar" data-bar="1"></div>
-          <div class="strength-bar" data-bar="2"></div>
-          <div class="strength-bar" data-bar="3"></div>
-        </div>
-        <div class="field-hint font-1-m">Mínimo de 8 caracteres, com letras (maiúsculas e minúsculas), números e símbolos.</div>
-      </div>
+      <div class="settings-card">
+        <div class="card-heading"><i class="fa-solid fa-lock"></i><span class="font-1-m-b">Alterar senha</span></div>
+        <p class="card-subtext font-1-m">Utilize esse campo para alterar a sua senha.</p>
 
-      <div class="field">
-        <label for="confirm-password" class="font-1-m">Confirmar nova senha</label>
-        <div class="field-password-wrap">
-          <input type="password" id="confirm-password" placeholder="••••••••">
-          <button type="button" class="toggle-password" data-target="confirm-password" aria-label="Mudar visibilidade da senha"><i class="fa-solid fa-eye"></i></button>
-        </div>
-        <div class="field-hint font-1-l" id="password-match-hint"></div>
-      </div>
-
-      <div class="form-actions">
-        <button class="btn-primary" id="save-password-btn" disabled aria-label="Atualizar a senha">Atualizar senha</button>
-      </div>
-    </div>
-
-    <div class="settings-card danger">
-      <div class="card-heading"><i class="fa-solid fa-triangle-exclamation"></i><span class="font-1-m-b">Zona de perigo</span></div>
-      <p class="card-subtext font-1-l">Ações abaixo são permanentes e não podem ser desfeitas.</p>
-
-      <div class="danger-row">
-        <div class="danger-row-text">
-          <h3 class="font-1-m">Excluir minha conta</h3>
-          <p class="font-1-s">Todos os seus dados, builds salvas e histórico serão removidos permanentemente.</p>
-        </div>
-        <button class="btn-danger" id="open-delete-modal" aria-label="Excluir a conta">Excluir conta</button>
-      </div>
-    </div>
-
-    </div>
-
-    <div class="modal-overlay" id="delete-modal">
-      <div class="modal-box">
-        <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-        <h3 class="font-1-m">Tem certeza que quer excluir sua conta?</h3>
-        <p class="font-1-m">Essa ação é <strong>permanente</strong> e não pode ser desfeita. Todas as suas builds, preferências e dados de perfil serão apagados. Para confirmar, digite <strong id="confirm-username-target">seu nome de usuário</strong> abaixo.</p>
-
-        <div class="field" style="margin-bottom: 0;">
-          <input type="text" id="delete-confirm-input" placeholder="Digite seu nome de usuário">
+        <div class="field">
+          <label for="current-password" class="font-1-m">Senha atual</label>
+          <div class="field-password-wrap">
+            <input type="password" id="current-password" placeholder="••••••••">
+            <button type="button" class="toggle-password" data-target="current-password" aria-label="Mudar visibilidade da senha"><i class="fa-solid fa-eye"></i></button>
+          </div>
         </div>
 
-        <div class="modal-actions">
-          <button class="btn-ghost" id="cancel-delete-btn" aria-label="Cancelar exclusão">Cancelar</button>
-          <button class="btn-danger" id="confirm-delete-btn" aria-label="Confirma exclusão de conta" disabled>Excluir permanentemente</button>
+        <div class="field">
+          <label for="new-password" class="font-1-m">Nova senha</label>
+          <div class="field-password-wrap">
+            <input type="password" id="new-password" placeholder="••••••••">
+            <button type="button" class="toggle-password" data-target="new-password" aria-label="Mudar visibilidade da senha"><i class="fa-solid fa-eye"></i></button>
+          </div>
+          <div class="password-strength">
+            <div class="strength-bar" data-bar="1"></div>
+            <div class="strength-bar" data-bar="2"></div>
+            <div class="strength-bar" data-bar="3"></div>
+          </div>
+          <div class="field-hint font-1-m">Mínimo de 8 caracteres, com letras (maiúsculas e minúsculas), números e símbolos.</div>
+        </div>
+
+        <div class="field">
+          <label for="confirm-password" class="font-1-m">Confirmar nova senha</label>
+          <div class="field-password-wrap">
+            <input type="password" id="confirm-password" placeholder="••••••••">
+            <button type="button" class="toggle-password" data-target="confirm-password" aria-label="Mudar visibilidade da senha"><i class="fa-solid fa-eye"></i></button>
+          </div>
+          <div class="field-hint font-1-l" id="password-match-hint"></div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-primary" id="save-password-btn" disabled aria-label="Atualizar a senha">Atualizar senha</button>
         </div>
       </div>
-    </div>
 
-    <div class="modal-overlay" id="verificar-email-modal">
-      <div class="modal-box" id="verificar-email-box">
-        <div class="modal-icon"><i class="fa-solid fa-envelope-circle-check"></i></div>
-        <h3 class="font-1-m">Confirme seu e-mail</h3>
-        <p class="font-1-m">Envie o código de verificação para <strong id="verificar-email-alvo">seu e-mail</strong> e digite os 4 dígitos recebidos abaixo.</p>
+      <div class="settings-card danger">
+        <div class="card-heading"><i class="fa-solid fa-triangle-exclamation"></i><span class="font-1-m-b">Zona de perigo</span></div>
+        <p class="card-subtext font-1-l">Ações abaixo são permanentes e não podem ser desfeitas.</p>
 
-        <div id="enviar-codigo-container">
-          <button type="button" class="btn-ghost" id="btn-enviar-codigo" aria-label="Enviar código de verificação para o e-mail">
-            <i class="fa-solid fa-paper-plane"></i>
-            Enviar código
-          </button>
-        </div>
-
-        <div class="codigo-inputs" id="codigo-inputs">
-          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="0" aria-label="Primeiro dígito do código" disabled>
-          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="1" aria-label="Segundo dígito do código" disabled>
-          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="2" aria-label="Terceiro dígito do código" disabled>
-          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="3" aria-label="Quarto dígito do código" disabled>
-        </div>
-
-        <p id="verificar-email-erro" class="font-1-xs erro-form"></p>
-
-        <div class="modal-actions">
-          <button type="button" class="btn-ghost" id="btn-fechar-verificacao" aria-label="Fechar verificação de e-mail">Fechar</button>
-          <button type="button" class="btn-primary" id="btn-confirmar-codigo" aria-label="Confirmar código de verificação" disabled>Confirmar</button>
+        <div class="danger-row">
+          <div class="danger-row-text">
+            <h3 class="font-1-m">Excluir minha conta</h3>
+            <p class="font-1-s">Todos os seus dados, builds salvas e histórico serão removidos permanentemente.</p>
+          </div>
+          <button class="btn-danger" id="open-delete-modal" aria-label="Excluir a conta">Excluir conta</button>
         </div>
       </div>
-    </div>
+
+      </div>
+
+      <div class="modal-overlay" id="delete-modal">
+        <div class="modal-box">
+          <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <h3 class="font-1-m">Tem certeza que quer excluir sua conta?</h3>
+          <p class="font-1-m">Essa ação é <strong>permanente</strong> e não pode ser desfeita. Todas as suas builds, preferências e dados de perfil serão apagados. Para confirmar, digite <strong id="confirm-username-target">seu nome de usuário</strong> abaixo.</p>
+
+          <div class="field" style="margin-bottom: 0;">
+            <input type="text" id="delete-confirm-input" placeholder="Digite seu nome de usuário">
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn-ghost" id="cancel-delete-btn" aria-label="Cancelar exclusão">Cancelar</button>
+            <button class="btn-danger" id="confirm-delete-btn" aria-label="Confirma exclusão de conta" disabled>Excluir permanentemente</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-overlay" id="verificar-email-modal">
+        <div class="modal-box" id="verificar-email-box">
+          <div class="modal-icon"><i class="fa-solid fa-envelope-circle-check"></i></div>
+          <h3 class="font-1-m">Confirme seu e-mail</h3>
+          <p class="font-1-m">Envie o código de verificação para <strong id="verificar-email-alvo">seu e-mail</strong> e digite os 4 dígitos recebidos abaixo.</p>
+
+          <div id="enviar-codigo-container">
+            <button type="button" class="btn-ghost" id="btn-enviar-codigo" aria-label="Enviar código de verificação para o e-mail">
+              <i class="fa-solid fa-paper-plane"></i>
+              Enviar código
+            </button>
+          </div>
+
+          <div class="codigo-inputs" id="codigo-inputs">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="0" aria-label="Primeiro dígito do código" disabled>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="1" aria-label="Segundo dígito do código" disabled>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="2" aria-label="Terceiro dígito do código" disabled>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="3" aria-label="Quarto dígito do código" disabled>
+          </div>
+
+          <p id="verificar-email-erro" class="font-1-xs erro-form"></p>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-ghost" id="btn-fechar-verificacao" aria-label="Fechar verificação de e-mail">Fechar</button>
+            <button type="button" class="btn-primary" id="btn-confirmar-codigo" aria-label="Confirmar código de verificação" disabled>Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
-
   <div class="toast" id="toast">
     <i class="fa-solid fa-circle-check" id="toast-icon"></i>
     <span id="toast-text" class="font-1-m">Alterações salvas com sucesso.</span>
