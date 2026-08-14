@@ -1,14 +1,11 @@
 {
-  // O Live Server recarrega a página sempre que QUALQUER arquivo do
-  // workspace muda no disco. Sem isso, escritas no banco SQLite
-  // (database/banco.db) ou arquivos do backend (ex.: __pycache__)
-  // disparam um reload da página no meio de uma ação do usuário,
-  // cortando toasts e resetando o estado da tela.
   "liveServer.settings.ignoreFiles": [
     ".vscode/**",
-    "database/**",
+    "**/*.scss",
+    "**/*.map",
     "backend/**",
-    "**/*.db",
-    "**/__pycache__/**"
+    "venv/**",
+    "database/**",
+    "instance/**"
   ]
 }

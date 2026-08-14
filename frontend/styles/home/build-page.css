@@ -1,6 +1,10 @@
 #build-page {
-  height: 100vh;
+  min-height: 80vh;
   padding: 100px 20px 0px 20px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
 }
 
 #build-container {
@@ -25,8 +29,8 @@
 }
 
 #build-page-p {
-  width: 60%;
+  width: 50%;
   text-align: center;
   color: var(--cor-3);
+  margin-bottom: var(--espacamento-32);
 }
-
