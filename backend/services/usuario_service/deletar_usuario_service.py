@@ -10,11 +10,8 @@ class DeletarUsuarioService:
     if not usuario:
       return False
     
-    Codigo.query.filter_by(usuario_id=usuario_id).delete()
+    Codigo.deletar_codigos_usuario(usuario.id)
 
-    usuario.ativo = False
-    usuario.email = ""
-    
-    db.session.commit()
+    usuario.desativar()
     
     return True

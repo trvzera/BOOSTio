@@ -35,6 +35,13 @@ class Usuario(ModeloBase,UserMixin):
       self.ativo = ativo
     db.session.commit()
 
+
+  def desativar(self):
+    self.email = f"usuario_deletado_{self.id}@removido.local"
+    self.senha = ""
+    self.ativo = False
+    db.session.commit()
+
   @staticmethod
   def buscar_por_email(email:str) -> "Usuario | None":
     usuario = Usuario.query.filter_by(email=email).first()
