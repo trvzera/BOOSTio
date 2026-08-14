@@ -52,6 +52,8 @@ def excluir_usuario(usuario_id):
         if usuario is False:
             return jsonify({"erro": "Usuario não encontrado."}), 404
 
+        logout_user()
+        
         return jsonify(""),204
 
     except SQLAlchemyError as e:
