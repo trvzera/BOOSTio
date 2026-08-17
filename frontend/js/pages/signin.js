@@ -5,6 +5,10 @@ import "../auth/auth.js";
 import { criarUsuario } from "../api/usuario/criarUsuario.js";
 import { enviarEmailVerificar } from "../api/email/enviarEmailVerificar.js";
 import { conferirEmailVerificar } from "../api/email/conferirEmailVerificar.js";
+import {
+  registrarAnimacao,
+  destruirTodas,
+} from "../components/lottie-controller.js";
 
 const SEGUNDOS_REENVIO = 30;
 
@@ -15,10 +19,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const senhaInput = document.querySelector("#senha1");
     const confirmarSenhaInput = document.querySelector("#senha2");
     const senhaMatchText = document.querySelector("#senha-match-text");
+    senhaMatchText.style.display = "none";
     const termosCheck = document.querySelector("#terms");
     const botaoCriarConta = document.querySelector("#btn-criar-conta");
     const erroTexto = document.querySelector("#signin-erro");
-
+    erroTexto.style.display = "none";
     const barra = document.querySelector(".barra");
     const textoStatus = document.querySelector("#status-text");
     const containerVerificacao = document.querySelector("#verificacao-senha");
@@ -29,6 +34,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     const simbolos = document.querySelector("#simbolos");
     const numeros = document.querySelector("#numeros");
 
+    const ltCheck = await registrarAnimacao(
+      "check-lt",
+      "../lottie/checkbox.json",
+    );
+
+    termosCheck.addEventListener("click", () => {
+      if (termosCheck.checked) {
+        ltCheck.setDirection(1);
+        ltCheck.play();
+      } else {
+        ltCheck.setDirection(-1);
+        ltCheck.play();
+      }
+    });
     let forcaSenha = 0;
 
     senhaInput.addEventListener("focus", () => {
@@ -92,15 +111,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function verificarSenhasIguais() {
       const senha2Vazia = confirmarSenhaInput.value.length === 0;
-
       if (senha2Vazia) {
+        senhaMatchText.style.display = "none";
         senhaMatchText.textContent = "";
         senhaMatchText.classList.remove("igual", "diferente");
         return;
       }
 
       const iguais = senhaInput.value === confirmarSenhaInput.value;
-
+      senhaMatchText.style.display = "block";
       senhaMatchText.textContent = iguais
         ? "As senhas coincidem"
         : "As senhas não coincidem";
@@ -306,6 +325,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       e.preventDefault();
 
       erroTexto.textContent = "";
+      erroTexto.style.display = "none";
 
       const userValue = nomeInput.value.trim();
       const emailValue = emailInput.value.trim();
@@ -321,6 +341,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           return;
         }
       } catch (erro) {
+        erroTexto.style.display = "block";
         console.error("Falha ao criar conta:", erro);
         erroTexto.textContent =
           erro.message ||
