@@ -37,7 +37,6 @@ class EnviarEmailService:
     msg.body = f'Seu código de verificação é: {codigo}'
     msg.html = f'''
         <div style="font-family: Arial, sans-serif; background-color:#1c1c1e; padding: 32px; border-radius: 16px; max-width: 480px; margin: 0 auto; border: 1px solid #3a3a3c;">
-  <img src="https://github.com/trvzera/BOOSTio/blob/main/frontend/imgs/logo.webp?raw=true" alt="BOOSTio" width="140" height="30" style="display:block; margin: 0 auto 24px auto;">
   <h2 style="color:#ffffff; text-align:center;">Confirme seu email</h2>
   <p style="color:#8e8e93; text-align:center;">Seu código de verificação é:</p>
   <div style="text-align:center; margin: 16px 0;">

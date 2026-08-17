@@ -35,7 +35,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
 
     emailInput.addEventListener("input", () => {
-      emailInput.classList.toggle("invalido", emailInput.value.length > 0 && !emailInput.checkValidity());
+      emailInput.classList.toggle(
+        "invalido",
+        emailInput.value.length > 0 && !emailInput.checkValidity(),
+      );
     });
 
     document.querySelectorAll(".toggle-password").forEach((btn) => {
@@ -130,7 +133,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       deleteConfirmInput.addEventListener("input", () => {
         confirmDeleteBtn.disabled =
-          deleteConfirmInput.value.trim() !== displayUsername.textContent.trim();
+          deleteConfirmInput.value.trim() !==
+          displayUsername.textContent.trim();
       });
 
       confirmDeleteBtn.addEventListener("click", async () => {
@@ -157,7 +161,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const pillVerificado = document.querySelector("#verificado-pill");
     const iconeVerificado = document.querySelector("#verificado-icone");
     const textoVerificado = document.querySelector("#verificado-texto");
-
+    gi
     function atualizarPillVerificado(verificado) {
       pillVerificado.classList.toggle("verificado", verificado);
       pillVerificado.classList.toggle("nao-verificado", !verificado);
@@ -187,12 +191,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     // --- Modal de verificação de e-mail ---
     const modalVerificacao = document.querySelector("#verificar-email-modal");
     const alvoEmail = document.querySelector("#verificar-email-alvo");
-    const botaoAbrirVerificacao = document.querySelector("#btn-verificar-agora");
+    const botaoAbrirVerificacao = document.querySelector(
+      "#btn-verificar-agora",
+    );
     const botaoEnviarCodigo = document.querySelector("#btn-enviar-codigo");
     const inputsCodigo = Array.from(document.querySelectorAll(".input-codigo"));
     const erroVerificacao = document.querySelector("#verificar-email-erro");
-    const botaoConfirmarCodigo = document.querySelector("#btn-confirmar-codigo");
-    const botaoFecharVerificacao = document.querySelector("#btn-fechar-verificacao");
+    const botaoConfirmarCodigo = document.querySelector(
+      "#btn-confirmar-codigo",
+    );
+    const botaoFecharVerificacao = document.querySelector(
+      "#btn-fechar-verificacao",
+    );
 
     let temporizadorReenvio = null;
 
@@ -293,7 +303,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (inputsCodigo[i]) inputsCodigo[i].value = digito;
         });
 
-        const proximo = inputsCodigo[Math.min(colado.length, inputsCodigo.length - 1)];
+        const proximo =
+          inputsCodigo[Math.min(colado.length, inputsCodigo.length - 1)];
         proximo.focus();
         validarCodigoCompleto();
       });
@@ -315,7 +326,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       } catch (erro) {
         console.error("Falha ao verificar código:", erro);
         erroVerificacao.textContent =
-          erro.message || "Não foi possível verificar o código. Tente novamente.";
+          erro.message ||
+          "Não foi possível verificar o código. Tente novamente.";
         botaoConfirmarCodigo.disabled = false;
       }
     });
@@ -327,6 +339,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     btnSalvar.addEventListener("click", () => {
       atualizaDados();
+      setTimeout(() => {
+        location.reload();
+      }, 500);
     });
 
     async function atualizaDados() {
@@ -349,8 +364,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const resposta =
           dados.usuario.email == valorEmail
-            ? await atualizarUsuario(dados.usuario.id, valorNome, undefined, undefined)
-            : await atualizarUsuario(dados.usuario.id, valorNome, valorEmail, undefined);
+            ? await atualizarUsuario(
+                dados.usuario.id,
+                valorNome,
+                undefined,
+                undefined,
+              )
+            : await atualizarUsuario(
+                dados.usuario.id,
+                valorNome,
+                valorEmail,
+                undefined,
+              );
 
         nomeConfigs.textContent = valorNome;
         emailConfigs.textContent = valorEmail;
@@ -358,7 +383,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         showToast(resposta.mensagem || "Perfil atualizado com sucesso.", true);
       } catch (erro) {
         console.error("Falha ao atualizar dados:", erro);
-        showToast(erro.message || "Não foi possível atualizar o perfil.", false);
+        showToast(
+          erro.message || "Não foi possível atualizar o perfil.",
+          false,
+        );
       }
     }
 
@@ -370,7 +398,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       const dados = await buscarUsuarioLogado();
 
       try {
-        await atualizarUsuario(dados.usuario.id, undefined, undefined, valorSenhaNova, valorSenhaAtual);
+        await atualizarUsuario(
+          dados.usuario.id,
+          undefined,
+          undefined,
+          valorSenhaNova,
+          valorSenhaAtual,
+        );
 
         currentPassword.value = "";
         newPassword.value = "";
