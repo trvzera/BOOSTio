@@ -86,7 +86,8 @@ footer {
 
 .footer-li a,
 #contato a,
-#sobre a {
+#sobre a,
+#termos {
   font-size: 1rem;
   color: var(--cor-4);
   position: relative;
@@ -96,13 +97,15 @@ footer {
 
 .footer-li a:hover,
 #contato a:hover,
-#sobre a:hover {
+#sobre a:hover,
+#termos:hover {
   color: var(--cor-p1);
 }
 
 .footer-li a::before,
 #contato a::before,
-#sobre a::before {
+#sobre a::before,
+#termos::before {
   content: "";
   width: 0%;
   height: 2px;
@@ -115,7 +118,8 @@ footer {
 
 .footer-li:hover a::before,
 #contato a:hover::before,
-#sobre a:hover::before {
+#sobre a:hover::before,
+#termos:hover::before {
   width: 100%;
   background-color: var(--cor-p1);
 }

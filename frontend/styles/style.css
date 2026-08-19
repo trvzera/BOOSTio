@@ -1,6 +1,9 @@
 /* GLOBAL */
 @import "./global/global.css";
 
+/* TERMOS */
+@import "./utilitarios/termos.css";
+
 /* UTILITARIOS */
 @import "./utilitarios/tipografia.css";
 @import "./utilitarios/cores.css";

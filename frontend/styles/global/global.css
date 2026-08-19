@@ -4,6 +4,16 @@
   box-sizing: border-box;
   scroll-behavior: smooth;
 }
+::selection {
+  color: var(--cor-p1);
+  background: var(--cor-p6);
+}
+
+::-moz-selection {
+  color: var(--cor-p1);
+  background: var(--cor-p6);
+}
+
 a {
   color: inherit;
   text-decoration: none;
