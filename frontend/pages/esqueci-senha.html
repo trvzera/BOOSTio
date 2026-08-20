@@ -4,18 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Entrar na conta</title>
-  <link rel="icon" type="image/x-icon" href="../imgs/favicon.webp">
+  <title>Recuperar senha</title>
+  <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
   <link rel="stylesheet" href="../styles/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-  <meta name="description" content="A Boostio é uma plataforma que simplifica a montagem de computadores,
-  ajudando você a escolher as peças ideais com base no seu objetivo,
-  orçamento e necessidade, tudo com precisão e confiança.">
+  <meta name="description" content="Recupere o acesso à sua conta BOOSTio.">
   <script type="module" src="../js/pages/loading.js" defer></script>
-  <script type="module" src="../js/pages/login.js" defer></script>
+  <script type="module" src="../js/pages/esqueci-senha.js" defer></script>
 </head>
 
-<body id="login">
+<body id="esqueci-senha">
   <div id="loading-screen">
     <video id="loading-video" autoplay muted playsinline>
       <source src="../video/loading-toggle.webm" type="video/webm">
@@ -90,26 +88,29 @@
     </div>
   </header>
 
-  <main id="login-page">
+  <main id="esqueci-senha-page">
     <div class="decoration decoration-1"></div>
     <div class="decoration decoration-2"></div>
 
-    <div id="login-container">
+    <div id="esqueci-senha-container">
       <img src="../imgs/logo.webp" alt="Logo">
-      <h1 id="login-title" class="font-1-l">Bem-vindo(a) de volta!</h1>
-      <p id="login-description" class="font-2-xs">Primeira vez aqui? <a href="./signin.html">Crie uma conta!</a></p>
+      <h1 id="esqueci-senha-title" class="font-1-l">Esqueceu sua senha?</h1>
+      <p id="esqueci-senha-description" class="font-2-xs">Sem problemas. Digite seu e-mail e enviaremos um link para você redefinir sua senha.</p>
 
-      <form id="login-form">
+      <form id="esqueci-senha-form">
         <input type="email" placeholder="Seu e-mail" class="input-text" id="email" required>
-        <div class="input-senha-wrapper">
-          <input type="password" placeholder="Sua senha" class="input-text" id="senha" required>
-          <i class="fa-solid fa-eye-slash toggle-senha" data-target="senha"></i>
-        </div>
 
-        <p id="login-erro" class="font-1-xs erro-form"></p>
-        <button type="submit" class="btn-login" id="btn-entrar" disabled>Entrar</button>
-        <a href="./esqueci-senha.html" id="esqueceu-senha" class="font-1-s">Esqueceu a sua senha?</a>
+        <p id="esqueci-senha-erro" class="font-1-xs erro-form"></p>
+        <button type="submit" class="btn-login" id="btn-enviar-link" disabled>Enviar link de recuperação</button>
+        <a href="./login.html" id="voltar-login" class="font-1-s">Voltar para o login</a>
       </form>
+
+      <div id="esqueci-senha-sucesso" class="oculto">
+        <div class="modal-icon"><i class="fa-solid fa-envelope-circle-check"></i></div>
+        <h2 class="font-1-l">Verifique seu e-mail</h2>
+        <p class="font-2-xs">Se existir uma conta associada a <strong id="email-confirmado">seu e-mail</strong>, você receberá um link para redefinir sua senha em instantes.</p>
+        <a href="./login.html" class="btn-login" id="voltar-login-sucesso">Voltar para o login</a>
+      </div>
     </div>
   </main>
 </body>
