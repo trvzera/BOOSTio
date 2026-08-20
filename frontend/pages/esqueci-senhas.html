@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar senha</title>
+  <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
+  <link rel="stylesheet" href="../styles/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+  <meta name="description" content="Recupere o acesso à sua conta BOOSTio.">
+  <script type="module" src="../js/pages/loading.js" defer></script>
+  <script type="module" src="../js/pages/esqueci-senha.js" defer></script>
+</head>
+
+<body id="esqueci-senha">
+  <div id="loading-screen">
+    <video id="loading-video" autoplay muted playsinline>
+      <source src="../video/loading-toggle.webm" type="video/webm">
+    </video>
+  </div>
+  <header id="header">
+    <div id="header-container">
+      <a href="./index.html" id="logo" aria-label="Logo da BOOSTio" width="100" height="20"></a>
+      <nav id="header-nav">
+        <ul id="nav-list">
+          <li class="nav-item"><a href="./index.html#main-page" class="nav-link font-1-xs" aria-label="Ir para sessão de inicial">Início</a></li>
+          <li class="nav-item"><a href="./index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para sessão sobre">Sobre</a></li>
+          <li class="nav-item"><a href="./index.html#services-page" class="nav-link font-1-xs" aria-label="Ir para sessão de serviços">Serviços</a></li>
+          <li class="nav-item"><a href="./index.html#build-page" class="nav-link font-1-xs" aria-label="Ir para sessão de montagem do computador">Monte o seu</a></li>
+          <li id="divider"></li>
+          <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página contendo suas builds">Suas Builds</a></li>
+        </ul>
+      </nav>
+      <div id="profile">
+        <input type="checkbox" name="profile" id="profile-check" aria-label="Abrir menu do perfil">
+        <div id="profile-options">
+          <nav id="profile-nav">
+            <ul class="profile-nav-list" id="profile-nav-list-logado">
+              <li class="profile-item">
+                <a href="#" class="profile-link font-1-s" id="btn-build" aria-label="Ir para suas builds">
+                  <i id="lottie-build" class="lottie-header"></i>
+                  <p>Builds</p>
+                </a>
+              </li>
+              <li class="profile-item">
+                <a href="./configuracoes.html" class="profile-link font-1-s" id="btn-user" aria-label="Ir para as Configurações do seu perfil">
+                  <i id="lottie-user" class="lottie-header"></i>
+                  <p>Configurações</p>
+                </a>
+              </li>
+              <li class="profile-item sair">
+                <a href="#" class="profile-link font-1-s" id="btn-logout" aria-label="Sair da sua conta">
+                  <i id="lottie-logout" class="lottie-header"></i>
+                  <p>Sair</p>
+                </a>
+              </li>
+            </ul>
+            <ul class="profile-nav-list" id="profile-nav-list-deslogado">
+              <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" id="btn-login" aria-label="Entrar na sua conta"><i id="lottie-login" class="lottie-header"></i>
+                  <p>Entrar</p>
+                </a></li>
+              <li class="profile-item"><a href="./signin.html" class="profile-link font-1-s" id="btn-logon" aria-label="Criar uma conta"><i id="lottie-logon" class="lottie-header"></i>
+                  <p>Criar conta</p>
+                </a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <header id="header-mobile">
+    <div id="burger-menu">
+      <input type="checkbox" id="burger-check" aria-label="Abrir menu de navegação">
+      <label for="burger-check" id="lottie-burger">
+      </label>
+
+      <nav id="mobile-nav">
+        <ul id="mobile-nav-list">
+          <li class="mobile-nav-item"><a href="./index.html#main-page" class="nav-link font-1-xs" aria-label="Ir para sessão de Início">Início</a></li>
+          <li class="mobile-nav-item"><a href="./index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para sessão Sobre">Sobre</a></li>
+          <li class="mobile-nav-item"><a href="./index.html#services-page" class="nav-link font-1-xs" aria-label="Ir para sessão de Serviços">Serviços</a></li>
+          <li class="mobile-nav-item"><a href="./index.html#build-page" class="nav-link font-1-xs" aria-label="Ir para sessão montar o computador">Monte o seu</a></li>
+          <li class="mobile-nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página das suas builds">Suas Builds</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="esqueci-senha-page">
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+
+    <div id="esqueci-senha-container">
+      <img src="../imgs/logo.webp" alt="Logo">
+      <h1 id="esqueci-senha-title" class="font-1-l">Esqueceu sua senha?</h1>
+      <p id="esqueci-senha-description" class="font-2-xs">Sem problemas. Digite seu e-mail e enviaremos um link para você redefinir sua senha.</p>
+
+      <form id="esqueci-senha-form">
+        <input type="email" placeholder="Seu e-mail" class="input-text" id="email" required>
+
+        <p id="esqueci-senha-erro" class="font-1-xs erro-form"></p>
+        <button type="submit" class="btn-login" id="btn-enviar-link" disabled>Enviar link de recuperação</button>
+        <a href="./login.html" id="voltar-login" class="font-1-s">Voltar para o login</a>
+      </form>
+
+      <div id="esqueci-senha-sucesso" class="oculto">
+        <div class="modal-icon"><i class="fa-solid fa-envelope-circle-check"></i></div>
+        <h2 class="font-1-l">Verifique seu e-mail</h2>
+        <p class="font-2-xs">Se existir uma conta associada a <strong id="email-confirmado">seu e-mail</strong>, você receberá um link para redefinir sua senha em instantes.</p>
+        <a href="./login.html" class="btn-login" id="voltar-login-sucesso">Voltar para o login</a>
+      </div>
+    </div>
+  </main>
+</body>
+
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redefinir senha</title>
+  <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
+  <link rel="stylesheet" href="../styles/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+  <meta name="description" content="Defina uma nova senha para sua conta BOOSTio.">
+  <script type="module" src="../js/pages/loading.js" defer></script>
+  <script type="module" src="../js/pages/resetar-senha.js" defer></script>
+</head>
+
+<body id="resetar-senha">
+  <div id="loading-screen">
+    <video id="loading-video" autoplay muted playsinline>
+      <source src="../video/loading-toggle.webm" type="video/webm">
+    </video>
+  </div>
+  <header id="header">
+    <div id="header-container">
+      <a href="./index.html" id="logo" aria-label="Logo da BOOSTio" width="100" height="20"></a>
+      <nav id="header-nav">
+        <ul id="nav-list">
+          <li class="nav-item"><a href="./index.html#main-page" class="nav-link font-1-xs" aria-label="Ir para sessão de inicial">Início</a></li>
+          <li class="nav-item"><a href="./index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para sessão sobre">Sobre</a></li>
+          <li class="nav-item"><a href="./index.html#services-page" class="nav-link font-1-xs" aria-label="Ir para sessão de serviços">Serviços</a></li>
+          <li class="nav-item"><a href="./index.html#build-page" class="nav-link font-1-xs" aria-label="Ir para sessão de montagem do computador">Monte o seu</a></li>
+          <li id="divider"></li>
+          <li class="nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página contendo suas builds">Suas Builds</a></li>
+        </ul>
+      </nav>
+      <div id="profile">
+        <input type="checkbox" name="profile" id="profile-check" aria-label="Abrir menu do perfil">
+        <div id="profile-options">
+          <nav id="profile-nav">
+            <ul class="profile-nav-list" id="profile-nav-list-logado">
+              <li class="profile-item">
+                <a href="#" class="profile-link font-1-s" id="btn-build" aria-label="Ir para suas builds">
+                  <i id="lottie-build" class="lottie-header"></i>
+                  <p>Builds</p>
+                </a>
+              </li>
+              <li class="profile-item">
+                <a href="./configuracoes.html" class="profile-link font-1-s" id="btn-user" aria-label="Ir para as Configurações do seu perfil">
+                  <i id="lottie-user" class="lottie-header"></i>
+                  <p>Configurações</p>
+                </a>
+              </li>
+              <li class="profile-item sair">
+                <a href="#" class="profile-link font-1-s" id="btn-logout" aria-label="Sair da sua conta">
+                  <i id="lottie-logout" class="lottie-header"></i>
+                  <p>Sair</p>
+                </a>
+              </li>
+            </ul>
+            <ul class="profile-nav-list" id="profile-nav-list-deslogado">
+              <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" id="btn-login" aria-label="Entrar na sua conta"><i id="lottie-login" class="lottie-header"></i>
+                  <p>Entrar</p>
+                </a></li>
+              <li class="profile-item"><a href="./signin.html" class="profile-link font-1-s" id="btn-logon" aria-label="Criar uma conta"><i id="lottie-logon" class="lottie-header"></i>
+                  <p>Criar conta</p>
+                </a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <header id="header-mobile">
+    <div id="burger-menu">
+      <input type="checkbox" id="burger-check" aria-label="Abrir menu de navegação">
+      <label for="burger-check" id="lottie-burger">
+      </label>
+
+      <nav id="mobile-nav">
+        <ul id="mobile-nav-list">
+          <li class="mobile-nav-item"><a href="./index.html#main-page" class="nav-link font-1-xs" aria-label="Ir para sessão de Início">Início</a></li>
+          <li class="mobile-nav-item"><a href="./index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para sessão Sobre">Sobre</a></li>
+          <li class="mobile-nav-item"><a href="./index.html#services-page" class="nav-link font-1-xs" aria-label="Ir para sessão de Serviços">Serviços</a></li>
+          <li class="mobile-nav-item"><a href="./index.html#build-page" class="nav-link font-1-xs" aria-label="Ir para sessão montar o computador">Monte o seu</a></li>
+          <li class="mobile-nav-item"><a href="#" class="nav-link font-1-xs" aria-label="Ir para página das suas builds">Suas Builds</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="resetar-senha-page">
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+
+    <div id="resetar-senha-container">
+      <img src="../imgs/logo.webp" alt="Logo">
+      <h1 id="resetar-senha-title" class="font-1-l">Defina uma nova senha</h1>
+      <p id="resetar-senha-description" class="font-2-xs">Crie uma senha forte para proteger sua conta.</p>
+
+      <form id="resetar-senha-form">
+        <div class="input-senha-wrapper">
+          <input type="password" placeholder="Nova senha" class="input-text" id="senha1">
+          <i class="fa-solid fa-eye-slash toggle-senha" data-target="senha1"></i>
+        </div>
+
+        <div id="verificacao-senha">
+          <div id="verificacao-senha-inner">
+            <div id="status-container">
+              <div id="fundo-barra">
+                <div class="barra"></div>
+              </div>
+              <p class="font-1-s" id="status-text"></p>
+            </div>
+            <div id="condicoes-container">
+              <div class="condicao-bloco" id="caracteres">
+                <div class="condicao-status">
+                  <i class="fa-solid fa-x"></i>
+                  <i class="fa-solid fa-check"></i>
+                </div>
+                <p class="font-1-s">+8 Caracteres</p>
+              </div>
+              <div class="condicao-bloco" id="simbolos">
+                <div class="condicao-status">
+                  <i class="fa-solid fa-x"></i>
+                  <i class="fa-solid fa-check"></i>
+                </div>
+                <p class="font-1-s">Símbolos</p>
+              </div>
+              <div class="condicao-bloco" id="maiusculas">
+                <div class="condicao-status">
+                  <i class="fa-solid fa-x"></i>
+                  <i class="fa-solid fa-check"></i>
+                </div>
+                <p class="font-1-s">Maiúsculas</p>
+              </div>
+              <div class="condicao-bloco" id="minusculas">
+                <div class="condicao-status">
+                  <i class="fa-solid fa-x"></i>
+                  <i class="fa-solid fa-check"></i>
+                </div>
+                <p class="font-1-s">Minúsculas</p>
+              </div>
+              <div class="condicao-bloco" id="numeros">
+                <div class="condicao-status">
+                  <i class="fa-solid fa-x"></i>
+                  <i class="fa-solid fa-check"></i>
+                </div>
+                <p class="font-1-s">Números</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-senha-wrapper">
+          <input type="password" placeholder="Confirme a nova senha" class="input-text" id="senha2">
+          <i class="fa-solid fa-eye-slash toggle-senha" data-target="senha2"></i>
+        </div>
+        <p id="senha-match-text" class="font-1-s"></p>
+
+        <p id="resetar-senha-erro" class="font-1-xs erro-form"></p>
+        <button type="submit" class="btn-login" id="btn-redefinir-senha" disabled>Redefinir senha</button>
+      </form>
+
+      <div id="resetar-senha-sucesso" class="oculto">
+        <div class="modal-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <h2 class="font-1-l">Senha redefinida!</h2>
+        <p class="font-2-xs">Sua senha foi alterada com sucesso. Você já pode entrar com a nova senha.</p>
+        <a href="./login.html" class="btn-login" id="ir-para-login">Ir para o login</a>
+      </div>
+
+      <div id="resetar-senha-invalido" class="oculto">
+        <div class="modal-icon modal-icon-erro"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <h2 class="font-1-l">Link inválido ou expirado</h2>
+        <p class="font-2-xs">Esse link de redefinição não é mais válido. Solicite um novo abaixo.</p>
+        <a href="./esqueci-senha.html" class="btn-login" id="solicitar-novo-link">Solicitar novo link</a>
+      </div>
+    </div>
+  </main>
+</body>
+
+</html>
