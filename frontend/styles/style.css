@@ -34,6 +34,7 @@
 /* SIGNIN */
 @import "./conta/signin.css";
 @import "./conta/configuracoes.css";
+@import "./conta/senha.css";
 
 /* RESPONSIVIDADE */
 @import "./responsividades/r-home.css";
