@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const pillVerificado = document.querySelector("#verificado-pill");
     const iconeVerificado = document.querySelector("#verificado-icone");
     const textoVerificado = document.querySelector("#verificado-texto");
-    gi
+    
     function atualizarPillVerificado(verificado) {
       pillVerificado.classList.toggle("verificado", verificado);
       pillVerificado.classList.toggle("nao-verificado", !verificado);
