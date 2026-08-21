@@ -1,0 +1,51 @@
+@media (max-width: 720px) {
+  .builds-quota-card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--espacamento-20);
+  }
+
+  .quota-actions {
+    justify-content: stretch;
+  }
+
+  .quota-actions .btn-build-primary,
+  .quota-actions .btn-build-ghost {
+    flex: 1;
+  }
+
+  .build-card {
+    padding: var(--espacamento-20);
+  }
+
+  .build-card-desc {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  #builds-page {
+    padding: 92px 16px 64px;
+  }
+
+  .builds-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .quota-actions {
+    flex-direction: column;
+  }
+
+  .quota-actions .btn-build-primary,
+  .quota-actions .btn-build-ghost {
+    width: 100%;
+  }
+
+  .build-card-bottom {
+    flex-wrap: wrap;
+  }
+
+  .build-card-date {
+    margin-left: 0;
+  }
+}

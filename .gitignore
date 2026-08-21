@@ -14,3 +14,4 @@ venv/
 instance/
 *.db
 .DS_Store
+testes.html

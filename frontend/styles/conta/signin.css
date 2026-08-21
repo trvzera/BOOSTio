@@ -1,3 +1,27 @@
+/* AMBAS */
+
+.login-divider {
+  width: 100%;
+  height: max-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacamento-12);
+  margin-bottom: var(--espacamento-32);
+}
+
+.login-line {
+  width: 30%;
+  height: 2px;
+  background-color: var(--cor-4);
+  border: 15px;
+}
+
+.login-divider p {
+  font-size: 1rem;
+  color: var(--cor-4);
+}
+
 /* SIGNIN */
 #signin-page {
   height: 100vh;
@@ -18,7 +42,7 @@
   flex-direction: column;
   align-items: center;
   position: relative;
-  transform: scale(1.15);
+  transform: scale(1.05);
 }
 
 #signin-title {
@@ -42,6 +66,8 @@
   flex-direction: column;
   align-items: center;
   gap: var(--espacamento-24);
+  margin-bottom: var(--espacamento-32);
+
 }
 
 #verificacao-senha {
@@ -273,6 +299,7 @@
   flex-direction: column;
   align-items: center;
   gap: var(--espacamento-24);
+  margin-bottom: var(--espacamento-32);
 }
 
 #login-form .btn-login {

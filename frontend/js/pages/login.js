@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const botaoEntrar = document.querySelector("#btn-entrar");
     const formLogin = document.querySelector("#login-form");
     const erroTexto = document.querySelector("#login-erro");
+    erroTexto.style.display = "none";
 
     document.querySelectorAll(".toggle-senha").forEach((icone) => {
       icone.addEventListener("click", () => {
@@ -37,6 +38,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     formLogin.addEventListener("submit", async (e) => {
       e.preventDefault();
 
+      erroTexto.style.display = "none";
       erroTexto.textContent = "";
 
       const emailValue = emailInput.value.trim();
@@ -53,8 +55,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       } catch (erro) {
         console.error("Falha ao entrar:", erro);
+        erroTexto.style.display = "block";
         erroTexto.textContent =
-          erro.message || "Não foi possível entrar. Tente novamente mais tarde.";
+          erro.message ||
+          "Não foi possível entrar. Tente novamente mais tarde.";
       } finally {
         botaoEntrar.disabled = false;
       }
