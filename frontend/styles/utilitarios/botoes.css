@@ -38,9 +38,28 @@
   cursor: pointer;
 }
 
-.btn-login:hover:not(:disabled) {
+.btn-login-secondary {
+  width: 100%;
+  font-family: Lexend;
+  font-weight: bold;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cor-4);
+  padding: 15px 100px;
+  background-color: var(--cor-1);
+  border: 1px solid var(--cor-4);
+  border-radius: 15px;
+  transition: 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87);
+  cursor: pointer;
+}
+
+.btn-login:hover:not(:disabled),
+.btn-login-secondary:hover:not(:disabled) {
   transform: translateY(-5px);
   border: 1px solid var(--cor-6);
+  color: var(--cor-6);
 }
 
 .btn-login:disabled {
