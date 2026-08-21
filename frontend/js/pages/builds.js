@@ -101,54 +101,85 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Inicialização manual com validação de botões desabilitados
   async function iniciarAnimacoesDoCard(card, buildId) {
-    
     // 1. Botão Trancar
     const btnTrancar = card.querySelector('[data-acao="trancar"]');
     if (btnTrancar) {
-      const ltLock = await registrarAnimacao(`lt-lock-${buildId}`, "../lottie/buildLock.json");
-      
+      const ltLock = await registrarAnimacao(
+        `lt-lock-${buildId}`,
+        "../lottie/buildLock.json",
+      );
+
       btnTrancar.addEventListener("mouseenter", () => {
         if (btnTrancar.disabled) return;
-        if (ltLock) { ltLock.setDirection(1); ltLock.play(); }
+        if (ltLock) {
+          ltLock.setDirection(1);
+          ltLock.play();
+        }
       });
-      
+
       btnTrancar.addEventListener("mouseleave", () => {
         if (btnTrancar.disabled) return;
-        if (ltLock) { ltLock.setDirection(-1); ltLock.play(); }
+        if (ltLock) {
+          ltLock.setDirection(-1);
+          ltLock.play();
+        }
       });
     }
 
     // 2. Botão Visibilidade (Público / Privado invertido: Público = Cadeado, Privado = Public)
     const btnVisibilidade = card.querySelector('[data-acao="visibilidade"]');
     if (btnVisibilidade) {
-      const ltVisLock = await registrarAnimacao(`lt-lock-vis-${buildId}`, "../lottie/buildLock.json");
-      const ltVisPublic = await registrarAnimacao(`lt-public-vis-${buildId}`, "../lottie/buildPublic.json");
-      
-      btnVisibilidade.addEventListener("mouseenter", () => { 
+      const ltVisLock = await registrarAnimacao(
+        `lt-lock-vis-${buildId}`,
+        "../lottie/buildLock.json",
+      );
+      const ltVisPublic = await registrarAnimacao(
+        `lt-public-vis-${buildId}`,
+        "../lottie/buildPublic.json",
+      );
+
+      btnVisibilidade.addEventListener("mouseenter", () => {
         if (btnVisibilidade.disabled) return;
-        if (ltVisLock) { ltVisLock.setDirection(1); ltVisLock.play(); }
-        if (ltVisPublic) { ltVisPublic.setDirection(1); ltVisPublic.play(); }
+        if (ltVisLock) {
+          ltVisLock.setDirection(1);
+          ltVisLock.play();
+        }
+        if (ltVisPublic) {
+          ltVisPublic.setDirection(1);
+          ltVisPublic.play();
+        }
       });
-      
-      btnVisibilidade.addEventListener("mouseleave", () => { 
+
+      btnVisibilidade.addEventListener("mouseleave", () => {
         if (btnVisibilidade.disabled) return;
-        if (ltVisLock) { ltVisLock.setDirection(-1); ltVisLock.play(); }
-        if (ltVisPublic) { ltVisPublic.setDirection(-1); ltVisPublic.play(); }
+        if (ltVisLock) {
+          ltVisLock.setDirection(-1);
+          ltVisLock.play();
+        }
+        if (ltVisPublic) {
+          ltVisPublic.setDirection(-1);
+          ltVisPublic.play();
+        }
       });
     }
 
     // 3. Botão Editar
     const btnEditar = card.querySelector('[data-acao="editar"]');
     if (btnEditar) {
-      const ltEditar = await registrarAnimacao(`lt-edit-${buildId}`, "../lottie/buildPencil.json");
+      const ltEditar = await registrarAnimacao(
+        `lt-edit-${buildId}`,
+        "../lottie/buildPencil.json",
+      );
       if (ltEditar) {
-        btnEditar.addEventListener("mouseenter", () => { 
+        btnEditar.addEventListener("mouseenter", () => {
           if (btnEditar.disabled) return;
-          ltEditar.setDirection(1); ltEditar.play(); 
+          ltEditar.setDirection(1);
+          ltEditar.play();
         });
-        btnEditar.addEventListener("mouseleave", () => { 
+        btnEditar.addEventListener("mouseleave", () => {
           if (btnEditar.disabled) return;
-          ltEditar.setDirection(-1); ltEditar.play(); 
+          ltEditar.setDirection(-1);
+          ltEditar.play();
         });
       }
     }
@@ -156,15 +187,20 @@ document.addEventListener("DOMContentLoaded", () => {
     // 4. Botão Duplicar
     const btnDuplicar = card.querySelector('[data-acao="duplicar"]');
     if (btnDuplicar) {
-      const ltClone = await registrarAnimacao(`lt-clone-${buildId}`, "../lottie/buildClone.json");
+      const ltClone = await registrarAnimacao(
+        `lt-clone-${buildId}`,
+        "../lottie/buildClone.json",
+      );
       if (ltClone) {
-        btnDuplicar.addEventListener("mouseenter", () => { 
+        btnDuplicar.addEventListener("mouseenter", () => {
           if (btnDuplicar.disabled) return;
-          ltClone.setDirection(1); ltClone.play(); 
+          ltClone.setDirection(1);
+          ltClone.play();
         });
-        btnDuplicar.addEventListener("mouseleave", () => { 
+        btnDuplicar.addEventListener("mouseleave", () => {
           if (btnDuplicar.disabled) return;
-          ltClone.setDirection(-1); ltClone.play(); 
+          ltClone.setDirection(-1);
+          ltClone.play();
         });
       }
     }
@@ -172,15 +208,20 @@ document.addEventListener("DOMContentLoaded", () => {
     // 5. Botão Copiar Link
     const btnCopiar = card.querySelector('[data-acao="copiar-link"]');
     if (btnCopiar) {
-      const ltCopy = await registrarAnimacao(`lt-copy-${buildId}`, "../lottie/buildCopy.json");
+      const ltCopy = await registrarAnimacao(
+        `lt-copy-${buildId}`,
+        "../lottie/buildCopy.json",
+      );
       if (ltCopy) {
-        btnCopiar.addEventListener("mouseenter", () => { 
+        btnCopiar.addEventListener("mouseenter", () => {
           if (btnCopiar.disabled) return;
-          ltCopy.setDirection(1); ltCopy.play(); 
+          ltCopy.setDirection(1);
+          ltCopy.play();
         });
-        btnCopiar.addEventListener("mouseleave", () => { 
+        btnCopiar.addEventListener("mouseleave", () => {
           if (btnCopiar.disabled) return;
-          ltCopy.setDirection(-1); ltCopy.play(); 
+          ltCopy.setDirection(-1);
+          ltCopy.play();
         });
       }
     }
@@ -188,15 +229,20 @@ document.addEventListener("DOMContentLoaded", () => {
     // 6. Botão Baixar CSV
     const btnBaixarCsv = card.querySelector('[data-acao="baixar-csv"]');
     if (btnBaixarCsv) {
-      const ltCsv = await registrarAnimacao(`lt-csv-${buildId}`, "../lottie/buildDownload.json");
+      const ltCsv = await registrarAnimacao(
+        `lt-csv-${buildId}`,
+        "../lottie/buildDownload.json",
+      );
       if (ltCsv) {
-        btnBaixarCsv.addEventListener("mouseenter", () => { 
+        btnBaixarCsv.addEventListener("mouseenter", () => {
           if (btnBaixarCsv.disabled) return;
-          ltCsv.setDirection(1); ltCsv.play(); 
+          ltCsv.setDirection(1);
+          ltCsv.play();
         });
-        btnBaixarCsv.addEventListener("mouseleave", () => { 
+        btnBaixarCsv.addEventListener("mouseleave", () => {
           if (btnBaixarCsv.disabled) return;
-          ltCsv.setDirection(-1); ltCsv.play(); 
+          ltCsv.setDirection(-1);
+          ltCsv.play();
         });
       }
     }
@@ -204,15 +250,20 @@ document.addEventListener("DOMContentLoaded", () => {
     // 7. Botão Baixar JSON
     const btnBaixarJson = card.querySelector('[data-acao="baixar-json"]');
     if (btnBaixarJson) {
-      const ltJson = await registrarAnimacao(`lt-json-${buildId}`, "../lottie/buildDownload.json");
+      const ltJson = await registrarAnimacao(
+        `lt-json-${buildId}`,
+        "../lottie/buildDownload.json",
+      );
       if (ltJson) {
-        btnBaixarJson.addEventListener("mouseenter", () => { 
+        btnBaixarJson.addEventListener("mouseenter", () => {
           if (btnBaixarJson.disabled) return;
-          ltJson.setDirection(1); ltJson.play(); 
+          ltJson.setDirection(1);
+          ltJson.play();
         });
-        btnBaixarJson.addEventListener("mouseleave", () => { 
+        btnBaixarJson.addEventListener("mouseleave", () => {
           if (btnBaixarJson.disabled) return;
-          ltJson.setDirection(-1); ltJson.play(); 
+          ltJson.setDirection(-1);
+          ltJson.play();
         });
       }
     }
@@ -220,15 +271,20 @@ document.addEventListener("DOMContentLoaded", () => {
     // 8. Botão Deletar
     const btnDeletar = card.querySelector('[data-acao="deletar"]');
     if (btnDeletar) {
-      const ltTrash = await registrarAnimacao(`lt-trash-${buildId}`, "../lottie/buildTrash.json");
+      const ltTrash = await registrarAnimacao(
+        `lt-trash-${buildId}`,
+        "../lottie/buildTrash.json",
+      );
       if (ltTrash) {
-        btnDeletar.addEventListener("mouseenter", () => { 
+        btnDeletar.addEventListener("mouseenter", () => {
           if (btnDeletar.disabled) return;
-          ltTrash.setDirection(1); ltTrash.play(); 
+          ltTrash.setDirection(1);
+          ltTrash.play();
         });
-        btnDeletar.addEventListener("mouseleave", () => { 
+        btnDeletar.addEventListener("mouseleave", () => {
           if (btnDeletar.disabled) return;
-          ltTrash.setDirection(-1); ltTrash.play(); 
+          ltTrash.setDirection(-1);
+          ltTrash.play();
         });
       }
     }
@@ -255,13 +311,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (build.travada) artigo.classList.add("travada");
     artigo.dataset.id = build.id;
 
-    const textoVisibilidade = build.visibilidade === "publico" ? "Tornar privado" : "Tornar público";
+    const textoVisibilidade =
+      build.visibilidade === "publico" ? "Tornar privado" : "Tornar público";
     const textoTranca = build.travada ? "Destrancar build" : "Trancar build";
 
     // Lógica invertida: Se for público, exibe o cadeado; se for privado, exibe o public
     const isPublico = build.visibilidade === "publico";
-    const displayLockVis = isPublico ? '' : 'style="display: none;"';
-    const displayPublicVis = isPublico ? 'style="display: none;"' : '';
+    const displayLockVis = isPublico ? "" : 'style="display: none;"';
+    const displayPublicVis = isPublico ? 'style="display: none;"' : "";
 
     artigo.innerHTML = `
       <div class="build-card-top">
