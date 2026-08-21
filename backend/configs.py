@@ -6,6 +6,7 @@ load_dotenv()
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY") #Sempre maiuscula, ate os nomes das variaveis se não o flask não reconhece
     SQLALCHEMY_DATABASE_URI = os.getenv("URL_DATABASE")
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:5500/frontend") #Base usada para montar links enviados por email (ex: recuperar senha)
     
     MAIL_SERVER = 'smtp.gmail.com'        # endereço do servidor SMTP
     MAIL_PORT = 587                        # porta (587 = TLS, 465 = SSL, 25 = sem criptografia/raro hoje)

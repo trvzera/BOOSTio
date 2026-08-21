@@ -1,4 +1,5 @@
 from models import Usuario
+from utils.validacoes import validar_senha_forte
 from werkzeug.security import generate_password_hash,check_password_hash
 from email_validator import validate_email, ValidatedEmail
 
@@ -30,7 +31,7 @@ class AtualizarUsuarioService:
     if senha:
       verificacao = self._confirma_senha(dados,usuario.senha)
       if verificacao:
-        self._validar_senha(senha)
+        validar_senha_forte(senha)
         senha = generate_password_hash(senha)
       else:
         raise ValueError("Digite a senha atual correta")
@@ -51,23 +52,6 @@ class AtualizarUsuarioService:
       return False
 
     return check_password_hash(senha_atual_hash,senha_atual_informada)
-
-  @staticmethod
-  def _validar_senha(senha:str) -> None:
-    if len(senha) < 8:
-      raise ValueError("A senha deve ter no minimo oito caracteres")
-  
-    if not any(c.isupper() for c in senha):
-      raise ValueError("A senha deve ter no minimo uma letra maiuscula")
-  
-    if not any(c.islower() for c in senha):
-      raise ValueError("A senha deve ter no minimo uma letra minuscula")
-  
-    if not any(c.isdigit() for c in senha):
-      raise ValueError("A senha deve conter ao menos um numero")
-  
-    if not any(not c.isalnum() for c in senha):
-      raise ValueError("A senha deve conter ao menos um caractere especial")
 
   @staticmethod
   def _validar_email(email: str) -> ValidatedEmail:

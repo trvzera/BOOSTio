@@ -1,7 +1,7 @@
 # tests/services/usuario_service/test_atualizar_usuario_service.py
+import pytest
 from services.usuario_service.atualizar_usuario_service import AtualizarUsuarioService
 from werkzeug.security import check_password_hash
-import pytest
 
 
 def test_retorna_none_quando_usuario_id_nao_informado():
@@ -10,13 +10,18 @@ def test_retorna_none_quando_usuario_id_nao_informado():
     assert resultado is None
 
 
-def test_retorna_none_quando_usuario_nao_encontrado(mock_usuario_nao_encontrado):
+def test_retorna_none_quando_usuario_nao_encontrado(mocker):
+    mocker.patch("models.usuario.Usuario.buscar_por_id", return_value=None)
+
     service = AtualizarUsuarioService()
     resultado = service.executar(1, {"nome": "Teste"})
+
     assert resultado is None
 
 
-def test_atualiza_nome_com_sucesso(mock_buscar_usuario_por_id, mock_atualizar_dados_sem_commit):
+def test_atualiza_nome_com_sucesso(mocker, usuario_fake_com_senha, mock_atualizar_dados_sem_commit):
+    mocker.patch("models.usuario.Usuario.buscar_por_id", return_value=usuario_fake_com_senha)
+
     dados = {"nome": "GustavoAzevedo"}
 
     service = AtualizarUsuarioService()
@@ -25,7 +30,13 @@ def test_atualiza_nome_com_sucesso(mock_buscar_usuario_por_id, mock_atualizar_da
     assert resultado["nome"] == "GustavoAzevedo"
 
 
-def test_lanca_erro_quando_email_ja_pertence_a_outro_usuario(mock_buscar_usuario_por_id, mock_email_pertence_a_outro_usuario):
+def test_lanca_erro_quando_email_ja_pertence_a_outro_usuario(mocker, usuario_fake_com_senha, mock_atualizar_dados_sem_commit):
+    usuario_fake_com_senha.id = 1
+    outro_usuario = mocker.Mock(id=2)
+
+    mocker.patch("models.usuario.Usuario.buscar_por_id", return_value=usuario_fake_com_senha)
+    mocker.patch("models.usuario.Usuario.buscar_por_email", return_value=outro_usuario)
+
     dados = {"email": "jaexiste@teste.com"}
 
     service = AtualizarUsuarioService()
@@ -34,7 +45,9 @@ def test_lanca_erro_quando_email_ja_pertence_a_outro_usuario(mock_buscar_usuario
         service.executar(1, dados)
 
 
-def test_lanca_erro_quando_senha_atual_informada_esta_errada(mock_buscar_usuario_com_senha):
+def test_lanca_erro_quando_senha_atual_informada_esta_errada(mocker, usuario_fake_com_senha):
+    mocker.patch("models.usuario.Usuario.buscar_por_id", return_value=usuario_fake_com_senha)
+
     dados = {
         "senha": "NovaSenha.123",
         "senha_atual": "SenhaErrada"
@@ -46,7 +59,9 @@ def test_lanca_erro_quando_senha_atual_informada_esta_errada(mock_buscar_usuario
         service.executar(1, dados)
 
 
-def test_lanca_erro_quando_nova_senha_e_fraca(mock_buscar_usuario_com_senha):
+def test_lanca_erro_quando_nova_senha_e_fraca(mocker, usuario_fake_com_senha):
+    mocker.patch("models.usuario.Usuario.buscar_por_id", return_value=usuario_fake_com_senha)
+
     dados = {
         "senha": "fraca",
         "senha_atual": "SenhaAtual.123"
@@ -58,7 +73,9 @@ def test_lanca_erro_quando_nova_senha_e_fraca(mock_buscar_usuario_com_senha):
         service.executar(1, dados)
 
 
-def test_atualiza_senha_com_sucesso(mock_buscar_usuario_com_senha, mock_atualizar_dados_sem_commit, usuario_fake_com_senha):
+def test_atualiza_senha_com_sucesso(mocker, usuario_fake_com_senha, mock_atualizar_dados_sem_commit):
+    mocker.patch("models.usuario.Usuario.buscar_por_id", return_value=usuario_fake_com_senha)
+
     dados = {
         "senha": "NovaSenha.123",
         "senha_atual": "SenhaAtual.123"

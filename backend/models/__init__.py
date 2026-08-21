@@ -20,6 +20,7 @@ from .usuario import Usuario
 from .fonte import Fonte
 from .setup import Setup
 from .codigo import Codigo
+from .token_recuperacao import TokenRecuperacao
 
 #Funcão obrigatória para o login buscar informações do usuario pelo id
 @lm.user_loader
@@ -28,4 +29,4 @@ def user_loader(id: str) -> Usuario | None:
     return usuario
 
 
-__all__ = ['lm','db','Peca','Usuario','ModeloBase','Fonte','Setup']
+__all__ = ['lm','db','Peca','Usuario','ModeloBase','Fonte','Setup','Codigo','TokenRecuperacao']
