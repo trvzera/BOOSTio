@@ -22,11 +22,15 @@ O BOOSTio é uma plataforma que simplifica a montagem de computadores. A ideia �
 
 - Cadastro de usuário, com verificação de força de senha em tempo real, confirmação de senha e aceite de termos obrigatório
 - Login, com exibição de erros vindos da API (ex: senha incorreta)
+- Login com Google (OAuth2), criando conta ou autenticando sem necessidade de senha
 - Logout, encerrando a sessão via cookie
 - Verificação de sessão ativa (rota `GET /auth/me`)
 - Proteção de páginas restritas no front — usuário não autenticado é redirecionado ao tentar acessar Configurações
 - Mostrar/ocultar senha em todos os campos de senha do site
 - Menu de perfil dinâmico no header — mostra "Entrar / Criar conta" ou "Builds / Configurações / Sair", dependendo da sessão
+- Recuperação de senha por email, com envio de link/token seguro e expiração configurada
+- Envio de código de verificação por email, para confirmação de conta e recuperação de senha
+- Conferência do código de verificação, validando o código antes de liberar a ação (ativação de conta ou redefinição de senha)
 
 ### 🚧 Pronto na interface, aguardando rota no back-end (PUT/DELETE)
 
