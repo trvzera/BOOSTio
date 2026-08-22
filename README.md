@@ -20,17 +20,16 @@ O BOOSTio é uma plataforma que simplifica a montagem de computadores. A ideia �
 
 ### ✅ Concluído (front + back conectados)
 
-- Cadastro de usuário, com verificação de força de senha em tempo real, confirmação de senha e aceite de termos obrigatório
-- Login, com exibição de erros vindos da API (ex: senha incorreta)
-- Login com Google (OAuth2), criando conta ou autenticando sem necessidade de senha
-- Logout, encerrando a sessão via cookie
-- Verificação de sessão ativa (rota `GET /auth/me`)
-- Proteção de páginas restritas no front — usuário não autenticado é redirecionado ao tentar acessar Configurações
-- Mostrar/ocultar senha em todos os campos de senha do site
-- Menu de perfil dinâmico no header — mostra "Entrar / Criar conta" ou "Builds / Configurações / Sair", dependendo da sessão
-- Recuperação de senha por email, com envio de link/token seguro e expiração configurada
-- Envio de código de verificação por email, para confirmação de conta e recuperação de senha
-- Conferência do código de verificação, validando o código antes de liberar a ação (ativação de conta ou redefinição de senha)
+-Cadastro de usuário com verificação de força de senha em tempo real, confirmação de senha e aceite obrigatório dos termos.
+-Login tradicional com exibição de erros retornados pela API (ex: senha incorreta).
+-Login com Google (OAuth2), permitindo criar conta ou autenticar sem precisar de senha.
+-Logout, encerrando a sessão via cookie httpOnly.
+-Atualização de dados do usuário (PUT /usuarios/<id>), protegida por login e por um decorator que garante que só o próprio usuário edite seus dados.
+-Exclusão de conta (DELETE /usuarios/<id>), restrita ao próprio usuário, com logout automático após a exclusão.
+-Busca do usuário logado (buscarUsuarioLogado.js), usada para checar sessão ativa e popular dados no front.
+-Recuperação de senha por e-mail, com token seguro e expiração, sem revelar se o e-mail está cadastrado (proteção contra enumeração de usuários).
+-Envio e conferência de código de verificação por e-mail, usado na ativação de conta e na redefinição de senha.
+-Menu de perfil dinâmico no header e mostrar/ocultar senha em todos os campos, com proteção de rotas restritas no front para usuários não autenticados.
 
 ### 🚧 Pronto na interface, aguardando rota no back-end (PUT/DELETE)
 

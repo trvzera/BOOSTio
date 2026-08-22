@@ -12,7 +12,9 @@ class CriarUsuarioService:
 
     usuario_existente = Usuario.buscar_por_email(email_tratado)
 
-    if usuario_existente:
+    usuario_existente2 = Usuario.buscar_por_email(dados['email'].lower())
+  
+    if usuario_existente or usuario_existente2:
       raise ValueError("Esse Usuario já existe,experimente fazer login")
 
     validar_senha_forte(dados["senha"])
