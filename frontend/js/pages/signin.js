@@ -3,6 +3,7 @@ import "../header.js";
 import "../services-carousel.js";
 import "../auth/auth.js";
 import { criarUsuario } from "../api/usuario/criarUsuario.js";
+import { entrarComGoogle } from "../api/usuario/entrarComGoogle.js";
 import { enviarEmailVerificar } from "../api/email/enviarEmailVerificar.js";
 import { conferirEmailVerificar } from "../api/email/conferirEmailVerificar.js";
 import {
@@ -24,6 +25,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const botaoCriarConta = document.querySelector("#btn-criar-conta");
     const erroTexto = document.querySelector("#signin-erro");
     erroTexto.style.display = "none";
+    const botaoGoogle = document.querySelector("#btn-google-login");
+
+    botaoGoogle.addEventListener("click", (e) => {
+      e.preventDefault();
+      entrarComGoogle();
+    });
     const barra = document.querySelector(".barra");
     const textoStatus = document.querySelector("#status-text");
     const containerVerificacao = document.querySelector("#verificacao-senha");

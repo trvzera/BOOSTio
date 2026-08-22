@@ -1,4 +1,4 @@
-from flask import Blueprint,request,jsonify,redirect,url_for
+from flask import Blueprint,request,jsonify,redirect,url_for,current_app
 from flask_login import LoginManager, UserMixin, login_user,logout_user, login_required, current_user
 from models import db,Usuario
 from sqlalchemy.exc import SQLAlchemyError
@@ -67,6 +67,8 @@ def callback_google():
         usuario = EntrarGoogleService().executar(dados_usuario)
         login_user(usuario)
 
-        return redirect('http://localhost:5500/pages/index.html') #Redirect obrigatorio, o google espera um retorno desse tipo
+        base_url = current_app.config['FRONTEND_URL'].rstrip('/')
+        return redirect(f'{base_url}/pages/index.html') #Redirect obrigatorio, o google espera um retorno desse tipo
     except ValueError as erro:
-        return redirect(f'http://localhost:5500/pages/login.html?erro={str(erro)}')
+        base_url = current_app.config['FRONTEND_URL'].rstrip('/')
+        return redirect(f'{base_url}/pages/login.html?erro={str(erro)}')
