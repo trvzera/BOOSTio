@@ -9,7 +9,7 @@ class Usuario(ModeloBase,UserMixin):
   email = db.Column(db.String(150),nullable = False,unique = True)
   senha = db.Column(db.String(100),nullable = True)
   verificado = db.Column(db.Boolean, default=False ,nullable= False)
-  ativo = db.Column(db.Boolean, default=False ,nullable= False)
+  ativo = db.Column(db.Boolean, default=True ,nullable= False)
   login_google = db.Column(db.Boolean,default=False,nullable = False)
 
   def to_dict(self) -> dict:
