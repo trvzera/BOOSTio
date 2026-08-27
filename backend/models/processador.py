@@ -4,10 +4,6 @@ from . import Peca
 class Processador(Peca):
     __tablename__ = "processador"
 
-    id = db.Column(db.Integer(), primary_key=True)
-    marca = db.Column(db.String(100), nullable=False)
-    modelo = db.Column(db.String(100), nullable=False)
-    preco = db.Column(db.Numeric(10, 2), nullable=False)
     soquete = db.Column(db.String(100), nullable=False)
     nucleo = db.Column(db.Integer(), nullable=False)
     thread = db.Column(db.Integer(), nullable=False)

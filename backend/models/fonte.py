@@ -2,7 +2,7 @@ from . import db
 from . import Peca
 
 class Fonte(Peca):
-  __tablename__ = "fonte"
+    __tablename__ = "fonte" 
 
-  potencia = db.Column(db.Float(),nullable = False)
-  tamanho_mm = db.Column(db.Float(),nullable = False)
+    potencia_w = db.Column(db.Integer(), nullable=False)
+    formato = db.Column(db.String(50))
