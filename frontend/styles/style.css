@@ -1,5 +1,7 @@
 /* GLOBAL */
 @import "./global/global.css";
+@import "./forms/forms.css";
+
 
 /* TERMOS */
 @import "./utilitarios/termos.css";
@@ -36,6 +38,7 @@
 @import "./conta/configuracoes.css";
 @import "./conta/senha.css";
 @import "./conta/builds.css";
+
 
 /* RESPONSIVIDADE */
 @import "./responsividades/r-home.css";

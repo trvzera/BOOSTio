@@ -1,8 +1,7 @@
 #builds-page {
   height: max-content;
-  max-width: 860px;
   margin: 0 auto;
-  padding: 100px 24px 80px;
+  padding: 100px 200px 80px;
 }
 
 .lottie-build-page {
@@ -18,7 +17,6 @@
 
 .builds-header {
   margin-bottom: var(--espacamento-32);
-
   h1 {
     color: var(--cor-6);
     font-size: 2rem;
@@ -136,8 +134,8 @@
 }
 
 #builds-lista {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--espacamento-16);
 }
 
@@ -156,6 +154,7 @@
   transform: translateY(-5px);
   color: var(--cor-p1);
   border: 1px solid var(--cor-p1);
+  z-index: 100;
 }
 
 .build-card.travada {
@@ -302,8 +301,8 @@
   border: 1px solid transparent;
   border-radius: 16px;
   box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.5);
-  z-index: 20;
-  display: flex;
+  z-index: 100;
+  display: flex;  
   flex-direction: column;
   gap: 2px;
   opacity: 0;

@@ -1,11 +1,11 @@
 .btn-primary {
   font-family: Lexend;
   font-weight: bold;
+  font-size: 1rem;
   color: var(--cor-6);
   padding: 15px 20px;
   background:
-    linear-gradient(var(--cor-p1), var(--cor-p4)) padding-box,
-    linear-gradient(to bottom, #ffffff, #ffffff00) border-box;
+    linear-gradient(var(--cor-p1), var(--cor-p4));
   border: 1px solid transparent;
   border-radius: 50px;
   transition: 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87);
@@ -13,9 +13,9 @@
 }
 
 .btn-primary:hover:not(:disabled) {
-  transform: translateY(-5px);
   color: var(--cor-5);
   background-color: var(--cor-6);
+  border: 1px solid var(--cor-6);
 }
 
 .btn-primary:disabled {
@@ -80,10 +80,17 @@
   cursor: pointer;
   transition: 0.2s var(--ease);
 }
-.btn-ghost:hover {
+.btn-ghost:hover:not(:disabled) {
   color: var(--cor-6);
   border-color: var(--cor-4);
 }
+
+.btn-ghost:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
 
 .btn-danger {
   font-family: Lexend;
@@ -106,4 +113,30 @@
   cursor: not-allowed;
   transform: none;
   filter: none;
+}
+
+.btn-primary-form {
+  font-family: Lexend;
+  font-weight: bold;
+  font-size: 0.8rem;
+  color: var(--cor-6);
+  padding: 15px 20px;
+  background:
+    linear-gradient(var(--cor-p1), var(--cor-p4));
+  border: 1px solid transparent;
+  border-radius: 50px;
+  transition: 0.2s cubic-bezier(0.81, 0.19, 0.16, 0.87);
+  cursor: pointer;
+}
+
+.btn-primary-form:hover:not(:disabled) {
+  color: var(--cor-5);
+  background-color: var(--cor-6);
+  border: 1px solid var(--cor-6);
+}
+
+.btn-primary-form:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
 }
