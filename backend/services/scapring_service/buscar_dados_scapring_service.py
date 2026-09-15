@@ -10,7 +10,6 @@ class BuscarDadosScapringService:
     }
 
     lojas = {
-      "terabyteshop": self._pega_dados_terabyte,
       "kabum": self._pega_preco_kabum,
     }
     
@@ -33,24 +32,11 @@ class BuscarDadosScapringService:
     site = BeautifulSoup(response.text, "html.parser")
 
     
-    preco = site.find("h4").text
+    preco = site.find("span", class_="text-2xl leading-tight").text
     preco = preco.replace("R$","")
 
 
-    preco = site.find("h4").text
     return preco
-  
-  
-  def _pega_dados_terabyte(self,headers, url: str) -> dict:
-    response = requests.get(url, headers=headers)
-    site = BeautifulSoup(response.text, "html.parser")
-
-    dados = {
-      "preco_a_vista": self._tratar_preco(self._extrair_texto_por_id(site, "valVista")),
-      "partnumber": self._tratar_partnumber(self._extrair_texto_por_id(site, "partnumber")),
-    }
-
-    return dados
 
 
   @staticmethod
@@ -59,19 +45,5 @@ class BuscarDadosScapringService:
         return None
     texto_limpo = texto.replace("R$", "").replace(".", "").replace(",", ".").strip()
     return float(texto_limpo)
-
-
-  @staticmethod
-  def _tratar_partnumber(texto: str | None) -> str | None:
-      if texto is None:
-          return None
-      return texto.replace("COD: ", "").strip()
-
-
-  @staticmethod
-  def _extrair_texto_por_id(site: BeautifulSoup, id_elemento: str) -> str | None:
-    elemento = site.find(id=id_elemento)
-    return elemento.get_text(strip=True) if elemento else None
-
 
 
