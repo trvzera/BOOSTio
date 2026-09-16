@@ -14,8 +14,8 @@ document.addEventListener("click", (e) => {
   }
 });
 
-const listaDeslogado = document.querySelector("#profile-nav-list-deslogado");
-listaDeslogado.classList.add("ativo");
+const listaDeslogado = document.querySelector("#profile-nav-list-signed-out");
+listaDeslogado.classList.add("active");
 
 async function iniciarAnimacoes() {
   const ltProfile = await registrarAnimacao(

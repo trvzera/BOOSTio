@@ -1,48 +1,43 @@
-/* GLOBAL */
+/* Base e utilitários compartilhados */
 @import "./global/global.css";
-@import "./forms/forms.css";
-
-
-/* TERMOS */
-@import "./utilitarios/termos.css";
-
-/* UTILITARIOS */
-@import "./utilitarios/tipografia.css";
 @import "./utilitarios/cores.css";
 @import "./utilitarios/espacamentos.css";
+@import "./utilitarios/tipografia.css";
+@import "./utilitarios/acessibilidade.css";
 @import "./utilitarios/botoes.css";
-@import "./utilitarios/decorations.css";
 @import "./utilitarios/inputs.css";
+@import "./utilitarios/decorations.css";
 @import "./utilitarios/transition.css";
-@import "./utilitarios/loading.css";
-@import "./utilitarios/footer.css";
 
-/* HEADER */
+/* Componentes compartilhados */
+@import "./componentes/loading.css";
 @import "./header/header.css";
 @import "./header/profile-header.css";
 
-/* MAIN */
+/* Páginas */
 @import "./home/home.css";
-
-/* ABOUT */
-@import "./about/about.css";
-
-/* SERVICES */
-@import "./services/services.css";
-
-/* FOOTER */
 @import "./home/build-page.css";
-
-/* SIGNIN */
+@import "./home/footer.css";
+@import "./about/about.css";
+@import "./services/services.css";
+@import "./paginas/termos.css";
+@import "./conta/campos.css";
 @import "./conta/signin.css";
 @import "./conta/configuracoes.css";
 @import "./conta/senha.css";
 @import "./conta/builds.css";
 
+/* Formulário */
+@import "./forms/forms.css";
+@import "./forms/opcoes.css";
+@import "./forms/orcamento.css";
+@import "./forms/navegacao.css";
+@import "./forms/feedback.css";
 
-/* RESPONSIVIDADE */
+/* Ajustes por largura de tela */
 @import "./responsividades/r-home.css";
 @import "./responsividades/r-services.css";
-@import "./responsividades/r-configuracoes.css";
 @import "./responsividades/r-build-page.css";
+@import "./responsividades/r-configuracoes.css";
 @import "./responsividades/r-builds.css";
+@import "./responsividades/r-forms.css";

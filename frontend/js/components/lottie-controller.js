@@ -39,6 +39,12 @@ export function obterAnimacao(id) {
   return animacoesCarregadas.get(id);
 }
 
+export function destruirAnimacao(id, animacao) {
+  if (animacoesCarregadas.get(id) !== animacao) return;
+  animacao.destroy();
+  animacoesCarregadas.delete(id);
+}
+
 export function destruirTodas() {
   animacoesCarregadas.forEach((animacao) => animacao.destroy());
   animacoesCarregadas.clear();  

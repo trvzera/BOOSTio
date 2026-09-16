@@ -12,7 +12,7 @@
   <script type="module" src="../js/pages/builds.js" defer></script>
 </head>
 
-<body id="builds">
+<body class="builds-page-body">
   <div id="loading-screen">
     <video id="loading-video" autoplay muted playsinline>
       <source src="../video/loading-toggle.webm" type="video/webm">
@@ -35,7 +35,7 @@
         <input type="checkbox" name="profile" id="profile-check" aria-label="Abrir menu do perfil">
         <div id="profile-options">
           <nav id="profile-nav">
-            <ul class="profile-nav-list" id="profile-nav-list-logado">
+            <ul class="profile-nav-list" id="profile-nav-list-signed-in">
               <li class="profile-item">
                 <a href="./builds.html" class="profile-link font-1-s" id="btn-build" aria-label="Ir para suas builds">
                   <i id="lottie-build" class="lottie-header"></i>
@@ -48,14 +48,14 @@
                   <p>Configurações</p>
                 </a>
               </li>
-              <li class="profile-item sair">
+              <li class="profile-item sign-out-item">
                 <a href="#" class="profile-link font-1-s" id="btn-logout" aria-label="Sair da sua conta">
                   <i id="lottie-logout" class="lottie-header"></i>
                   <p>Sair</p>
                 </a>
               </li>
             </ul>
-            <ul class="profile-nav-list" id="profile-nav-list-deslogado">
+            <ul class="profile-nav-list" id="profile-nav-list-signed-out">
               <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" id="btn-login" aria-label="Entrar na sua conta"><i id="lottie-login" class="lottie-header"></i>
                   <p>Entrar</p>
                 </a></li>
@@ -108,12 +108,12 @@
           </div>
         </div>
         <div class="quota-actions">
-          <button type="button" class="btn-build-ghost" id="btn-importar-build" aria-label="Importar uma build">Importar build</button>
-          <button type="button" class="btn-build-primary" id="btn-criar-build" aria-label="Criar uma build">Criar build</button>
+          <button type="button" class="btn-build-ghost" id="btn-import-build" aria-label="Importar uma build">Importar build</button>
+          <button type="button" class="btn-build-primary" id="btn-create-build" aria-label="Criar uma build">Criar build</button>
         </div>
       </div>
 
-      <div id="builds-lista">
+      <div id="builds-list">
         <!-- O JS preenche isso, mas aqui está o fallback estático -->
         <article class="build-card" data-id="build-demo-1">
           <div class="build-card-top">
@@ -122,35 +122,35 @@
               <button type="button" class="build-menu-trigger" aria-label="Abrir menu da build" aria-expanded="false" aria-haspopup="true">···</button>
               <div class="build-menu" role="menu">
                 <button type="button" class="build-menu-item" data-acao="trancar" role="menuitem">
-                  <i id="lt-lock-build-demo-1" class="lottie-build-page"></i>
+                  <i id="lottie-lock-build-demo-1" class="lottie-build-page"></i>
                   <span class="btn-text">Trancar build</span>
                 </button>
                 <span class="build-menu-divider"></span>
                 <button type="button" class="build-menu-item" data-acao="visibilidade" role="menuitem">
                   <!-- Se for demo publico, exibe o cadeado; se privado, exibe o public -->
-                  <i id="lt-lock-vis-build-demo-1" class="lottie-build-page"></i>
-                  <i id="lt-public-vis-build-demo-1" class="lottie-build-page" style="display: none;"></i>
+                  <i id="lottie-lock-vis-build-demo-1" class="lottie-build-page"></i>
+                  <i id="lottie-public-vis-build-demo-1" class="lottie-build-page" style="display: none;"></i>
                   <span class="btn-text">Tornar privado</span>
                 </button>
                 <button type="button" class="build-menu-item" data-acao="editar" role="menuitem">
-                  <i id="lt-edit-build-demo-1" class="lottie-build-page"></i>Editar detalhes
+                  <i id="lottie-edit-build-demo-1" class="lottie-build-page"></i>Editar detalhes
                 </button>
                 <button type="button" class="build-menu-item" data-acao="duplicar" role="menuitem">
-                  <i id="lt-clone-build-demo-1" class="lottie-build-page"></i>Duplicar build
+                  <i id="lottie-clone-build-demo-1" class="lottie-build-page"></i>Duplicar build
                 </button>
                 <button type="button" class="build-menu-item" data-acao="copiar-link" role="menuitem">
-                  <i id="lt-copy-build-demo-1" class="lottie-build-page"></i>Copiar link
+                  <i id="lottie-copy-build-demo-1" class="lottie-build-page"></i>Copiar link
                 </button>
                 <span class="build-menu-divider"></span>
                 <button type="button" class="build-menu-item" data-acao="baixar-csv" role="menuitem">
-                  <i id="lt-csv-build-demo-1" class="lottie-build-page"></i>Baixar build (CSV)
+                  <i id="lottie-csv-build-demo-1" class="lottie-build-page"></i>Baixar build (CSV)
                 </button>
                 <button type="button" class="build-menu-item" data-acao="baixar-json" role="menuitem">
-                  <i id="lt-json-build-demo-1" class="lottie-build-page"></i>Baixar build (JSON)
+                  <i id="lottie-json-build-demo-1" class="lottie-build-page"></i>Baixar build (JSON)
                 </button>
                 <span class="build-menu-divider"></span>
-                <button type="button" class="build-menu-item perigo" data-acao="deletar" role="menuitem">
-                  <i id="lt-trash-build-demo-1" class="lottie-build-page"></i>Deletar build
+                <button type="button" class="build-menu-item danger-menu-item" data-acao="deletar" role="menuitem">
+                  <i id="lottie-trash-build-demo-1" class="lottie-build-page"></i>Deletar build
                 </button>
               </div>
             </div>
@@ -161,42 +161,42 @@
             <div class="build-progress-fill" style="width: 75%"></div>
           </div>
           <div class="build-card-bottom">
-            <span class="build-status incompleta font-1-xs">Incompleta</span>
+            <span class="build-status incomplete font-1-xs">Incompleta</span>
             <time class="build-card-date font-2-xs" datetime="2026-08-15T14:32:00.000Z">15 Ago 2026, 14:32</time>
           </div>
         </article>
       </div>
 
-      <p id="builds-vazio" class="font-2-s" hidden>Você ainda não tem nenhuma build salva.</p>
+      <p id="builds-empty" class="font-2-s" hidden>Você ainda não tem nenhuma build salva.</p>
     </section>
   </main>
 
-  <div class="modal-overlay" id="editar-build-modal">
+  <div class="modal-overlay" id="edit-build-modal">
     <div class="modal-box">
       <h3 class="font-1-m">Editar detalhes</h3>
       <p class="font-1-m">Altere o título e a descrição desta build.</p>
       <div class="field">
-        <label for="editar-titulo" class="font-1-m">Título</label>
-        <input type="text" id="editar-titulo" maxlength="60" placeholder="Nome da build">
+        <label for="edit-title" class="font-1-m">Título</label>
+        <input type="text" id="edit-title" maxlength="60" placeholder="Nome da build">
       </div>
       <div class="field">
-        <label for="editar-descricao" class="font-1-m">Descrição</label>
-        <input type="text" id="editar-descricao" maxlength="160" placeholder="Uma breve descrição">
+        <label for="edit-description" class="font-1-m">Descrição</label>
+        <input type="text" id="edit-description" maxlength="160" placeholder="Uma breve descrição">
       </div>
       <div class="modal-actions">
-        <button type="button" class="btn-ghost" id="cancelar-editar-build">Cancelar</button>
-        <button type="button" class="btn-primary" id="salvar-editar-build">Salvar</button>
+        <button type="button" class="btn-ghost" id="cancel-build-edit">Cancelar</button>
+        <button type="button" class="btn-primary" id="save-build-edit">Salvar</button>
       </div>
     </div>
   </div>
 
-  <div class="modal-overlay" id="deletar-build-modal">
+  <div class="modal-overlay" id="delete-build-modal">
     <div class="modal-box">
       <h3 class="font-1-m">Deletar build</h3>
       <p class="font-1-m">Essa ação remove a build da lista. No backend, a exclusão será permanente.</p>
       <div class="modal-actions">
-        <button type="button" class="btn-ghost" id="cancelar-deletar-build">Cancelar</button>
-        <button type="button" class="btn-danger" id="confirmar-deletar-build">Deletar</button>
+        <button type="button" class="btn-ghost" id="cancel-build-delete">Cancelar</button>
+        <button type="button" class="btn-danger" id="confirm-build-delete">Deletar</button>
       </div>
     </div>
   </div>

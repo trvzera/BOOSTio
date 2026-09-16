@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       savePasswordBtn.disabled = !(hasCurrent && strongEnough && match);
     }
-    if (document.querySelector("#configs")) {
+    if (document.body.classList.contains("settings-page-body")) {
       newPassword.addEventListener("input", () => {
         const score = checkPasswordStrength(newPassword.value);
         updateStrengthBars(score);
@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     function closeModal() {
       deleteModal.classList.remove("open");
     }
-    if (document.querySelector("#configs")) {
+    if (document.body.classList.contains("settings-page-body")) {
       openDeleteModalBtn.addEventListener("click", openModal);
       cancelDeleteBtn.addEventListener("click", closeModal);
       deleteModal.addEventListener("click", (e) => {
@@ -155,16 +155,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const emailConfigs = document.querySelector("#display-email");
     const inputNome = document.querySelector("#username-input");
     const inputEmail = document.querySelector("#email-input");
-    const criadoEm = document.querySelector("#criado-em");
+    const criadoEm = document.querySelector("#created-at");
     const btnSalvar = document.querySelector("#save-profile-btn");
 
-    const pillVerificado = document.querySelector("#verificado-pill");
-    const iconeVerificado = document.querySelector("#verificado-icone");
-    const textoVerificado = document.querySelector("#verificado-texto");
+    const pillVerificado = document.querySelector("#verified-pill");
+    const iconeVerificado = document.querySelector("#verified-icon");
+    const textoVerificado = document.querySelector("#verified-text");
     
     function atualizarPillVerificado(verificado) {
-      pillVerificado.classList.toggle("verificado", verificado);
-      pillVerificado.classList.toggle("nao-verificado", !verificado);
+      pillVerificado.classList.toggle("verified", verificado);
+      pillVerificado.classList.toggle("unverified", !verificado);
       iconeVerificado.classList.toggle("fa-circle-check", verificado);
       iconeVerificado.classList.toggle("fa-triangle-exclamation", !verificado);
       textoVerificado.textContent = verificado
@@ -189,19 +189,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // --- Modal de verificação de e-mail ---
-    const modalVerificacao = document.querySelector("#verificar-email-modal");
-    const alvoEmail = document.querySelector("#verificar-email-alvo");
+    const modalVerificacao = document.querySelector("#verify-email-modal");
+    const alvoEmail = document.querySelector("#verify-email-target");
     const botaoAbrirVerificacao = document.querySelector(
-      "#btn-verificar-agora",
+      "#btn-verify-now",
     );
-    const botaoEnviarCodigo = document.querySelector("#btn-enviar-codigo");
-    const inputsCodigo = Array.from(document.querySelectorAll(".input-codigo"));
-    const erroVerificacao = document.querySelector("#verificar-email-erro");
+    const botaoEnviarCodigo = document.querySelector("#btn-send-code");
+    const inputsCodigo = Array.from(document.querySelectorAll(".code-input"));
+    const erroVerificacao = document.querySelector("#verify-email-error");
     const botaoConfirmarCodigo = document.querySelector(
-      "#btn-confirmar-codigo",
+      "#btn-confirm-code",
     );
     const botaoFecharVerificacao = document.querySelector(
-      "#btn-fechar-verificacao",
+      "#btn-close-verification",
     );
 
     let temporizadorReenvio = null;

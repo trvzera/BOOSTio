@@ -104,21 +104,21 @@
   font-size: 1rem;
 }
 
-.meta-pill.verificado {
+.meta-pill.verified {
   color: var(--cor-d5);
   border-color: rgba(52, 199, 89, 0.35);
   background: rgba(52, 199, 89, 0.08);
 }
-.meta-pill.verificado i {
+.meta-pill.verified i {
   color: var(--cor-d5);
 }
 
-.meta-pill.nao-verificado {
+.meta-pill.unverified {
   color: var(--cor-d2);
   border-color: rgba(255, 149, 0, 0.35);
   background: rgba(255, 149, 0, 0.08);
 }
-.meta-pill.nao-verificado i {
+.meta-pill.unverified i {
   color: var(--cor-d2);
 }
 
@@ -142,7 +142,7 @@
   text-decoration: underline;
 }
 
-.meta-pill.nao-verificado .meta-pill-action {
+.meta-pill.unverified .meta-pill-action {
   display: inline;
   color: var(--cor-d2);
 }

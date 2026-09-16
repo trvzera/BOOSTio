@@ -8,10 +8,10 @@ import { entrarComGoogle } from "../api/usuario/entrarComGoogle.js";
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     const emailInput = document.querySelector("#email");
-    const senhaInput = document.querySelector("#senha");
-    const botaoEntrar = document.querySelector("#btn-entrar");
+    const senhaInput = document.querySelector("#password");
+    const botaoEntrar = document.querySelector("#btn-sign-in");
     const formLogin = document.querySelector("#login-form");
-    const erroTexto = document.querySelector("#login-erro");
+    const erroTexto = document.querySelector("#login-error");
     const botaoGoogle = document.querySelector("#btn-google-login");
     erroTexto.style.display = "none";
 
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       entrarComGoogle();
     });
 
-    document.querySelectorAll(".toggle-senha").forEach((icone) => {
+    document.querySelectorAll(".password-toggle").forEach((icone) => {
       icone.addEventListener("click", () => {
         const alvo = document.querySelector(`#${icone.dataset.target}`);
         const vendo = alvo.type === "text";

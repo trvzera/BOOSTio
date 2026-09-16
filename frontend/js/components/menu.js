@@ -1,8 +1,8 @@
 // Alterna as classes que mostram o menu de perfil logado ou deslogado.
 export function atualizarMenu(autenticado) {
-  const menuComLogin = document.querySelector("#profile-nav-list-logado");
-  const menuSemLogin = document.querySelector("#profile-nav-list-deslogado");
+  const menuComLogin = document.querySelector("#profile-nav-list-signed-in");
+  const menuSemLogin = document.querySelector("#profile-nav-list-signed-out");
 
-  menuComLogin.classList.toggle("ativo", autenticado);
-  menuSemLogin.classList.toggle("ativo", !autenticado);
+  menuComLogin.classList.toggle("active", autenticado);
+  menuSemLogin.classList.toggle("active", !autenticado);
 }

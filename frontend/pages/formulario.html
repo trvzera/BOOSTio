@@ -15,7 +15,7 @@
   <script type="module" src="../js/pages/forms.js"></script>
 </head>
 
-<body id="formulario">
+<body class="form-page">
   <div id="loading-screen">
     <video id="loading-video" autoplay muted playsinline>
       <source src="../video/loading-toggle.webm" type="video/webm">
@@ -38,7 +38,7 @@
         <input type="checkbox" name="profile" id="profile-check" aria-label="Abrir menu do perfil">
         <div id="profile-options">
           <nav id="profile-nav">
-            <ul class="profile-nav-list" id="profile-nav-list-logado">
+            <ul class="profile-nav-list" id="profile-nav-list-signed-in">
               <li class="profile-item">
                 <a href="./builds.html" class="profile-link font-1-s" id="btn-build" aria-label="Ir para suas builds">
                   <i id="lottie-build" class="lottie-header"></i>
@@ -51,14 +51,14 @@
                   <p>Configurações</p>
                 </a>
               </li>
-              <li class="profile-item sair">
+              <li class="profile-item sign-out-item">
                 <a href="#" class="profile-link font-1-s" id="btn-logout" aria-label="Sair da sua conta">
                   <i id="lottie-logout" class="lottie-header"></i>
                   <p>Sair</p>
                 </a>
               </li>
             </ul>
-            <ul class="profile-nav-list" id="profile-nav-list-deslogado">
+            <ul class="profile-nav-list" id="profile-nav-list-signed-out">
               <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" id="btn-login" aria-label="Entrar na sua conta"><i id="lottie-login" class="lottie-header"></i>
                   <p>Entrar</p>
                 </a></li>

@@ -1,0 +1,81 @@
+#terms-checkbox-field {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  color: var(--cor-4);
+  gap: 10px;
+}
+
+#terms-checkbox-field label {
+  font-size: 0.9rem;
+  cursor: pointer;
+  a {
+    padding-bottom: 5px;
+    text-decoration: underline;
+  }
+}
+
+.checkbox-wrapper {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lottie-check {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+#terms-checkbox-animation {
+  position: relative;
+  width: 35px;
+  height: 35px;
+}
+
+#terms-checkbox-animation svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-input-wrapper .input-text {
+  padding-right: 45px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 16px;
+  color: var(--cor-4);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+  color: var(--cor-6);
+}
+
+.form-error {
+  width: 100%;
+  min-height: 1.2em;
+  color: var(--cor-d1);
+  text-align: left;
+}

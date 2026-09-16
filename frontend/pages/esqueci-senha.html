@@ -13,7 +13,7 @@
   <script type="module" src="../js/pages/esqueci-senha.js" defer></script>
 </head>
 
-<body id="esqueci-senha">
+<body class="forgot-password-page-body">
   <div id="loading-screen">
     <video id="loading-video" autoplay muted playsinline>
       <source src="../video/loading-toggle.webm" type="video/webm">
@@ -36,7 +36,7 @@
         <input type="checkbox" name="profile" id="profile-check" aria-label="Abrir menu do perfil">
         <div id="profile-options">
           <nav id="profile-nav">
-            <ul class="profile-nav-list" id="profile-nav-list-logado">
+            <ul class="profile-nav-list" id="profile-nav-list-signed-in">
               <li class="profile-item">
                 <a href="./builds.html" class="profile-link font-1-s" id="btn-build" aria-label="Ir para suas builds">
                   <i id="lottie-build" class="lottie-header"></i>
@@ -49,14 +49,14 @@
                   <p>Configurações</p>
                 </a>
               </li>
-              <li class="profile-item sair">
+              <li class="profile-item sign-out-item">
                 <a href="#" class="profile-link font-1-s" id="btn-logout" aria-label="Sair da sua conta">
                   <i id="lottie-logout" class="lottie-header"></i>
                   <p>Sair</p>
                 </a>
               </li>
             </ul>
-            <ul class="profile-nav-list" id="profile-nav-list-deslogado">
+            <ul class="profile-nav-list" id="profile-nav-list-signed-out">
               <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" id="btn-login" aria-label="Entrar na sua conta"><i id="lottie-login" class="lottie-header"></i>
                   <p>Entrar</p>
                 </a></li>
@@ -88,27 +88,27 @@
     </div>
   </header>
 
-  <main id="esqueci-senha-page">
+  <main id="forgot-password-page">
     <div class="decoration decoration-1"></div>
     <div class="decoration decoration-2"></div>
 
-    <div id="esqueci-senha-container">
+    <div id="forgot-password-container">
       <img src="../imgs/logo.webp" alt="Logo">
-      <h1 id="esqueci-senha-title" class="font-1-l">Esqueceu sua senha?</h1>
-      <p id="esqueci-senha-description" class="font-2-xs">Sem problemas. Digite seu e-mail e enviaremos um link para você redefinir sua senha.</p>
+      <h1 id="forgot-password-title" class="font-1-l">Esqueceu sua senha?</h1>
+      <p id="forgot-password-description" class="font-2-xs">Sem problemas. Digite seu e-mail e enviaremos um link para você redefinir sua senha.</p>
 
-      <form id="esqueci-senha-form">
+      <form id="forgot-password-form">
         <input type="email" placeholder="Seu e-mail" class="input-text" id="email" required>
-        <p id="esqueci-senha-erro" class="font-1-xs erro-form"></p>
-        <button type="submit" class="btn-login" id="btn-enviar-link" disabled>Enviar link de recuperação</button>
-        <a href="./login.html" id="voltar-login" class="font-1-s">Voltar para o login</a>
+        <p id="forgot-password-error" class="font-1-xs form-error"></p>
+        <button type="submit" class="btn-login" id="btn-send-link" disabled>Enviar link de recuperação</button>
+        <a href="./login.html" id="back-to-login" class="font-1-s">Voltar para o login</a>
       </form>
 
-      <div id="esqueci-senha-sucesso" class="oculto">
+      <div id="forgot-password-success" class="hidden">
         <div class="modal-icon"><i class="fa-solid fa-envelope-circle-check"></i></div>
         <h2 class="font-1-l">Verifique seu e-mail</h2>
-        <p class="font-2-xs">Se existir uma conta associada a <strong id="email-confirmado">seu e-mail</strong>, você receberá um link para redefinir sua senha em instantes.</p>
-        <a href="./login.html" class="btn-login" id="voltar-login-sucesso">Voltar para o login</a>
+        <p class="font-2-xs">Se existir uma conta associada a <strong id="email-confirmed">seu e-mail</strong>, você receberá um link para redefinir sua senha em instantes.</p>
+        <a href="./login.html" class="btn-login" id="back-to-login-success">Voltar para o login</a>
       </div>
     </div>
   </main>

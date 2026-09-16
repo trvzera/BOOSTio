@@ -1,5 +1,9 @@
 import "../header.js";
 import "../auth/auth.js";
+import {
+  registrarAnimacao,
+  destruirAnimacao,
+} from "../components/lottie-controller.js";
 
 const perguntas = [
   {
@@ -89,6 +93,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const painel = document.querySelector("#question-info");
   const respostas = {};
   let indiceAtual = 0;
+  let geracaoPergunta = 0;
+  const animacoesCheckbox = new Map();
+  const estadosCheckbox = new Map();
   const paginaConfiguracaoBuild = "./configuracao-build.html";
   const moeda = new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -117,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
     painel.classList.remove("question-enter");
     void painel.offsetWidth;
     painel.classList.add("question-enter");
-    painel.innerHTML = `<p class="question-tag font-1-xs">${pergunta.tag}</p><h1 class="font-1-xl">${pergunta.titulo}</h1><p class="font-2-s">${pergunta.descricao}</p><div class="tip-card"><p class="font-1-m-b">Formulário inteligente</p><p class="font-2-xs">Revise suas escolhas pelo menu superior ou avance quando estiver pronto.</p></div>`;
+    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Montagem inteligente · ${pergunta.tag}</span><h1 class="font-1-xl">${pergunta.titulo}</h1><p class="font-2-s">${pergunta.descricao}</p></div><div class="manual-build"><h2 class="font-1-m-b">Deseja montar manualmente?</h2><p class="font-2-s">Escolha cada peça da sua build por conta própria quando a montagem manual estiver disponível.</p><button type="button" class="btn-primary-form" disabled aria-label="Montagem manual em breve">Montar manualmente · Em breve</button></div>`;
   }
 
   function opcoesHtml(pergunta) {
@@ -128,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return pergunta.opcoes
       .map(
         ([valor, titulo, descricao]) =>
-          `<div class="option-card"><input type="${tipo}" name="${pergunta.chave}" id="${valor}" value="${valor}" ${selecionadas.includes(valor) ? "checked" : ""}><label for="${valor}"><span class="choice-control" aria-hidden="true"></span><span><span class="option-title font-1-m-b">${titulo}</span>${descricao ? `<span class="option-desc font-2-xs">${descricao}</span>` : ""}</span></label></div>`,
+          `<div class="option-card"><input type="${tipo}" name="${pergunta.chave}" id="${valor}" value="${valor}" ${selecionadas.includes(valor) ? "checked" : ""}><label for="${valor}"><span class="choice-control ${pergunta.multipla ? "choice-control-lottie" : ""}" ${pergunta.multipla ? `id="check-${valor}"` : ""} aria-hidden="true"></span><span><span class="option-title font-1-m-b">${titulo}</span>${descricao ? `<span class="option-desc font-2-xs">${descricao}</span>` : ""}</span></label></div>`,
       )
       .join("");
   }
@@ -144,12 +151,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderizarPergunta() {
+    limparCheckboxesLottie();
+    const geracao = geracaoPergunta;
     const pergunta = perguntas[indiceAtual];
     renderizarPainel(pergunta);
     conteudo.classList.remove("question-enter");
     void conteudo.offsetWidth;
     conteudo.classList.add("question-enter");
-    conteudo.innerHTML = `<div class="options-heading"><p class="font-1-m-b">${pergunta.multipla ? "Selecione as opções aplicáveis" : "Escolha uma opção"}</p><span class="font-2-xs">${indiceAtual + 1} de ${perguntas.length}</span></div><fieldset class="question-options ${pergunta.multipla ? "pieces-grid" : ""}"><legend class="sr-only">${pergunta.titulo}</legend>${opcoesHtml(pergunta)}</fieldset>${pergunta.chave === "orcamento" ? rangeHtml() : ""}<div id="form-navigation"><button type="button" class="btn-ghost" ${indiceAtual === 0 ? "disabled" : ""}><i class="fa-solid fa-arrow-left"></i>Voltar</button><button type="button" class="btn-primary-form" id="next-question" ${podeAvancar() ? "" : "disabled"}>${indiceAtual === perguntas.length - 1 ? "Gerar configuração" : "Avançar"} <i class="fa-solid fa-arrow-right"></i></button></div>`;
+    conteudo.innerHTML = `<div class="options-heading"><p class="font-1-m-b">${pergunta.multipla ? "Selecione as opções aplicáveis" : "Escolha uma opção"}</p><span class="font-2-xs">${indiceAtual + 1} de ${perguntas.length}</span></div><fieldset class="question-options ${pergunta.multipla ? "pieces-grid" : ""}"><legend class="sr-only">${pergunta.titulo}</legend>${opcoesHtml(pergunta)}</fieldset>${pergunta.chave === "orcamento" ? rangeHtml() : ""}<div id="form-navigation"><button type="button" class="btn-ghost" ${indiceAtual === 0 ? "disabled" : ""}><i class="fa-solid fa-arrow-left"></i> Voltar</button><button type="button" class="btn-primary-form" id="next-question" ${podeAvancar() ? "" : "disabled"}>${indiceAtual === perguntas.length - 1 ? "Gerar configuração" : "Avançar"} <i class="fa-solid fa-arrow-right"></i></button></div>`;
     conteudo
       .querySelector(".btn-ghost")
       .addEventListener("click", () => navegarPara(indiceAtual - 1));
@@ -162,6 +171,51 @@ document.addEventListener("DOMContentLoaded", () => {
       .querySelector("#budget-range")
       ?.addEventListener("input", atualizarRange);
     conteudo.querySelector("#next-question").addEventListener("click", avancar);
+    if (pergunta.multipla) iniciarCheckboxesLottie(geracao);
+  }
+
+  function limparCheckboxesLottie() {
+    geracaoPergunta += 1;
+    animacoesCheckbox.forEach((animacao, id) => destruirAnimacao(id, animacao));
+    animacoesCheckbox.clear();
+    estadosCheckbox.clear();
+  }
+
+  async function iniciarCheckboxesLottie(geracao) {
+    for (const input of conteudo.querySelectorAll('input[name="pecas"]')) {
+      if (geracao !== geracaoPergunta) return;
+      const id = `check-${input.value}`;
+      estadosCheckbox.set(id, input.checked);
+      const animacao = await registrarAnimacao(id, "../lottie/checkbox.json");
+      if (!animacao) continue;
+      if (geracao !== geracaoPergunta) {
+        destruirAnimacao(id, animacao);
+        return;
+      }
+      animacoesCheckbox.set(id, animacao);
+      animacao.addEventListener("DOMLoaded", () => {
+        animacao.goToAndStop(input.checked ? animacao.totalFrames - 1 : 0, true);
+        input.nextElementSibling.querySelector(".choice-control").classList.add("lottie-ready");
+      });
+    }
+  }
+
+  function sincronizarCheckboxesLottie() {
+    conteudo.querySelectorAll('input[name="pecas"]').forEach((input) => {
+      const id = `check-${input.value}`;
+      if (estadosCheckbox.get(id) === input.checked) return;
+      estadosCheckbox.set(id, input.checked);
+      const animacao = animacoesCheckbox.get(id);
+      if (!animacao || !animacao.isLoaded) return;
+      if (input.checked) {
+        animacao.goToAndStop(0, true);
+        animacao.setDirection(1);
+      } else {
+        animacao.goToAndStop(animacao.totalFrames - 1, true);
+        animacao.setDirection(-1);
+      }
+      animacao.play();
+    });
   }
 
   function podeAvancar() {
@@ -189,6 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
       conteudo.querySelectorAll('input[name="pecas"]').forEach((item) => {
         item.checked = escolhidas.has(item.value);
       });
+      sincronizarCheckboxesLottie();
     }
     if (pergunta.chave === "orcamento") {
       const budgetRange = conteudo.querySelector(".budget-range");
@@ -230,12 +285,16 @@ document.addEventListener("DOMContentLoaded", () => {
     indiceAtual = indice;
     atualizarMenu();
     renderizarPergunta();
+    if (window.matchMedia("(max-width: 850px)").matches) {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
   }
 
   function mostrarGerando() {
+    limparCheckboxesLottie();
     atualizarMenu();
-    painel.innerHTML = `<p class="question-tag font-1-xs">Última etapa</p><h1 class="font-1-xl">Estamos montando sua configuração ideal.</h1><p class="font-2-s">Analisando suas escolhas, orçamento e peças que já possui.</p>`;
-    conteudo.innerHTML = `<div class="build-loading" role="status"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-l">Criando a sua build</h2><p class="font-2-s">Isso leva apenas alguns instantes.</p><div class="loading-steps"><span class="active">Analisando preferências</span><span>Verificando compatibilidade</span><span>Preparando a configuração</span></div></div>`;
+    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Estamos montando sua configuração ideal.</h1><p class="font-2-s">Analisando suas escolhas, orçamento e peças que já possui.</p></div>`;
+    conteudo.innerHTML = `<div class="build-loading" role="status"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-l">Criando a sua build</h2><p class="font-2-s">Isso leva apenas alguns instantes.</p><div class="loading-steps"><span class="active font-1-xs">Analisando preferências</span><span class="font-1-xs">Verificando compatibilidade</span><span class="font-1-xs">Preparando a configuração</span></div></div>`;
     window.setTimeout(() => {
       window.location.href = paginaConfiguracaoBuild;
     }, 2600);

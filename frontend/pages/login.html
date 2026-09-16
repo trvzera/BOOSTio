@@ -15,7 +15,7 @@
   <script type="module" src="../js/pages/login.js" defer></script>
 </head>
 
-<body id="login">
+<body class="login-page-body">
   <div id="loading-screen">
     <video id="loading-video" autoplay muted playsinline>
       <source src="../video/loading-toggle.webm" type="video/webm">
@@ -38,7 +38,7 @@
         <input type="checkbox" name="profile" id="profile-check" aria-label="Abrir menu do perfil">
         <div id="profile-options">
           <nav id="profile-nav">
-            <ul class="profile-nav-list" id="profile-nav-list-logado">
+            <ul class="profile-nav-list" id="profile-nav-list-signed-in">
               <li class="profile-item">
                 <a href="./builds.html" class="profile-link font-1-s" id="btn-build" aria-label="Ir para suas builds">
                   <i id="lottie-build" class="lottie-header"></i>
@@ -51,14 +51,14 @@
                   <p>Configurações</p>
                 </a>
               </li>
-              <li class="profile-item sair">
+              <li class="profile-item sign-out-item">
                 <a href="#" class="profile-link font-1-s" id="btn-logout" aria-label="Sair da sua conta">
                   <i id="lottie-logout" class="lottie-header"></i>
                   <p>Sair</p>
                 </a>
               </li>
             </ul>
-            <ul class="profile-nav-list" id="profile-nav-list-deslogado">
+            <ul class="profile-nav-list" id="profile-nav-list-signed-out">
               <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" id="btn-login" aria-label="Entrar na sua conta"><i id="lottie-login" class="lottie-header"></i>
                   <p>Entrar</p>
                 </a></li>
@@ -101,14 +101,14 @@
 
       <form id="login-form">
         <input type="email" placeholder="Seu e-mail" class="input-text" id="email" required>
-        <div class="input-senha-wrapper">
-          <input type="password" placeholder="Sua senha" class="input-text" id="senha" required>
-          <i class="fa-solid fa-eye-slash toggle-senha" data-target="senha"></i>
+        <div class="password-input-wrapper">
+          <input type="password" placeholder="Sua senha" class="input-text" id="password" required>
+          <i class="fa-solid fa-eye-slash password-toggle" data-target="password"></i>
         </div>
 
-        <p id="login-erro" class="font-1-xs erro-form"></p>
-        <button type="submit" class="btn-login" id="btn-entrar" disabled>Entrar</button>
-        <a href="./esqueci-senha.html" id="esqueceu-senha" class="font-1-s">Esqueceu a sua senha?</a>
+        <p id="login-error" class="font-1-xs form-error"></p>
+        <button type="submit" class="btn-login" id="btn-sign-in" disabled>Entrar</button>
+        <a href="./esqueci-senha.html" id="forgot-password-link" class="font-1-s">Esqueceu a sua senha?</a>
       </form>
       <div class="login-divider">
         <span class="login-line"></span>

@@ -15,15 +15,15 @@ const SEGUNDOS_REENVIO = 30;
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    const nomeInput = document.querySelector("#nome-usuario");
+    const nomeInput = document.querySelector("#username");
     const emailInput = document.querySelector("#email");
-    const senhaInput = document.querySelector("#senha1");
-    const confirmarSenhaInput = document.querySelector("#senha2");
-    const senhaMatchText = document.querySelector("#senha-match-text");
+    const senhaInput = document.querySelector("#primary-password");
+    const confirmarSenhaInput = document.querySelector("#confirm-password");
+    const senhaMatchText = document.querySelector("#password-match-text");
     senhaMatchText.style.display = "none";
     const termosCheck = document.querySelector("#terms");
-    const botaoCriarConta = document.querySelector("#btn-criar-conta");
-    const erroTexto = document.querySelector("#signin-erro");
+    const botaoCriarConta = document.querySelector("#btn-create-account");
+    const erroTexto = document.querySelector("#sign-up-error");
     erroTexto.style.display = "none";
     const botaoGoogle = document.querySelector("#btn-google-login");
 
@@ -31,18 +31,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       e.preventDefault();
       entrarComGoogle();
     });
-    const barra = document.querySelector(".barra");
+    const barra = document.querySelector(".strength-meter-bar");
     const textoStatus = document.querySelector("#status-text");
-    const containerVerificacao = document.querySelector("#verificacao-senha");
+    const containerVerificacao = document.querySelector("#password-verification");
 
-    const caracteres = document.querySelector("#caracteres");
-    const maiusculas = document.querySelector("#maiusculas");
-    const minusculas = document.querySelector("#minusculas");
-    const simbolos = document.querySelector("#simbolos");
-    const numeros = document.querySelector("#numeros");
+    const caracteres = document.querySelector("#password-length-rule");
+    const maiusculas = document.querySelector("#uppercase-rule");
+    const minusculas = document.querySelector("#lowercase-rule");
+    const simbolos = document.querySelector("#symbol-rule");
+    const numeros = document.querySelector("#number-rule");
 
     const ltCheck = await registrarAnimacao(
-      "check-lt",
+      "terms-checkbox-animation",
       "../lottie/checkbox.json",
     );
 
@@ -58,12 +58,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     let forcaSenha = 0;
 
     senhaInput.addEventListener("focus", () => {
-      containerVerificacao.classList.add("aberto");
+      containerVerificacao.classList.add("open");
     });
 
     senhaInput.addEventListener("blur", () => {
       if (senhaInput.value.length === 0) {
-        containerVerificacao.classList.remove("aberto");
+        containerVerificacao.classList.remove("open");
       }
     });
 
@@ -78,11 +78,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function atualizarClasse(elemento, condicao, vazio) {
       if (vazio) {
-        elemento.classList.remove("certo", "errado");
+        elemento.classList.remove("valid", "invalid");
         return;
       }
-      elemento.classList.toggle("certo", condicao);
-      elemento.classList.toggle("errado", !condicao);
+      elemento.classList.toggle("valid", condicao);
+      elemento.classList.toggle("invalid", !condicao);
     }
 
     function compararSenha() {
@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (senha2Vazia) {
         senhaMatchText.style.display = "none";
         senhaMatchText.textContent = "";
-        senhaMatchText.classList.remove("igual", "diferente");
+        senhaMatchText.classList.remove("matching", "mismatched");
         return;
       }
 
@@ -130,8 +130,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       senhaMatchText.textContent = iguais
         ? "As senhas coincidem"
         : "As senhas não coincidem";
-      senhaMatchText.classList.toggle("igual", iguais);
-      senhaMatchText.classList.toggle("diferente", !iguais);
+      senhaMatchText.classList.toggle("matching", iguais);
+      senhaMatchText.classList.toggle("mismatched", !iguais);
     }
 
     function corValor(total) {
@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return "FORTE";
     }
 
-    document.querySelectorAll(".toggle-senha").forEach((icone) => {
+    document.querySelectorAll(".password-toggle").forEach((icone) => {
       icone.addEventListener("click", () => {
         const alvo = document.querySelector(`#${icone.dataset.target}`);
         const vendo = alvo.type === "text";
@@ -185,16 +185,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     validarFormulario();
 
     // --- Modal de verificação de e-mail ---
-    const modalVerificacao = document.querySelector("#verificar-email-modal");
-    const alvoEmail = document.querySelector("#verificar-email-alvo");
-    const botaoEnviarCodigo = document.querySelector("#btn-enviar-codigo");
-    const inputsCodigo = Array.from(document.querySelectorAll(".input-codigo"));
-    const erroVerificacao = document.querySelector("#verificar-email-erro");
+    const modalVerificacao = document.querySelector("#verify-email-modal");
+    const alvoEmail = document.querySelector("#verify-email-target");
+    const botaoEnviarCodigo = document.querySelector("#btn-send-code");
+    const inputsCodigo = Array.from(document.querySelectorAll(".code-input"));
+    const erroVerificacao = document.querySelector("#verify-email-error");
     const botaoConfirmarCodigo = document.querySelector(
-      "#btn-confirmar-codigo",
+      "#btn-confirm-code",
     );
     const botaoVerificarDepois = document.querySelector(
-      "#btn-verificar-depois",
+      "#btn-verify-later",
     );
 
     let usuarioCriado = null;
