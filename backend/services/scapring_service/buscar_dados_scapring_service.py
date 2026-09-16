@@ -32,9 +32,13 @@ class BuscarDadosScapringService:
     site = BeautifulSoup(response.text, "html.parser")
 
     
-    preco = site.find("span", class_="text-2xl leading-tight").text
-    preco = preco.replace("R$","")
+    preco = site.find("span", class_="text-2xl leading-tight")
+    
+    if preco:
+      preco = preco.text.replace("R$","")
 
+    elif preco is None:
+      preco = "Esse produto esta esgotado"
 
     return preco
 
