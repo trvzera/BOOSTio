@@ -26,7 +26,7 @@
     flex-direction: column;
     gap: var(--espacamento-12);
   }
-  #sobre h2 {
+  #about-section h2 {
     margin-top: 0;
   }
 }

@@ -65,14 +65,14 @@ footer {
 }
 
 #footer-nav h2,
-#contato h2,
-#sobre h2 {
+#contact-section h2,
+#about-section h2 {
   color: var(--cor-6);
   margin-bottom: var(--espacamento-12);
   font-size: 1.3rem;
 }
 
-#sobre h2 {
+#about-section h2 {
   margin-top: var(--espacamento-12);
 }
 
@@ -84,10 +84,10 @@ footer {
   gap: var(--espacamento-12);
 }
 
-.footer-li a,
-#contato a,
-#sobre a,
-#termos {
+.footer-item a,
+#contact-section a,
+#about-section a,
+#terms-link {
   font-size: 1rem;
   color: var(--cor-4);
   position: relative;
@@ -95,17 +95,17 @@ footer {
   transition: 0.2s var(--ease);
 }
 
-.footer-li a:hover,
-#contato a:hover,
-#sobre a:hover,
-#termos:hover {
+.footer-item a:hover,
+#contact-section a:hover,
+#about-section a:hover,
+#terms-link:hover {
   color: var(--cor-p1);
 }
 
-.footer-li a::before,
-#contato a::before,
-#sobre a::before,
-#termos::before {
+.footer-item a::before,
+#contact-section a::before,
+#about-section a::before,
+#terms-link::before {
   content: "";
   width: 0%;
   height: 2px;
@@ -116,10 +116,10 @@ footer {
   transition: 0.2s var(--ease);
 }
 
-.footer-li:hover a::before,
-#contato a:hover::before,
-#sobre a:hover::before,
-#termos:hover::before {
+.footer-item:hover a::before,
+#contact-section a:hover::before,
+#about-section a:hover::before,
+#terms-link:hover::before {
   width: 100%;
   background-color: var(--cor-p1);
 }

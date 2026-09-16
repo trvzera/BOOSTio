@@ -19,8 +19,8 @@
   }
 }
 @media (max-width: 580px) {
-  #esqueci-senha-container,
-  #resetar-senha-container {
+  #forgot-password-container,
+  #reset-password-container {
     transform: scale(1);
     width: 90%;
   }

@@ -36,6 +36,6 @@
   margin-bottom: var(--espacamento-32);
 }
 
-#inicio .btn-primary:hover {
+.home-page .btn-primary:hover {
   transform: translateY(-5px);
 }

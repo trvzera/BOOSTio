@@ -1,5 +1,5 @@
-#esqueci-senha-page,
-#resetar-senha-page {
+#forgot-password-page,
+#reset-password-page {
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -12,8 +12,8 @@
   }
 }
 
-#esqueci-senha-container,
-#resetar-senha-container {
+#forgot-password-container,
+#reset-password-container {
   width: 380px;
   display: flex;
   flex-direction: column;
@@ -22,22 +22,22 @@
   transform: scale(1.15);
 }
 
-#esqueci-senha-title,
-#resetar-senha-title {
+#forgot-password-title,
+#reset-password-title {
   color: var(--cor-p1);
   margin-bottom: var(--espacamento-8);
 }
 
-#esqueci-senha-description,
-#resetar-senha-description {
+#forgot-password-description,
+#reset-password-description {
   text-align: center;
   color: var(--cor-4);
   margin-bottom: var(--espacamento-32);
   font-size: 0.9rem;
 }
 
-#esqueci-senha-form,
-#resetar-senha-form {
+#forgot-password-form,
+#reset-password-form {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -45,24 +45,24 @@
   gap: var(--espacamento-24);
 }
 
-#voltar-login {
+#back-to-login {
   color: var(--cor-6);
   text-decoration: none;
   font-size: 0.9rem;
   transition: opacity 0.2s var(--ease);
 }
 
-#voltar-login:hover {
+#back-to-login:hover {
   opacity: 0.7;
 }
 
-.oculto {
+.hidden {
   display: none !important;
 }
 
-#esqueci-senha-sucesso,
-#resetar-senha-sucesso,
-#resetar-senha-invalido {
+#forgot-password-success,
+#reset-password-success,
+#reset-password-invalid {
   width: 100%;
   height: 100%;
   background-color: var(--cor-0);
@@ -74,26 +74,26 @@
   position: absolute;
 }
 
-#esqueci-senha-sucesso h2,
-#resetar-senha-sucesso h2,
-#resetar-senha-invalido h2 {
+#forgot-password-success h2,
+#reset-password-success h2,
+#reset-password-invalid h2 {
   color: var(--cor-6);
 }
 
-#esqueci-senha-sucesso p,
-#resetar-senha-sucesso p,
-#resetar-senha-invalido p {
+#forgot-password-success p,
+#reset-password-success p,
+#reset-password-invalid p {
   color: var(--cor-4);
   font-size: 0.9rem;
 }
 
-#esqueci-senha-sucesso strong {
+#forgot-password-success strong {
   color: var(--cor-p1);
 }
 
-#esqueci-senha-sucesso .btn-login,
-#resetar-senha-sucesso .btn-login,
-#resetar-senha-invalido .btn-login {
+#forgot-password-success .btn-login,
+#reset-password-success .btn-login,
+#reset-password-invalid .btn-login {
   width: 100%;
   text-align: center;
   margin-top: var(--espacamento-8);
@@ -108,7 +108,7 @@
   color: var(--cor-p1);
 }
 
-.modal-icon-erro {
+.modal-icon-error {
   width: 56px;
   height: 56px;
   padding: 15px;

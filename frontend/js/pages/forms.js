@@ -285,6 +285,9 @@ document.addEventListener("DOMContentLoaded", () => {
     indiceAtual = indice;
     atualizarMenu();
     renderizarPergunta();
+    if (window.matchMedia("(max-width: 850px)").matches) {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
   }
 
   function mostrarGerando() {

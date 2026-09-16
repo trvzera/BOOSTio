@@ -11,6 +11,12 @@ const STATUS_LABEL = {
   erro: "Com erro",
   atencao: "Com atenção",
 };
+const STATUS_CLASS = {
+  incompleta: "incomplete",
+  completa: "complete",
+  erro: "error",
+  atencao: "warning",
+};
 
 const ROTULOS_PECA = {
   cpu: "Processador",
@@ -50,19 +56,19 @@ let idEdicao = null;
 let idExclusao = null;
 
 document.addEventListener("DOMContentLoaded", () => {
-  const lista = document.getElementById("builds-lista");
-  const vazio = document.getElementById("builds-vazio");
+  const lista = document.getElementById("builds-list");
+  const vazio = document.getElementById("builds-empty");
   const quotaCount = document.getElementById("quota-count");
   const quotaFill = document.getElementById("quota-fill");
-  const btnCriar = document.getElementById("btn-criar-build");
-  const btnImportar = document.getElementById("btn-importar-build");
+  const btnCriar = document.getElementById("btn-create-build");
+  const btnImportar = document.getElementById("btn-import-build");
   const toast = document.getElementById("toast");
   const toastText = document.getElementById("toast-text");
 
-  const modalEditar = document.getElementById("editar-build-modal");
-  const inputTitulo = document.getElementById("editar-titulo");
-  const inputDescricao = document.getElementById("editar-descricao");
-  const modalDeletar = document.getElementById("deletar-build-modal");
+  const modalEditar = document.getElementById("edit-build-modal");
+  const inputTitulo = document.getElementById("edit-title");
+  const inputDescricao = document.getElementById("edit-description");
+  const modalDeletar = document.getElementById("delete-build-modal");
 
   function showToast(mensagem) {
     toastText.textContent = mensagem;
@@ -92,8 +98,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function fecharMenus() {
-    lista.querySelectorAll(".build-menu-wrap.aberto").forEach((wrap) => {
-      wrap.classList.remove("aberto");
+    lista.querySelectorAll(".build-menu-wrap.open").forEach((wrap) => {
+      wrap.classList.remove("open");
       const trigger = wrap.querySelector(".build-menu-trigger");
       if (trigger) trigger.setAttribute("aria-expanded", "false");
     });
@@ -105,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnTrancar = card.querySelector('[data-acao="trancar"]');
     if (btnTrancar) {
       const ltLock = await registrarAnimacao(
-        `lt-lock-${buildId}`,
+        `lottie-lock-${buildId}`,
         "../lottie/buildLock.json",
       );
 
@@ -130,11 +136,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnVisibilidade = card.querySelector('[data-acao="visibilidade"]');
     if (btnVisibilidade) {
       const ltVisLock = await registrarAnimacao(
-        `lt-lock-vis-${buildId}`,
+        `lottie-lock-vis-${buildId}`,
         "../lottie/buildLock.json",
       );
       const ltVisPublic = await registrarAnimacao(
-        `lt-public-vis-${buildId}`,
+        `lottie-public-vis-${buildId}`,
         "../lottie/buildPublic.json",
       );
 
@@ -167,7 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnEditar = card.querySelector('[data-acao="editar"]');
     if (btnEditar) {
       const ltEditar = await registrarAnimacao(
-        `lt-edit-${buildId}`,
+        `lottie-edit-${buildId}`,
         "../lottie/buildPencil.json",
       );
       if (ltEditar) {
@@ -188,7 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnDuplicar = card.querySelector('[data-acao="duplicar"]');
     if (btnDuplicar) {
       const ltClone = await registrarAnimacao(
-        `lt-clone-${buildId}`,
+        `lottie-clone-${buildId}`,
         "../lottie/buildClone.json",
       );
       if (ltClone) {
@@ -209,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnCopiar = card.querySelector('[data-acao="copiar-link"]');
     if (btnCopiar) {
       const ltCopy = await registrarAnimacao(
-        `lt-copy-${buildId}`,
+        `lottie-copy-${buildId}`,
         "../lottie/buildCopy.json",
       );
       if (ltCopy) {
@@ -230,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnBaixarCsv = card.querySelector('[data-acao="baixar-csv"]');
     if (btnBaixarCsv) {
       const ltCsv = await registrarAnimacao(
-        `lt-csv-${buildId}`,
+        `lottie-csv-${buildId}`,
         "../lottie/buildDownload.json",
       );
       if (ltCsv) {
@@ -251,7 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnBaixarJson = card.querySelector('[data-acao="baixar-json"]');
     if (btnBaixarJson) {
       const ltJson = await registrarAnimacao(
-        `lt-json-${buildId}`,
+        `lottie-json-${buildId}`,
         "../lottie/buildDownload.json",
       );
       if (ltJson) {
@@ -272,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnDeletar = card.querySelector('[data-acao="deletar"]');
     if (btnDeletar) {
       const ltTrash = await registrarAnimacao(
-        `lt-trash-${buildId}`,
+        `lottie-trash-${buildId}`,
         "../lottie/buildTrash.json",
       );
       if (ltTrash) {
@@ -307,8 +313,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const progresso = calcularProgresso(build.pecas);
     const status = resolverStatus(build);
     const artigo = document.createElement("article");
-    artigo.className = `build-card ${status}`;
-    if (build.travada) artigo.classList.add("travada");
+    artigo.className = `build-card ${STATUS_CLASS[status]}`;
+    if (build.travada) artigo.classList.add("locked");
     artigo.dataset.id = build.id;
 
     const textoVisibilidade =
@@ -327,34 +333,34 @@ document.addEventListener("DOMContentLoaded", () => {
           <button type="button" class="build-menu-trigger" aria-label="Abrir menu da build" aria-expanded="false" aria-haspopup="true">···</button>
           <div class="build-menu" role="menu">
             <button type="button" class="build-menu-item" data-acao="trancar" role="menuitem">
-              <i id="lt-lock-${build.id}" class="lottie-build-page"></i>
+              <i id="lottie-lock-${build.id}" class="lottie-build-page"></i>
               <span class="btn-text">${textoTranca}</span>
             </button>
             <span class="build-menu-divider"></span>
             <button type="button" class="build-menu-item" data-acao="visibilidade" role="menuitem">
-              <i id="lt-lock-vis-${build.id}" class="lottie-build-page" ${displayLockVis}></i>
-              <i id="lt-public-vis-${build.id}" class="lottie-build-page" ${displayPublicVis}></i>
+              <i id="lottie-lock-vis-${build.id}" class="lottie-build-page" ${displayLockVis}></i>
+              <i id="lottie-public-vis-${build.id}" class="lottie-build-page" ${displayPublicVis}></i>
               <span class="btn-text">${textoVisibilidade}</span>
             </button>
             <button type="button" class="build-menu-item" data-acao="editar" role="menuitem">
-              <i id="lt-edit-${build.id}" class="lottie-build-page"></i>Editar detalhes
+              <i id="lottie-edit-${build.id}" class="lottie-build-page"></i>Editar detalhes
             </button>
             <button type="button" class="build-menu-item" data-acao="duplicar" role="menuitem">
-              <i id="lt-clone-${build.id}" class="lottie-build-page"></i>Duplicar build
+              <i id="lottie-clone-${build.id}" class="lottie-build-page"></i>Duplicar build
             </button>
             <button type="button" class="build-menu-item" data-acao="copiar-link" role="menuitem">
-              <i id="lt-copy-${build.id}" class="lottie-build-page"></i>Copiar link
+              <i id="lottie-copy-${build.id}" class="lottie-build-page"></i>Copiar link
             </button>
             <span class="build-menu-divider"></span>
             <button type="button" class="build-menu-item" data-acao="baixar-csv" role="menuitem">
-              <i id="lt-csv-${build.id}" class="lottie-build-page"></i>Baixar build (CSV)
+              <i id="lottie-csv-${build.id}" class="lottie-build-page"></i>Baixar build (CSV)
             </button>
             <button type="button" class="build-menu-item" data-acao="baixar-json" role="menuitem">
-              <i id="lt-json-${build.id}" class="lottie-build-page"></i>Baixar build (JSON)
+              <i id="lottie-json-${build.id}" class="lottie-build-page"></i>Baixar build (JSON)
             </button>
             <span class="build-menu-divider"></span>
-            <button type="button" class="build-menu-item perigo" data-acao="deletar" role="menuitem">
-              <i id="lt-trash-${build.id}" class="lottie-build-page"></i>Deletar build
+            <button type="button" class="build-menu-item danger-menu-item" data-acao="deletar" role="menuitem">
+              <i id="lottie-trash-${build.id}" class="lottie-build-page"></i>Deletar build
             </button>
           </div>
         </div>
@@ -365,7 +371,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="build-progress-fill" style="width: ${progresso}%"></div>
       </div>
       <div class="build-card-bottom">
-        <span class="build-status ${status} font-1-xs">${STATUS_LABEL[status]}</span>
+        <span class="build-status ${STATUS_CLASS[status]} font-1-xs">${STATUS_LABEL[status]}</span>
         <time class="build-card-date font-2-xs" datetime="${build.criadoEm}"></time>
       </div>
     `;
@@ -457,10 +463,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const trigger = evento.target.closest(".build-menu-trigger");
     if (trigger) {
       const wrap = trigger.closest(".build-menu-wrap");
-      const jaAberto = wrap.classList.contains("aberto");
+      const jaAberto = wrap.classList.contains("open");
       fecharMenus();
       if (!jaAberto) {
-        wrap.classList.add("aberto");
+        wrap.classList.add("open");
         trigger.setAttribute("aria-expanded", "true");
       }
       return;
@@ -583,14 +589,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document
-    .getElementById("cancelar-editar-build")
+    .getElementById("cancel-build-edit")
     .addEventListener("click", () => {
       idEdicao = null;
       fecharModal(modalEditar);
     });
 
   document
-    .getElementById("salvar-editar-build")
+    .getElementById("save-build-edit")
     .addEventListener("click", () => {
       const build = buscarBuild(idEdicao);
       if (!build || build.travada) {
@@ -611,14 +617,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   document
-    .getElementById("cancelar-deletar-build")
+    .getElementById("cancel-build-delete")
     .addEventListener("click", () => {
       idExclusao = null;
       fecharModal(modalDeletar);
     });
 
   document
-    .getElementById("confirmar-deletar-build")
+    .getElementById("confirm-build-delete")
     .addEventListener("click", () => {
       builds = builds.filter((item) => item.id !== idExclusao);
       idExclusao = null;

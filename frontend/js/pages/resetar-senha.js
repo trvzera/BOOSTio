@@ -5,42 +5,42 @@ document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const token = params.get("token");
 
-  const form = document.querySelector("#resetar-senha-form");
-  const containerSucesso = document.querySelector("#resetar-senha-sucesso");
-  const containerInvalido = document.querySelector("#resetar-senha-invalido");
+  const form = document.querySelector("#reset-password-form");
+  const containerSucesso = document.querySelector("#reset-password-success");
+  const containerInvalido = document.querySelector("#reset-password-invalid");
 
   if (!token) {
-    form.classList.add("oculto");
-    containerInvalido.classList.remove("oculto");
+    form.classList.add("hidden");
+    containerInvalido.classList.remove("hidden");
     return;
   }
 
-  const senhaInput = document.querySelector("#senha1");
-  const confirmarSenhaInput = document.querySelector("#senha2");
-  const senhaMatchText = document.querySelector("#senha-match-text");
+  const senhaInput = document.querySelector("#primary-password");
+  const confirmarSenhaInput = document.querySelector("#confirm-password");
+  const senhaMatchText = document.querySelector("#password-match-text");
   senhaMatchText.style.display = "none";
-  const botaoRedefinir = document.querySelector("#btn-redefinir-senha");
-  const erroTexto = document.querySelector("#resetar-senha-erro");
+  const botaoRedefinir = document.querySelector("#btn-reset-password");
+  const erroTexto = document.querySelector("#reset-password-error");
 
-  const barra = document.querySelector(".barra");
+  const barra = document.querySelector(".strength-meter-bar");
   const textoStatus = document.querySelector("#status-text");
-  const containerVerificacao = document.querySelector("#verificacao-senha");
+  const containerVerificacao = document.querySelector("#password-verification");
 
-  const caracteres = document.querySelector("#caracteres");
-  const maiusculas = document.querySelector("#maiusculas");
-  const minusculas = document.querySelector("#minusculas");
-  const simbolos = document.querySelector("#simbolos");
-  const numeros = document.querySelector("#numeros");
+  const caracteres = document.querySelector("#password-length-rule");
+  const maiusculas = document.querySelector("#uppercase-rule");
+  const minusculas = document.querySelector("#lowercase-rule");
+  const simbolos = document.querySelector("#symbol-rule");
+  const numeros = document.querySelector("#number-rule");
 
   let forcaSenha = 0;
 
   senhaInput.addEventListener("focus", () => {
-    containerVerificacao.classList.add("aberto");
+    containerVerificacao.classList.add("open");
   });
 
   senhaInput.addEventListener("blur", () => {
     if (senhaInput.value.length === 0) {
-      containerVerificacao.classList.remove("aberto");
+      containerVerificacao.classList.remove("open");
     }
   });
 
@@ -52,11 +52,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function atualizarClasse(elemento, condicao, vazio) {
     if (vazio) {
-      elemento.classList.remove("certo", "errado");
+      elemento.classList.remove("valid", "invalid");
       return;
     }
-    elemento.classList.toggle("certo", condicao);
-    elemento.classList.toggle("errado", !condicao);
+    elemento.classList.toggle("valid", condicao);
+    elemento.classList.toggle("invalid", !condicao);
   }
 
   function compararSenha() {
@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (senha2Vazia) {
       senhaMatchText.style.display = "none";
       senhaMatchText.textContent = "";
-      senhaMatchText.classList.remove("igual", "diferente");
+      senhaMatchText.classList.remove("matching", "mismatched");
       return;
     }
 
@@ -104,8 +104,8 @@ document.addEventListener("DOMContentLoaded", () => {
     senhaMatchText.textContent = iguais
       ? "As senhas coincidem"
       : "As senhas não coincidem";
-    senhaMatchText.classList.toggle("igual", iguais);
-    senhaMatchText.classList.toggle("diferente", !iguais);
+    senhaMatchText.classList.toggle("matching", iguais);
+    senhaMatchText.classList.toggle("mismatched", !iguais);
   }
 
   function corValor(total) {
@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return "FORTE";
   }
 
-  document.querySelectorAll(".toggle-senha").forEach((icone) => {
+  document.querySelectorAll(".password-toggle").forEach((icone) => {
     icone.addEventListener("click", () => {
       const alvo = document.querySelector(`#${icone.dataset.target}`);
       const vendo = alvo.type === "text";
@@ -157,8 +157,8 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await redefinirSenha(token, novaSenha);
 
-      form.classList.add("oculto");
-      containerSucesso.classList.remove("oculto");
+      form.classList.add("hidden");
+      containerSucesso.classList.remove("hidden");
     } catch (erro) {
       console.error("Falha ao redefinir senha:", erro);
       erroTexto.textContent =

@@ -9,7 +9,7 @@
     radial-gradient(ellipse 700px 550px at 100% 72%, rgba(0, 195, 180, 0.12), transparent 72%);
 }
 
-#inicio {
+.home-page {
   height: auto;
   min-height: 100vh;
   overflow-x: clip;

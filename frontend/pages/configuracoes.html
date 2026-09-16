@@ -15,7 +15,7 @@
   <script type="module" src="../js/pages/configuracoes.js" defer></script>
 </head>
 
-<body id="configs">
+<body class="settings-page-body">
   <div id="loading-screen">
     <video id="loading-video" autoplay muted playsinline>
       <source src="../video/loading-toggle.webm" type="video/webm">
@@ -38,7 +38,7 @@
         <input type="checkbox" name="profile" id="profile-check" aria-label="Abrir menu do perfil">
         <div id="profile-options">
           <nav id="profile-nav">
-            <ul class="profile-nav-list" id="profile-nav-list-logado">
+            <ul class="profile-nav-list" id="profile-nav-list-signed-in">
               <li class="profile-item">
                 <a href="./builds.html" class="profile-link font-1-s" id="btn-build" aria-label="Ir para suas builds">
                   <i id="lottie-build" class="lottie-header"></i>
@@ -51,14 +51,14 @@
                   <p>Configurações</p>
                 </a>
               </li>
-              <li class="profile-item sair">
+              <li class="profile-item sign-out-item">
                 <a href="#" class="profile-link font-1-s" id="btn-logout" aria-label="Sair da sua conta">
                   <i id="lottie-logout" class="lottie-header"></i>
                   <p>Sair</p>
                 </a>
               </li>
             </ul>
-            <ul class="profile-nav-list" id="profile-nav-list-deslogado">
+            <ul class="profile-nav-list" id="profile-nav-list-signed-out">
               <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" id="btn-login" aria-label="Entrar na sua conta"><i id="lottie-login" class="lottie-header"></i>
                   <p>Entrar</p>
                 </a></li>
@@ -90,23 +90,6 @@
     </div>
   </header>
 
-  <header id="header-mobile">
-    <div id="burger-menu">
-      <input type="checkbox" id="burger-check" aria-label="Abrir menu de navegação">
-      <label for="burger-check" id="lottie-burger">
-      </label>
-
-      <nav id="mobile-nav">
-        <ul id="mobile-nav-list">
-          <li class="mobile-nav-item"><a href="./index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de Início">Início</a></li>
-          <li class="mobile-nav-item"><a href="./index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão Sobre">Sobre</a></li>
-          <li class="mobile-nav-item"><a href="./index.html#services-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão de Serviços">Serviços</a></li>
-          <li class="mobile-nav-item"><a href="./index.html#build-page" class="nav-link font-1-xs" aria-label="Ir para página principal na sessão montar o computador">Monte o seu</a></li>
-          <li class="mobile-nav-item"><a href="./builds.html" class="nav-link font-1-xs" aria-label="Ir para página das suas builds">Suas Builds</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
   <main role="main">
 
     <section id="settings-page">
@@ -127,12 +110,12 @@
           </div>
         </div>
         <div class="profile-meta">
-          <div class="meta-pill font-1-m"><i class="fa-solid fa-calendar"></i><span id="criado-em"></span></div>
+          <div class="meta-pill font-1-m"><i class="fa-solid fa-calendar"></i><span id="created-at"></span></div>
           <div class="meta-pill font-1-m"><i class="fa-solid fa-desktop"></i>X builds salvas</div>
-          <div class="meta-pill font-1-m" id="verificado-pill">
-            <i class="fa-solid" id="verificado-icone"></i>
-            <span id="verificado-texto"></span>
-            <button type="button" class="meta-pill-action" id="btn-verificar-agora" aria-label="Verificar meu e-mail">Verificar agora</button>
+          <div class="meta-pill font-1-m" id="verified-pill">
+            <i class="fa-solid" id="verified-icon"></i>
+            <span id="verified-text"></span>
+            <button type="button" class="meta-pill-action" id="btn-verify-now" aria-label="Verificar meu e-mail">Verificar agora</button>
           </div>
         </div>
 
@@ -223,31 +206,31 @@
         </div>
       </div>
 
-      <div class="modal-overlay" id="verificar-email-modal">
-        <div class="modal-box" id="verificar-email-box">
+      <div class="modal-overlay" id="verify-email-modal">
+        <div class="modal-box" id="verify-email-box">
           <div class="modal-icon"><i class="fa-solid fa-envelope-circle-check"></i></div>
           <h3 class="font-1-m">Confirme seu e-mail</h3>
-          <p class="font-1-m">Envie o código de verificação para <strong id="verificar-email-alvo">seu e-mail</strong> e digite os 4 dígitos recebidos abaixo.</p>
+          <p class="font-1-m">Envie o código de verificação para <strong id="verify-email-target">seu e-mail</strong> e digite os 4 dígitos recebidos abaixo.</p>
 
-          <div id="enviar-codigo-container">
-            <button type="button" class="btn-ghost" id="btn-enviar-codigo" aria-label="Enviar código de verificação para o e-mail">
+          <div id="send-code-container">
+            <button type="button" class="btn-ghost" id="btn-send-code" aria-label="Enviar código de verificação para o e-mail">
               <i class="fa-solid fa-paper-plane"></i>
               Enviar código
             </button>
           </div>
 
-          <div class="codigo-inputs" id="codigo-inputs">
-            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="0" aria-label="Primeiro dígito do código" disabled>
-            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="1" aria-label="Segundo dígito do código" disabled>
-            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="2" aria-label="Terceiro dígito do código" disabled>
-            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="3" aria-label="Quarto dígito do código" disabled>
+          <div class="code-inputs" id="code-inputs">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="0" aria-label="Primeiro dígito do código" disabled>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="1" aria-label="Segundo dígito do código" disabled>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="2" aria-label="Terceiro dígito do código" disabled>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="3" aria-label="Quarto dígito do código" disabled>
           </div>
 
-          <p id="verificar-email-erro" class="font-1-xs erro-form"></p>
+          <p id="verify-email-error" class="font-1-xs form-error"></p>
 
           <div class="modal-actions">
-            <button type="button" class="btn-ghost" id="btn-fechar-verificacao" aria-label="Fechar verificação de e-mail">Fechar</button>
-            <button type="button" class="btn-primary" id="btn-confirmar-codigo" aria-label="Confirmar código de verificação" disabled>Confirmar</button>
+            <button type="button" class="btn-ghost" id="btn-close-verification" aria-label="Fechar verificação de e-mail">Fechar</button>
+            <button type="button" class="btn-primary" id="btn-confirm-code" aria-label="Confirmar código de verificação" disabled>Confirmar</button>
           </div>
         </div>
       </div>

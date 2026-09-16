@@ -1,11 +1,11 @@
-document.body.classList.add("carregando");
+document.body.classList.add("loading-active");
 
 const loadingScreen = document.querySelector("#loading-screen");
 const loadingVideo = document.querySelector("#loading-video");
 
 function esconderLoading() {
-  loadingScreen.classList.add("escondido");
-  document.body.classList.remove("carregando");
+  loadingScreen.classList.add("loading-dismissed");
+  document.body.classList.remove("loading-active");
 
   loadingScreen.addEventListener(
     "transitionend",

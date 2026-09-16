@@ -15,7 +15,7 @@
   <script type="module" src="../js/pages/signin.js" defer></script>
 </head>
 
-<body id="signin">
+<body class="sign-up-page-body">
   <div id="loading-screen">
     <video id="loading-video" autoplay muted playsinline>
       <source src="../video/loading-toggle.webm" type="video/webm">
@@ -38,7 +38,7 @@
         <input type="checkbox" name="profile" id="profile-check" aria-label="Abrir menu do perfil">
         <div id="profile-options">
           <nav id="profile-nav">
-            <ul class="profile-nav-list" id="profile-nav-list-logado">
+            <ul class="profile-nav-list" id="profile-nav-list-signed-in">
               <li class="profile-item">
                 <a href="./builds.html" class="profile-link font-1-s" id="btn-build" aria-label="Ir para suas builds">
                   <i id="lottie-build" class="lottie-header"></i>
@@ -51,14 +51,14 @@
                   <p>Configurações</p>
                 </a>
               </li>
-              <li class="profile-item sair">
+              <li class="profile-item sign-out-item">
                 <a href="#" class="profile-link font-1-s" id="btn-logout" aria-label="Sair da sua conta">
                   <i id="lottie-logout" class="lottie-header"></i>
                   <p>Sair</p>
                 </a>
               </li>
             </ul>
-            <ul class="profile-nav-list" id="profile-nav-list-deslogado">
+            <ul class="profile-nav-list" id="profile-nav-list-signed-out">
               <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" id="btn-login" aria-label="Entrar na sua conta"><i id="lottie-login" class="lottie-header"></i>
                   <p>Entrar</p>
                 </a></li>
@@ -99,53 +99,53 @@
       <h1 id="signin-title" class="font-1-l">Vamos criar a sua conta!</h1>
       <p id="signin-description" class="font-2-xs">Já possui uma conta? <a href="./login.html">Entrar com sua conta.</a></p>
       <form id="signin-form">
-        <input type="text" placeholder="Seu nome de usuário" class="input-text" id="nome-usuario" maxlength="15">
+        <input type="text" placeholder="Seu nome de usuário" class="input-text" id="username" maxlength="15">
         <input type="email" placeholder="Seu melhor e-mail" class="input-text" id="email">
 
-        <div class="input-senha-wrapper">
-          <input type="password" placeholder="Uma senha forte" class="input-text" id="senha1">
-          <i class="fa-solid fa-eye-slash toggle-senha" data-target="senha1"></i>
+        <div class="password-input-wrapper">
+          <input type="password" placeholder="Uma senha forte" class="input-text" id="primary-password">
+          <i class="fa-solid fa-eye-slash password-toggle" data-target="primary-password"></i>
         </div>
 
-        <div id="verificacao-senha">
-          <div id="verificacao-senha-inner">
+        <div id="password-verification">
+          <div id="password-verification-content">
             <div id="status-container">
-              <div id="fundo-barra">
-                <div class="barra"></div>
+              <div id="strength-meter-track">
+                <div class="strength-meter-bar"></div>
               </div>
               <p class="font-1-s" id="status-text"></p>
             </div>
-            <div id="condicoes-container">
-              <div class="condicao-bloco" id="caracteres">
-                <div class="condicao-status">
+            <div id="password-rules">
+              <div class="password-rule" id="password-length-rule">
+                <div class="password-rule-status">
                   <i class="fa-solid fa-x"></i>
                   <i class="fa-solid fa-check"></i>
                 </div>
                 <p class="font-1-s">+8 Caracteres</p>
               </div>
-              <div class="condicao-bloco" id="simbolos">
-                <div class="condicao-status">
+              <div class="password-rule" id="symbol-rule">
+                <div class="password-rule-status">
                   <i class="fa-solid fa-x"></i>
                   <i class="fa-solid fa-check"></i>
                 </div>
                 <p class="font-1-s">Símbolos</p>
               </div>
-              <div class="condicao-bloco" id="maiusculas">
-                <div class="condicao-status">
+              <div class="password-rule" id="uppercase-rule">
+                <div class="password-rule-status">
                   <i class="fa-solid fa-x"></i>
                   <i class="fa-solid fa-check"></i>
                 </div>
                 <p class="font-1-s">Maiúsculas</p>
               </div>
-              <div class="condicao-bloco" id="minusculas">
-                <div class="condicao-status">
+              <div class="password-rule" id="lowercase-rule">
+                <div class="password-rule-status">
                   <i class="fa-solid fa-x"></i>
                   <i class="fa-solid fa-check"></i>
                 </div>
                 <p class="font-1-s">Minúsculas</p>
               </div>
-              <div class="condicao-bloco" id="numeros">
-                <div class="condicao-status">
+              <div class="password-rule" id="number-rule">
+                <div class="password-rule-status">
                   <i class="fa-solid fa-x"></i>
                   <i class="fa-solid fa-check"></i>
                 </div>
@@ -155,14 +155,14 @@
           </div>
         </div>
 
-        <div class="input-senha-wrapper">
-          <input type="password" placeholder="Confirme sua senha" class="input-text" id="senha2">
-          <i class="fa-solid fa-eye-slash toggle-senha" data-target="senha2"></i>
+        <div class="password-input-wrapper">
+          <input type="password" placeholder="Confirme sua senha" class="input-text" id="confirm-password">
+          <i class="fa-solid fa-eye-slash password-toggle" data-target="confirm-password"></i>
         </div>
-        <p id="senha-match-text" class="font-1-s"></p>
+        <p id="password-match-text" class="font-1-s"></p>
 
-        <div id="campo-check">
-          <div class="checkbox-wrapper" id="check-lt">
+        <div id="terms-checkbox-field">
+          <div class="checkbox-wrapper" id="terms-checkbox-animation">
             <input type="checkbox" name="terms" id="terms" class="lottie-check">
           </div>
           <label for="terms" class="font-1-xs">
@@ -170,8 +170,8 @@
           </label>
 
         </div>
-        <p id="signin-erro" class="font-1-xs erro-form"></p>
-        <button type="submit" class="btn-login" id="btn-criar-conta" disabled>Criar conta</button>
+        <p id="sign-up-error" class="font-1-xs form-error"></p>
+        <button type="submit" class="btn-login" id="btn-create-account" disabled>Criar conta</button>
       </form>
       <div class="login-divider">
         <span class="login-line"></span>
@@ -181,31 +181,31 @@
       <a href="#" class="btn-login-secondary" id="btn-google-login">Criar com Google</a>
     </div>
 
-    <div class="modal-overlay" id="verificar-email-modal">
-      <div class="modal-box" id="verificar-email-box">
+    <div class="modal-overlay" id="verify-email-modal">
+      <div class="modal-box" id="verify-email-box">
         <div class="modal-icon"><i class="fa-solid fa-envelope-circle-check"></i></div>
         <h3 class="font-1-m">Confirme seu e-mail</h3>
-        <p class="font-1-m">Para ativar sua conta, envie o código de verificação para <strong id="verificar-email-alvo">seu e-mail</strong> e digite os 4 dígitos recebidos abaixo.</p>
+        <p class="font-1-m">Para ativar sua conta, envie o código de verificação para <strong id="verify-email-target">seu e-mail</strong> e digite os 4 dígitos recebidos abaixo.</p>
 
-        <div id="enviar-codigo-container">
-          <button type="button" class="btn-ghost" id="btn-enviar-codigo" aria-label="Enviar código de verificação para o e-mail">
+        <div id="send-code-container">
+          <button type="button" class="btn-ghost" id="btn-send-code" aria-label="Enviar código de verificação para o e-mail">
             <i class="fa-solid fa-paper-plane"></i>
             Enviar código
           </button>
         </div>
 
-        <div class="codigo-inputs" id="codigo-inputs">
-          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="0" aria-label="Primeiro dígito do código" disabled>
-          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="1" aria-label="Segundo dígito do código" disabled>
-          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="2" aria-label="Terceiro dígito do código" disabled>
-          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="input-codigo" data-index="3" aria-label="Quarto dígito do código" disabled>
+        <div class="code-inputs" id="code-inputs">
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="0" aria-label="Primeiro dígito do código" disabled>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="1" aria-label="Segundo dígito do código" disabled>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="2" aria-label="Terceiro dígito do código" disabled>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="3" aria-label="Quarto dígito do código" disabled>
         </div>
 
-        <p id="verificar-email-erro" class="font-1-xs erro-form"></p>
+        <p id="verify-email-error" class="font-1-xs form-error"></p>
 
         <div class="modal-actions">
-          <button type="button" class="btn-ghost" id="btn-verificar-depois" aria-label="Verificar e-mail mais tarde">Fazer isso depois</button>
-          <button type="button" class="btn-primary" id="btn-confirmar-codigo" aria-label="Confirmar código de verificação" disabled>Confirmar</button>
+          <button type="button" class="btn-ghost" id="btn-verify-later" aria-label="Verificar e-mail mais tarde">Fazer isso depois</button>
+          <button type="button" class="btn-primary" id="btn-confirm-code" aria-label="Confirmar código de verificação" disabled>Confirmar</button>
         </div>
       </div>
     </div>

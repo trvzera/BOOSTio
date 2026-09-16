@@ -13,7 +13,7 @@
   <script type="module" src="../js/pages/resetar-senha.js" defer></script>
 </head>
 
-<body id="resetar-senha">
+<body class="reset-password-page-body">
   <div id="loading-screen">
     <video id="loading-video" autoplay muted playsinline>
       <source src="../video/loading-toggle.webm" type="video/webm">
@@ -36,7 +36,7 @@
         <input type="checkbox" name="profile" id="profile-check" aria-label="Abrir menu do perfil">
         <div id="profile-options">
           <nav id="profile-nav">
-            <ul class="profile-nav-list" id="profile-nav-list-logado">
+            <ul class="profile-nav-list" id="profile-nav-list-signed-in">
               <li class="profile-item">
                 <a href="./builds.html" class="profile-link font-1-s" id="btn-build" aria-label="Ir para suas builds">
                   <i id="lottie-build" class="lottie-header"></i>
@@ -49,14 +49,14 @@
                   <p>Configurações</p>
                 </a>
               </li>
-              <li class="profile-item sair">
+              <li class="profile-item sign-out-item">
                 <a href="#" class="profile-link font-1-s" id="btn-logout" aria-label="Sair da sua conta">
                   <i id="lottie-logout" class="lottie-header"></i>
                   <p>Sair</p>
                 </a>
               </li>
             </ul>
-            <ul class="profile-nav-list" id="profile-nav-list-deslogado">
+            <ul class="profile-nav-list" id="profile-nav-list-signed-out">
               <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" id="btn-login" aria-label="Entrar na sua conta"><i id="lottie-login" class="lottie-header"></i>
                   <p>Entrar</p>
                 </a></li>
@@ -88,60 +88,60 @@
     </div>
   </header>
 
-  <main id="resetar-senha-page">
+  <main id="reset-password-page">
     <div class="decoration decoration-1"></div>
     <div class="decoration decoration-2"></div>
 
-    <div id="resetar-senha-container">
+    <div id="reset-password-container">
       <img src="../imgs/logo.webp" alt="Logo">
-      <h1 id="resetar-senha-title" class="font-1-l">Defina uma nova senha</h1>
-      <p id="resetar-senha-description" class="font-2-xs">Crie uma senha forte para proteger sua conta.</p>
+      <h1 id="reset-password-title" class="font-1-l">Defina uma nova senha</h1>
+      <p id="reset-password-description" class="font-2-xs">Crie uma senha forte para proteger sua conta.</p>
 
-      <form id="resetar-senha-form">
-        <div class="input-senha-wrapper">
-          <input type="password" placeholder="Nova senha" class="input-text" id="senha1">
-          <i class="fa-solid fa-eye-slash toggle-senha" data-target="senha1"></i>
+      <form id="reset-password-form">
+        <div class="password-input-wrapper">
+          <input type="password" placeholder="Nova senha" class="input-text" id="primary-password">
+          <i class="fa-solid fa-eye-slash password-toggle" data-target="primary-password"></i>
         </div>
 
-        <div id="verificacao-senha">
-          <div id="verificacao-senha-inner">
+        <div id="password-verification">
+          <div id="password-verification-content">
             <div id="status-container">
-              <div id="fundo-barra">
-                <div class="barra"></div>
+              <div id="strength-meter-track">
+                <div class="strength-meter-bar"></div>
               </div>
               <p class="font-1-s" id="status-text"></p>
             </div>
-            <div id="condicoes-container">
-              <div class="condicao-bloco" id="caracteres">
-                <div class="condicao-status">
+            <div id="password-rules">
+              <div class="password-rule" id="password-length-rule">
+                <div class="password-rule-status">
                   <i class="fa-solid fa-x"></i>
                   <i class="fa-solid fa-check"></i>
                 </div>
                 <p class="font-1-s">+8 Caracteres</p>
               </div>
-              <div class="condicao-bloco" id="simbolos">
-                <div class="condicao-status">
+              <div class="password-rule" id="symbol-rule">
+                <div class="password-rule-status">
                   <i class="fa-solid fa-x"></i>
                   <i class="fa-solid fa-check"></i>
                 </div>
                 <p class="font-1-s">Símbolos</p>
               </div>
-              <div class="condicao-bloco" id="maiusculas">
-                <div class="condicao-status">
+              <div class="password-rule" id="uppercase-rule">
+                <div class="password-rule-status">
                   <i class="fa-solid fa-x"></i>
                   <i class="fa-solid fa-check"></i>
                 </div>
                 <p class="font-1-s">Maiúsculas</p>
               </div>
-              <div class="condicao-bloco" id="minusculas">
-                <div class="condicao-status">
+              <div class="password-rule" id="lowercase-rule">
+                <div class="password-rule-status">
                   <i class="fa-solid fa-x"></i>
                   <i class="fa-solid fa-check"></i>
                 </div>
                 <p class="font-1-s">Minúsculas</p>
               </div>
-              <div class="condicao-bloco" id="numeros">
-                <div class="condicao-status">
+              <div class="password-rule" id="number-rule">
+                <div class="password-rule-status">
                   <i class="fa-solid fa-x"></i>
                   <i class="fa-solid fa-check"></i>
                 </div>
@@ -151,28 +151,28 @@
           </div>
         </div>
 
-        <div class="input-senha-wrapper">
-          <input type="password" placeholder="Confirme a nova senha" class="input-text" id="senha2">
-          <i class="fa-solid fa-eye-slash toggle-senha" data-target="senha2"></i>
+        <div class="password-input-wrapper">
+          <input type="password" placeholder="Confirme a nova senha" class="input-text" id="confirm-password">
+          <i class="fa-solid fa-eye-slash password-toggle" data-target="confirm-password"></i>
         </div>
-        <p id="senha-match-text" class="font-1-s"></p>
+        <p id="password-match-text" class="font-1-s"></p>
 
-        <p id="resetar-senha-erro" class="font-1-xs erro-form"></p>
-        <button type="submit" class="btn-login" id="btn-redefinir-senha" disabled>Redefinir senha</button>
+        <p id="reset-password-error" class="font-1-xs form-error"></p>
+        <button type="submit" class="btn-login" id="btn-reset-password" disabled>Redefinir senha</button>
       </form>
 
-      <div id="resetar-senha-sucesso" class="oculto">
+      <div id="reset-password-success" class="hidden">
         <div class="modal-icon"><i class="fa-solid fa-circle-check"></i></div>
         <h2 class="font-1-l">Senha redefinida!</h2>
         <p class="font-2-xs">Sua senha foi alterada com sucesso. Você já pode entrar com a nova senha.</p>
-        <a href="./login.html" class="btn-login" id="ir-para-login">Ir para o login</a>
+        <a href="./login.html" class="btn-login" id="go-to-login">Ir para o login</a>
       </div>
 
-      <div id="resetar-senha-invalido" class="oculto">
-        <div class="modal-icon modal-icon-erro"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <div id="reset-password-invalid" class="hidden">
+        <div class="modal-icon modal-icon-error"><i class="fa-solid fa-triangle-exclamation"></i></div>
         <h2 class="font-1-l">Link inválido ou expirado</h2>
         <p class="font-2-xs">Esse link de redefinição não é mais válido. Solicite um novo abaixo.</p>
-        <a href="./esqueci-senha.html" class="btn-login" id="solicitar-novo-link">Solicitar novo link</a>
+        <a href="./esqueci-senha.html" class="btn-login" id="request-new-link">Solicitar novo link</a>
       </div>
     </div>
   </main>
