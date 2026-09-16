@@ -110,6 +110,9 @@
   #main-page .btn-primary {
     transform: scale(0.7);
   }
+  #main-page .btn-primary:hover {
+    transform: translateY(-5px) scale(0.7);
+  }
   #about-page {
     height: max-content;
   }

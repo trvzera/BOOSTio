@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
     painel.classList.remove("question-enter");
     void painel.offsetWidth;
     painel.classList.add("question-enter");
-    painel.innerHTML = `<p class="question-tag font-1-xs">${pergunta.tag}</p><h1 class="font-1-xl">${pergunta.titulo}</h1><p class="font-2-s">${pergunta.descricao}</p><div class="tip-card"><p class="font-1-m-b">Formulário inteligente</p><p class="font-2-xs">Revise suas escolhas pelo menu superior ou avance quando estiver pronto.</p></div>`;
+    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Montagem inteligente · ${pergunta.tag}</span><h1 class="font-1-xl">${pergunta.titulo}</h1><p class="font-2-s">${pergunta.descricao}</p></div><div class="manual-build"><h2 class="font-1-m-b">Deseja montar manualmente?</h2><p class="font-2-s">Escolha cada peça da sua build por conta própria quando a montagem manual estiver disponível.</p><button type="button" class="btn-primary-form" disabled aria-label="Montagem manual em breve">Montar manualmente · Em breve</button></div>`;
   }
 
   function opcoesHtml(pergunta) {
@@ -290,7 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function mostrarGerando() {
     limparCheckboxesLottie();
     atualizarMenu();
-    painel.innerHTML = `<p class="question-tag font-1-xs">Última etapa</p><h1 class="font-1-xl">Estamos montando sua configuração ideal.</h1><p class="font-2-s">Analisando suas escolhas, orçamento e peças que já possui.</p>`;
+    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Estamos montando sua configuração ideal.</h1><p class="font-2-s">Analisando suas escolhas, orçamento e peças que já possui.</p></div>`;
     conteudo.innerHTML = `<div class="build-loading" role="status"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-l">Criando a sua build</h2><p class="font-2-s">Isso leva apenas alguns instantes.</p><div class="loading-steps"><span class="active font-1-xs">Analisando preferências</span><span class="font-1-xs">Verificando compatibilidade</span><span class="font-1-xs">Preparando a configuração</span></div></div>`;
     window.setTimeout(() => {
       window.location.href = paginaConfiguracaoBuild;

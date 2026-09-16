@@ -28,7 +28,7 @@
           <li class="nav-item"><a href="#main-page" class="nav-link font-1-xs" aria-label="Ir para sessão de inicial">Início</a></li>
           <li class="nav-item"><a href="#about-page" class="nav-link font-1-xs" aria-label="Ir para sessão sobre">Sobre</a></li>
           <li class="nav-item"><a href="#services-page" class="nav-link font-1-xs" aria-label="Ir para sessão de serviços">Serviços</a></li>
-          <li class="nav-item"><a href="#build-page" class="nav-link font-1-xs" aria-label="Ir para sessão de montagem do computador">Monte o seu</a></li>
+          <li class="nav-item"><a href="./formulario.html" class="nav-link font-1-xs" aria-label="Ir para o formulário de montagem do computador">Monte o seu</a></li>
           <li id="divider"></li>
           <li class="nav-item"><a href="./builds.html" class="nav-link font-1-xs" aria-label="Ir para página contendo suas builds">Suas Builds</a></li>
         </ul>
@@ -82,7 +82,7 @@
           <li class="mobile-nav-item"><a href="#main-page" class="nav-link font-1-xs" aria-label="Ir para sessão de Início">Início</a></li>
           <li class="mobile-nav-item"><a href="#about-page" class="nav-link font-1-xs" aria-label="Ir para sessão Sobre">Sobre</a></li>
           <li class="mobile-nav-item"><a href="#services-page" class="nav-link font-1-xs" aria-label="Ir para sessão de Serviços">Serviços</a></li>
-          <li class="mobile-nav-item"><a href="#build-page" class="nav-link font-1-xs" aria-label="Ir para sessão montar o computador">Monte o seu</a></li>
+          <li class="mobile-nav-item"><a href="./formulario.html" class="nav-link font-1-xs" aria-label="Ir para o formulário de montagem do computador">Monte o seu</a></li>
           <li class="mobile-nav-item"><a href="./builds.html" class="nav-link font-1-xs" aria-label="Ir para página das suas builds">Suas Builds</a></li>
         </ul>
       </nav>
@@ -91,7 +91,7 @@
   <main role="main">
 
     <section id="main-page">
-      <video autoplay muted loop playsinline>
+      <video autoplay muted loop playsinline preload="metadata">
         <source src="../video/background.webm">
         Seu navegador não suporta vídeos.
       </video>
@@ -99,29 +99,25 @@
       <p id="main-description" class="font-2-s">A Boostio é uma plataforma que simplifica a montagem de computadores,
         ajudando você a escolher as peças ideais com base no seu objetivo,
         orçamento e necessidade, tudo com precisão e confiança.</p>
-      <a href="#" class="btn-primary" aria-label="Botão para montar a sua build">Monte o seu</a>
+      <a href="./formulario.html" class="btn-primary" aria-label="Ir para o formulário de montagem da sua build">Monte o seu</a>
     </section>
 
     <section id="about-page">
-      <div class="decoration"></div>
       <div id="about-container">
         <div id="text-about">
           <h1 class="font-1-xl">Nós somos a <span>BOOSTio.</span><br> Seja muito bem vindo(a)!</h1>
           <p class="font-2-s">A BOOSTio é uma plataforma desenvolvida para simplificar a montagem e o upgrade de computadores. Através de uma interface intuitiva e formulários inteligentes, selecionamos para você a <span>sua máquina ideal.</span></p>
           <p class="font-2-s">Nosso objetivo é democratizar o acesso ao hardware de alta performance, permitindo que usuários com qualquer nível de conhecimento configurem o setup ideal de forma segura, visual e eficiente.</p>
-          <a href="#" class="btn-primary" aria-label="Botão para montar a sua build">Monte o seu</a>
+          <a href="./formulario.html" class="btn-primary" aria-label="Ir para o formulário de montagem da sua build">Monte o seu</a>
         </div>
         <span id="about-line"></span>
-        <video id="pc-video" autoplay muted loop playsinline>
+        <video id="pc-video" muted loop playsinline preload="metadata">
           <source src="../video/pc.webm">
         </video>
       </div>
     </section>
 
     <section id="services-page">
-      <div class="services-decoration d1"></div>
-      <div class="services-decoration d2"></div>
-
       <div id="services-container">
         <h1 id="services-h1" class="font-1-xl">Você está a <span>3 etapas</span><br> do seu setup dos sonhos.</h1>
         <p id="services-p" class="font-2-s">
@@ -159,12 +155,10 @@
     </section>
 
     <section id="build-page">
-      <div class="decoration-4"></div>
-      <div class="decoration-3"></div>
       <div id="build-container">
         <h1 id="build-page-h1" class="font-1-xl">Monte da forma que <span>preferir.</span></h1>
-        <p class="font-1-m" id="build-page-p">Sabemos que cada usuário é único, por isso criamos um sistema que se adapta a você. Explore nosso configurador: use o formulário para um diagnóstico rápido, monte do zero com total liberdade. Aqui, o poder de escolha é sempre seu.</p>
-        <a href="#" class="btn-primary" aria-label="Botão para montar a sua build">Monte o seu</a>
+        <p class="font-1-m" id="build-page-p">Sabemos que cada usuário é único, por isso criamos um sistema que se adapta a você. Use o formulário inteligente para começar sua configuração. Em breve, você também poderá escolher cada peça manualmente.</p>
+        <a href="./formulario.html" class="btn-primary" aria-label="Ir para o formulário de montagem da sua build">Monte o seu</a>
       </div>
       <footer>
         <div id="top-footer">
@@ -176,7 +170,7 @@
             <h2 class="font-1-l">Páginas</h2>
             <ul id="footer-nav-ul">
               <li class="footer-li"><a href="./index.html" aria-label="Ir para Landing page" class="font-2-s">Landing page</a></li>
-              <li class="footer-li"><a href="#" aria-label="Ir para página de montagem" class="font-2-s">Montagem</a></li>
+              <li class="footer-li"><a href="./formulario.html" aria-label="Ir para o formulário de montagem" class="font-2-s">Montagem</a></li>
               <li class="footer-li"><a href="./builds.html" aria-label="Ir para suas builds" class="font-2-s">Suas Builds</a></li>
             </ul>
           </nav>
