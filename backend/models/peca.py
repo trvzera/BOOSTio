@@ -9,6 +9,7 @@ class Peca(ModeloBase):
   consumo_energia = db.Column(db.Float(),nullable = False)
   preco = db.Column(db.Float(),nullable = False)
   part_number = db.Column(db.String(100), nullable=True)
+  link = db.Column(db.String(255), nullable=False)
   
   def atualizar_preco(self, preco: float) -> None:
     if preco < 0:
