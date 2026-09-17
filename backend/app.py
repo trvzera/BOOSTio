@@ -8,6 +8,7 @@ import os
 from controllers.usuario_controller import usuario_bp
 from controllers.auth_controller import auth_bp
 from controllers.email_controller import email_bp
+from services.peca_service.popular_pecas_service import PopularPecasService
 
 load_dotenv()
 
@@ -31,4 +32,5 @@ app.register_blueprint(email_bp)
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        PopularPecasService().executar()
     app.run(debug=True)
