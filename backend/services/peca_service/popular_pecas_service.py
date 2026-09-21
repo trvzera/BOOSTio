@@ -18,9 +18,10 @@ from models import (
   Mouse,
   Monitor,
 )
+from services.scapring_service.buscar_link_produto_service import BuscarLinkProdutoService
 
 
-def _link_kabum(fabricante: str, modelo: str) -> str:
+def _link_busca_kabum(fabricante: str, modelo: str) -> str:
   return f"https://www.kabum.com.br/busca/{quote_plus(f'{fabricante} {modelo}')}"
 
 
@@ -28,24 +29,76 @@ class PopularPecasService:
   """Garante pelo menos 10 registros cadastrados para cada tipo de peça."""
 
   QUANTIDADE_MINIMA = 10
+  #Palavra usada na busca da kabum e que precisa aparecer no nome do produto encontrado
+  CATEGORIAS_KABUM = {
+    Processador: "Processador",
+    PlacaMae: "Placa Mãe",
+    PlacaVideo: "Placa de Vídeo",
+    MemoriaRAM: "Memória",
+    SSD: "SSD",
+    HD: "HD",
+    Fonte: "Fonte",
+    Gabinete: "Gabinete",
+    WaterCooler: "Water Cooler",
+    AirCooler: "Cooler",
+    Fan: "Fan",
+    Fone: "Headset",
+    Teclado: "Teclado",
+    Mouse: "Mouse",
+    Monitor: "Monitor",
+  }
+
+  def __init__(self) -> None:
+    self._buscar_link = BuscarLinkProdutoService()
 
   def executar(self) -> None:
     for classe, itens in self._dados_seed().items():
       self._popular_classe(classe, itens)
 
   def _popular_classe(self, classe, itens: list[dict]) -> None:
-    for item in itens:
-      ja_existe = classe.query.filter_by(part_number=item["part_number"]).first()
+    com_link_produto = 0
+    existentes = {
+      item["part_number"]: classe.query.filter_by(part_number=item["part_number"]).first()
+      for item in itens
+    }
+    #Peca que ja tem o link da pagina do produto nao precisa buscar de novo
+    pendentes = [
+      item for item in itens
+      if not existentes[item["part_number"]] or "/busca/" in existentes[item["part_number"]].link
+    ]
+    com_link_produto += len(itens) - len(pendentes)
+
+    for item in pendentes:
+      ja_existe = existentes[item["part_number"]]
+      #Uma busca por vez: em paralelo a kabum passa a recusar as requisicoes
+      link = self._link_produto(classe, item)
+
+      if link:
+        com_link_produto += 1
 
       if ja_existe:
+        #Peca criada antes com link de busca: so troca se achou a pagina do produto
+        if link:
+          ja_existe.link = link
         continue
 
       item = dict(item)
-      item["link"] = _link_kabum(item["fabricante"], item["modelo"])
+      #Se a kabum nao tiver o produto, fica o link de busca (a coluna link nao aceita vazio)
+      item["link"] = link or _link_busca_kabum(item["fabricante"], item["modelo"])
 
       db.session.add(classe(**item))
 
     db.session.commit()
+    print(f"[kabum] {classe.__name__}: {com_link_produto}/{len(itens)} com link da página do produto")
+
+  def _link_produto(self, classe, item: dict) -> str | None:
+    #Nas placas de video o fabricante (NVIDIA/AMD) e do chip, nao aparece no nome do produto
+    return self._buscar_link.executar(
+      item["fabricante"],
+      item["modelo"],
+      self.CATEGORIAS_KABUM[classe],
+      exigir_fabricante=classe is not PlacaVideo,
+    )
 
   def _dados_seed(self) -> dict:
     return {

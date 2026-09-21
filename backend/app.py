@@ -14,7 +14,8 @@ load_dotenv()
 
 
 #Inicio o app e passo as configurações do app.
-app = Flask(__name__,)
+#O instance_path é fixado ao lado do app.py: sem isso o flask usa a pasta atual (cwd) e o caminho relativo do sqlite (URL_DATABASE) quebra dependendo de onde o app é executado.
+app = Flask(__name__, instance_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "instance"))
 app.config.from_object(ambientes[os.getenv('APP_ENV', 'desenvolvimento')])
 #Iniciar o login manager e passar o app como parametro
 lm.init_app(app)
