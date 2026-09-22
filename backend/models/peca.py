@@ -19,5 +19,10 @@ class Peca(ModeloBase):
     db.session.commit()
 
   @classmethod
+  def mostrar_pecas(cls):
+    return cls.query.all()
+
+
+  @classmethod
   def buscar_mais_barata_por_part_number(cls, part_number: str) -> "Peca | None":
     return cls.query.filter_by(part_number=part_number).order_by(cls.preco.asc()).first()
