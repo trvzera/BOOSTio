@@ -1,7 +1,3 @@
-// Lógica de autenticação compartilhada por todas as páginas: confirma se
-// existe sessão ativa, redireciona conforme a página atual e mantém o menu
-// de perfil sincronizado. Equivale à antiga lógica de scripts.js, mas agora
-// busca o usuário logado via api/usuario/buscarUsuarioLogado.js.
 import { buscarUsuarioLogado } from "../api/usuario/buscarUsuarioLogado.js";
 import { logout } from "../api/usuario/logout.js";
 import { atualizarMenu } from "../components/menu.js";

@@ -8,12 +8,16 @@ import os
 from controllers.usuario_controller import usuario_bp
 from controllers.auth_controller import auth_bp
 from controllers.email_controller import email_bp
+from services.peca_service.popular_pecas_service import PopularPecasService
+from services.peca_service.atualizar_precos_service import AtualizarPrecosService
 
 load_dotenv()
 
 
 #Inicio o app e passo as configurações do app.
-app = Flask(__name__,)
+#O instance_path é fixado ao lado do app.py: sem isso o flask usa a pasta atual (cwd) e o caminho relativo do sqlite (URL_DATABASE) quebra dependendo de onde o app é executado.
+app = Flask(__name__, instance_path=os.path.join(os.path.dirname(os.path.abspath(__file__))))
+
 app.config.from_object(ambientes[os.getenv('APP_ENV', 'desenvolvimento')])
 #Iniciar o login manager e passar o app como parametro
 lm.init_app(app)
@@ -31,4 +35,6 @@ app.register_blueprint(email_bp)
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        PopularPecasService().executar()
+        AtualizarPrecosService().executar()
     app.run(debug=True)
