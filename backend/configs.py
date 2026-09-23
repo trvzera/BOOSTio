@@ -5,9 +5,21 @@ from authlib.integrations.flask_client import OAuth
 
 load_dotenv()
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__)) #pasta backend/, usada para resolver o caminho do sqlite independente de onde o app é executado
+
+def resolver_uri_banco(uri):
+    #Caminho relativo do sqlite (ex: sqlite:///../database/banco.db) é resolvido pelo sqlite3 com base no cwd do processo, não no instance_path do Flask.
+    #Por isso convertemos para um caminho absoluto baseado neste arquivo, e garantimos que a pasta exista (o sqlite não cria diretórios sozinho).
+    if uri and uri.startswith("sqlite:///") and not uri.startswith("sqlite:////"):
+        caminho_relativo = uri[len("sqlite:///"):]
+        caminho_absoluto = os.path.normpath(os.path.join(BASE_DIR, caminho_relativo))
+        os.makedirs(os.path.dirname(caminho_absoluto), exist_ok=True)
+        return f"sqlite:///{caminho_absoluto}"
+    return uri
+
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY") #Sempre maiuscula, ate os nomes das variaveis se não o flask não reconhece
-    SQLALCHEMY_DATABASE_URI = os.getenv("URL_DATABASE")
+    SQLALCHEMY_DATABASE_URI = resolver_uri_banco(os.getenv("URL_DATABASE"))
     FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:5500/frontend") #Base usada para montar links enviados por email (ex: recuperar senha)
     
     MAIL_SERVER = 'smtp.gmail.com'        # endereço do servidor SMTP

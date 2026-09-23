@@ -27,7 +27,6 @@ class AtualizarPrecosService:
 
         db.session.commit()
 
-        return pecas_atualizadas
 
     except Exception:
         db.session.rollback()
