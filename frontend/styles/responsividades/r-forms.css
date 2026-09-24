@@ -75,9 +75,6 @@
     overflow: visible;
     padding-right: 0;
   }
-  .pieces-grid .option-card:first-child {
-    grid-column: auto;
-  }
   .budget-range {
     grid-template-columns: 1fr;
   }

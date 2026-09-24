@@ -21,6 +21,7 @@
 @import "./about/about.css";
 @import "./services/services.css";
 @import "./paginas/termos.css";
+@import "./paginas/erro.css";
 @import "./conta/campos.css";
 @import "./conta/signin.css";
 @import "./conta/configuracoes.css";
@@ -41,3 +42,4 @@
 @import "./responsividades/r-configuracoes.css";
 @import "./responsividades/r-builds.css";
 @import "./responsividades/r-forms.css";
+@import "./responsividades/r-erro.css";

@@ -16,7 +16,7 @@ export async function confirmaUsuario() {
       window.location.href =  "./index.html";
       return;
     }
-  } else if (document.body.id !== "inicio") {
+  } else if (!["inicio", "erro"].includes(document.body.id)) {
     // Páginas protegidas: se não está logado, manda pro login.
     // "inicio" (index.html) é pública, não entra nessa checagem.
     if (!resposta.auth) {
@@ -28,8 +28,15 @@ export async function confirmaUsuario() {
   atualizarMenu(resposta.auth);
 }
 
-window.addEventListener("load", () => {
-  confirmaUsuario();
+window.addEventListener("load", async () => {
+  try {
+    await confirmaUsuario();
+  } catch (erro) {
+    // Permite visualizar o front com o Live Server mesmo quando a API
+    // ainda não estiver em execução. Nesse caso, exibe o menu deslogado.
+    console.warn("Não foi possível consultar a sessão do usuário:", erro);
+    atualizarMenu(false);
+  }
 });
 
 async function sairSessao() {
