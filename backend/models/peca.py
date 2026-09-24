@@ -10,6 +10,7 @@ class Peca(ModeloBase):
   preco = db.Column(db.Float(),nullable = False)
   part_number = db.Column(db.String(100), nullable=True)
   link = db.Column(db.String(255), nullable=False)
+  esgotado = db.Column(db.Boolean(), nullable=False, default=False)
   
   def atualizar_preco(self, preco: float) -> None:
     if preco < 0:
