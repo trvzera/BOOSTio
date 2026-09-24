@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desenvolvedores — BOOSTio</title>
+  <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
+  <link rel="stylesheet" href="../styles/style.css">
+  <meta name="description" content="Conheça a equipe responsável pelo desenvolvimento da plataforma BOOSTio.">
+  <script type="module" src="../js/pages/loading.js" defer></script>
+  <script type="module" src="../js/pages/desenvolvedores.js" defer></script>
+</head>
+
+<body id="desenvolvedores" class="developers-page">
+  <div id="loading-screen">
+    <video id="loading-video" autoplay muted playsinline>
+      <source src="../video/loading-toggle.webm" type="video/webm">
+    </video>
+  </div>
+
+  <header id="header">
+    <div id="header-container">
+      <a href="./index.html" id="logo" aria-label="Logo da BOOSTio" width="100" height="20"></a>
+      <nav id="header-nav">
+        <ul id="nav-list">
+          <li class="nav-item"><a href="./index.html#main-page" class="nav-link font-1-xs" aria-label="Ir para seção inicial">Início</a></li>
+          <li class="nav-item"><a href="./index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para seção sobre">Sobre</a></li>
+          <li class="nav-item"><a href="./index.html#services-page" class="nav-link font-1-xs" aria-label="Ir para seção de serviços">Serviços</a></li>
+          <li class="nav-item"><a href="./formulario.html" class="nav-link font-1-xs" aria-label="Ir para o formulário de montagem">Monte o seu</a></li>
+          <li id="divider"></li>
+          <li class="nav-item"><a href="./builds.html" class="nav-link font-1-xs" aria-label="Ir para suas builds">Suas Builds</a></li>
+        </ul>
+      </nav>
+      <div id="profile">
+        <input type="checkbox" name="profile" id="profile-check" aria-label="Abrir menu do perfil">
+        <div id="profile-options">
+          <nav id="profile-nav">
+            <ul class="profile-nav-list" id="profile-nav-list-signed-in">
+              <li class="profile-item">
+                <a href="./builds.html" class="profile-link font-1-s" id="btn-build" aria-label="Ir para suas builds">
+                  <i id="lottie-build" class="lottie-header"></i>
+                  <p>Builds</p>
+                </a>
+              </li>
+              <li class="profile-item">
+                <a href="./configuracoes.html" class="profile-link font-1-s" id="btn-user" aria-label="Ir para as configurações">
+                  <i id="lottie-user" class="lottie-header"></i>
+                  <p>Configurações</p>
+                </a>
+              </li>
+              <li class="profile-item sign-out-item">
+                <a href="#" class="profile-link font-1-s" id="btn-logout" aria-label="Sair da sua conta">
+                  <i id="lottie-logout" class="lottie-header"></i>
+                  <p>Sair</p>
+                </a>
+              </li>
+            </ul>
+            <ul class="profile-nav-list" id="profile-nav-list-signed-out">
+              <li class="profile-item">
+                <a href="./login.html" class="profile-link font-1-s" id="btn-login" aria-label="Entrar na sua conta">
+                  <i id="lottie-login" class="lottie-header"></i>
+                  <p>Entrar</p>
+                </a>
+              </li>
+              <li class="profile-item">
+                <a href="./signin.html" class="profile-link font-1-s" id="btn-logon" aria-label="Criar uma conta">
+                  <i id="lottie-logon" class="lottie-header"></i>
+                  <p>Criar conta</p>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <header id="header-mobile">
+    <div id="burger-menu">
+      <input type="checkbox" id="burger-check" aria-label="Abrir menu de navegação">
+      <label for="burger-check" id="lottie-burger"></label>
+      <nav id="mobile-nav">
+        <ul id="mobile-nav-list">
+          <li class="mobile-nav-item"><a href="./index.html#main-page" class="nav-link font-1-xs">Início</a></li>
+          <li class="mobile-nav-item"><a href="./index.html#about-page" class="nav-link font-1-xs">Sobre</a></li>
+          <li class="mobile-nav-item"><a href="./index.html#services-page" class="nav-link font-1-xs">Serviços</a></li>
+          <li class="mobile-nav-item"><a href="./formulario.html" class="nav-link font-1-xs">Monte o seu</a></li>
+          <li class="mobile-nav-item"><a href="./builds.html" class="nav-link font-1-xs">Suas Builds</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="developers-main">
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+
+    <section class="developers-hero" aria-labelledby="developers-title">
+      <div class="developers-hero-copy">
+        <span class="developers-kicker font-1-xs">Equipe BOOSTio</span>
+        <h1 id="developers-title" class="font-1-xxl">Conheça nossa equipe.</h1>
+        <p class="font-2-s">Conheça os integrantes e desenvolvedores da BOOSTio, suas funções e contribuições para o projeto.</p>
+      </div>
+    </section>
+
+    <section class="developers-team" aria-labelledby="team-title">
+      <header class="developers-section-heading">
+        <div>
+          <span class="font-1-xs">Nossa equipe</span>
+          <h2 id="team-title" class="font-1-xl">Integrantes e desenvolvedores</h2>
+        </div>
+        <p class="font-2-s">Esta é a equipe responsável pelo planejamento, desenvolvimento e apresentação da plataforma.</p>
+      </header>
+
+      <div class="developers-grid">
+        <article class="developer-card">
+          <div class="developer-card-top">
+            <span class="developer-number font-1-xs">01</span>
+            <span class="developer-status font-2-xs">BOOSTio team</span>
+          </div>
+          <div class="developer-avatar developer-avatar-photo">
+            <img src="../imgs/devs/giovanni.webp" alt="Giovanni Trivellato" width="768" height="1024">
+          </div>
+          <div class="developer-info">
+            <h3 class="font-1-l">Giovanni Trivellato</h3>
+            <span class="developer-role font-1-xs">Fundador e desenvolvedor front-end</span>
+            <p class="font-2-xs">Fundador da BOOSTio e responsável por todo o front-end, pela marca, pelo design e pela identidade visual da plataforma.</p>
+          </div>
+          <ul class="developer-skills" aria-label="Tecnologias do integrante">
+            <li class="font-1-xs">Front-end</li>
+            <li class="font-1-xs">UI/UX</li>
+            <li class="font-1-xs">Branding</li>
+          </ul>
+          <div class="developer-socials" aria-label="Links profissionais de Giovanni Trivellato">
+            <a href="https://github.com/trvzera" target="_blank" rel="noopener noreferrer" class="font-1-xs" aria-label="Abrir GitHub de Giovanni Trivellato em uma nova aba">GitHub</a>
+            <a href="https://www.linkedin.com/in/giovannitrivellato/" target="_blank" rel="noopener noreferrer" class="font-1-xs" aria-label="Abrir LinkedIn de Giovanni Trivellato em uma nova aba">LinkedIn</a>
+          </div>
+        </article>
+
+        <article class="developer-card">
+          <div class="developer-card-top">
+            <span class="developer-number font-1-xs">02</span>
+            <span class="developer-status font-2-xs">BOOSTio team</span>
+          </div>
+          <div class="developer-avatar" aria-hidden="true">02</div>
+          <div class="developer-info">
+            <h3 class="font-1-l">Nome do integrante</h3>
+            <span class="developer-role font-1-xs">Função no projeto</span>
+            <p class="font-2-xs">Adicione aqui uma breve apresentação, responsabilidades e principais contribuições deste integrante.</p>
+          </div>
+          <ul class="developer-skills" aria-label="Tecnologias do integrante">
+            <li class="font-1-xs">Tecnologia</li>
+            <li class="font-1-xs">Tecnologia</li>
+          </ul>
+          <div class="developer-socials" aria-label="Links profissionais ainda não adicionados">
+            <span class="font-1-xs">GitHub</span>
+            <span class="font-1-xs">LinkedIn</span>
+          </div>
+        </article>
+
+        <article class="developer-card">
+          <div class="developer-card-top">
+            <span class="developer-number font-1-xs">03</span>
+            <span class="developer-status font-2-xs">BOOSTio team</span>
+          </div>
+          <div class="developer-avatar" aria-hidden="true">03</div>
+          <div class="developer-info">
+            <h3 class="font-1-l">Nome do integrante</h3>
+            <span class="developer-role font-1-xs">Função no projeto</span>
+            <p class="font-2-xs">Adicione aqui uma breve apresentação, responsabilidades e principais contribuições deste integrante.</p>
+          </div>
+          <ul class="developer-skills" aria-label="Tecnologias do integrante">
+            <li class="font-1-xs">Tecnologia</li>
+            <li class="font-1-xs">Tecnologia</li>
+          </ul>
+          <div class="developer-socials" aria-label="Links profissionais ainda não adicionados">
+            <span class="font-1-xs">GitHub</span>
+            <span class="font-1-xs">LinkedIn</span>
+          </div>
+        </article>
+
+        <article class="developer-card">
+          <div class="developer-card-top">
+            <span class="developer-number font-1-xs">04</span>
+            <span class="developer-status font-2-xs">BOOSTio team</span>
+          </div>
+          <div class="developer-avatar" aria-hidden="true">04</div>
+          <div class="developer-info">
+            <h3 class="font-1-l">Nome do integrante</h3>
+            <span class="developer-role font-1-xs">Função no projeto</span>
+            <p class="font-2-xs">Adicione aqui uma breve apresentação, responsabilidades e principais contribuições deste integrante.</p>
+          </div>
+          <ul class="developer-skills" aria-label="Tecnologias do integrante">
+            <li class="font-1-xs">Tecnologia</li>
+            <li class="font-1-xs">Tecnologia</li>
+          </ul>
+          <div class="developer-socials" aria-label="Links profissionais ainda não adicionados">
+            <span class="font-1-xs">GitHub</span>
+            <span class="font-1-xs">LinkedIn</span>
+          </div>
+        </article>
+
+        <article class="developer-card">
+          <div class="developer-card-top">
+            <span class="developer-number font-1-xs">05</span>
+            <span class="developer-status font-2-xs">BOOSTio team</span>
+          </div>
+          <div class="developer-avatar" aria-hidden="true">05</div>
+          <div class="developer-info">
+            <h3 class="font-1-l">Nome do integrante</h3>
+            <span class="developer-role font-1-xs">Função no projeto</span>
+            <p class="font-2-xs">Adicione aqui uma breve apresentação, responsabilidades e principais contribuições deste integrante.</p>
+          </div>
+          <ul class="developer-skills" aria-label="Tecnologias do integrante">
+            <li class="font-1-xs">Tecnologia</li>
+            <li class="font-1-xs">Tecnologia</li>
+          </ul>
+          <div class="developer-socials" aria-label="Links profissionais ainda não adicionados">
+            <span class="font-1-xs">GitHub</span>
+            <span class="font-1-xs">LinkedIn</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="developers-footer-wrapper">
+    <footer>
+      <div id="top-footer">
+        <div id="footer-hero">
+          <img src="../imgs/logo.webp" alt="Logo BOOSTio">
+          <p class="font-2-s">A BOOSTio é uma plataforma desenvolvida para simplificar a montagem e o upgrade de computadores.</p>
+        </div>
+        <nav id="footer-nav">
+          <h2 class="font-1-l">Páginas</h2>
+          <ul id="footer-nav-ul">
+            <li class="footer-item"><a href="./index.html" aria-label="Ir para Landing page" class="font-2-s">Landing page</a></li>
+            <li class="footer-item"><a href="./formulario.html" aria-label="Ir para o formulário de montagem" class="font-2-s">Montagem</a></li>
+            <li class="footer-item"><a href="./builds.html" aria-label="Ir para suas builds" class="font-2-s">Suas Builds</a></li>
+          </ul>
+        </nav>
+        <div id="footer-extra">
+          <div id="contact-section">
+            <h2 class="font-1-l">Contato</h2>
+            <a href="#" aria-label="Email de contato BOOSTio" class="font-2-s">contato@boostio.com.br</a>
+          </div>
+          <div id="about-section">
+            <h2 class="font-1-l">Sobre Nós</h2>
+            <a href="./desenvolvedores.html" aria-label="Ver sobre os Desenvolvedores" class="font-2-s">Desenvolvedores</a>
+          </div>
+        </div>
+      </div>
+      <div id="footer-divider"></div>
+      <div id="bottom-footer">
+        <p class="font-2-s">&copy;2026 BOOSTio - Todos direitos reservados</p>
+        <a href="./termos.html" target="_blank" aria-label="Ver termos de uso" class="font-2-s" id="terms-link">Termos de uso</a>
+      </div>
+    </footer>
+  </div>
+</body>
+
+</html>

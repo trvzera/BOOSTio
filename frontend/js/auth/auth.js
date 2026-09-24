@@ -16,7 +16,7 @@ export async function confirmaUsuario() {
       window.location.href =  "./index.html";
       return;
     }
-  } else if (!["inicio", "erro"].includes(document.body.id)) {
+  } else if (!["inicio", "erro", "desenvolvedores"].includes(document.body.id)) {
     // Páginas protegidas: se não está logado, manda pro login.
     // "inicio" (index.html) é pública, não entra nessa checagem.
     if (!resposta.auth) {
