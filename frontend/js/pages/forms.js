@@ -64,7 +64,7 @@ const perguntas = [
     tag: "Etapa 03",
     titulo: "O que você já possui?",
     descricao:
-      "Marque todas as peças e periféricos que pretende reaproveitar. Se estiver começando do zero, marque a primeira opção.",
+      "Marque todas as peças e periféricos que pretende reaproveitar e informe o modelo de cada item. Se estiver começando do zero, marque a primeira opção.",
     multipla: true,
     opcoes: [
       ["nenhuma", "Ainda não tenho peças"],
@@ -88,6 +88,25 @@ const perguntas = [
   },
 ];
 
+const exemplosPecas = {
+  processador: "Ex.: AMD Ryzen 5 5600",
+  "placa-mae": "Ex.: ASUS TUF Gaming B550M-Plus",
+  "placa-video": "Ex.: GeForce RTX 4060 8 GB",
+  memoria: "Ex.: Kingston Fury 16 GB DDR4 3200 MHz",
+  ssd: "Ex.: Kingston NV2 1 TB NVMe",
+  hd: "Ex.: Seagate Barracuda 2 TB",
+  fonte: "Ex.: Corsair CV650 650 W",
+  gabinete: "Ex.: Montech Air 100",
+  cooler: "Ex.: DeepCool AK400",
+  fans: "Ex.: Kit 3 fans Rise Mode 120 mm",
+  monitor: "Ex.: LG UltraGear 24GN60R-B",
+  teclado: "Ex.: Redragon Kumara K552",
+  mouse: "Ex.: Logitech G203",
+  headset: "Ex.: HyperX Cloud II",
+  webcam: "Ex.: Logitech C920",
+  microfone: "Ex.: HyperX SoloCast",
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   const conteudo = document.querySelector("#question-content");
   const painel = document.querySelector("#question-info");
@@ -102,6 +121,15 @@ document.addEventListener("DOMContentLoaded", () => {
     currency: "BRL",
     maximumFractionDigits: 0,
   });
+
+  function escaparHtml(valor = "") {
+    return String(valor)
+      .replaceAll("&", "&amp;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+  }
 
   function atualizarMenu() {
     document.querySelectorAll(".form-step").forEach((item, indice) => {
@@ -133,11 +161,27 @@ document.addEventListener("DOMContentLoaded", () => {
       : [respostas[pergunta.chave]];
     const tipo = pergunta.multipla ? "checkbox" : "radio";
     return pergunta.opcoes
-      .map(
-        ([valor, titulo, descricao]) =>
-          `<div class="option-card"><input type="${tipo}" name="${pergunta.chave}" id="${valor}" value="${valor}" ${selecionadas.includes(valor) ? "checked" : ""}><label for="${valor}"><span class="choice-control ${pergunta.multipla ? "choice-control-lottie" : ""}" ${pergunta.multipla ? `id="check-${valor}"` : ""} aria-hidden="true"></span><span><span class="option-title font-1-m-b">${titulo}</span>${descricao ? `<span class="option-desc font-2-xs">${descricao}</span>` : ""}</span></label></div>`,
-      )
+      .map(([valor, titulo, descricao]) => {
+        const selecionada = selecionadas.includes(valor);
+        const atributosPeca = pergunta.chave === "pecas"
+          ? ` data-piece="${valor}"`
+          : "";
+        const detalhe = pergunta.chave === "pecas" && selecionada
+          ? detalhePecaHtml(valor, titulo)
+          : "";
+
+        return `<div class="option-card${detalhe ? " has-piece-detail" : ""}"${atributosPeca}><input type="${tipo}" name="${pergunta.chave}" id="${valor}" value="${valor}" ${selecionada ? "checked" : ""}><label for="${valor}"><span class="choice-control ${pergunta.multipla ? "choice-control-lottie" : ""}" ${pergunta.multipla ? `id="check-${valor}"` : ""} aria-hidden="true"></span><span><span class="option-title font-1-m-b">${titulo}</span>${descricao ? `<span class="option-desc font-2-xs">${descricao}</span>` : ""}</span></label>${detalhe}</div>`;
+      })
       .join("");
+  }
+
+  function detalhePecaHtml(valor, titulo, visivel = true) {
+    if (valor === "nenhuma") return "";
+
+    const detalhe = respostas.pecasDetalhes?.[valor] || "";
+    const placeholder = exemplosPecas[valor] || "Informe a marca e o modelo";
+
+    return `<div class="piece-detail${visivel ? " is-visible" : ""}"><label class="font-1-xs" for="detalhe-${valor}">Qual ${titulo.toLowerCase()} você possui?</label><input class="piece-model-input font-2-xs" type="text" id="detalhe-${valor}" data-piece-detail="${valor}" value="${escaparHtml(detalhe)}" placeholder="${placeholder}" maxlength="120" autocomplete="off" required aria-describedby="ajuda-${valor}"><span class="piece-detail-help font-2-xs" id="ajuda-${valor}">Informe marca e modelo para verificarmos a compatibilidade.</span></div>`;
   }
 
   function rangeHtml() {
@@ -158,12 +202,13 @@ document.addEventListener("DOMContentLoaded", () => {
     conteudo.classList.remove("question-enter");
     void conteudo.offsetWidth;
     conteudo.classList.add("question-enter");
+    conteudo.classList.toggle("pieces-question-content", pergunta.chave === "pecas");
     conteudo.innerHTML = `<div class="options-heading"><p class="font-1-m-b">${pergunta.multipla ? "Selecione as opções aplicáveis" : "Escolha uma opção"}</p><span class="font-2-xs">${indiceAtual + 1} de ${perguntas.length}</span></div><fieldset class="question-options ${pergunta.multipla ? "pieces-grid" : ""}"><legend class="sr-only">${pergunta.titulo}</legend>${opcoesHtml(pergunta)}</fieldset>${pergunta.chave === "orcamento" ? rangeHtml() : ""}<div id="form-navigation"><button type="button" class="btn-ghost" ${indiceAtual === 0 ? "disabled" : ""}><i class="fa-solid fa-arrow-left"></i> Voltar</button><button type="button" class="btn-primary-form" id="next-question" ${podeAvancar() ? "" : "disabled"}>${indiceAtual === perguntas.length - 1 ? "Gerar configuração" : "Avançar"} <i class="fa-solid fa-arrow-right"></i></button></div>`;
     conteudo
       .querySelector(".btn-ghost")
       .addEventListener("click", () => navegarPara(indiceAtual - 1));
     conteudo
-      .querySelectorAll(".question-options input")
+      .querySelectorAll(`.question-options input[name="${pergunta.chave}"]`)
       .forEach((input) =>
         input.addEventListener("change", () => tratarSelecao(pergunta, input)),
       );
@@ -171,7 +216,66 @@ document.addEventListener("DOMContentLoaded", () => {
       .querySelector("#budget-range")
       ?.addEventListener("input", atualizarRange);
     conteudo.querySelector("#next-question").addEventListener("click", avancar);
-    if (pergunta.multipla) iniciarCheckboxesLottie(geracao);
+    if (pergunta.multipla) {
+      vincularCamposDetalhesPecas();
+      iniciarCheckboxesLottie(geracao);
+    }
+  }
+
+  function vincularCamposDetalhesPecas() {
+    conteudo.querySelectorAll(".piece-model-input").forEach((input) => {
+      if (input.dataset.listener === "true") return;
+      input.dataset.listener = "true";
+      input.addEventListener("input", () => {
+        respostas.pecasDetalhes ??= {};
+        respostas.pecasDetalhes[input.dataset.pieceDetail] = input.value;
+        input.classList.toggle("invalid", input.value.trim().length === 0);
+        conteudo.querySelector("#next-question").disabled = !podeAvancar();
+      });
+    });
+  }
+
+  function sincronizarCamposDetalhesPecas() {
+    const escolhidas = new Set(respostas.pecas || []);
+
+    conteudo.querySelectorAll(".option-card[data-piece]").forEach((card) => {
+      const valor = card.dataset.piece;
+      const deveExibir = valor !== "nenhuma" && escolhidas.has(valor);
+      const detalheAtual = card.querySelector(".piece-detail");
+
+      if (deveExibir && !detalheAtual) {
+        const titulo = card.querySelector(".option-title").textContent;
+        card.insertAdjacentHTML(
+          "beforeend",
+          detalhePecaHtml(valor, titulo, false),
+        );
+        card.classList.add("has-piece-detail");
+        const novoDetalhe = card.querySelector(".piece-detail");
+        requestAnimationFrame(() => novoDetalhe.classList.add("is-visible"));
+      } else if (deveExibir && detalheAtual) {
+        detalheAtual.classList.add("is-visible");
+        card.classList.add("has-piece-detail");
+      } else if (!deveExibir && detalheAtual) {
+        detalheAtual.classList.remove("is-visible");
+        const removerDepoisDaTransicao = (evento) => {
+          if (evento.propertyName !== "max-height") return;
+          detalheAtual.removeEventListener(
+            "transitionend",
+            removerDepoisDaTransicao,
+          );
+          const checkbox = card.querySelector(':scope > input[name="pecas"]');
+          if (checkbox?.checked) return;
+          detalheAtual.remove();
+          card.classList.remove("has-piece-detail");
+        };
+        detalheAtual.addEventListener(
+          "transitionend",
+          removerDepoisDaTransicao,
+        );
+      }
+    });
+
+    vincularCamposDetalhesPecas();
   }
 
   function limparCheckboxesLottie() {
@@ -222,7 +326,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (perguntas[indiceAtual].chave === "orcamento")
       return Boolean(respostas.orcamento);
     const resposta = respostas[perguntas[indiceAtual].chave];
-    return Array.isArray(resposta) ? resposta.length > 0 : Boolean(resposta);
+    if (!Array.isArray(resposta)) return Boolean(resposta);
+    if (resposta.length === 0) return false;
+    if (resposta.includes("nenhuma")) return true;
+
+    return resposta.every(
+      (peca) => respostas.pecasDetalhes?.[peca]?.trim().length > 0,
+    );
   }
 
   function tratarSelecao(pergunta, input) {
@@ -232,18 +342,25 @@ document.addEventListener("DOMContentLoaded", () => {
       const escolhidas = new Set(respostas.pecas || []);
       if (input.value === "nenhuma") {
         escolhidas.clear();
-        if (input.checked) escolhidas.add("nenhuma");
+        if (input.checked) {
+          escolhidas.add("nenhuma");
+          respostas.pecasDetalhes = {};
+        }
       } else {
         escolhidas.delete("nenhuma");
-        input.checked
-          ? escolhidas.add(input.value)
-          : escolhidas.delete(input.value);
+        if (input.checked) {
+          escolhidas.add(input.value);
+        } else {
+          escolhidas.delete(input.value);
+          delete respostas.pecasDetalhes?.[input.value];
+        }
       }
       respostas.pecas = [...escolhidas];
       conteudo.querySelectorAll('input[name="pecas"]').forEach((item) => {
         item.checked = escolhidas.has(item.value);
       });
       sincronizarCheckboxesLottie();
+      sincronizarCamposDetalhesPecas();
     }
     if (pergunta.chave === "orcamento") {
       const budgetRange = conteudo.querySelector(".budget-range");
@@ -293,6 +410,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function mostrarGerando() {
     limparCheckboxesLottie();
     atualizarMenu();
+    sessionStorage.setItem(
+      "boostio:respostas-formulario",
+      JSON.stringify(respostas),
+    );
     painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Estamos montando sua configuração ideal.</h1><p class="font-2-s">Analisando suas escolhas, orçamento e peças que já possui.</p></div>`;
     conteudo.innerHTML = `<div class="build-loading" role="status"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-l">Criando a sua build</h2><p class="font-2-s">Isso leva apenas alguns instantes.</p><div class="loading-steps"><span class="active font-1-xs">Analisando preferências</span><span class="font-1-xs">Verificando compatibilidade</span><span class="font-1-xs">Preparando a configuração</span></div></div>`;
     window.setTimeout(() => {

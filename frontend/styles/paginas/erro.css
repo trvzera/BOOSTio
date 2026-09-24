@@ -1,0 +1,74 @@
+.error-page {
+  min-height: 100vh;
+  height: auto;
+  overflow-x: hidden;
+}
+
+#error-main {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 140px var(--espacamento-24) 80px;
+}
+
+.error-card {
+  position: relative;
+  width: min(100%, 720px);
+  padding: 58px;
+  overflow: hidden;
+  border: 1px solid var(--cor-2);
+  border-radius: 28px;
+  background: rgba(28, 28, 30, 0.76);
+  backdrop-filter: blur(18px);
+  text-align: center;
+}
+
+.error-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 170px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cor-p1), transparent);
+  transform: translateX(-50%);
+}
+
+#error-code {
+  display: block;
+  margin-bottom: var(--espacamento-16);
+  color: var(--cor-p1);
+  font-family: "Lexend", sans-serif;
+  font-size: clamp(4.5rem, 13vw, 8.5rem);
+  font-weight: 700;
+  letter-spacing: -0.08em;
+  line-height: 0.9;
+}
+
+#error-title {
+  margin-bottom: var(--espacamento-12);
+  color: var(--cor-6);
+}
+
+#error-description {
+  max-width: 520px;
+  margin: 0 auto;
+  color: var(--cor-4);
+  line-height: 1.7;
+}
+
+.error-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacamento-12);
+  margin-top: var(--espacamento-32);
+}
+
+.error-actions .btn-primary,
+.error-actions .btn-ghost {
+  min-width: 170px;
+  text-align: center;
+}

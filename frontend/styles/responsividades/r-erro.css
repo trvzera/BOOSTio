@@ -1,0 +1,20 @@
+@media (max-width: 580px) {
+  #error-main {
+    padding: 112px 16px 48px;
+  }
+
+  .error-card {
+    padding: 44px 22px;
+    border-radius: 20px;
+  }
+
+  .error-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .error-actions .btn-primary,
+  .error-actions .btn-ghost {
+    width: 100%;
+  }
+}

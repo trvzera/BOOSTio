@@ -7,5 +7,6 @@
     "venv/**",
     "database/**",
     "instance/**"
-  ]
+  ],
+  "liveServer.settings.port": 5501
 }

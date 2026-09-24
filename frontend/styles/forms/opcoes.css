@@ -18,12 +18,12 @@
 .option-card {
   position: relative;
 }
-.option-card input {
+.option-card > input {
   position: absolute;
   opacity: 0;
   pointer-events: none;
 }
-.option-card label {
+.option-card > label {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -42,11 +42,11 @@
   font-family: inherit;
   font-size: 0.96rem;
 }
-.option-card label:hover {
+.option-card > label:hover {
   border-color: rgba(0, 123, 255, 0.6);
   transform: translateX(4px);
 }
-.option-card input:focus-visible + label {
+.option-card > input:focus-visible + label {
   outline: 2px solid var(--cor-p1);
   outline-offset: 3px;
 }
@@ -58,12 +58,12 @@
   border-radius: 50%;
   transition: 0.2s var(--ease);
 }
-.option-card input:checked + label {
+.option-card > input:checked + label {
   border-color: var(--cor-p1);
   background: rgba(0, 123, 255, 0.1);
   color: var(--cor-6);
 }
-.option-card input:checked + label .choice-control {
+.option-card > input:checked + label .choice-control {
   border: 5px solid var(--cor-p1);
 }
 .option-title {
@@ -90,10 +90,10 @@
   scrollbar-width: thin;
   scrollbar-color: var(--cor-2) transparent;
 }
-.pieces-grid .option-card:first-child {
+.pieces-grid .option-card[data-piece="nenhuma"] {
   grid-column: 1 / -1;
 }
-.pieces-grid .option-card label {
+.pieces-grid .option-card > label {
   min-height: 70px;
   padding: 12px 14px;
 }
@@ -106,11 +106,11 @@
 .pieces-grid .choice-control-lottie.lottie-ready {
   border: 0;
 }
-.pieces-grid input:checked + label .choice-control-lottie {
+.pieces-grid .option-card > input:checked + label .choice-control-lottie {
   border-width: 1px;
   background: none;
 }
-.pieces-grid input:checked + label .choice-control-lottie.lottie-ready {
+.pieces-grid .option-card > input:checked + label .choice-control-lottie.lottie-ready {
   border: 0;
 }
 .pieces-grid .choice-control-lottie svg {
@@ -118,6 +118,85 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
+}
+.pieces-question-content {
+  justify-content: flex-start !important;
+}
+.pieces-question-content .pieces-grid {
+  flex: 1;
+  min-height: 0;
+}
+.piece-detail {
+  display: grid;
+  gap: 8px;
+  max-height: 0;
+  margin-top: 0;
+  padding: 0 14px;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: rgba(0, 123, 255, 0.07);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition:
+    max-height 0.35s var(--ease),
+    margin-top 0.35s var(--ease),
+    padding 0.35s var(--ease),
+    border-color 0.35s var(--ease),
+    opacity 0.25s var(--ease),
+    transform 0.35s var(--ease);
+}
+.piece-detail.is-visible {
+  max-height: 240px;
+  margin-top: 8px;
+  padding: 14px;
+  border-color: rgba(0, 123, 255, 0.35);
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.piece-detail > label {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--cor-6);
+  cursor: default;
+  line-height: 1.4;
+}
+.piece-detail > label:hover {
+  border-color: transparent;
+  transform: none;
+}
+.piece-model-input {
+  width: 100%;
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid var(--cor-2);
+  border-radius: 9px;
+  outline: none;
+  background: var(--cor-1);
+  color: var(--cor-6);
+  transition:
+    border-color 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
+}
+.piece-model-input::placeholder {
+  color: var(--cor-3);
+}
+.piece-model-input:focus {
+  border-color: var(--cor-p1);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.14);
+}
+.piece-model-input.invalid {
+  border-color: var(--cor-d1);
+}
+.piece-detail-help {
+  color: var(--cor-4);
+  font-size: 0.7rem;
+  line-height: 1.45;
 }
 .needs-selection {
   animation: form-shake 0.3s ease-in-out;

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Erro — BOOSTio</title>
+  <link rel="icon" type="image/x-icon" href="../imgs/favicon.webp">
+  <link rel="stylesheet" href="../styles/style.css">
+  <meta name="description" content="Não foi possível acessar esta página da BOOSTio.">
+  <script type="module" src="../js/pages/loading.js" defer></script>
+  <script type="module" src="../js/pages/erro.js" defer></script>
+</head>
+
+<body id="erro" class="error-page">
+  <div id="loading-screen">
+    <video id="loading-video" autoplay muted playsinline>
+      <source src="../video/loading-toggle.webm" type="video/webm">
+    </video>
+  </div>
+  <header id="header">
+    <div id="header-container">
+      <a href="./index.html" id="logo" aria-label="Logo da BOOSTio" width="100" height="20"></a>
+      <nav id="header-nav">
+        <ul id="nav-list">
+          <li class="nav-item"><a href="./index.html#main-page" class="nav-link font-1-xs" aria-label="Ir para seção inicial">Início</a></li>
+          <li class="nav-item"><a href="./index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para seção sobre">Sobre</a></li>
+          <li class="nav-item"><a href="./index.html#services-page" class="nav-link font-1-xs" aria-label="Ir para seção de serviços">Serviços</a></li>
+          <li class="nav-item"><a href="./formulario.html" class="nav-link font-1-xs" aria-label="Ir para o formulário de montagem">Monte o seu</a></li>
+          <li id="divider"></li>
+          <li class="nav-item"><a href="./builds.html" class="nav-link font-1-xs" aria-label="Ir para suas builds">Suas Builds</a></li>
+        </ul>
+      </nav>
+      <div id="profile">
+        <input type="checkbox" name="profile" id="profile-check" aria-label="Abrir menu do perfil">
+        <div id="profile-options">
+          <nav id="profile-nav">
+            <ul class="profile-nav-list" id="profile-nav-list-signed-in">
+              <li class="profile-item"><a href="./builds.html" class="profile-link font-1-s" id="btn-build" aria-label="Ir para suas builds"><i id="lottie-build" class="lottie-header"></i><p>Builds</p></a></li>
+              <li class="profile-item"><a href="./configuracoes.html" class="profile-link font-1-s" id="btn-user" aria-label="Ir para as configurações"><i id="lottie-user" class="lottie-header"></i><p>Configurações</p></a></li>
+              <li class="profile-item sign-out-item"><a href="#" class="profile-link font-1-s" id="btn-logout" aria-label="Sair da sua conta"><i id="lottie-logout" class="lottie-header"></i><p>Sair</p></a></li>
+            </ul>
+            <ul class="profile-nav-list" id="profile-nav-list-signed-out">
+              <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" id="btn-login" aria-label="Entrar na sua conta"><i id="lottie-login" class="lottie-header"></i><p>Entrar</p></a></li>
+              <li class="profile-item"><a href="./signin.html" class="profile-link font-1-s" id="btn-logon" aria-label="Criar uma conta"><i id="lottie-logon" class="lottie-header"></i><p>Criar conta</p></a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <header id="header-mobile">
+    <div id="burger-menu">
+      <input type="checkbox" id="burger-check" aria-label="Abrir menu de navegação">
+      <label for="burger-check" id="lottie-burger"></label>
+      <nav id="mobile-nav">
+        <ul id="mobile-nav-list">
+          <li class="mobile-nav-item"><a href="./index.html#main-page" class="nav-link font-1-xs">Início</a></li>
+          <li class="mobile-nav-item"><a href="./index.html#about-page" class="nav-link font-1-xs">Sobre</a></li>
+          <li class="mobile-nav-item"><a href="./index.html#services-page" class="nav-link font-1-xs">Serviços</a></li>
+          <li class="mobile-nav-item"><a href="./formulario.html" class="nav-link font-1-xs">Monte o seu</a></li>
+          <li class="mobile-nav-item"><a href="./builds.html" class="nav-link font-1-xs">Suas Builds</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="error-main">
+    <section class="error-card" aria-labelledby="error-title">
+      <span id="error-code" aria-hidden="true">500</span>
+      <h1 id="error-title" class="font-1-xl">Algo não saiu como esperado</h1>
+      <p id="error-description" class="font-2-s">Ocorreu um erro inesperado. Tente novamente ou volte à página inicial.</p>
+      <div class="error-actions">
+        <button type="button" class="btn-ghost" id="error-back">Voltar</button>
+        <a href="./index.html" class="btn-primary">Ir para o início</a>
+      </div>
+    </section>
+  </main>
+</body>
+
+</html>
