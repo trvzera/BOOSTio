@@ -780,7 +780,7 @@ LINKS_KABUM: dict[str, str] = {
 
 
 class PopularPecasService:
-  """Insere as pecas da seed que ainda nao existem no banco (por part_number). Nao faz nenhuma chamada de rede."""
+  """Insere as pecas da seed que ainda nao existem no banco (por part_number) e atualiza o link das que ja existem com link de busca. Nao faz nenhuma chamada de rede."""
 
   def executar(self) -> None:
     for classe, itens in self._dados_seed().items():
@@ -789,15 +789,30 @@ class PopularPecasService:
   def _popular_classe(self, classe, itens: list[dict]) -> None:
     part_numbers = [item["part_number"] for item in itens]
     existentes = {
-      row.part_number
+      row.part_number: row
       for row in classe.query.filter(classe.part_number.in_(part_numbers)).all()
     }
 
-    novos = [classe(**item) for item in itens if item["part_number"] not in existentes]
+    novos = []
+    atualizados = 0
+
+    for item in itens:
+      existente = existentes.get(item["part_number"])
+
+      if existente is None:
+        novos.append(classe(**item))
+        continue
+
+      #Peca ja cadastrada com link de busca: troca pelo link da pagina do produto assim que ele existir na seed
+      if "/busca/" in existente.link and "/busca/" not in item["link"]:
+        existente.link = item["link"]
+        atualizados += 1
+
     db.session.add_all(novos)
     db.session.commit()
 
-    print(f"[seed] {classe.__name__}: {len(novos)} inseridos, {len(itens) - len(novos)} já existiam")
+    sem_mudanca = len(itens) - len(novos) - atualizados
+    print(f"[seed] {classe.__name__}: {len(novos)} inseridos, {atualizados} links atualizados, {sem_mudanca} sem mudança")
 
   def _dados_seed(self) -> dict:
     return {

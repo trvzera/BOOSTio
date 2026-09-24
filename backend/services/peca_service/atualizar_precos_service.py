@@ -1,4 +1,21 @@
-from models import db,PlacaMae,PlacaVideo,Processador,SSD,WaterCooler
+from models import (
+  db,
+  PlacaMae,
+  PlacaVideo,
+  Processador,
+  SSD,
+  WaterCooler,
+  MemoriaRAM,
+  HD,
+  Fonte,
+  Gabinete,
+  AirCooler,
+  Fan,
+  Fone,
+  Teclado,
+  Mouse,
+  Monitor,
+)
 from ..scapring_service.buscar_dados_scapring_service import BuscarDadosScapringService,ProdutoEsgotadoError,PrecoNaoEncontradoError
 
 class AtualizarPrecosService:
@@ -8,7 +25,17 @@ class AtualizarPrecosService:
       Processador,
       SSD,
       PlacaVideo,
-      WaterCooler
+      WaterCooler,
+      MemoriaRAM,
+      HD,
+      Fonte,
+      Gabinete,
+      AirCooler,
+      Fan,
+      Fone,
+      Teclado,
+      Mouse,
+      Monitor,
     ]
 
     pecas_atualizadas = []
