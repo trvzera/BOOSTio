@@ -54,8 +54,13 @@ class AtualizarPrecosService:
 
           try:
             preco_atual = scraper.executar(peca.link)
-          except (ProdutoEsgotadoError, PrecoNaoEncontradoError, ValueError) as e:
+          except (PrecoNaoEncontradoError, ValueError) as e:
             print(f"[AtualizarPrecos] {peca.modelo}: {e} | {peca.link}")
+            falhas += 1
+            continue
+          except ProdutoEsgotadoError as e:
+            print(f"[AtualizarPrecos] {peca.modelo}: {e} | {peca.link}")
+            peca.esgotado = True
             falhas += 1
             continue
           except Exception as e:
