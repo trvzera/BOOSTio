@@ -52,13 +52,13 @@ class Build(ModeloBase):
     
     placa_mae = db.relationship("PlacaMae", backref="builds")
     processador = db.relationship("Processador", backref="builds")
-    memoria_ram = db.relationship("MemoriaRam", backref="builds")
+    memoria_ram = db.relationship("MemoriaRAM", backref="builds")
     fonte = db.relationship("Fonte", backref="builds")
     gabinete = db.relationship("Gabinete", backref="builds")
     placa_video = db.relationship("PlacaVideo", backref="builds")
  
-    ssd = db.relationship("Ssd", backref="builds")
-    hd = db.relationship("Hd", backref="builds")
+    ssd = db.relationship("SSD", backref="builds")
+    hd = db.relationship("HD", backref="builds")
  
     air_cooler = db.relationship("AirCooler", backref="builds")
     water_cooler = db.relationship("WaterCooler", backref="builds")
