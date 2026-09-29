@@ -28,7 +28,14 @@
 #loading-screen.loading-full #loading-video { visibility: visible; }
 #loading-screen.loading-fade { transition-duration: var(--loading-fade, 480ms); }
 #loading-screen.loading-fade #loading-video { display: none; }
+.quick-loading { display: flex; flex-direction: column; align-items: center; gap: 14px; color: var(--cor-4); font: .75rem/1.5 var(--font-body); }
+.quick-loading-track { display: block; width: 72px; height: 2px; overflow: hidden; background: var(--cor-2); border-radius: 50px; }
+.quick-loading-track::before { content: ""; display: block; width: 32px; height: 100%; background: var(--cor-p1); animation: quick-loading 1s ease-in-out infinite alternate; }
+@keyframes quick-loading { from { transform: translateX(-20px); } to { transform: translateX(60px); } }
+.navigation-fade { position: fixed; inset: 0; background: var(--cor-0); z-index: 10000; opacity: 0; pointer-events: none; transition: opacity .26s ease; }
+.navigation-fade.navigation-leaving { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { #loading-screen { transition-duration: 0.01ms; } }
+@media (prefers-reduced-motion: reduce) { .quick-loading-track::before { animation: none; } .navigation-fade { transition: none; } }
 
 body.loading-active {
   overflow: hidden;

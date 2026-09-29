@@ -25,9 +25,7 @@
 :is(.build-menu-trigger, .component-remove, .toggle-password, .experimental-toggle) { border-radius: var(--radius-control); }
 .build-menu-item { border-radius: var(--radius-control); }
 :is(.build-status.incomplete, .build-status.warning, .compatibility-status.incompleta, .compatibility-status.atencao) { color: var(--status-warning); }
-.build-card.incomplete .build-progress-fill, .build-card.warning .build-progress-fill { background: var(--status-warning); }
-.build-card.error .build-progress-fill { background: var(--status-error); }
-.build-card.complete .build-progress-fill { background: var(--status-success); }
+.build-card .build-progress-fill { background: var(--cor-p1); }
 .build-status.incomplete { background: rgba(255,204,0,.06); border-color: rgba(255,204,0,.25); }
 .social-logo { width: 18px; height: 18px; object-fit: contain; filter: invert(1); flex: 0 0 18px; }
 .developer-socials a, .social-link { display: inline-flex; align-items: center; gap: 8px; }

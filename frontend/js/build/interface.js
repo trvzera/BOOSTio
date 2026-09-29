@@ -24,8 +24,10 @@ export async function copiarTexto(texto) {
     dialogo.className = "share-dialog glass-card";
     dialogo.innerHTML = '<h2 class="font-1-l">Compartilhar build</h2><p class="font-2-xs">Copie o link abaixo.</p>';
     const fechar = document.createElement("button");
+    fechar.type = "button";
     fechar.className = "btn-ghost";
     fechar.textContent = "Fechar";
+    fechar.setAttribute("aria-label", "Fechar compartilhamento da build");
     fechar.onclick = () => { dialogo.close(); dialogo.remove(); };
     dialogo.append(campo, fechar);
     document.body.append(dialogo);
@@ -35,6 +37,6 @@ export async function copiarTexto(texto) {
 }
 
 export function mostrarFalha(container, erro) {
-  container.innerHTML = '<section class="catalog-empty glass-card"><h1 class="font-1-l">Não foi possível abrir este conteúdo</h1><p class="font-2-s"></p><a class="btn-ghost" data-page-back href="./configuracao-build.html"><span data-back-label>Voltar à build</span></a></section>';
+  container.innerHTML = '<section class="catalog-empty glass-card"><h1 class="font-1-l">Não foi possível abrir este conteúdo</h1><p class="font-2-s"></p><a class="btn-ghost" data-page-back href="./configuracao-build.html" aria-label="Voltar à build"><span data-back-label>Voltar à build</span></a></section>';
   container.querySelector("p").textContent = erro.message;
 }

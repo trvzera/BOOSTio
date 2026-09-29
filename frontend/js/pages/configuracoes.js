@@ -50,6 +50,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         input.type = isPassword ? "text" : "password";
         icon.classList.toggle("fa-eye");
         icon.classList.toggle("fa-eye-slash");
+        const campo = {"current-password":"senha atual","new-password":"nova senha","confirm-password":"confirmação da senha"}[btn.dataset.target];
+        btn.setAttribute("aria-label", (isPassword ? "Ocultar " : "Mostrar ") + campo);
+        btn.setAttribute("aria-pressed", String(isPassword));
       });
     });
 

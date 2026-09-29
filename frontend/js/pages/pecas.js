@@ -1,10 +1,11 @@
 import "../header.js";
 import "../auth/auth.js";
 import { carregarCatalogo, categoriaCatalogo, moeda, htmlSeguro as h, nomePeca, imagemPeca, fichaTecnica } from "../build/catalogo.js";
-import { abrirBuild, guardarRascunho, motivoSelecao, itensRam } from "../build/estado.js";
+import { abrirBuild, guardarRascunho, motivoSelecao, itensCategoria, categoriasMultiplas } from "../build/estado.js";
 import { pecaCompativel, selecionarPecaCompativel } from "../build/compatibilidade.js";
 import { avisar, mostrarFalha } from "../build/interface.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
+import { navegarPara } from "../components/page-loading.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const main = document.querySelector("#catalog-main");
@@ -19,13 +20,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const tamanhoPagina = 12;
     const temPecas = Object.keys(build.componentes).length > 0;
     const produtos = catalogo.filter((p) => (categoria.tipos || [categoria.id]).includes(p.categoria));
-    main.innerHTML = '<header class="builder-heading"><div><a class="builder-back font-1-xs" data-page-back href="./configuracao-build.html?id=' + encodeURIComponent(build.id) + '">' + iconeAnimado("arrow","back") + '<span data-back-label>Voltar à build</span></a><h1 class="font-1-xl">' + categoria.nome +
+    main.innerHTML = '<header class="builder-heading"><div><a class="builder-back font-1-xs" data-page-back href="./configuracao-build.html?id=' + encodeURIComponent(build.id) + '" aria-label="Voltar à build">' + iconeAnimado("arrow","back") + '<span data-back-label>Voltar à build</span></a><h1 class="font-1-xl">' + categoria.nome +
       '</h1><p class="font-2-s">Compare os modelos e selecione a peça para sua configuração.</p></div><span class="builder-demo font-1-xs">Catálogo demonstrativo</span></header>' +
       '<div class="catalog-toolbar glass-card"><label class="catalog-search font-1-xs">Buscar modelo<input class="input-text" id="component-search" type="search" placeholder="Marca ou modelo"></label>' +
       '<label class="font-1-xs">Marca<select id="brand-filter" class="input-text"><option value="">Todas</option>' + [...new Set(produtos.map((p) => p.fabricante))].sort().map((marca) => '<option>' + h(marca) + '</option>').join("") + '</select></label>' +
       '<label class="font-1-xs">Ordenar<select id="component-sort" class="input-text"><option value="preco-asc">Menor preço</option><option value="preco-desc">Maior preço</option><option value="nome">Nome</option></select></label>' +
       '</div><p class="catalog-context">' + (temPecas ? 'Mostrando apenas opções sem conflitos detectados com sua build. Modelos não identificados precisam de conferência.' : 'Selecione a primeira peça; as próximas categorias serão filtradas automaticamente.') + '</p>' +
-      '<p id="catalog-count" class="font-2-xs summary-note" role="status"></p><section id="catalog-results" class="catalog-grid" aria-label="Peças da categoria"></section><nav class="catalog-pagination" aria-label="Páginas do catálogo"><button type="button" id="previous-products" class="btn-ghost">Anterior</button><span id="catalog-page" class="font-2-xs"></span><button type="button" id="next-products" class="btn-ghost">Próxima</button></nav>';
+      '<p id="catalog-count" class="font-2-xs summary-note" role="status"></p><section id="catalog-results" class="catalog-grid" aria-label="Peças da categoria"></section><nav class="catalog-pagination" aria-label="Páginas do catálogo"><button type="button" id="previous-products" class="btn-ghost" aria-label="Página anterior do catálogo">Anterior</button><span id="catalog-page" class="font-2-xs"></span><button type="button" id="next-products" class="btn-ghost" aria-label="Próxima página do catálogo">Próxima</button></nav>';
     const campoBusca = main.querySelector("#component-search");
     const marca = main.querySelector("#brand-filter"), ordem = main.querySelector("#component-sort");
     let filtrados = [];
@@ -40,14 +41,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       main.querySelector("#catalog-count").textContent = filtrados.length + " opções encontradas · preços demonstrativos, sem atualização em tempo real.";
       main.querySelector("#catalog-results").innerHTML = filtrados.slice((pagina-1)*tamanhoPagina, pagina*tamanhoPagina).map((peca) => {
         const detalhes = "./peca.html?" + new URLSearchParams({ id: peca.id, build: build.id });
-        const selecionada = peca.categoria === "memoria_ram" ? itensRam(build).some(r => r.id === peca.id) : build.componentes[peca.categoria]?.id === peca.id;
+        const selecionada = itensCategoria(build,peca.categoria).some(r => r.id === peca.id);
         const motivo = motivoSelecao(build,peca,catalogo);
+        const destaques = peca.categoria === "placa_mae"
+          ? [["Slots de RAM",peca.quantidade_slots_ram],["Slots M.2",peca.quantidade_slots_m2],["Portas SATA",peca.quantidade_portas_sata]].filter(([,valor]) => valor != null)
+          : fichaTecnica(peca).slice(3,6);
         return '<article class="product-card glass-card"><a class="product-visual" href="' + detalhes + '" aria-label="Ver detalhes de ' + h(nomePeca(peca)) + '">' + imagemPeca(peca) +
-          '</a><div class="product-card-body"><span class="component-category font-1-xs">' + h(peca.fabricante) + '</span><h2 class="font-1-m-b"><a href="' + detalhes + '">' + h(peca.modelo) +
-          '</a></h2><ul class="product-highlights">' + fichaTecnica(peca).slice(3,6).map(([rotulo,valor]) => '<li class="font-2-xs">' + h(rotulo) + ': ' + h(valor) + '</li>').join("") +
+          '</a><div class="product-card-body"><span class="component-category font-1-xs">' + h(peca.fabricante) + '</span><h2 class="font-1-m-b"><a href="' + detalhes + '" aria-label="Ver detalhes de ' + h(nomePeca(peca)) + '">' + h(peca.modelo) +
+          '</a></h2><ul class="product-highlights">' + destaques.map(([rotulo,valor]) => '<li class="font-2-xs">' + h(rotulo) + ': ' + h(valor) + '</li>').join("") +
           '</ul><strong class="product-price font-1-l">' + moeda(peca.preco) + '</strong><div class="product-actions"><a class="btn-ghost" href="' + detalhes +
-          '">Detalhes</a><button type="button" class="btn-primary" data-add="' + peca.id + '" ' + (motivo ? 'disabled data-disabled-reason="' + h(motivo) + '"' : "") + '>' +
-          iconeAnimado("plus") + (selecionada && peca.categoria === "memoria_ram" ? "Adicionar mais" : "Adicionar") + '</button></div></div></article>';
+          '" aria-label="Detalhes de ' + h(nomePeca(peca)) + '">Detalhes</a><button type="button" class="btn-primary" data-add="' + peca.id + '" aria-label="' + (selecionada && categoriasMultiplas.has(peca.categoria) ? "Adicionar mais" : "Adicionar") + ' ' + h(nomePeca(peca)) + ' à build" ' + (motivo ? 'disabled data-disabled-reason="' + h(motivo) + '"' : "") + '>' +
+          iconeAnimado("plus") + (selecionada && categoriasMultiplas.has(peca.categoria) ? "Adicionar mais" : "Adicionar") + '</button></div></div></article>';
       }).join("") || '<div class="catalog-empty glass-card"><p class="font-2-s">' + (build.travada ? 'Build trancada: destranque-a antes de escolher componentes.' : 'Nenhuma opção está disponível com estes filtros e a configuração atual. Para trocar uma peça já selecionada, remova-a primeiro no editor.') + '</p></div>';
       iniciarIcones(main);
       main.querySelector("#catalog-page").textContent = pagina + " / " + paginas;
@@ -63,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       try {
         build = selecionarPecaCompativel(build, catalogo.find((p) => p.id === botao.dataset.add), catalogo);
         guardarRascunho(build);
-        location.href = "./configuracao-build.html?id=" + encodeURIComponent(build.id);
+        navegarPara("./configuracao-build.html?id=" + encodeURIComponent(build.id));
       } catch (erro) { avisar(erro.message); }
     });
     renderizar();

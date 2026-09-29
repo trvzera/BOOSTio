@@ -39,7 +39,9 @@ Para revelar só uma vez, dentro do callback mantenha a classe e chame
 com a velocidade do scroll. As opções de movimento reduzido do sistema são respeitadas.
 Os conteúdos continuam visíveis se o JavaScript ou o observer não estiverem disponíveis.
 Na home, o reveal é aplicado ao card inteiro para manter texto e fundo juntos.
-O footer de todas as páginas que usam `loading.js` recebe o mesmo reveal automaticamente.
+O footer e os cards/sections das demais páginas recebem o mesmo reveal automaticamente
+após o loading. Um MutationObserver registra também cards criados pelo JavaScript,
+sem duplicar observers; a área principal da home continua sem blur inicial.
 
 ## Estado local e pontos de integração
 
@@ -61,12 +63,19 @@ RAM é uma lista em `componentes.memoria_ram`; o formato antigo com um objeto é
 automaticamente. Cada entrada tem `id` e `quantidade` de kits. Todos os módulos de todos
 os kits contam nos slots e na capacidade máxima da placa-mãe. Novos modelos precisam
 ter o mesmo DDR e frequência; misturar marcas/modelos gera aviso de estabilidade.
-Duplicação e remoção são individuais. Para trocar outras peças, remova a atual primeiro.
+Duplicação e remoção são individuais. SSD, HD e fan também são listas de modelos e
+quantidades; objetos antigos são migrados sem perder os dados. Para trocar outras peças,
+remova a atual primeiro. A duplicação soma preço, consumo e capacidade; diminuir libera
+conexões sem remover os demais modelos. Rascunhos, JSON e links preservam quantidades.
 
 `js/build/compatibilidade.js` verifica socket, DDR, slots, capacidade, formato do gabinete,
-altura do air cooler, suporte declarado a water cooler, M.2 e potência da fonte.
-Dados genéricos como “Intel/AMD” produzem aviso para conferir o socket no fabricante.
-BIOS, dimensões da GPU, conectores e disponibilidade não são plenamente validados.
+altura do air cooler, comprimento da GPU, radiadores, diâmetro/quantidade de fans,
+slots M.2, portas SATA compartilhadas por HD/SSD e potência da fonte.
+Dados genéricos como “Intel/AMD” produzem dica para conferir o socket no fabricante.
+BIOS, conectores, disposição dos encaixes e disponibilidade não são plenamente validados.
+Medidas ausentes produzem dicas azuis, nunca um encaixe confirmado. Novas unidades de discos
+exigem uma placa identificada com limite conhecido; não se presume que uma placa tenha
+quatro portas SATA. Trocar a placa ou o gabinete também revalida as peças já selecionadas.
 O consumo exclui monitor e periféricos externos e é apenas uma estimativa da seed.
 Não há potência recomendada. Fonte abaixo do consumo é erro; igual ao consumo gera aviso
 de ausência de margem. Fans são obrigatórias. Air cooler e water cooler ficam em uma categoria;
@@ -76,10 +85,47 @@ O checkbox mantém o mesmo elemento e a mesma instância Lottie durante a atuali
 dos cards, permitindo concluir a animação nos dois sentidos.
 SSD e HD aparecem juntos em **SSD / HD**, um grupo obrigatório: basta um dos dois.
 As peças continuam armazenadas como `ssd` e `hd`, preservando rascunhos existentes.
+O contador de armazenamento mostra unidades de SSD/HD e conexões M.2/SATA ocupadas.
 Placa de vídeo é obrigatória quando o processador selecionado não tem vídeo integrado;
 enquanto faltar, o status da build permanece incompleto.
 O catálogo é filtrado automaticamente pelas verificações quando a build já possui peças.
 O botão da página de produto também revalida a seleção antes de adicionar.
+
+### Campos técnicos para a futura API
+
+Em `js/build/hardware.js`, campos numéricos nulos são desconhecidos, não zero.
+
+- Placa-mãe: `quantidade_slots_m2`, `quantidade_portas_sata`,
+  `quantidade_slots_m2_sata` e `portas_sata_desativadas_por_m2_sata`.
+- GPU: `comprimento_mm`; air cooler: `altura_mm` (o antigo `dimensoes` só serve se numérico).
+- Gabinete: `tamanho_max_gpu_mm`, `tamanho_max_cooler_mm`,
+  `radiadores_suportados_mm: [120, 240, 360]`, `tamanhos_fan_suportados_mm: [120, 140]`,
+  `quantidade_max_fans` e `fans_inclusos`.
+- Water cooler: `tamanho_radiador_mm`, `quantidade_fans`; fan: `tamanho_mm`, `quantidade`
+  (unidades físicas por kit, multiplicadas pela quantidade de kits na build).
+
+Esses arrays são exemplos de contrato, não medidas de um gabinete real. Radiador de
+360 mm precisa estar listado nos tamanhos suportados. Três fans de 120 mm continuam
+três unidades de 120 mm, não uma fan de 360 mm. A contagem considera as fans inclusas
+e as do radiador como instaladas; modelos com distribuição não informada precisam
+de conferência para encaixes compartilhados. Não existe um seletor de posição física ainda.
+As medidas de GPU e os encaixes de radiador/fans ainda faltam na seed atual.
+
+O complemento exclusivo do catálogo demonstrativo usa as fichas de
+[ASUS PRIME A520M-K](https://www.asus.com/motherboards-components/motherboards/prime/prime-a520m-k/techspec/),
+[GIGABYTE B550M DS3H rev. 1.0/1.1/1.2/1.3](https://www.gigabyte.com/Motherboard/B550M-DS3H-rev-10-11-12-13/sp)
+e [MSI PRO B760M-P](https://us.msi.com/Motherboard/PRO-B760M-P/Specification).
+Esses três modelos têm quatro portas SATA; as quantidades M.2 são respectivamente
+uma, duas e duas. Na MSI, M.2 SATA desativa SATA5. Os links de lojas da seed podem
+apontar para outras variantes; este complemento usa o nome/modelo da demonstração,
+não o anúncio, e não deve ser aplicado a outras revisões sem conferência.
+
+Nenhum arquivo Python foi alterado. O backend atual **não** executa estas validações
+nem o limite de três builds; o modelo possui quantidades, mas não há rotas de builds
+registradas em `app.py`. O front continua com catálogo demonstrativo e localStorage.
+Ao integrar, o servidor deve revalidar estoque, compatibilidade, medidas, quantidades,
+tranca, visibilidade, propriedade da build e quota. O modelo atual também só armazena
+um ID por categoria; vários modelos de RAM/SSD/HD/fan precisam de um contrato adequado.
 
 KaBuM usa os links já existentes. Pichau e Mercado Livre abrem buscas, claramente rotuladas,
 até haver ofertas diretas cadastradas. Não são inventados preços de cada loja.
@@ -125,8 +171,13 @@ uma âncora focável permite ler a explicação pelo teclado sem habilitar a aç
 
 `js/pages/loading.js` usa `sessionStorage["boostio:visita-iniciada"]`, não a conta.
 Primeira visita da aba/sessão e toda entrada na home usam vídeo. A home sempre mantém 1×.
-As demais páginas usam preto com fade de 480 ms. Apenas o fluxo editor → catálogo →
-peça usa fade mais curto: 280 ms antes de o catálogo estar disponível e 180 ms depois.
+As demais páginas mostram um loading curto (linha animada sobre preto), espera mínima
+de 320 ms e fade de 600 ms. O fluxo editor → catálogo → peça usa espera de 320 ms e
+fade de 460 ms; com catálogo pronto, 160 ms e 360 ms. Links internos e botões desse fluxo
+têm também fade preto de saída de 260 ms, sem afetar links externos ou âncoras da mesma página.
+Retornos pelo histórico/bfcache reapresentam a transição curta; o fluxo de componentes
+reabre o documento para ler o rascunho atualizado. Retornar à home recarrega o loading
+completo. A tela curta nunca depende de o vídeo estar disponível.
 O formulário tem espera mínima de 800 ms e fade de 700 ms, inclusive nas visitas seguintes.
 A primeira visita continua usando o vídeo; movimento reduzido ignora a espera artificial.
 Nesse fluxo, um vídeo inicial pode acelerar para 2.2× quando os dados já estiverem prontos;
@@ -155,7 +206,18 @@ do cursor, e Escape, clique fora ou um segundo clique fecham o menu.
 O hamburger flutuante fica oculto até a autenticação. Em `testes.html`, o atributo
 `data-menu-preview` permite verificar o hamburger mesmo sem login.
 Os painéis usam glass, itens compactos, `inert` quando fechados, Escape e clique fora
-para fechar. Abrir um painel fecha o outro. Navegações usam páginas.
+para fechar. Abrir um painel fecha o outro. Navegações usam páginas; na home o menu
+inclui também Sobre, Como funciona e Começar montagem, ligados às respectivas sections.
+O editor tem um botão direto para voltar a Suas builds, sem depender do histórico.
+
+Nos cards de builds, o progresso permanece azul e a linha inferior exibe apenas
+privacidade e data. Builds trancadas mostram um cadeado ao lado do nome e não
+podem ser editadas nem deletadas até serem destrancadas.
+A barra à esquerda do título fica azul sem pendências, amarela com aviso/incompletude
+e vermelha com erro. Hover, foco ou toque mostram a lista de pendências; Escape fecha.
+O editor usa o mesmo indicador. Criar, duplicar e importar ficam bloqueados na quota
+completa, inclusive com uma explicação acessível. Importar continua um botão de prévia,
+sem implementação da leitura de arquivos ou integração com o servidor nesta versão.
 
 Os controles `data-page-back` usam `js/components/navigation-back.js` para retornar
 à entrada anterior do navegador, com a URL completa da build/categoria. O texto e a
@@ -189,7 +251,7 @@ Login e cadastro têm altura livre, e os modais são limitados pela altura visí
 com rolagem interna. Campos no mobile usam pelo menos 16px, sem reduzir a tela
 inteira com `scale()`. O detalhamento de compatibilidade abre no fluxo no mobile.
 
-Testes: `node --test frontend/tests/*.test.mjs` (34 verificações de lógica e regressão).
+Testes: `node --test frontend/tests/*.test.mjs` (52 verificações de lógica e regressão).
 Ao alterar layouts, confira 320, 390, 600, 768, 1024 e 1440px, landscape e os
 estados abertos (menus, modais, senha e modelos de peças).
 

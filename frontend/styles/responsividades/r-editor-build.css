@@ -50,11 +50,8 @@
   .product-detail-visual { min-height: 200px; }
   .product-detail-visual img { height: 220px; }
   .store-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-  /* No mobile o detalhe se abre no fluxo, sem cobrir as peças ou gerar scroll duplo. */
-  .compatibility-popover { width: 100%; }
-  .compatibility-details { position: static; width: 100%; display: none; margin-top: 12px; }
-  .compatibility-popover[data-open] .compatibility-details { display: block; }
-  .compatibility-details::before { display: none; }
+  .build-indicator { width: auto; }
+  .compatibility-details { width: min(320px,calc(100vw - 64px)); }
 }
 @media (max-width: 650px) {
   .catalog-grid, .store-grid { grid-template-columns: minmax(0, 1fr); }

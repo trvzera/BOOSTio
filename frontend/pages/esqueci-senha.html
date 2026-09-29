@@ -33,15 +33,15 @@
       <form id="forgot-password-form">
         <input type="email" placeholder="Seu e-mail" class="input-text" id="email" required>
         <p id="forgot-password-error" class="font-1-xs form-error"></p>
-        <button type="submit" class="btn-login" id="btn-send-link" disabled>Enviar link de recuperação</button>
-        <a href="./login.html" id="back-to-login" class="font-1-s page-back-link" data-page-back><span class="ui-lottie" data-lottie="arrow" data-direction="back" aria-hidden="true"><span class="ui-icon-fallback">→</span></span><span data-back-label>Voltar ao login</span></a>
+        <button type="submit" class="btn-login" id="btn-send-link" aria-label="Enviar link de recuperação de senha" disabled>Enviar link de recuperação</button>
+        <a href="./login.html" id="back-to-login" class="font-1-s page-back-link" data-page-back aria-label="Voltar ao login"><span class="ui-lottie" data-lottie="arrow" data-direction="back" aria-hidden="true"><span class="ui-icon-fallback">→</span></span><span data-back-label>Voltar ao login</span></a>
       </form>
 
       <div id="forgot-password-success" class="hidden">
         <div class="modal-icon"><i class="fa-solid fa-envelope-circle-check"></i></div>
         <h2 class="font-1-l">Verifique seu e-mail</h2>
         <p class="font-2-xs">Se existir uma conta associada a <strong id="email-confirmed">seu e-mail</strong>, você receberá um link para redefinir sua senha em instantes.</p>
-        <a href="./login.html" class="btn-login" id="back-to-login-success" data-page-back><span class="ui-lottie" data-lottie="arrow" data-direction="back" aria-hidden="true"><span class="ui-icon-fallback">→</span></span><span data-back-label>Voltar ao login</span></a>
+        <a href="./login.html" class="btn-login" id="back-to-login-success" data-page-back aria-label="Voltar ao login"><span class="ui-lottie" data-lottie="arrow" data-direction="back" aria-hidden="true"><span class="ui-icon-fallback">→</span></span><span data-back-label>Voltar ao login</span></a>
       </div>
     </div>
   </main>

@@ -31,8 +31,10 @@ test("home mantém velocidade fixa; apenas editor/catálogo/peça aceleram", () 
   }
   const normal = perfilLoading({home:false,visitada:true});
   const frequente = perfilLoading({home:false,visitada:true,frequente:true,cache:true});
-  assert.equal(normal.fadeMs,480); assert.equal(normal.velocidadePronta,1);
+  assert.equal(normal.fadeMs,600); assert.equal(normal.velocidadePronta,1);
+  assert.ok(normal.minimoMs >= 300);
   assert.ok(frequente.fadeMs < normal.fadeMs); assert.equal(frequente.velocidadePronta,2.2);
+  assert.ok(frequente.fadeMs >= 350); assert.ok(frequente.minimoMs >= 150);
 });
 test("formulário mantém sua política de sessão com espera mínima e fade maior", () => {
   const repetida = perfilLoading({home:false,visitada:true,formulario:true});

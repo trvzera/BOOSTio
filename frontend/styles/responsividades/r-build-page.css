@@ -1,11 +1,11 @@
-#build-page { height: auto; padding: 72px var(--page-gutter); gap: 48px; }
+#build-page { height: auto; padding: 40px var(--page-gutter) 72px; gap: 48px; }
 #build-page-h1 { text-align: center; }
 #build-page-p { width: min(640px, 100%); }
 #build-container { min-width: 0; }
 .build-entry-actions { max-width: 100%; }
 @media (max-width: 900px) { #build-page-h1 { font-size: 2.2rem; } #build-page-p { font-size: .95rem; } }
 @media (max-width: 600px) {
-  #build-page { padding-block: 56px 96px; gap: 32px; }
+  #build-page { padding-block: 36px 96px; gap: 32px; }
   #build-container { gap: 24px; }
   .build-entry-actions { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .build-entry-card { padding: 24px; }
