@@ -26,19 +26,8 @@ const erro = erros[codigo];
 const codigoElemento = document.querySelector("#error-code");
 const tituloElemento = document.querySelector("#error-title");
 const descricaoElemento = document.querySelector("#error-description");
-const voltar = document.querySelector("#error-back");
 
 codigoElemento.textContent = codigo;
 tituloElemento.textContent = erro.titulo;
 descricaoElemento.textContent = erro.descricao;
 document.title = `${codigo} — ${erro.titulo}`;
-
-voltar.addEventListener("click", () => {
-  const origem = document.referrer ? new URL(document.referrer) : null;
-  if (origem?.origin === window.location.origin) {
-    window.history.back();
-    return;
-  }
-
-  window.location.href = "./index.html";
-});

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Selecionar peças — BOOSTio</title>
+  <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
+  <link rel="stylesheet" href="../styles/style.css">
+  <meta name="description" content="Selecionar peças e conferir componentes para sua configuração na BOOSTio.">
+  <script type="module" src="../js/pages/loading.js" defer></script>
+  <script type="module" src="../js/pages/pecas.js" defer></script>
+</head>
+<body id="pecas" class="builder-page">
+  <div id="loading-screen"><video id="loading-video" autoplay muted playsinline><source src="../video/loading-toggle.webm" type="video/webm"></video></div>
+  <div data-site-navigation></div>
+
+
+  <div class="decoration decoration-1" aria-hidden="true"></div>
+  <div class="decoration decoration-2" aria-hidden="true"></div>
+  <main id="catalog-main" class="builder-page-main"><p class="font-2-s catalog-loading" role="status">Carregando componentes…</p></main>
+  <div class="builder-footer-wrapper">
+    <footer>
+      <div id="top-footer">
+        <div id="footer-hero">
+          <img src="../imgs/logo.webp" alt="Logo BOOSTio">
+          <p class="font-2-s">A BOOSTio é uma plataforma desenvolvida para simplificar a montagem e o upgrade de computadores.</p>
+        </div>
+        <nav id="footer-nav">
+          <h2 class="font-1-l">Páginas</h2>
+          <ul id="footer-nav-ul">
+            <li class="footer-item"><a href="./index.html" aria-label="Ir para Landing page" class="font-2-s">Landing page</a></li>
+            <li class="footer-item"><a href="./formulario.html" aria-label="Ir para o formulário de montagem" class="font-2-s">Montagem</a></li>
+            <li class="footer-item"><a href="./builds.html" aria-label="Ir para suas builds" class="font-2-s">Suas Builds</a></li>
+          </ul>
+        </nav>
+        <div id="footer-extra">
+          <div id="contact-section">
+            <h2 class="font-1-l">Contato</h2>
+            <a href="#" aria-label="Email de contato BOOSTio" class="font-2-s">contato@boostio.com.br</a>
+          </div>
+          <div id="about-section">
+            <h2 class="font-1-l">Sobre Nós</h2>
+            <a href="./desenvolvedores.html" aria-label="Ver sobre os Desenvolvedores" class="font-2-s">Desenvolvedores</a>
+          </div>
+        </div>
+      </div>
+      <div id="footer-divider"></div>
+      <div id="bottom-footer">
+        <p class="font-2-s">&copy;2026 BOOSTio - Todos direitos reservados</p>
+        <a href="./termos.html" target="_blank" aria-label="Ver termos de uso" class="font-2-s" id="terms-link">Termos de uso</a>
+      </div>
+    </footer>
+  </div>
+  <noscript><p>Ative o JavaScript para configurar sua build.</p></noscript>
+</body>
+</html>

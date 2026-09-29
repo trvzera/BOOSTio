@@ -9,6 +9,7 @@ import { deletarUsuario } from "../api/usuario/deletarUsuario.js";
 import { formatarMesAno } from "../utils/formatarData.js";
 import { enviarEmailVerificar } from "../api/email/enviarEmailVerificar.js";
 import { conferirEmailVerificar } from "../api/email/conferirEmailVerificar.js";
+import { acompanharCarregamento } from "../components/page-loading.js";
 
 const SEGUNDOS_REENVIO = 30;
 
@@ -423,7 +424,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       atualizaSenha();
     });
 
-    trocarDadosConfigs();
+    await acompanharCarregamento(trocarDadosConfigs());
   } catch (erro) {
     console.error("Erro ao iniciar a página de configurações:", erro);
   }

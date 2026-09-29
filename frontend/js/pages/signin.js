@@ -41,18 +41,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     const simbolos = document.querySelector("#symbol-rule");
     const numeros = document.querySelector("#number-rule");
 
-    const ltCheck = await registrarAnimacao(
+    let ltCheck;
+    registrarAnimacao(
       "terms-checkbox-animation",
       "../lottie/checkbox.json",
-    );
+    ).then(animacao => {
+      ltCheck = animacao;
+      const pronto = () => {
+        document.querySelector("#terms-checkbox-animation").setAttribute("data-ready", "");
+        ltCheck?.goToAndStop(termosCheck.checked ? ltCheck.totalFrames - 1 : 0, true);
+      };
+      if (ltCheck?.isLoaded) pronto(); else ltCheck?.addEventListener("DOMLoaded",pronto);
+    }).catch(() => {});
 
     termosCheck.addEventListener("click", () => {
       if (termosCheck.checked) {
-        ltCheck.setDirection(1);
-        ltCheck.play();
+        ltCheck?.setDirection(1);
+        ltCheck?.play();
       } else {
-        ltCheck.setDirection(-1);
-        ltCheck.play();
+        ltCheck?.setDirection(-1);
+        ltCheck?.play();
       }
     });
     let forcaSenha = 0;
@@ -160,6 +168,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         alvo.type = vendo ? "password" : "text";
         icone.classList.toggle("fa-eye", !vendo);
         icone.classList.toggle("fa-eye-slash", vendo);
+        icone.setAttribute("aria-pressed",String(!vendo));
+        icone.setAttribute("aria-label",vendo ? "Mostrar senha" : "Ocultar senha");
       });
     });
 
@@ -339,6 +349,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const senhaValue = senhaInput.value.trim();
 
       botaoCriarConta.disabled = true;
+      botaoCriarConta.dataset.busy = "true";
 
       try {
         const resposta = await criarUsuario(userValue, emailValue, senhaValue);
@@ -354,6 +365,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           erro.message ||
           "Não foi possível criar a conta. Tente novamente mais tarde.";
       } finally {
+        delete botaoCriarConta.dataset.busy;
         botaoCriarConta.disabled = false;
       }
     });
