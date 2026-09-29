@@ -30,14 +30,14 @@
     <div id="signin-container">
       <img src="../imgs/logo.webp" alt="Logo">
       <h1 id="signin-title" class="font-1-l">Vamos criar a sua conta!</h1>
-      <p id="signin-description" class="font-2-xs">Já possui uma conta? <a href="./login.html">Entrar com sua conta.</a></p>
+      <p id="signin-description" class="font-2-xs">Já possui uma conta? <a href="./login.html" aria-label="Entrar com sua conta.">Entrar com sua conta.</a></p>
       <form id="signin-form">
         <input type="text" placeholder="Seu nome de usuário" class="input-text" id="username" maxlength="15">
         <input type="email" placeholder="Seu melhor e-mail" class="input-text" id="email">
 
         <div class="password-input-wrapper">
           <input type="password" placeholder="Uma senha forte" class="input-text" id="primary-password">
-          <button type="button" class="password-toggle fa-eye-slash" data-target="primary-password" aria-label="Mostrar senha" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button>
+          <button type="button" class="password-toggle fa-eye-slash" data-target="primary-password" aria-label="Mostrar senha" aria-pressed="false" aria-controls="primary-password"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button>
         </div>
 
         <div id="password-verification">
@@ -90,7 +90,7 @@
 
         <div class="password-input-wrapper">
           <input type="password" placeholder="Confirme sua senha" class="input-text" id="confirm-password">
-          <button type="button" class="password-toggle fa-eye-slash" data-target="confirm-password" aria-label="Mostrar senha" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button>
+          <button type="button" class="password-toggle fa-eye-slash" data-target="confirm-password" aria-label="Mostrar confirmação da senha" aria-pressed="false" aria-controls="confirm-password"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button>
         </div>
         <p id="password-match-text" class="font-1-s"></p>
 
@@ -99,19 +99,19 @@
             <input type="checkbox" name="terms" id="terms" class="lottie-check">
           </div>
           <label for="terms" class="font-1-xs">
-            Li e concordo com os <a href="./termos.html" target="_blank">Termos e Condições</a>
+            Li e concordo com os <a href="./termos.html" target="_blank" rel="noopener noreferrer" aria-label="Ler Termos e Condições em uma nova aba">Termos e Condições</a>
           </label>
 
         </div>
         <p id="sign-up-error" class="font-1-xs form-error"></p>
-        <button type="submit" class="btn-login" id="btn-create-account" disabled>Criar conta</button>
+        <button type="submit" class="btn-login" id="btn-create-account" aria-label="Criar conta" disabled>Criar conta</button>
       </form>
       <div class="login-divider">
         <span class="login-line"></span>
         <p class="font-1-s">Ou se preferir</p>
         <span class="login-line"></span>
       </div>
-      <a href="#" class="btn-login-secondary" id="btn-google-login">Criar com Google</a>
+      <a href="#" class="btn-login-secondary" id="btn-google-login" aria-label="Criar com Google uma conta">Criar com Google</a>
     </div>
 
     <div class="modal-overlay" id="verify-email-modal">
@@ -137,7 +137,7 @@
         <p id="verify-email-error" class="font-1-xs form-error"></p>
 
         <div class="modal-actions">
-          <button type="button" class="btn-ghost" id="btn-verify-later" aria-label="Verificar e-mail mais tarde">Fazer isso depois</button>
+          <button type="button" class="btn-ghost" id="btn-verify-later" aria-label="Fazer isso depois: verificar e-mail mais tarde">Fazer isso depois</button>
           <button type="button" class="btn-primary" id="btn-confirm-code" aria-label="Confirmar código de verificação" disabled>Confirmar</button>
         </div>
       </div>

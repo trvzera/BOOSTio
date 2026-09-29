@@ -1,3 +1,4 @@
+import { navegarPara,transicionarSaida } from "./page-loading.js";
 const rotulos = {
   "index.html":"Voltar ao início", "formulario.html":"Voltar ao formulário",
   "configuracao-build.html":"Voltar à build", "builds.html":"Voltar às suas builds",
@@ -57,8 +58,8 @@ export function iniciarVoltar() {
         evento.metaKey || evento.shiftKey || evento.altKey || controle.target === "_blank") return;
     evento.preventDefault();
     const {destino,historico} = retorno(controle);
-    if (historico) history.back();
-    else location.assign(destino);
+    if (historico) transicionarSaida(() => history.back());
+    else navegarPara(destino);
   });
   window.addEventListener("pageshow",atualizarBotoesVoltar);
 }

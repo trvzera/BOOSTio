@@ -41,8 +41,8 @@
           </div>
         </div>
         <div class="quota-actions">
-          <button type="button" class="btn-build-ghost" id="btn-import-build" aria-label="Importar uma build"><span class="ui-lottie" data-lottie="import" aria-hidden="true"><span class="ui-icon-fallback">→</span></span>Importar build</button>
-          <button type="button" class="btn-build-primary" id="btn-create-build" aria-label="Criar uma build"><span class="ui-lottie" data-lottie="plus" aria-hidden="true"><span class="ui-icon-fallback">+</span></span>Criar build</button>
+          <button type="button" class="btn-build-ghost" id="btn-import-build" aria-label="Importar build"><span class="ui-lottie" data-lottie="import" aria-hidden="true"><span class="ui-icon-fallback">→</span></span>Importar build</button>
+          <button type="button" class="btn-build-primary" id="btn-create-build" aria-label="Criar build"><span class="ui-lottie" data-lottie="plus" aria-hidden="true"><span class="ui-icon-fallback">+</span></span>Criar build</button>
         </div>
       </div>
 
@@ -54,48 +54,50 @@
             <div class="build-menu-wrap">
               <button type="button" class="build-menu-trigger" aria-label="Abrir menu da build" aria-expanded="false" aria-haspopup="true">···</button>
               <div class="build-menu" role="menu">
-                <button type="button" class="build-menu-item" data-acao="trancar" role="menuitem">
+                <button type="button" class="build-menu-item" data-acao="trancar" role="menuitem" aria-label="Trancar build Setup Gamer 1440p">
                   <i id="lottie-lock-build-demo-1" class="lottie-build-page"></i>
                   <span class="btn-text">Trancar build</span>
                 </button>
                 <span class="build-menu-divider"></span>
-                <button type="button" class="build-menu-item" data-acao="visibilidade" role="menuitem">
+                <button type="button" class="build-menu-item" data-acao="visibilidade" role="menuitem" aria-label="Tornar privado: Setup Gamer 1440p">
                   <!-- Se for demo publico, exibe o cadeado; se privado, exibe o public -->
                   <i id="lottie-lock-vis-build-demo-1" class="lottie-build-page"></i>
                   <i id="lottie-public-vis-build-demo-1" class="lottie-build-page" style="display: none;"></i>
                   <span class="btn-text">Tornar privado</span>
                 </button>
-                <button type="button" class="build-menu-item" data-acao="editar" role="menuitem">
+                <button type="button" class="build-menu-item" data-acao="editar" role="menuitem" aria-label="Editar detalhes de Setup Gamer 1440p">
                   <i id="lottie-edit-build-demo-1" class="lottie-build-page"></i>Editar detalhes
                 </button>
-                <button type="button" class="build-menu-item" data-acao="duplicar" role="menuitem">
+                <button type="button" class="build-menu-item" data-acao="duplicar" role="menuitem" aria-label="Duplicar build Setup Gamer 1440p">
                   <i id="lottie-clone-build-demo-1" class="lottie-build-page"></i>Duplicar build
                 </button>
-                <button type="button" class="build-menu-item" data-acao="copiar-link" role="menuitem">
+                <button type="button" class="build-menu-item" data-acao="copiar-link" role="menuitem" aria-label="Copiar link de Setup Gamer 1440p">
                   <i id="lottie-copy-build-demo-1" class="lottie-build-page"></i>Copiar link
                 </button>
                 <span class="build-menu-divider"></span>
-                <button type="button" class="build-menu-item" data-acao="baixar-csv" role="menuitem">
+                <button type="button" class="build-menu-item" data-acao="baixar-csv" role="menuitem" aria-label="Baixar build (CSV): Setup Gamer 1440p">
                   <i id="lottie-csv-build-demo-1" class="lottie-build-page"></i>Baixar build (CSV)
                 </button>
-                <button type="button" class="build-menu-item" data-acao="baixar-json" role="menuitem">
+                <button type="button" class="build-menu-item" data-acao="baixar-json" role="menuitem" aria-label="Baixar build (JSON): Setup Gamer 1440p">
                   <i id="lottie-json-build-demo-1" class="lottie-build-page"></i>Baixar build (JSON)
                 </button>
                 <span class="build-menu-divider"></span>
-                <button type="button" class="build-menu-item danger-menu-item" data-acao="deletar" role="menuitem">
+                <button type="button" class="build-menu-item danger-menu-item" data-acao="deletar" role="menuitem" aria-label="Deletar build Setup Gamer 1440p">
                   <i id="lottie-trash-build-demo-1" class="lottie-build-page"></i>Deletar build
                 </button>
               </div>
             </div>
           </div>
           <p class="build-card-desc font-2-xs">Montagem focada em jogos em 1440p, com equilíbrio entre GPU e processador.</p>
-          <p class="build-card-percent font-1-l" data-percent>75%</p>
-          <div class="build-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="75" aria-label="Progresso da build">
-            <div class="build-progress-fill" style="width: 75%"></div>
-          </div>
-          <div class="build-card-bottom">
-            <span class="build-status incomplete font-1-xs">Incompleta</span>
-            <time class="build-card-date font-2-xs" datetime="2026-08-15T14:32:00.000Z">15 Ago 2026, 14:32</time>
+          <div class="build-card-meta">
+            <p class="build-card-percent font-1-l" data-percent>75%</p>
+            <div class="build-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="75" aria-label="Progresso da build">
+              <div class="build-progress-fill" style="width: 75%"></div>
+            </div>
+            <div class="build-card-bottom">
+              <span class="build-visibility publico">Pública</span>
+              <time class="build-card-date font-2-xs" datetime="2026-08-15T14:32:00.000Z">15 Ago 2026, 14:32</time>
+            </div>
           </div>
         </article>
       </div>
@@ -114,11 +116,11 @@
       </div>
       <div class="field">
         <label for="edit-description" class="font-1-m">Descrição</label>
-        <input type="text" id="edit-description" maxlength="160" placeholder="Uma breve descrição">
+        <textarea id="edit-description" maxlength="160" rows="5" placeholder="Uma breve descrição"></textarea>
       </div>
       <div class="modal-actions">
-        <button type="button" class="btn-ghost" id="cancel-build-edit">Cancelar</button>
-        <button type="button" class="btn-primary" id="save-build-edit">Salvar</button>
+        <button type="button" class="btn-ghost" id="cancel-build-edit" aria-label="Cancelar edição dos detalhes da build">Cancelar</button>
+        <button type="button" class="btn-primary" id="save-build-edit" aria-label="Salvar detalhes da build">Salvar</button>
       </div>
     </div>
   </div>
@@ -128,8 +130,8 @@
       <h3 class="font-1-m">Deletar build</h3>
       <p class="font-1-m">Essa ação remove a build da lista. No backend, a exclusão será permanente.</p>
       <div class="modal-actions">
-        <button type="button" class="btn-ghost" id="cancel-build-delete">Cancelar</button>
-        <button type="button" class="btn-danger" id="confirm-build-delete">Deletar</button>
+        <button type="button" class="btn-ghost" id="cancel-build-delete" aria-label="Cancelar exclusão da build">Cancelar</button>
+        <button type="button" class="btn-danger" id="confirm-build-delete" aria-label="Deletar build: confirmar exclusão">Deletar</button>
       </div>
     </div>
   </div>

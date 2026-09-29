@@ -3,8 +3,8 @@ import "../auth/auth.js";
 import { iniciarTratamentoGlobalDeErros } from "../components/error-handler.js";
 import { iniciarUI } from "../components/ui.js";
 import { iniciarEntradaPagina } from "../components/page-entry.js";
-import { iniciarScrollReveal } from "../components/scroll-reveal.js";
-import { aguardarCarregamentos, perfilLoading } from "../components/page-loading.js";
+import { iniciarRevealsGlobais } from "../components/scroll-reveal.js";
+import { aguardarCarregamentos, perfilLoading, iniciarTransicaoLinks } from "../components/page-loading.js";
 
 iniciarTratamentoGlobalDeErros();
 let tela = document.querySelector("#loading-screen");
@@ -27,7 +27,10 @@ tela.classList.add("loading-" + perfil.modo);
 tela.style.setProperty("--loading-fade",perfil.fadeMs + "ms");
 tela.setAttribute("aria-hidden","true");
 document.body.classList.add("loading-active");
-if (perfil.modo === "fade" || reduzido) { video?.pause(); video?.remove(); }
+if (perfil.modo === "fade" || reduzido) {
+  video?.pause(); video?.remove();
+  if (!reduzido) tela.innerHTML = '<div class="quick-loading"><span class="quick-loading-track" aria-hidden="true"></span><span>Carregando…</span></div>';
+}
 else if (video) video.playbackRate = perfil.velocidade;
 
 let finalizada = false;
@@ -38,12 +41,15 @@ function revelar() {
   tela.remove();
   document.body.classList.remove("loading-active");
   document.body.classList.add("page-ready");
-  if (!home) iniciarEntradaPagina();
   document.dispatchEvent(new Event("boostio:page-ready"));
 }
 function liberar() {
   if (finalizada) return;
   finalizada = true;
+  // Prepara a entrada enquanto a camada ainda cobre a página: evita um frame
+  // visível sem as classes de animação entre o loading e o conteúdo.
+  if (!home) iniciarEntradaPagina();
+  iniciarRevealsGlobais();
   document.body.classList.remove("loading-active");
   tela.classList.add("loading-dismissed"); // Nunca captura cliques enquanto desaparece.
   const duracao = reduzido ? 0 : perfil.fadeMs;
@@ -55,7 +61,7 @@ const domPronto = document.readyState === "loading"
   : Promise.resolve();
 domPronto.then(() => {
   iniciarUI();
-  iniciarScrollReveal(document, "footer");
+  iniciarTransicaoLinks();
 }).catch(erro => { console.warn("Falha ao iniciar os controles:",erro); liberar(); });
 const esperar = ms => new Promise(resolve => setTimeout(resolve,ms));
 const videoPronto = !video || perfil.modo === "fade" || reduzido ? Promise.resolve()
@@ -79,4 +85,18 @@ Promise.all([conteudoPronto,videoPronto,esperar(reduzido ? 0 : perfil.minimoMs)]
   console.warn("O carregamento terminou com uma falha recuperável:",erro);
   clearTimeout(seguranca); liberar();
 });
-window.addEventListener("pageshow",e => { if (e.persisted) { finalizada = true; revelar(); document.body.classList.remove("loading-active"); } });
+window.addEventListener("pageshow",e => {
+  if (!e.persisted) return;
+  if (home || frequente) { location.reload(); return; } // Reabre o rascunho atual, não o snapshot antigo do editor.
+  document.querySelectorAll(".navigation-fade").forEach(el => el.remove());
+  document.body.classList.remove("loading-active");
+  if (reduzido) return;
+  // O bfcache não executa os módulos novamente: ainda precisa de uma transição curta.
+  const rapida = document.createElement("div"); rapida.id = "loading-screen";
+  rapida.className = "loading-fade"; rapida.setAttribute("aria-hidden","true");
+  rapida.style.setProperty("--loading-fade",perfil.fadeMs + "ms");
+  rapida.innerHTML = '<div class="quick-loading"><span class="quick-loading-track" aria-hidden="true"></span><span>Carregando…</span></div>';
+  document.body.prepend(rapida);
+  setTimeout(() => rapida.classList.add("loading-dismissed"),perfil.minimoMs);
+  setTimeout(() => rapida.remove(),perfil.minimoMs + perfil.fadeMs + 80);
+});

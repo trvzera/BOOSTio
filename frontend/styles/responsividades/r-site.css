@@ -50,7 +50,7 @@ footer { width: 100%; max-width: 1240px; padding: clamp(20px, 3vw, 32px); }
 .password-rule-status { flex: 0 0 25px; }
 #password-rules { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 #password-rules p { font-size: 1rem; }
-#terms-checkbox-field { align-items: flex-start; }
+#terms-checkbox-field { align-items: center; }
 .checkbox-wrapper { flex: 0 0 30px; }
 .password-toggle { right: 4px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; }
 .password-toggle::before { content: none !important; }

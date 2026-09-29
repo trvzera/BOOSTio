@@ -3,17 +3,14 @@ import "../auth/auth.js";
 import { registrarAnimacao } from "../components/lottie-controller.js";
 import { formatarDataHora } from "../utils/formatarData.js";
 import { abrirBuild, buildsLocais, sincronizarRascunho, CHAVE_PERFIL_LOCAL, linkCompartilhado } from "../build/estado.js";
-import { htmlSeguro } from "../build/catalogo.js";
+import { htmlSeguro, carregarCatalogo } from "../build/catalogo.js";
+import { avaliarBuild } from "../build/compatibilidade.js";
+import { indicadorBuild,iniciarIndicadores } from "../build/indicador.js";
 import { iniciarIcones } from "../components/ui.js";
+import { navegarPara } from "../components/page-loading.js";
 
 const LIMITE_BUILDS = 3;
 
-const STATUS_LABEL = {
-  incompleta: "Incompleta",
-  completa: "Completa",
-  erro: "Com erro",
-  atencao: "Com atenção",
-};
 const STATUS_CLASS = {
   incompleta: "incomplete",
   completa: "complete",
@@ -66,7 +63,9 @@ try {
       }));
 } catch { /* A lista de demonstração continua disponível sem armazenamento. */ }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  let catalogo = [];
+  try { catalogo = await carregarCatalogo(); } catch { /* Exibe a lista mesmo se o catálogo falhar. */ }
   iniciarIcones();
   const lista = document.getElementById("builds-list");
   const vazio = document.getElementById("builds-empty");
@@ -99,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (build.status === "erro" || build.status === "atencao") {
       return build.status;
     }
-    return (build.progresso ?? calcularProgresso(build.pecas)) === 100 ? "completa" : "incompleta";
+    return (build.progresso ?? calcularProgresso(build.pecas || {})) === 100 ? "completa" : "incompleta";
   }
 
   function atualizarQuota() {
@@ -107,13 +106,18 @@ document.addEventListener("DOMContentLoaded", () => {
     quotaCount.textContent = `${usadas}/${LIMITE_BUILDS}`;
     quotaFill.style.width = `${(usadas / LIMITE_BUILDS) * 100}%`;
     btnCriar.disabled = usadas >= LIMITE_BUILDS;
+    btnImportar.disabled = usadas >= LIMITE_BUILDS;
+    btnCriar.dataset.disabledReason = btnImportar.dataset.disabledReason = "Limite de três builds atingido. Exclua uma build para liberar espaço.";
   }
 
   function fecharMenus() {
     lista.querySelectorAll(".build-menu-wrap.open").forEach((wrap) => {
       wrap.classList.remove("open");
       const trigger = wrap.querySelector(".build-menu-trigger");
-      if (trigger) trigger.setAttribute("aria-expanded", "false");
+      if (trigger) {
+        trigger.setAttribute("aria-expanded", "false");
+        trigger.setAttribute("aria-label", "Abrir menu da build " + trigger.dataset.buildTitle);
+      }
     });
   }
 
@@ -327,19 +331,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function criarCard(build) {
-    const progresso = build.progresso ?? calcularProgresso(build.pecas);
+    const resultado = catalogo.length && build.componentes ? avaliarBuild(build,catalogo) : null;
+    const progresso = resultado ? Math.round(resultado.preenchidos / resultado.total * 100) : build.progresso ?? calcularProgresso(build.pecas || {});
     const idHtml = htmlSeguro(build.id);
-    const status = resolverStatus(build);
+    const tituloSeguro = htmlSeguro(build.titulo);
+    const status = resultado?.status || resolverStatus(build);
     const artigo = document.createElement("article");
     artigo.className = `build-card ${STATUS_CLASS[status]}`;
     if (build.travada) artigo.classList.add("locked");
     artigo.dataset.id = build.id;
     artigo.tabIndex = 0;
-    artigo.setAttribute("aria-label", "Abrir " + build.titulo);
+    artigo.setAttribute("aria-label", "Abrir " + build.titulo + (build.travada ? " (trancada)" : ""));
     artigo.addEventListener("keydown", (evento) => {
       if (evento.target !== artigo || !["Enter", " "].includes(evento.key)) return;
       evento.preventDefault();
-      window.location.href = "./configuracao-build.html?id=" + encodeURIComponent(build.id);
+      navegarPara("./configuracao-build.html?id=" + encodeURIComponent(build.id));
     });
 
     const textoVisibilidade =
@@ -353,61 +359,73 @@ document.addEventListener("DOMContentLoaded", () => {
 
     artigo.innerHTML = `
       <div class="build-card-top">
-        <h2 class="build-card-title font-1-m-b"></h2>
+        <div class="build-title-line">${indicadorBuild(resultado || {erros:status === "erro" ? ["Reabra a build para conferir as incompatibilidades."] : [],avisos:status === "atencao" ? ["Reabra a build para conferir os avisos."] : [],faltam:Object.entries(build.pecas || {}).filter(([,tem]) => !tem).map(([chave]) => ROTULOS_PECA[chave] || chave)},"build-details-" + build.id)}<h2 class="build-card-title font-1-m-b"></h2></div>
         <div class="build-menu-wrap">
-          <button type="button" class="build-menu-trigger" aria-label="Abrir menu da build" aria-expanded="false" aria-haspopup="true">···</button>
+          <button type="button" class="build-menu-trigger" aria-label="Abrir menu da build ${tituloSeguro}" aria-expanded="false" aria-haspopup="true">···</button>
           <div class="build-menu" role="menu">
-            <button type="button" class="build-menu-item" data-acao="trancar" role="menuitem">
+            <button type="button" class="build-menu-item" data-acao="trancar" role="menuitem" aria-label="${textoTranca} de ${tituloSeguro}">
               <i id="lottie-lock-${idHtml}" class="lottie-build-page"></i>
               <span class="btn-text">${textoTranca}</span>
             </button>
             <span class="build-menu-divider"></span>
-            <button type="button" class="build-menu-item" data-acao="visibilidade" role="menuitem">
+            <button type="button" class="build-menu-item" data-acao="visibilidade" role="menuitem" aria-label="${textoVisibilidade} de ${tituloSeguro}">
               <i id="lottie-lock-vis-${idHtml}" class="lottie-build-page" ${displayLockVis}></i>
               <i id="lottie-public-vis-${idHtml}" class="lottie-build-page" ${displayPublicVis}></i>
               <span class="btn-text">${textoVisibilidade}</span>
             </button>
-            <button type="button" class="build-menu-item" data-acao="editar" role="menuitem">
+            <button type="button" class="build-menu-item" data-acao="editar" role="menuitem" aria-label="Editar detalhes de ${tituloSeguro}">
               <i id="lottie-edit-${idHtml}" class="lottie-build-page"></i>Editar detalhes
             </button>
-            <button type="button" class="build-menu-item" data-acao="duplicar" role="menuitem">
+            <button type="button" class="build-menu-item" data-acao="duplicar" role="menuitem" aria-label="Duplicar build ${tituloSeguro}">
               <i id="lottie-clone-${idHtml}" class="lottie-build-page"></i>Duplicar build
             </button>
-            <button type="button" class="build-menu-item" data-acao="copiar-link" role="menuitem">
+            <button type="button" class="build-menu-item" data-acao="copiar-link" role="menuitem" aria-label="Copiar link de ${tituloSeguro}">
               <i id="lottie-copy-${idHtml}" class="lottie-build-page"></i>Copiar link
             </button>
             <span class="build-menu-divider"></span>
-            <button type="button" class="build-menu-item" data-acao="baixar-csv" role="menuitem">
+            <button type="button" class="build-menu-item" data-acao="baixar-csv" role="menuitem" aria-label="Baixar build (CSV): ${tituloSeguro}">
               <i id="lottie-csv-${idHtml}" class="lottie-build-page"></i>Baixar build (CSV)
             </button>
-            <button type="button" class="build-menu-item" data-acao="baixar-json" role="menuitem">
+            <button type="button" class="build-menu-item" data-acao="baixar-json" role="menuitem" aria-label="Baixar build (JSON): ${tituloSeguro}">
               <i id="lottie-json-${idHtml}" class="lottie-build-page"></i>Baixar build (JSON)
             </button>
             <span class="build-menu-divider"></span>
-            <button type="button" class="build-menu-item danger-menu-item" data-acao="deletar" role="menuitem">
+            <button type="button" class="build-menu-item danger-menu-item" data-acao="deletar" role="menuitem" aria-label="Deletar build ${tituloSeguro}" ${build.travada ? 'disabled data-disabled-reason="Destranque a build para deletar."' : ""}>
               <i id="lottie-trash-${idHtml}" class="lottie-build-page"></i>Deletar build
             </button>
           </div>
         </div>
       </div>
       <p class="build-card-desc font-2-xs"></p>
-      <p class="build-card-percent font-1-l" data-percent>${progresso}%</p>
-      <div class="build-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progresso}" aria-label="Progresso da build">
-        <div class="build-progress-fill" style="width: ${progresso}%"></div>
-      </div>
-      <div class="build-card-bottom">
-        <span class="build-status ${STATUS_CLASS[status]} font-1-xs">${STATUS_LABEL[status]}</span>
-        <span class="build-visibility ${isPublico ? "publico" : "privado"}">${isPublico ? "Pública" : "Privada"}</span>
-        <time class="build-card-date font-2-xs"></time>
+      <div class="build-card-meta">
+        <p class="build-card-percent font-1-l" data-percent>${progresso}%</p>
+        <div class="build-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progresso}" aria-label="Progresso da build">
+          <div class="build-progress-fill" style="width: ${progresso}%"></div>
+        </div>
+        <div class="build-card-bottom">
+          <span class="build-visibility ${isPublico ? "publico" : "privado"}">${isPublico ? "Pública" : "Privada"}</span>
+          <time class="build-card-date font-2-xs"></time>
+        </div>
       </div>
     `;
 
-    artigo.querySelector(".build-card-title").textContent = build.titulo;
+    const menuTrigger = artigo.querySelector(".build-menu-trigger");
+    menuTrigger.dataset.buildTitle = build.titulo;
+
+    const titulo = artigo.querySelector(".build-card-title");
+    titulo.textContent = build.titulo;
+    if (build.travada) {
+      const cadeado = document.createElement("i");
+      cadeado.className = "fa-solid fa-lock build-card-lock";
+      cadeado.setAttribute("aria-hidden", "true");
+      titulo.append(cadeado);
+    }
     artigo.querySelector(".build-card-desc").textContent = build.descricao;
     artigo.querySelector(".build-card-date").textContent = formatarDataHora(
       build.criadoEm,
     );
     artigo.querySelector(".build-card-date").dateTime = build.criadoEm;
+    iniciarIndicadores(artigo);
 
     if (build.travada) {
       artigo.querySelector('[data-acao="visibilidade"]').disabled = true;
@@ -444,6 +462,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const link = document.createElement("a");
     link.href = url;
     link.download = nome;
+    link.setAttribute("aria-label", "Baixar arquivo " + nome);
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -487,10 +506,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   lista.addEventListener("click", async (evento) => {
+    if (evento.target.closest(".build-indicator")) return;
     if (!evento.target.closest(".build-menu-wrap")) {
       const selecionado = evento.target.closest(".build-card");
       if (selecionado) {
-        window.location.href = "./configuracao-build.html?id=" + encodeURIComponent(selecionado.dataset.id);
+        navegarPara("./configuracao-build.html?id=" + encodeURIComponent(selecionado.dataset.id));
         return;
       }
     }
@@ -502,6 +522,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!jaAberto) {
         wrap.classList.add("open");
         trigger.setAttribute("aria-expanded", "true");
+        trigger.setAttribute("aria-label", "Fechar menu da build " + trigger.dataset.buildTitle);
       }
       return;
     }
@@ -607,6 +628,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (acao === "deletar") {
+      if (build.travada) {
+        showToast("Destranque a build para deletar.");
+        return;
+      }
       idExclusao = build.id;
       abrirModal(modalDeletar);
     }
@@ -619,10 +644,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   btnCriar.addEventListener("click", () => {
-    window.location.href = "./configuracao-build.html";
+    if (builds.length >= LIMITE_BUILDS) return;
+    navegarPara("./configuracao-build.html");
   });
 
   btnImportar.addEventListener("click", () => {
+    if (builds.length >= LIMITE_BUILDS) { showToast("Limite de 3 builds atingido."); return; }
     showToast("A importação de builds depende do backend.");
   });
 
@@ -666,6 +693,13 @@ document.addEventListener("DOMContentLoaded", () => {
   document
     .getElementById("confirm-build-delete")
     .addEventListener("click", () => {
+      const build = buscarBuild(idExclusao);
+      if (!build || build.travada) {
+        idExclusao = null;
+        fecharModal(modalDeletar);
+        showToast("Destranque a build para deletar.");
+        return;
+      }
       builds = builds.filter((item) => item.id !== idExclusao);
       idExclusao = null;
       fecharModal(modalDeletar);

@@ -1,5 +1,5 @@
-#services-page { height: auto; min-height: 100svh; }
-#services-container { padding: 72px var(--page-gutter); }
+#services-page { height: auto; min-height: 0; }
+#services-container { padding: 72px var(--page-gutter) 32px; }
 #cards-grid {
   width: min(1240px, 100%);
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -32,7 +32,7 @@
 @media (max-width: 700px) {
   #services-h1 { font-size: 2.4rem; }
   #services-p { font-size: .9rem; }
-  #services-container { padding-block: 56px; }
+  #services-container { padding-block: 56px 28px; }
   #cards-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .card-service { max-width: none; padding: 24px; }
 }

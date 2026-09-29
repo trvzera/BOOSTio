@@ -5,6 +5,7 @@ import { abrirBuild, guardarRascunho } from "../build/estado.js";
 import { selecionarPecaCompativel } from "../build/compatibilidade.js";
 import { avisar, mostrarFalha } from "../build/interface.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
+import { navegarPara } from "../components/page-loading.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const main = document.querySelector("#product-main");
@@ -27,15 +28,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       '<div class="product-detail-copy"><span class="component-category font-1-xs">' + categoria.nome + '</span><h1 class="font-1-xl">' + h(nomePeca(peca)) +
       '</h1><ul class="product-detail-highlights">' + detalhes.slice(3,7).map(([rotulo,valor]) => '<li class="font-2-xs"><span>' + h(rotulo) + '</span><strong>' + h(valor) + '</strong></li>').join("") +
       '</ul><span class="summary-eyebrow font-1-xs">Preço demonstrativo</span><strong class="summary-total font-1-xl">' + moeda(peca.preco) + '</strong>' +
-      '<button type="button" id="add-product" class="btn-primary" ' + (motivo ? 'disabled data-disabled-reason="' + h(motivo) + '"' : "") + '>' + iconeAnimado("plus") + 'Adicionar à build</button>' +
+      '<button type="button" id="add-product" class="btn-primary" aria-label="Adicionar à build: ' + h(nomePeca(peca)) + '" ' + (motivo ? 'disabled data-disabled-reason="' + h(motivo) + '"' : "") + '>' + iconeAnimado("plus") + 'Adicionar à build</button>' +
       '<p class="font-2-xs summary-note">' + h(motivo || "Sem novos conflitos detectados nas verificações disponíveis. Confirme os dados no fabricante.") + '</p></div></section>' +
       '<section class="product-stores" aria-labelledby="stores-title"><h2 class="font-1-l" id="stores-title">Onde comprar</h2><p class="font-2-xs summary-note">Confira preço, estoque e o modelo exato na loja. As buscas não representam ofertas confirmadas.</p><div class="store-grid">' +
-      ofertasPeca(peca).map((oferta) => '<article class="store-card glass-card"><a class="store-brand" href="' + h(oferta.url) + '" target="_blank" rel="noopener noreferrer"><img class="store-logo" src="' + h(oferta.logo) +
+      ofertasPeca(peca).map((oferta) => '<article class="store-card glass-card"><a class="store-brand" href="' + h(oferta.url) + '" target="_blank" rel="noopener noreferrer" aria-label="Abrir ' + h(oferta.loja) + ' em uma nova aba"><img class="store-logo" src="' + h(oferta.logo) +
       '" alt="' + oferta.loja + '"><span class="store-name font-1-m-b" hidden>' + oferta.loja + '</span></a>' +
       (oferta.preco != null ? '<strong class="store-price">' + moeda(oferta.preco) + '</strong>' : '<span class="store-price-unavailable">Preço ainda não cadastrado</span>') +
       '<p class="font-2-xs">' +
       (oferta.direta ? "Página do produto cadastrada" : "Busca pelo modelo · anúncio não cadastrado") + '</p><a class="btn-ghost" href="' + h(oferta.url) +
-      '" target="_blank" rel="noopener noreferrer">' + iconeAnimado("cart") + (oferta.direta ? "Comprar na loja" : "Buscar na loja") + '</a></article>').join("") + '</div></section>' +
+      '" target="_blank" rel="noopener noreferrer" aria-label="' + (oferta.direta ? "Comprar na loja" : "Buscar na loja") + ' ' + h(oferta.loja) + ' em uma nova aba">' + iconeAnimado("cart") + (oferta.direta ? "Comprar na loja" : "Buscar na loja") + '</a></article>').join("") + '</div></section>' +
       '<section class="product-specifications glass-card" aria-labelledby="spec-title"><h2 class="font-1-l" id="spec-title">Informações técnicas</h2><dl>' +
       detalhes.map(([rotulo,valor]) => '<div><dt class="font-2-xs">' + h(rotulo) + '</dt><dd class="font-1-xs">' + h(valor) + '</dd></div>').join("") +
       '</dl></section>';
@@ -45,7 +46,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       try {
         build = selecionarPecaCompativel(build, peca, catalogo);
         guardarRascunho(build);
-        location.href = "./configuracao-build.html?id=" + encodeURIComponent(build.id);
+        navegarPara("./configuracao-build.html?id=" + encodeURIComponent(build.id));
       } catch (erro) { avisar(erro.message); }
     };
   } catch (erro) { mostrarFalha(main, erro); }

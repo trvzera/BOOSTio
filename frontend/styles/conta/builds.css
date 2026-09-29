@@ -142,14 +142,19 @@
 
 .build-card {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 264px;
   background: var(--cor-1);
   border: 1px solid var(--cor-2);
   border-radius: 20px;
   padding: var(--espacamento-24) var(--espacamento-32);
   color: var(--cor-6);
+  font-family: var(--font-body);
   cursor: pointer;
   transition: 0.2s var(--ease);
 }
+.quota-actions button { white-space: nowrap; }
 
 .build-card:hover {
   transform: translateY(-5px);
@@ -174,12 +179,23 @@
   color: var(--cor-6);
   font-size: 1.15rem;
 }
+.build-card-lock {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: 8px;
+  background: var(--cor-4);
+  -webkit-mask: url("../../svgs/lock.svg") center / contain no-repeat;
+  mask: url("../../svgs/lock.svg") center / contain no-repeat;
+}
 
 .build-card-desc {
   color: var(--cor-4);
-  margin: var(--espacamento-8) 0 var(--espacamento-20);
+  margin: var(--espacamento-8) 0 0;
   max-width: 90%;
 }
+.build-card-desc:empty { display: none; }
+.build-card-meta { margin-top: auto; padding-top: var(--espacamento-20); }
 
 .build-card-percent {
   color: var(--cor-6);
@@ -205,24 +221,14 @@
   transition: width 0.35s var(--ease);
 }
 
-.build-card.complete .build-progress-fill {
-  background: var(--cor-d5);
-}
-
-.build-card.erro .build-progress-fill {
-  background: var(--cor-d1);
-}
-
-.build-card.warning .build-progress-fill {
-  background: var(--cor-d2);
-}
-
 .build-card-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--espacamento-12);
 }
+.build-title-line { flex: 1; }
+.build-card:has(.build-indicator[data-open]) { z-index: 110; }
 
 .build-status {
   display: inline-flex;
@@ -415,6 +421,24 @@
 #delete-build-modal .modal-box h3 {
   color: var(--cor-6);
 }
+
+#edit-description {
+  display: block;
+  width: 100%;
+  min-height: 144px;
+  resize: vertical;
+  padding: 13px 16px;
+  background: var(--cor-0);
+  border: 1px solid var(--cor-2);
+  border-radius: 12px;
+  color: var(--cor-6);
+  font-size: 1rem;
+  line-height: 1.5;
+  font-family: var(--font-body);
+  transition: border-color .2s var(--ease);
+}
+#edit-description:focus { outline: none; border-color: var(--cor-p1); }
+#edit-description::placeholder { color: var(--cor-3); }
 
 #delete-build-modal .modal-box h3 {
   color: var(--cor-d1);

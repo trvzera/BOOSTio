@@ -1,9 +1,10 @@
 import { categorias, perifericos } from "./catalogo.js";
-import { itensSelecionados, informacoesRam, selecionarPeca } from "./estado.js";
+import { itensSelecionados, itensCategoria, informacoesRam, informacoesArmazenamento, conflitosArmazenamento, selecionarPeca } from "./estado.js";
+import { validarEncaixe, conexaoDisco } from "./hardware.js";
 
 export function avaliarBuild(build,catalogo) {
-  const get = cat => catalogo.find(p => p.id === build.componentes[cat]?.id && p.categoria === cat);
-  const erros = [], avisos = [], infoRam = informacoesRam(build,catalogo);
+  const get = cat => catalogo.find(p => p.id === itensCategoria(build,cat)[0]?.id && p.categoria === cat);
+  const erros = [], avisos = [], dicas = [], infoRam = informacoesRam(build,catalogo);
   const cpu = get("processador"), placa = get("placa_mae"), fonte = get("fonte"), gabinete = get("gabinete");
   const rams = infoRam.itens.filter(r => r.peca);
   let preco = 0, watts = 0;
@@ -28,7 +29,7 @@ export function avaliarBuild(build,catalogo) {
     if (rams[0] && (ram.ddr !== rams[0].peca.ddr || Number(ram.frequencia_mhz) !== Number(rams[0].peca.frequencia_mhz)))
       erros.push("As memórias precisam ter o mesmo padrão DDR e a mesma frequência.");
   }
-  if (placa && infoRam.usados > infoRam.slots) erros.push("Há mais módulos de RAM do que slots disponíveis.");
+  if (placa && infoRam.usados > infoRam.slots) erros.push("Há mais pentes de RAM do que slots disponíveis.");
   if (placa?.memoria_maxima_gb && infoRam.capacidade > Number(placa.memoria_maxima_gb))
     erros.push("A capacidade de RAM supera o máximo informado da placa-mãe.");
   if (new Set(rams.map(r => r.peca.id)).size > 1)
@@ -43,7 +44,7 @@ export function avaliarBuild(build,catalogo) {
     if (cooler && cpu && cooler.compatibilidade) {
       const sockets = String(cooler.compatibilidade).toUpperCase().split(/[,;/\s]+/);
       if (sockets.includes("INTEL") || sockets.includes("AMD"))
-        avisos.push("Confirme no fabricante o suporte do cooler ao socket " + cpu.soquete + ".");
+        dicas.push("Confirme no fabricante o suporte do cooler ao socket " + cpu.soquete + ".");
       else if (!sockets.includes(String(cpu.soquete).toUpperCase()))
         erros.push("O cooler não lista o socket do processador.");
     }
@@ -52,19 +53,25 @@ export function avaliarBuild(build,catalogo) {
   const formatos = String(gabinete?.formatos_placa_mae || "").toUpperCase().split(/[,;/]+/).map(v => v.trim());
   if (placa && gabinete?.formatos_placa_mae && !formatos.includes(String(placa.formato).toUpperCase()))
     erros.push("O gabinete não lista o formato da placa-mãe.");
-  const cooler = get("air_cooler");
-  if (cooler && gabinete?.tamanho_max_cooler_mm && Number(cooler.dimensoes) > Number(gabinete.tamanho_max_cooler_mm))
-    erros.push("O air cooler ultrapassa a altura suportada pelo gabinete.");
-  if (get("water_cooler") && gabinete && !gabinete.suporte_water_cooler)
-    erros.push("O gabinete não informa suporte a water cooler.");
-  if (get("ssd")?.formato === "M.2" && placa && !Number(placa.quantidade_slots_m2))
-    erros.push("A placa-mãe não informa um slot M.2 para este SSD.");
+  const discos = informacoesArmazenamento(build,catalogo);
+  erros.push(...conflitosArmazenamento(discos));
+  if (discos.itens.length) {
+    if (!placa) dicas.push("Selecione a placa-mãe para conferir as conexões de armazenamento.");
+    if (discos.itens.some(({peca}) => !conexaoDisco(peca))) dicas.push("Há discos sem conexão identificada; confirme a interface antes de duplicar.");
+    if (placa && ((discos.m2 && discos.limites.m2 == null) || (discos.sata && discos.limites.sata == null)))
+      dicas.push("Faltam as quantidades de slots M.2 ou portas SATA da placa-mãe para confirmar o armazenamento.");
+    if (placa && discos.m2Sata && discos.limites.m2Sata == null) dicas.push("Confirme quais slots M.2 da placa-mãe aceitam SSD SATA.");
+    if (placa && discos.limites.compartilhamentoDesconhecido) dicas.push("Confirme se o SSD M.2 SATA desativa alguma porta SATA da placa-mãe.");
+  }
+  const encaixe = validarEncaixe({gpu:get("placa_video"),air:get("air_cooler"),water:get("water_cooler"),gabinete,
+    fans:itensSelecionados(build,catalogo).filter(p => p.categoria === "fan")});
+  erros.push(...encaixe.erros); dicas.push(...encaixe.avisos);
   const grupos = ["processador","placa_mae","memoria_ram","armazenamento","placa_video","fonte","gabinete","fan","refrigeracao"];
   const preenchidos = grupos.filter(cat => cat === "armazenamento" ? get("ssd") || get("hd")
     : cat === "refrigeracao" ? get("air_cooler") || get("water_cooler") || cpu?.cooler
     : cat === "placa_video" ? get(cat) || cpu?.videointegrado
     : cat === "memoria_ram" ? rams.length : get(cat)).length;
-  return {erros:[...new Set(erros)],avisos:[...new Set(avisos)],faltam,preco,watts:Math.round(watts),
+  return {erros:[...new Set(erros)],avisos:[...new Set(avisos)],dicas:[...new Set(dicas)],faltam,preco,watts:Math.round(watts),
     preenchidos,total:grupos.length,status:erros.length ? "erro" : faltam.length ? "incompleta" : avisos.length ? "atencao" : "completa"};
 }
 export function selecionarPecaCompativel(build,peca,catalogo) {

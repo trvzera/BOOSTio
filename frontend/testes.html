@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratório de recursos — BOOSTio</title>
+  <script type="module" src="./js/pages/loading.js" defer></script>
+  <script type="module" src="./js/pages/testes.js" defer></script>
+  <link rel="icon" type="image/webp" href="./imgs/favicon.webp">
+  <link rel="stylesheet" href="./styles/style.css">
+  <link rel="stylesheet" href="./styles/paginas/testes.css">
+  <meta name="description" content="A Boostio é uma plataforma que simplifica a montagem de computadores,
+  ajudando você a escolher as peças ideais com base no seu objetivo,
+  orçamento e necessidade, tudo com precisão e confiança.">
+  <style>
+    body.menu-test-page { height: auto; min-height: 100vh; color: var(--cor-6); overflow-x: clip; }
+    .test-logo { position: absolute; top: 28px; left: 32px; width: 110px; }
+    .test-main { display: block; max-width: 1100px; margin: auto; padding: 160px 32px 130px; }
+    .test-main h1 { max-width: 700px; font-size: clamp(2.3rem, 6vw, 4.8rem); line-height: 1.1; margin: 20px 0; }
+    .test-main > p { color: var(--cor-4); max-width: 680px; line-height: 1.8; }
+    .test-kicker { color: var(--cor-p1); letter-spacing: .08em; text-transform: uppercase; }
+    .test-panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 60px; }
+    .test-panel { border: 1px solid var(--cor-2); border-radius: 22px; padding: 28px; }
+    .test-panel p { color: var(--cor-4); margin: 12px 0 24px; }
+    .test-panel .btn-ghost { display: inline-block; }
+    @media(max-width: 700px) { .test-panels { grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: 32px; } }
+    @media(max-width: 600px) { .test-main { padding: var(--page-top) 16px 112px; } .test-panel { padding: 20px; } }
+    @media(prefers-reduced-motion: reduce) { .experimental-menu * { transition-duration: .01ms !important; transition-delay: 0ms !important; } }
+  </style>
+</head>
+
+<body class="menu-test-page">
+  <div data-site-navigation data-menu-preview></div>
+  <div class="decoration decoration-1" aria-hidden="true"></div>
+  <div class="decoration decoration-2" aria-hidden="true"></div>
+  <main class="test-main">
+    <span class="test-kicker font-1-xs">Laboratório BOOSTio</span>
+    <h1 class="font-1-xxl">Experimente novos recursos.</h1>
+    <p class="font-2-s">Teste a aparência de novos recursos antes de levá-los ao site: desempenho, comparação de builds e budget no perfil. O menu hamburger permanece visível aqui mesmo sem login.</p>
+    <div class="test-panels">
+      <section class="test-panel glass-card"><h2 class="font-1-l">Editor da build</h2><p class="font-2-xs">Selecione as peças e confira o resumo da configuração.</p><a class="btn-secondary" href="./pages/configuracao-build.html" aria-label="Abrir editor da build">Abrir editor</a></section>
+      <section class="test-panel glass-card"><h2 class="font-1-l">Componentes</h2><p class="font-2-xs">Veja o catálogo de peças e as informações técnicas.</p><a class="btn-ghost" href="./pages/pecas.html?categoria=processador" aria-label="Ver processadores no catálogo">Ver processadores</a></section>
+      <section class="test-panel glass-card"><h2 class="font-1-l">Teste anterior</h2><div class="login-divider"><span class="login-line"></span><p class="font-1-s">Ou se preferir</p><span class="login-line"></span></div><button class="btn-login-secondary" type="button" aria-label="Logar com Google (demonstração)">Logar com Google</button></section>
+    </div>
+
+    <section class="test-feature" id="teste-desempenho" aria-labelledby="performance-title">
+      <div class="test-feature-head">
+        <span class="test-kicker font-1-xs">Experimento · desempenho</span>
+        <h2 class="font-1-xl" id="performance-title">Testar minha build.</h2>
+        <p class="font-2-s">Prévia do botão no topo da montagem. Ele só fica disponível quando a build chega a 100%. Ainda não há FPS integrado.</p>
+      </div>
+      <div class="test-placement glass-card">
+        <span class="test-placement-label font-1-xs">No topo da montagem</span>
+        <div class="test-builder-preview"><div><strong class="font-1-l">Configure sua build.</strong><p class="font-2-xs" id="preview-build-progress">Verificando peças selecionadas…</p></div><button type="button" class="test-benchmark-button" id="preview-builder-test" aria-label="Testar build na prévia da montagem" data-disabled-reason="Complete 100% das peças para testar a build." disabled>Testar build</button></div>
+      </div>
+      <div class="test-feature-panel glass-card test-performance-panel">
+        <div class="test-field-row">
+          <label class="test-field font-1-s" for="performance-build">Build para avaliar<select id="performance-build"></select></label>
+          <label class="test-field font-1-s" for="performance-resolution">Resolução desejada<select id="performance-resolution"><option value="1080p">1080p</option><option value="1440p">1440p</option></select></label>
+        </div>
+        <div class="test-actions"><button type="button" class="btn-primary" id="performance-check" aria-label="Verificar dados da build para estimativa de FPS" data-disabled-reason="Complete 100% das peças para verificar a build." disabled>Verificar dados da build</button></div>
+        <p class="test-feedback font-2-xs" id="performance-feedback" role="status" aria-live="polite">Escolha a build e confira os dados necessários.</p>
+        <div class="test-performance-details" id="performance-details" hidden></div>
+      </div>
+      <p class="test-muted font-2-xs test-footnote">O FPS mostrado futuramente será uma estimativa da combinação entre processador e placa de vídeo, não uma medição da sua máquina. O resultado pode variar com memória RAM, drivers, temperatura, configurações gráficas e outros fatores. CPU e GPU precisarão corresponder aos modelos aceitos pelo provedor; nenhum valor será inventado pelo front-end.</p>
+    </section>
+
+    <section class="test-feature" id="teste-comparacao" aria-labelledby="comparison-title">
+      <div class="test-feature-head">
+        <span class="test-kicker font-1-xs">Experimento 01 · suas builds</span>
+        <h2 class="font-1-xl" id="comparison-title">Compare configurações.</h2>
+        <p class="font-2-s">Na lista de builds, o botão abre uma comparação direta quando há apenas duas. Com três ou mais, você escolhe quais comparar. É possível ajustar a seleção sem fechar o modal.</p>
+      </div>
+      <div class="test-feature-panel glass-card">
+        <div class="test-compare-launch"><div><strong class="font-1-m-b">Suas builds</strong><p class="font-2-xs" id="compare-available">Carregando builds de teste…</p></div><button type="button" class="btn-primary" id="compare-button" aria-label="Comparar builds" data-disabled-reason="São necessárias pelo menos duas builds." disabled>Comparar builds</button></div>
+        <div id="compare-build-list" class="test-compare-build-list" aria-label="Builds disponíveis para comparação"></div>
+        <label class="test-demo-toggle font-2-xs" for="compare-third"><input type="checkbox" id="compare-third"><span>Mostrar terceira build demonstrativa</span></label>
+      </div>
+    </section>
+
+    <section class="test-feature" id="teste-prontas" aria-labelledby="ready-title">
+      <div class="test-feature-head">
+        <span class="test-kicker font-1-xs">Experimento 02 · configurações prontas</span>
+        <h2 class="font-1-xl" id="ready-title">Exemplos para explorar.</h2>
+        <p class="font-2-s">Três montagens demonstrativas com peças do catálogo atual. Abra a lista para conferir os componentes.</p>
+      </div>
+      <div class="test-demo-grid" id="ready-builds"></div>
+    </section>
+
+    <section class="test-feature" id="teste-budget" aria-labelledby="budget-title">
+      <div class="test-feature-head">
+        <span class="test-kicker font-1-xs">Experimento 03 · budget</span>
+        <h2 class="font-1-xl" id="budget-title">Budget no perfil.</h2>
+        <p class="font-2-s">Prévia de como o usuário registraria seu orçamento disponível no perfil e decidiria se novas configurações podem partir desse valor.</p>
+      </div>
+      <div class="test-feature-panel glass-card">
+        <label class="test-field font-1-s" for="test-budget">Budget disponível (R$)
+          <input id="test-budget" type="number" min="0" max="1000000" step="50" inputmode="decimal" placeholder="Ex.: 2000" aria-describedby="budget-help">
+        </label>
+        <p class="test-muted font-2-xs" id="budget-help">O valor é um planejamento, não um saldo bancário. Não é descontado automaticamente.</p>
+        <div class="test-actions"><button type="button" class="btn-primary" id="budget-save" aria-label="Guardar budget neste teste">Guardar budget neste teste</button></div>
+        <p class="test-feedback font-2-xs" id="budget-feedback" role="status" aria-live="polite">Nenhum valor registrado nesta sessão.</p>
+        <label class="test-budget-consent font-2-xs" for="budget-use-new"><input type="checkbox" id="budget-use-new" disabled aria-describedby="budget-optin-help"><span><strong>Usar este budget nas novas configurações</strong><small id="budget-optin-help">Ao iniciar outra montagem, o formulário poderá usar esse valor como limite inicial. Você poderá ajustá-lo para cada build.</small></span></label>
+        <div class="test-budget-preview"><span class="test-placement-label font-1-xs">Prévia · nova configuração</span><label class="test-field font-1-s" for="budget-new-build-input">Orçamento desta build <output id="budget-new-build-value" for="budget-new-build-input">R$ 0,00</output><input id="budget-new-build-input" type="range" min="0" max="10000" step="50" value="0"></label><p class="font-2-xs" id="budget-new-build-preview" role="status" aria-live="polite">Sem budget aplicado automaticamente.</p></div>
+      </div>
+      <p class="test-muted font-2-xs test-footnote">Somente demonstração: o valor e a escolha são guardados nesta sessão, não no perfil nem no backend.</p>
+    </section>
+
+    <section class="test-feature" id="teste-melhorias" aria-labelledby="upgrade-title">
+      <div class="test-feature-head">
+        <span class="test-kicker font-1-xs">Experimento 04 · melhorias do setup</span>
+        <h2 class="font-1-xl" id="upgrade-title">Explore trocas compatíveis.</h2>
+        <p class="font-2-s">Escolha uma ou duas peças para trocar. Clique em uma candidata para vê-la entrar imediatamente na build de teste, com orçamento e compatibilidade conferidos em conjunto.</p>
+      </div>
+      <div class="test-feature-panel glass-card">
+        <div class="test-field-row">
+          <label class="test-field font-1-s" for="upgrade-build">Build atual<select id="upgrade-build"></select></label>
+          <fieldset class="test-upgrade-categories"><legend class="font-1-s">Peças que deseja avaliar</legend><label class="font-2-xs"><input type="checkbox" name="upgrade-category" value="processador" checked>Processador</label><label class="font-2-xs"><input type="checkbox" name="upgrade-category" value="placa_video">Placa de vídeo</label></fieldset>
+        </div>
+        <div class="test-upgrade-rank" role="group" aria-label="Critério das recomendações"><button type="button" class="is-active" aria-label="Melhor preço" aria-pressed="true">Melhor preço</button><button type="button" aria-label="Melhor desempenho" data-disabled-reason="Precisa de benchmarks comparáveis; ainda não integrado." disabled>Melhor desempenho</button><button type="button" aria-label="Mais vendida nas lojas" data-disabled-reason="Precisa de dados reais de vendas das lojas; ainda não integrado." disabled>Mais vendida nas lojas</button></div>
+        <div class="test-actions"><button type="button" class="btn-primary" id="upgrade-search" aria-label="Buscar candidatas compatíveis para troca">Buscar candidatas</button></div>
+        <p class="test-feedback font-2-xs" id="upgrade-feedback" role="status" aria-live="polite">Registre um budget para testar a busca.</p>
+        <div class="test-upgrade-preview" id="upgrade-preview" aria-live="polite"></div>
+        <div class="test-candidates" id="upgrade-results" hidden></div>
+      </div>
+      <p class="test-muted font-2-xs">A troca altera somente a cópia exibida neste teste. Nada é gravado nas builds reais. Uma peça compatível não é necessariamente mais rápida; ganho real exige benchmarks comparáveis.</p>
+    </section>
+  </main>
+  <dialog class="test-compare-dialog" id="compare-dialog" aria-labelledby="compare-dialog-title">
+    <div class="test-compare-dialog-head"><div><span class="test-kicker font-1-xs">Laboratório · comparação</span><h2 class="font-1-l" id="compare-dialog-title">Compare suas builds.</h2></div><button type="button" class="test-dialog-close" id="compare-close" aria-label="Fechar comparação">×</button></div>
+    <div id="compare-selection" hidden><p class="test-muted font-2-xs">Selecione duas ou três builds para comparar. Você pode alterar essa escolha depois.</p><div id="compare-options" class="test-choice-list" role="group" aria-label="Builds disponíveis para comparação"></div><div class="test-actions"><button type="button" class="btn-primary" id="compare-confirm" aria-label="Ver comparação" data-disabled-reason="Selecione pelo menos duas builds." disabled>Ver comparação</button></div><p class="test-feedback font-2-xs" id="compare-feedback" role="status" aria-live="polite"></p></div>
+    <div class="test-results" id="compare-results" hidden aria-live="polite"></div>
+  </dialog>
+
+</body>
+
+</html>

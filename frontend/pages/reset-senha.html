@@ -33,7 +33,7 @@
       <form id="reset-password-form">
         <div class="password-input-wrapper">
           <input type="password" placeholder="Nova senha" class="input-text" id="primary-password">
-          <button type="button" class="password-toggle fa-eye-slash" data-target="primary-password" aria-label="Mostrar senha" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button>
+          <button type="button" class="password-toggle fa-eye-slash" data-target="primary-password" aria-label="Mostrar senha" aria-pressed="false" aria-controls="primary-password"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button>
         </div>
 
         <div id="password-verification">
@@ -86,26 +86,26 @@
 
         <div class="password-input-wrapper">
           <input type="password" placeholder="Confirme a nova senha" class="input-text" id="confirm-password">
-          <button type="button" class="password-toggle fa-eye-slash" data-target="confirm-password" aria-label="Mostrar senha" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button>
+          <button type="button" class="password-toggle fa-eye-slash" data-target="confirm-password" aria-label="Mostrar confirmação da senha" aria-pressed="false" aria-controls="confirm-password"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button>
         </div>
         <p id="password-match-text" class="font-1-s"></p>
 
         <p id="reset-password-error" class="font-1-xs form-error"></p>
-        <button type="submit" class="btn-login" id="btn-reset-password" disabled>Redefinir senha</button>
+        <button type="submit" class="btn-login" id="btn-reset-password" aria-label="Redefinir senha" disabled>Redefinir senha</button>
       </form>
 
       <div id="reset-password-success" class="hidden">
         <div class="modal-icon"><i class="fa-solid fa-circle-check"></i></div>
         <h2 class="font-1-l">Senha redefinida!</h2>
         <p class="font-2-xs">Sua senha foi alterada com sucesso. Você já pode entrar com a nova senha.</p>
-        <a href="./login.html" class="btn-login" id="go-to-login">Ir para o login</a>
+        <a href="./login.html" class="btn-login" id="go-to-login" aria-label="Ir para o login">Ir para o login</a>
       </div>
 
       <div id="reset-password-invalid" class="hidden">
         <div class="modal-icon modal-icon-error"><i class="fa-solid fa-triangle-exclamation"></i></div>
         <h2 class="font-1-l">Link inválido ou expirado</h2>
         <p class="font-2-xs">Esse link de redefinição não é mais válido. Solicite um novo abaixo.</p>
-        <a href="./esqueci-senha.html" class="btn-login" id="request-new-link">Solicitar novo link</a>
+        <a href="./esqueci-senha.html" class="btn-login" id="request-new-link" aria-label="Solicitar novo link de recuperação">Solicitar novo link</a>
       </div>
     </div>
   </main>

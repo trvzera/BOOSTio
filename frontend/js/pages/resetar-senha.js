@@ -135,7 +135,8 @@ document.addEventListener("DOMContentLoaded", () => {
       icone.classList.toggle("fa-eye", !vendo);
       icone.classList.toggle("fa-eye-slash", vendo);
       icone.setAttribute("aria-pressed",String(!vendo));
-      icone.setAttribute("aria-label",vendo ? "Mostrar senha" : "Ocultar senha");
+      const campo = icone.dataset.target === "confirm-password" ? "confirmação da senha" : "senha";
+      icone.setAttribute("aria-label", (vendo ? "Mostrar " : "Ocultar ") + campo);
     });
   });
 

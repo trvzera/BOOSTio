@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
     painel.classList.remove("question-enter");
     void painel.offsetWidth;
     painel.classList.add("question-enter");
-    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Montagem inteligente · ${pergunta.tag}</span><h1 class="font-1-xl">${pergunta.titulo}</h1><p class="font-2-s">${pergunta.descricao}</p></div><div class="manual-build"><h2 class="font-1-m-b">Deseja montar manualmente?</h2><p class="font-2-s">Escolha os componentes da sua build por conta própria no editor.</p><a href="./configuracao-build.html" class="btn-primary-form">Montar manualmente</a></div>`;
+    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Montagem inteligente · ${pergunta.tag}</span><h1 class="font-1-xl">${pergunta.titulo}</h1><p class="font-2-s">${pergunta.descricao}</p></div><div class="manual-build"><h2 class="font-1-m-b">Deseja montar manualmente?</h2><p class="font-2-s">Escolha os componentes da sua build por conta própria no editor.</p><a href="./configuracao-build.html" class="btn-primary-form" aria-label="Montar manualmente no editor de build">Montar manualmente</a></div>`;
   }
 
   function opcoesHtml(pergunta) {
@@ -203,7 +203,8 @@ document.addEventListener("DOMContentLoaded", () => {
     void conteudo.offsetWidth;
     conteudo.classList.add("question-enter");
     conteudo.classList.toggle("pieces-question-content", pergunta.chave === "pecas");
-    conteudo.innerHTML = `<div class="options-heading"><p class="font-1-m-b">${pergunta.multipla ? "Selecione as opções aplicáveis" : "Escolha uma opção"}</p><span class="font-2-xs">${indiceAtual + 1} de ${perguntas.length}</span></div><fieldset class="question-options ${pergunta.multipla ? "pieces-grid" : ""}"><legend class="sr-only">${pergunta.titulo}</legend>${opcoesHtml(pergunta)}</fieldset>${pergunta.chave === "orcamento" ? rangeHtml() : ""}<div id="form-navigation"><button type="button" class="btn-ghost" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}><i class="fa-solid fa-arrow-left"></i> Etapa anterior</button><button type="button" class="btn-primary-form" id="next-question" ${podeAvancar() ? "" : "disabled"}>${indiceAtual === perguntas.length - 1 ? "Gerar configuração" : "Avançar"} <i class="fa-solid fa-arrow-right"></i></button></div>`;
+    const rotuloAvancar = indiceAtual === perguntas.length - 1 ? "Gerar configuração" : "Avançar";
+    conteudo.innerHTML = `<div class="options-heading"><p class="font-1-m-b">${pergunta.multipla ? "Selecione as opções aplicáveis" : "Escolha uma opção"}</p><span class="font-2-xs">${indiceAtual + 1} de ${perguntas.length}</span></div><fieldset class="question-options ${pergunta.multipla ? "pieces-grid" : ""}"><legend class="sr-only">${pergunta.titulo}</legend>${opcoesHtml(pergunta)}</fieldset>${pergunta.chave === "orcamento" ? rangeHtml() : ""}<div id="form-navigation"><button type="button" class="btn-ghost" aria-label="Etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}><i class="fa-solid fa-arrow-left"></i> Etapa anterior</button><button type="button" class="btn-primary-form" id="next-question" aria-label="${rotuloAvancar}" ${podeAvancar() ? "" : "disabled"}>${rotuloAvancar} <i class="fa-solid fa-arrow-right"></i></button></div>`;
     conteudo
       .querySelector(".btn-ghost")
       .addEventListener("click", () => navegarPara(indiceAtual - 1));

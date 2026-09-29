@@ -1,4 +1,5 @@
 import { acompanharCarregamento } from "../components/page-loading.js";
+import { completarCatalogoDemo } from "./hardware.js";
 export const perifericos = ["monitor", "teclado", "mouse", "fone"];
 export const categorias = [
   { id: "processador", nome: "Processador", sigla: "CPU", obrigatoria: true },
@@ -35,7 +36,7 @@ export function carregarCatalogo() {
       return resposta.json();
     }).then(catalogo => {
       try { sessionStorage.setItem("boostio:catalogo-pronto","1"); } catch {}
-      return catalogo;
+      return completarCatalogoDemo(catalogo);
     }).catch(erro => { carregamento = null; throw erro; }));
   return carregamento;
 }
@@ -98,7 +99,12 @@ export const rotulosTecnicos = {
   chipset: "Chipset", formato: "Formato", tipo_memoria: "Tipo de memória",
   quantidade_slots_ram: "Slots de RAM", memoria_maxima_gb: "RAM máxima (GB)",
   quantidade_slots_m2: "Slots M.2", capacidade_gb: "Capacidade (GB)", ddr: "Geração",
-  frequencia_mhz: "Frequência (MHz)", latencia: "Latência", quantidade_pentes: "Módulos no kit",
+  quantidade_portas_sata:"Portas SATA", quantidade_slots_m2_sata:"Slots M.2 com suporte a SATA",
+  portas_sata_desativadas_por_m2_sata:"Portas SATA desativadas por M.2 SATA",
+  comprimento_mm:"Comprimento (mm)", altura_mm:"Altura (mm)",
+  radiadores_suportados_mm:"Radiadores suportados (mm)", tamanhos_fan_suportados_mm:"Fans suportadas (mm)",
+  quantidade_max_fans:"Posições de fans (total)",
+  frequencia_mhz: "Frequência (MHz)", latencia: "Latência", quantidade_pentes: "Pentes no kit",
   iluminacao: "Iluminação", potencia: "Potência (W)", tamanho_mm: "Tamanho (mm)",
   compatibilidade: "Sockets suportados", interface: "Interface", tipo: "Tipo",
   memoria_gb: "Memória de vídeo (GB)", interface_memoria: "Interface da memória",
