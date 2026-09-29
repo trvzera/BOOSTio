@@ -1,8 +1,5 @@
-from services.scapring_service.buscar_dados_scapring_service import BuscarDadosScapringService
+from services.scapring_service.mercado_livre_scapring_service import MercadoLivreScapringService
 
-url = "https://www.kabum.com.br/produto/398510/placa-mae-asus-prime-a520m-k-amd-am3-matx-ddr4-1500-m0eay0"
+service = MercadoLivreScapringService()
 
-service = BuscarDadosScapringService()
-preco = service.executar(url)
-
-print(preco)
+produtos = service.executar("/search?q=Ryzen 7 5700g")
