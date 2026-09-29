@@ -2,8 +2,10 @@
 import "../header.js";
 import "../services-carousel.js";
 import "../auth/auth.js";
+import { iniciarScrollReveal } from "../components/scroll-reveal.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+  iniciarScrollReveal();
   const videos = document.querySelectorAll(
     "#main-page video, #about-page video",
   );

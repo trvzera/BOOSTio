@@ -13,7 +13,7 @@ function carregarLottie() {
 const animacoesCarregadas = new Map();
 
 export async function registrarAnimacao(id, path, opcoes = {}) {
-  const container = document.querySelector(`#${id}`);
+  const container = document.getElementById(id);
 
   if (!container) {
     console.warn(`Container #${id} não encontrado.`);

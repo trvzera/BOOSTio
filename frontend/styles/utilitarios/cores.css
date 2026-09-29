@@ -24,8 +24,17 @@
 
   /* DETALHES */
   --cor-d1: #FF3B30;
-  --cor-d2: #FF9500;
+  --cor-d2: #FFCC00;
   --cor-d3: #FFCC00;
   --cor-d4: #aac734;
   --cor-d5: #34C759;
+  --status-success: var(--cor-d5);
+  --status-warning: var(--cor-d2);
+  --status-error: var(--cor-d1);
+  --text-primary: var(--cor-6);
+  --text-secondary: #a1a1a6;
+  --brand-gradient: linear-gradient(115deg, var(--cor-p1), #50b8ff);
+  --radius-control: 999px;
+  --radius-card: 20px;
+  --motion-fast: 180ms;
 }

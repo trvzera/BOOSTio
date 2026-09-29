@@ -1,132 +1,43 @@
-@media (max-width: 1400px) {
-  #main-title {
-    font-size: 3.4rem;
-  }
-  #main-description {
-    width: 50%;
-    font-size: 1rem;
-  }
-  #about-container {
-    padding: 40px;
-  }
-  #text-about {
-    h1 {
-      font-size: 2.2rem;
-    }
-    p {
-      font-size: 0.9rem;
-    }
-  }
-  #pc-video {
-    width: 400px;
-    height: 400px;
-  }
-  #about-line {
-    height: 50%;
-  }
+/* Seções acompanham o conteúdo; não ficam limitadas a 100vh em landscape. */
+#main-page {
+  height: auto;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: var(--page-top) var(--page-gutter) 80px;
 }
-
-@media (max-width: 1000px) {
-  #main-title {
-    font-size: 2.6rem;
-  }
-  #main-description {
-    width: 60%;
-    font-size: 0.8rem;
-  }
-  #text-about {
-    h1 {
-      font-size: 2rem;
-    }
-    p {
-      font-size: 0.8rem;
-    }
-  }
-  #pc-video {
-    width: 350px;
-    height: 350px;
-  }
+#main-title { max-width: 100%; }
+#main-description { width: 45%; }
+#main-page .btn-primary { max-width: 100%; transform: none; }
+#main-page .btn-primary:hover { transform: translateY(-1px); }
+#about-page { height: auto; min-height: 100svh; }
+#about-container {
+  max-width: 1320px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) 1px minmax(0, .85fr);
+  height: auto;
+  min-height: inherit;
+  gap: clamp(24px, 3vw, 48px);
+  padding: 80px var(--page-gutter);
 }
+#text-about { width: 100%; min-width: 0; }
+#text-about .about-title { width: 100%; text-wrap: balance; }
+#text-about p { width: 100%; max-width: 56ch; line-height: 1.7; }
+#pc-video { width: 100%; height: auto; aspect-ratio: 1; z-index: auto; }
+#about-line { position: static; width: 1px; height: auto; align-self: stretch; }
 
 @media (max-width: 950px) {
-  #about-container {
-    flex-direction: column;
-    gap: 100px;
-  }
-  #text-about {
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    width: 100%;
-    h1 {
-      font-size: 2.3rem;
-    }
-    p {
-      font-size: 1rem;
-      width: 70%;
-    }
-  }
-  #about-line {
-    width: 0%;
-  }
+  #about-container { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 32px; }
+  #text-about { align-items: center; text-align: center; }
+  #pc-video { width: min(380px, 100%); }
+  #about-line { display: none; }
 }
-
-@media (max-width: 768px) {
-  #header-nav {
-    display: none;
-  }
-
-  #header-mobile {
-    display: flex;
-  }
+@media (max-width: 600px) {
+  #main-page { padding-bottom: 96px; }
+  #about-container { padding-block: 56px; gap: 24px; }
 }
-
-@media (max-width: 755px) {
-  #main-title {
-    font-size: 2rem;
-  }
-  #main-description {
-    width: 60%;
-    font-size: 0.7rem;
-  }
-  #text-about {
-    p {
-      width: 80%;
-    }
-  }
-}
-
-@media (max-width: 580px) {
-  #main-page {
-    padding: 10px;
-  }
-  #main-title {
-    font-size: 1.5rem;
-  }
-  #main-description {
-    width: 80%;
-    font-size: 0.8rem;
-  }
-  #main-page .btn-primary {
-    transform: scale(0.7);
-  }
-  #main-page .btn-primary:hover {
-    transform: translateY(-5px) scale(0.7);
-  }
-  #about-page {
-    height: max-content;
-  }
-  #text-about {
-    h1 {
-      font-size: 2rem;
-    }
-    p {
-      font-size: 0.9rem;
-    }
-  }
-
-  #signin-container,
-  #login-container {
-    transform: scale(0.8);
-  }
-}
+/* Tamanhos de título do layout original, sem reduzir o container com scale(). */
+@media (max-width: 1400px) { #main-title { font-size: 3.4rem; } #main-description { width: 50%; font-size: 1rem; } #text-about .about-title { font-size: 2.2rem; } #text-about p { font-size: .9rem; } }
+@media (max-width: 1000px) { #main-title { font-size: 2.6rem; } #main-description { width: 60%; font-size: .8rem; } #text-about .about-title { font-size: 2rem; } #text-about p { font-size: .8rem; } }
+@media (max-width: 950px) { #text-about .about-title { font-size: 2.3rem; } #text-about p { font-size: 1rem; } }
+@media (max-width: 755px) { #main-title { font-size: 2rem; } #main-description { font-size: .7rem; } }
+@media (max-width: 580px) { #main-title { font-size: 1.5rem; } #main-description { width: 80%; font-size: .8rem; } #text-about .about-title { font-size: 2rem; } #text-about p { font-size: .9rem; } }

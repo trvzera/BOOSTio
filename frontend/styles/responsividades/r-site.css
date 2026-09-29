@@ -1,0 +1,101 @@
+/* Base responsiva compartilhada. As regras específicas das páginas vêm depois. */
+:root {
+  --page-gutter: clamp(16px, 3vw, 32px);
+  --page-top: calc(104px + env(safe-area-inset-top, 0px));
+}
+
+body {
+  height: auto;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+img, video { max-width: 100%; }
+input, select, textarea, fieldset { min-width: 0; }
+:is(h1, h2, h3, p, a, label, dt, dd, strong) { overflow-wrap: anywhere; }
+:is(.disabled-tip-anchor, .glass-card, .modal-box, .terms-container) { min-width: 0; }
+.decoration { width: min(500px, 65vw); height: min(500px, 65vw); }
+:is(#main-page, #about-page, #services-page, #build-page) { scroll-margin-top: 90px; }
+
+/* O footer usa a mesma grade em todas as páginas que o incluem. */
+footer { width: 100%; max-width: 1240px; padding: clamp(20px, 3vw, 32px); }
+#top-footer { width: 100%; display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, .8fr) minmax(0, 1fr); align-items: start; gap: 32px; }
+#top-footer > * { min-width: 0; }
+#footer-hero { width: 100%; gap: 20px; }
+#footer-hero p { max-width: 480px; }
+#footer-nav-ul { gap: 4px; }
+:is(.footer-item a, #contact-section a, #about-section a, #terms-link) { display: inline-flex; align-items: center; min-height: 44px; }
+#footer-extra { display: grid; gap: 16px; }
+#about-section h2 { margin-top: 0; }
+#bottom-footer { gap: 16px; flex-wrap: wrap; }
+
+/* Login/cadastro/recuperação crescem com o conteúdo, inclusive com o teclado aberto. */
+#signin-page, #login-page, #forgot-password-page, #reset-password-page {
+  height: auto;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: var(--page-top) var(--page-gutter) calc(96px + env(safe-area-inset-bottom, 0px));
+  overflow: visible;
+}
+#signin-container, #login-container, #forgot-password-container, #reset-password-container {
+  width: min(380px, 100%);
+  min-width: 0;
+  flex-shrink: 0;
+  transform: none;
+}
+:is(#signin-container, #login-container, #forgot-password-container, #reset-password-container) > img { width: min(200px, 65%); margin-bottom: 20px; }
+#signin-title, #login-title, #forgot-password-title, #reset-password-title { text-align: center; }
+.login-divider { gap: 12px; }
+.login-divider p { flex-shrink: 0; }
+.login-line { flex: 1; width: auto; min-width: 0; }
+.password-rule-status { flex: 0 0 25px; }
+#password-rules { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#password-rules p { font-size: 1rem; }
+#terms-checkbox-field { align-items: flex-start; }
+.checkbox-wrapper { flex: 0 0 30px; }
+.password-toggle { right: 4px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; }
+.password-toggle::before { content: none !important; }
+.password-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.password-toggle .password-eye-slash { display: none; }
+.password-toggle.fa-eye-slash .password-eye-slash { display: block; }
+.password-toggle:active:not(:disabled), .toggle-password:active:not(:disabled) { transform: translateY(-50%) scale(.98); }
+.toggle-password { right: 2px; width: 44px; height: 44px; }
+#forgot-password-success, #reset-password-success, #reset-password-invalid { position: static; height: auto; }
+
+/* Modais e avisos: limite pela altura visível, sem cortar os controles. */
+.modal-overlay { padding: max(16px, env(safe-area-inset-top, 0px)) var(--page-gutter) max(16px, env(safe-area-inset-bottom, 0px)); }
+.modal-box, .share-dialog {
+  max-height: calc(100vh - 48px);
+  max-height: calc(100dvh - 48px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  overflow-wrap: anywhere;
+}
+.modal-actions { flex-wrap: wrap; }
+.modal-actions > .disabled-tip-anchor { padding: 0; }
+.modal-actions > .disabled-tip-anchor > button { width: 100%; }
+.code-inputs { display: grid; grid-template-columns: repeat(4, minmax(0, 52px)); gap: clamp(6px, 2vw, 12px); }
+.code-input { width: 100%; min-width: 0; }
+.toast, #builder-feedback { width: max-content; max-width: calc(100% - 32px); bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+.toast { border-radius: 16px; }
+.toast > span { min-width: 0; }
+
+.terms-page { padding-top: var(--page-top); overflow: visible; }
+.terms-acceptance { padding: clamp(16px, 3vw, 24px); }
+
+@media (max-width: 960px) {
+  #top-footer { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  #footer-hero { grid-column: 1 / -1; }
+}
+@media (max-width: 600px) {
+  /* 16px evita o zoom automático do Safari ao focar os campos. */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea { font-size: 1rem; }
+  .modal-box, .share-dialog { padding: 20px; }
+  .modal-actions { flex-direction: column; align-items: stretch; }
+  .modal-actions > *, .modal-actions > .disabled-tip-anchor > button { width: 100%; }
+  #bottom-footer { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .terms-page { padding: var(--page-top) 16px 96px; }
+}
+@media (max-width: 380px) {
+  #top-footer { grid-template-columns: minmax(0, 1fr); }
+  #password-rules { grid-template-columns: minmax(0, 1fr); }
+}

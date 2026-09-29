@@ -22,7 +22,7 @@
   align-items: start;
   justify-content: center;
   flex-direction: column;
-  h1 {
+  .about-title {
     margin-bottom: var(--espacamento-32);
     span {
       color: var(--cor-p1);

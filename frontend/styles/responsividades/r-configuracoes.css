@@ -1,27 +1,22 @@
+#settings-page { width: 100%; padding-top: var(--page-top); padding-inline: var(--page-gutter); }
+.profile-info { min-width: 0; }
+.profile-meta { gap: 8px; }
+.meta-pill { max-width: 100%; flex-wrap: wrap; }
+.meta-pill i { flex-shrink: 0; }
+.card-heading { align-items: flex-start; }
+.card-heading i { flex-shrink: 0; }
+.form-actions { flex-wrap: wrap; }
 @media (max-width: 600px) {
-  .profile-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .form-actions {
-    justify-content: stretch;
-  }
-  .form-actions .btn-primary,
-  .form-actions .btn-ghost {
-    flex: 1;
-  }
-  .danger-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .danger-row .btn-danger {
-    width: 100%;
-  }
+  #settings-page { padding-bottom: 96px; }
+  .settings-header { margin-bottom: 24px; }
+  .settings-card { padding: 20px; }
+  .profile-row { gap: 16px; align-items: flex-start; }
+  .avatar { width: 56px; height: 56px; font-size: 1.25rem; }
+  .form-actions { flex-direction: column; align-items: stretch; }
+  .form-actions > *, .form-actions > .disabled-tip-anchor > button { width: 100%; }
+  .danger-row { flex-direction: column; align-items: stretch; }
+  .danger-row .btn-danger { width: 100%; }
 }
-@media (max-width: 580px) {
-  #forgot-password-container,
-  #reset-password-container {
-    transform: scale(1);
-    width: 90%;
-  }
+@media (max-width: 380px) {
+  .profile-row { flex-direction: column; }
 }

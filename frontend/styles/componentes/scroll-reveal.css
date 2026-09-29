@@ -1,0 +1,24 @@
+:root {
+  --reveal-distance: 42px;
+  --reveal-blur: 6px;
+  --reveal-scale: 0.985;
+  --reveal-duration: 0.75s;
+  --reveal-move-duration: 0.9s;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .reveal-pending {
+    opacity: 0;
+    transform: translate3d(0, var(--reveal-distance), 0) scale(var(--reveal-scale));
+    filter: blur(var(--reveal-blur));
+    transition:
+      opacity var(--reveal-duration) ease,
+      transform var(--reveal-move-duration) cubic-bezier(0.22, 1, 0.36, 1),
+      filter var(--reveal-duration) ease;
+  }
+  .reveal-pending.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+}

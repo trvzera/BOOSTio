@@ -1,16 +1,17 @@
-@media (max-width: 1370px) {
-  .card-index {
-    font-size: 4rem;
-  }
-  .card-title {
-    font-size: 2rem;
-  }
-  .card-desc {
-    font-size: 1rem;
-  }
+#services-page { height: auto; min-height: 100svh; }
+#services-container { padding: 72px var(--page-gutter); }
+#cards-grid {
+  width: min(1240px, 100%);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 24px 0;
+  overflow: visible;
 }
+.card-service { min-width: 0; padding: 28px; }
+.card-desc { width: 100%; }
+.scroll-dots { display: none; }
 
-@media (max-width: 1150px) {
+/* O carrossel continua disponível no tablet, dentro da largura da seção. */
+@media (min-width: 701px) and (max-width: 1150px) {
   #cards-grid {
     display: flex;
     overflow-x: auto;
@@ -18,65 +19,20 @@
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    padding: 40px 24px;
-    margin-left: -24px;
-    margin-right: -24px;
+    gap: 20px;
+    padding: 24px 8px;
+    scroll-padding-inline: 8px;
   }
-
-  #cards-grid::-webkit-scrollbar {
-    display: none;
-  }
-
-  .card-service {
-    flex: 0 0 82%;
-    max-width: none;
-    scroll-snap-align: center;
-  }
+  #cards-grid::-webkit-scrollbar { display: none; }
+  .card-service { flex: 0 0 min(75%, 460px); max-width: 460px; scroll-snap-align: center; cursor: pointer; }
+  .scroll-dots { display: flex; justify-content: center; gap: 8px; margin-top: 16px; }
+  .scroll-dots .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cor-2); cursor: pointer; transition: .2s var(--ease); }
+  .scroll-dots .dot.active { background: var(--cor-p1); width: 20px; border-radius: 4px; }
 }
-
-@media (max-width: 1150px) and (min-width: 701px) {
-  .card-service {
-    cursor: pointer;
-  }
-
-  .scroll-dots {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: var(--espacamento-16);
-  }
-
-  .scroll-dots .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--cor-2);
-    cursor: pointer;
-    transition: 0.2s var(--ease);
-  }
-
-  .scroll-dots .dot.active {
-    background: var(--cor-p1);
-    width: 20px;
-    border-radius: 4px;
-  }
-}
-
 @media (max-width: 700px) {
-  #services-page {
-    height: max-content;
-  }
-  #services-container {
-    padding: 20px;
-  }
-  #cards-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-  #services-h1 {
-    font-size: 2.4rem;
-  }
-  #services-p {
-    font-size: 0.9rem;
-  }
+  #services-h1 { font-size: 2.4rem; }
+  #services-p { font-size: .9rem; }
+  #services-container { padding-block: 56px; }
+  #cards-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .card-service { max-width: none; padding: 24px; }
 }

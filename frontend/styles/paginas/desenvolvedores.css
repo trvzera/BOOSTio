@@ -26,22 +26,17 @@
 
 .developers-kicker {
   display: inline-flex;
-  margin-bottom: var(--espacamento-24);
-  padding: 8px 12px;
-  border: 1px solid rgba(0, 123, 255, 0.3);
-  border-radius: 50px;
-  background: rgba(0, 123, 255, 0.08);
+  margin-bottom: var(--espacamento-16);
   color: var(--cor-p1);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .developers-hero h1 {
   color: var(--cor-6);
-  font-size: clamp(3rem, 6vw, 5.8rem);
-  line-height: 1.02;
-  letter-spacing: -0.055em;
+  text-wrap: balance;
 }
+
+.developers-back { margin-bottom: var(--espacamento-32); color: var(--cor-6); }
+.developers-back:hover:not(:disabled) { color: var(--cor-p1); border-color: var(--cor-p1); }
 
 .developers-hero-copy > p {
   max-width: 660px;
@@ -66,16 +61,18 @@
   display: block;
   margin-bottom: var(--espacamento-12);
   color: var(--cor-p1);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .developers-section-heading h2 {
   color: var(--cor-6);
+  font-weight: 600;
+  line-height: 1.35;
+  text-wrap: balance;
 }
 
 .developers-section-heading > p {
-  max-width: 510px;
+  max-width: 46ch;
+  font-size: .95rem;
   color: var(--cor-4);
   line-height: 1.7;
 }
@@ -171,18 +168,22 @@
 .developer-info h3 {
   margin-bottom: var(--espacamento-8);
   color: var(--cor-6);
+  font-weight: 600;
+  line-height: 1.35;
 }
 
 .developer-role {
   display: block;
   margin-bottom: var(--espacamento-16);
   color: var(--cor-p1);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: .85rem;
+  font-weight: 400;
+  line-height: 1.5;
 }
 
 .developer-info p {
   color: var(--cor-4);
+  font-size: .95rem;
   line-height: 1.7;
 }
 
@@ -198,7 +199,6 @@
   border: 1px solid var(--cor-2);
   border-radius: 50px;
   color: var(--cor-4);
-  font-size: 0.68rem;
 }
 
 .developer-socials {
@@ -217,6 +217,8 @@
 .developer-socials a {
   position: relative;
   padding-bottom: 3px;
+  color: var(--cor-5);
+  font-size: .85rem;
   transition: color 0.2s var(--ease);
 }
 

@@ -1,130 +1,104 @@
-import {
-  registrarAnimacao,
-  destruirTodas,
-} from "./components/lottie-controller.js";
+import { iconeAnimado, iniciarIcones } from "./components/ui.js";
+import { linksVisitante, linksAutenticado } from "./components/navigation-config.js";
 
-const containerProfile = document.querySelector("#profile");
-const profileCheck = document.querySelector("#profile-check");
-const burgerMenu = document.querySelector("#burger-menu");
-const burgerCheck = document.querySelector("#burger-check");
+let navegacao;
+const pagina = nome => new URL("../pages/" + nome, import.meta.url).href;
 
-document.addEventListener("click", (e) => {
-  if (!burgerMenu.contains(e.target)) {
-    burgerCheck.checked = false;
+export function iniciarNavegacao() {
+  if (navegacao) return navegacao;
+  const host = document.querySelector("[data-site-navigation]") || document.body.appendChild(document.createElement("div"));
+  host.dataset.siteNavigation = "";
+  const preview = host.hasAttribute("data-menu-preview");
+  if (!document.querySelector(".site-brand")) {
+    const logo = document.createElement("a");
+    logo.className = "site-brand";
+    logo.href = pagina("index.html");
+    logo.setAttribute("aria-label", "BOOSTio — página inicial");
+    logo.innerHTML = '<img src="' + new URL("../imgs/logo.webp", import.meta.url).href + '" alt="BOOSTio" width="100" height="20">';
+    document.body.prepend(logo);
   }
-});
+  const links = (itens, perfil = false) => itens.map(item =>
+    '<a class="' + (perfil ? 'profile-link font-1-s' : 'site-menu-link') + '" href="' + pagina(item.pagina) + '"' +
+    (location.pathname.endsWith("/" + item.pagina) ? ' aria-current="page"' : "") + '>' +
+    '<span class="site-menu-link-label">' + (item.icone ? iconeAnimado(item.icone) : "") +
+    '<span>' + item.rotulo + '</span></span>' + (perfil ? "" : iconeAnimado("arrow")) + '</a>'
+  ).join("");
+  const conta = [
+    {pagina:"builds.html", rotulo:"Builds", icone:"build"},
+    {pagina:"configuracoes.html", rotulo:"Configurações", icone:"user"},
+  ];
+  host.innerHTML =
+    '<div id="profile" class="site-profile"><button type="button" class="profile-toggle" aria-label="Abrir menu do perfil" aria-expanded="false" aria-controls="profile-options">' +
+    iconeAnimado("profile") + '</button><nav id="profile-options" class="profile-panel" aria-label="Menu do perfil" aria-hidden="true" inert>' +
+    '<div class="site-menu-group" data-profile-guest>' + links(linksVisitante, true) + '</div>' +
+    '<div class="site-menu-group" data-profile-user hidden>' + links(conta, true) +
+    '<div class="site-menu-divider"></div><button type="button" class="profile-link font-1-s profile-logout" id="btn-logout">' +
+    '<span class="site-menu-link-label">' + iconeAnimado("logout") + '<span>Sair</span></span></button></div></nav></div>' +
+    '<div class="site-menu" data-site-menu' + (preview ? "" : " hidden") + '><nav id="site-menu-panel" class="site-menu-panel" aria-label="Navegação entre páginas" aria-hidden="true" inert>' +
+    '<div class="site-menu-group">' + links(linksAutenticado) + '</div></nav>' +
+    '<button type="button" class="site-menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="site-menu-panel">' +
+    '<span class="ui-lottie hamburger-animation" data-lottie="hamburger" aria-hidden="true"><span class="ui-icon-fallback hamburger-fallback"><span></span><span></span><span></span></span></span></button></div>';
 
-const listaDeslogado = document.querySelector("#profile-nav-list-signed-out");
-listaDeslogado.classList.add("active");
-
-async function iniciarAnimacoes() {
-  const ltProfile = await registrarAnimacao(
-    "profile",
-    "../lottie/profile.json",
-  );
-  const ltLogon = await registrarAnimacao(
-    "lottie-logon",
-    "../lottie/logon.json",
-  );
-  const ltLogin = await registrarAnimacao(
-    "lottie-login",
-    "../lottie/login.json",
-  );
-  const ltLogout = await registrarAnimacao(
-    "lottie-logout",
-    "../lottie/logout-lt.json",
-  );
-  const ltUser = await registrarAnimacao("lottie-user", "../lottie/user.json");
-  const ltBuild = await registrarAnimacao(
-    "lottie-build",
-    "../lottie/build.json",
-  );
-  const ltBurger = await registrarAnimacao(
-    "lottie-burger",
-    "../lottie/hamburger.json",
-  );
-
-  document.addEventListener("click", (e) => {
-    if (!containerProfile.contains(e.target)) {
-      profileCheck.checked = false;
-      ltProfile.setDirection(-1);
-      ltProfile.play();
+  const controles = [];
+  function configurar(container, painel, botao, rotulo, hover = false) {
+    let fixado = false, fechamento;
+    const controle = {container, painel, botao, alternar(aberto) {
+      clearTimeout(fechamento);
+      if (!aberto) fixado = false;
+      container.toggleAttribute("data-open", aberto);
+      painel.inert = !aberto;
+      painel.setAttribute("aria-hidden", String(!aberto));
+      botao.setAttribute("aria-expanded", String(aberto));
+      botao.setAttribute("aria-label", (aberto ? "Fechar " : "Abrir ") + rotulo);
+    }};
+    const abrir = () => {
+      controles.forEach(outro => { if (outro !== controle) outro.alternar(false); });
+      controle.alternar(true);
+    };
+    botao.addEventListener("click", () => {
+      const aberto = hover ? !fixado : !container.hasAttribute("data-open");
+      if (aberto) { abrir(); fixado = hover; }
+      else controle.alternar(false);
+    });
+    if (hover) {
+      container.addEventListener("pointerenter", e => {
+        if (e.pointerType === "mouse") abrir();
+      });
+      container.addEventListener("pointerleave", e => {
+        if (e.pointerType !== "mouse" || fixado) return;
+        fechamento = setTimeout(() => {
+          if (!painel.contains(document.activeElement)) controle.alternar(false);
+        }, 160);
+      });
+      container.addEventListener("focusin", abrir);
+      container.addEventListener("focusout", e => {
+        if (!fixado && !container.contains(e.relatedTarget) && !container.matches(":hover")) controle.alternar(false);
+      });
     }
+    painel.addEventListener("click", e => { if (e.target.closest("a,button")) controle.alternar(false); });
+    controles.push(controle);
+    return controle;
+  }
+  const perfil = configurar(host.querySelector(".site-profile"), host.querySelector("#profile-options"), host.querySelector(".profile-toggle"), "menu do perfil", true);
+  const hamburger = configurar(host.querySelector(".site-menu"), host.querySelector("#site-menu-panel"), host.querySelector(".site-menu-toggle"), "menu");
+  document.addEventListener("click", e => controles.forEach(c => { if (!c.container.contains(e.target)) c.alternar(false); }));
+  document.addEventListener("keydown", e => {
+    if (e.key !== "Escape") return;
+    controles.forEach(c => { if (c.container.hasAttribute("data-open")) { c.botao.focus(); c.alternar(false); } });
   });
-
-  containerProfile.addEventListener("mouseenter", () => {
-    if (!profileCheck.checked) {
-      ltProfile.setDirection(1);
-      ltProfile.play();
-    }
-  });
-
-  containerProfile.addEventListener("mouseleave", () => {
-    if (!profileCheck.checked) {
-      ltProfile.setDirection(-1);
-      ltProfile.play();
-    }
-  });
-
-  const btnLogon = document.getElementById("btn-logon");
-  btnLogon.addEventListener("mouseenter", () => {
-    ltLogon.setDirection(1);
-    ltLogon.play();
-  });
-  btnLogon.addEventListener("mouseleave", () => {
-    ltLogon.setDirection(-1);
-    ltLogon.play();
-  });
-
-  const btnLogin = document.getElementById("btn-login");
-  btnLogin.addEventListener("mouseenter", () => {
-    ltLogin.setDirection(1);
-    ltLogin.play();
-  });
-  btnLogin.addEventListener("mouseleave", () => {
-    ltLogin.setDirection(-1);
-    ltLogin.play();
-  });
-
-  const btnLogout = document.getElementById("btn-logout");
-  btnLogout.addEventListener("mouseenter", () => {
-    ltLogout.setDirection(1);
-    ltLogout.play();
-  });
-  btnLogout.addEventListener("mouseleave", () => {
-    ltLogout.setDirection(-1);
-    ltLogout.play();
-  });
-
-  const btnUser = document.getElementById("btn-user");
-  btnUser.addEventListener("mouseenter", () => {
-    ltUser.setDirection(1);
-    ltUser.play();
-  });
-  btnUser.addEventListener("mouseleave", () => {
-    ltUser.setDirection(-1);
-    ltUser.play();
-  });
-
-  const btnBuild = document.getElementById("btn-build");
-  btnBuild.addEventListener("mouseenter", () => {
-    ltBuild.setDirection(1);
-    ltBuild.play();
-  });
-  btnBuild.addEventListener("mouseleave", () => {
-    ltBuild.setDirection(-1);
-    ltBuild.play();
-  });
-
-  burgerCheck.addEventListener("click", () => {
-    if (burgerCheck.checked) {
-      ltBurger.setDirection(1);
-      ltBurger.play();
-    } else {
-      ltBurger.setDirection(-1);
-      ltBurger.play();
-    }
-  });
+  hamburger.painel.querySelectorAll(".site-menu-link").forEach((link, indice) => link.style.setProperty("--menu-item-index", indice));
+  navegacao = {host, perfil, hamburger, preview};
+  iniciarIcones(host);
+  return navegacao;
 }
 
-iniciarAnimacoes();
+export function atualizarNavegacao(autenticado) {
+  const {host, perfil, hamburger, preview} = iniciarNavegacao();
+  host.querySelector("[data-profile-guest]").hidden = Boolean(autenticado);
+  host.querySelector("[data-profile-user]").hidden = !autenticado;
+  hamburger.container.hidden = !autenticado && !preview;
+  perfil.alternar(false);
+  hamburger.alternar(false);
+}
+if (document.body) iniciarNavegacao();
+else document.addEventListener("DOMContentLoaded", iniciarNavegacao, {once:true});

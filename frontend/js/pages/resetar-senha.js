@@ -134,6 +134,8 @@ document.addEventListener("DOMContentLoaded", () => {
       alvo.type = vendo ? "password" : "text";
       icone.classList.toggle("fa-eye", !vendo);
       icone.classList.toggle("fa-eye-slash", vendo);
+      icone.setAttribute("aria-pressed",String(!vendo));
+      icone.setAttribute("aria-label",vendo ? "Mostrar senha" : "Ocultar senha");
     });
   });
 
@@ -153,6 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
     erroTexto.textContent = "";
     const novaSenha = senhaInput.value.trim();
     botaoRedefinir.disabled = true;
+    botaoRedefinir.dataset.busy = "true";
 
     try {
       await redefinirSenha(token, novaSenha);
@@ -163,6 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Falha ao redefinir senha:", erro);
       erroTexto.textContent =
         erro.message || "Não foi possível redefinir a senha. Tente novamente.";
+      delete botaoRedefinir.dataset.busy;
       botaoRedefinir.disabled = false;
     }
   });

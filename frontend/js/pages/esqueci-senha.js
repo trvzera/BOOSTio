@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const emailValue = emailInput.value.trim();
     botaoEnviar.disabled = true;
+    botaoEnviar.dataset.busy = "true";
 
     try {
       await solicitarRecuperacaoSenha(emailValue);
@@ -39,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
       erroTexto.textContent =
         erro.message ||
         "Não foi possível enviar o link. Tente novamente mais tarde.";
+      delete botaoEnviar.dataset.busy;
       botaoEnviar.disabled = false;
     }
   });

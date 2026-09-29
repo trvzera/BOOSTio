@@ -10,7 +10,7 @@
   z-index: 9999;
   opacity: 1;
   pointer-events: auto;
-  transition: opacity 0.5s ease;
+  transition: opacity var(--loading-fade, 480ms) ease;
   view-transition-name: none;
 }
 
@@ -23,7 +23,12 @@
   width: min(420px, 40vw);
   height: auto;
   object-fit: contain;
+  visibility: hidden;
 }
+#loading-screen.loading-full #loading-video { visibility: visible; }
+#loading-screen.loading-fade { transition-duration: var(--loading-fade, 480ms); }
+#loading-screen.loading-fade #loading-video { display: none; }
+@media (prefers-reduced-motion: reduce) { #loading-screen { transition-duration: 0.01ms; } }
 
 body.loading-active {
   overflow: hidden;

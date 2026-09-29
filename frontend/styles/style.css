@@ -11,8 +11,9 @@
 
 /* Componentes compartilhados */
 @import "./componentes/loading.css";
-@import "./header/header.css";
-@import "./header/profile-header.css";
+@import "./componentes/site-menu.css";
+@import "./componentes/scroll-reveal.css";
+@import "./componentes/page-entry.css";
 
 /* Páginas */
 @import "./home/home.css";
@@ -28,6 +29,8 @@
 @import "./conta/configuracoes.css";
 @import "./conta/senha.css";
 @import "./conta/builds.css";
+@import "./build/editor.css";
+@import "./build/catalogo.css";
 
 /* Formulário */
 @import "./forms/forms.css";
@@ -35,8 +38,11 @@
 @import "./forms/orcamento.css";
 @import "./forms/navegacao.css";
 @import "./forms/feedback.css";
+@import "./componentes/ui-system.css";
+@import "./componentes/glass.css";
 
 /* Ajustes por largura de tela */
+@import "./responsividades/r-site.css";
 @import "./responsividades/r-home.css";
 @import "./responsividades/r-services.css";
 @import "./responsividades/r-build-page.css";
@@ -45,3 +51,4 @@
 @import "./responsividades/r-forms.css";
 @import "./responsividades/r-erro.css";
 @import "./responsividades/r-desenvolvedores.css";
+@import "./responsividades/r-editor-build.css";

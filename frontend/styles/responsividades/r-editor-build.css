@@ -1,0 +1,89 @@
+.builder-page-main { padding-top: var(--page-top); }
+.builder-heading > *, .builder-layout > *, .component-empty > div { min-width: 0; }
+.component-empty p { font-size: var(--text-small); }
+.component-image { flex-shrink: 0; }
+.component-add, .status-dot { flex-shrink: 0; }
+.component-remove { width: 44px; height: 44px; }
+.component-purchase .component-buy, .ram-controls .btn-ghost { min-height: 44px; }
+.ram-controls > div { flex-wrap: wrap; }
+.ram-controls .disabled-tip-anchor { padding: 0; }
+.ram-controls .disabled-tip-anchor > button { width: 100%; }
+.builder-demo, .compatibility-trigger { max-width: 100%; }
+.build-sidebar { min-width: 0; }
+.catalog-toolbar { grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 1fr)); }
+.product-actions { flex-wrap: wrap; }
+.product-actions > * { min-width: 0; }
+.product-actions > .disabled-tip-anchor { padding: 0; }
+.product-actions > .disabled-tip-anchor > button { width: 100%; }
+.product-detail-layout { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
+.product-detail-layout > *, .product-card-body, .store-card, .store-brand > * { min-width: 0; }
+.store-logo { flex-shrink: 0; }
+.catalog-pagination { flex-wrap: wrap; }
+.catalog-pagination > .disabled-tip-anchor { padding: 0; }
+
+@media (max-width: 1100px) {
+  .builder-layout { grid-template-columns: minmax(0, 1fr) 280px; gap: 20px; }
+  /* Grade explícita mantém o remover no canto, mesmo quando ele está bloqueado. */
+  .component-selected-main { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 12px; }
+  .component-image { grid-column: 1; grid-row: 1; }
+  .component-copy { grid-column: 2; grid-row: 1; }
+  .component-remove, .component-selected-main > .disabled-tip-anchor { grid-column: 3; grid-row: 1; align-self: start; }
+  .component-purchase { grid-column: 2 / -1; grid-row: 2; display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 16px; text-align: left; }
+  .component-purchase strong { text-align: right; }
+  .catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .builder-heading { align-items: flex-start; flex-direction: column; }
+  .compatibility-popover { margin-top: 0; }
+  .compatibility-details { left: 0; right: auto; }
+}
+@media (max-width: 960px) {
+  .builder-layout { grid-template-columns: minmax(0, 1fr); }
+  .build-sidebar { position: static; }
+}
+@media (max-height: 760px) {
+  .build-sidebar { position: static; }
+}
+@media (max-width: 850px) {
+  .builder-page-main, .builder-footer-wrapper { width: calc(100% - 32px); }
+  .catalog-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 20px; gap: 16px; }
+  .catalog-toolbar .catalog-search { grid-column: 1 / -1; }
+  .product-detail-layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .product-detail-visual { min-height: 200px; }
+  .product-detail-visual img { height: 220px; }
+  .store-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  /* No mobile o detalhe se abre no fluxo, sem cobrir as peças ou gerar scroll duplo. */
+  .compatibility-popover { width: 100%; }
+  .compatibility-details { position: static; width: 100%; display: none; margin-top: 12px; }
+  .compatibility-popover[data-open] .compatibility-details { display: block; }
+  .compatibility-details::before { display: none; }
+}
+@media (max-width: 650px) {
+  .catalog-grid, .store-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .builder-page-main, .builder-footer-wrapper { padding-bottom: 96px; }
+  .component-empty, .component-selected-main { padding: 16px; gap: 12px; }
+  .component-empty { gap: 12px; padding: 18px 16px; }
+  .component-purchase { grid-column: 1 / -1; }
+  .component-group-heading { flex-wrap: wrap; }
+  .ram-add-model, .component-group > .disabled-tip-anchor:has(> .ram-add-model) { width: 100%; justify-self: stretch; }
+  .builder-options { flex-direction: column; gap: 8px; }
+  .build-summary, .compatibility-card, .product-specifications, .store-card { padding: 20px; }
+  .summary-details .input-text, .catalog-toolbar .input-text { font-size: 1rem; }
+  .product-detail-visual .component-placeholder { width: 100px; height: 100px; font-size: 1.4rem; }
+  .product-detail-highlights li { flex-wrap: wrap; gap: 4px 12px; }
+  .product-specifications dl > div { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .store-card p { min-height: 0; }
+  .ram-controls { padding: 16px; }
+  .ram-controls > div { width: 100%; }
+  .ram-controls > div > *, .ram-controls > div > .disabled-tip-anchor > button { flex: 1; }
+  .catalog-pagination { gap: 12px; }
+  .catalog-pagination > span, .catalog-pagination > p { width: 100%; text-align: center; order: -1; }
+  .catalog-pagination > .disabled-tip-anchor { width: auto; }
+}
+@media (max-width: 480px) {
+  .catalog-toolbar { grid-template-columns: minmax(0, 1fr); }
+  .catalog-empty { padding: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .builder-page *, .builder-page *::before { transition-duration: .01ms !important; }
+}

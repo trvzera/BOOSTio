@@ -2,6 +2,9 @@ import "../header.js";
 import "../auth/auth.js";
 import { registrarAnimacao } from "../components/lottie-controller.js";
 import { formatarDataHora } from "../utils/formatarData.js";
+import { abrirBuild, buildsLocais, sincronizarRascunho, CHAVE_PERFIL_LOCAL, linkCompartilhado } from "../build/estado.js";
+import { htmlSeguro } from "../build/catalogo.js";
+import { iniciarIcones } from "../components/ui.js";
 
 const LIMITE_BUILDS = 3;
 
@@ -55,7 +58,16 @@ let builds = [
 let idEdicao = null;
 let idExclusao = null;
 
+try {
+  builds = localStorage.getItem(CHAVE_PERFIL_LOCAL) !== null
+    ? buildsLocais()
+    : builds.map((build) => ({
+        ...abrirBuild(new URLSearchParams({ id: build.id })), ...build,
+      }));
+} catch { /* A lista de demonstração continua disponível sem armazenamento. */ }
+
 document.addEventListener("DOMContentLoaded", () => {
+  iniciarIcones();
   const lista = document.getElementById("builds-list");
   const vazio = document.getElementById("builds-empty");
   const quotaCount = document.getElementById("quota-count");
@@ -87,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (build.status === "erro" || build.status === "atencao") {
       return build.status;
     }
-    return calcularProgresso(build.pecas) === 100 ? "completa" : "incompleta";
+    return (build.progresso ?? calcularProgresso(build.pecas)) === 100 ? "completa" : "incompleta";
   }
 
   function atualizarQuota() {
@@ -297,6 +309,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderizarBuilds() {
+    try {
+      localStorage.setItem(CHAVE_PERFIL_LOCAL, JSON.stringify(builds));
+      builds.forEach((build) => sincronizarRascunho(build));
+    } catch { /* As ações da interface continuam disponíveis em memória. */ }
     fecharMenus();
     lista.innerHTML = "";
     vazio.hidden = builds.length > 0;
@@ -305,17 +321,26 @@ document.addEventListener("DOMContentLoaded", () => {
     builds.forEach((build) => {
       const cardCriado = criarCard(build);
       lista.appendChild(cardCriado);
-      iniciarAnimacoesDoCard(cardCriado, build.id);
+      iniciarAnimacoesDoCard(cardCriado, build.id).catch((erro) =>
+        console.warn("Não foi possível carregar os ícones do card:", erro));
     });
   }
 
   function criarCard(build) {
-    const progresso = calcularProgresso(build.pecas);
+    const progresso = build.progresso ?? calcularProgresso(build.pecas);
+    const idHtml = htmlSeguro(build.id);
     const status = resolverStatus(build);
     const artigo = document.createElement("article");
     artigo.className = `build-card ${STATUS_CLASS[status]}`;
     if (build.travada) artigo.classList.add("locked");
     artigo.dataset.id = build.id;
+    artigo.tabIndex = 0;
+    artigo.setAttribute("aria-label", "Abrir " + build.titulo);
+    artigo.addEventListener("keydown", (evento) => {
+      if (evento.target !== artigo || !["Enter", " "].includes(evento.key)) return;
+      evento.preventDefault();
+      window.location.href = "./configuracao-build.html?id=" + encodeURIComponent(build.id);
+    });
 
     const textoVisibilidade =
       build.visibilidade === "publico" ? "Tornar privado" : "Tornar público";
@@ -333,34 +358,34 @@ document.addEventListener("DOMContentLoaded", () => {
           <button type="button" class="build-menu-trigger" aria-label="Abrir menu da build" aria-expanded="false" aria-haspopup="true">···</button>
           <div class="build-menu" role="menu">
             <button type="button" class="build-menu-item" data-acao="trancar" role="menuitem">
-              <i id="lottie-lock-${build.id}" class="lottie-build-page"></i>
+              <i id="lottie-lock-${idHtml}" class="lottie-build-page"></i>
               <span class="btn-text">${textoTranca}</span>
             </button>
             <span class="build-menu-divider"></span>
             <button type="button" class="build-menu-item" data-acao="visibilidade" role="menuitem">
-              <i id="lottie-lock-vis-${build.id}" class="lottie-build-page" ${displayLockVis}></i>
-              <i id="lottie-public-vis-${build.id}" class="lottie-build-page" ${displayPublicVis}></i>
+              <i id="lottie-lock-vis-${idHtml}" class="lottie-build-page" ${displayLockVis}></i>
+              <i id="lottie-public-vis-${idHtml}" class="lottie-build-page" ${displayPublicVis}></i>
               <span class="btn-text">${textoVisibilidade}</span>
             </button>
             <button type="button" class="build-menu-item" data-acao="editar" role="menuitem">
-              <i id="lottie-edit-${build.id}" class="lottie-build-page"></i>Editar detalhes
+              <i id="lottie-edit-${idHtml}" class="lottie-build-page"></i>Editar detalhes
             </button>
             <button type="button" class="build-menu-item" data-acao="duplicar" role="menuitem">
-              <i id="lottie-clone-${build.id}" class="lottie-build-page"></i>Duplicar build
+              <i id="lottie-clone-${idHtml}" class="lottie-build-page"></i>Duplicar build
             </button>
             <button type="button" class="build-menu-item" data-acao="copiar-link" role="menuitem">
-              <i id="lottie-copy-${build.id}" class="lottie-build-page"></i>Copiar link
+              <i id="lottie-copy-${idHtml}" class="lottie-build-page"></i>Copiar link
             </button>
             <span class="build-menu-divider"></span>
             <button type="button" class="build-menu-item" data-acao="baixar-csv" role="menuitem">
-              <i id="lottie-csv-${build.id}" class="lottie-build-page"></i>Baixar build (CSV)
+              <i id="lottie-csv-${idHtml}" class="lottie-build-page"></i>Baixar build (CSV)
             </button>
             <button type="button" class="build-menu-item" data-acao="baixar-json" role="menuitem">
-              <i id="lottie-json-${build.id}" class="lottie-build-page"></i>Baixar build (JSON)
+              <i id="lottie-json-${idHtml}" class="lottie-build-page"></i>Baixar build (JSON)
             </button>
             <span class="build-menu-divider"></span>
             <button type="button" class="build-menu-item danger-menu-item" data-acao="deletar" role="menuitem">
-              <i id="lottie-trash-${build.id}" class="lottie-build-page"></i>Deletar build
+              <i id="lottie-trash-${idHtml}" class="lottie-build-page"></i>Deletar build
             </button>
           </div>
         </div>
@@ -372,7 +397,8 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div class="build-card-bottom">
         <span class="build-status ${STATUS_CLASS[status]} font-1-xs">${STATUS_LABEL[status]}</span>
-        <time class="build-card-date font-2-xs" datetime="${build.criadoEm}"></time>
+        <span class="build-visibility ${isPublico ? "publico" : "privado"}">${isPublico ? "Pública" : "Privada"}</span>
+        <time class="build-card-date font-2-xs"></time>
       </div>
     `;
 
@@ -381,6 +407,7 @@ document.addEventListener("DOMContentLoaded", () => {
     artigo.querySelector(".build-card-date").textContent = formatarDataHora(
       build.criadoEm,
     );
+    artigo.querySelector(".build-card-date").dateTime = build.criadoEm;
 
     if (build.travada) {
       artigo.querySelector('[data-acao="visibilidade"]').disabled = true;
@@ -432,7 +459,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ["visibilidade", build.visibilidade],
       ["travada", build.travada],
       ["status", resolverStatus(build)],
-      ["progresso", `${calcularProgresso(build.pecas)}%`],
+      ["progresso", `${build.progresso ?? calcularProgresso(build.pecas)}%`],
       ["criadoEm", build.criadoEm],
       [],
       ["peca", "na_build"],
@@ -460,6 +487,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   lista.addEventListener("click", async (evento) => {
+    if (!evento.target.closest(".build-menu-wrap")) {
+      const selecionado = evento.target.closest(".build-card");
+      if (selecionado) {
+        window.location.href = "./configuracao-build.html?id=" + encodeURIComponent(selecionado.dataset.id);
+        return;
+      }
+    }
     const trigger = evento.target.closest(".build-menu-trigger");
     if (trigger) {
       const wrap = trigger.closest(".build-menu-wrap");
@@ -484,6 +518,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (acao === "trancar") {
       build.travada = !build.travada;
+      try { sincronizarRascunho(build, { travada: build.travada }); }
+      catch { showToast("Não foi possível persistir a tranca neste navegador."); }
       renderizarBuilds();
       showToast(build.travada ? "Build trancada." : "Build destrancada.");
       return;
@@ -496,6 +532,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       build.visibilidade =
         build.visibilidade === "publico" ? "privado" : "publico";
+      try { sincronizarRascunho(build, { visibilidade: build.visibilidade }); }
+      catch { showToast("Não foi possível persistir a visibilidade neste navegador."); }
       renderizarBuilds();
       showToast(
         build.visibilidade === "publico"
@@ -538,7 +576,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast("Builds privadas não podem ser compartilhadas.");
         return;
       }
-      const url = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(build.id)}`;
+      const url = linkCompartilhado(build);
       try {
         await navigator.clipboard.writeText(url);
         showToast("Link copiado.");
@@ -581,7 +619,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   btnCriar.addEventListener("click", () => {
-    showToast("A criação de builds depende do backend.");
+    window.location.href = "./configuracao-build.html";
   });
 
   btnImportar.addEventListener("click", () => {
@@ -610,6 +648,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       build.titulo = titulo;
       build.descricao = inputDescricao.value.trim();
+      try { sincronizarRascunho(build, { titulo: build.titulo, descricao: build.descricao }); }
+      catch { showToast("Não foi possível persistir os detalhes neste navegador."); }
       idEdicao = null;
       fecharModal(modalEditar);
       renderizarBuilds();

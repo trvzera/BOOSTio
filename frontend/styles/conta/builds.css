@@ -1,7 +1,8 @@
 #builds-page {
   height: max-content;
+  width: min(1160px, calc(100% - 48px));
   margin: 0 auto;
-  padding: 100px 200px 80px;
+  padding: 100px 0 64px;
 }
 
 .lottie-build-page {
