@@ -62,3 +62,18 @@ def configurar_oauth(app):
         server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
         client_kwargs={'scope': 'openid email profile'}
     )
+
+oauth.register(
+    name="mercadolivre",
+    client_id=os.getenv("ML_CLIENT_ID"),
+    client_secret=os.getenv("ML_CLIENT_SECRET"),
+
+    authorize_url="https://auth.mercadolivre.com.br/authorization",
+    access_token_url="https://api.mercadolibre.com/oauth/token",
+
+    client_kwargs={
+        "scope": "offline_access read",
+        "token_endpoint_auth_method": "client_secret_post",
+        "code_challenge_method": "S256"
+    }
+)

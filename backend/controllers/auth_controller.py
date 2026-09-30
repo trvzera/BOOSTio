@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint,request,jsonify,redirect,url_for,current_app
 from flask_login import LoginManager, UserMixin, login_user,logout_user, login_required, current_user
 from models import db,Usuario
@@ -72,3 +73,24 @@ def callback_google():
     except ValueError as erro:
         base_url = current_app.config['FRONTEND_URL'].rstrip('/')
         return redirect(f'{base_url}/pages/login.html?erro={str(erro)}')
+
+
+@auth_bp.get("/mercadolivre/redirecionar")
+def redirecionar_mercadolivre():
+    redirect_uri = os.getenv("ML_REDIRECT_URI")
+
+    return oauth.mercadolivre.authorize_redirect(
+        redirect_uri
+    )
+
+
+@auth_bp.get("/mercadolivre/entrar")
+def callback_mercadolivre():
+    try:
+        token = oauth.mercadolivre.authorize_access_token()
+        print(token)
+        return "Mercado Livre autorizado!"
+
+    except Exception as erro:
+        print(repr(erro))
+        return f"Erro ao autorizar Mercado Livre: {erro}", 400
