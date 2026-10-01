@@ -14,3 +14,7 @@ class TokensMeli(ModeloBase):
         default=lambda: datetime.now(timezone.utc) + timedelta(hours=6),
         nullable=False,
     )
+
+    @staticmethod
+    def buscar_atual() -> "TokensMeli | None":
+        return TokensMeli.query.order_by(TokensMeli.id.desc()).first()

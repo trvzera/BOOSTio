@@ -1,10 +1,18 @@
 import os
 import requests
+from models import TokensMeli
+from .salvar_tokens_service import SalvarTokensMeliService
 
 
-class RenovarTokenMercadoLivreService:
+class RefreshTokenMercadoLivreService:
 
-    def executar(self, refresh_token):
+    def executar(self, refresh_token=None):
+
+        if refresh_token is None:
+            tokens = TokensMeli.buscar_atual()
+            if tokens is None:
+                raise ValueError("Nenhum refresh token do Mercado Livre foi salvo")
+            refresh_token = tokens.refresh_token
 
         url = "https://api.mercadolibre.com/oauth/token"
 
@@ -21,9 +29,13 @@ class RenovarTokenMercadoLivreService:
             headers={
                 "accept": "application/json",
                 "content-type": "application/x-www-form-urlencoded"
-            }
+            },
+            timeout=15,
         )
 
         response.raise_for_status()
 
-        return response.json()
+        novos_tokens = response.json()
+        SalvarTokensMeliService().executar(novos_tokens)
+
+        return novos_tokens

@@ -1,18 +1,27 @@
 import requests
 import os
 from dotenv import load_dotenv
+from models import TokensMeli
+from datetime import datetime
+from services.mercadolivre_scapring_service.refresh_token_service import RefreshTokenMercadoLivreService
 
 load_dotenv()
 
 class MercadoLivreScapringService:
   def executar(self, termo_busca: str):
+
+    token = TokensMeli.buscar_atual()
+
+    if token.data_expiracao < datetime.now():
+      RefreshTokenMercadoLivreService().executar(token.refresh_token)
+
     # URL oficial do Mercado Livre Brasil bem estruturada
     url = "https://api.mercadolibre.com/sites/MLB/items/bulk?ids=MLB48991061"
     # url = "https://api.mercadolibre.com/sites/MLB/search"
     # url = "https://api.mercadolibre.com/products/search"
 
     headers = {
-      "Authorization": f"Bearer {os.getenv('ML_ACCESS_TOKEN')}"
+      "Authorization": f"Bearer {os.getenv('access_token')}"
     }
 
     params = {

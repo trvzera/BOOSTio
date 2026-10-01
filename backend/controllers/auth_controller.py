@@ -7,6 +7,7 @@ from models import lm
 from configs import oauth
 from services.usuario_service.entrar_usuario_service import EntrarUsuarioService
 from services.usuario_service.entrar_google_usuario_service import EntrarGoogleService
+from services.mercadolivre_scapring_service.salvar_tokens_service import SalvarTokensMeliService
 
 auth_bp = Blueprint("auth",__name__,url_prefix='/auth')
 
@@ -88,8 +89,12 @@ def redirecionar_mercadolivre():
 def callback_mercadolivre():
     try:
         token = oauth.mercadolivre.authorize_access_token()
-        print(token)
+        SalvarTokensMeliService().executar(token)
         return "Mercado Livre autorizado!"
+
+    except SQLAlchemyError:
+        db.session.rollback()
+        return "Erro ao salvar os tokens do Mercado Livre", 500
 
     except Exception as erro:
         print(repr(erro))
