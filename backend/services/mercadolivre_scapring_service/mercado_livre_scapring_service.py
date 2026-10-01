@@ -28,11 +28,6 @@ class MercadoLivreScapringService:
         headers=headers
     )
 
-    response = requests.get(
-        url,MLB48991061
-        headers=headers
-    )
-
     dados = response.json()
     print(dados)
     # for produto in dados["results"]:

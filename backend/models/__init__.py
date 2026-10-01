@@ -37,6 +37,7 @@ from .setup import Setup
 from .codigo import Codigo
 from .build import Build
 from .token_recuperacao import TokenRecuperacao
+from .tokens_meli import TokensMeli
 
 #Funcão obrigatória para o login buscar informações do usuario pelo id
 @lm.user_loader
@@ -49,5 +50,5 @@ __all__ = [
     'lm','db','Peca','Periferico','Usuario','ModeloBase','Fonte',
     'Processador','PlacaMae','PlacaVideo','MemoriaRAM','SSD','HD',
     'Gabinete','WaterCooler','AirCooler','Fan','Fone','Teclado','Mouse','Monitor',
-    'Setup','Codigo','TokenRecuperacao','Build'
+    'Setup','Codigo','TokenRecuperacao','Build','TokensMeli'
 ]

@@ -1,4 +1,4 @@
-from services.scapring_service.mercado_livre_scapring_service import MercadoLivreScapringService
+from services.mercadolivre_scapring_service.mercado_livre_scapring_service import MercadoLivreScapringService
 
 service = MercadoLivreScapringService()
 
