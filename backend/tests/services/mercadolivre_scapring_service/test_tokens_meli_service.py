@@ -7,7 +7,8 @@ from flask import Flask
 from controllers.auth_controller import auth_bp
 from configs import oauth
 from models import TokensMeli, db
-from services.mercadolivre_scapring_service.refresh_token_service import RenovarTokenMercadoLivreService
+from services.mercadolivre_scapring_service.refresh_token_service import RefreshTokenMercadoLivreService
+from services.mercadolivre_scapring_service.mercado_livre_scapring_service import MercadoLivreScapringService
 from services.mercadolivre_scapring_service.salvar_tokens_service import SalvarTokensMeliService
 
 
@@ -62,7 +63,7 @@ class TestTokensMeliService(unittest.TestCase):
         resposta_http.json.return_value = resposta_meli
 
         with patch("services.mercadolivre_scapring_service.refresh_token_service.requests.post", return_value=resposta_http) as post:
-            retorno = RenovarTokenMercadoLivreService().executar()
+            retorno = RefreshTokenMercadoLivreService().executar()
 
         atual = TokensMeli.buscar_atual()
         self.assertEqual(retorno, resposta_meli)
@@ -73,6 +74,25 @@ class TestTokensMeliService(unittest.TestCase):
         self.assertEqual(TokensMeli.query.count(), 1)
         expira_em = atual.data_expiracao.replace(tzinfo=timezone.utc)
         self.assertLess(abs(expira_em - (datetime.now(timezone.utc) + timedelta(hours=1))), timedelta(seconds=5))
+
+    def test_busca_usa_termo_informado_e_token_do_banco(self):
+        SalvarTokensMeliService().executar({
+            "access_token": "access-banco", "refresh_token": "refresh-banco", "expires_in": 21600,
+        })
+        resposta = Mock(ok=True, status_code=200, headers={"Content-Type": "application/json"})
+        resposta.json.return_value = {"results": [{"id": "MLB-teste"}]}
+        with patch("services.mercadolivre_scapring_service.mercado_livre_scapring_service.requests.get", return_value=resposta) as get:
+            retorno = MercadoLivreScapringService().executar("  Ryzen 5 5600  ")
+        self.assertEqual(retorno, resposta.json.return_value)
+        self.assertEqual(get.call_args.args[0], "https://api.mercadolibre.com/products/search")
+        self.assertEqual(get.call_args.kwargs["params"]["q"], "Ryzen 5 5600")
+        self.assertEqual(get.call_args.kwargs["headers"]["Authorization"], "Bearer access-banco")
+
+    def test_busca_vazia_nao_faz_requisicao(self):
+        with patch("services.mercadolivre_scapring_service.mercado_livre_scapring_service.requests.get") as get:
+            with self.assertRaisesRegex(ValueError, "Informe um termo"):
+                MercadoLivreScapringService().executar("  ")
+            get.assert_not_called()
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@ import requests
 import os
 from dotenv import load_dotenv
 from models import TokensMeli
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from services.mercadolivre_scapring_service.refresh_token_service import RefreshTokenMercadoLivreService
 
 load_dotenv()
@@ -10,35 +10,66 @@ load_dotenv()
 class MercadoLivreScapringService:
   def executar(self, termo_busca: str):
 
+    if not isinstance(termo_busca, str) or not termo_busca.strip():
+      raise ValueError("Informe um termo para buscar no Mercado Livre")
+
     token = TokensMeli.buscar_atual()
 
-    if token.data_expiracao < datetime.now():
-      RefreshTokenMercadoLivreService().executar(token.refresh_token)
+    if token is None:
+      refresh_token_inicial = os.getenv("refresh_token")
+      if not refresh_token_inicial:
+        raise ValueError("Nenhum token salvo e nenhum refresh_token configurado no .env. Autorize a integração primeiro")
 
-    # URL oficial do Mercado Livre Brasil bem estruturada
-    url = "https://api.mercadolibre.com/sites/MLB/items/bulk?ids=MLB48991061"
-    # url = "https://api.mercadolibre.com/sites/MLB/search"
-    # url = "https://api.mercadolibre.com/products/search"
+      # Renova o token inicial para obter a expiração real e persistir o novo par.
+      RefreshTokenMercadoLivreService().executar(refresh_token_inicial)
+      token = TokensMeli.buscar_atual()
+
+    data_expiracao = token.data_expiracao
+    # O SQLite pode devolver a data sem fuso, embora tenha sido salva em UTC.
+    if data_expiracao.tzinfo is None:
+      data_expiracao = data_expiracao.replace(tzinfo=timezone.utc)
+
+    if data_expiracao <= datetime.now(timezone.utc) + timedelta(minutes=1):
+      RefreshTokenMercadoLivreService().executar(token.refresh_token)
+      token = TokensMeli.buscar_atual()
+
+    url = "https://api.mercadolibre.com/products/search"
 
     headers = {
-      "Authorization": f"Bearer {os.getenv('access_token')}"
+      "Authorization": f"Bearer {token.access_token}"
     }
 
     params = {
         "status": "active",
         "site_id": "MLB",
-        "q": "Ryzen 7 5700G",
-        "domain_id": "MLB48991061"
+        "q": termo_busca.strip(),
     }
 
     response = requests.get(
         url,
         params=params,
-        headers=headers
+        headers=headers,
+        timeout=15,
     )
 
-    dados = response.json()
+    status = response.status_code
+    tipo_conteudo = response.headers.get("Content-Type", "não informado")
+    if not response.ok:
+      raise requests.HTTPError(
+        f"Consulta ao Mercado Livre falhou: HTTP {status}; Content-Type: {tipo_conteudo}",
+        response=response,
+      )
+
+    try:
+      dados = response.json()
+    except requests.exceptions.JSONDecodeError as erro:
+      raise ValueError(
+        f"Mercado Livre retornou uma resposta sem JSON válido: HTTP {status}; "
+        f"Content-Type: {tipo_conteudo}; tamanho: {len(response.content)} bytes"
+      ) from erro
+
     print(dados)
+    return dados
     # for produto in dados["results"]:
     #   print(
     #       produto["id"],

@@ -10,6 +10,7 @@ from controllers.auth_controller import auth_bp
 from controllers.email_controller import email_bp
 from services.peca_service.popular_pecas_service import PopularPecasService
 from services.peca_service.atualizar_precos_service import AtualizarPrecosService
+from services.mercadolivre_scapring_service.mercado_livre_scapring_service import MercadoLivreScapringService
 
 load_dotenv()
 
@@ -37,4 +38,5 @@ if __name__ == '__main__':
         db.create_all()
         # PopularPecasService().executar()
         # AtualizarPrecosService().executar()
+        MercadoLivreScapringService().executar("Ryzen 7 5700G")
     app.run(debug=True)
