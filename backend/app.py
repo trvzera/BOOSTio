@@ -38,5 +38,5 @@ if __name__ == '__main__':
         db.create_all()
         # PopularPecasService().executar()
         # AtualizarPrecosService().executar()
-        MercadoLivreScapringService().executar("Ryzen 7 5700G")
+        MercadoLivreScapringService().executar(["Ryzen 7 5700G"])
     app.run(debug=True)

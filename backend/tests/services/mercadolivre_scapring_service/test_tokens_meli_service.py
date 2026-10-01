@@ -82,17 +82,47 @@ class TestTokensMeliService(unittest.TestCase):
         resposta = Mock(ok=True, status_code=200, headers={"Content-Type": "application/json"})
         resposta.json.return_value = {"results": [{"id": "MLB-teste"}]}
         with patch("services.mercadolivre_scapring_service.mercado_livre_scapring_service.requests.get", return_value=resposta) as get:
-            retorno = MercadoLivreScapringService().executar("  Ryzen 5 5600  ")
-        self.assertEqual(retorno, resposta.json.return_value)
+            retorno = MercadoLivreScapringService().executar(["  Ryzen 5 5600  "])
+        self.assertEqual(retorno, resposta.json.return_value["results"])
         self.assertEqual(get.call_args.args[0], "https://api.mercadolibre.com/products/search")
         self.assertEqual(get.call_args.kwargs["params"]["q"], "Ryzen 5 5600")
         self.assertEqual(get.call_args.kwargs["headers"]["Authorization"], "Bearer access-banco")
 
     def test_busca_vazia_nao_faz_requisicao(self):
         with patch("services.mercadolivre_scapring_service.mercado_livre_scapring_service.requests.get") as get:
-            with self.assertRaisesRegex(ValueError, "Informe um termo"):
-                MercadoLivreScapringService().executar("  ")
+            with self.assertRaisesRegex(ValueError, "Informe os termos"):
+                MercadoLivreScapringService().executar([])
             get.assert_not_called()
+
+    def test_busca_por_id_sem_termos(self):
+        service = MercadoLivreScapringService()
+        resposta = Mock(ok=True)
+        resposta.json.return_value = {"id": "MLB48991060", "name": "Produto"}
+        for termos in (None, []):
+            with patch.object(service, "_requisitar_com_tentativas", return_value=resposta) as requisitar:
+                retorno = service.executar(termos, produto_id="MLB48991060")
+                self.assertEqual(retorno, [resposta.json.return_value])
+                requisitar.assert_called_once_with("https://api.mercadolibre.com/products/MLB48991060", None)
+
+    def test_lista_ignora_busca_sem_resultados_e_atualiza_cabecalho(self):
+        from types import SimpleNamespace
+
+        respostas = []
+        for produtos in ([], [{"id": "primeiro"}, {"id": "segundo"}]):
+            resposta = Mock(ok=True, status_code=200, headers={})
+            resposta.json.return_value = {"results": produtos}
+            respostas.append(resposta)
+
+        service = MercadoLivreScapringService()
+        with patch.object(service, "_obter_token_atual", side_effect=[
+            SimpleNamespace(access_token="antigo"), SimpleNamespace(access_token="renovado"),
+        ]), patch("services.mercadolivre_scapring_service.mercado_livre_scapring_service.requests.get", side_effect=respostas) as get:
+            retorno = service.executar(["inexistente", "Ryzen 7 5700G"])
+
+        self.assertEqual(retorno, [{"id": "primeiro"}])
+        self.assertEqual([c.kwargs["params"]["q"] for c in get.call_args_list], ["inexistente", "Ryzen 7 5700G"])
+        self.assertEqual(get.call_args_list[0].kwargs["headers"]["Authorization"], "Bearer antigo")
+        self.assertEqual(get.call_args_list[1].kwargs["headers"]["Authorization"], "Bearer renovado")
 
 
 if __name__ == "__main__":

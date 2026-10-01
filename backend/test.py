@@ -1,5 +1,6 @@
+from app import app
 from services.mercadolivre_scapring_service.mercado_livre_scapring_service import MercadoLivreScapringService
 
-service = MercadoLivreScapringService()
-
-produtos = service.executar("Ryzen 7 5700g")
+with app.app_context():
+    s = MercadoLivreScapringService()
+    print(s.obter_preco_catalogo("MLB19444510"))
