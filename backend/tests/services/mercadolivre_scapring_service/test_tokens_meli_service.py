@@ -10,6 +10,7 @@ from models import TokensMeli, db
 from services.mercadolivre_scapring_service.refresh_token_service import RefreshTokenMercadoLivreService
 from services.mercadolivre_scapring_service.mercado_livre_scapring_service import MercadoLivreScapringService
 from services.mercadolivre_scapring_service.salvar_tokens_service import SalvarTokensMeliService
+from services.mercadolivre_scapring_service.consultar_api_service import ConsultarApiMercadoLivreService
 
 
 class TestTokensMeliService(unittest.TestCase):
@@ -81,7 +82,7 @@ class TestTokensMeliService(unittest.TestCase):
         })
         resposta = Mock(ok=True, status_code=200, headers={"Content-Type": "application/json"})
         resposta.json.return_value = {"results": [{"id": "MLB-teste"}]}
-        with patch("services.mercadolivre_scapring_service.mercado_livre_scapring_service.requests.get", return_value=resposta) as get:
+        with patch("services.mercadolivre_scapring_service.consultar_api_service.requests.get", return_value=resposta) as get:
             retorno = MercadoLivreScapringService().executar(["  Ryzen 5 5600  "])
         self.assertEqual(retorno, resposta.json.return_value["results"])
         self.assertEqual(get.call_args.args[0], "https://api.mercadolibre.com/products/search")
@@ -89,7 +90,7 @@ class TestTokensMeliService(unittest.TestCase):
         self.assertEqual(get.call_args.kwargs["headers"]["Authorization"], "Bearer access-banco")
 
     def test_busca_vazia_nao_faz_requisicao(self):
-        with patch("services.mercadolivre_scapring_service.mercado_livre_scapring_service.requests.get") as get:
+        with patch("services.mercadolivre_scapring_service.consultar_api_service.requests.get") as get:
             with self.assertRaisesRegex(ValueError, "Informe os termos"):
                 MercadoLivreScapringService().executar([])
             get.assert_not_called()
@@ -99,7 +100,7 @@ class TestTokensMeliService(unittest.TestCase):
         resposta = Mock(ok=True)
         resposta.json.return_value = {"id": "MLB48991060", "name": "Produto"}
         for termos in (None, []):
-            with patch.object(service, "_requisitar_com_tentativas", return_value=resposta) as requisitar:
+            with patch.object(ConsultarApiMercadoLivreService, "_requisitar_com_tentativas", return_value=resposta) as requisitar:
                 retorno = service.executar(termos, produto_id="MLB48991060")
                 self.assertEqual(retorno, [resposta.json.return_value])
                 requisitar.assert_called_once_with("https://api.mercadolibre.com/products/MLB48991060", None)
@@ -114,9 +115,9 @@ class TestTokensMeliService(unittest.TestCase):
             respostas.append(resposta)
 
         service = MercadoLivreScapringService()
-        with patch.object(service, "_obter_token_atual", side_effect=[
+        with patch.object(ConsultarApiMercadoLivreService, "_obter_token_atual", side_effect=[
             SimpleNamespace(access_token="antigo"), SimpleNamespace(access_token="renovado"),
-        ]), patch("services.mercadolivre_scapring_service.mercado_livre_scapring_service.requests.get", side_effect=respostas) as get:
+        ]), patch("services.mercadolivre_scapring_service.consultar_api_service.requests.get", side_effect=respostas) as get:
             retorno = service.executar(["inexistente", "Ryzen 7 5700G"])
 
         self.assertEqual(retorno, [{"id": "primeiro"}])
