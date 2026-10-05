@@ -10,7 +10,6 @@ from controllers.auth_controller import auth_bp
 from controllers.email_controller import email_bp
 from services.peca_service.popular_pecas_service import PopularPecasService
 from services.peca_service.atualizar_precos_service import AtualizarPrecosService
-from services.mercadolivre_scapring_service.mercado_livre_scapring_service import MercadoLivreScapringService
 
 load_dotenv()
 
@@ -33,10 +32,12 @@ app.register_blueprint(usuario_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(email_bp)
 
+from commands.precos import registrar_comandos_precos
+registrar_comandos_precos(app)
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         # PopularPecasService().executar()
         # AtualizarPrecosService().executar()
-        MercadoLivreScapringService().executar(["Ryzen 7 5700G"])
     app.run(debug=True)
