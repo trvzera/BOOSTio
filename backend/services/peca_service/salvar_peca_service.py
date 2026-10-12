@@ -13,17 +13,15 @@ class SalvarPecaService:
         if peca is None:
             raise ValueError("Peça não encontrada")
         campos = dict(dados)
-        for loja in ("kabum", "meli"):
-            campo = f"{loja}_external"
-            if campo in campos:
-                url = (campos[campo] or "").strip() or None
-                if url:
-                    ValidarLinkService().executar(url, loja)
-                if loja == "meli" and url != peca.meli_external:
-                    peca.preco_atualizado_em = None
-                    peca.esgotado = True
-                    peca.preco = 0
-                campos[campo] = url
+        if "kabum_external" in campos:
+            url = (campos["kabum_external"] or "").strip() or None
+            if url:
+                ValidarLinkService().executar(url)
+            if url != peca.kabum_external:
+                peca.preco_atualizado_em = None
+                peca.esgotado = True
+                peca.preco = 0
+            campos["kabum_external"] = url
         if peca_id is None:
             peca.preco = 0
             peca.esgotado = True

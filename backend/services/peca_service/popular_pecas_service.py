@@ -1,5 +1,4 @@
 from models import (
-  db,
   Processador,
   PlacaMae,
   PlacaVideo,
@@ -16,37 +15,20 @@ from models import (
   Mouse,
   Monitor,
 )
+from .atualizar_precos_service import AtualizarPrecosService
 
 
 class PopularPecasService:
-  """Cadastra especificações sem preços fictícios ou links de busca; não consulta a rede."""
+  """Cadastra peças ausentes e atualiza os preços dos links cadastrados."""
 
-  def executar(self) -> None:
+  def executar(self, limite: int | None = None, intervalo: float = 1.0):
     for classe, itens in self._dados_seed().items():
       self._popular_classe(classe, itens)
+    return AtualizarPrecosService().executar(limite=limite, intervalo=intervalo)
 
   def _popular_classe(self, classe, itens: list[dict]) -> None:
-    part_numbers = [item["part_number"] for item in itens]
-    existentes = {
-      row.part_number: row
-      for row in classe.query.filter(classe.part_number.in_(part_numbers)).all()
-    }
-
-    novos = []
-    atualizados = 0
-
-    for item in itens:
-      existente = existentes.get(item["part_number"])
-
-      if existente is None:
-        novos.append(classe(**item))
-        continue
-
-    db.session.add_all(novos)
-    db.session.commit()
-
-    sem_mudanca = len(itens) - len(novos) - atualizados
-    print(f"[seed] {classe.__name__}: {len(novos)} inseridos, {atualizados} links atualizados, {sem_mudanca} sem mudança")
+    novos = classe.cadastrar_ausentes(itens)
+    print(f"[seed] {classe.__name__}: {novos} inseridos, {len(itens) - novos} já cadastrados")
 
   def _dados_seed(self) -> dict:
     return {
@@ -129,7 +111,6 @@ class PopularPecasService:
         "preco": preco,
         "part_number": part_number,
         "kabum_external": None,
-        "meli_external": None,
         "esgotado": True,
         "soquete": soquete,
         "nucleo": nucleo,
@@ -211,7 +192,6 @@ class PopularPecasService:
         "preco": self._preco(indice, 500, 90),
         "part_number": part_number,
         "kabum_external": None,
-        "meli_external": None,
         "esgotado": True,
         "socket": socket,
         "chipset": chipset,
@@ -290,7 +270,6 @@ class PopularPecasService:
         "preco": self._preco(indice, 1400, 250),
         "part_number": part_number,
         "kabum_external": None,
-        "meli_external": None,
         "esgotado": True,
         "memoria_gb": memoria_gb,
         "tipo_memoria": tipo_memoria,
@@ -367,7 +346,6 @@ class PopularPecasService:
         "preco": self._preco(indice, 700, 90),
         "part_number": part_number,
         "kabum_external": None,
-        "meli_external": None,
         "esgotado": True,
         "capacidade_gb": capacidade_gb,
         "ddr": ddr,
@@ -444,7 +422,6 @@ class PopularPecasService:
         "preco": self._preco(indice, 450, 50),
         "part_number": part_number,
         "kabum_external": None,
-        "meli_external": None,
         "esgotado": True,
         "capacidade_gb": capacidade_gb,
         "tipo": tipo,
@@ -521,7 +498,6 @@ class PopularPecasService:
         "preco": self._preco(indice, 350, 40),
         "part_number": part_number,
         "kabum_external": None,
-        "meli_external": None,
         "esgotado": True,
         "capacidade_gb": capacidade_gb,
         "velocidade_rpm": rpm,
@@ -596,7 +572,6 @@ class PopularPecasService:
         "preco": self._preco(indice, 600, 100),
         "part_number": part_number,
         "kabum_external": None,
-        "meli_external": None,
         "esgotado": True,
         "potencia_w": potencia_w,
         "formato": formato,
@@ -669,7 +644,6 @@ class PopularPecasService:
         "preco": self._preco(indice, 400, 60),
         "part_number": part_number,
         "kabum_external": None,
-        "meli_external": None,
         "esgotado": True,
         "formato": formato,
         "formatos_placa_mae": formatos_placa_mae,
@@ -750,7 +724,6 @@ class PopularPecasService:
         "preco": self._preco(indice, 550, 90),
         "part_number": part_number,
         "kabum_external": None,
-        "meli_external": None,
         "esgotado": True,
         "compatibilidade": compatibilidade,
         "tamanho_radiador_mm": radiador,
@@ -825,7 +798,6 @@ class PopularPecasService:
         "preco": self._preco(indice, 220, 40),
         "part_number": part_number,
         "kabum_external": None,
-        "meli_external": None,
         "esgotado": True,
         "compatibilidade": compatibilidade,
         "dimensoes": dimensoes,
@@ -899,7 +871,6 @@ class PopularPecasService:
         "preco": self._preco(indice, 120, 25),
         "part_number": part_number,
         "kabum_external": None,
-        "meli_external": None,
         "esgotado": True,
         "tamanho_mm": tamanho_mm,
         "quantidade": quantidade,
@@ -973,7 +944,6 @@ class PopularPecasService:
         "preco": self._preco(indice, 350, 60),
         "part_number": part_number,
         "kabum_external": None,
-        "meli_external": None,
         "esgotado": True,
         "conexao": conexao,
         "iluminacao": False,
@@ -1050,7 +1020,6 @@ class PopularPecasService:
         "preco": self._preco(indice, 350, 60),
         "part_number": part_number,
         "kabum_external": None,
-        "meli_external": None,
         "esgotado": True,
         "conexao": "USB",
         "iluminacao": mecanico,
@@ -1127,7 +1096,6 @@ class PopularPecasService:
         "preco": self._preco(indice, 250, 40),
         "part_number": part_number,
         "kabum_external": None,
-        "meli_external": None,
         "esgotado": True,
         "conexao": "USB",
         "iluminacao": True,
@@ -1203,7 +1171,6 @@ class PopularPecasService:
         "preco": self._preco(indice, 1200, 250),
         "part_number": part_number,
         "kabum_external": None,
-        "meli_external": None,
         "esgotado": True,
         "conexao": "HDMI/DP",
         "iluminacao": False,
