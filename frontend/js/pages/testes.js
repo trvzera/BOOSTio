@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const checarDesempenho = document.querySelector("#performance-check");
     const atualizarNomePreview = () => {
       const item = dados.get(selecionarDesempenho.value);
-      const completo = item?.avaliacao.total > 0 && item.avaliacao.preenchidos === item.avaliacao.total;
+      const completo = item?.avaliacao.total > 0 && item.avaliacao.preenchidos === item.avaliacao.total && !item.avaliacao.erros.length;
       const percentual = item?.avaliacao.total ? Math.round(item.avaliacao.preenchidos / item.avaliacao.total * 100) : 0;
       document.querySelector("#preview-build-progress").textContent = (item?.build.titulo || "Build") + " · " + percentual + "% das peças selecionadas";
       testeTopo.disabled = !completo;

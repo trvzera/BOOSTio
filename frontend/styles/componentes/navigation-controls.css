@@ -1,0 +1,38 @@
+/* Controles de navegação: um mesmo tamanho, acabamento e interação em todas as páginas. */
+.ui-close-button:is(button), .ui-back-button:is(a,button) {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: auto;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-control);
+  background: rgba(255,255,255,.035);
+  color: var(--cor-6);
+  font: 500 .85rem/1.4 var(--font-heading);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--motion-fast) ease, border-color var(--motion-fast) ease, background var(--motion-fast) ease;
+}
+.ui-close-button:is(button), .ui-back-button.icon-back {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+}
+.ui-close-button:is(button) svg { display: block; width: 22px; height: 22px; pointer-events: none; }
+.ui-close-button:is(button):hover:not(:disabled), .ui-back-button:is(a,button):hover:not(:disabled) {
+  color: var(--cor-p1);
+  border-color: var(--cor-p1);
+  background: rgba(0,123,255,.06);
+  transform: none;
+}
+.ui-close-button:is(button):focus-visible, .ui-back-button:is(a,button):focus-visible { outline: 2px solid var(--cor-p1); outline-offset: 4px; }
+.ui-back-button .ui-lottie { width: 22px; height: 22px; flex: 0 0 22px; }
+@media (prefers-reduced-motion: reduce) {
+  .ui-close-button:is(button), .ui-back-button:is(a,button) { transition: none; }
+}

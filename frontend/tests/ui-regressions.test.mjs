@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { access, readFile } from "node:fs/promises";
+import { access, readFile, readdir } from "node:fs/promises";
 import { definirTextoSeMudou, iconeAnimado } from "../js/components/ui.js";
 import { redirecionamentoSessao, linksVisitante, linksAutenticado } from "../js/components/navigation-config.js";
 import { perfilLoading } from "../js/components/page-loading.js";
@@ -76,6 +76,49 @@ test("logos das lojas apontam para os SVGs/PNG disponíveis", async () => {
 });
 test("seta de voltar mantém direção independente da animação", () => {
   assert.match(iconeAnimado("arrow","back"),/data-direction="back"/);
+});
+test("menu dos cards usa dots Lottie e mantém alternativa estática acessível",async () => {
+  const html = await readFile(new URL("../pages/builds.html",import.meta.url),"utf8");
+  const js = await readFile(new URL("../js/pages/builds.js",import.meta.url),"utf8");
+  const ui = await readFile(new URL("../js/components/ui.js",import.meta.url),"utf8");
+  const icone = iconeAnimado("dots");
+  await access(new URL("../lottie/dots.json",import.meta.url));
+  assert.match(ui,/dots:"dots\.json"/);
+  assert.match(js,/\$\{iconeAnimado\("dots"\)\}/);
+  assert.match(html,/class="build-menu-trigger"[^>]*>\s*<span class="ui-lottie" data-lottie="dots"/);
+  assert.match(icone,/aria-hidden="true"/);
+  assert.equal([...icone.matchAll(/<circle\b/g)].length,3);
+});
+test("criar build oferece manual ou formulário, sem dois atalhos divergentes",async () => {
+  const html = await readFile(new URL("../pages/builds.html",import.meta.url),"utf8");
+  const js = await readFile(new URL("../js/pages/builds.js",import.meta.url),"utf8");
+  assert.doesNotMatch(html,/id="btn-create-build-form"/);
+  assert.match(js,/Como você quer criar sua build/);
+  assert.match(js,/Montagem manual/);
+  assert.match(js,/Formulário inteligente/);
+  assert.match(js,/menu\.showPopover\(\)/);
+});
+test("fechar e voltar compartilham controles visuais sem alterar a tipografia global",async () => {
+  const css = await readFile(new URL("../styles/componentes/navigation-controls.css",import.meta.url),"utf8");
+  const raiz = await readFile(new URL("../styles/style.css",import.meta.url),"utf8");
+  assert.match(css,/\.ui-close-button/);
+  assert.match(css,/\.ui-back-button/);
+  assert.match(css,/min-height: 44px/);
+  assert.match(css,/color: var\(--cor-p1\)/);
+  assert.match(raiz,/navigation-controls\.css/);
+});
+test("ícone do setup atual usa o estado inverso sem afetar os demais", () => {
+  assert.match(iconeAnimado("circledot","internal",{invertido:true}),/data-lottie-reversed="true"/);
+  assert.doesNotMatch(iconeAnimado("circledot"),/data-lottie-reversed/);
+});
+test("footers apresentam a BOOSTio pela página Sobre nós, sem links para a equipe removida", async () => {
+  const paginas = new URL("../pages/",import.meta.url);
+  await access(new URL("sobre.html",paginas));
+  for (const nome of (await readdir(paginas)).filter(nome => nome.endsWith(".html"))) {
+    const html = await readFile(new URL(nome,paginas),"utf8");
+    assert.doesNotMatch(html,/href="[^\"]*desenvolvedores\.html"/,nome);
+    if (html.includes('id="about-section"')) assert.match(html,/href="\.\/sobre\.html"/,nome);
+  }
 });
 test("classes de tipografia preservam famílias e tamanhos originais", async () => {
   const css = await readFile(new URL("../styles/utilitarios/tipografia.css",import.meta.url),"utf8");

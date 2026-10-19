@@ -5,9 +5,10 @@ const arquivos = {
   plus:"plus.json", trash:"buildTrash.json", cart:"cartshopping.json", import:"login.json",
   arrow:"arrow.json", chevron:"chavron.json", checkbox:"checkbox.json", hamburger:"hamburger.json",
   login:"login.json", signup:"logon.json", build:"build.json", user:"user.json", profile:"profile.json", logout:"logout-lt.json",
-  circledot:"circledot.json", magnifying:"magnifying.json", magic:"magic.json",
+  circledot:"circledot.json", magnifying:"magnifying.json", magic:"magic.json", dots:"dots.json",
 };
 const alternativas = {plus:"+",trash:"×",cart:"↗",import:"→",arrow:"→",chevron:"⌄",checkbox:"✓",
+  dots:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="20" cy="12" r="2"/></svg>',
   hamburger:"☰",login:"→",signup:"+",build:"▦",user:"●",
   profile:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></svg>',logout:"←",
   circledot:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>',
@@ -16,10 +17,11 @@ const alternativas = {plus:"+",trash:"×",cart:"↗",import:"→",arrow:"→",ch
 const ativos = new Map();
 let sequencia = 0, iniciada = false;
 
-export function iconeAnimado(nome, direcao = "internal") {
+export function iconeAnimado(nome, direcao = "internal", {invertido = false} = {}) {
   const orientacao = ["internal","external","back","up"].includes(direcao) ? direcao : "internal";
   return '<span class="ui-lottie" data-lottie="' + nome + '"' +
     (nome === "arrow" ? ' data-direction="' + orientacao + '"' : "") +
+    (invertido ? ' data-lottie-reversed="true"' : "") +
     ' aria-hidden="true"><span class="ui-icon-fallback">' + (alternativas[nome] || "") + '</span></span>';
 }
 export function iniciarIcones(raiz = document) {
@@ -40,15 +42,16 @@ export function iniciarIcones(raiz = document) {
       if (!elemento.isConnected) { destruirAnimacao(elemento.id,animacao); return; }
       const controle = elemento.closest("button,a,label,summary");
       const input = controle?.querySelector('input[type="checkbox"]');
-      const alternavel = ["checkbox","chevron","hamburger","profile"].includes(elemento.dataset.lottie);
+      const alternavel = ["checkbox","chevron","hamburger","profile","dots"].includes(elemento.dataset.lottie);
       const aberto = () => input ? input.checked : controle?.getAttribute("aria-expanded") === "true";
+      const invertido = elemento.dataset.lottieReversed === "true";
       const mover = direcao => {
         if (controle?.disabled || input?.disabled || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
         animacao.setDirection(direcao); animacao.play();
       };
       const atualizarEstado = () => mover(aberto() ? 1 : -1);
-      const entrar = () => { if (!alternavel || !aberto()) mover(1); };
-      const sair = () => { if (!alternavel || !aberto()) mover(-1); };
+      const entrar = () => { if (!alternavel || !aberto()) mover(invertido ? -1 : 1); };
+      const sair = () => { if (!alternavel || !aberto()) mover(invertido ? 1 : -1); };
       let observador;
       if (alternavel) {
         input?.addEventListener("change",atualizarEstado);
@@ -66,7 +69,7 @@ export function iniciarIcones(raiz = document) {
       const pronto = () => {
         if (!elemento.isConnected) return;
         elemento.setAttribute("data-ready","");
-        animacao.goToAndStop(alternavel && aberto() ? animacao.totalFrames - 1 : 0,true);
+        animacao.goToAndStop(invertido || alternavel && aberto() ? animacao.totalFrames - 1 : 0,true);
       };
       animacao.isLoaded ? pronto() : animacao.addEventListener("DOMLoaded",pronto);
       ativos.set(elemento,{animacao,limpar:() => {
@@ -109,14 +112,30 @@ function motivo(controle) {
 export function definirTextoSeMudou(elemento,texto) {
   if (elemento.textContent !== texto) elemento.textContent = texto;
 }
+function padronizarControles() {
+  document.querySelectorAll(".build-action-close, .compare-button-close, .test-dialog-close, [data-ui-close], #btn-close-verification").forEach(controle => {
+    if (controle.classList.contains("ui-close-button")) return;
+    controle.classList.add("ui-close-button");
+    controle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>';
+  });
+  document.querySelectorAll("[data-page-back], .builder-back, .page-back-link, .prontas-voltar, .company-back").forEach(controle => {
+    controle.classList.add("ui-back-button");
+    if (!controle.querySelector('[data-lottie="arrow"]')) controle.insertAdjacentHTML("afterbegin",iconeAnimado("arrow","back"));
+  });
+}
 export function iniciarUI() {
   if (iniciada) return;
   iniciada = true;
   iniciarVoltar();
   const tooltip = document.createElement("div");
   tooltip.id = "ui-tooltip"; tooltip.role = "tooltip"; tooltip.hidden = true; document.body.append(tooltip);
+  if (typeof tooltip.showPopover === "function") tooltip.setAttribute("popover","manual");
   let atual;
-  const esconder = () => { atual?.removeAttribute("aria-describedby"); atual = null; tooltip.hidden = true; };
+  const esconder = () => {
+    atual?.removeAttribute("aria-describedby"); atual = null;
+    if (typeof tooltip.hidePopover === "function" && tooltip.matches(":popover-open")) tooltip.hidePopover();
+    tooltip.hidden = true;
+  };
   function posicionar(ancora) {
     const vista = window.visualViewport;
     const esquerda = (vista?.offsetLeft || 0) + 12, topo = (vista?.offsetTop || 0) + 12;
@@ -131,9 +150,11 @@ export function iniciarUI() {
     const controle = ancora.querySelector("button");
     if (!controle?.disabled) return;
     esconder(); atual = ancora; definirTextoSeMudou(tooltip,motivo(controle)); tooltip.hidden = false;
+    if (tooltip.hasAttribute("popover")) tooltip.showPopover();
     ancora.setAttribute("aria-describedby",tooltip.id); posicionar(ancora);
   }
   function atualizar() {
+    padronizarControles();
     atualizarBotoesVoltar();
     document.querySelectorAll("button").forEach(controle => {
       let ancora = controle.parentElement;

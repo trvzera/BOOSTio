@@ -77,7 +77,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const quotaCount = document.getElementById("quota-count");
   const quotaFill = document.getElementById("quota-fill");
   const btnCriar = document.getElementById("btn-create-build");
-  const btnCriarFormulario = document.getElementById("btn-create-build-form");
   const btnImportar = document.getElementById("btn-import-build");
   const toast = document.getElementById("toast");
   const toastText = document.getElementById("toast-text");
@@ -111,7 +110,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const usadas = builds.length;
     quotaCount.textContent = `${usadas}/${LIMITE_BUILDS}`;
     quotaFill.style.width = `${(usadas / LIMITE_BUILDS) * 100}%`;
-    for (const botao of [btnCriar, btnCriarFormulario, btnImportar]) {
+    for (const botao of [btnCriar, btnImportar]) {
       botao.disabled = usadas >= LIMITE_BUILDS;
       botao.dataset.disabledReason = "Limite de três builds atingido. Exclua uma build para liberar espaço.";
     }
@@ -121,6 +120,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   function fecharMenus() {
     lista.querySelectorAll(".build-menu-wrap.open").forEach((wrap) => {
       wrap.classList.remove("open");
+      const menu = wrap.querySelector(".build-menu");
+      if (typeof menu?.hidePopover === "function" && menu.matches(":popover-open")) menu.hidePopover();
       const trigger = wrap.querySelector(".build-menu-trigger");
       if (trigger) {
         trigger.setAttribute("aria-expanded", "false");
@@ -155,7 +156,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     menu.dataset.placement = "bottom";
     menu.style.maxHeight = Math.floor(abaixo) + "px";
-    menu.style.top = rect.bottom + 8 - ancora.top + "px";
+    const flutuante = menu.hasAttribute("popover");
+    menu.style.top = rect.bottom + 8 - (flutuante ? 0 : ancora.top) + "px";
+    if (flutuante) {
+      menu.style.left = Math.max(12, Math.min(rect.right - menu.offsetWidth, innerWidth - menu.offsetWidth - 12)) + "px";
+    }
   }
 
   function reposicionarMenuAberto() {
@@ -375,7 +380,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.warn("Não foi possível carregar os ícones do card:", erro));
     });
     iniciarIcones(lista);
-    iniciarIcones(lista);
   }
 
   function criarCard(build) {
@@ -383,6 +387,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const progresso = resultado ? Math.round(resultado.preenchidos / resultado.total * 100) : build.progresso ?? calcularProgresso(build.pecas || {});
     const idHtml = htmlSeguro(build.id);
     const tituloSeguro = htmlSeguro(build.titulo);
+    const setupAtual = planejamentoLocal().setupAtualId === build.id;
+    const textoSetupAtual = setupAtual ? "Remover como setup atual" : "Definir como setup atual";
     const status = resultado?.status || resolverStatus(build);
     const artigo = document.createElement("article");
     artigo.className = `build-card ${STATUS_CLASS[status]}`;
@@ -409,11 +415,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       <div class="build-card-top">
         <div class="build-title-line">${indicadorBuild(resultado || {erros:status === "erro" ? ["Reabra a build para conferir as incompatibilidades."] : [],avisos:status === "atencao" ? ["Reabra a build para conferir os avisos."] : [],faltam:Object.entries(build.pecas || {}).filter(([,tem]) => !tem).map(([chave]) => ROTULOS_PECA[chave] || chave)},"build-details-" + build.id)}<h2 class="build-card-title font-1-m-b"></h2></div>
         <div class="build-menu-wrap">
-          <button type="button" class="build-menu-trigger" aria-label="Abrir menu da build ${tituloSeguro}" aria-expanded="false" aria-haspopup="true">···</button>
+          <button type="button" class="build-menu-trigger" aria-label="Abrir menu da build ${tituloSeguro}" aria-expanded="false" aria-haspopup="true">${iconeAnimado("dots")}</button>
           <div class="build-menu" role="menu">
             <button type="button" class="build-menu-item benchmark-menu-item" data-acao="benchmark" role="menuitem" aria-label="Testar build ${tituloSeguro}" ${!catalogo.length || motivoBenchmark(normalizarBuild(build),catalogo) ? 'disabled data-disabled-reason="Complete as peças e resolva os erros de compatibilidade para testar a build."' : ""}>${iconeAnimado("magic")}Testar build</button>
             <button type="button" class="build-menu-item" data-acao="melhorias" role="menuitem" aria-label="Buscar melhorias para ${tituloSeguro}" ${build.travada ? 'disabled data-disabled-reason="Destranque a build para buscar melhorias."' : ""}>${iconeAnimado("magnifying")}Buscar melhorias</button>
-            <button type="button" class="build-menu-item" data-acao="setup-atual" role="menuitem" aria-label="Definir como setup atual: ${tituloSeguro}">${iconeAnimado("circledot")}Definir como setup atual</button>
+            <button type="button" class="build-menu-item" data-acao="setup-atual" role="menuitemcheckbox" aria-label="${textoSetupAtual}: ${tituloSeguro}" aria-checked="${setupAtual}">${iconeAnimado("circledot","internal",{invertido:setupAtual})}${textoSetupAtual}</button>
             <span class="build-menu-divider"></span>
             <button type="button" class="build-menu-item" data-acao="trancar" role="menuitem" aria-label="${textoTranca} de ${tituloSeguro}">
               <i id="lottie-lock-${idHtml}" class="lottie-build-page"></i>
@@ -463,6 +469,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const menuTrigger = artigo.querySelector(".build-menu-trigger");
     menuTrigger.dataset.buildTitle = build.titulo;
+    const menu = artigo.querySelector(".build-menu");
+    // A camada superior evita que o glass do card limite o blur do dropdown.
+    if (typeof menu.showPopover === "function") menu.setAttribute("popover", "manual");
 
     const titulo = artigo.querySelector(".build-card-title");
     titulo.textContent = build.titulo;
@@ -552,6 +561,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       fecharMenus();
       if (!jaAberto) {
         wrap.classList.add("open");
+        const menu = wrap.querySelector(".build-menu");
+        if (menu.hasAttribute("popover")) menu.showPopover();
         posicionarMenu(wrap, true);
         trigger.setAttribute("aria-expanded", "true");
         trigger.setAttribute("aria-label", "Fechar menu da build " + trigger.dataset.buildTitle);
@@ -571,8 +582,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (["benchmark","melhorias","setup-atual"].includes(acao)) {
       try {
+        if (acao !== "setup-atual") card.querySelector(".build-menu-trigger")?.focus({preventScroll:true});
         if (acao === "benchmark") abrirBenchmark(normalizarBuild(build),catalogo);
-        if (acao === "setup-atual") { salvarPlanejamento({setupAtualId:build.id}); renderizarBuilds(); showToast("Setup atual definido neste navegador."); }
+        if (acao === "setup-atual") {
+          const remover = planejamentoLocal().setupAtualId === build.id;
+          salvarPlanejamento({setupAtualId:remover ? null : build.id});
+          renderizarBuilds();
+          showToast(remover ? "Build desmarcada como setup atual." : "Setup atual definido neste navegador.");
+        }
         if (acao === "melhorias") abrirMelhorias(normalizarBuild(build),catalogo,proxima => {
           Object.assign(build,proxima); sincronizarRascunho(build,proxima); renderizarBuilds(); showToast("Melhorias aplicadas à build local.");
         });
@@ -689,15 +706,27 @@ document.addEventListener("DOMContentLoaded", async () => {
       fecharMenus();
     }
   });
+  document.addEventListener("keydown", evento => {
+    if (evento.key !== "Escape") return;
+    const trigger = lista.querySelector(".build-menu-wrap.open .build-menu-trigger");
+    fecharMenus();
+    trigger?.focus({preventScroll:true});
+  });
 
   btnCriar.addEventListener("click", () => {
     if (builds.length >= LIMITE_BUILDS) return;
-    navegarPara("./configuracao-build.html");
-  });
-
-  btnCriarFormulario.addEventListener("click", () => {
-    if (builds.length >= LIMITE_BUILDS) return;
-    navegarPara("./formulario.html");
+    fecharMenus();
+    const dialogo = abrirDialogoBuild("Como você quer criar sua build?", '<p class="planning-help">Escolha como começar sua montagem.</p><div class="build-create-options"><a class="build-create-option" href="./configuracao-build.html" aria-label="Criar build manualmente"><strong>Montagem manual</strong><span>Escolha peça por peça e acompanhe a compatibilidade e o orçamento no editor.</span><span class="build-create-option-action">Montar manualmente ' + iconeAnimado("arrow") + '</span></a><a class="build-create-option" href="./formulario.html" aria-label="Criar build pelo formulário inteligente"><strong>Formulário inteligente</strong><span>Informe seu objetivo, orçamento e as peças que já possui. Por enquanto, as respostas preparam o editor; a sugestão automática ainda está em desenvolvimento.</span><span class="build-create-option-action">Responder formulário ' + iconeAnimado("arrow") + '</span></a></div>');
+    dialogo.classList.add("build-create-dialog");
+    dialogo.querySelectorAll(".build-create-option").forEach(link => {
+      link.addEventListener("click",evento => {
+        if (evento.button !== 0 || evento.ctrlKey || evento.metaKey || evento.shiftKey || evento.altKey) return;
+        evento.preventDefault();
+        const destino = link.href;
+        dialogo.close();
+        navegarPara(destino);
+      });
+    });
   });
 
   btnImportar.addEventListener("click", () => {

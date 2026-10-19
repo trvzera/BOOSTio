@@ -14,7 +14,7 @@ const erros = {
   500: {
     titulo: "Algo não saiu como esperado",
     descricao:
-      "Ocorreu um erro inesperado. Tente novamente ou volte à página inicial.",
+      "Tente acessar novamente em instantes.",
   },
 };
 
@@ -31,3 +31,12 @@ codigoElemento.textContent = codigo;
 tituloElemento.textContent = erro.titulo;
 descricaoElemento.textContent = erro.descricao;
 document.title = `${codigo} — ${erro.titulo}`;
+
+// Sem uma origem distinta do início, não oferece dois botões para o mesmo destino.
+const voltar = document.querySelector("#error-back");
+try {
+  const nav = window.navigation;
+  const entrada = nav?.entries().find(item => item.index === nav.currentEntry.index - 1);
+  const origem = new URL(nav ? entrada?.url || "" : document.referrer);
+  voltar.hidden = origem.origin !== location.origin || /\/(index|erro)\.html$/.test(origem.pathname) || origem.href === location.href;
+} catch { voltar.hidden = true; }

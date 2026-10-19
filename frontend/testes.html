@@ -7,6 +7,7 @@
   <title>Laboratório de recursos — BOOSTio</title>
   <script type="module" src="./js/pages/loading.js" defer></script>
   <script type="module" src="./js/pages/testes.js" defer></script>
+  <script type="module" src="./js/pages/test-benchmark.js" defer></script>
   <link rel="icon" type="image/webp" href="./imgs/favicon.webp">
   <link rel="stylesheet" href="./styles/style.css">
   <link rel="stylesheet" href="./styles/paginas/testes.css">
@@ -47,9 +48,11 @@
     <section class="test-feature" id="teste-desempenho" aria-labelledby="performance-title">
       <div class="test-feature-head">
         <span class="test-kicker font-1-xs">Experimento · desempenho</span>
-        <h2 class="font-1-xl" id="performance-title">Testar minha build</h2>
-        <p class="font-2-s">Prévia do botão no topo da montagem. Ele só fica disponível quando a build chega a 100%. Ainda não há FPS integrado.</p>
+        <h2 class="font-1-xl" id="performance-title">Desempenho esperado</h2>
+        <p class="font-2-s">Escolha um jogo para consultar a expectativa de FPS.</p>
       </div>
+      <details class="test-performance-prototype fpshq-disclosure" data-animated-details>
+        <summary>Prévia na montagem</summary>
       <div class="test-placement glass-card">
         <span class="test-placement-label font-1-xs">No topo da montagem</span>
         <div class="test-builder-preview"><div><strong class="font-1-l">Configure sua build</strong><p class="font-2-xs" id="preview-build-progress">Verificando peças selecionadas…</p></div><button type="button" class="test-benchmark-button" id="preview-builder-test" aria-label="Testar build na prévia da montagem" data-disabled-reason="Complete 100% das peças para testar a build." disabled>Testar build</button></div>
@@ -64,6 +67,44 @@
         <div class="test-performance-details" id="performance-details" hidden></div>
       </div>
       <p class="test-muted font-2-xs test-footnote">O FPS mostrado futuramente será uma estimativa da combinação entre processador e placa de vídeo, não uma medição da sua máquina. O resultado pode variar com memória RAM, drivers, temperatura, configurações gráficas e outros fatores. CPU e GPU precisarão corresponder aos modelos aceitos pelo provedor; nenhum valor será inventado pelo front-end.</p>
+      </details>
+      <fieldset class="fpshq-layouts" id="fpshq-layouts" aria-describedby="fpshq-layout-help">
+        <legend class="font-1-xs">Interface de teste</legend>
+        <label><input type="radio" name="fpshq-layout" value="cards" checked aria-controls="fpshq-panel"><span>Cards</span></label>
+        <label><input type="radio" name="fpshq-layout" value="panel" aria-controls="fpshq-panel"><span>Painel</span></label>
+        <label><input type="radio" name="fpshq-layout" value="compact" aria-controls="fpshq-panel"><span>Compacto</span></label>
+      </fieldset>
+      <p class="sr-only" id="fpshq-layout-help">Alterne entre três apresentações dos mesmos dados sem fazer uma nova consulta. O jogo, os ajustes e o resultado são preservados.</p>
+      <section class="test-feature-panel glass-card fpshq-panel" id="fpshq-panel" data-layout="cards" aria-labelledby="fpshq-title">
+        <h3 class="font-1-l" id="fpshq-title">Teste em jogos</h3>
+        <p class="test-muted font-2-xs fpshq-hardware">Ryzen 5 5600 <span aria-hidden="true">·</span> GeForce RTX 3060 <span class="fpshq-reference">Combinação de referência</span></p>
+        <div class="fpshq-workspace">
+          <div class="fpshq-controls">
+            <form id="fpshq-test-form">
+              <div class="test-field-row fpshq-fields">
+                <label class="test-field font-1-s" for="fpshq-game">Jogo<select id="fpshq-game" required></select></label>
+                <label class="test-field font-1-s" for="fpshq-resolution">Resolução<select id="fpshq-resolution"><option value="1080p">1080p</option><option value="1440p">1440p</option><option value="4k">4K</option></select></label>
+                <label class="test-field font-1-s" for="fpshq-preset">Qualidade gráfica<select id="fpshq-preset"><option value="low">Baixa</option><option value="medium">Média</option><option value="high" selected>Alta</option><option value="ultra">Ultra</option></select></label>
+              </div>
+              <div class="test-actions"><button type="submit" class="btn-primary" aria-label="Ver desempenho esperado na FPSHQ" data-disabled-reason="Aguarde a consulta atual ou o intervalo solicitado pelo provedor.">Ver desempenho</button></div>
+            </form>
+            <details class="fpshq-search-details fpshq-disclosure" data-animated-details>
+              <summary>Buscar outro jogo</summary>
+              <div class="fpshq-search-row"><label class="test-field font-1-s" for="fpshq-search-text"><span class="sr-only">Nome do jogo</span><input id="fpshq-search-text" type="search" minlength="2" maxlength="60" placeholder="Nome do jogo" aria-describedby="fpshq-search-help"></label><button id="fpshq-search" type="button" class="btn-secondary" aria-label="Buscar jogos na FPSHQ" data-disabled-reason="Aguarde a consulta atual ou o intervalo solicitado pelo provedor.">Buscar</button></div>
+              <p class="sr-only" id="fpshq-search-help">Digite ao menos dois caracteres. A busca retorna até dez jogos. Selecione o jogo desejado nos resultados.</p>
+              <p class="test-feedback font-2-xs" id="fpshq-search-status" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+              <ul id="fpshq-search-results" class="fpshq-search-results" aria-label="Jogos encontrados" hidden></ul>
+            </details>
+          </div>
+          <div class="fpshq-output">
+            <p class="test-feedback font-2-xs" id="fpshq-feedback" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+            <div class="fpshq-empty" id="fpshq-empty"><span class="font-1-m-b">O resultado aparece aqui</span><p class="font-2-xs">Escolha um jogo e consulte o desempenho esperado.</p></div>
+            <div id="fpshq-result" class="fpshq-result" hidden aria-live="polite" aria-atomic="true"></div>
+            <aside id="fpshq-notice" class="fpshq-notice" aria-label="Limitações do desempenho esperado" hidden><p class="font-2-xs">Expectativa de desempenho, não uma garantia de FPS.</p><details class="fpshq-disclosure fpshq-limitations" data-animated-details><summary>O que pode influenciar?</summary><p class="font-2-xs">Modelo das peças, RAM, canais de memória, drivers, temperatura, limites de energia, configurações e programas em segundo plano podem mudar o resultado. A API não avalia a RAM desta referência nem confirma todos os requisitos do jogo.</p><p class="font-2-xs">A rede afeta a experiência online: latência e perda de pacotes podem causar lag, mas não equivalem necessariamente a queda de FPS. Rede e consumo instantâneo não são medidos aqui.</p><p class="font-2-xs">Não é uma medição da sua máquina e não altera suas builds. Confiança do provedor não garante precisão; confira requisitos e testes independentes antes de comprar peças.</p></details></aside>
+            <p class="test-muted font-2-xs fpshq-attribution">Dados: <a id="fpshq-source" href="https://fpshq.com/pt/api/" target="_blank" rel="noopener noreferrer" aria-label="FPSHQ — ver fonte em nova aba">FPSHQ</a> <span aria-hidden="true">·</span> <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" aria-label="Ver licença CC BY 4.0 em nova aba">CC BY 4.0</a></p>
+          </div>
+        </div>
+      </section>
     </section>
 
     <section class="test-feature" id="teste-comparacao" aria-labelledby="comparison-title">

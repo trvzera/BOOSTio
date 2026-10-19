@@ -47,7 +47,7 @@ test("todos os links e botões do HTML têm aria-label", async () => {
 });
 
 test("templates JavaScript também identificam links e botões", async () => {
-  for (const pasta of ["js/", "js/pages/", "js/components/", "js/build/"]) {
+  for (const pasta of ["js/", "js/pages/", "js/components/", "js/build/", "js/benchmark/"]) {
     const arquivos = await readdir(new URL(pasta, frontend));
     for (const arquivo of arquivos.filter(nome => nome.endsWith(".js"))) {
       const codigo = await readFile(new URL(pasta + arquivo, frontend), "utf8");
