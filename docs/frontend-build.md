@@ -6,6 +6,7 @@ Abra pelo Live Server:
 - `frontend/pages/configuracao-build.html?id=build-demo-1`: configuração de exemplo.
 - `frontend/pages/pecas.html?categoria=processador`: catálogo por categoria.
 - `frontend/pages/peca.html?id=SEED-CPU-02`: ficha técnica e lojas.
+- `frontend/pages/configuracoes-prontas.html`: modelos demonstrativos e cópia editável.
 - `frontend/testes.html`: demonstração que usa o mesmo menu hamburger das demais páginas.
 
 O catálogo demonstrativo é uma cópia das 750 peças de
@@ -54,6 +55,11 @@ O campo `imagem` já é suportado; ausências exibem um placeholder.
 Salvar no perfil nesta versão significa salvar neste navegador. Não há gravação na conta
 do Flask nem sincronização entre dispositivos. Dados do formulário entram como peças
 próprias sem preço; o usuário precisa selecionar o modelo para a validação técnica.
+`js/build/autosalvar.js` grava cada alteração válida na lista local, inclusive seleções
+do catálogo e da ficha da peça. Abrir o editor sem editar não cria uma build salva.
+Nome vazio ou quota completa preservam somente o rascunho e exibem a pendência;
+build trancada não pode ser sobrescrita. O botão **Salvar build e voltar** continua
+disponível para concluir e retornar à lista, sem ser necessário para persistir cada edição.
 
 Links compartilhados carregam a configuração por IDs de catálogo e quantidades, e abrem
 uma cópia. A visibilidade e a tranca são controles locais de interface, não autorização
@@ -208,7 +214,12 @@ O hamburger flutuante fica oculto até a autenticação. Em `testes.html`, o atr
 Os painéis usam glass, itens compactos, `inert` quando fechados, Escape e clique fora
 para fechar. Abrir um painel fecha o outro. Navegações usam páginas; na home o menu
 inclui também Sobre, Como funciona e Começar montagem, ligados às respectivas sections.
-O editor tem um botão direto para voltar a Suas builds, sem depender do histórico.
+O editor tem um botão direto para voltar a Minhas builds, sem depender do histórico.
+Minhas builds e Builds prontas compartilham um seletor de páginas com `aria-current`;
+o comparador aparece apenas em Minhas builds. Os cards não têm ação de compra.
+Em Minhas builds, **Criar pelo formulário** abre `formulario.html` com a transição
+compartilhada; a criação manual continua disponível em **Criar build**. Ambas as
+opções ficam bloqueadas quando a quota local de três builds está completa.
 
 Nos cards de builds, o progresso permanece azul e a linha inferior exibe apenas
 privacidade e data. Builds trancadas mostram um cadeado ao lado do nome e não
@@ -216,8 +227,68 @@ podem ser editadas nem deletadas até serem destrancadas.
 A barra à esquerda do título fica azul sem pendências, amarela com aviso/incompletude
 e vermelha com erro. Hover, foco ou toque mostram a lista de pendências; Escape fecha.
 O editor usa o mesmo indicador. Criar, duplicar e importar ficam bloqueados na quota
-completa, inclusive com uma explicação acessível. Importar continua um botão de prévia,
-sem implementação da leitura de arquivos ou integração com o servidor nesta versão.
+completa, inclusive com uma explicação acessível. Importar lê JSON e CSV da BOOSTio,
+valida o arquivo e abre uma prévia antes de criar uma cópia privada e destrancada.
+O salvamento ainda é local, sem integração com o servidor.
+
+### Recursos de planejamento e arquivos
+
+`js/build/rede.js` mantém conexão, posse, velocidade e comprimento do cabo na quarta
+etapa do formulário, sem campo de preço. `custoPrevisto` de arquivos v1 é aceito,
+normalizado para `null` e nunca somado. Na build, **Incluir rede** mostra a categoria
+**Wi-Fi / Rede** com adicionar/remover igual às outras peças. Os componentes usam
+`cabo_rede` e `adaptador_wifi`; `incluirRede` e as respostas do formulário sobrevivem
+à edição, duplicação, links e JSON/CSV. O catálogo demonstrativo ainda não possui
+esses produtos e mostra um estado vazio explícito, sem inventar preço ou modelo.
+Somente o preço de produtos cadastrados entra no total. Rede é opcional e não muda
+a conclusão ou o consumo estimado do PC; conferir interfaces/roteador continua necessário.
+
+O dropdown **Nome, descrição e orçamento** usa `components/animated-details.js`
+para animar as duas direções e respeita movimento reduzido. Os Lotties `circledot`,
+`magnifying` e `magic` usam o controlador compartilhado com hover/foco e reversão.
+O menu de três pontos abre para baixo, ajustando a rolagem ao abrir se faltar espaço,
+sem cobrir os controles flutuantes; sua lista tem rolagem própria e glass mais forte.
+
+`js/build/planejamento.js` guarda budget, preferência de uso e ID de setup atual
+neste navegador. O formulário preenche o range quando a preferência está ativa;
+`build.orcamento` permite ajustar o limite sem alterar o budget registrado.
+Sincronização e separação por conta continuam dependentes do backend.
+
+`js/build/arquivos.js` exporta JSON e CSV versionados (`boostio-build`, versão 1).
+O CSV inclui metadados e uma linha por modelo com categoria, ID ou peça própria,
+quantidade e nome. Arquivos têm limite de 1 MiB; a importação valida estrutura,
+quantidades e IDs, sem confiar em preços/consumo enviados no arquivo. Gera novo UUID,
+preserva planejamento e nunca reutiliza a visibilidade pública ou tranca da origem.
+
+`js/build/comparacao.js` abre o comparador da lista real de builds locais.
+`js/build/melhorias.js` monta uma prévia de trocas CPU/GPU dentro de um budget combinado
+e somente altera a build após confirmação. Rankings de desempenho e de vendas aguardam
+dados externos. `js/build/modelos.js` mantém exemplos versionados para a vitrine.
+
+`js/build/acoes-build.js` compartilha os modais de compra e benchmark e o aviso sobre
+lojas terceiras. O benchmark abre apenas com 100% das peças e sem erros; permite
+escolher resolução e preset, mas ainda não consulta FPS. Comprar build, somente no editor, lista as lojas
+e quantidades de cada peça, sem checkout nem abertura automática de múltiplas abas.
+
+### Consulta de FPS — preparação da integração
+
+A [documentação oficial da FPSHQ](https://fpshq.com/api-docs/) descreve descoberta de
+slugs em `/search` e catálogos `/cpus`, `/gpus`, `/games`, seguida de
+`GET /api/v1/fps?game=<slug>&gpu=<slug>&cpu=<slug>&res=1080p&preset=low`.
+Os presets são `low`, `medium`, `high`, `ultra`; resoluções: `1080p`, `1440p`, `4K`.
+A resposta documentada contém `ok`, jogo/CPU/GPU, resolução/preset, `fps`, `fps_min`,
+`fps_max`, `verdict`, `source`, `bottleneck` e `url`. Identificar `source=benchmark`
+versus `prediction`, atribuir a fonte pelo `url` e não chamar mínimo de “1% low”.
+O provedor informa uso sem chave, CORS, cache de uma hora e fair use de aproximadamente
+60 requisições/minuto/IP. Antes de ativar: validar disponibilidade e respostas reais,
+mapear componentes exatos (incluindo variantes/iGPU), tratar faltas/429/timeouts e cachear.
+Nesta revisão, o acesso direto ao site/endpoint foi bloqueado na ferramenta de pesquisa;
+o contrato acima foi conferido na documentação indexada, não em uma resposta executada.
+O modal inclui **Baixa**, mas a consulta permanece desativada até essa validação.
+
+A [API da UL](https://support.benchmarks.ul.com/support/solutions/articles/44002238427-api-documentation)
+é alternativa contratada e exige chave/segredo e assinatura; qualquer integração dela
+deve passar pelo backend, sem expor credenciais no JavaScript.
 
 Os controles `data-page-back` usam `js/components/navigation-back.js` para retornar
 à entrada anterior do navegador, com a URL completa da build/categoria. O texto e a
@@ -228,7 +299,7 @@ esse retorno do botão **Etapa anterior**, que só muda a pergunta atual.
 
 `js/components/navigation-config.js` contém os links e a política de sessão. Visitantes
 veem Entrar e Criar conta no perfil; usuários autenticados veem Builds, Configurações
-e Sair. O hamburger contém Início, Montar build, Suas builds e Perfil.
+e Sair. O hamburger contém Início, Montar build, Minhas builds, Builds prontas e Perfil.
 A página de login não redireciona visitantes para ela mesma. Falhas de
 consulta da sessão mantêm o menu de visitante disponível.
 
@@ -251,7 +322,16 @@ Login e cadastro têm altura livre, e os modais são limitados pela altura visí
 com rolagem interna. Campos no mobile usam pelo menos 16px, sem reduzir a tela
 inteira com `scale()`. O detalhamento de compatibilidade abre no fluxo no mobile.
 
-Testes: `node --test frontend/tests/*.test.mjs` (52 verificações de lógica e regressão).
+No formulário, opções e campos de rede rolam dentro da sua área, preservando os
+botões de navegação. Em telas baixas na horizontal, o cartão ganha altura e a página
+pode rolar, em vez de espremer ou esconder os campos. O resumo expandido do editor
+deixa de ser fixo para não prender os controles abaixo da tela. Menus dos cards de
+build abrem para baixo e limitam sua altura ao espaço disponível; a
+posição é recalculada ao rolar ou redimensionar. Botões bloqueados mantêm a largura
+mobile mesmo com o wrapper de tooltip, e prévias de importação quebram nomes longos.
+
+Testes: `node --test frontend/tests/*.test.mjs` (lógica de montagem, arquivos,
+planejamento, acessibilidade e regressões).
 Ao alterar layouts, confira 320, 390, 600, 768, 1024 e 1440px, landscape e os
 estados abertos (menus, modais, senha e modelos de peças).
 

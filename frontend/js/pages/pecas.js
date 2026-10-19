@@ -6,6 +6,7 @@ import { pecaCompativel, selecionarPecaCompativel } from "../build/compatibilida
 import { avisar, mostrarFalha } from "../build/interface.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { navegarPara } from "../components/page-loading.js";
+import { salvarAlteracaoLocal } from "../build/autosalvar.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const main = document.querySelector("#catalog-main");
@@ -52,7 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           '</ul><strong class="product-price font-1-l">' + moeda(peca.preco) + '</strong><div class="product-actions"><a class="btn-ghost" href="' + detalhes +
           '" aria-label="Detalhes de ' + h(nomePeca(peca)) + '">Detalhes</a><button type="button" class="btn-primary" data-add="' + peca.id + '" aria-label="' + (selecionada && categoriasMultiplas.has(peca.categoria) ? "Adicionar mais" : "Adicionar") + ' ' + h(nomePeca(peca)) + ' à build" ' + (motivo ? 'disabled data-disabled-reason="' + h(motivo) + '"' : "") + '>' +
           iconeAnimado("plus") + (selecionada && categoriasMultiplas.has(peca.categoria) ? "Adicionar mais" : "Adicionar") + '</button></div></div></article>';
-      }).join("") || '<div class="catalog-empty glass-card"><p class="font-2-s">' + (build.travada ? 'Build trancada: destranque-a antes de escolher componentes.' : 'Nenhuma opção está disponível com estes filtros e a configuração atual. Para trocar uma peça já selecionada, remova-a primeiro no editor.') + '</p></div>';
+      }).join("") || '<div class="catalog-empty glass-card"><p class="font-2-s">' + (build.travada ? 'Build trancada: destranque-a antes de escolher componentes.' : categoria.rede && !produtos.length ? 'Cabos de rede e adaptadores Wi-Fi ainda não foram cadastrados no catálogo. As preferências do formulário foram preservadas; nenhum produto ou preço será presumido.' : 'Nenhuma opção está disponível com estes filtros e a configuração atual. Para trocar uma peça já selecionada, remova-a primeiro no editor.') + '</p></div>';
       iniciarIcones(main);
       main.querySelector("#catalog-page").textContent = pagina + " / " + paginas;
       main.querySelector("#previous-products").disabled = pagina <= 1;
@@ -66,7 +67,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!botao || botao.disabled) return;
       try {
         build = selecionarPecaCompativel(build, catalogo.find((p) => p.id === botao.dataset.add), catalogo);
-        guardarRascunho(build);
+        const salvo = salvarAlteracaoLocal(build,catalogo);
+        if (!salvo.salvo) { avisar(salvo.motivo); return; }
         navegarPara("./configuracao-build.html?id=" + encodeURIComponent(build.id));
       } catch (erro) { avisar(erro.message); }
     });

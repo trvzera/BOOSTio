@@ -5,7 +5,8 @@ export const linksVisitante = [
 export const linksAutenticado = [
   {pagina:"index.html",rotulo:"Início"},
   {pagina:"configuracao-build.html",rotulo:"Montar build",icone:"plus"},
-  {pagina:"builds.html",rotulo:"Suas builds",icone:"build"},
+  {pagina:"builds.html",rotulo:"Minhas builds",icone:"build"},
+  {pagina:"configuracoes-prontas.html",rotulo:"Builds prontas",icone:"build"},
   {pagina:"configuracoes.html",rotulo:"Perfil",icone:"user"},
 ];
 export function redirecionamentoSessao(pagina,autenticado) {

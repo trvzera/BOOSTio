@@ -86,9 +86,15 @@ footer { width: 100%; max-width: 1240px; padding: clamp(20px, 3vw, 32px); }
   #top-footer { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
   #footer-hero { grid-column: 1 / -1; }
 }
+@media (max-width: 850px) {
+  /* Mantém também os campos dos novos fluxos legíveis e sem zoom ao focar. */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea,
+  .planning-field :is(input, select, textarea),
+  .prontas-campo :is(input, select),
+  .summary-details .input-text,
+  .catalog-toolbar .input-text { font-size: 1rem; }
+}
 @media (max-width: 600px) {
-  /* 16px evita o zoom automático do Safari ao focar os campos. */
-  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea { font-size: 1rem; }
   .modal-box, .share-dialog { padding: 20px; }
   .modal-actions { flex-direction: column; align-items: stretch; }
   .modal-actions > *, .modal-actions > .disabled-tip-anchor > button { width: 100%; }

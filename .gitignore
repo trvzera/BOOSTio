@@ -16,3 +16,4 @@ instance/
 .DS_Store
 testes.html
 !frontend/testes.html
+/docs/pendencias-produto.md

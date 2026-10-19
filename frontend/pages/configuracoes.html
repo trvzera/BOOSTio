@@ -67,6 +67,18 @@
         </div>
       </div>
 
+      <section class="settings-card" aria-labelledby="profile-budget-title">
+        <div class="card-heading"><h2 class="font-1-m-b" id="profile-budget-title">Seu budget</h2></div>
+        <p class="card-subtext font-2-xs">Registre quanto pretende investir nas próximas montagens e melhorias.</p>
+        <form id="budget-profile-form">
+          <label class="planning-field" for="profile-budget"><span>Orçamento disponível (R$)</span><input id="profile-budget" type="number" min="0" max="1000000" step="any" inputmode="decimal" placeholder="Ex.: 5000"></label>
+          <label class="planning-consent" for="profile-budget-use"><input id="profile-budget-use" type="checkbox"><span>Usar este budget nas novas configurações</span></label>
+          <p class="planning-help">Você poderá ajustar o valor para cada build. Por enquanto, esta preferência fica salva neste navegador; a sincronização com a conta será adicionada depois.</p>
+          <button type="submit" class="btn-primary" aria-label="Salvar budget">Salvar budget</button>
+          <p class="planning-help" id="profile-budget-feedback" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
       <div class="settings-card">
         <div class="card-heading"><i class="fa-solid fa-lock"></i><span class="font-1-m-b">Alterar senha</span></div>
         <p class="card-subtext font-1-m">Utilize esse campo para alterar a sua senha.</p>

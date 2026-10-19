@@ -1,6 +1,9 @@
-#questions { grid-template-columns: repeat(2, minmax(0, 1fr)); min-height: 0; }
+#questions { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); min-height: 0; }
 #question-content, #question-info { min-width: 0; padding: clamp(24px, 3vw, 40px); }
-#question-info { gap: 32px; }
+#question-info { min-height: 0; gap: 32px; overflow-y: auto; }
+#question-content { overflow: hidden; }
+.question-options { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; }
+.options-heading, .budget-range, #form-navigation { flex-shrink: 0; }
 .options-heading { flex-wrap: wrap; gap: 8px; }
 .options-heading > p { min-width: 0; }
 .options-heading > span { flex-shrink: 0; }
@@ -15,9 +18,18 @@
 .budget-range { grid-template-columns: minmax(0, 1fr) auto; }
 
 @media (min-width: 851px) {
-  .form-page { --form-top: clamp(64px, 8vh, 94px); min-height: 100svh; padding: var(--form-top) var(--page-gutter) 24px; }
-  #forms-page-container { min-height: calc(100svh - var(--form-top) - 24px); justify-content: center; gap: 16px; }
-  #questions { height: clamp(460px, calc(100svh - 246px), 700px); }
+  .form-page { --form-top: clamp(64px, 8vh, 94px); min-height: 100svh; padding: var(--form-top) var(--page-gutter) calc(96px + env(safe-area-inset-bottom, 0px)); }
+  #forms-page-container { min-height: calc(100svh - var(--form-top) - 96px - env(safe-area-inset-bottom, 0px)); justify-content: center; gap: 16px; }
+  #questions { height: clamp(460px, calc(100svh - 318px), 700px); }
+}
+@media (min-width: 851px) and (max-height: 850px) {
+  #question-content { gap: 16px; }
+  #question-info { gap: 20px; padding: 24px; }
+  #question-info .question-tag { margin-bottom: 16px; }
+  #question-info h1 { margin-bottom: 12px; }
+  #question-info .question-intro > p { font-size: .9rem; line-height: 1.6; }
+  #question-info .manual-build { gap: 8px; padding-top: 16px; }
+  #question-info .manual-build p { display: none; }
 }
 
 @media (max-width: 850px) {
@@ -44,7 +56,7 @@
   .form-page #question-content { padding-bottom: 64px; }
 }
 @media (max-width: 600px) {
-  .form-page { height: auto; min-height: 100svh; padding-bottom: 48px; overflow-x: clip; overflow-y: visible; }
+  .form-page { height: auto; min-height: 100svh; padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); overflow-x: clip; overflow-y: visible; }
   .form-page #forms-page-container { height: auto; gap: 16px; }
   .form-page #questions { flex: none; height: clamp(730px, calc(100svh + 110px), 1040px); }
   #forms-header { gap: 8px; flex-wrap: nowrap; }
@@ -71,7 +83,7 @@
   #form-navigation > :only-child { grid-column: 1 / -1; }
 }
 @media (max-width: 380px) {
-  #question-content, #question-info { padding: 20px 16px; }
+  .form-page #question-content, .form-page #question-info { padding: 20px 16px; }
   #form-navigation button { font-size: .75rem; }
 }
 @media (max-width: 580px) {
@@ -80,12 +92,14 @@
   .question-intro { font-size: .7rem; }
 }
 @media (min-width: 601px) and (max-width: 850px) and (max-height: 700px) {
-  .form-page { padding-top: 60px; padding-bottom: 8px; }
-  .form-page #forms-page-container { gap: 6px; }
+  /* Em paisagem, preserva área útil para os campos e permite rolar a página. */
+  .form-page { height: auto; min-height: 100svh; padding-top: 72px; padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); overflow-y: visible; }
+  .form-page #forms-page-container { height: auto; gap: 12px; }
+  .form-page #questions { flex: none; height: clamp(560px, calc(100svh + 160px), 780px); }
   .form-page #question-info { padding: 10px 16px; }
   .form-page #question-info .question-intro > p,
   .form-page .manual-build { display: none; }
-  .form-page #question-content { gap: 8px; padding: 10px 16px 64px; }
+  .form-page #question-content { gap: 12px; padding: 16px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .question-enter { animation: none; }

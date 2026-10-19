@@ -2,12 +2,17 @@ import "../header.js";
 import "../auth/auth.js";
 import { registrarAnimacao } from "../components/lottie-controller.js";
 import { formatarDataHora } from "../utils/formatarData.js";
-import { abrirBuild, buildsLocais, sincronizarRascunho, CHAVE_PERFIL_LOCAL, linkCompartilhado } from "../build/estado.js";
+import { abrirBuild, buildsLocais, sincronizarRascunho, CHAVE_PERFIL_LOCAL, linkCompartilhado, normalizarBuild } from "../build/estado.js";
 import { htmlSeguro, carregarCatalogo } from "../build/catalogo.js";
 import { avaliarBuild } from "../build/compatibilidade.js";
 import { indicadorBuild,iniciarIndicadores } from "../build/indicador.js";
-import { iniciarIcones } from "../components/ui.js";
+import { iniciarIcones, iconeAnimado } from "../components/ui.js";
 import { navegarPara } from "../components/page-loading.js";
+import { abrirBenchmark, abrirDialogoBuild, motivoBenchmark } from "../build/acoes-build.js";
+import { abrirComparacao } from "../build/comparacao.js";
+import { exportarJson, exportarCsv, importarBuild } from "../build/arquivos.js";
+import { planejamentoLocal, salvarPlanejamento } from "../build/planejamento.js";
+import { abrirMelhorias } from "../build/melhorias.js";
 
 const LIMITE_BUILDS = 3;
 
@@ -72,6 +77,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const quotaCount = document.getElementById("quota-count");
   const quotaFill = document.getElementById("quota-fill");
   const btnCriar = document.getElementById("btn-create-build");
+  const btnCriarFormulario = document.getElementById("btn-create-build-form");
   const btnImportar = document.getElementById("btn-import-build");
   const toast = document.getElementById("toast");
   const toastText = document.getElementById("toast-text");
@@ -105,9 +111,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const usadas = builds.length;
     quotaCount.textContent = `${usadas}/${LIMITE_BUILDS}`;
     quotaFill.style.width = `${(usadas / LIMITE_BUILDS) * 100}%`;
-    btnCriar.disabled = usadas >= LIMITE_BUILDS;
-    btnImportar.disabled = usadas >= LIMITE_BUILDS;
-    btnCriar.dataset.disabledReason = btnImportar.dataset.disabledReason = "Limite de três builds atingido. Exclua uma build para liberar espaço.";
+    for (const botao of [btnCriar, btnCriarFormulario, btnImportar]) {
+      botao.disabled = usadas >= LIMITE_BUILDS;
+      botao.dataset.disabledReason = "Limite de três builds atingido. Exclua uma build para liberar espaço.";
+    }
+    document.querySelector("#btn-compare-builds").disabled = builds.length < 2 || !catalogo.length;
   }
 
   function fecharMenus() {
@@ -120,6 +128,44 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
   }
+
+  function posicionarMenu(wrap, acomodar = false) {
+    const menu = wrap.querySelector(".build-menu");
+    const trigger = wrap.querySelector(".build-menu-trigger");
+    const vista = window.visualViewport;
+    const topo = vista?.offsetTop || 0;
+    const fundo = topo + (vista?.height || window.innerHeight);
+    const rect = trigger.getBoundingClientRect();
+    if (rect.bottom <= topo || rect.top >= fundo) { fecharMenus(); return; }
+    const ancora = wrap.getBoundingClientRect();
+    const esquerda = ancora.right - menu.offsetWidth;
+    let limiteTopo = topo + 12, limiteFundo = fundo - 12;
+    // Não coloca ações atrás dos controles flutuantes de navegação.
+    for (const seletor of [".site-brand", ".site-profile", ".site-menu"]) {
+      const flutuante = document.querySelector(seletor)?.getBoundingClientRect();
+      if (!flutuante?.width || flutuante.left >= ancora.right || flutuante.right <= esquerda) continue;
+      if (seletor === ".site-menu") limiteFundo = Math.min(limiteFundo, flutuante.top - 12);
+      else limiteTopo = Math.max(limiteTopo, flutuante.bottom + 12);
+    }
+    const abaixo = Math.max(0, limiteFundo - rect.bottom - 8);
+    const minimoUtil = Math.max(0, Math.min(260, limiteFundo - limiteTopo - rect.height - 8));
+    if (acomodar && abaixo < minimoUtil) {
+      window.scrollBy({top:minimoUtil - abaixo,behavior:"instant"});
+      posicionarMenu(wrap); return;
+    }
+    menu.dataset.placement = "bottom";
+    menu.style.maxHeight = Math.floor(abaixo) + "px";
+    menu.style.top = rect.bottom + 8 - ancora.top + "px";
+  }
+
+  function reposicionarMenuAberto() {
+    const aberto = lista.querySelector(".build-menu-wrap.open");
+    if (aberto) posicionarMenu(aberto);
+  }
+  window.addEventListener("resize", reposicionarMenuAberto);
+  window.addEventListener("scroll", reposicionarMenuAberto, { passive: true, capture: true });
+  window.visualViewport?.addEventListener("resize", reposicionarMenuAberto);
+  window.visualViewport?.addEventListener("scroll", reposicionarMenuAberto);
 
   // Inicialização manual com validação de botões desabilitados
   async function iniciarAnimacoesDoCard(card, buildId) {
@@ -328,6 +374,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       iniciarAnimacoesDoCard(cardCriado, build.id).catch((erro) =>
         console.warn("Não foi possível carregar os ícones do card:", erro));
     });
+    iniciarIcones(lista);
+    iniciarIcones(lista);
   }
 
   function criarCard(build) {
@@ -363,6 +411,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="build-menu-wrap">
           <button type="button" class="build-menu-trigger" aria-label="Abrir menu da build ${tituloSeguro}" aria-expanded="false" aria-haspopup="true">···</button>
           <div class="build-menu" role="menu">
+            <button type="button" class="build-menu-item benchmark-menu-item" data-acao="benchmark" role="menuitem" aria-label="Testar build ${tituloSeguro}" ${!catalogo.length || motivoBenchmark(normalizarBuild(build),catalogo) ? 'disabled data-disabled-reason="Complete as peças e resolva os erros de compatibilidade para testar a build."' : ""}>${iconeAnimado("magic")}Testar build</button>
+            <button type="button" class="build-menu-item" data-acao="melhorias" role="menuitem" aria-label="Buscar melhorias para ${tituloSeguro}" ${build.travada ? 'disabled data-disabled-reason="Destranque a build para buscar melhorias."' : ""}>${iconeAnimado("magnifying")}Buscar melhorias</button>
+            <button type="button" class="build-menu-item" data-acao="setup-atual" role="menuitem" aria-label="Definir como setup atual: ${tituloSeguro}">${iconeAnimado("circledot")}Definir como setup atual</button>
+            <span class="build-menu-divider"></span>
             <button type="button" class="build-menu-item" data-acao="trancar" role="menuitem" aria-label="${textoTranca} de ${tituloSeguro}">
               <i id="lottie-lock-${idHtml}" class="lottie-build-page"></i>
               <span class="btn-text">${textoTranca}</span>
@@ -414,6 +466,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const titulo = artigo.querySelector(".build-card-title");
     titulo.textContent = build.titulo;
+    if (planejamentoLocal().setupAtualId === build.id) {
+      const rotulo = document.createElement("span"); rotulo.className = "build-card-current"; rotulo.textContent = "Setup atual"; titulo.append(rotulo);
+    }
     if (build.travada) {
       const cadeado = document.createElement("i");
       cadeado.className = "fa-solid fa-lock build-card-lock";
@@ -470,31 +525,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function montarCsv(build) {
-    const linhas = [
-      ["campo", "valor"],
-      ["id", build.id],
-      ["titulo", build.titulo],
-      ["descricao", build.descricao],
-      ["visibilidade", build.visibilidade],
-      ["travada", build.travada],
-      ["status", resolverStatus(build)],
-      ["progresso", `${build.progresso ?? calcularProgresso(build.pecas)}%`],
-      ["criadoEm", build.criadoEm],
-      [],
-      ["peca", "na_build"],
-    ];
-
-    Object.entries(build.pecas).forEach(([chave, valor]) => {
-      linhas.push([ROTULOS_PECA[chave] || chave, valor ? "sim" : "nao"]);
-    });
-
-    return linhas
-      .map((linha) =>
-        linha
-          .map((celula) => `"${String(celula).replace(/"/g, '""')}"`)
-          .join(","),
-      )
-      .join("\n");
+    return exportarCsv(build,catalogo);
   }
 
   function abrirModal(modal) {
@@ -507,7 +538,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   lista.addEventListener("click", async (evento) => {
     if (evento.target.closest(".build-indicator")) return;
-    if (!evento.target.closest(".build-menu-wrap")) {
+    if (!evento.target.closest(".build-menu-wrap") && !evento.target.closest("[data-acao]")) {
       const selecionado = evento.target.closest(".build-card");
       if (selecionado) {
         navegarPara("./configuracao-build.html?id=" + encodeURIComponent(selecionado.dataset.id));
@@ -521,6 +552,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       fecharMenus();
       if (!jaAberto) {
         wrap.classList.add("open");
+        posicionarMenu(wrap, true);
         trigger.setAttribute("aria-expanded", "true");
         trigger.setAttribute("aria-label", "Fechar menu da build " + trigger.dataset.buildTitle);
       }
@@ -536,6 +568,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const acao = botao.dataset.acao;
     fecharMenus();
+
+    if (["benchmark","melhorias","setup-atual"].includes(acao)) {
+      try {
+        if (acao === "benchmark") abrirBenchmark(normalizarBuild(build),catalogo);
+        if (acao === "setup-atual") { salvarPlanejamento({setupAtualId:build.id}); renderizarBuilds(); showToast("Setup atual definido neste navegador."); }
+        if (acao === "melhorias") abrirMelhorias(normalizarBuild(build),catalogo,proxima => {
+          Object.assign(build,proxima); sincronizarRascunho(build,proxima); renderizarBuilds(); showToast("Melhorias aplicadas à build local.");
+        });
+      } catch (erro) { showToast(erro.message); }
+      return;
+    }
 
     if (acao === "trancar") {
       build.travada = !build.travada;
@@ -608,22 +651,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     if (acao === "baixar-json") {
+      try {
       baixarArquivo(
         `${slugify(build.titulo) || "build"}.json`,
-        JSON.stringify(build, null, 2),
+        exportarJson(build),
         "application/json",
       );
       showToast("Download do JSON iniciado.");
+      } catch (erro) { showToast(erro.message); }
       return;
     }
 
     if (acao === "baixar-csv") {
+      try {
       baixarArquivo(
         `${slugify(build.titulo) || "build"}.csv`,
         montarCsv(build),
         "text/csv;charset=utf-8",
       );
       showToast("Download do CSV iniciado.");
+      } catch (erro) { showToast(erro.message); }
       return;
     }
 
@@ -648,10 +695,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     navegarPara("./configuracao-build.html");
   });
 
+  btnCriarFormulario.addEventListener("click", () => {
+    if (builds.length >= LIMITE_BUILDS) return;
+    navegarPara("./formulario.html");
+  });
+
   btnImportar.addEventListener("click", () => {
     if (builds.length >= LIMITE_BUILDS) { showToast("Limite de 3 builds atingido."); return; }
-    showToast("A importação de builds depende do backend.");
+    const dialogo = abrirDialogoBuild("Importar build",'<p class="planning-help">Selecione um JSON de build ou um CSV exportado pela BOOSTio (até 1 MB). A importação cria uma nova cópia privada e editável.</p><label class="planning-field" for="build-import-file"><span>Arquivo CSV ou JSON</span><input id="build-import-file" type="file" accept=".json,.csv"></label><div id="build-import-preview" class="import-preview" hidden></div><p id="build-import-status" class="planning-help" role="status" aria-live="polite"></p><div class="build-action-actions"><button type="button" class="btn-secondary" id="build-import-cancel" aria-label="Cancelar importação">Cancelar</button><button type="button" class="btn-primary" id="build-import-confirm" aria-label="Importar build" disabled data-disabled-reason="Selecione um arquivo de build válido.">Importar build</button></div>');
+    const confirmar = dialogo.querySelector("#build-import-confirm"), status = dialogo.querySelector("#build-import-status");
+    let candidata = null, geracao = 0;
+    dialogo.querySelector("#build-import-cancel").onclick = () => dialogo.close();
+    dialogo.querySelector("#build-import-file").onchange = async evento => {
+      const atual = ++geracao, arquivo = evento.target.files[0];
+      candidata = null; confirmar.disabled = true; dialogo.querySelector("#build-import-preview").hidden = true;
+      if (!arquivo) { status.textContent = "Selecione um arquivo."; return; }
+      try {
+        if (arquivo.size > 1024 * 1024) throw new Error("O arquivo deve ter até 1 MB.");
+        const extensao = arquivo.name.split(".").pop().toLowerCase();
+        if (!["csv","json"].includes(extensao)) throw new Error("Selecione um arquivo CSV ou JSON.");
+        const texto = await arquivo.text();
+        if (atual !== geracao || !dialogo.open) return;
+        candidata = importarBuild(texto,extensao,catalogo);
+        const resultado = avaliarBuild(candidata,catalogo), preview = dialogo.querySelector("#build-import-preview");
+        preview.hidden = false;
+        preview.textContent = candidata.titulo + " · " + resultado.preenchidos + "/" + resultado.total + " peças · " + (resultado.erros.length ? resultado.erros.length + " erro(s) de compatibilidade para corrigir" : "configuração pronta para abrir no editor");
+        status.textContent = "Arquivo validado. Confira os dados antes de importar."; status.dataset.tone = "info"; confirmar.disabled = false;
+      } catch (erro) { if (atual === geracao) { status.textContent = erro.message; status.dataset.tone = "error"; } }
+    };
+    confirmar.onclick = () => {
+      if (!candidata) return;
+      if (builds.length >= LIMITE_BUILDS) { status.textContent = "Limite de três builds atingido."; return; }
+      try {
+        const proximaLista = [...builds,candidata];
+        localStorage.setItem(CHAVE_PERFIL_LOCAL,JSON.stringify(proximaLista));
+        builds = proximaLista; renderizarBuilds(); dialogo.close(); showToast("Build importada neste navegador.");
+      } catch { status.textContent = "Não foi possível salvar a build neste navegador."; }
+    };
   });
+  document.querySelector("#btn-compare-builds").onclick = () => { try { abrirComparacao(builds.map(build => normalizarBuild(build)),catalogo); } catch (erro) { showToast(erro.message); } };
 
   document
     .getElementById("cancel-build-edit")
@@ -701,6 +783,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
       builds = builds.filter((item) => item.id !== idExclusao);
+      if (planejamentoLocal().setupAtualId === idExclusao) {
+        try { salvarPlanejamento({setupAtualId:null}); } catch { /* A exclusão da lista continua disponível. */ }
+      }
       idExclusao = null;
       fecharModal(modalDeletar);
       renderizarBuilds();

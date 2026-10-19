@@ -77,7 +77,7 @@
   height: 100%;
   width: 33.333%;
   border-radius: 50px;
-  background: linear-gradient(90deg, var(--cor-p1), var(--cor-s1));
+  background: linear-gradient(90deg, var(--cor-p4), var(--cor-p1));
   transition: width 0.35s var(--ease);
 }
 

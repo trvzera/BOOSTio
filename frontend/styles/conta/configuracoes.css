@@ -62,7 +62,7 @@
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--cor-p1), var(--cor-s1));
+  background: var(--brand-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
