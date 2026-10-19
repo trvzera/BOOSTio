@@ -42,7 +42,7 @@ export function iniciarIcones(raiz = document) {
       if (!elemento.isConnected) { destruirAnimacao(elemento.id,animacao); return; }
       const controle = elemento.closest("button,a,label,summary");
       const input = controle?.querySelector('input[type="checkbox"]');
-      const alternavel = ["checkbox","chevron","hamburger","profile"].includes(elemento.dataset.lottie);
+      const alternavel = ["checkbox","chevron","hamburger","profile","dots"].includes(elemento.dataset.lottie);
       const aberto = () => input ? input.checked : controle?.getAttribute("aria-expanded") === "true";
       const invertido = elemento.dataset.lottieReversed === "true";
       const mover = direcao => {

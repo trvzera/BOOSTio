@@ -3,6 +3,9 @@ import { itensSelecionados, itensCategoria, informacoesRam } from "./estado.js";
 import { avaliarBuild } from "./compatibilidade.js";
 import { normalizarRede, resumoRede } from "./rede.js";
 import { iniciarIcones } from "../components/ui.js";
+import { hardwareBenchmark } from "../benchmark/hardware.js";
+import { painelBenchmarkHtml } from "../benchmark/painel.js";
+import { iniciarPainelBenchmark } from "../benchmark/interface.js";
 
 export function avisoCompraHtml() {
   return '<p class="purchase-notice">A BOOSTio não vende, entrega ou processa pagamentos de peças e periféricos. Os links abrem lojas de terceiros, responsáveis pela venda e pelo atendimento da compra. Confira preço, estoque, frete, garantia e devolução diretamente na loja.</p>';
@@ -37,15 +40,13 @@ export function abrirBenchmark(build,catalogo) {
   if (motivo) throw new Error(motivo);
   const peca = categoria => catalogo.find(p => p.id === itensCategoria(build,categoria)[0]?.id);
   const cpu = peca("processador"), gpu = peca("placa_video"), ram = informacoesRam(build,catalogo);
-  return abrirDialogoBuild("Testar build",'<p class="planning-help">' + h(build.titulo) + '</p>' +
-    '<dl class="benchmark-specs"><div><dt>Processador</dt><dd>' + h(nomePeca(cpu)) + '</dd></div>' +
-    '<div><dt>Placa de vídeo</dt><dd>' + h(gpu ? nomePeca(gpu) : cpu?.modelo_videointegrado || "Vídeo integrado · modelo a confirmar") + '</dd></div>' +
-    '<div><dt>Memória</dt><dd>' + ram.capacidade + ' GB</dd></div></dl>' +
-    '<div class="planning-grid"><label class="planning-field" for="benchmark-resolution"><span>Resolução</span><select id="benchmark-resolution"><option>1080p</option><option>1440p</option><option>4K</option></select></label>' +
-    '<label class="planning-field" for="benchmark-preset"><span>Qualidade gráfica</span><select id="benchmark-preset"><option value="low">Baixa</option><option value="medium" selected>Média</option><option value="high">Alta</option><option value="ultra">Ultra</option></select></label></div>' +
-    '<div class="benchmark-empty" role="status"><strong>Estimativas de FPS em breve</strong><p>O serviço de desempenho ainda não está disponível. Quando estiver integrado, você poderá consultar os jogos suportados com estas configurações.</p></div>' +
-    '<button type="button" class="btn-primary" disabled data-disabled-reason="A integração com o serviço de benchmark ainda está em andamento." aria-label="Consultar FPS estimado">Consultar FPS estimado</button>' +
-    '<p class="planning-help">O FPS será uma estimativa da combinação entre processador e GPU, não uma medição da sua máquina. RAM, drivers, temperatura, resolução e configurações do jogo podem alterar o desempenho real.</p>');
+  const prefixo = "build-fpshq";
+  const dialogo = abrirDialogoBuild("Desempenho esperado",'<p class="planning-help">' + h(build.titulo) + '</p>' +
+    painelBenchmarkHtml({prefixo,hardware:nomePeca(cpu) + " · " + (gpu ? nomePeca(gpu) : "Vídeo integrado"),memoria:ram.capacidade}));
+  dialogo.classList.add("benchmark-dialog");
+  const limpar = iniciarPainelBenchmark(dialogo,{prefixo,hardware:hardwareBenchmark(cpu,gpu)});
+  dialogo.addEventListener("close",() => limpar?.(),{once:true});
+  return dialogo;
 }
 export function abrirCompraBuild(build,catalogo) {
   const itens = itensSelecionados(build,catalogo);

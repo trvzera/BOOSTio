@@ -41,6 +41,7 @@
 @import "./componentes/ui-system.css";
 @import "./componentes/glass.css";
 @import "./build/recursos.css";
+@import "./componentes/benchmark.css";
 @import "./build/comparacao.css";
 @import "./build/prontas.css";
 @import "./build/melhorias.css";

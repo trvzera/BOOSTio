@@ -66,6 +66,7 @@
   gap: var(--espacamento-12);
   margin-top: var(--espacamento-32);
 }
+.error-actions [hidden] { display: none; }
 
 .error-actions .btn-primary,
 .error-actions .btn-ghost {

@@ -21,11 +21,21 @@ export async function fetchComErro(caminho, opcoes = {}) {
     }
     return null;
   }
-  const dados = await resposta.json();
+  let dados;
+  try { dados = await resposta.json(); }
+  catch {
+    const erro = new Error("O servidor retornou uma resposta inválida. Tente novamente mais tarde.");
+    erro.status = resposta.status;
+    throw erro;
+  }
 
 
   if (!resposta.ok) {
-    throw new Error(dados.erro || "Erro ao comunicar com o servidor.");
+    const erro = new Error(dados.erro || "Erro ao comunicar com o servidor.");
+    erro.status = resposta.status;
+    erro.codigo = dados.codigo;
+    erro.espera = Number.isFinite(dados.espera) && dados.espera > 0 ? dados.espera : 0;
+    throw erro;
   }
 
   return dados;

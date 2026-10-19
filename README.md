@@ -18,7 +18,7 @@ A página [Sobre nós](frontend/pages/sobre.html) apresenta a proposta da BOOSTi
 
 ## Status
 
-**Em desenvolvimento ativo.** Cadastro e login já estão conectados ao back-end. O editor, o catálogo, a comparação, a busca de melhorias, as configurações prontas, o budget e a importação/exportação estão disponíveis no front-end com dados demonstrativos e armazenamento local. As builds e preferências ainda não são sincronizadas com a conta. Preços atualizados, montagem automática pela LLM e resultados de benchmark aguardam suas integrações. A página [`frontend/testes.html`](frontend/testes.html) permanece como laboratório de interface.
+**Em desenvolvimento ativo.** Cadastro, login e consulta de desempenho esperado já usam o back-end. O editor, o catálogo, a comparação, a busca de melhorias, as configurações prontas, o budget e a importação/exportação estão disponíveis no front-end com dados demonstrativos e armazenamento local. As builds e preferências ainda não são sincronizadas com a conta. Preços atualizados e montagem automática pela LLM aguardam integração. A página [`frontend/testes.html`](frontend/testes.html) permanece como laboratório de interface.
 
 ## Funcionalidades
 
@@ -49,9 +49,9 @@ Os 20 requisitos do produto estão listados abaixo. **Conectado** indica front-e
 
 O fluxo de autenticação também inclui login com Google, recuperação de senha, verificação de e-mail e configurações de conta. Essas funções não substituem a integração pendente das builds com o back-end.
 
-O botão **Testar build** está no editor e no menu dos cards, disponível com 100% das peças e sem erros de compatibilidade. O modal já apresenta as opções de resolução e qualidade; resultados de FPS dependem da API de benchmark. **Comprar build**, disponível somente dentro da build, permite consultar as lojas de cada peça e suas quantidades. A BOOSTio informa junto aos links e nos termos que não vende, entrega ou processa pagamentos; a compra ocorre no site da loja.
+O botão **Testar build** está no editor e no menu dos cards, disponível com 100% das peças e sem erros de compatibilidade. O modal consulta a FPSHQ pelo backend autenticado para os modelos com correspondência cadastrada, com jogo, resolução, qualidade, FPS médio e 1% low quando disponível. A comparação de ajustes já fica visível e usa a matriz recebida, sem novas consultas. Peças não mapeadas não são substituídas por modelos parecidos. **Comprar build**, disponível somente dentro da build, permite consultar as lojas de cada peça e suas quantidades. A BOOSTio informa junto aos links e nos termos que não vende, entrega ou processa pagamentos; a compra ocorre no site da loja.
 
-Somente em `frontend/testes.html`, **Desempenho esperado** consulta a API pública gratuita da FPSHQ para a combinação de referência Ryzen 5 5600 + RTX 3060. Permite escolher jogo, resolução e qualidade, buscar outros jogos e ver FPS médio/1% low quando disponíveis, com cache, atribuição e avisos de limitações. Não é uma medição da máquina nem integração das builds da conta. A exigência de login para criar builds está planejada e ainda não foi aplicada às páginas locais.
+**Desempenho esperado** usa `GET /benchmark/fps` e `GET /benchmark/jogos`, seguindo `controllers → services` e exigindo sessão. O Flask valida os parâmetros e a combinação retornada, mantém cache em memória por uma hora e trata limites, ausência de dados e indisponibilidade do provedor. Fonte e licença continuam visíveis. O laboratório também usa essas rotas, com a combinação de referência Ryzen 5 5600 + RTX 3060 e login necessário para consultar. Não é uma medição da máquina nem uma aprovação dos requisitos do jogo: RAM e requisitos mínimos/recomendados ainda precisam de validação separada. O cache e os limites são por processo; múltiplos workers exigirão um armazenamento compartilhado. A exigência de login para criar builds permanece pendente nas demais páginas locais.
 
 ## Stack
 
@@ -72,7 +72,7 @@ Somente em `frontend/testes.html`, **Desempenho esperado** consulta a API públi
 - Persistir builds por usuário no back-end, com componentes múltiplos e validação no servidor.
 - Integrar o catálogo e o monitoramento de preços; até lá, preços demonstrativos não devem ser apresentados como cotações atuais.
 - Integrar a LLM ao formulário para sugerir builds com peças reais do catálogo e revalidar as respostas no servidor.
-- Integrar a API de benchmark aos controles já disponíveis e alimentar as comparações de desempenho.
+- Ampliar os mapeamentos exatos de hardware, compartilhar cache/limites entre workers e alimentar as comparações de desempenho com condições equivalentes. A consulta individual de benchmark já está integrada ao backend.
 - Validar requisitos mínimos/recomendados dos jogos e RAM antes de aprovar o desempenho esperado; distinguir hardware abaixo do mínimo, modelo sem dados e falha do provedor, sem interpretar FPS previsto como garantia de execução.
 - Integrar builds, setup atual, comparação, melhorias e budget à conta e aos dados reais do back-end.
 - Administrar a curadoria das configurações prontas no servidor e manter compatibilidade dos arquivos importados/exportados com os IDs da API.

@@ -278,10 +278,11 @@ dados externos. `js/build/modelos.js` mantém exemplos versionados para a vitrin
 
 `js/build/acoes-build.js` compartilha os modais de compra e benchmark e o aviso sobre
 lojas terceiras. O benchmark abre apenas com 100% das peças e sem erros; permite
-escolher resolução e preset, mas ainda não consulta FPS. Comprar build, somente no editor, lista as lojas
+escolher jogo, resolução e preset e consulta FPS pelo backend para modelos mapeados.
+Comprar build, somente no editor, lista as lojas
 e quantidades de cada peça, sem checkout nem abertura automática de múltiplas abas.
 
-### Consulta de FPS — laboratório, não produção
+### Consulta de FPS — backend e interface compartilhada
 
 Contrato atual conferido no [OpenAPI](https://fpshq.com/openapi.json), na
 [documentação pública](https://fpshq.com/pt/api/) e em chamadas reais em 19/10/2026.
@@ -302,10 +303,12 @@ ter retornado lista vazia. Outros jogos continuam acessíveis pela busca.
 Não há catálogo REST de CPUs listado neste OpenAPI; mapear componentes exatos sem
 inventar slugs nem usar uma GPU dedicada como substituta de vídeo integrado.
 
-O laboratório `testes.html` carrega `js/pages/test-benchmark.js` e o cliente isolado
-`js/experimentos/fpshq.js`: combinação fixa Ryzen 5 5600 + RTX 3060, consulta por clique,
-cache local de sessão por uma hora, intervalo entre chamadas, timeout, tratamento de
-404/429 e espera do provedor. Nada é consultado automaticamente ao abrir a página.
+O laboratório `testes.html` carrega `js/pages/test-benchmark.js`, que inicializa
+`js/benchmark/interface.js` com a combinação fixa Ryzen 5 5600 + RTX 3060. O mesmo
+controlador é usado pelo modal real de `js/build/acoes-build.js`, com as peças da build.
+Ambos chamam `js/api/benchmark/consultarBenchmark.js` → `fetchComErro`, com cookies de
+sessão. O cliente direto antigo em `js/experimentos/fpshq.js` não é carregado por essas
+interfaces. Nada é consultado automaticamente ao abrir a página ou o modal.
 Nas verificações houve respostas lentas/timeouts intermitentes; o cliente encerra a
 espera após 20 segundos, sem retentativa automática nem FPS fictício. A resposta real
 também foi recebida por fetch no navegador; isso não garante disponibilidade contínua.
@@ -318,32 +321,80 @@ O provedor declara uso gratuito sem chave, CORS e CC BY 4.0 com atribuição, al
 no backend, validar cobertura/precisão e integrar as builds da conta. RAM, consumo
 instantâneo e rede não são parâmetros desse endpoint; os avisos distinguem latência
 de FPS. O recurso se chama **Desempenho esperado** e não promete medição ou precisão.
-O modal de produção permanece sem consulta externa; nenhum arquivo Python foi alterado.
+O modal agora consulta o Flask autenticado, que acessa a FPSHQ. As rotas e os serviços
+novos estão documentados abaixo; não há alteração de modelos ou migração de banco.
 No laboratório, a prévia da montagem fica recolhida e a área principal mostra apenas
 hardware de referência, jogo, resolução e qualidade. A busca apresenta resultados
 para seleção explícita, sem escolher automaticamente o primeiro. O aviso começa
 oculto e aparece após selecionar o jogo ou receber seu resultado; detalhes de RAM,
 rede e demais limitações ficam em uma seção expansível, sem remover as ressalvas.
-`js/experimentos/benchmark-view.js` monta a visualização compacta: **Comparar ajustes**
+`js/benchmark/view.js` monta a visualização compacta: **Comparar ajustes** fica visível e
 permite alternar a qualidade e ver as três resoluções da matriz já recebida, sem
 requisitar a API nem substituir os FPS do resultado principal. **Sobre os dados**
-reúne origem, definição de 1% low, cache e limites. Fonte e licença continuam visíveis.
+reúne origem, definição de 1% low e data. Cotas operacionais ficam apenas nesta
+documentação, não no texto do resultado. Fonte e licença continuam visíveis.
 
 O seletor **Interface de teste** alterna **Cards** (métricas lado a lado), **Painel**
 (ajustes à esquerda e resultado em destaque à direita no desktop) e **Compacto**
 (controles em uma faixa e métricas em linhas). As três variantes usam o mesmo DOM,
 cliente e resposta: mudar o visual preserva jogo, ajustes, comparação aberta e dados,
 sem consumir outra consulta. Em telas menores, o painel passa a uma coluna.
-Ainda são experiências exclusivas de `testes.html`, não uma alteração do modal real.
+O seletor de variantes continua exclusivo do laboratório. O modal real usa Cards,
+com métricas menores, controles mais curtos e sem repetição de avisos operacionais.
 
 Os menus expansíveis usam `js/components/animated-details.js`: o JS mede a altura
 natural e anima abertura/fechamento com Web Animations, mantendo `aria-expanded`.
-Em `styles/paginas/testes.css`, `.fpshq-disclosure` configura `--details-duration`
+Em `styles/componentes/benchmark.css`, `.fpshq-disclosure` configura `--details-duration`
 (número em milissegundos, padrão do laboratório: `320`) e `--details-easing`.
 O CSS também cuida da seta, cores e recorte durante a transição. Movimento reduzido
 ou ausência de suporte desativa a animação sem impedir a navegação. Menus inseridos
 com o resultado são inicializados após renderizar; seleção da busca fecha o menu
 pelo mesmo controlador para não deixar animações pendentes reabrirem o conteúdo.
+
+#### Rotas Flask e serviços
+
+`backend/controllers/benchmark_controller.py` registra o Blueprint `/benchmark`,
+conectado em `app.py`, com `@login_required` e erro 401 em JSON. Não aceita URL externa,
+ID de usuário fornecido pelo cliente, parâmetros desconhecidos ou repetidos.
+
+- `GET /benchmark/fps?game=valorant&cpu=ryzen-5-5600&gpu=rtx-3060&res=1080p&preset=high`
+  → `ConsultarBenchmarkService.executar(dados, current_user.id)`.
+- `GET /benchmark/jogos?q=Valorant`
+  → `BuscarJogosBenchmarkService.executar(dados, current_user.id)`.
+
+Os serviços ficam em `services/benchmark_service/`, seguindo o padrão existente.
+`FpshqService` faz GET apenas no host fixo do provedor, sem redirecionamentos, com
+timeout de conexão/leitura de 4/15 segundos. Respostas de FPS só são aceitas quando
+CPU, GPU, jogo, resolução e preset correspondem ao pedido; números ausentes não
+viram zero. O veredito 1080p High do provedor não é reutilizado.
+
+O JSON de sucesso é `{"resultado": ...}`, com `consulta`, `jogo`, `fps`, `low1`,
+`intervalo`, `origem`, `base`, `confianca`, `matriz`, `url`, `consultadoEm` (epoch em ms),
+`cache`, `ramAvaliada: false` e `requisitosVerificados: false`. A busca retorna
+`resultado.jogos` com até dez pares `slug`/`name`. Erros usam `erro`, `codigo`, `espera`
+e, no 429, `Retry-After`; validação 400, ausência 404/422, falha 502/503 e timeout 504.
+O frontend não consulta o provedor como fallback e cancela a espera ao fechar o modal.
+
+Cache LRU de até 256 consultas válidas por uma hora, compartilhado entre usuários do
+mesmo processo e sem armazenar builds ou dados de perfil. Lock impede consultas
+idênticas simultâneas duplicadas. Limites preventivos: 10 consultas externas/minuto
+por usuário, 45/minuto e 9 mil/24h por processo; cache não consome outra chamada externa.
+429 externo bloqueia novas chamadas pelo intervalo informado, preservando leituras
+do cache. Nenhuma retentativa automática. Antes de escalar para múltiplos processos,
+usar cache/contador distribuído; esses limites em memória não são globais entre workers.
+
+`js/benchmark/hardware.js` mantém correspondências explícitas de modelos e VRAM;
+modelos não registrados, variantes desconhecidas e vídeo integrado mostram motivo e
+não são substituídos. A identificação final ainda depende da confirmação do provedor.
+Ampliar esse registro ao integrar os IDs definitivos do catálogo, sem deduzir variantes.
+
+Verificação real pela rota Flask autenticada, sem criar usuário no banco: Valorant,
+Ryzen 5 5600 + RTX 3060, 1080p/Alta → HTTP 200, 288 FPS/261 de 1% low; segunda consulta
+HTTP 200 com `cache: true`. São os valores retornados no teste, não dados fixos da UI.
+As verificações automatizadas de falhas e interface usam respostas controladas.
+Nesta rodada: 54 testes Python, 133 testes JavaScript e 66 verificações de navegador
+sem falhas (320, 390, 768 e 1440 px), incluindo dots apenas por estado, modal real,
+comparação visível, foco de retorno, sessão expirada, ausência de dados e 429/rede.
 
 ### RAM, peças antigas e requisitos mínimos — investigação, ainda sem integração
 

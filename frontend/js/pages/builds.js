@@ -582,6 +582,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (["benchmark","melhorias","setup-atual"].includes(acao)) {
       try {
+        if (acao !== "setup-atual") card.querySelector(".build-menu-trigger")?.focus({preventScroll:true});
         if (acao === "benchmark") abrirBenchmark(normalizarBuild(build),catalogo);
         if (acao === "setup-atual") {
           const remover = planejamentoLocal().setupAtualId === build.id;

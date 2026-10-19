@@ -109,7 +109,10 @@ test("resultado compacto mantém FPS, fonte dos números e detalhes recolhidos",
   assert.match(html,/Comparar ajustes/);
   assert.match(html,/Sobre os dados/);
   assert.match(html,/Não é uma medição desta máquina/);
-  assert.match(html,/Resposta em cache/);
+  assert.match(html,/Dados em cache/);
+  assert.match(html,/<section class="fpshq-alternatives"/);
+  assert.doesNotMatch(html,/<details\b[^>]*fpshq-alternatives/);
+  assert.doesNotMatch(html,/consultas\/minuto|mil\/dia|Cache de uma hora/);
   assert.doesNotMatch(html,/<table\b|<details\b[^>]*\bopen/);
   assert.equal([...html.matchAll(/type="radio"/g)].length,4);
   assert.match(html,/value="high" checked/);
@@ -132,7 +135,7 @@ test("resultado escapa nomes de jogos e mantém intervalo e 1% low ausente",() =
 });
 test("aviso começa oculto e busca exige escolher um resultado",async () => {
   const html = await readFile(new URL("../testes.html",import.meta.url),"utf8");
-  const js = await readFile(new URL("../js/pages/test-benchmark.js",import.meta.url),"utf8");
+  const js = await readFile(new URL("../js/benchmark/interface.js",import.meta.url),"utf8");
   assert.match(html,/<aside\b[^>]*id="fpshq-notice"[^>]*\bhidden/);
   assert.match(html,/id="fpshq-search-results"[^>]*\bhidden/);
   assert.match(html,/<details class="test-performance-prototype fpshq-disclosure" data-animated-details>/);
@@ -142,8 +145,8 @@ test("aviso começa oculto e busca exige escolher um resultado",async () => {
 });
 test("laboratório alterna três interfaces no mesmo formulário e resultado",async () => {
   const html = await readFile(new URL("../testes.html",import.meta.url),"utf8");
-  const js = await readFile(new URL("../js/pages/test-benchmark.js",import.meta.url),"utf8");
-  const css = await readFile(new URL("../styles/paginas/testes.css",import.meta.url),"utf8");
+  const js = await readFile(new URL("../js/benchmark/interface.js",import.meta.url),"utf8");
+  const css = await readFile(new URL("../styles/componentes/benchmark.css",import.meta.url),"utf8");
   assert.equal([...html.matchAll(/name="fpshq-layout"/g)].length,3);
   for (const layout of ["cards","panel","compact"]) assert.match(html,new RegExp('name="fpshq-layout" value="' + layout + '"'));
   assert.equal([...html.matchAll(/id="fpshq-test-form"/g)].length,1);
@@ -159,7 +162,7 @@ test("laboratório alterna três interfaces no mesmo formulário e resultado",as
 });
 test("menus estáticos e resultados da API inicializam a animação compartilhada",async () => {
   const html = await readFile(new URL("../testes.html",import.meta.url),"utf8");
-  const js = await readFile(new URL("../js/pages/test-benchmark.js",import.meta.url),"utf8");
+  const js = await readFile(new URL("../js/benchmark/interface.js",import.meta.url),"utf8");
   const resultado = resultadoDesempenhoHtml({...normalizarResultado(resposta(),consulta),consultadoEm:Date.now()});
   for (const disclosure of [...html.matchAll(/<details\b[^>]*fpshq-disclosure[^>]*>/g),...resultado.matchAll(/<details\b[^>]*fpshq-disclosure[^>]*>/g)])
     assert.match(disclosure[0],/data-animated-details/);
