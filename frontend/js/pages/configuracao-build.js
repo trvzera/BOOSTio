@@ -1,7 +1,7 @@
 import "../header.js";
 import "../auth/auth.js";
 import { carregarCatalogo,categoriasEditor,perifericos,acessoriosRede,moeda,htmlSeguro as h,nomePeca,imagemPeca,ofertasPeca } from "../build/catalogo.js";
-import { abrirBuild,guardarRascunho,salvarNoPerfilLocal,buildsLocais,itensCategoria,categoriasMultiplas,informacoesRam,informacoesArmazenamento,motivoSelecao,removerPeca,reduzirQuantidade,linkCompartilhado } from "../build/estado.js";
+import { abrirBuild,guardarRascunho,buildsLocais,itensCategoria,categoriasMultiplas,informacoesRam,informacoesArmazenamento,motivoSelecao,removerPeca,reduzirQuantidade,linkCompartilhado } from "../build/estado.js";
 import { avaliarBuild,selecionarPecaCompativel } from "../build/compatibilidade.js";
 import { avisar,copiarTexto,mostrarFalha } from "../build/interface.js";
 import { iconeAnimado,iniciarIcones } from "../components/ui.js";
@@ -122,8 +122,8 @@ document.addEventListener("DOMContentLoaded",async () => {
       main.querySelector("#benchmark-build").onclick = () => { try { abrirBenchmark(build,catalogo); } catch (erro) { avisar(erro.message); } };
       main.querySelector("#buy-configuration").onclick = () => { try { abrirCompraBuild(build,catalogo); } catch (erro) { avisar(erro.message); } };
       main.querySelector("#improve-configuration").onclick = () => { try { abrirMelhorias(build,catalogo,proxima => { build = proxima; persistir(); renderizar(); }); } catch (erro) { avisar(erro.message); } };
-      main.querySelector("#save-configuration").dataset.disabledReason = "Informe o nome da build para salvar.";
-      main.querySelector("#save-configuration").disabled = !build.titulo.trim();
+      main.querySelector("#save-configuration").dataset.disabledReason = build.travada ? trancada : "Informe o nome da build para salvar.";
+      main.querySelector("#save-configuration").disabled = build.travada || !build.titulo.trim();
       main.querySelector("#build-name").addEventListener("input",e => {
         if (build.travada) return;
         build.titulo = e.target.value; main.querySelector("#save-configuration").disabled = !build.titulo.trim(); persistir();
@@ -150,7 +150,8 @@ document.addEventListener("DOMContentLoaded",async () => {
           const invalido = [...main.querySelectorAll("#build-budget")].find(input => !input.checkValidity());
           if (invalido) { main.querySelector(".summary-metadata").open = true; invalido.reportValidity(); return; }
           if (!build.titulo.trim()) throw new Error("Informe um nome para a build.");
-          salvarNoPerfilLocal({...build,status:resultado.status,progresso:Math.round(resultado.preenchidos / resultado.total * 100)});
+          const salvo = salvarAlteracaoLocal(build,catalogo);
+          if (!salvo.salvo) throw new Error(salvo.motivo);
           navegarPara("./builds.html");
         } catch (erro) { avisar(erro.message); }
       };

@@ -7,6 +7,7 @@ Abra pelo Live Server:
 - `frontend/pages/pecas.html?categoria=processador`: catálogo por categoria.
 - `frontend/pages/peca.html?id=SEED-CPU-02`: ficha técnica e lojas.
 - `frontend/pages/configuracoes-prontas.html`: modelos demonstrativos e cópia editável.
+- `frontend/pages/sobre.html`: apresentação da BOOSTio, proposta, ferramentas e estágio do projeto.
 - `frontend/testes.html`: demonstração que usa o mesmo menu hamburger das demais páginas.
 
 O catálogo demonstrativo é uma cópia das 750 peças de
@@ -204,6 +205,12 @@ sem depender exclusivamente de `transitionend`.
 
 ## Navegação e interatividade
 
+`pages/sobre.html` substitui a antiga página de desenvolvedores. Apresenta a proposta
+da BOOSTio, ferramentas de planejamento, origem do projeto e limites atuais, sem
+perfis individuais ou promessas de integrações já concluídas. Os footers apontam para
+**Conheça a BOOSTio**; a página usa navegação, loading, fontes, glass e reveal compartilhados.
+`paginas/sobre.css` e `responsividades/r-sobre.css` cuidam do layout específico.
+
 `js/header.js` renderiza a logo de 100px no topo esquerdo e o perfil no topo direito.
 O perfil permanece disponível antes e depois do login; os seus links não usam setas.
 O botão usa `profile.json` no tamanho original de 60px. Hover e foco abrem o dropdown;
@@ -217,9 +224,9 @@ inclui também Sobre, Como funciona e Começar montagem, ligados às respectivas
 O editor tem um botão direto para voltar a Minhas builds, sem depender do histórico.
 Minhas builds e Builds prontas compartilham um seletor de páginas com `aria-current`;
 o comparador aparece apenas em Minhas builds. Os cards não têm ação de compra.
-Em Minhas builds, **Criar pelo formulário** abre `formulario.html` com a transição
-compartilhada; a criação manual continua disponível em **Criar build**. Ambas as
-opções ficam bloqueadas quando a quota local de três builds está completa.
+Em Minhas builds, **Criar build** abre um modal para escolher entre montagem manual
+e formulário inteligente. A escolha fecha o modal antes da transição compartilhada.
+O botão fica bloqueado quando a quota local de três builds está completa.
 
 Nos cards de builds, o progresso permanece azul e a linha inferior exibe apenas
 privacidade e data. Builds trancadas mostram um cadeado ao lado do nome e não
@@ -246,6 +253,10 @@ a conclusão ou o consumo estimado do PC; conferir interfaces/roteador continua 
 O dropdown **Nome, descrição e orçamento** usa `components/animated-details.js`
 para animar as duas direções e respeita movimento reduzido. Os Lotties `circledot`,
 `magnifying` e `magic` usam o controlador compartilhado com hover/foco e reversão.
+Na build definida como setup atual, circledot inicia no último frame e inverte
+hover/saída; `aria-checked` informa o estado, atualizado ao escolher outra build.
+O botão da principal mostra **Remover como setup atual** e desmarca a preferência,
+sem excluir a build. As demais mostram **Definir como setup atual**, com ícone normal.
 O menu de três pontos abre para baixo, ajustando a rolagem ao abrir se faltar espaço,
 sem cobrir os controles flutuantes; sua lista tem rolagem própria e glass mais forte.
 
@@ -270,21 +281,138 @@ lojas terceiras. O benchmark abre apenas com 100% das peças e sem erros; permit
 escolher resolução e preset, mas ainda não consulta FPS. Comprar build, somente no editor, lista as lojas
 e quantidades de cada peça, sem checkout nem abertura automática de múltiplas abas.
 
-### Consulta de FPS — preparação da integração
+### Consulta de FPS — laboratório, não produção
 
-A [documentação oficial da FPSHQ](https://fpshq.com/api-docs/) descreve descoberta de
-slugs em `/search` e catálogos `/cpus`, `/gpus`, `/games`, seguida de
-`GET /api/v1/fps?game=<slug>&gpu=<slug>&cpu=<slug>&res=1080p&preset=low`.
-Os presets são `low`, `medium`, `high`, `ultra`; resoluções: `1080p`, `1440p`, `4K`.
-A resposta documentada contém `ok`, jogo/CPU/GPU, resolução/preset, `fps`, `fps_min`,
-`fps_max`, `verdict`, `source`, `bottleneck` e `url`. Identificar `source=benchmark`
-versus `prediction`, atribuir a fonte pelo `url` e não chamar mínimo de “1% low”.
-O provedor informa uso sem chave, CORS, cache de uma hora e fair use de aproximadamente
-60 requisições/minuto/IP. Antes de ativar: validar disponibilidade e respostas reais,
-mapear componentes exatos (incluindo variantes/iGPU), tratar faltas/429/timeouts e cachear.
-Nesta revisão, o acesso direto ao site/endpoint foi bloqueado na ferramenta de pesquisa;
-o contrato acima foi conferido na documentação indexada, não em uma resposta executada.
-O modal inclui **Baixa**, mas a consulta permanece desativada até essa validação.
+Contrato atual conferido no [OpenAPI](https://fpshq.com/openapi.json), na
+[documentação pública](https://fpshq.com/pt/api/) e em chamadas reais em 19/10/2026.
+A rota é `GET /api/public/v1/fps`, com `game`, `gpu`, `cpu`, `res` e `preset`.
+Não usar o contrato antigo `/api/v1/`. Os presets são `low`, `medium`, `high`, `ultra`;
+resoluções: `1080p`, `1440p`, `4k`. Retorna `fps`, `low1`, `source` (`measured`/`model`),
+`basis` (`measured`/`aggregate`/`model`), `confidence` e matriz 3×4.
+Ausências e intervalos nulos não são zero. `verdict` tem base 1080p High, não se aplica
+automaticamente à seleção do usuário. A origem de cada célula da matriz não é individualizada.
+
+`GET /api/public/v1/games?q=<texto>` busca de 2 a 60 caracteres e retorna até dez jogos.
+Foram encontrados Valorant, Counter-Strike 2 (`cs2`), Fortnite, Cyberpunk 2077 e Forza
+Horizon 5, entre outros. Encontrar no catálogo não garante FPS para toda combinação.
+Os cinco jogos padrão do laboratório, nesta ordem, são Valorant, Counter-Strike 2,
+Fortnite, Cyberpunk 2077 e Red Dead Redemption 2. O último foi confirmado por consulta
+direta a `/fps` com `game=red-dead-redemption-2`, apesar de a busca pelo nome completo
+ter retornado lista vazia. Outros jogos continuam acessíveis pela busca.
+Não há catálogo REST de CPUs listado neste OpenAPI; mapear componentes exatos sem
+inventar slugs nem usar uma GPU dedicada como substituta de vídeo integrado.
+
+O laboratório `testes.html` carrega `js/pages/test-benchmark.js` e o cliente isolado
+`js/experimentos/fpshq.js`: combinação fixa Ryzen 5 5600 + RTX 3060, consulta por clique,
+cache local de sessão por uma hora, intervalo entre chamadas, timeout, tratamento de
+404/429 e espera do provedor. Nada é consultado automaticamente ao abrir a página.
+Nas verificações houve respostas lentas/timeouts intermitentes; o cliente encerra a
+espera após 20 segundos, sem retentativa automática nem FPS fictício. A resposta real
+também foi recebida por fetch no navegador; isso não garante disponibilidade contínua.
+Chamada real de Valorant, 1080p/High: 288 FPS, 1% low 261, source/basis `measured`.
+São valores retornados naquele momento pelo provedor, não medidos pela BOOSTio e
+não fixados como resultados no código. A combinação com CPU inexistente retornou 404.
+
+O provedor declara uso gratuito sem chave, CORS e CC BY 4.0 com atribuição, além de
+60 consultas/minuto e 10 mil/dia por IP. Antes de produção, centralizar cache e limites
+no backend, validar cobertura/precisão e integrar as builds da conta. RAM, consumo
+instantâneo e rede não são parâmetros desse endpoint; os avisos distinguem latência
+de FPS. O recurso se chama **Desempenho esperado** e não promete medição ou precisão.
+O modal de produção permanece sem consulta externa; nenhum arquivo Python foi alterado.
+No laboratório, a prévia da montagem fica recolhida e a área principal mostra apenas
+hardware de referência, jogo, resolução e qualidade. A busca apresenta resultados
+para seleção explícita, sem escolher automaticamente o primeiro. O aviso começa
+oculto e aparece após selecionar o jogo ou receber seu resultado; detalhes de RAM,
+rede e demais limitações ficam em uma seção expansível, sem remover as ressalvas.
+`js/experimentos/benchmark-view.js` monta a visualização compacta: **Comparar ajustes**
+permite alternar a qualidade e ver as três resoluções da matriz já recebida, sem
+requisitar a API nem substituir os FPS do resultado principal. **Sobre os dados**
+reúne origem, definição de 1% low, cache e limites. Fonte e licença continuam visíveis.
+
+O seletor **Interface de teste** alterna **Cards** (métricas lado a lado), **Painel**
+(ajustes à esquerda e resultado em destaque à direita no desktop) e **Compacto**
+(controles em uma faixa e métricas em linhas). As três variantes usam o mesmo DOM,
+cliente e resposta: mudar o visual preserva jogo, ajustes, comparação aberta e dados,
+sem consumir outra consulta. Em telas menores, o painel passa a uma coluna.
+Ainda são experiências exclusivas de `testes.html`, não uma alteração do modal real.
+
+Os menus expansíveis usam `js/components/animated-details.js`: o JS mede a altura
+natural e anima abertura/fechamento com Web Animations, mantendo `aria-expanded`.
+Em `styles/paginas/testes.css`, `.fpshq-disclosure` configura `--details-duration`
+(número em milissegundos, padrão do laboratório: `320`) e `--details-easing`.
+O CSS também cuida da seta, cores e recorte durante a transição. Movimento reduzido
+ou ausência de suporte desativa a animação sem impedir a navegação. Menus inseridos
+com o resultado são inicializados após renderizar; seleção da busca fecha o menu
+pelo mesmo controlador para não deixar animações pendentes reabrirem o conteúdo.
+
+### RAM, peças antigas e requisitos mínimos — investigação, ainda sem integração
+
+Em 19/10/2026 foram conferidos o [OpenAPI REST](https://fpshq.com/openapi.json),
+o `tools/list` do [MCP público da FPSHQ](https://fpshq.com/en/api/ai/) e consultas reais.
+O REST `/fps` não recebe RAM; seu `/canrun` usa GPU/renderer e devolve a referência
+1080p High, sem ser uma checagem completa de CPU, RAM e requisitos técnicos.
+Não confundir esse endpoint com a ferramenta MCP `can_run`, que aceita `game`, `gpu`,
+`cpu` e `ram_gb` (capacidade inteira de 1 a 512 GB). Ela retorna requisitos e avaliação
+da capacidade, não ajusta frequência, latência, canais ou memória efetivamente livre.
+`game_requirements` retorna mínimos/recomendados, origem (`steam`/`manual`/`estimate`)
+e situação de lançamento. Esse caminho foi pesquisado, não adicionado ao cliente do site.
+
+Resultados observados em Cyberpunk 2077, usando Ryzen 5 5600:
+
+- REST `/fps`, GT 1030 reconhecida (`geforce-gt-1030`), 1080p High: HTTP 200,
+  `fps=8`, intervalo `[7,12]`, `low1=6`, `source=model`, `confidence=low` e
+  `verdict.key=no`. A GPU abaixo dos mínimos não causou erro HTTP; houve previsão.
+- REST `/fps`, slug `gt-710`: HTTP 404 com `error=gpu_not_found`. A busca “GT 710”
+  retornou lista vazia. Isso é ausência de modelo nesse acesso ao catálogo, não prova
+  de que a peça não roda nenhum jogo nem de que outro slug/variante inexiste.
+- MCP `can_run`, GTX 750 Ti, 4 GB RAM: previsão de 11 FPS em 1080p High,
+  intervalo `[9,16]`, `verdict=no`, presets para 30/60 FPS nulos e
+  `ram.meets_minimum=false`. Nenhum desses números é uma medição da BOOSTio.
+- MCP `can_run`, RTX 3060, comparando 4 GB com 16 GB RAM: em ambos retornou
+  70 FPS em 1080p High e veredito `ok`/“Roda bem”. Com 4 GB, os campos de RAM
+  indicaram `meets_minimum=false` e `meets_recommended=false`; com 16 GB, ambos
+  foram `true`. A matriz de FPS foi igual: não usar o veredito isolado como aprovação.
+- MCP `game_requirements` informou mínimo 12 GB e recomendado 16 GB RAM, GPU mínima
+  GTX 1060 6 GB/RX 580 8 GB e 70 GB de armazenamento. Marcou `requirements_source=manual`
+  e `basis=official`. Os valores principais foram conferidos com a
+  [publicação da CD Projekt](https://www.cyberpunk.net/en/news/48271/update-to-pc-system-requirements),
+  que também especifica SSD. O campo `storage_gb` sozinho não carrega esse detalhe.
+
+Tratamento planejado: validar mínimos/recomendados antes de aprovar o resultado como
+expectativa do PC completo; um mínimo conhecido não atendido deve prevalecer sobre
+“Roda bem”. Abaixo do mínimo não equivale necessariamente a impossibilidade de iniciar;
+mostrar requisito, limitação e ausência de garantia, sem inventar FPS=0. Se houver
+recurso técnico obrigatório comprovadamente incompatível, informar o impedimento.
+Ausência de dados/modelo e indisponibilidade/429 são estados diferentes de desempenho
+baixo. `verdict=no` é um limiar de FPS em 1080p High, não uma validação de DirectX,
+instruções, SO ou inicialização. A conclusão de montagem continua separada disso.
+
+A RAM pode alterar o desempenho dependendo do jogo e configuração, como mostram os
+[testes da Kingston](https://www.kingston.com/unitedkingdom/en/blog/gaming/overclocking-ram-more-fps).
+Não criar correção percentual universal. Número de pentes não confirma canais ativos;
+perfil anunciado não garante a taxa em uso. Memória ocupada pelo SO/outros programas
+e uso por vídeo integrado também precisam de ressalva, sem supor detecção pelo navegador.
+
+Priorizar requisitos oficiais com fonte/data e validar um adaptador de leitura da
+própria FPSHQ antes de contratar outro serviço. Não inferir “atende” de descrições
+genéricas nem tratar requisito estimado como oficial. A API documentada do
+[System Requirements Lab](https://docs.systemrequirementslab.com/api/api-quickstart-guide.html)
+usa credenciais/token e consulta análises de testes de usuários; não foi comprovada
+uma API anônima gratuita equivalente para builds hipotéticas. Nenhum fallback foi
+habilitado. Implementação e cenários de teste estão em `pendencias-produto.md`.
+
+### Criação e controles compartilhados
+
+Em Minhas builds, **Criar build** abre uma escolha entre montagem manual e formulário
+inteligente, sem criar build antes da escolha e respeitando a quota. A LLM ainda não
+está conectada. `navigation-controls.css` e `ui.js` padronizam voltar e fechar sem
+alterar os destinos ou a lógica de histórico. Os menus dos cards usam Popover API
+quando disponível, evitando o backdrop root do próprio card, com blur de 36px e
+fallback. A exigência de sessão para os recursos de montagem está apenas registrada
+em `pendencias-produto.md`, não implementada nesta etapa.
+O botão de três pontos dos cards usa `dots.json` por `iconeAnimado("dots")`, com
+hover/foco e reversão na saída. O HTML de fallback usa o mesmo marcador; movimento
+reduzido ou falha no carregamento mantém um SVG estático de três pontos e o aria-label.
 
 A [API da UL](https://support.benchmarks.ul.com/support/solutions/articles/44002238427-api-documentation)
 é alternativa contratada e exige chave/segredo e assinatura; qualquer integração dela
@@ -317,7 +445,7 @@ Eles são importados **depois** de `ui-system.css`, para os estilos gerais não
 sobrescreverem os breakpoints. O protótipo `testes.html` mantém seus ajustes locais.
 
 O menu flutuante é usado em todas as larguras. Editor e formulário passam para uma coluna
-quando falta espaço; catálogo, builds e desenvolvedores reduzem suas grades.
+quando falta espaço; catálogo, builds e a página Sobre nós reduzem suas grades.
 Login e cadastro têm altura livre, e os modais são limitados pela altura visível
 com rolagem interna. Campos no mobile usam pelo menos 16px, sem reduzir a tela
 inteira com `scale()`. O detalhamento de compatibilidade abre no fluxo no mobile.
@@ -352,7 +480,7 @@ Antes da integração:
 ## Glass e verificação
 
 `styles/componentes/glass.css` aplica a base de glass aos cards de serviços, builds,
-configurações, desenvolvedores e novos componentes. Ajuste `--glass-background`
+configurações e novos componentes. A página Sobre nós usa os mesmos cards compartilhados. Ajuste `--glass-background`
 para a transparência e `--glass-blur` para o desfoque do fundo.
 
 Testes da lógica: `node --test frontend/tests/build.test.mjs`.

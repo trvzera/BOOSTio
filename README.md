@@ -14,6 +14,8 @@ Repositório do meu **projeto de software anual e final do curso**, desenvolvido
 
 O BOOSTio é uma plataforma que simplifica a montagem de computadores. A ideia é ajudar o usuário a escolher as peças ideais com base no seu orçamento e objetivo (jogos, trabalho, uso cotidiano), permitindo também a seleção manual de componentes específicos, com o sistema integrando essas escolhas à sugestão final. O usuário pode salvar seus setups no perfil e compartilhar com outras pessoas.
 
+A página [Sobre nós](frontend/pages/sobre.html) apresenta a proposta da BOOSTio, suas ferramentas e o estágio de desenvolvimento da plataforma.
+
 ## Status
 
 **Em desenvolvimento ativo.** Cadastro e login já estão conectados ao back-end. O editor, o catálogo, a comparação, a busca de melhorias, as configurações prontas, o budget e a importação/exportação estão disponíveis no front-end com dados demonstrativos e armazenamento local. As builds e preferências ainda não são sincronizadas com a conta. Preços atualizados, montagem automática pela LLM e resultados de benchmark aguardam suas integrações. A página [`frontend/testes.html`](frontend/testes.html) permanece como laboratório de interface.
@@ -27,7 +29,7 @@ Os 20 requisitos do produto estão listados abaixo. **Conectado** indica front-e
 | 1 | Criar conta e fazer login | **Conectado:** cadastro, login, logout e sessão usam o back-end. |
 | 2 | Cadastrar o setup atual | **Local:** o usuário pode informar peças próprias e definir uma build salva como setup atual; falta persistir esse vínculo na conta. |
 | 3 | Pesquisar compatibilidade e peças | **Parcial:** há busca no catálogo e verificações de compatibilidade no front-end, com dados demonstrativos. |
-| 4 | Montar o setup atual por meio de formulário | **Parcial:** acessível pelo botão “Criar pelo formulário” em “Minhas builds”; quatro etapas coletam objetivo, orçamento, peças existentes e conexão com a internet e levam os dados ao editor. A montagem automática pela LLM ainda não está integrada. |
+| 4 | Montar o setup atual por meio de formulário | **Parcial:** “Criar build” em “Minhas builds” abre a escolha entre montagem manual e formulário inteligente; quatro etapas coletam objetivo, orçamento, peças existentes e conexão com a internet e levam os dados ao editor. A montagem automática pela LLM ainda não está integrada. |
 | 5 | Salvar configurações de computadores | **Local:** alterações no editor e seleções pelo catálogo/ficha são salvas automaticamente neste navegador, com limite de três builds; ainda não há sincronização com a conta. |
 | 6 | Excluir configurações salvas no perfil | **Local:** a exclusão funciona para builds salvas neste navegador. |
 | 7 | Comparar configurações salvas | **Local:** comparação de duas ou três builds por modal em “Minhas builds”, com adição/remoção durante a comparação; desempenho depende da API de benchmark. |
@@ -49,6 +51,8 @@ O fluxo de autenticação também inclui login com Google, recuperação de senh
 
 O botão **Testar build** está no editor e no menu dos cards, disponível com 100% das peças e sem erros de compatibilidade. O modal já apresenta as opções de resolução e qualidade; resultados de FPS dependem da API de benchmark. **Comprar build**, disponível somente dentro da build, permite consultar as lojas de cada peça e suas quantidades. A BOOSTio informa junto aos links e nos termos que não vende, entrega ou processa pagamentos; a compra ocorre no site da loja.
 
+Somente em `frontend/testes.html`, **Desempenho esperado** consulta a API pública gratuita da FPSHQ para a combinação de referência Ryzen 5 5600 + RTX 3060. Permite escolher jogo, resolução e qualidade, buscar outros jogos e ver FPS médio/1% low quando disponíveis, com cache, atribuição e avisos de limitações. Não é uma medição da máquina nem integração das builds da conta. A exigência de login para criar builds está planejada e ainda não foi aplicada às páginas locais.
+
 ## Stack
 
 **Back-end**
@@ -69,6 +73,7 @@ O botão **Testar build** está no editor e no menu dos cards, disponível com 1
 - Integrar o catálogo e o monitoramento de preços; até lá, preços demonstrativos não devem ser apresentados como cotações atuais.
 - Integrar a LLM ao formulário para sugerir builds com peças reais do catálogo e revalidar as respostas no servidor.
 - Integrar a API de benchmark aos controles já disponíveis e alimentar as comparações de desempenho.
+- Validar requisitos mínimos/recomendados dos jogos e RAM antes de aprovar o desempenho esperado; distinguir hardware abaixo do mínimo, modelo sem dados e falha do provedor, sem interpretar FPS previsto como garantia de execução.
 - Integrar builds, setup atual, comparação, melhorias e budget à conta e aos dados reais do back-end.
 - Administrar a curadoria das configurações prontas no servidor e manter compatibilidade dos arquivos importados/exportados com os IDs da API.
 - Documentar os contratos e as rotas da API.

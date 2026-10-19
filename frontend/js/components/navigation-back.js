@@ -4,7 +4,7 @@ const rotulos = {
   "configuracao-build.html":"Voltar à build", "builds.html":"Voltar para Minhas builds",
   "configuracoes-prontas.html":"Voltar para Builds prontas",
   "pecas.html":"Voltar ao catálogo", "peca.html":"Voltar à peça",
-  "desenvolvedores.html":"Voltar à equipe", "configuracoes.html":"Voltar ao perfil",
+  "sobre.html":"Voltar à página Sobre nós", "configuracoes.html":"Voltar ao perfil",
   "login.html":"Voltar ao login", "signin.html":"Voltar ao cadastro",
   "esqueci-senha.html":"Voltar à recuperação de senha", "testes.html":"Voltar aos testes",
 };

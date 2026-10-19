@@ -295,6 +295,7 @@
   border-color: var(--cor-2);
   background: var(--cor-0);
 }
+.build-menu-trigger > .ui-lottie { width: 24px; height: 24px; flex-basis: 24px; }
 
 .build-menu {
   position: absolute;

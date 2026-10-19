@@ -26,6 +26,7 @@ export async function copiarTexto(texto) {
     const fechar = document.createElement("button");
     fechar.type = "button";
     fechar.className = "btn-ghost";
+    fechar.setAttribute("data-ui-close", "");
     fechar.textContent = "Fechar";
     fechar.setAttribute("aria-label", "Fechar compartilhamento da build");
     fechar.onclick = () => { dialogo.close(); dialogo.remove(); };

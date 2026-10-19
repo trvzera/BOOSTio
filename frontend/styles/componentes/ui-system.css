@@ -28,7 +28,7 @@
 .build-card .build-progress-fill { background: var(--cor-p1); }
 .build-status.incomplete { background: rgba(255,204,0,.06); border-color: rgba(255,204,0,.25); }
 .social-logo { width: 18px; height: 18px; object-fit: contain; filter: invert(1); flex: 0 0 18px; }
-.developer-socials a, .social-link { display: inline-flex; align-items: center; gap: 8px; }
+.social-link { display: inline-flex; align-items: center; gap: 8px; }
 .ui-lottie { display: inline-grid; place-items: center; width: 20px; height: 20px; flex: 0 0 20px; position: relative; }
 .ui-lottie svg { width: 100% !important; height: 100% !important; }
 .ui-lottie:not([data-lottie="checkbox"]):not([data-lottie="profile"]) svg path[fill]:not([fill="none"]) { fill: currentColor; }
@@ -64,6 +64,8 @@
 #ui-tooltip { position: fixed; z-index: 11000; max-width: min(300px,calc(100vw - 24px)); padding: 10px 14px;
   border: 1px solid var(--cor-2); border-radius: 12px; background: #19191cef; backdrop-filter: blur(14px);
   color: var(--cor-5); font: 400 var(--text-caption)/1.65 var(--font-body); box-shadow: 0 8px 24px #0006; pointer-events: none; }
+#ui-tooltip[popover] { inset: auto; margin: 0; }
+#ui-tooltip[popover]::backdrop { background: transparent; pointer-events: none; }
 .manual-build { display: grid; gap: 12px; padding-top: 24px; border-top: 1px solid var(--cor-2); }
 .manual-build h2, .manual-build p { margin: 0; }
 .manual-build .btn-primary-form { justify-self: start; margin-top: 4px; padding: 14px 22px; border-radius: var(--radius-control); text-decoration: none; }
@@ -78,8 +80,6 @@
 #build-page-h1 span, #text-about p span, .card-title {
   background: var(--brand-gradient); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
-#developers-main { padding-top: 110px; }
-.developers-hero { min-height: 230px; padding-bottom: 40px; }
 .build-visibility { font-size: var(--text-caption); color: var(--text-secondary); }
 .build-visibility.publico { color: var(--status-success); }
 .quota-actions > .disabled-tip-anchor { flex: 1; }
