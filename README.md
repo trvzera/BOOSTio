@@ -14,35 +14,36 @@ O BOOSTio é uma plataforma que simplifica a montagem de computadores. A ideia �
 
 ## Status
 
-**Em desenvolvimento ativo.** O fluxo de autenticação (cadastro, login, logout e proteção de rotas) já está funcional de ponta a ponta, com front-end e back-end conectados. O núcleo de montagem de PC (catálogo de peças, formulário de recomendação, builds salvas) ainda está em construção — os modelos de dados já existem no back-end, mas as rotas e telas correspondentes ainda não.
+**Em desenvolvimento ativo.** Cadastro e login já estão conectados ao back-end. O editor de builds, o catálogo e a página “Suas Builds” existem no front-end, mas usam um catálogo demonstrativo e armazenamento local no navegador; as builds ainda não são sincronizadas com a conta. Comparação, busca de melhorias, configurações prontas e budget têm protótipos em [`frontend/testes.html`](frontend/testes.html).
 
 ## Funcionalidades
 
-### ✅ Concluído (front + back conectados)
+Os 20 requisitos do produto estão listados abaixo. **Conectado** indica front-end e back-end integrados; **local** significa que os dados ficam somente neste navegador; **protótipo** indica uma experiência de teste, ainda fora do fluxo principal. Um requisito **parcial** ainda não deve ser considerado concluído.
 
--Cadastro de usuário com verificação de força de senha em tempo real, confirmação de senha e aceite obrigatório dos termos.
--Login tradicional com exibição de erros retornados pela API (ex: senha incorreta).
--Login com Google (OAuth2), permitindo criar conta ou autenticar sem precisar de senha.
--Logout, encerrando a sessão via cookie httpOnly.
--Atualização de dados do usuário (PUT /usuarios/<id>), protegida por login e por um decorator que garante que só o próprio usuário edite seus dados.
--Exclusão de conta (DELETE /usuarios/<id>), restrita ao próprio usuário, com logout automático após a exclusão.
--Busca do usuário logado (buscarUsuarioLogado.js), usada para checar sessão ativa e popular dados no front.
--Recuperação de senha por e-mail, com token seguro e expiração, sem revelar se o e-mail está cadastrado (proteção contra enumeração de usuários).
--Envio e conferência de código de verificação por e-mail, usado na ativação de conta e na redefinição de senha.
--Menu de perfil dinâmico no header e mostrar/ocultar senha em todos os campos, com proteção de rotas restritas no front para usuários não autenticados.
+| Nº | Funcionalidade requerida | Situação atual |
+| --- | --- | --- |
+| 1 | Criar conta e fazer login | **Conectado:** cadastro, login, logout e sessão usam o back-end. |
+| 2 | Cadastrar o setup atual | **Parcial:** o usuário pode informar peças que já possui, mas ainda não há um setup atual persistido no perfil. |
+| 3 | Pesquisar compatibilidade e peças | **Parcial:** há busca no catálogo e verificações de compatibilidade no front-end, com dados demonstrativos. |
+| 4 | Montar o setup atual por meio de formulário | **Parcial:** o formulário coleta objetivo, orçamento e peças existentes e leva essas informações ao editor; não identifica nem monta automaticamente todos os modelos. |
+| 5 | Salvar configurações de computadores | **Local:** é possível salvar builds no navegador, ainda não na conta do usuário. |
+| 6 | Excluir configurações salvas no perfil | **Local:** a exclusão funciona para builds salvas neste navegador. |
+| 7 | Comparar configurações salvas | **Protótipo:** há um comparador de duas ou três builds na página de testes; falta integrá-lo à página “Suas Builds”. |
+| 8 | Compartilhar configurações por link | **Parcial:** uma build pública pode gerar um link com uma cópia dos seus dados; não há autorização ou revogação de links no servidor. |
+| 9 | Buscar melhorias do setup | **Protótipo:** a página de testes sugere trocas compatíveis dentro de um budget, sem modificar a build salva. |
+| 10 | Ver configurações prontas | **Protótipo:** há exemplos na página de testes; falta uma vitrine de builds curadas com a opção “Usar como base”. |
+| 11 | Editar e modificar configurações salvas | **Local:** o editor altera componentes e detalhes das builds do navegador. |
+| 12 | Ver o preço da peça pelo site | **Parcial:** preços demonstrativos e campos de ofertas por loja são exibidos; ainda não há cotações atualizadas de todas as lojas. |
+| 13 | Ver informações de compatibilidade e consumo de energia da montagem | **Parcial:** o editor mostra validações e consumo estimado com os dados conhecidos; isso não substitui a conferência técnica de dados ausentes. |
+| 14 | Adicionar periféricos ao setup e considerar seu custo | **Local:** o editor permite incluir periféricos opcionais e somá-los ao preço demonstrativo. |
+| 15 | Registrar o budget no perfil para compras e melhorias futuras | **Protótipo:** valor e preferência de uso em novas builds existem apenas na sessão da página de testes. |
+| 16 | Baixar a build em JSON e CSV | **Parcial:** o JSON pode ser baixado; o CSV atual precisa incluir modelos, quantidades e demais dados das peças. |
+| 17 | Alterar a visibilidade da build | **Local:** a interface alterna entre pública e privada, sem controle de acesso implementado no servidor. |
+| 18 | Duplicar uma build | **Local:** uma cópia editável pode ser criada, respeitando o limite local de builds. |
+| 19 | Definir nome e descrição da build | **Local:** ambos os campos podem ser editados e salvos no navegador. |
+| 20 | Importar builds por arquivos CSV ou JSON | **Pendente:** o botão existe, mas ainda não lê nem valida arquivos. |
 
-### 🚧 Pronto na interface, aguardando rota no back-end (PUT/DELETE)
-
-- Edição de nome e e-mail do perfil
-- Troca de senha, com indicador de força e confirmação
-- Exclusão de conta, com modal de confirmação por digitação do nome de usuário
-
-### 📋 Planejado
-
-- Formulário de recomendação de setup (orçamento + objetivo)
-- Catálogo de peças (`Peca`, `Fonte`)
-- Montagem e salvamento de setups (`Setup`)
-- Página "Suas Builds", com listagem dos setups salvos pelo usuário
+O fluxo de autenticação também inclui login com Google, recuperação de senha, verificação de e-mail e configurações de conta. Essas funções não substituem a integração pendente das builds com o back-end.
 
 ## Stack
 
@@ -60,8 +61,10 @@ O BOOSTio é uma plataforma que simplifica a montagem de computadores. A ideia �
 
 ## Próximos passos
 
-- Implementar as rotas `PUT` e `DELETE` de usuário no back-end e conectar às telas de Configurações já prontas
-- Iniciar o catálogo de peças e o formulário de recomendação de setup
-- Documentar as rotas da API (ex: via Swagger/OpenAPI ou uma tabela neste README)
+- Persistir builds por usuário no back-end, com componentes múltiplos e validação no servidor.
+- Integrar o catálogo e o monitoramento de preços; até lá, preços demonstrativos não devem ser apresentados como cotações atuais.
+- Levar os protótipos de comparação, melhorias e budget para o fluxo principal após a integração necessária.
+- Criar a vitrine de configurações prontas e implementar importação e exportação completas.
+- Documentar os contratos e as rotas da API.
 
-Este README será atualizado conforme o projeto avança.
+Outras decisões e dependências estão em [`docs/pendencias-produto.md`](docs/pendencias-produto.md). O README será atualizado conforme o projeto avança.
