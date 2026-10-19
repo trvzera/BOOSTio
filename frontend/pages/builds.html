@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Suas Builds</title>
+  <title>Minhas builds — BOOSTio</title>
   <link rel="icon" type="image/x-icon" href="../imgs/favicon.webp">
   <link rel="stylesheet" href="../styles/style.css">
   <meta name="description" content="A Boostio é uma plataforma que simplifica a montagem de computadores, ajudando você a escolher as peças ideais com base no seu objetivo, orçamento e necessidade, tudo com precisão e confiança.">
@@ -26,9 +26,14 @@
       <div class="decoration decoration-2"></div>
 
       <div class="builds-header">
-        <h1 class="font-1-l">Suas builds</h1>
+        <h1 class="font-1-l">Minhas builds</h1>
         <p class="font-2-s">Gerencie, compartilhe e exporte as montagens salvas no seu perfil.</p>
       </div>
+
+      <nav class="builds-page-switch" aria-label="Páginas de builds">
+        <a href="./builds.html" aria-label="Minhas builds" aria-current="page">Minhas builds</a>
+        <a href="./configuracoes-prontas.html" aria-label="Builds prontas">Builds prontas</a>
+      </nav>
 
       <div class="builds-quota-card" id="builds-quota-card">
         <div class="quota-left">
@@ -44,6 +49,11 @@
           <button type="button" class="btn-build-ghost" id="btn-import-build" aria-label="Importar build"><span class="ui-lottie" data-lottie="import" aria-hidden="true"><span class="ui-icon-fallback">→</span></span>Importar build</button>
           <button type="button" class="btn-build-primary" id="btn-create-build" aria-label="Criar build"><span class="ui-lottie" data-lottie="plus" aria-hidden="true"><span class="ui-icon-fallback">+</span></span>Criar build</button>
         </div>
+      </div>
+
+      <div class="builds-toolbar">
+        <button type="button" class="btn-secondary" id="btn-create-build-form" aria-label="Criar pelo formulário">Criar pelo formulário</button>
+        <button type="button" class="btn-secondary" id="btn-compare-builds" aria-label="Comparar builds" data-disabled-reason="Salve pelo menos duas builds para comparar." disabled>Comparar builds</button>
       </div>
 
       <div id="builds-list">
@@ -112,11 +122,11 @@
       <p class="font-1-m">Altere o título e a descrição desta build.</p>
       <div class="field">
         <label for="edit-title" class="font-1-m">Título</label>
-        <input type="text" id="edit-title" maxlength="60" placeholder="Nome da build">
+        <input type="text" id="edit-title" maxlength="100" placeholder="Nome da build">
       </div>
       <div class="field">
         <label for="edit-description" class="font-1-m">Descrição</label>
-        <textarea id="edit-description" maxlength="160" rows="5" placeholder="Uma breve descrição"></textarea>
+        <textarea id="edit-description" maxlength="300" rows="5" placeholder="Uma breve descrição"></textarea>
       </div>
       <div class="modal-actions">
         <button type="button" class="btn-ghost" id="cancel-build-edit" aria-label="Cancelar edição dos detalhes da build">Cancelar</button>

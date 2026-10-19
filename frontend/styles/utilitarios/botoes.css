@@ -17,20 +17,20 @@
 :is(.btn-secondary, .btn-ghost, .btn-login-secondary, .btn-build-ghost, .btn-back) {
   color: var(--cor-5); background: rgba(255,255,255,.035); border-color: var(--cor-2);
 }
-.btn-secondary { background: rgba(0,123,255,.1); border-color: rgba(0,123,255,.35); color: #9acbff; }
+.btn-secondary { background: transparent; border-color: var(--glass-border,rgba(255,255,255,.12)); color: var(--cor-5); font-weight: 500; }
 .btn-primary-form, .btn-login, .btn-login-secondary { font-size: .8rem; }
 .btn-ghost, .btn-build-ghost, .btn-danger, .btn-secondary { font-size: .9rem; }
 .btn-danger { color: var(--cor-6); background: var(--status-error); }
 .btn-login, .btn-login-secondary { width: 100%; }
 @media (hover: hover) {
   :is(.btn-primary, .btn-primary-form, .btn-login, .btn-build-primary, .component-buy):hover:not(:disabled) {
-    background: linear-gradient(160deg, #0877e0, #005ab9); border-color: #65b3ff; transform: translateY(-1px);
+    background: linear-gradient(160deg, var(--cor-p2), var(--cor-p4)); border-color: var(--cor-p1); transform: translateY(-1px);
   }
   :is(.btn-secondary, .btn-ghost, .btn-login-secondary, .btn-build-ghost, .btn-back):hover:not(:disabled) {
-    background: rgba(255,255,255,.075); border-color: var(--cor-4); color: var(--cor-6); transform: translateY(-1px);
+    background: rgba(255,255,255,.035); border-color: var(--cor-3); color: var(--cor-6); transform: none;
   }
   .btn-danger:hover:not(:disabled) { background: #d92c23; transform: translateY(-1px); }
 }
 :is(button, [class*="btn-"]):active:not(:disabled) { transform: scale(.98); }
 button:disabled { opacity: .45; cursor: not-allowed; transform: none; filter: none; }
-:is(button, a, input, select, textarea):focus-visible { outline: 2px solid #65b3ff; outline-offset: 4px; }
+:is(button, a, input, select, textarea):focus-visible { outline: 2px solid var(--cor-p1); outline-offset: 4px; }

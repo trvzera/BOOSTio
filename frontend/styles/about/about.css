@@ -32,7 +32,7 @@
     width: 60%;
     color: var(--cor-4);
     span {
-      background: linear-gradient(45deg, var(--cor-p1), var(--cor-s1));
+      background: var(--brand-gradient);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;

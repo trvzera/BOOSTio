@@ -6,6 +6,8 @@ import { selecionarPecaCompativel } from "../build/compatibilidade.js";
 import { avisar, mostrarFalha } from "../build/interface.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { navegarPara } from "../components/page-loading.js";
+import { avisoCompraHtml } from "../build/acoes-build.js";
+import { salvarAlteracaoLocal } from "../build/autosalvar.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const main = document.querySelector("#product-main");
@@ -21,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     try { selecionarPecaCompativel(build,peca,catalogo); } catch (erro) { motivo = erro.message; }
     document.title = nomePeca(peca) + " — BOOSTio";
     const categoriaVoltar = ["air_cooler","water_cooler"].includes(peca.categoria) ? "cooler"
-      : ["ssd","hd"].includes(peca.categoria) ? "armazenamento" : peca.categoria;
+      : ["ssd","hd"].includes(peca.categoria) ? "armazenamento" : ["cabo_rede","adaptador_wifi"].includes(peca.categoria) ? "rede" : peca.categoria;
     main.innerHTML = '<header class="builder-heading"><a class="builder-back icon-back btn-ghost" data-page-back href="./pecas.html?' + new URLSearchParams({ categoria: categoriaVoltar, build: build.id }) +
       '" aria-label="Voltar ao catálogo de ' + categoria.nome + '" title="Voltar à categoria">' + iconeAnimado("arrow","back") + '</a></header>' +
       '<section class="product-detail-layout"><div class="product-detail-visual glass-card">' + imagemPeca(peca) + (peca.imagem ? "" : '<span class="font-2-xs summary-note">Imagem ainda não cadastrada</span>') + '</div>' +
@@ -40,12 +42,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       '<section class="product-specifications glass-card" aria-labelledby="spec-title"><h2 class="font-1-l" id="spec-title">Informações técnicas</h2><dl>' +
       detalhes.map(([rotulo,valor]) => '<div><dt class="font-2-xs">' + h(rotulo) + '</dt><dd class="font-1-xs">' + h(valor) + '</dd></div>').join("") +
       '</dl></section>';
+    main.querySelector(".product-stores > p").insertAdjacentHTML("afterend",avisoCompraHtml());
     main.querySelectorAll(".store-logo").forEach(img => img.addEventListener("error",() => { img.hidden = true; img.nextElementSibling.hidden = false; },{once:true}));
     iniciarIcones(main);
     main.querySelector("#add-product").onclick = () => {
       try {
         build = selecionarPecaCompativel(build, peca, catalogo);
-        guardarRascunho(build);
+        const salvo = salvarAlteracaoLocal(build,catalogo);
+        if (!salvo.salvo) { avisar(salvo.motivo); return; }
         navegarPara("./configuracao-build.html?id=" + encodeURIComponent(build.id));
       } catch (erro) { avisar(erro.message); }
     };

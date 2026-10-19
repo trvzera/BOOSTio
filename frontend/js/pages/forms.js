@@ -1,5 +1,7 @@
 import "../header.js";
 import "../auth/auth.js";
+import { normalizarRede, vincularRede } from "../build/rede.js";
+import { planejamentoLocal } from "../build/planejamento.js";
 import {
   registrarAnimacao,
   destruirAnimacao,
@@ -86,6 +88,12 @@ const perguntas = [
       ["microfone", "Microfone"],
     ],
   },
+  {
+    chave:"rede",etapa:"Conexão",tag:"Etapa 04",
+    titulo:"Como seu PC vai se conectar à internet?",
+    descricao:"Informe se usará cabo de rede ou Wi-Fi e se já possui o necessário. Você poderá adicionar o acessório pelo catálogo da build quando houver produtos cadastrados.",
+    opcoes:[],
+  },
 ];
 
 const exemplosPecas = {
@@ -110,7 +118,12 @@ const exemplosPecas = {
 document.addEventListener("DOMContentLoaded", () => {
   const conteudo = document.querySelector("#question-content");
   const painel = document.querySelector("#question-info");
-  const respostas = {};
+  const planejamento = planejamentoLocal();
+  const respostas = {rede:normalizarRede()};
+  if (planejamento.usarBudget && planejamento.budget != null) {
+    respostas.orcamento = "personalizado";
+    respostas.orcamentoPersonalizado = planejamento.budget;
+  }
   let indiceAtual = 0;
   let geracaoPergunta = 0;
   const animacoesCheckbox = new Map();
@@ -135,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".form-step").forEach((item, indice) => {
       item.classList.toggle("active", indice === indiceAtual);
       item.classList.toggle("completed", indice < indiceAtual);
-      item.disabled = indice > 0 && !respostas[perguntas[indice - 1].chave];
+      item.disabled = perguntas.slice(0,indice).some((_,i) => !etapaRespondida(i));
       item.querySelector(".form-step-number").innerHTML =
         indice < indiceAtual
           ? '<i class="fa-solid fa-check"></i>'
@@ -185,13 +198,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function rangeHtml() {
-    const valor = respostas.orcamentoPersonalizado || 5000;
+    const valor = respostas.orcamentoPersonalizado ?? 5000;
+    const maximo = Math.max(20000,valor);
     const isActive = respostas.orcamento === "personalizado" ? "active" : "";
-    return `<div class="budget-range ${isActive}"><div><span class="font-1-m-b">Orçamento personalizado</span><strong class="font-2-xs" id="budget-value">${moeda.format(valor)}</strong></div><input type="range" id="budget-range" min="1500" max="20000" step="500" value="${valor}" style="--range-progress: ${progressoRange(valor)}%" aria-label="Valor do orçamento personalizado"><div class="range-labels"><span class="font-2-xs">R$ 1.500</span><span class="font-2-xs">R$ 20.000+</span></div></div>`;
+    return `<div class="budget-range ${isActive}"><div><span class="font-1-m-b">Orçamento personalizado</span><strong class="font-2-xs" id="budget-value">${moeda.format(valor)}</strong></div><input type="range" id="budget-range" min="0" max="${maximo}" step="any" value="${valor}" style="--range-progress: ${progressoRange(valor)}%" aria-label="Valor do orçamento personalizado"><div class="range-labels"><span class="font-2-xs">R$ 0</span><span class="font-2-xs">${moeda.format(maximo)}</span></div></div>`;
   }
 
   function progressoRange(valor) {
-    return ((valor - 1500) / (20000 - 1500)) * 100;
+    return valor / Math.max(20000,respostas.orcamentoPersonalizado || 0) * 100;
   }
 
   function renderizarPergunta() {
@@ -203,8 +217,12 @@ document.addEventListener("DOMContentLoaded", () => {
     void conteudo.offsetWidth;
     conteudo.classList.add("question-enter");
     conteudo.classList.toggle("pieces-question-content", pergunta.chave === "pecas");
-    const rotuloAvancar = indiceAtual === perguntas.length - 1 ? "Gerar configuração" : "Avançar";
-    conteudo.innerHTML = `<div class="options-heading"><p class="font-1-m-b">${pergunta.multipla ? "Selecione as opções aplicáveis" : "Escolha uma opção"}</p><span class="font-2-xs">${indiceAtual + 1} de ${perguntas.length}</span></div><fieldset class="question-options ${pergunta.multipla ? "pieces-grid" : ""}"><legend class="sr-only">${pergunta.titulo}</legend>${opcoesHtml(pergunta)}</fieldset>${pergunta.chave === "orcamento" ? rangeHtml() : ""}<div id="form-navigation"><button type="button" class="btn-ghost" aria-label="Etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}><i class="fa-solid fa-arrow-left"></i> Etapa anterior</button><button type="button" class="btn-primary-form" id="next-question" aria-label="${rotuloAvancar}" ${podeAvancar() ? "" : "disabled"}>${rotuloAvancar} <i class="fa-solid fa-arrow-right"></i></button></div>`;
+    const rotuloAvancar = indiceAtual === perguntas.length - 1 ? "Abrir editor" : "Avançar";
+    conteudo.innerHTML = `<div class="options-heading"><p class="font-1-m-b">${pergunta.chave === "rede" ? "Planeje sua conexão" : pergunta.multipla ? "Selecione as opções aplicáveis" : "Escolha uma opção"}</p><span class="font-2-xs">${indiceAtual + 1} de ${perguntas.length}</span></div>${pergunta.chave === "rede" ? '<div id="form-network"></div>' : `<fieldset class="question-options ${pergunta.multipla ? "pieces-grid" : ""}"><legend class="sr-only">${pergunta.titulo}</legend>${opcoesHtml(pergunta)}</fieldset>`}${pergunta.chave === "orcamento" ? rangeHtml() : ""}<div id="form-navigation"><button type="button" class="btn-ghost" aria-label="Etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}><i class="fa-solid fa-arrow-left"></i> Etapa anterior</button><button type="button" class="btn-primary-form" id="next-question" aria-label="${rotuloAvancar}" ${podeAvancar() ? "" : "disabled"}>${rotuloAvancar} <i class="fa-solid fa-arrow-right"></i></button></div>`;
+    if (pergunta.chave === "rede") vincularRede(conteudo.querySelector("#form-network"),respostas.rede,{prefixo:"form-rede",aoAlterar:rede => {
+      respostas.rede = rede;
+      conteudo.querySelector("#next-question").disabled = !podeAvancar();
+    }});
     conteudo
       .querySelector(".btn-ghost")
       .addEventListener("click", () => navegarPara(indiceAtual - 1));
@@ -323,10 +341,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function podeAvancar() {
-    if (perguntas[indiceAtual].chave === "orcamento")
+  function etapaRespondida(indice) {
+    if (perguntas[indice].chave === "rede") return true;
+    if (perguntas[indice].chave === "orcamento")
       return Boolean(respostas.orcamento);
-    const resposta = respostas[perguntas[indiceAtual].chave];
+    const resposta = respostas[perguntas[indice].chave];
     if (!Array.isArray(resposta)) return Boolean(resposta);
     if (resposta.length === 0) return false;
     if (resposta.includes("nenhuma")) return true;
@@ -334,6 +353,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return resposta.every(
       (peca) => respostas.pecasDetalhes?.[peca]?.trim().length > 0,
     );
+  }
+  function podeAvancar() {
+    return etapaRespondida(indiceAtual) && ![...conteudo.querySelectorAll("#form-network input")].some(input => !input.checkValidity());
   }
 
   function tratarSelecao(pergunta, input) {
@@ -415,7 +437,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "boostio:respostas-formulario",
       JSON.stringify(respostas),
     );
-    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Configure os componentes da sua build.</h1><p class="font-2-s">Suas peças próprias serão levadas ao editor. Selecione os modelos no catálogo para iniciar as verificações de compatibilidade.</p></div>`;
+    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Configure os componentes da sua build</h1><p class="font-2-s">Suas peças próprias serão levadas ao editor. Selecione os modelos no catálogo para iniciar as verificações de compatibilidade.</p></div>`;
     conteudo.innerHTML = `<div class="build-loading" role="status"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-l">Preparando o editor</h2><p class="font-2-s">Você poderá escolher, alterar e remover os componentes.</p></div>`;
     window.setTimeout(() => {
       window.location.href = paginaConfiguracaoBuild;

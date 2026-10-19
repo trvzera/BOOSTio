@@ -5,10 +5,14 @@ const arquivos = {
   plus:"plus.json", trash:"buildTrash.json", cart:"cartshopping.json", import:"login.json",
   arrow:"arrow.json", chevron:"chavron.json", checkbox:"checkbox.json", hamburger:"hamburger.json",
   login:"login.json", signup:"logon.json", build:"build.json", user:"user.json", profile:"profile.json", logout:"logout-lt.json",
+  circledot:"circledot.json", magnifying:"magnifying.json", magic:"magic.json",
 };
 const alternativas = {plus:"+",trash:"×",cart:"↗",import:"→",arrow:"→",chevron:"⌄",checkbox:"✓",
   hamburger:"☰",login:"→",signup:"+",build:"▦",user:"●",
-  profile:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></svg>',logout:"←"};
+  profile:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></svg>',logout:"←",
+  circledot:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>',
+  magnifying:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 6 6"/></svg>',
+  magic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 20 12-12 4 4L8 24M4 3v6M1 6h6M18 1v6M15 4h6"/></svg>'};
 const ativos = new Map();
 let sequencia = 0, iniciada = false;
 
@@ -34,7 +38,7 @@ export function iniciarIcones(raiz = document) {
       const animacao = await registrarAnimacao(elemento.id,new URL("../../lottie/" + arquivo,import.meta.url).href);
       if (!animacao) return;
       if (!elemento.isConnected) { destruirAnimacao(elemento.id,animacao); return; }
-      const controle = elemento.closest("button,a,label");
+      const controle = elemento.closest("button,a,label,summary");
       const input = controle?.querySelector('input[type="checkbox"]');
       const alternavel = ["checkbox","chevron","hamburger","profile"].includes(elemento.dataset.lottie);
       const aberto = () => input ? input.checked : controle?.getAttribute("aria-expanded") === "true";

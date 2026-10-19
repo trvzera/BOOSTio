@@ -1,6 +1,7 @@
 import { acompanharCarregamento } from "../components/page-loading.js";
 import { completarCatalogoDemo } from "./hardware.js";
 export const perifericos = ["monitor", "teclado", "mouse", "fone"];
+export const acessoriosRede = ["cabo_rede", "adaptador_wifi"];
 export const categorias = [
   { id: "processador", nome: "Processador", sigla: "CPU", obrigatoria: true },
   { id: "placa_mae", nome: "Placa-mãe", sigla: "MB", obrigatoria: true },
@@ -17,12 +18,15 @@ export const categorias = [
   { id: "teclado", nome: "Teclado", sigla: "KEY" },
   { id: "mouse", nome: "Mouse", sigla: "MSE" },
   { id: "fone", nome: "Headset / Fone", sigla: "SND" },
+  { id: "cabo_rede", nome: "Cabo de rede", sigla: "LAN" },
+  { id: "adaptador_wifi", nome: "Adaptador Wi-Fi", sigla: "WIFI" },
 ];
-export const categoriasEditor = categorias.filter(c => !["ssd","hd","air_cooler","water_cooler"].includes(c.id));
+export const categoriasEditor = categorias.filter(c => !["ssd","hd","air_cooler","water_cooler",...acessoriosRede].includes(c.id));
 categoriasEditor.splice(3, 0,
   {id:"armazenamento",nome:"SSD / HD",sigla:"SSD/HD",tipos:["ssd","hd"],armazenamento:true,obrigatoria:true});
 categoriasEditor.splice(categoriasEditor.findIndex(c => c.id === "fan") + 1, 0,
   {id:"cooler",nome:"Coolers",sigla:"COOL",tipos:["air_cooler","water_cooler"]});
+categoriasEditor.push({id:"rede",nome:"Wi-Fi / Rede",sigla:"REDE",tipos:acessoriosRede,rede:true});
 export function categoriaCatalogo(id) {
   return categoriasEditor.find(c => c.id === id) || categorias.find(c => c.id === id);
 }

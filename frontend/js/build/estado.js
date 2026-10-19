@@ -1,5 +1,7 @@
-import { categorias, perifericos } from "./catalogo.js";
+import { categorias, perifericos, acessoriosRede } from "./catalogo.js";
 import { conexaoDisco, limitesArmazenamento, numeroConhecido } from "./hardware.js";
+import { normalizarRede } from "./rede.js";
+import { planejamentoLocal } from "./planejamento.js";
 
 const CHAVE_RASCUNHOS = "boostio:rascunhos-build";
 export const CHAVE_PERFIL_LOCAL = "boostio:builds-locais";
@@ -54,6 +56,9 @@ export function normalizarBuild(valor = {}) {
     visibilidade:valor.visibilidade === "publico" ? "publico" : "privado",
     travada:Boolean(valor.travada),
     incluirPerifericos:typeof valor.incluirPerifericos === "boolean" ? valor.incluirPerifericos : perifericos.some(cat => componentes[cat]),
+    incluirRede:typeof valor.incluirRede === "boolean" ? valor.incluirRede : acessoriosRede.some(cat => componentes[cat]) || ["cabo","wifi"].includes(valor.rede?.tipo),
+    rede:normalizarRede(valor.rede),
+    orcamento:valor.orcamento != null && Number.isFinite(Number(valor.orcamento)) && Number(valor.orcamento) >= 0 && Number(valor.orcamento) <= 1000000 ? Number(valor.orcamento) : null,
     componentes,
   };
 }
@@ -77,11 +82,17 @@ export function abrirBuild(parametros = new URLSearchParams(location.search)) {
   });
   const nova = normalizarBuild({id:id || undefined});
   if (!id) {
+    const planejamento = planejamentoLocal();
+    if (planejamento.usarBudget) nova.orcamento = planejamento.budget;
     const mapa = {processador:"processador","placa-mae":"placa_mae","placa-video":"placa_video",
       memoria:"memoria_ram",ssd:"ssd",hd:"hd",fonte:"fonte",gabinete:"gabinete",cooler:"air_cooler",
       fans:"fan",monitor:"monitor",teclado:"teclado",mouse:"mouse",headset:"fone"};
     try {
       const formulario = JSON.parse(sessionStorage.getItem("boostio:respostas-formulario") || "{}");
+      nova.rede = normalizarRede(formulario.rede);
+      nova.incluirRede = nova.rede.tipo !== "indefinido";
+      const faixas = {"ate-3000":3000,"3000-5000":5000,"5000-8000":8000};
+      nova.orcamento = formulario.orcamento === "personalizado" ? formulario.orcamentoPersonalizado : faixas[formulario.orcamento] ?? nova.orcamento;
       for (const [chave,modelo] of Object.entries(formulario.pecasDetalhes || {})) {
         if (mapa[chave] && typeof modelo === "string" && modelo.trim())
           nova.componentes[mapa[chave]] = {proprio:modelo.trim(),quantidade:1};
@@ -215,6 +226,7 @@ export function selecionarPeca(build,peca,catalogo) {
   const conflitos = conflitosArmazenamento(informacoesArmazenamento(proxima,catalogo));
   if (conflitos.length) throw new Error(conflitos.join(" "));
   if (perifericos.includes(peca.categoria)) proxima.incluirPerifericos = true;
+  if (acessoriosRede.includes(peca.categoria)) proxima.incluirRede = true;
   return proxima;
 }
 export function removerPeca(build,categoria,id) {
@@ -236,7 +248,7 @@ export function reduzirRam(build,id) { return reduzirQuantidade(build,"memoria_r
 export function linkCompartilhado(build) {
   if (build.visibilidade !== "publico") throw new Error("Torne a build pública antes de compartilhar.");
   const url = new URL("./configuracao-build.html",location.href); url.search = "";
-  const dados = {titulo:build.titulo,visibilidade:"publico",componentes:build.componentes,incluirPerifericos:build.incluirPerifericos};
+  const dados = {titulo:build.titulo,descricao:build.descricao,visibilidade:"publico",componentes:build.componentes,incluirPerifericos:build.incluirPerifericos,incluirRede:build.incluirRede,rede:build.rede,orcamento:build.orcamento};
   url.searchParams.set("compartilhar",btoa(unescape(encodeURIComponent(JSON.stringify(dados)))));
   return url.href;
 }

@@ -1,4 +1,4 @@
-import { categorias, perifericos } from "./catalogo.js";
+import { categorias, perifericos, acessoriosRede } from "./catalogo.js";
 import { itensSelecionados, itensCategoria, informacoesRam, informacoesArmazenamento, conflitosArmazenamento, selecionarPeca } from "./estado.js";
 import { validarEncaixe, conexaoDisco } from "./hardware.js";
 
@@ -15,7 +15,7 @@ export function avaliarBuild(build,catalogo) {
       continue;
     }
     preco += Number(peca.preco || 0) * item.quantidade;
-    if (![...perifericos,"fonte"].includes(categoria)) watts += Number(peca.consumo_energia || 0) * item.quantidade;
+    if (![...perifericos,...acessoriosRede,"fonte"].includes(categoria)) watts += Number(peca.consumo_energia || 0) * item.quantidade;
   }
   const faltam = categorias.filter(c => c.obrigatoria && (c.id === "memoria_ram" ? !rams.length : !get(c.id))).map(c => c.nome);
   if (!get("ssd") && !get("hd")) faltam.push("Armazenamento");
@@ -39,6 +39,8 @@ export function avaliarBuild(build,catalogo) {
   else if (fonte && watts > 0 && watts === potencia)
     avisos.push("A potência da fonte é igual ao consumo estimado, sem margem para picos de energia.");
   if (cpu && !cpu.videointegrado && !get("placa_video")) avisos.push("Este processador precisa de uma placa de vídeo para exibir imagem.");
+  if (get("adaptador_wifi")) dicas.push("Confira a interface USB/PCIe do adaptador, as conexões livres e a compatibilidade com o roteador.");
+  if (get("cabo_rede")) dicas.push("Confira o comprimento e a categoria do cabo, a velocidade da porta Ethernet e do roteador.");
   for (const tipo of ["air_cooler","water_cooler"]) {
     const cooler = get(tipo);
     if (cooler && cpu && cooler.compatibilidade) {

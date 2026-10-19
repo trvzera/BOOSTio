@@ -40,6 +40,10 @@
 @import "./forms/feedback.css";
 @import "./componentes/ui-system.css";
 @import "./componentes/glass.css";
+@import "./build/recursos.css";
+@import "./build/comparacao.css";
+@import "./build/prontas.css";
+@import "./build/melhorias.css";
 
 /* Ajustes por largura de tela */
 @import "./responsividades/r-site.css";

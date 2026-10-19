@@ -6,7 +6,7 @@
   position: relative;
   background:
     radial-gradient(ellipse 700px 550px at 0% 72%, rgba(0, 123, 255, 0.22), transparent 72%),
-    radial-gradient(ellipse 700px 550px at 100% 72%, rgba(0, 195, 180, 0.12), transparent 72%);
+    radial-gradient(ellipse 700px 550px at 100% 72%, rgba(0, 86, 179, 0.12), transparent 72%);
 }
 
 .home-page {
@@ -33,7 +33,7 @@
   margin-bottom: var(--espacamento-16);
   text-wrap: balance;
   span {
-    background: linear-gradient(45deg, var(--cor-p1), var(--cor-s1));
+    background: var(--brand-gradient);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
