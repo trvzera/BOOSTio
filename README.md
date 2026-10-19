@@ -4,6 +4,8 @@
 
 ---
 
+<img src="./frontend/imgs/logoBOOSTio.gif">
+
 # BOOSTio
 
 Repositório do meu **projeto de software anual e final do curso**, desenvolvido no **Colégio Cotemig**. É aqui que o BOOSTio é desenvolvido, versionado e documentado ao longo do ano.
