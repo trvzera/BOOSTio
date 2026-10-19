@@ -118,6 +118,27 @@ e as do radiador como instaladas; modelos com distribuição não informada prec
 de conferência para encaixes compartilhados. Não existe um seletor de posição física ainda.
 As medidas de GPU e os encaixes de radiador/fans ainda faltam na seed atual.
 
+#### Pendência: encaixe físico completo do gabinete
+
+`validarEncaixe()` já compara no frontend comprimento da GPU, altura do air cooler,
+tamanho nominal de radiador e tamanho/quantidade de fans, e a avaliação confere o
+formato da placa-mãe. Isso não equivale à confirmação de uma montagem física completa.
+A próxima integração deve preservar os dados do JSON e completar os campos ausentes,
+revalidando no Python com medidas do modelo/revisão corretos.
+
+O gabinete precisa informar limites internos por configuração e posição: GPU com e
+sem radiador frontal; altura/espessura da GPU e espaço dos conectores; radiador +
+fans no topo/frente e suas interferências com placa-mãe/RAM; altura do air cooler;
+formato/comprimento da fonte e baias de discos. Fans e radiadores podem disputar as
+mesmas posições, e fans inclusas podem ser removidas ou substituídas; a configuração
+instalada deve ser explícita antes de confirmar o encaixe. Dimensões externas do
+gabinete e o tamanho nominal de um radiador, isoladamente, não bastam.
+
+Retornar distinção entre encaixe confirmado com os dados conhecidos, incompatível
+e não verificado por falta de dados. Não inferir medidas pelo nome comercial nem
+transformar dado ausente em confirmação. Essa checagem é independente do benchmark
+de jogos e deve ser refeita ao trocar o gabinete ou qualquer peça que afete o espaço.
+
 O complemento exclusivo do catálogo demonstrativo usa as fichas de
 [ASUS PRIME A520M-K](https://www.asus.com/motherboards-components/motherboards/prime/prime-a520m-k/techspec/),
 [GIGABYTE B550M DS3H rev. 1.0/1.1/1.2/1.3](https://www.gigabyte.com/Motherboard/B550M-DS3H-rev-10-11-12-13/sp)
