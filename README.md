@@ -37,11 +37,11 @@ proposta da plataforma.
 ainda está em desenvolvimento.** Uma função local não deve ser confundida com uma
 função persistida e autorizada no servidor.
 
-- **Integrado ao backend:** cadastro, login, logout, sessão e consulta de desempenho
+- **Integrado ao backend:** cadastro, login, logout, sessão, budget por conta e consulta de desempenho
   esperado pela FPSHQ. O fluxo de conta também possui login com Google, verificação
   de e-mail e recuperação de senha, conforme a configuração dos serviços.
 - **Disponível no navegador:** editor manual, formulário, builds salvas localmente,
-  comparação, sugestões de melhorias, configurações prontas, budget, importação e
+  comparação, sugestões de melhorias, configurações prontas, importação e
   exportação. Esses dados ainda não acompanham o usuário entre dispositivos.
 - **A concluir:** persistência das builds e preferências por conta, autorização das
   operações, validações definitivas em Python, ofertas atualizadas e montagem pela LLM.
@@ -82,7 +82,7 @@ Os **20 requisitos do produto** estão preservados abaixo.
 | 12 | Consultar preços das peças pelo site | **Parcial.** Preços cadastrados e links por loja; falta monitoramento atualizado de todas as ofertas. |
 | 13 | Ver compatibilidade e consumo de energia | **Parcial.** Validações e consumo estimado; faltam revalidação em Python e encaixe físico completo do gabinete. |
 | 14 | Incluir periféricos no setup e no orçamento | **Parcial.** Periféricos entram no total; rede tem planejamento próprio, mas cabos/adaptadores ainda precisam de produtos no catálogo. |
-| 15 | Registrar budget no perfil | **Local.** Preferência para novas montagens e orçamento por build; falta persistir por conta. |
+| 15 | Registrar budget no perfil | **Integrado.** Valor e autorização salvos na conta; preenche novas montagens sem alterar o orçamento das builds existentes. |
 | 16 | Baixar a build em JSON e CSV | **Local.** Exportação versionada com componentes, quantidades, peças próprias e metadados. |
 | 17 | Alterar a visibilidade da build | **Local.** Alternância pública/privada; falta controle de acesso efetivo no servidor. |
 | 18 | Duplicar a build | **Local.** Cópia independente, privada e editável, respeitando a quota local. |
@@ -109,6 +109,18 @@ O cache dura uma hora, fica em memória e é compartilhado apenas dentro do mesm
 processo. Antes de usar múltiplos workers, cache e limites precisarão de armazenamento
 compartilhado. A fonte e a licença dos dados permanecem visíveis na interface.
 
+### Budget da conta
+
+O valor e a opção **Usar este budget nas novas configurações** são salvos no Python,
+por usuário, e retornados em `/auth/me`. A alteração usa `PUT /usuarios/<id>/budget`,
+com sessão e verificação de propriedade. São aceitos valores de R$ 0 até R$ 1.000.000,
+com até dois decimais; deixar o campo vazio remove o valor. A autorização exige valor
+positivo. O orçamento de cada build é independente e não há desconto automático.
+
+O antigo budget local não é importado automaticamente para nenhuma conta. Entre e
+salve o valor nas configurações para sincronizá-lo entre dispositivos. As builds e a
+escolha de setup atual continuam locais.
+
 ### Compra e lojas
 
 **Comprar build** existe apenas dentro do editor: reúne quantidades, links e preços
@@ -125,7 +137,7 @@ e devolução devem ser conferidos diretamente com o vendedor.
 - Revisar os modelos e contratos para rascunhos incompletos e múltiplos modelos de
   RAM, SSD, HD e fans, sem perder as seleções que o editor já permite.
 - Criar operações de cadastro, listagem, atualização e exclusão de builds por usuário.
-- Persistir setup atual, budget, descrição, visibilidade, tranca e planejamento de rede.
+- Persistir setup atual, orçamento por build, descrição, visibilidade, tranca e planejamento de rede.
 - Validar no servidor proprietário, quota, quantidades e ações permitidas pela tranca.
 - Migrar dados locais com confirmação e manter o salvamento automático seguro.
 
@@ -189,8 +201,23 @@ Os fluxos de e-mail usam `MAIL_USERNAME` e `MAIL_PASSWORD`; login com Google usa
 `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`. Configure esses valores apenas no ambiente,
 sem publicar credenciais. As opções estão em [`backend/configs.py`](backend/configs.py).
 
+Para **SQLite já existente**, pare o servidor e execute uma vez antes de iniciar:
+
 ```bash
 cd backend
+python -m flask --app app migrar-budget
+```
+
+O comando cria um backup `.antes-budget-*.db` ao lado do banco, adiciona apenas as
+colunas ausentes e não altera os cadastros. Também cobre bancos antigos sem
+`login_google`. Pode ser repetido sem duplicar campos ou apagar budgets. Os backups
+contêm dados privados: ficam ignorados pelo Git e devem ser protegidos como o banco.
+Em uma instalação nova, `app.py` já cria as colunas; não execute a migração antes de
+existir uma tabela de usuários.
+
+Com o ambiente virtual ativo, inicie a partir de `backend/`:
+
+```bash
 python app.py
 ```
 
@@ -230,6 +257,8 @@ python -m pytest
 
 Os cenários automatizados de benchmark usam respostas controladas para não depender
 da disponibilidade do provedor nem consumir suas cotas durante a execução dos testes.
+Os testes de budget usam SQLite temporário e verificam autorização, centavos,
+separação entre contas, remoção, persistência entre sessões e migração com backup.
 
 ## Organização do projeto
 

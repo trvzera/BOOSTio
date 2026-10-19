@@ -12,11 +12,13 @@ import { salvarAlteracaoLocal } from "../build/autosalvar.js";
 import { iniciarDetalhesAnimados } from "../components/animated-details.js";
 import { abrirBenchmark, abrirCompraBuild, motivoBenchmark, avisoCompraHtml } from "../build/acoes-build.js";
 import { abrirMelhorias } from "../build/melhorias.js";
+import { carregarPerfil } from "../conta/perfil.js";
+import { acompanharCarregamento } from "../components/page-loading.js";
 
 document.addEventListener("DOMContentLoaded",async () => {
   const main = document.querySelector("#builder-main");
   try {
-    const catalogo = await carregarCatalogo();
+    const [catalogo] = await acompanharCarregamento(Promise.all([carregarCatalogo(),carregarPerfil().catch(() => null)]));
     let build = abrirBuild();
     let mensagemSalvamento = "Alterações são salvas automaticamente neste navegador.", tomSalvamento = "info";
     if (build.travada) mensagemSalvamento = "Build trancada. Destranque-a para alterar e salvar.";

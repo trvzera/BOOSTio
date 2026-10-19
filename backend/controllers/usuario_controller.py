@@ -12,12 +12,35 @@ from services.usuario_service.deletar_usuario_service import DeletarUsuarioServi
 from services.usuario_service.listar_usuarios_service import ListarUsuariosService
 from services.usuario_service.listar_usuario_id_service import ListarUsuarioIdService
 from services.usuario_service.atualizar_usuario_service import AtualizarUsuarioService
+from services.usuario_service.atualizar_budget_usuario_service import AtualizarBudgetUsuarioService
 from services.usuario_service.redefinir_senha_service import RedefinirSenhaService
 from services.email_service.enviar_codigo_email_service import EnviarEmailService
 from services.email_service.enviar_email_recuperar_service import EnviarEmailRecuperarService
 
 
 usuario_bp = Blueprint("usuario", __name__, url_prefix="/usuarios")
+
+@usuario_bp.errorhandler(401)
+def sessao_necessaria(_erro):
+    return jsonify({"erro": "Entre na sua conta para continuar."}), 401
+
+
+@usuario_bp.put("/<int:usuario_id>/budget")
+@login_required
+@apenas_proprio_usuario
+def atualizar_budget(usuario_id):
+    try:
+        usuario = AtualizarBudgetUsuarioService().executar(usuario_id, request.get_json(silent=True))
+        if usuario is None:
+            return jsonify({"erro": "Usuário não encontrado."}), 404
+        resposta = jsonify({"mensagem": "Budget atualizado com sucesso", "usuario": usuario})
+        resposta.headers["Cache-Control"] = "no-store"
+        return resposta, 200
+    except ValueError as erro:
+        return jsonify({"erro": str(erro)}), 400
+    except SQLAlchemyError:
+        db.session.rollback()
+        return jsonify({"erro": "Não foi possível salvar o budget. Tente novamente."}), 500
 
 #Faltando buscar por Email e finalizar criar usuario na service.
 

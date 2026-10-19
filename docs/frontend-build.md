@@ -281,10 +281,27 @@ sem excluir a build. As demais mostram **Definir como setup atual**, com ícone 
 O menu de três pontos abre para baixo, ajustando a rolagem ao abrir se faltar espaço,
 sem cobrir os controles flutuantes; sua lista tem rolagem própria e glass mais forte.
 
-`js/build/planejamento.js` guarda budget, preferência de uso e ID de setup atual
-neste navegador. O formulário preenche o range quando a preferência está ativa;
-`build.orcamento` permite ajustar o limite sem alterar o budget registrado.
-Sincronização e separação por conta continuam dependentes do backend.
+`js/build/planejamento.js` mantém o ID de setup atual neste navegador, mas recebe o
+budget da conta apenas em memória. `js/conta/perfil.js` consulta `/auth/me` sem cache,
+compartilha solicitações simultâneas e descarta respostas antigas após logout ou
+salvamento. Formulário e editor aguardam essa consulta antes de aplicar a preferência;
+sem sessão/conexão não reaproveitam o budget legado do localStorage.
+
+`js/pages/budget-perfil.js` carrega valor e autorização e envia `PUT /usuarios/<id>/budget`
+por `js/api/usuario/atualizarBudgetUsuario.js`. A interface só confirma após resposta
+do servidor, permite tentar novamente em caso de falha e desativa consentimento sem
+valor positivo. O Python valida sessão, dono, intervalo e centavos, seguindo
+controller → service → modelo. O valor não aparece na listagem geral de usuários.
+
+O formulário preenche o range quando a preferência está ativa; `build.orcamento`
+permite ajustar o limite sem alterar o perfil. Rascunhos, builds já existentes e
+orçamento escolhido no formulário prevalecem sobre a preferência. As builds e o
+setup atual ainda não são sincronizados entre contas/dispositivos.
+
+No SQLite existente, executar em `backend/`: `python -m flask --app app migrar-budget`.
+`migrations/budget_usuario.py` cria backup e adiciona somente colunas ausentes em uma
+transação, incluindo `login_google` para bancos antigos; nunca recria usuários.
+Instalações novas recebem os campos por `db.create_all()`.
 
 `js/build/arquivos.js` exporta JSON e CSV versionados (`boostio-build`, versão 1).
 O CSV inclui metadados e uma linha por modelo com categoria, ID ou peça própria,

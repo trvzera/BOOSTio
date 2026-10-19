@@ -11,6 +11,7 @@ from controllers.email_controller import email_bp
 from controllers.benchmark_controller import benchmark_bp
 from services.peca_service.popular_pecas_service import PopularPecasService
 from services.peca_service.atualizar_precos_service import AtualizarPrecosService
+from migrations.budget_usuario import registrar_migracao_budget
 
 load_dotenv()
 
@@ -33,6 +34,7 @@ app.register_blueprint(usuario_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(email_bp)
 app.register_blueprint(benchmark_bp)
+registrar_migracao_budget(app, db)
 
 if __name__ == '__main__':
     with app.app_context():

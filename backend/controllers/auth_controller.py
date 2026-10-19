@@ -9,6 +9,11 @@ from services.usuario_service.entrar_google_usuario_service import EntrarGoogleS
 
 auth_bp = Blueprint("auth",__name__,url_prefix='/auth')
 
+@auth_bp.after_request
+def nao_armazenar_sessao(resposta):
+    resposta.headers["Cache-Control"] = "no-store"
+    return resposta
+
 #Rota de login
 @auth_bp.post("/entrar")
 def entrar_usuario():
@@ -43,7 +48,7 @@ def teste_logado():
     if current_user.is_authenticated:
         return jsonify({
             "auth":True,
-            "usuario":current_user.to_dict()
+            "usuario":current_user.to_dict(incluir_budget=True)
         }),200
 
     return jsonify({
