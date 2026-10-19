@@ -1,7 +1,8 @@
 #builds-page {
   height: max-content;
+  width: min(1160px, calc(100% - 48px));
   margin: 0 auto;
-  padding: 100px 200px 80px;
+  padding: 100px 0 64px;
 }
 
 .lottie-build-page {
@@ -76,7 +77,7 @@
   height: 100%;
   width: 33.333%;
   border-radius: 50px;
-  background: linear-gradient(90deg, var(--cor-p1), var(--cor-s1));
+  background: linear-gradient(90deg, var(--cor-p4), var(--cor-p1));
   transition: width 0.35s var(--ease);
 }
 
@@ -133,7 +134,7 @@
   cursor: not-allowed;
 }
 
-#builds-lista {
+#builds-list {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--espacamento-16);
@@ -141,14 +142,19 @@
 
 .build-card {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 264px;
   background: var(--cor-1);
   border: 1px solid var(--cor-2);
   border-radius: 20px;
   padding: var(--espacamento-24) var(--espacamento-32);
   color: var(--cor-6);
+  font-family: var(--font-body);
   cursor: pointer;
   transition: 0.2s var(--ease);
 }
+.quota-actions button { white-space: nowrap; }
 
 .build-card:hover {
   transform: translateY(-5px);
@@ -157,7 +163,7 @@
   z-index: 100;
 }
 
-.build-card.travada {
+.build-card.locked {
   border-color: var(--cor-3);
 }
 
@@ -173,12 +179,23 @@
   color: var(--cor-6);
   font-size: 1.15rem;
 }
+.build-card-lock {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: 8px;
+  background: var(--cor-4);
+  -webkit-mask: url("../../svgs/lock.svg") center / contain no-repeat;
+  mask: url("../../svgs/lock.svg") center / contain no-repeat;
+}
 
 .build-card-desc {
   color: var(--cor-4);
-  margin: var(--espacamento-8) 0 var(--espacamento-20);
+  margin: var(--espacamento-8) 0 0;
   max-width: 90%;
 }
+.build-card-desc:empty { display: none; }
+.build-card-meta { margin-top: auto; padding-top: var(--espacamento-20); }
 
 .build-card-percent {
   color: var(--cor-6);
@@ -204,24 +221,14 @@
   transition: width 0.35s var(--ease);
 }
 
-.build-card.completa .build-progress-fill {
-  background: var(--cor-d5);
-}
-
-.build-card.erro .build-progress-fill {
-  background: var(--cor-d1);
-}
-
-.build-card.atencao .build-progress-fill {
-  background: var(--cor-d2);
-}
-
 .build-card-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--espacamento-12);
 }
+.build-title-line { flex: 1; }
+.build-card:has(.build-indicator[data-open]) { z-index: 110; }
 
 .build-status {
   display: inline-flex;
@@ -233,23 +240,23 @@
   color: var(--cor-4);
 }
 
-.build-status.completa {
+.build-status.complete {
   color: var(--cor-d5);
   border-color: rgba(52, 199, 89, 0.35);
   background: rgba(52, 199, 89, 0.08);
 }
 
-.build-status.incompleta {
+.build-status.incomplete {
   color: var(--cor-4);
 }
 
-.build-status.erro {
+.build-status.error {
   color: var(--cor-d1);
   border-color: rgba(255, 59, 48, 0.35);
   background: rgba(255, 59, 48, 0.08);
 }
 
-.build-status.atencao {
+.build-status.warning {
   color: var(--cor-d2);
   border-color: rgba(255, 149, 0, 0.35);
   background: rgba(255, 149, 0, 0.08);
@@ -283,11 +290,12 @@
 }
 
 .build-menu-trigger:hover,
-.build-menu-wrap.aberto .build-menu-trigger {
+.build-menu-wrap.open .build-menu-trigger {
   color: var(--cor-6);
   border-color: var(--cor-2);
   background: var(--cor-0);
 }
+.build-menu-trigger > .ui-lottie { width: 24px; height: 24px; flex-basis: 24px; }
 
 .build-menu {
   position: absolute;
@@ -314,7 +322,7 @@
     transform 0.2s var(--ease);
 }
 
-.build-menu-wrap.aberto .build-menu {
+.build-menu-wrap.open .build-menu {
   opacity: 1;
   pointer-events: auto;
   transform: scale(1);
@@ -380,18 +388,18 @@
   cursor: not-allowed;
 }
 
-.build-menu-item.perigo,
-.build-menu-item.perigo > .lottie-build-page {
+.build-menu-item.danger-menu-item,
+.build-menu-item.danger-menu-item > .lottie-build-page {
   color: var(--cor-d1);
   path {
     fill: var(--cor-d1);
   }
 }
 
-.build-menu-item.perigo:hover:not(:disabled) {
+.build-menu-item.danger-menu-item:hover:not(:disabled) {
   color: var(--cor-d1);
 }
-.build-menu-item.perigo:hover:not(:disabled) > .lottie-build-page path {
+.build-menu-item.danger-menu-item:hover:not(:disabled) > .lottie-build-page path {
   fill: var(--cor-d1);
 }
 
@@ -402,7 +410,7 @@
   background: var(--cor-2);
 }
 
-#builds-vazio {
+#builds-empty {
   color: var(--cor-4);
   text-align: center;
   padding: var(--espacamento-48) var(--espacamento-16);
@@ -410,11 +418,29 @@
   border-radius: 20px;
 }
 
-#editar-build-modal .modal-box h3,
-#deletar-build-modal .modal-box h3 {
+#edit-build-modal .modal-box h3,
+#delete-build-modal .modal-box h3 {
   color: var(--cor-6);
 }
 
-#deletar-build-modal .modal-box h3 {
+#edit-description {
+  display: block;
+  width: 100%;
+  min-height: 144px;
+  resize: vertical;
+  padding: 13px 16px;
+  background: var(--cor-0);
+  border: 1px solid var(--cor-2);
+  border-radius: 12px;
+  color: var(--cor-6);
+  font-size: 1rem;
+  line-height: 1.5;
+  font-family: var(--font-body);
+  transition: border-color .2s var(--ease);
+}
+#edit-description:focus { outline: none; border-color: var(--cor-p1); }
+#edit-description::placeholder { color: var(--cor-3); }
+
+#delete-build-modal .modal-box h3 {
   color: var(--cor-d1);
 }

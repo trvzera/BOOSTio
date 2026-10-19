@@ -1,31 +1,12 @@
 #services-page {
   height: 100vh;
   width: 100%;
-  background-color: var(--cor-0);
+  background:
+    radial-gradient(ellipse 500px 500px at 0% 15%, rgba(0, 123, 255, 0.12), transparent 72%),
+    radial-gradient(ellipse 500px 500px at 100% 85%, rgba(0, 195, 180, 0.08), transparent 72%),
+    var(--cor-0);
   position: relative;
   overflow: hidden;
-}
-
-.services-decoration {
-  position: absolute;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.15;
-  z-index: 0;
-  pointer-events: none;
-}
-.services-decoration.d1 {
-  background: var(--cor-p1);
-  top: 5%;
-  left: -5%;
-}
-.services-decoration.d2 {
-  background: var(--cor-s1);
-  bottom: 5%;
-  right: -5%;
-  opacity: 0.1;
 }
 
 #services-container {
@@ -79,22 +60,36 @@
   transform: translateY(-5px);
   border: 1px solid var(--cor-p1);
 }
+@media (prefers-reduced-motion: no-preference) {
+  .card-service.reveal-pending {
+    transition:
+      opacity var(--reveal-duration) ease,
+      transform var(--reveal-move-duration) cubic-bezier(0.22, 1, 0.36, 1),
+      filter var(--reveal-duration) ease,
+      border-color .2s var(--ease);
+  }
+}
 .card-container {
   width: 100%;
   display: flex;
   align-items: start;
-  justify-content: center;
+  justify-content: flex-start;
   flex-direction: column;
 }
 
 .card-index {
-  margin-bottom: var(--espacamento-12);
-  font-size: 5rem;
+  margin-bottom: var(--espacamento-24);
+  font-size: 2.75rem;
+  line-height: 1;
+  color: var(--cor-4);
 }
 
 .card-title {
-  margin-bottom: var(--espacamento-20);
-  background: linear-gradient(45deg, var(--cor-p1), var(--cor-s1));
+  margin-bottom: var(--espacamento-16);
+  font-size: 1.5rem;
+  line-height: 1.35;
+  text-wrap: balance;
+  background: var(--brand-gradient);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -102,6 +97,8 @@
 }
 
 .card-desc {
-  width: 90%;
+  width: 100%;
+  font-size: .95rem;
+  line-height: 1.7;
   color: var(--cor-4);
 }

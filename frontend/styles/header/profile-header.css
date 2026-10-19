@@ -65,7 +65,7 @@
   gap: var(--espacamento-4);
 }
 
-.profile-nav-list.ativo {
+.profile-nav-list.active {
   display: flex;
 }
 
@@ -99,14 +99,14 @@
   fill: var(--cor-4);
 }
 
-.profile-item.sair {
+.profile-item.sign-out-item {
   color: var(--cor-d1);
   .profile-link {
     color: inherit;
   }
 }
 
-.profile-item.sair a > i path {
+.profile-item.sign-out-item a > i path {
   fill: var(--cor-d1);
 }
 

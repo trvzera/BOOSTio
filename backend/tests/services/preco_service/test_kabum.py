@@ -84,6 +84,13 @@ class ColetaKabumTest(unittest.TestCase):
         self.assertEqual(atualizar.call_count, 2)
         atualizar.assert_called_with(limite=None, intervalo=0)
 
+    def test_popular_pode_cadastrar_sem_coletar_no_inicio_do_app(self):
+        with patch("services.peca_service.popular_pecas_service.AtualizarPrecosService.executar") as atualizar, \
+             patch("builtins.print"):
+            PopularPecasService().executar(atualizar_precos=False)
+        self.assertEqual(sum(classe.query.count() for classe in MODELOS_PECAS), 750)
+        atualizar.assert_not_called()
+
     def test_popular_depois_atualiza_pecas_uma_a_uma(self):
         dados = [
             {"fabricante": "Palit", "modelo": str(codigo), "memoria_gb": 6,

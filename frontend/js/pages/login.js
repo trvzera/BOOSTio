@@ -8,10 +8,10 @@ import { entrarComGoogle } from "../api/usuario/entrarComGoogle.js";
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     const emailInput = document.querySelector("#email");
-    const senhaInput = document.querySelector("#senha");
-    const botaoEntrar = document.querySelector("#btn-entrar");
+    const senhaInput = document.querySelector("#password");
+    const botaoEntrar = document.querySelector("#btn-sign-in");
     const formLogin = document.querySelector("#login-form");
-    const erroTexto = document.querySelector("#login-erro");
+    const erroTexto = document.querySelector("#login-error");
     const botaoGoogle = document.querySelector("#btn-google-login");
     erroTexto.style.display = "none";
 
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       entrarComGoogle();
     });
 
-    document.querySelectorAll(".toggle-senha").forEach((icone) => {
+    document.querySelectorAll(".password-toggle").forEach((icone) => {
       icone.addEventListener("click", () => {
         const alvo = document.querySelector(`#${icone.dataset.target}`);
         const vendo = alvo.type === "text";
@@ -36,6 +36,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         alvo.type = vendo ? "password" : "text";
         icone.classList.toggle("fa-eye", !vendo);
         icone.classList.toggle("fa-eye-slash", vendo);
+        icone.setAttribute("aria-pressed",String(!vendo));
+        icone.setAttribute("aria-label",vendo ? "Mostrar senha" : "Ocultar senha");
       });
     });
 
@@ -60,6 +62,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const senhaValue = senhaInput.value.trim();
 
       botaoEntrar.disabled = true;
+      botaoEntrar.dataset.busy = "true";
 
       try {
         const resposta = await login(emailValue, senhaValue);
@@ -75,6 +78,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           erro.message ||
           "Não foi possível entrar. Tente novamente mais tarde.";
       } finally {
+        delete botaoEntrar.dataset.busy;
         botaoEntrar.disabled = false;
       }
     });

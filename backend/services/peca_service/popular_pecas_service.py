@@ -21,10 +21,11 @@ from .atualizar_precos_service import AtualizarPrecosService
 class PopularPecasService:
   """Cadastra peças ausentes e atualiza os preços dos links cadastrados."""
 
-  def executar(self, limite: int | None = None, intervalo: float = 1.0):
+  def executar(self, limite: int | None = None, intervalo: float = 1.0, atualizar_precos: bool = True):
     for classe, itens in self._dados_seed().items():
       self._popular_classe(classe, itens)
-    return AtualizarPrecosService().executar(limite=limite, intervalo=intervalo)
+    if atualizar_precos:
+      return AtualizarPrecosService().executar(limite=limite, intervalo=intervalo)
 
   def _popular_classe(self, classe, itens: list[dict]) -> None:
     novos = classe.cadastrar_ausentes(itens)

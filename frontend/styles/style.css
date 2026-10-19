@@ -1,48 +1,60 @@
-/* GLOBAL */
+/* Base e utilitários compartilhados */
 @import "./global/global.css";
-@import "./forms/forms.css";
-
-
-/* TERMOS */
-@import "./utilitarios/termos.css";
-
-/* UTILITARIOS */
-@import "./utilitarios/tipografia.css";
 @import "./utilitarios/cores.css";
 @import "./utilitarios/espacamentos.css";
+@import "./utilitarios/tipografia.css";
+@import "./utilitarios/acessibilidade.css";
 @import "./utilitarios/botoes.css";
-@import "./utilitarios/decorations.css";
 @import "./utilitarios/inputs.css";
+@import "./utilitarios/decorations.css";
 @import "./utilitarios/transition.css";
-@import "./utilitarios/loading.css";
-@import "./utilitarios/footer.css";
 
-/* HEADER */
-@import "./header/header.css";
-@import "./header/profile-header.css";
+/* Componentes compartilhados */
+@import "./componentes/loading.css";
+@import "./componentes/site-menu.css";
+@import "./componentes/scroll-reveal.css";
+@import "./componentes/page-entry.css";
 
-/* MAIN */
+/* Páginas */
 @import "./home/home.css";
-
-/* ABOUT */
-@import "./about/about.css";
-
-/* SERVICES */
-@import "./services/services.css";
-
-/* FOOTER */
 @import "./home/build-page.css";
-
-/* SIGNIN */
+@import "./home/footer.css";
+@import "./about/about.css";
+@import "./services/services.css";
+@import "./paginas/termos.css";
+@import "./paginas/erro.css";
+@import "./paginas/sobre.css";
+@import "./conta/campos.css";
 @import "./conta/signin.css";
 @import "./conta/configuracoes.css";
 @import "./conta/senha.css";
 @import "./conta/builds.css";
+@import "./build/editor.css";
+@import "./build/catalogo.css";
 
+/* Formulário */
+@import "./forms/forms.css";
+@import "./forms/opcoes.css";
+@import "./forms/orcamento.css";
+@import "./forms/navegacao.css";
+@import "./forms/feedback.css";
+@import "./componentes/ui-system.css";
+@import "./componentes/glass.css";
+@import "./build/recursos.css";
+@import "./componentes/benchmark.css";
+@import "./build/comparacao.css";
+@import "./build/prontas.css";
+@import "./build/melhorias.css";
 
-/* RESPONSIVIDADE */
+/* Ajustes por largura de tela */
+@import "./responsividades/r-site.css";
 @import "./responsividades/r-home.css";
 @import "./responsividades/r-services.css";
-@import "./responsividades/r-configuracoes.css";
 @import "./responsividades/r-build-page.css";
+@import "./responsividades/r-configuracoes.css";
 @import "./responsividades/r-builds.css";
+@import "./responsividades/r-forms.css";
+@import "./responsividades/r-erro.css";
+@import "./responsividades/r-sobre.css";
+@import "./responsividades/r-editor-build.css";
+@import "./componentes/navigation-controls.css";

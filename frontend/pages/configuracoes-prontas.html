@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Builds prontas — BOOSTio</title>
+  <meta name="description" content="Explore três configurações demonstrativas, filtre por objetivo e budget e abra uma cópia independente para personalizar na BOOSTio.">
+  <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
+  <link rel="stylesheet" href="../styles/style.css">
+  <script type="module" src="../js/pages/loading.js" defer></script>
+  <script type="module" src="../js/pages/configuracoes-prontas.js" defer></script>
+</head>
+<body id="configuracoes-prontas" class="prontas-page">
+  <div id="loading-screen"><video id="loading-video" autoplay muted playsinline><source src="../video/loading-toggle.webm" type="video/webm"></video></div>
+  <div data-site-navigation></div>
+  <div class="decoration decoration-1" aria-hidden="true"></div>
+  <div class="decoration decoration-2" aria-hidden="true"></div>
+
+  <main id="prontas-main" class="prontas-main">
+    <header class="prontas-heading">
+      <a class="prontas-voltar" href="./index.html" aria-label="Voltar ao início"><span class="ui-lottie" data-lottie="arrow" data-direction="back" aria-hidden="true"><span class="ui-icon-fallback">→</span></span>Voltar ao início</a>
+      <p class="prontas-eyebrow">Um ponto de partida para sua montagem</p>
+      <h1>Builds prontas</h1>
+      <p>Explore três exemplos curados, confira as peças e personalize uma cópia no editor.</p>
+    </header>
+
+    <nav class="builds-page-switch" aria-label="Páginas de builds">
+      <a href="./builds.html" aria-label="Minhas builds">Minhas builds</a>
+      <a href="./configuracoes-prontas.html" aria-label="Builds prontas" aria-current="page">Builds prontas</a>
+    </nav>
+
+    <aside class="prontas-aviso glass-card" aria-label="Sobre os modelos demonstrativos">
+      <p><strong>Preços demonstrativos.</strong> Os totais e o filtro de budget usam o catálogo de exemplo. Confirme o preço e as condições de compra nas lojas.</p>
+      <p>Você pode explorar as peças e abrir uma cópia para editar. As builds são salvas neste navegador enquanto a sincronização com a conta está em desenvolvimento.</p>
+    </aside>
+
+    <form id="prontas-filtros" class="prontas-filtros glass-card" aria-label="Filtrar configurações prontas">
+      <div class="prontas-campo">
+        <label for="prontas-objetivo">Objetivo</label>
+        <select id="prontas-objetivo" aria-label="Filtrar configurações por objetivo"><option value="">Todos os objetivos</option></select>
+      </div>
+      <div class="prontas-campo">
+        <label for="prontas-budget">Budget máximo (R$)</label>
+        <input id="prontas-budget" type="number" min="0" max="1000000" step="0.01" inputmode="decimal" placeholder="Sem limite" aria-label="Filtrar por budget máximo em reais" aria-describedby="prontas-budget-ajuda prontas-feedback">
+        <small id="prontas-budget-ajuda">Compara totais demonstrativos. Vazio mostra qualquer valor.</small>
+      </div>
+      <button type="reset" class="btn-ghost" aria-label="Limpar filtros de objetivo e budget">Limpar filtros</button>
+    </form>
+
+    <div class="prontas-lista-heading">
+      <p id="prontas-contador" role="status" aria-live="polite">Carregando configurações…</p>
+      <p id="prontas-cota" role="status" aria-live="polite">Cota local: até três builds salvas</p>
+    </div>
+    <p id="prontas-feedback" class="prontas-feedback" role="status" aria-live="polite" aria-atomic="true"></p>
+    <section id="prontas-lista" class="prontas-lista" aria-label="Modelos de configurações prontas" aria-busy="true"></section>
+    <noscript><p>Ative o JavaScript para filtrar modelos, conferir as peças e abrir um rascunho.</p></noscript>
+  </main>
+
+  <div class="prontas-footer-wrapper">
+    <footer>
+      <div id="top-footer">
+        <div id="footer-hero">
+          <img src="../imgs/logo.webp" alt="Logo BOOSTio">
+          <p class="font-2-s">A BOOSTio é uma plataforma desenvolvida para simplificar a montagem e o upgrade de computadores.</p>
+        </div>
+        <nav id="footer-nav" aria-label="Páginas da BOOSTio">
+          <h2 class="font-1-l">Páginas</h2>
+          <ul id="footer-nav-ul">
+            <li class="footer-item"><a href="./index.html" aria-label="Ir para o início" class="font-2-s">Início</a></li>
+            <li class="footer-item"><a href="./formulario.html" aria-label="Ir para o formulário de montagem" class="font-2-s">Montagem</a></li>
+            <li class="footer-item"><a href="./builds.html" aria-label="Ir para Minhas builds" class="font-2-s">Minhas builds</a></li>
+          </ul>
+        </nav>
+        <div id="footer-extra">
+          <div id="contact-section">
+            <h2 class="font-1-l">Contato</h2>
+            <a href="mailto:contato@boostio.com.br" aria-label="Enviar e-mail para contato@boostio.com.br" class="font-2-s">contato@boostio.com.br</a>
+          </div>
+          <div id="about-section">
+            <h2 class="font-1-l">Sobre nós</h2>
+            <a href="./sobre.html" aria-label="Conheça a BOOSTio" class="font-2-s">Conheça a BOOSTio</a>
+          </div>
+        </div>
+      </div>
+      <div id="footer-divider"></div>
+      <div id="bottom-footer">
+        <p class="font-2-s">&copy;2026 BOOSTio - Todos direitos reservados</p>
+        <a href="./termos.html" target="_blank" rel="noopener noreferrer" aria-label="Ver termos de uso em uma nova aba" class="font-2-s" id="terms-link">Termos de uso</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

@@ -15,80 +15,13 @@
   <script type="module" src="../js/pages/forms.js"></script>
 </head>
 
-<body id="formulario">
+<body class="form-page">
   <div id="loading-screen">
     <video id="loading-video" autoplay muted playsinline>
       <source src="../video/loading-toggle.webm" type="video/webm">
     </video>
   </div>
-  <header id="header">
-    <div id="header-container">
-      <a href="./index.html" id="logo" aria-label="Logo da BOOSTio" width="100" height="20"></a>
-      <nav id="header-nav">
-        <ul id="nav-list">
-          <li class="nav-item"><a href="./index.html#main-page" class="nav-link font-1-xs" aria-label="Ir para sessão de inicial">Início</a></li>
-          <li class="nav-item"><a href="./index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para sessão sobre">Sobre</a></li>
-          <li class="nav-item"><a href="./index.html#services-page" class="nav-link font-1-xs" aria-label="Ir para sessão de serviços">Serviços</a></li>
-          <li class="nav-item"><a href="./index.html#build-page" class="nav-link font-1-xs" aria-label="Ir para sessão de montagem do computador">Monte o seu</a></li>
-          <li id="divider"></li>
-          <li class="nav-item"><a href="./builds.html" class="nav-link font-1-xs" aria-label="Ir para página contendo suas builds">Suas Builds</a></li>
-        </ul>
-      </nav>
-      <div id="profile">
-        <input type="checkbox" name="profile" id="profile-check" aria-label="Abrir menu do perfil">
-        <div id="profile-options">
-          <nav id="profile-nav">
-            <ul class="profile-nav-list" id="profile-nav-list-logado">
-              <li class="profile-item">
-                <a href="./builds.html" class="profile-link font-1-s" id="btn-build" aria-label="Ir para suas builds">
-                  <i id="lottie-build" class="lottie-header"></i>
-                  <p>Builds</p>
-                </a>
-              </li>
-              <li class="profile-item">
-                <a href="./configuracoes.html" class="profile-link font-1-s" id="btn-user" aria-label="Ir para as Configurações do seu perfil">
-                  <i id="lottie-user" class="lottie-header"></i>
-                  <p>Configurações</p>
-                </a>
-              </li>
-              <li class="profile-item sair">
-                <a href="#" class="profile-link font-1-s" id="btn-logout" aria-label="Sair da sua conta">
-                  <i id="lottie-logout" class="lottie-header"></i>
-                  <p>Sair</p>
-                </a>
-              </li>
-            </ul>
-            <ul class="profile-nav-list" id="profile-nav-list-deslogado">
-              <li class="profile-item"><a href="./login.html" class="profile-link font-1-s" id="btn-login" aria-label="Entrar na sua conta"><i id="lottie-login" class="lottie-header"></i>
-                  <p>Entrar</p>
-                </a></li>
-              <li class="profile-item"><a href="./signin.html" class="profile-link font-1-s" id="btn-logon" aria-label="Criar uma conta"><i id="lottie-logon" class="lottie-header"></i>
-                  <p>Criar conta</p>
-                </a></li>
-            </ul>
-          </nav>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <header id="header-mobile">
-    <div id="burger-menu">
-      <input type="checkbox" id="burger-check" aria-label="Abrir menu de navegação">
-      <label for="burger-check" id="lottie-burger">
-      </label>
-
-      <nav id="mobile-nav">
-        <ul id="mobile-nav-list">
-          <li class="mobile-nav-item"><a href="./index.html#main-page" class="nav-link font-1-xs" aria-label="Ir para sessão de Início">Início</a></li>
-          <li class="mobile-nav-item"><a href="./index.html#about-page" class="nav-link font-1-xs" aria-label="Ir para sessão Sobre">Sobre</a></li>
-          <li class="mobile-nav-item"><a href="./index.html#services-page" class="nav-link font-1-xs" aria-label="Ir para sessão de Serviços">Serviços</a></li>
-          <li class="mobile-nav-item"><a href="./index.html#build-page" class="nav-link font-1-xs" aria-label="Ir para sessão montar o computador">Monte o seu</a></li>
-          <li class="mobile-nav-item"><a href="./builds.html" class="nav-link font-1-xs" aria-label="Ir para página das suas builds">Suas Builds</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+  <div data-site-navigation></div>
 
   <main id="forms-page">
 
@@ -97,12 +30,19 @@
 
     <div id="forms-page-container">
 
+      <a href="./index.html" class="btn-ghost form-page-back" data-page-back aria-label="Voltar ao início">
+        <span class="ui-lottie" data-lottie="arrow" data-direction="back" aria-hidden="true"><span class="ui-icon-fallback">→</span></span>
+        <span data-back-label>Voltar ao início</span>
+      </a>
+
       <nav id="forms-header" aria-label="Navegação entre etapas do formulário">
-        <button type="button" class="form-step active" data-step="0"><span class="form-step-number font-1-xs">01</span><span class="font-1-xs">Objetivo</span></button>
+        <button type="button" class="form-step active" data-step="0" aria-label="01 Objetivo: ir para a etapa 1"><span class="form-step-number font-1-xs">01</span><span class="font-1-xs">Objetivo</span></button>
         <div class="form-bar" data-bar="0"></div>
-        <button type="button" class="form-step" data-step="1"><span class="form-step-number font-1-xs">02</span><span class="font-1-xs">Orçamento</span></button>
+        <button type="button" class="form-step" data-step="1" aria-label="02 Orçamento: ir para a etapa 2"><span class="form-step-number font-1-xs">02</span><span class="font-1-xs">Orçamento</span></button>
         <div class="form-bar" data-bar="1"></div>
-        <button type="button" class="form-step" data-step="2"><span class="form-step-number font-1-xs">03</span><span class="font-1-xs">Suas peças</span></button>
+        <button type="button" class="form-step" data-step="2" aria-label="03 Suas peças: ir para a etapa 3"><span class="form-step-number font-1-xs">03</span><span class="font-1-xs">Suas peças</span></button>
+        <div class="form-bar" data-bar="2"></div>
+        <button type="button" class="form-step" data-step="3" aria-label="04 Conexão: ir para a etapa 4"><span class="form-step-number font-1-xs">04</span><span class="font-1-xs">Conexão</span></button>
       </nav>
 
       <section id="questions">

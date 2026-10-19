@@ -13,7 +13,7 @@ function carregarLottie() {
 const animacoesCarregadas = new Map();
 
 export async function registrarAnimacao(id, path, opcoes = {}) {
-  const container = document.querySelector(`#${id}`);
+  const container = document.getElementById(id);
 
   if (!container) {
     console.warn(`Container #${id} não encontrado.`);
@@ -37,6 +37,12 @@ export async function registrarAnimacao(id, path, opcoes = {}) {
 
 export function obterAnimacao(id) {
   return animacoesCarregadas.get(id);
+}
+
+export function destruirAnimacao(id, animacao) {
+  if (animacoesCarregadas.get(id) !== animacao) return;
+  animacao.destroy();
+  animacoesCarregadas.delete(id);
 }
 
 export function destruirTodas() {

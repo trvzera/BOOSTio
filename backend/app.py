@@ -8,8 +8,8 @@ import os
 from controllers.usuario_controller import usuario_bp
 from controllers.auth_controller import auth_bp
 from controllers.email_controller import email_bp
+from controllers.benchmark_controller import benchmark_bp
 from services.peca_service.popular_pecas_service import PopularPecasService
-from services.peca_service.atualizar_precos_service import AtualizarPrecosService
 
 load_dotenv()
 
@@ -31,6 +31,7 @@ CORS(app, supports_credentials=True, origins=["http://localhost:5500", "http://1
 app.register_blueprint(usuario_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(email_bp)
+app.register_blueprint(benchmark_bp)
 
 from commands.precos import registrar_comandos_precos
 registrar_comandos_precos(app)
@@ -38,6 +39,5 @@ registrar_comandos_precos(app)
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        # PopularPecasService().executar()
-        # AtualizarPrecosService().executar()
+        PopularPecasService().executar(atualizar_precos=False)
     app.run(debug=True)
