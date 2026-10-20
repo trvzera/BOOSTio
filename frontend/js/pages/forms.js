@@ -2,6 +2,8 @@ import "../header.js";
 import "../auth/auth.js";
 import { normalizarRede, vincularRede } from "../build/rede.js";
 import { planejamentoLocal } from "../build/planejamento.js";
+import { carregarPerfil } from "../conta/perfil.js";
+import { acompanharCarregamento } from "../components/page-loading.js";
 import {
   registrarAnimacao,
   destruirAnimacao,
@@ -115,9 +117,10 @@ const exemplosPecas = {
   microfone: "Ex.: HyperX SoloCast",
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const conteudo = document.querySelector("#question-content");
   const painel = document.querySelector("#question-info");
+  await acompanharCarregamento(carregarPerfil().catch(() => null));
   const planejamento = planejamentoLocal();
   const respostas = {rede:normalizarRede()};
   if (planejamento.usarBudget && planejamento.budget != null) {

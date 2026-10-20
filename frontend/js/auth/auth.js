@@ -1,11 +1,11 @@
-import { buscarUsuarioLogado } from "../api/usuario/buscarUsuarioLogado.js";
+import { carregarPerfil, limparPerfil } from "../conta/perfil.js";
 import { logout } from "../api/usuario/logout.js";
 import { atualizarMenu } from "../components/menu.js";
 import { redirecionamentoSessao } from "../components/navigation-config.js";
 
 export function caminhoLogin() { return new URL("../../pages/login.html",import.meta.url).href; }
 export async function confirmaUsuario() {
-  const resposta = await buscarUsuarioLogado();
+  const resposta = await carregarPerfil();
   const autenticado = Boolean(resposta?.auth);
   atualizarMenu(autenticado);
   const destino = redirecionamentoSessao(location.pathname.split("/").pop(),autenticado);
@@ -20,13 +20,13 @@ async function conferirSessao() {
   }
 }
 window.addEventListener("load",conferirSessao);
-window.addEventListener("pageshow",e => { if (e.persisted) conferirSessao(); });
+window.addEventListener("pageshow",e => { if (e.persisted) { limparPerfil(); conferirSessao(); } });
 document.addEventListener("click",async e => {
   if (!e.target.closest("#btn-logout")) return;
   e.preventDefault();
   const botao = document.querySelector("#btn-logout");
   botao.disabled = true; botao.dataset.busy = "true";
-  try { await logout(); location.href = caminhoLogin(); }
+  try { await logout(); limparPerfil(); location.href = caminhoLogin(); }
   catch (erro) {
     botao.disabled = false; delete botao.dataset.busy;
     const aviso = document.querySelector("#ui-tooltip");

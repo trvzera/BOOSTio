@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { normalizarRede, custoRede, selecionarAcessorioRede } from "../js/build/rede.js";
 import { normalizarBuild, abrirBuild } from "../js/build/estado.js";
-import { planejamentoLocal, salvarPlanejamento } from "../js/build/planejamento.js";
+import { planejamentoLocal, salvarPlanejamento, sincronizarBudgetPerfil } from "../js/build/planejamento.js";
 import { avaliarBuild } from "../js/build/compatibilidade.js";
 import { modelosProntos, copiarModelo } from "../js/build/modelos.js";
 
@@ -66,14 +66,43 @@ test("formulário transfere rede e budget ao editor sem perder peças próprias"
 
 test("preferência aplica budget somente a novas builds quando autorizada",() => {
   globalThis.localStorage = armazenamento(); globalThis.sessionStorage = armazenamento();
-  salvarPlanejamento({budget:6000,usarBudget:false});
+  sincronizarBudgetPerfil({id:1,budget:6000,usar_budget:false});
   assert.equal(abrirBuild(new URLSearchParams()).orcamento,null);
-  salvarPlanejamento({usarBudget:true});
+  sincronizarBudgetPerfil({id:1,budget:6000,usar_budget:true});
   const build = abrirBuild(new URLSearchParams());
   assert.equal(build.orcamento,6000);
   build.orcamento = 4000;
   assert.equal(planejamentoLocal().budget,6000);
   assert.throws(() => salvarPlanejamento({budget:-1}),/budget/);
+  sincronizarBudgetPerfil(null);
+});
+
+test("budget legado não é aplicado à conta e logout limpa apenas a projeção de budget",() => {
+  globalThis.localStorage = armazenamento();
+  localStorage.setItem("boostio:planejamento-local",JSON.stringify({budget:9999,usarBudget:true,setupAtualId:"meu-setup"}));
+  sincronizarBudgetPerfil(null);
+  assert.deepEqual(planejamentoLocal(),{budget:null,usarBudget:false,setupAtualId:"meu-setup"});
+  sincronizarBudgetPerfil({id:1,budget:6000.75,usar_budget:true});
+  assert.equal(planejamentoLocal().budget,6000.75);
+  sincronizarBudgetPerfil({id:2,budget:null,usar_budget:false});
+  assert.equal(planejamentoLocal().budget,null);
+  sincronizarBudgetPerfil(null);
+  assert.equal(planejamentoLocal().usarBudget,false);
+  salvarPlanejamento({setupAtualId:null});
+  assert.equal(planejamentoLocal().setupAtualId,null);
+  assert.equal(JSON.parse(localStorage.getItem("boostio:planejamento-local")).budget,undefined);
+});
+
+test("budget da conta não muda orçamento de build existente nem respostas do formulário",() => {
+  globalThis.localStorage = armazenamento(); globalThis.sessionStorage = armazenamento();
+  localStorage.setItem("boostio:builds-locais",JSON.stringify([{id:"existente",orcamento:4500,componentes:{}}]));
+  sincronizarBudgetPerfil({id:1,budget:8000,usar_budget:true});
+  assert.equal(abrirBuild(new URLSearchParams({id:"existente"})).orcamento,4500);
+  sessionStorage.setItem("boostio:respostas-formulario",JSON.stringify({orcamento:"personalizado",orcamentoPersonalizado:3000}));
+  assert.equal(abrirBuild(new URLSearchParams()).orcamento,3000);
+  sincronizarBudgetPerfil({id:1,budget:0,usar_budget:true});
+  assert.equal(abrirBuild(new URLSearchParams()).orcamento,null);
+  sincronizarBudgetPerfil(null);
 });
 
 test("cópia de configuração pronta não altera os modelos nem reutiliza sua identidade",() => {
