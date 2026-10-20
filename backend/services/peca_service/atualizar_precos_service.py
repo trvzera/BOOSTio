@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 import requests
 
-from models import ConsultaPreco
+from models import ConsultaPreco, ControleColeta
 from .modelos_pecas import MODELOS_PECAS
 from services.preco_service.buscar_preco_kabum_service import BuscarPrecoKabumService
 from services.preco_service.reservar_consulta_service import ReservarConsultaService
@@ -17,6 +17,8 @@ class AtualizarPrecosService:
 
         if intervalo < 0:
             raise ValueError("O intervalo não pode ser negativo")
+
+        ControleColeta.inicializar()
 
         resumo = {"consultas": 0, "atualizadas": 0, "falhas": 0, "ignoradas": 0}
 
@@ -54,8 +56,11 @@ class AtualizarPrecosService:
             for peca in classe.com_link_kabum()
             if (classe.__tablename__, peca.id, peca.kabum_external) not in consultadas_hoje
         ]
+        essenciais = ("processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "hd")
         return sorted(candidatas, key=lambda par: (
-            ultimas.get(par[1].kabum_external, 0), par[0].__tablename__, par[1].id,
+            ultimas.get(par[1].kabum_external, 0),
+            par[0].__tablename__ not in essenciais, par[1].id,
+            essenciais.index(par[0].__tablename__) if par[0].__tablename__ in essenciais else par[0].__tablename__,
         ))
 
     def _consultar(self, consulta, resumo):

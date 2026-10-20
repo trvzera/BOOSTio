@@ -6,10 +6,16 @@ from services.peca_service.migrar_links_service import MigrarLinksService
 from services.peca_service.popular_pecas_service import PopularPecasService
 from services.peca_service.atualizar_precos_service import AtualizarPrecosService
 from services.peca_service.salvar_peca_service import SalvarPecaService
+from services.peca_service.restaurar_links_kabum_service import RestaurarLinksKabumService
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 
 
 def registrar_comandos_precos(app):
+    @app.cli.command("pecas-restaurar-links")
+    def restaurar_links():
+        """Repõe links conhecidos da seed sem sobrescrever os links atuais."""
+        click.echo(json.dumps(RestaurarLinksKabumService().executar(), ensure_ascii=False))
+
     @app.cli.command("precos-migrar")
     def migrar():
         MigrarLinksService().executar()

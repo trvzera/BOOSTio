@@ -1,4 +1,4 @@
-from sqlalchemy import func, update
+from sqlalchemy import func, text, update
 
 from . import db, ModeloBase
 
@@ -62,6 +62,11 @@ class ControleColeta(db.Model):
     __tablename__ = "controle_coleta"
     id = db.Column(db.Integer, primary_key=True)
     versao = db.Column(db.Integer, nullable=False, default=0)
+
+    @classmethod
+    def inicializar(cls):
+        db.session.execute(text("INSERT OR IGNORE INTO controle_coleta (id, versao) VALUES (1, 0)"))
+        db.session.commit()
 
     @classmethod
     def bloquear(cls):

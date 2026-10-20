@@ -3,13 +3,13 @@ import os
 import requests
 
 class LLMService:
-  def executar(self, prompt: str):
+  def executar(self, prompt: str, modelo: str = "gemini-3.5-flash-lite"):
     chave = os.getenv("GEMINI_API_KEY")
     if not chave:
       raise RuntimeError("GEMINI_API_KEY não configurada")
 
     resposta = requests.post(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+      f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent",
       headers={"x-goog-api-key": chave},
       json={
         "contents": [{"parts": [{"text": prompt}]}],

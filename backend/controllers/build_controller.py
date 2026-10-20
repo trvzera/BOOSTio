@@ -2,7 +2,7 @@ from flask import Blueprint,request,jsonify
 from flask_login import login_required,current_user
 from models import db
 from sqlalchemy.exc import SQLAlchemyError
-from requests.exceptions import RequestException
+from requests.exceptions import RequestException, HTTPError, Timeout, ConnectionError
 
 from services.build_service.listar_builds_service import ListarBuildService
 from services.build_service.criar_build_service import CriarBuildService
@@ -37,7 +37,14 @@ def criar_build():
       return jsonify({"erro": "Envie um objeto JSON válido"}),400
 
     usuario_id = current_user.id
-    build = CriarBuildService().executar(usuario_id, dados)
+    try:
+      build = CriarBuildService().executar(usuario_id, dados)
+    except HTTPError as erro:
+      if erro.response is None or erro.response.status_code not in (429, 500, 502, 503, 504):
+        raise
+      build = CriarBuildService().executar(usuario_id, dados, modelo="gemini-3.8-flash")
+    except (Timeout, ConnectionError):
+      build = CriarBuildService().executar(usuario_id, dados, modelo="gemini-3.8-flash")
     builds = ListarBuildService().executar(usuario_id)
 
     return jsonify({"mensagem": "Build criada com sucesso", "build": build, "builds": builds}),201

@@ -14,7 +14,7 @@ class CriarBuildService:
     "videointegrado", "cooler", "quantidade_pentes",
   )
 
-  def executar(self, usuario_id, dados):
+  def executar(self, usuario_id, dados, modelo="gemini-3.5-flash-lite"):
     validacao_campos(dados, ["nome", "descricao", "utilidade", "orcamento"])
     if not Usuario.buscar_por_id(usuario_id):
       raise ValueError("Usuario não encontrado")
@@ -35,7 +35,7 @@ class CriarBuildService:
     if any(tipo not in catalogo for tipo in obrigatorias) or not ("ssd" in catalogo or "hd" in catalogo):
       raise ValueError("Não há peças suficientes para montar um PC nesse orçamento")
 
-    resposta = LLMService().executar(self._criar_prompt(dados, orcamento, margem, catalogo))
+    resposta = LLMService().executar(self._criar_prompt(dados, orcamento, margem, catalogo), modelo)
 
     build = json.loads(resposta) if isinstance(resposta, str) else resposta
 
@@ -61,7 +61,7 @@ class CriarBuildService:
     for modelo in MODELOS_PECAS:
       if modelo.__tablename__ in ("monitor", "teclado", "mouse", "fone"):
         continue
-      pecas = modelo.listar_disponiveis_ate(preco_maximo)
+      pecas = modelo.listar_disponiveis_ate(preco_maximo, limite=8)
       if pecas:
         catalogo[modelo.__tablename__] = [cls._campos_pecas(peca) for peca in pecas]
     return catalogo

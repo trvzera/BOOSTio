@@ -18,6 +18,17 @@ class Peca(ModeloBase):
     return cls.query.filter(cls.kabum_external.isnot(None), cls.kabum_external != "").all()
 
   @classmethod
+  def restaurar_links_ausentes(cls, links):
+    pecas = cls.query.filter(cls.part_number.in_(links)).all()
+    atualizadas = 0
+    for peca in pecas:
+      if not peca.kabum_external:
+        peca.kabum_external = links[peca.part_number]
+        atualizadas += 1
+    db.session.commit()
+    return atualizadas
+
+  @classmethod
   def buscar_por_id(cls, peca_id):
     return db.session.get(cls, peca_id)
 

@@ -16,6 +16,7 @@ from models import (
   Monitor,
 )
 from .atualizar_precos_service import AtualizarPrecosService
+from .restaurar_links_kabum_service import RestaurarLinksKabumService
 
 
 class PopularPecasService:
@@ -24,6 +25,7 @@ class PopularPecasService:
   def executar(self, limite: int | None = None, intervalo: float = 1.0, atualizar_precos: bool = True):
     for classe, itens in self._dados_seed().items():
       self._popular_classe(classe, itens)
+    RestaurarLinksKabumService().executar()
     if atualizar_precos:
       return AtualizarPrecosService().executar(limite=limite, intervalo=intervalo)
 
