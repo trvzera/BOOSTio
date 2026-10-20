@@ -29,8 +29,10 @@ proposta da plataforma.
 > **EN:** BOOSTio is a PC-building platform developed as my annual final course
 > project at Colégio Cotemig. Authentication and expected gaming performance are
 > connected to the Flask backend, alongside account-based build management and budget.
-> LLM generation and KaBuM price collection are implemented; complete compatibility,
-> multi-store live offers and production validation are still in progress.
+> LLM generation and KaBuM price collection are implemented. Most stored prices come
+> from KaBuM; other marketplaces are available through product search links.
+> Complete compatibility, scheduled price monitoring and production validation are
+> still in progress. Blender rendering performance is planned alongside gaming estimates.
 
 ## Estado atual
 
@@ -45,7 +47,7 @@ local continuam existindo; não equivalem ao salvamento no servidor.
   coleta de preços da KaBuM por comandos. Chaves, cotas e rede precisam ser configuradas;
   esta revisão de interface não fez chamadas pagas de geração nem coleta real de preços.
 - **A concluir:** compatibilidade física definitiva no Python, requisitos de jogos/RAM,
-  ofertas atualizadas nas três lojas, curadoria de modelos e validação completa dos
+  monitoramento agendado dos preços da KaBuM, curadoria de modelos e validação completa dos
   fluxos da LLM e migração consentida das builds antigas do navegador.
 
 **Limite por conta:** até três builds, conferido pelo Python para montagem manual,
@@ -63,39 +65,47 @@ refazer a raspagem ou recriar o catálogo.
 A montagem da conta usa `/build/catalogo`; modelos demonstrativos e fluxos legados
 ainda usam o JSON. É necessário alinhar seus identificadores sem refazer a coleta.
 **Catálogo existente e monitoramento de preços são coisas diferentes:**
-ter uma peça cadastrada não confirma que o preço, o estoque ou a oferta de cada loja
-estejam atualizados. As referências de preço ainda não são cotações em tempo real.
+ter uma peça cadastrada não confirma que seu preço e estoque estejam atualizados
+no momento da consulta.
+
+**A maioria dos preços cadastrados tem origem na KaBuM.** Quando o anúncio está
+vinculado, o link leva à página do produto exato na KaBuM, usada para consultar sua
+oferta. Pichau e Mercado Livre permanecem como alternativas de **busca pelo modelo**,
+para o usuário pesquisar outras condições de compra; esses links não representam
+preços coletados nem anúncios equivalentes já confirmados nessas lojas.
+O preço exibido é o valor registrado na coleta, não uma garantia de cotação em tempo real.
 
 ## Funcionalidades
 
 Os **20 requisitos do produto** estão preservados abaixo.
 
-- **Conectado:** usa o backend no fluxo indicado.
+- **Implementado:** código e integração do fluxo descrito disponíveis; pendências
+  específicas continuam indicadas, sem significar homologação em produção.
 - **Local:** funciona neste navegador, sem persistência na conta.
 - **Parcial:** possui implementação, mas ainda depende das etapas descritas.
 
 | Nº | Funcionalidade | Estado atual |
 | --- | --- | --- |
-| 1 | Criar conta e fazer login | **Conectado.** Cadastro, login, logout e sessão. |
-| 2 | Cadastrar o setup atual | **Conectado.** Definir/remover setup atual na conta; peças próprias identificadas no editor. |
+| 1 | Criar conta e fazer login | **Implementado.** Cadastro, login, logout e sessão. |
+| 2 | Cadastrar o setup atual | **Implementado.** Definir/remover setup atual na conta; peças próprias identificadas no editor. |
 | 3 | Pesquisar peças e compatibilidade | **Parcial.** Catálogo da conta conectado; compatibilidade técnica ainda exige validação definitiva no Python. |
 | 4 | Montar o setup por formulário | **Parcial.** Geração pela LLM implementada e salva na conta; validar chave/cotas, contexto completo e compatibilidade do resultado. |
-| 5 | Salvar configurações | **Conectado.** Builds e rascunhos incompletos salvos na conta, com limite de três; falta migração consentida dos dados locais antigos. |
-| 6 | Excluir configurações salvas | **Conectado.** Exclusão autenticada, com verificação de dono e tranca. |
+| 5 | Salvar configurações | **Implementado.** Builds e rascunhos incompletos salvos na conta, com limite de três; falta migração consentida dos dados locais antigos. |
+| 6 | Excluir configurações salvas | **Implementado.** Exclusão autenticada, com verificação de dono e tranca. |
 | 7 | Comparar configurações salvas | **Parcial.** Comparador usa builds da conta; falta comparar desempenho medido nas mesmas condições. |
-| 8 | Compartilhar configurações por link | **Conectado.** URL por ID e leitura pública condicionada à visibilidade; links legados continuam sendo cópias independentes. |
+| 8 | Compartilhar configurações por link | **Implementado.** URL por ID e leitura pública condicionada à visibilidade; links legados continuam sendo cópias independentes. |
 | 9 | Buscar melhorias do setup | **Parcial.** Trocas de CPU/GPU podem ser salvas na conta; faltam ganhos comprovados, ofertas atuais e dados de vendas. |
 | 10 | Ver configurações prontas | **Parcial.** Vitrine e cópia para a conta; faltam curadoria no servidor, mapeamento completo e ofertas atualizadas. |
-| 11 | Editar configurações salvas | **Conectado.** Editor salva componentes e detalhes na conta, respeitando a tranca. |
-| 12 | Consultar preços das peças pelo site | **Parcial.** Coleta e histórico de tentativas da KaBuM implementados por comandos; completar automação, integração visual e outras lojas. |
+| 11 | Editar configurações salvas | **Implementado.** Editor salva componentes e detalhes na conta, respeitando a tranca. |
+| 12 | Consultar preços das peças pelo site | **Implementado.** Consulta dos valores cadastrados, majoritariamente da KaBuM, com link do produto quando vinculado; outras lojas por busca. Agendamento e apresentação da origem/data ainda precisam de consolidação. |
 | 13 | Ver compatibilidade e consumo de energia | **Parcial.** Validações e consumo estimado; faltam revalidação em Python e encaixe físico completo do gabinete. |
 | 14 | Incluir periféricos no setup e no orçamento | **Parcial.** Reserva percentual opcional no formulário, validada na geração pelo Python; cabos/adaptadores ainda precisam de produtos no catálogo. |
-| 15 | Registrar budget no perfil | **Conectado.** Valor/autorização persistidos e formulário preenchido; alinhar o valor inicial da criação manual da conta. |
-| 16 | Baixar a build em JSON e CSV | **Conectado.** Arquivos gerados no navegador a partir das builds da conta; formato versionado. |
-| 17 | Alterar a visibilidade da build | **Conectado.** Estado persistido e conferido na leitura pública pelo servidor. |
-| 18 | Duplicar a build | **Conectado.** Cópia independente na conta, respeitando o limite de três. |
-| 19 | Definir nome e descrição | **Conectado.** Edição e validação de limites no Python. |
-| 20 | Importar builds em CSV ou JSON | **Conectado.** Prévia/validação no frontend e criação na conta com IDs e quantidades conferidos no servidor. |
+| 15 | Registrar budget no perfil | **Implementado.** Valor/autorização persistidos e formulário preenchido; alinhar o valor inicial da criação manual da conta. |
+| 16 | Baixar a build em JSON e CSV | **Implementado.** Arquivos gerados no navegador a partir das builds da conta; formato versionado. |
+| 17 | Alterar a visibilidade da build | **Implementado.** Estado persistido e conferido na leitura pública pelo servidor. |
+| 18 | Duplicar a build | **Implementado.** Cópia independente na conta, respeitando o limite de três. |
+| 19 | Definir nome e descrição | **Implementado.** Edição e validação de limites no Python. |
+| 20 | Importar builds em CSV ou JSON | **Implementado.** Prévia/validação no frontend e criação na conta com IDs e quantidades conferidos no servidor. |
 
 ### Desempenho esperado em jogos
 
@@ -124,6 +134,14 @@ O cache dura uma hora, fica em memória e é compartilhado apenas dentro do mesm
 processo. Antes de usar múltiplos workers, cache e limites precisarão de armazenamento
 compartilhado. A fonte e a licença dos dados permanecem visíveis na interface.
 
+### Desempenho em renderização — planejado
+
+O escopo de desempenho fica em **jogos com FPSHQ** e **renderização com Blender Open
+Data**. A integração com o Blender ainda não foi implementada. Deve apresentar
+resultados comparáveis por CPU/GPU, versão do Blender e método de renderização,
+sem converter a pontuação em tempo garantido para qualquer projeto. Benchmarks de
+editores de vídeo e imagem ficam fora do escopo atual.
+
 ### Budget da conta
 
 O valor e a opção **Usar este budget nas novas configurações** são salvos no Python,
@@ -151,7 +169,9 @@ revisar o orçamento sem perder as respostas.
 ### Compra e lojas
 
 **Comprar build** existe apenas dentro do editor: reúne quantidades, links e preços
-cadastrados por loja, sem checkout e sem abrir várias abas automaticamente.
+cadastrados, sem checkout e sem abrir várias abas automaticamente. A referência de
+preço vem majoritariamente da KaBuM; os links de busca nos outros marketplaces são
+opções para o usuário pesquisar, não uma comparação automática de cotações.
 
 A BOOSTio **não vende, entrega ou processa pagamentos** de peças e periféricos.
 A compra e o atendimento acontecem no site da loja. Preço, estoque, frete, garantia
@@ -182,8 +202,15 @@ e devolução devem ser conferidos diretamente com o vendedor.
 ### 3. Completar dados e integrações
 
 - Alinhar catálogo JSON, banco e identificadores das peças, incluindo arquivos importados.
-- Consolidar a coleta da KaBuM e completar ofertas, estoque e data de atualização nas outras lojas.
+- Consolidar o agendamento da coleta da KaBuM, estoque e data da última atualização.
+- Apresentar a origem do preço na interface, corrigir rótulos antigos de preço
+  demonstrativo nos fluxos da conta e distinguir anúncio exato de busca em outra loja.
+  Não reproduzir o preço da KaBuM como se fosse uma cotação de Pichau ou Mercado Livre.
 - Levar a identificação de hardware do benchmark para o backend e ampliar sua cobertura.
+- Validar novamente a consulta real à FPSHQ com o backend operacional, distinguindo
+  falha local de inicialização, sessão e indisponibilidade externa.
+- Integrar dados do Blender Open Data para desempenho em renderização, com
+  correspondência de componentes e agrupamento de resultados comparáveis.
 - Verificar requisitos dos jogos e RAM, distinguindo incompatibilidade, ausência de
   dados e falha do provedor.
 - Alimentar comparações e melhorias com desempenho sob as mesmas condições; obter
@@ -201,6 +228,16 @@ e devolução devem ser conferidos diretamente com o vendedor.
 
 A consulta individual de desempenho e o CRUD da conta já estão implementados; as
 pendências acima são de consolidação, não de reescrever essas integrações.
+
+### 5. Refinar a experiência de montagem
+
+- Completar imagens das peças, preservando a identificação quando não houver foto.
+- Priorizar dois pentes de RAM quando orçamento, kits e slots permitirem.
+- Perguntar a preferência entre custo-benefício e desempenho, mantendo o orçamento.
+- Orientar quem começa do zero a considerar todos os itens necessários e informar
+  também os periféricos que já possui.
+- Completar testes de ponta a ponta de formulário → geração → editor → conta,
+  incluindo falhas, nova tentativa e salvamentos concorrentes.
 
 ## Como executar
 
