@@ -5,6 +5,7 @@ import { planejamentoLocal } from "../build/planejamento.js";
 import { carregarPerfil } from "../conta/perfil.js";
 import { acompanharCarregamento } from "../components/page-loading.js";
 import { criarBuild } from "../api/build/builds.js";
+import { pecasPropriasFormulario } from "../build/pecas-proprias.js";
 import { buscarUsuarioLogado } from "../api/usuario/buscarUsuarioLogado.js";
 import {
   registrarAnimacao,
@@ -82,7 +83,8 @@ const perguntas = [
       ["hd", "HD"],
       ["fonte", "Fonte"],
       ["gabinete", "Gabinete"],
-      ["cooler", "Cooler / Water cooler"],
+      ["cooler", "Air cooler"],
+      ["water-cooler", "Water cooler"],
       ["fans", "Fans"],
       ["monitor", "Monitor"],
       ["teclado", "Teclado"],
@@ -110,6 +112,7 @@ const exemplosPecas = {
   fonte: "Ex.: Corsair CV650 650 W",
   gabinete: "Ex.: Montech Air 100",
   cooler: "Ex.: DeepCool AK400",
+  "water-cooler": "Ex.: Corsair H100i",
   fans: "Ex.: Kit 3 fans Rise Mode 120 mm",
   monitor: "Ex.: LG UltraGear 24GN60R-B",
   teclado: "Ex.: Redragon Kumara K552",
@@ -222,7 +225,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     void conteudo.offsetWidth;
     conteudo.classList.add("question-enter");
     conteudo.classList.toggle("pieces-question-content", pergunta.chave === "pecas");
-    const rotuloAvancar = indiceAtual === perguntas.length - 1 ? "Abrir editor" : "Avançar";
+    const rotuloAvancar = indiceAtual === perguntas.length - 1 ? "Gerar build" : "Avançar";
     conteudo.innerHTML = `<div class="options-heading"><p class="font-1-m-b">${pergunta.chave === "rede" ? "Planeje sua conexão" : pergunta.multipla ? "Selecione as opções aplicáveis" : "Escolha uma opção"}</p><span class="font-2-xs">${indiceAtual + 1} de ${perguntas.length}</span></div>${pergunta.chave === "rede" ? '<div id="form-network"></div>' : `<fieldset class="question-options ${pergunta.multipla ? "pieces-grid" : ""}"><legend class="sr-only">${pergunta.titulo}</legend>${opcoesHtml(pergunta)}</fieldset>`}${pergunta.chave === "orcamento" ? rangeHtml() : ""}<div id="form-navigation"><button type="button" class="btn-ghost" aria-label="Etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}><i class="fa-solid fa-arrow-left"></i> Etapa anterior</button><button type="button" class="btn-primary-form" id="next-question" aria-label="${rotuloAvancar}" ${podeAvancar() ? "" : "disabled"}>${rotuloAvancar} <i class="fa-solid fa-arrow-right"></i></button></div>`;
     if (pergunta.chave === "rede") vincularRede(conteudo.querySelector("#form-network"),respostas.rede,{prefixo:"form-rede",aoAlterar:rede => {
       respostas.rede = rede;
@@ -440,25 +443,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     gerando = true;
     limparCheckboxesLottie();
     atualizarMenu();
-    if (respostas.pecas?.some(peca => peca !== "nenhuma")) {
-      sessionStorage.setItem("boostio:respostas-formulario", JSON.stringify(respostas));
-      painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Configure os componentes da sua build</h1><p class="font-2-s">Suas peças próprias serão levadas ao editor para completar a montagem.</p></div>`;
-      conteudo.innerHTML = `<div class="build-loading" role="status"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-l">Preparando o editor</h2></div>`;
-      window.location.href = paginaConfiguracaoBuild;
-      return;
-    }
-
     painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Gerando sua build</h1><p class="font-2-s">Vamos selecionar peças compatíveis dentro do seu orçamento.</p></div>`;
     conteudo.innerHTML = `<div class="build-loading" role="status"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-l">Consultando as peças</h2></div>`;
     const faixas = {"ate-3000": 3000, "3000-5000": 5000, "5000-8000": 8000};
     const orcamento = respostas.orcamento === "personalizado"
       ? respostas.orcamentoPersonalizado : faixas[respostas.orcamento];
     const utilidade = perguntas[0].opcoes.find(opcao => opcao[0] === respostas.objetivo)?.[1] || respostas.objetivo;
+    const pecasProprias = pecasPropriasFormulario(respostas);
 
     try {
       const sessao = await buscarUsuarioLogado();
       if (!sessao.auth) throw new Error("Entre na sua conta para salvar a build.");
-      const resposta = await criarBuild({nome: `PC para ${utilidade}`, descricao: `Montagem para ${utilidade}.`, utilidade, orcamento});
+      const resposta = await criarBuild({nome: `PC para ${utilidade}`, descricao: `Montagem para ${utilidade}.`, utilidade, orcamento, pecas_proprias:pecasProprias, rede:respostas.rede});
       window.location.href = `${paginaConfiguracaoBuild}?build_id=${encodeURIComponent(resposta.build.id)}`;
     } catch (erro) {
       gerando = false;

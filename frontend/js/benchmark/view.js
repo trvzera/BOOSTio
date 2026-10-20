@@ -29,7 +29,7 @@ export function resultadoDesempenhoHtml(dados,prefixo = "fpshq") {
     + resolucoesHtml(dados.matriz,dados.consulta.preset) + '</dl></section>'
     + '<details class="fpshq-data-details fpshq-disclosure" data-animated-details><summary>Sobre os dados</summary><div class="fpshq-data-copy">'
     + '<p>' + origem + '</p><p>1% low indica momentos de menor fluidez, não o FPS mínimo.</p>'
-    + '<p class="fpshq-data-stamp">' + (dados.cache ? 'Dados em cache' : 'Atualizado') + ' <span aria-hidden="true">·</span> '
+    + '<p class="fpshq-data-stamp">' + (dados.desatualizado ? 'Última consulta disponível; a FPSHQ não respondeu agora' : dados.cache ? 'Dados em cache' : 'Atualizado') + ' <span aria-hidden="true">·</span> '
     + h(new Date(dados.consultadoEm).toLocaleString("pt-BR")) + '.</p>'
     + '</div></details>';
 }

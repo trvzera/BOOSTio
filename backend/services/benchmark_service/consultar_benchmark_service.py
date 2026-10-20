@@ -17,7 +17,7 @@ class ConsultarBenchmarkService:
         self.cliente = cliente or cliente_fpshq
 
     def executar(self, dados, usuario_id):
-        with self.cliente.lock:
+        with self.cliente.travar("fps", dados):
             return self._consultar(dados, usuario_id)
 
     def _consultar(self, dados, usuario_id):
