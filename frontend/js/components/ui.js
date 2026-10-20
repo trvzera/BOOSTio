@@ -31,6 +31,7 @@ export function iniciarIcones(raiz = document) {
     }
   }
   raiz.querySelectorAll("[data-lottie]:not([data-lottie-initialized])").forEach(async elemento => {
+    if (elemento.closest("[inert], [hidden]")) return;
     elemento.dataset.lottieInitialized = "";
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     elemento.id ||= "ui-lottie-" + (++sequencia);
@@ -161,6 +162,7 @@ export function iniciarUI() {
       if (!ancora) return;
       if (controle.disabled && !ancora.classList.contains("disabled-tip-anchor")) {
         ancora = document.createElement("span"); ancora.className = "disabled-tip-anchor"; ancora.tabIndex = 0;
+        ancora.setAttribute("role","group");
         controle.before(ancora); ancora.append(controle);
         ancora.addEventListener("pointerenter",() => mostrar(ancora));
         ancora.addEventListener("pointerleave",esconder);

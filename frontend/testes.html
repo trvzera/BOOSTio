@@ -10,10 +10,12 @@
   <script type="module" src="./js/pages/test-benchmark.js" defer></script>
   <link rel="icon" type="image/webp" href="./imgs/favicon.webp">
   <link rel="stylesheet" href="./styles/style.css">
+  <noscript><link rel="stylesheet" href="./styles/componentes/no-script.css"></noscript>
   <link rel="stylesheet" href="./styles/paginas/testes.css">
-  <meta name="description" content="A Boostio é uma plataforma que simplifica a montagem de computadores,
-  ajudando você a escolher as peças ideais com base no seu objetivo,
-  orçamento e necessidade, tudo com precisão e confiança.">
+  <meta name="description" content="Laboratório de interfaces da BOOSTio: testes de comparação de builds, orçamento, melhorias e desempenho esperado em jogos.">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="preload" href="./fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <style>
     body.menu-test-page { height: auto; min-height: 100vh; color: var(--cor-6); overflow-x: clip; }
     .test-logo { position: absolute; top: 28px; left: 32px; width: 110px; }
@@ -32,10 +34,11 @@
 </head>
 
 <body class="menu-test-page">
+  <a class="skip-link" href="#main-content" aria-label="Pular para o conteúdo principal">Pular para o conteúdo principal</a>
   <div data-site-navigation data-menu-preview></div>
   <div class="decoration decoration-1" aria-hidden="true"></div>
   <div class="decoration decoration-2" aria-hidden="true"></div>
-  <main class="test-main">
+  <main id="main-content" class="test-main" tabindex="-1">
     <span class="test-kicker font-1-xs">Laboratório BOOSTio</span>
     <h1 class="font-1-xxl">Experimente novos recursos</h1>
     <p class="font-2-s">Teste a aparência de novos recursos antes de levá-los ao site: desempenho, comparação de builds e budget no perfil. O menu hamburger permanece visível aqui mesmo sem login.</p>

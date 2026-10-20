@@ -4,39 +4,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Criar sua conta</title>
-  <link rel="icon" type="image/x-icon" href="../imgs/favicon.webp">
+  <title>Criar conta — BOOSTio</title>
+  <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
   <link rel="stylesheet" href="../styles/style.css">
+  <noscript><link rel="stylesheet" href="../styles/componentes/no-script.css"></noscript>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-  <meta name="description" content="A Boostio é uma plataforma que simplifica a montagem de computadores,
-  ajudando você a escolher as peças ideais com base no seu objetivo,
-  orçamento e necessidade, tudo com precisão e confiança.">
+  <meta name="description" content="Crie sua conta BOOSTio para salvar configurações de computadores, organizar seu budget e planejar melhorias no seu setup.">
+  <meta name="robots" content="noindex,follow">
+  <link rel="preload" href="../fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <script type="module" src="../js/pages/loading.js" defer></script>
   <script type="module" src="../js/pages/signin.js" defer></script>
 </head>
 
 <body class="sign-up-page-body">
+  <a class="skip-link" href="#signin-page" aria-label="Pular para o conteúdo principal">Pular para o conteúdo principal</a>
   <div id="loading-screen">
-    <video id="loading-video" autoplay muted playsinline>
+    <video id="loading-video" width="1000" height="1000" autoplay muted playsinline aria-hidden="true" tabindex="-1">
       <source src="../video/loading-toggle.webm" type="video/webm">
     </video>
   </div>
   <div data-site-navigation></div>
 
-  <main id="signin-page">
+  <main id="signin-page" tabindex="-1">
     <div class="decoration decoration-1"></div>
     <div class="decoration decoration-2"></div>
 
     <div id="signin-container">
-      <img src="../imgs/logo.webp" alt="Logo">
+      <img src="../imgs/logo.webp" alt="Logo" width="668" height="237" decoding="async">
       <h1 id="signin-title" class="font-1-l">Vamos criar a sua conta!</h1>
       <p id="signin-description" class="font-2-xs">Já possui uma conta? <a href="./login.html" aria-label="Entrar com sua conta.">Entrar com sua conta.</a></p>
-      <form id="signin-form">
-        <input type="text" placeholder="Seu nome de usuário" class="input-text" id="username" maxlength="15">
-        <input type="email" placeholder="Seu melhor e-mail" class="input-text" id="email">
+      <form id="signin-form" method="post">
+        <label class="sr-only" for="username">Seu nome de usuário</label>
+        <input type="text" name="username" autocomplete="nickname" placeholder="Seu nome de usuário" class="input-text" id="username" maxlength="15" required>
+        <label class="sr-only" for="email">Seu e-mail</label>
+        <input type="email" name="email" autocomplete="username" placeholder="Seu melhor e-mail" class="input-text" id="email" required>
 
         <div class="password-input-wrapper">
-          <input type="password" placeholder="Uma senha forte" class="input-text" id="primary-password">
+          <label class="sr-only" for="primary-password">Crie uma senha</label>
+          <input type="password" name="password" autocomplete="new-password" placeholder="Uma senha forte" class="input-text" id="primary-password" required aria-describedby="password-rules">
           <button type="button" class="password-toggle fa-eye-slash" data-target="primary-password" aria-label="Mostrar senha" aria-pressed="false" aria-controls="primary-password"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button>
         </div>
 
@@ -51,36 +57,36 @@
             <div id="password-rules">
               <div class="password-rule" id="password-length-rule">
                 <div class="password-rule-status">
-                  <i class="fa-solid fa-x"></i>
-                  <i class="fa-solid fa-check"></i>
+                  <i class="fa-solid fa-x" aria-hidden="true"></i>
+                  <i class="fa-solid fa-check" aria-hidden="true"></i>
                 </div>
                 <p class="font-1-s">+8 Caracteres</p>
               </div>
               <div class="password-rule" id="symbol-rule">
                 <div class="password-rule-status">
-                  <i class="fa-solid fa-x"></i>
-                  <i class="fa-solid fa-check"></i>
+                  <i class="fa-solid fa-x" aria-hidden="true"></i>
+                  <i class="fa-solid fa-check" aria-hidden="true"></i>
                 </div>
                 <p class="font-1-s">Símbolos</p>
               </div>
               <div class="password-rule" id="uppercase-rule">
                 <div class="password-rule-status">
-                  <i class="fa-solid fa-x"></i>
-                  <i class="fa-solid fa-check"></i>
+                  <i class="fa-solid fa-x" aria-hidden="true"></i>
+                  <i class="fa-solid fa-check" aria-hidden="true"></i>
                 </div>
                 <p class="font-1-s">Maiúsculas</p>
               </div>
               <div class="password-rule" id="lowercase-rule">
                 <div class="password-rule-status">
-                  <i class="fa-solid fa-x"></i>
-                  <i class="fa-solid fa-check"></i>
+                  <i class="fa-solid fa-x" aria-hidden="true"></i>
+                  <i class="fa-solid fa-check" aria-hidden="true"></i>
                 </div>
                 <p class="font-1-s">Minúsculas</p>
               </div>
               <div class="password-rule" id="number-rule">
                 <div class="password-rule-status">
-                  <i class="fa-solid fa-x"></i>
-                  <i class="fa-solid fa-check"></i>
+                  <i class="fa-solid fa-x" aria-hidden="true"></i>
+                  <i class="fa-solid fa-check" aria-hidden="true"></i>
                 </div>
                 <p class="font-1-s">Números</p>
               </div>
@@ -89,10 +95,11 @@
         </div>
 
         <div class="password-input-wrapper">
-          <input type="password" placeholder="Confirme sua senha" class="input-text" id="confirm-password">
+          <label class="sr-only" for="confirm-password">Confirme sua senha</label>
+          <input type="password" name="password-confirmation" autocomplete="new-password" placeholder="Confirme sua senha" class="input-text" id="confirm-password" required aria-describedby="password-match-text">
           <button type="button" class="password-toggle fa-eye-slash" data-target="confirm-password" aria-label="Mostrar confirmação da senha" aria-pressed="false" aria-controls="confirm-password"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button>
         </div>
-        <p id="password-match-text" class="font-1-s"></p>
+        <p id="password-match-text" class="font-1-s" role="status" aria-live="polite"></p>
 
         <div id="terms-checkbox-field">
           <div class="checkbox-wrapper" id="terms-checkbox-animation">
@@ -103,7 +110,7 @@
           </label>
 
         </div>
-        <p id="sign-up-error" class="font-1-xs form-error"></p>
+        <p id="sign-up-error" class="font-1-xs form-error" role="alert"></p>
         <button type="submit" class="btn-login" id="btn-create-account" aria-label="Criar conta" disabled>Criar conta</button>
       </form>
       <div class="login-divider">
@@ -116,19 +123,19 @@
 
     <div class="modal-overlay" id="verify-email-modal">
       <div class="modal-box" id="verify-email-box">
-        <div class="modal-icon"><i class="fa-solid fa-envelope-circle-check"></i></div>
-        <h3 class="font-1-m">Confirme seu e-mail</h3>
+        <div class="modal-icon"><i class="fa-solid fa-envelope-circle-check" aria-hidden="true"></i></div>
+        <h2 class="font-1-m">Confirme seu e-mail</h2>
         <p class="font-1-m">Para ativar sua conta, envie o código de verificação para <strong id="verify-email-target">seu e-mail</strong> e digite os 4 dígitos recebidos abaixo.</p>
 
         <div id="send-code-container">
           <button type="button" class="btn-ghost" id="btn-send-code" aria-label="Enviar código de verificação para o e-mail">
-            <i class="fa-solid fa-paper-plane"></i>
+            <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
             Enviar código
           </button>
         </div>
 
         <div class="code-inputs" id="code-inputs">
-          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="0" aria-label="Primeiro dígito do código" disabled>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" autocomplete="one-time-code" data-index="0" aria-label="Primeiro dígito do código" disabled>
           <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="1" aria-label="Segundo dígito do código" disabled>
           <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="2" aria-label="Terceiro dígito do código" disabled>
           <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="3" aria-label="Quarto dígito do código" disabled>

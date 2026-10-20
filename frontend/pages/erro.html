@@ -5,22 +5,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Erro — BOOSTio</title>
-  <link rel="icon" type="image/x-icon" href="../imgs/favicon.webp">
+  <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
   <link rel="stylesheet" href="../styles/style.css">
+  <noscript><link rel="stylesheet" href="../styles/componentes/no-script.css"></noscript>
   <meta name="description" content="Não foi possível acessar esta página da BOOSTio.">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="preload" href="../fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <script type="module" src="../js/pages/loading.js" defer></script>
   <script type="module" src="../js/pages/erro.js" defer></script>
 </head>
 
 <body id="erro" class="error-page">
+  <a class="skip-link" href="#error-main" aria-label="Pular para o conteúdo principal">Pular para o conteúdo principal</a>
   <div id="loading-screen">
-    <video id="loading-video" autoplay muted playsinline>
+    <video id="loading-video" width="1000" height="1000" autoplay muted playsinline aria-hidden="true" tabindex="-1">
       <source src="../video/loading-toggle.webm" type="video/webm">
     </video>
   </div>
   <div data-site-navigation></div>
 
-  <main id="error-main">
+  <main id="error-main" tabindex="-1">
     <section class="error-card" aria-labelledby="error-title">
       <span id="error-code" aria-hidden="true">500</span>
       <h1 id="error-title" class="font-1-xl">Algo não saiu como esperado</h1>

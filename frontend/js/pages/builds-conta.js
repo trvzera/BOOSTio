@@ -52,10 +52,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const progresso = Math.round(avaliacao.preenchidos / avaliacao.total * 100);
     const trancada = build.travada, setup = Boolean(dados.estado?.setupAtual);
     const classe = avaliacao.erros.length ? "error" : avaliacao.avisos.length ? "warning" : progresso === 100 ? "complete" : "incomplete";
-    const opcao = (acao, texto, desabilitada = false) => `<button type="button" class="build-menu-item" data-acao="${acao}" role="menuitem" aria-label="${h(texto)}: ${h(build.titulo)}" ${desabilitada ? "disabled" : ""}>${h(texto)}</button>`;
-    return `<article class="build-card build-account-card ${classe} ${trancada ? "locked" : ""}" data-id="${h(build.id)}" tabindex="0">
-      <div class="build-card-top"><div class="build-title-line"><span class="compatibility-marker" aria-label="${progresso}% completo"></span><h2 class="build-card-title font-1-m-b"><a href="${url(build)}" aria-label="Abrir configuração de ${h(build.titulo)}">${h(build.titulo)}</a></h2>${trancada ? '<i class="fa-solid fa-lock build-card-lock" aria-hidden="true"></i>' : ""}${setup ? '<span class="build-card-current">Setup atual</span>' : ""}</div>
-      <div class="build-menu-wrap"><button type="button" class="build-menu-trigger" aria-label="Abrir menu da build ${h(build.titulo)}" aria-expanded="false" aria-haspopup="true">${iconeAnimado("dots")}</button><div class="build-menu" role="menu">
+    const opcao = (acao, texto, desabilitada = false) => `<button type="button" class="build-menu-item" data-acao="${acao}" aria-label="${h(texto)}: ${h(build.titulo)}" ${desabilitada ? "disabled" : ""}>${h(texto)}</button>`;
+    const menuId = "build-options-" + encodeURIComponent(build.id);
+    return `<article class="build-card build-account-card ${classe} ${trancada ? "locked" : ""}" data-id="${h(build.id)}">
+      <div class="build-card-top"><div class="build-title-line"><span class="compatibility-marker" role="img" aria-label="${progresso}% completo"></span><h2 class="build-card-title font-1-m-b"><a href="${url(build)}" aria-label="Abrir configuração de ${h(build.titulo)}">${h(build.titulo)}</a></h2>${trancada ? '<i class="fa-solid fa-lock build-card-lock" aria-hidden="true"></i>' : ""}${setup ? '<span class="build-card-current">Setup atual</span>' : ""}</div>
+      <div class="build-menu-wrap"><button type="button" class="build-menu-trigger" aria-label="Abrir menu da build ${h(build.titulo)}" aria-expanded="false" aria-controls="${menuId}">${iconeAnimado("dots")}</button><div class="build-menu" id="${menuId}" role="group" aria-label="Opções da build ${h(build.titulo)}" aria-hidden="true" inert>
         ${opcao("benchmark","Testar build",Boolean(motivoBenchmark(build,catalogo)))}
         ${opcao("melhorias","Buscar melhorias",trancada)}
         ${opcao("setup-atual",setup ? "Remover como setup atual" : "Definir como setup atual")}
@@ -67,7 +68,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <span class="build-menu-divider"></span>${opcao("deletar","Deletar build",trancada)}
       </div></div></div>
       <p class="build-card-desc font-2-xs">${h(build.descricao || `${dados.componentes.length} peças · ${moeda(dados.preco_total)}`)}</p>
-      <div class="build-card-meta"><p class="build-card-percent font-1-l">${progresso}%</p><div class="build-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progresso}"><div class="build-progress-fill" style="width:${progresso}%"></div></div>
+      <div class="build-card-meta"><p class="build-card-percent font-1-l">${progresso}%</p><div class="build-progress" role="progressbar" aria-label="Preenchimento de ${h(build.titulo)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progresso}"><div class="build-progress-fill" style="width:${progresso}%"></div></div>
       <div class="build-card-bottom"><span class="build-visibility ${build.visibilidade}">${build.visibilidade === "publico" ? "Pública" : "Privada"}</span><time class="build-card-date font-2-xs" datetime="${h(dados.criado_em)}">${h(formatarDataHora(dados.criado_em))}</time></div></div></article>`;
   }
 
@@ -81,12 +82,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   async function atualizar(id, estado) { await atualizarBuild(id, estado); await carregar(); }
 
+  function alternarMenu(wrap, aberto) {
+    wrap.classList.toggle("open",aberto);
+    const botao = wrap.querySelector(".build-menu-trigger"), menu = wrap.querySelector(".build-menu");
+    botao.setAttribute("aria-expanded",String(aberto));
+    menu.inert = !aberto; menu.setAttribute("aria-hidden",String(!aberto));
+  }
+
   lista.addEventListener("click", async evento => {
     const trigger = evento.target.closest(".build-menu-trigger");
     if (trigger) {
       const wrap = trigger.closest(".build-menu-wrap"), abrir = !wrap.classList.contains("open");
-      lista.querySelectorAll(".build-menu-wrap.open").forEach(item => { item.classList.remove("open"); item.querySelector(".build-menu-trigger").setAttribute("aria-expanded","false"); });
-      wrap.classList.toggle("open",abrir); trigger.setAttribute("aria-expanded",String(abrir)); return;
+      lista.querySelectorAll(".build-menu-wrap.open").forEach(item => alternarMenu(item,false));
+      alternarMenu(wrap,abrir); return;
     }
     const botao = evento.target.closest("[data-acao]");
     if (!botao || botao.disabled) {
@@ -99,7 +107,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const dados = encontrar(botao.closest(".build-card").dataset.id);
     if (!dados) return;
     const build = local(dados), acao = botao.dataset.acao;
-    botao.closest(".build-menu-wrap").classList.remove("open");
+    const wrap = botao.closest(".build-menu-wrap");
+    alternarMenu(wrap,false); wrap.querySelector(".build-menu-trigger").focus({preventScroll:true});
     try {
       if (acao === "benchmark") abrirBenchmark(build,catalogo);
       else if (acao === "melhorias") abrirMelhorias(build,catalogo,proxima => {
@@ -133,7 +142,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     evento.preventDefault(); navegarPara(url(encontrar(evento.target.dataset.id)));
   });
   document.addEventListener("click", evento => {
-    if (!lista.contains(evento.target)) lista.querySelectorAll(".build-menu-wrap.open").forEach(item => item.classList.remove("open"));
+    if (!lista.contains(evento.target)) lista.querySelectorAll(".build-menu-wrap.open").forEach(item => alternarMenu(item,false));
+  });
+  document.addEventListener("keydown", evento => {
+    if (evento.key !== "Escape") return;
+    lista.querySelectorAll(".build-menu-wrap.open").forEach(wrap => {
+      alternarMenu(wrap,false); wrap.querySelector(".build-menu-trigger").focus();
+    });
   });
 
   document.querySelector("#btn-create-build").onclick = () => {

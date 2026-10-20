@@ -248,3 +248,4 @@
 .compatibility-details h3 { font: 600 .85rem/1.5 var(--font-heading); color: var(--cor-6); }
 .compatibility-messages li { font-size: var(--text-caption); }
 .compatibility-messages li.tip { border-color: var(--cor-p1); }
+.builder-page-main { min-height: 100svh; }

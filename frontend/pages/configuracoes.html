@@ -4,26 +4,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Configurações de conta</title>
-  <link rel="icon" type="image/x-icon" href="../imgs/favicon.webp">
+  <title>Configurações da conta — BOOSTio</title>
+  <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
   <link rel="stylesheet" href="../styles/style.css">
+  <noscript><link rel="stylesheet" href="../styles/componentes/no-script.css"></noscript>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-  <meta name="description" content="A Boostio é uma plataforma que simplifica a montagem de computadores,
-  ajudando você a escolher as peças ideais com base no seu objetivo,
-  orçamento e necessidade, tudo com precisão e confiança.">
+  <meta name="description" content="Atualize seus dados, configure o budget para novas montagens e gerencie a segurança da sua conta BOOSTio.">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="preload" href="../fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <script type="module" src="../js/pages/loading.js" defer></script>
   <script type="module" src="../js/pages/configuracoes.js" defer></script>
 </head>
 
 <body class="settings-page-body">
+  <a class="skip-link" href="#main-content" aria-label="Pular para o conteúdo principal">Pular para o conteúdo principal</a>
   <div id="loading-screen">
-    <video id="loading-video" autoplay muted playsinline>
+    <video id="loading-video" width="1000" height="1000" autoplay muted playsinline aria-hidden="true" tabindex="-1">
       <source src="../video/loading-toggle.webm" type="video/webm">
     </video>
   </div>
   <div data-site-navigation></div>
 
-  <main role="main">
+  <main id="main-content" tabindex="-1">
 
     <section id="settings-page">
       <div class="decoration decoration-1"></div>
@@ -33,7 +36,7 @@
         <p class="font-2-s">Gerencie suas informações pessoais e a segurança do seu perfil.</p>
       </div>
       <div class="settings-card">
-        <div class="card-heading"><i class="fa-solid fa-user"></i><span class="font-1-l">Perfil</span></div>
+        <div class="card-heading"><i class="fa-solid fa-user" aria-hidden="true"></i><span class="font-1-l">Perfil</span></div>
         <p class="card-subtext font-1-m">Suas informações de login.</p>
 
         <div class="profile-row">
@@ -43,10 +46,10 @@
           </div>
         </div>
         <div class="profile-meta">
-          <div class="meta-pill font-1-m"><i class="fa-solid fa-calendar"></i><span id="created-at"></span></div>
-          <div class="meta-pill font-1-m"><i class="fa-solid fa-desktop"></i>X builds salvas</div>
+          <div class="meta-pill font-1-m"><i class="fa-solid fa-calendar" aria-hidden="true"></i><span id="created-at"></span></div>
+          <div class="meta-pill font-1-m"><i class="fa-solid fa-desktop" aria-hidden="true"></i>X builds salvas</div>
           <div class="meta-pill font-1-m" id="verified-pill">
-            <i class="fa-solid" id="verified-icon"></i>
+            <i class="fa-solid" id="verified-icon" aria-hidden="true"></i>
             <span id="verified-text"></span>
             <button type="button" class="meta-pill-action" id="btn-verify-now" aria-label="Verificar agora meu e-mail">Verificar agora</button>
           </div>
@@ -54,12 +57,12 @@
 
         <div class="field">
           <label for="username-input" class="font-1-m">Nome de usuário</label>
-          <input type="text" id="username-input" value="Lorem ipsum" placeholder="Seu nome de usuário" maxlength="15">
+          <input type="text" id="username-input" name="username" autocomplete="nickname" placeholder="Seu nome de usuário" maxlength="15">
         </div>
 
         <div class="field">
           <label for="email-input" class="font-1-m">E-mail</label>
-          <input type="email" id="email-input" value="loremipsum@lorem.ipsum" placeholder="seu@email.com" required>
+          <input type="email" id="email-input" name="email" autocomplete="email" placeholder="seu@email.com" required>
         </div>
 
         <div class="form-actions">
@@ -80,13 +83,13 @@
       </section>
 
       <div class="settings-card">
-        <div class="card-heading"><i class="fa-solid fa-lock"></i><span class="font-1-m-b">Alterar senha</span></div>
+        <div class="card-heading"><i class="fa-solid fa-lock" aria-hidden="true"></i><span class="font-1-m-b">Alterar senha</span></div>
         <p class="card-subtext font-1-m">Utilize esse campo para alterar a sua senha.</p>
 
         <div class="field">
           <label for="current-password" class="font-1-m">Senha atual</label>
           <div class="field-password-wrap">
-            <input type="password" id="current-password" placeholder="••••••••">
+            <input type="password" id="current-password" name="current-password" autocomplete="current-password" placeholder="••••••••">
             <button type="button" class="toggle-password" data-target="current-password" aria-label="Mostrar senha atual" aria-pressed="false" aria-controls="current-password"><i class="fa-solid fa-eye" aria-hidden="true"></i></button>
           </div>
         </div>
@@ -94,7 +97,7 @@
         <div class="field">
           <label for="new-password" class="font-1-m">Nova senha</label>
           <div class="field-password-wrap">
-            <input type="password" id="new-password" placeholder="••••••••">
+            <input type="password" id="new-password" name="new-password" autocomplete="new-password" placeholder="••••••••">
             <button type="button" class="toggle-password" data-target="new-password" aria-label="Mostrar nova senha" aria-pressed="false" aria-controls="new-password"><i class="fa-solid fa-eye" aria-hidden="true"></i></button>
           </div>
           <div class="password-strength">
@@ -108,7 +111,7 @@
         <div class="field">
           <label for="confirm-password" class="font-1-m">Confirmar nova senha</label>
           <div class="field-password-wrap">
-            <input type="password" id="confirm-password" placeholder="••••••••">
+            <input type="password" id="confirm-password" name="password-confirmation" autocomplete="new-password" placeholder="••••••••">
             <button type="button" class="toggle-password" data-target="confirm-password" aria-label="Mostrar confirmação da senha" aria-pressed="false" aria-controls="confirm-password"><i class="fa-solid fa-eye" aria-hidden="true"></i></button>
           </div>
           <div class="field-hint font-1-l" id="password-match-hint"></div>
@@ -120,7 +123,7 @@
       </div>
 
       <div class="settings-card danger">
-        <div class="card-heading"><i class="fa-solid fa-triangle-exclamation"></i><span class="font-1-m-b">Zona de perigo</span></div>
+        <div class="card-heading"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i><span class="font-1-m-b">Zona de perigo</span></div>
         <p class="card-subtext font-1-l">Ações abaixo são permanentes e não podem ser desfeitas.</p>
 
         <div class="danger-row">
@@ -136,12 +139,13 @@
 
       <div class="modal-overlay" id="delete-modal">
         <div class="modal-box">
-          <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
           <h3 class="font-1-m">Tem certeza que quer excluir sua conta?</h3>
           <p class="font-1-m">Essa ação é <strong>permanente</strong> e não pode ser desfeita. Todas as suas builds, preferências e dados de perfil serão apagados. Para confirmar, digite <strong id="confirm-username-target">seu nome de usuário</strong> abaixo.</p>
 
           <div class="field" style="margin-bottom: 0;">
-            <input type="text" id="delete-confirm-input" placeholder="Digite seu nome de usuário">
+            <label class="sr-only" for="delete-confirm-input">Digite seu nome de usuário para confirmar a exclusão</label>
+            <input type="text" id="delete-confirm-input" autocomplete="off" placeholder="Digite seu nome de usuário">
           </div>
 
           <div class="modal-actions">
@@ -153,19 +157,19 @@
 
       <div class="modal-overlay" id="verify-email-modal">
         <div class="modal-box" id="verify-email-box">
-          <div class="modal-icon"><i class="fa-solid fa-envelope-circle-check"></i></div>
+          <div class="modal-icon"><i class="fa-solid fa-envelope-circle-check" aria-hidden="true"></i></div>
           <h3 class="font-1-m">Confirme seu e-mail</h3>
           <p class="font-1-m">Envie o código de verificação para <strong id="verify-email-target">seu e-mail</strong> e digite os 4 dígitos recebidos abaixo.</p>
 
           <div id="send-code-container">
             <button type="button" class="btn-ghost" id="btn-send-code" aria-label="Enviar código de verificação para o e-mail">
-              <i class="fa-solid fa-paper-plane"></i>
+              <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
               Enviar código
             </button>
           </div>
 
           <div class="code-inputs" id="code-inputs">
-            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="0" aria-label="Primeiro dígito do código" disabled>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" autocomplete="one-time-code" data-index="0" aria-label="Primeiro dígito do código" disabled>
             <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="1" aria-label="Segundo dígito do código" disabled>
             <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="2" aria-label="Terceiro dígito do código" disabled>
             <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="3" aria-label="Quarto dígito do código" disabled>
@@ -182,7 +186,7 @@
     </section>
   </main>
   <div class="toast" id="toast">
-    <i class="fa-solid fa-circle-check" id="toast-icon"></i>
+    <i class="fa-solid fa-circle-check" id="toast-icon" aria-hidden="true"></i>
     <span id="toast-text" class="font-1-m">Alterações salvas com sucesso.</span>
   </div>
 

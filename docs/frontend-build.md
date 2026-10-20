@@ -1,8 +1,15 @@
 # Editor de build e efeitos de scroll
 
+Após a integração da `main` em 20/10/2026, as montagens da conta usam
+`pages/builds-conta.js`, `/build/` e `/build/catalogo`; `builds.js` foi substituído.
+O texto abaixo também documenta modos legados e etapas anteriores. O estado atual
+dos requisitos está no README; a revisão de acessibilidade/performance está em
+[qualidade-frontend.md](qualidade-frontend.md).
+
 Abra pelo Live Server:
 
-- `frontend/pages/configuracao-build.html`: editor vazio.
+- `frontend/pages/configuracao-build.html`: cria uma montagem vazia na conta, com sessão.
+- `frontend/pages/configuracao-build.html?build_id=s-ID`: edita uma montagem da conta.
 - `frontend/pages/configuracao-build.html?id=build-demo-1`: configuração de exemplo.
 - `frontend/pages/pecas.html?categoria=processador`: catálogo por categoria.
 - `frontend/pages/peca.html?id=SEED-CPU-02`: ficha técnica e lojas.
@@ -10,10 +17,9 @@ Abra pelo Live Server:
 - `frontend/pages/sobre.html`: apresentação da BOOSTio, proposta, ferramentas e estágio do projeto.
 - `frontend/testes.html`: demonstração que usa o mesmo menu hamburger das demais páginas.
 
-O catálogo demonstrativo é uma cópia das 750 peças de
-`backend/services/peca_service/popular_pecas_service.py`, criada em 28/09/2026.
-Os preços da seed são gerados para demonstração, não cotações atuais.
-Não foram executados o Flask, a seed nem o scraper para montar essa cópia.
+O catálogo JSON existente reúne as 750 peças já coletadas para o projeto e continua
+nos modelos/fluxos legados. A montagem da conta busca o catálogo do backend. Essa
+integração não equivale a monitoramento atualizado das ofertas das três lojas.
 Quando a seed mudar, o JSON não se atualiza sozinho.
 
 ## Como funciona o blur no scroll

@@ -5,6 +5,7 @@ import { iniciarUI } from "../components/ui.js";
 import { iniciarEntradaPagina } from "../components/page-entry.js";
 import { iniciarRevealsGlobais } from "../components/scroll-reveal.js";
 import { aguardarCarregamentos, perfilLoading, iniciarTransicaoLinks } from "../components/page-loading.js";
+import { iniciarModaisAcessiveis } from "../components/modal-accessibility.js";
 
 iniciarTratamentoGlobalDeErros();
 let tela = document.querySelector("#loading-screen");
@@ -60,6 +61,7 @@ const domPronto = document.readyState === "loading"
   ? new Promise(resolve => document.addEventListener("DOMContentLoaded",resolve,{once:true}))
   : Promise.resolve();
 domPronto.then(() => {
+  iniciarModaisAcessiveis();
   iniciarUI();
   iniciarTransicaoLinks();
 }).catch(erro => { console.warn("Falha ao iniciar os controles:",erro); liberar(); });

@@ -14,8 +14,9 @@ export function iniciarNavegacao() {
     logo.className = "site-brand";
     logo.href = pagina("index.html");
     logo.setAttribute("aria-label", "BOOSTio — página inicial");
-    logo.innerHTML = '<img src="' + new URL("../imgs/logo.webp", import.meta.url).href + '" alt="BOOSTio" width="100" height="20">';
-    document.body.prepend(logo);
+    logo.innerHTML = '<img src="' + new URL("../imgs/logo.webp", import.meta.url).href + '" alt="BOOSTio" width="668" height="237" decoding="async">';
+    const atalho = document.querySelector(".skip-link");
+    if (atalho) atalho.after(logo); else document.body.prepend(logo);
   }
   const links = (itens, perfil = false) => itens.map(item =>
     '<a class="' + (perfil ? 'profile-link font-1-s' : 'site-menu-link') + '" href="' + pagina(item.pagina) + '" aria-label="Ir para ' + item.rotulo + '"' +
@@ -56,6 +57,7 @@ export function iniciarNavegacao() {
       painel.setAttribute("aria-hidden", String(!aberto));
       botao.setAttribute("aria-expanded", String(aberto));
       botao.setAttribute("aria-label", (aberto ? "Fechar " : "Abrir ") + rotulo);
+      if (aberto) iniciarIcones(painel);
     }};
     const abrir = () => {
       controles.forEach(outro => { if (outro !== controle) outro.alternar(false); });
@@ -103,6 +105,7 @@ export function atualizarNavegacao(autenticado) {
   host.querySelector("[data-profile-guest]").hidden = Boolean(autenticado);
   host.querySelector("[data-profile-user]").hidden = !autenticado;
   hamburger.container.hidden = !autenticado && !preview;
+  iniciarIcones(host);
   perfil.alternar(false);
   hamburger.alternar(false);
 }

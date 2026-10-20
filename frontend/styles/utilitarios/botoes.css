@@ -20,7 +20,7 @@
 .btn-secondary { background: transparent; border-color: var(--glass-border,rgba(255,255,255,.12)); color: var(--cor-5); font-weight: 500; }
 .btn-primary-form, .btn-login, .btn-login-secondary { font-size: .8rem; }
 .btn-ghost, .btn-build-ghost, .btn-danger, .btn-secondary { font-size: .9rem; }
-.btn-danger { color: var(--cor-6); background: var(--status-error); }
+.btn-danger { color: var(--cor-6); background: #c92b23; }
 .btn-login, .btn-login-secondary { width: 100%; }
 @media (hover: hover) {
   :is(.btn-primary, .btn-primary-form, .btn-login, .btn-build-primary, .component-buy):hover:not(:disabled) {
@@ -29,7 +29,7 @@
   :is(.btn-secondary, .btn-ghost, .btn-login-secondary, .btn-build-ghost, .btn-back):hover:not(:disabled) {
     background: rgba(255,255,255,.035); border-color: var(--cor-3); color: var(--cor-6); transform: none;
   }
-  .btn-danger:hover:not(:disabled) { background: #d92c23; transform: translateY(-1px); }
+  .btn-danger:hover:not(:disabled) { background: #b6241d; transform: translateY(-1px); }
 }
 :is(button, [class*="btn-"]):active:not(:disabled) { transform: scale(.98); }
 button:disabled { opacity: .45; cursor: not-allowed; transform: none; filter: none; }
