@@ -12,20 +12,43 @@ import { salvarAlteracaoLocal } from "../build/autosalvar.js";
 import { iniciarDetalhesAnimados } from "../components/animated-details.js";
 import { abrirBenchmark, abrirCompraBuild, motivoBenchmark, avisoCompraHtml } from "../build/acoes-build.js";
 import { abrirMelhorias } from "../build/melhorias.js";
+import { carregarPerfil } from "../conta/perfil.js";
+import { acompanharCarregamento } from "../components/page-loading.js";
+import { mostrarBuildSalva } from "../build/build-salva.js";
+import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta, linkBuildConta, estadoParaConta } from "../build/conta.js";
+import { criarBuildManual } from "../api/build/builds.js";
 
 document.addEventListener("DOMContentLoaded",async () => {
   const main = document.querySelector("#builder-main");
   try {
-    const catalogo = await carregarCatalogo();
-    let build = abrirBuild();
-    let mensagemSalvamento = "Alterações são salvas automaticamente neste navegador.", tomSalvamento = "info";
+    await acompanharCarregamento(carregarPerfil().catch(() => null));
+    const parametros = new URLSearchParams(location.search);
+    let buildId = parametros.get("build_id");
+    const compartilhada = parametros.get("compartilhar_id");
+    if (compartilhada !== null) {
+      await mostrarBuildSalva(main, compartilhada, true);
+      return;
+    }
+    if (buildId === null && !parametros.has("id") && !parametros.has("compartilhar")) {
+      const nova = await criarBuildManual(estadoParaConta({titulo:"Minha build",descricao:"",visibilidade:"privado",travada:false,orcamento:null,incluirPerifericos:false,incluirRede:false,rede:{},componentes:{}}));
+      buildId = nova.build.id;
+      history.replaceState(null,"","./configuracao-build.html?" + new URLSearchParams({build_id:buildId}));
+    }
+    const conta = buildId !== null;
+    const catalogo = await acompanharCarregamento(conta ? carregarCatalogoConta() : carregarCatalogo());
+    let build = conta ? await acompanharCarregamento(carregarBuildConta(buildId)) : abrirBuild();
+    let filaSalvamento = Promise.resolve();
+    let falhaSalvamento = null;
+    let mensagemSalvamento = conta ? "Alterações são salvas automaticamente na sua conta." : "Alterações são salvas automaticamente neste navegador.", tomSalvamento = "info";
     if (build.travada) mensagemSalvamento = "Build trancada. Destranque-a para alterar e salvar.";
-    else if (buildsLocais().length >= 3 && !buildsLocais().some(item => item.id === build.id)) {
+    else if (!conta && buildsLocais().length >= 3 && !buildsLocais().some(item => item.id === build.id)) {
       mensagemSalvamento = "Limite de três builds atingido. Apenas o rascunho será guardado até liberar espaço.";
       tomSalvamento = "warning";
     }
-    history.replaceState(null,"","./configuracao-build.html?" + new URLSearchParams({id:build.id}));
-    guardarRascunho(build);
+    if (!conta) {
+      history.replaceState(null,"","./configuracao-build.html?" + new URLSearchParams({id:build.id}));
+      guardarRascunho(build);
+    }
     const get = cat => catalogo.find(p => p.id === build.componentes[cat]?.id);
     const urlCategoria = cat => "./pecas.html?" + new URLSearchParams({categoria:cat,build:build.id});
     const bloqueado = (condicao,motivo) => condicao ? 'disabled data-disabled-reason="' + h(motivo) + '"' : "";
@@ -104,7 +127,7 @@ document.addEventListener("DOMContentLoaded",async () => {
         '><option value="privado" ' + (build.visibilidade === "privado" ? "selected" : "") + '>Privada</option><option value="publico" ' + (build.visibilidade === "publico" ? "selected" : "") +
         '>Pública</option></select><label for="build-description">Descrição</label><textarea class="input-text" id="build-description" rows="4" maxlength="300" ' + bloqueado(build.travada,trancada) + '>' + h(build.descricao) + '</textarea><label for="build-budget">Orçamento desta build (R$)</label><input class="input-text" id="build-budget" type="number" min="0" max="1000000" step="any" inputmode="decimal" value="' + h(build.orcamento ?? "") + '" placeholder="Sem limite definido" ' + bloqueado(build.travada,trancada) + '></div></details><p class="planning-help" id="build-budget-note"></p><p class="build-autosave-status" id="build-autosave-status" role="status" aria-live="polite" data-tone="' + tomSalvamento + '">' + h(mensagemSalvamento) + '</p><button class="btn-primary" type="button" id="save-configuration" aria-label="Salvar build e voltar">Salvar build e voltar</button><button class="btn-secondary" type="button" id="buy-configuration" aria-label="Comprar build" ' + bloqueado(!Object.keys(build.componentes).length,"Adicione uma peça para consultar as lojas.") + '>' + iconeAnimado("cart") + 'Comprar build</button><button class="btn-secondary" type="button" id="improve-configuration" aria-label="Buscar melhorias" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("magnifying") + 'Buscar melhorias</button><button class="btn-secondary" type="button" id="share-configuration" aria-label="Compartilhar build" ' +
         bloqueado(build.visibilidade !== "publico","Torne a build pública para compartilhar.") +
-        '>Compartilhar</button><p class="summary-note">Preços demonstrativos, sem frete. Salvamento local neste navegador; o link público compartilha uma cópia.</p>' + avisoCompraHtml() +
+        '>Compartilhar</button><p class="summary-note">' + (conta ? 'Preços atuais do catálogo, sem frete. Alterações salvas na conta.' : 'Preços demonstrativos, sem frete. Salvamento local neste navegador.') + '</p>' + avisoCompraHtml() +
         (build.travada ? '<p class="summary-note">Build trancada. Destranque-a em Minhas builds.</p>' : "") + '</section></aside></div>';
       if (opcoes) main.querySelector(".builder-options").replaceWith(opcoes);
       const atualizarCustos = () => {
@@ -145,33 +168,55 @@ document.addEventListener("DOMContentLoaded",async () => {
         if (!build.incluirRede) acessoriosRede.forEach(cat => delete build.componentes[cat]);
         persistir(); renderizar();
       });
-      main.querySelector("#save-configuration").onclick = () => {
+      main.querySelector("#save-configuration").onclick = async () => {
         try {
           const invalido = [...main.querySelectorAll("#build-budget")].find(input => !input.checkValidity());
           if (invalido) { main.querySelector(".summary-metadata").open = true; invalido.reportValidity(); return; }
           if (!build.titulo.trim()) throw new Error("Informe um nome para a build.");
-          const salvo = salvarAlteracaoLocal(build,catalogo);
-          if (!salvo.salvo) throw new Error(salvo.motivo);
+          if (conta) { await filaSalvamento; if (falhaSalvamento) throw falhaSalvamento; }
+          else {
+            const salvo = salvarAlteracaoLocal(build,catalogo);
+            if (!salvo.salvo) throw new Error(salvo.motivo);
+          }
           navegarPara("./builds.html");
         } catch (erro) { avisar(erro.message); }
       };
-      main.querySelector("#share-configuration").onclick = () => {
-        try { copiarTexto(linkCompartilhado(build)); } catch (erro) { avisar(erro.message); }
+      main.querySelector("#share-configuration").onclick = async () => {
+        try { if (conta) { await filaSalvamento; if (falhaSalvamento) throw falhaSalvamento; } copiarTexto(conta ? linkBuildConta(build.id) : linkCompartilhado(build)); } catch (erro) { avisar(erro.message); }
       };
       iniciarIndicadores(main); iniciarDetalhesAnimados(main); iniciarIcones(main);
     }
     function persistir() {
+      if (conta) {
+        const atual = structuredClone(build);
+        mensagemSalvamento = "Salvando na sua conta…";
+        filaSalvamento = filaSalvamento.then(() => salvarBuildConta(atual)).then(() => {
+          falhaSalvamento = null;
+          mensagemSalvamento = "Salvo na sua conta."; tomSalvamento = "info";
+          const status = main.querySelector("#build-autosave-status");
+          if (status) { status.textContent = mensagemSalvamento; status.dataset.tone = tomSalvamento; }
+        }).catch(erro => {
+          falhaSalvamento = erro;
+          mensagemSalvamento = "Não foi possível salvar: " + erro.message; tomSalvamento = "error";
+          avisar(mensagemSalvamento);
+        });
+      } else {
       try {
         const estado = salvarAlteracaoLocal(build,catalogo);
         mensagemSalvamento = estado.motivo; tomSalvamento = estado.salvo ? "info" : "warning";
       } catch (erro) { mensagemSalvamento = "Não foi possível salvar: " + erro.message; tomSalvamento = "error"; }
+      }
       const status = main.querySelector("#build-autosave-status");
       if (status) { status.textContent = mensagemSalvamento; status.dataset.tone = tomSalvamento; }
     }
-    main.addEventListener("click",e => {
+    main.addEventListener("click",async e => {
       const botao = e.target.closest("button");
       if (!botao || botao.disabled) return;
-      if (botao.dataset.category) { navegarPara(urlCategoria(botao.dataset.category)); return; }
+      if (botao.dataset.category) {
+        try { if (conta) { await filaSalvamento; if (falhaSalvamento) throw falhaSalvamento; } navegarPara(urlCategoria(botao.dataset.category)); }
+        catch (erro) { avisar(erro.message); }
+        return;
+      }
       try {
         if (botao.dataset.remove) build = removerPeca(build,botao.dataset.remove,botao.dataset.item);
         else if (botao.dataset.quantityAdd) build = selecionarPecaCompativel(build,catalogo.find(p => p.id === botao.dataset.quantityAdd),catalogo);

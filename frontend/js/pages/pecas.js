@@ -7,6 +7,7 @@ import { avisar, mostrarFalha } from "../build/interface.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { navegarPara } from "../components/page-loading.js";
 import { salvarAlteracaoLocal } from "../build/autosalvar.js";
+import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta } from "../build/conta.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const main = document.querySelector("#catalog-main");
@@ -14,15 +15,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const parametros = new URLSearchParams(location.search);
     const categoria = categoriaCatalogo(parametros.get("categoria") || "processador");
     if (!categoria) throw new Error("Categoria não encontrada.");
-    const catalogo = await carregarCatalogo();
-    let build = abrirBuild(new URLSearchParams({ id: parametros.get("build") || "" }));
-    guardarRascunho(build);
+    const conta = parametros.get("build")?.startsWith("s-");
+    const catalogo = conta ? await carregarCatalogoConta() : await carregarCatalogo();
+    let build = conta ? await carregarBuildConta(parametros.get("build")) : abrirBuild(new URLSearchParams({ id: parametros.get("build") || "" }));
+    if (!conta) guardarRascunho(build);
     let pagina = 1;
     const tamanhoPagina = 12;
     const temPecas = Object.keys(build.componentes).length > 0;
     const produtos = catalogo.filter((p) => (categoria.tipos || [categoria.id]).includes(p.categoria));
-    main.innerHTML = '<header class="builder-heading"><div><a class="builder-back font-1-xs" data-page-back href="./configuracao-build.html?id=' + encodeURIComponent(build.id) + '" aria-label="Voltar à build">' + iconeAnimado("arrow","back") + '<span data-back-label>Voltar à build</span></a><h1 class="font-1-xl">' + categoria.nome +
-      '</h1><p class="font-2-s">Compare os modelos e selecione a peça para sua configuração.</p></div><span class="builder-demo font-1-xs">Catálogo demonstrativo</span></header>' +
+    main.innerHTML = '<header class="builder-heading"><div><a class="builder-back font-1-xs" data-page-back href="./configuracao-build.html?' + new URLSearchParams({[conta ? "build_id" : "id"]:build.id}) + '" aria-label="Voltar à build">' + iconeAnimado("arrow","back") + '<span data-back-label>Voltar à build</span></a><h1 class="font-1-xl">' + categoria.nome +
+      '</h1><p class="font-2-s">Compare os modelos e selecione a peça para sua configuração.</p></div><span class="builder-demo font-1-xs">' + (conta ? "Catálogo da conta" : "Catálogo demonstrativo") + '</span></header>' +
       '<div class="catalog-toolbar glass-card"><label class="catalog-search font-1-xs">Buscar modelo<input class="input-text" id="component-search" type="search" placeholder="Marca ou modelo"></label>' +
       '<label class="font-1-xs">Marca<select id="brand-filter" class="input-text"><option value="">Todas</option>' + [...new Set(produtos.map((p) => p.fabricante))].sort().map((marca) => '<option>' + h(marca) + '</option>').join("") + '</select></label>' +
       '<label class="font-1-xs">Ordenar<select id="component-sort" class="input-text"><option value="preco-asc">Menor preço</option><option value="preco-desc">Maior preço</option><option value="nome">Nome</option></select></label>' +
@@ -39,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         : ordem.value === "preco-desc" ? b.preco-a.preco : a.preco-b.preco);
       const paginas = Math.max(1, Math.ceil(filtrados.length / tamanhoPagina));
       pagina = Math.min(pagina, paginas);
-      main.querySelector("#catalog-count").textContent = filtrados.length + " opções encontradas · preços demonstrativos, sem atualização em tempo real.";
+      main.querySelector("#catalog-count").textContent = filtrados.length + (conta ? " opções encontradas · preços cadastrados no banco." : " opções encontradas · preços demonstrativos, sem atualização em tempo real.");
       main.querySelector("#catalog-results").innerHTML = filtrados.slice((pagina-1)*tamanhoPagina, pagina*tamanhoPagina).map((peca) => {
         const detalhes = "./peca.html?" + new URLSearchParams({ id: peca.id, build: build.id });
         const selecionada = itensCategoria(build,peca.categoria).some(r => r.id === peca.id);
@@ -62,14 +64,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     [campoBusca, marca, ordem].forEach((campo) => campo.addEventListener(campo === campoBusca ? "input" : "change", () => { pagina=1; renderizar(); }));
     main.querySelector("#previous-products").onclick = () => { pagina--; renderizar(); };
     main.querySelector("#next-products").onclick = () => { pagina++; renderizar(); };
-    main.querySelector("#catalog-results").addEventListener("click", (event) => {
+    main.querySelector("#catalog-results").addEventListener("click", async (event) => {
       const botao = event.target.closest("[data-add]");
       if (!botao || botao.disabled) return;
       try {
         build = selecionarPecaCompativel(build, catalogo.find((p) => p.id === botao.dataset.add), catalogo);
-        const salvo = salvarAlteracaoLocal(build,catalogo);
-        if (!salvo.salvo) { avisar(salvo.motivo); return; }
-        navegarPara("./configuracao-build.html?id=" + encodeURIComponent(build.id));
+        if (conta) await salvarBuildConta(build);
+        else {
+          const salvo = salvarAlteracaoLocal(build,catalogo);
+          if (!salvo.salvo) { avisar(salvo.motivo); return; }
+        }
+        navegarPara("./configuracao-build.html?" + new URLSearchParams({[conta ? "build_id" : "id"]:build.id}));
       } catch (erro) { avisar(erro.message); }
     });
     renderizar();

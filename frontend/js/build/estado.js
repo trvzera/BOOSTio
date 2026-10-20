@@ -9,7 +9,7 @@ const categoriasValidas = new Set(categorias.map(c => c.id));
 function ler(chave,padrao) {
   try { return JSON.parse(localStorage.getItem(chave)) || padrao; } catch { return padrao; }
 }
-export function buildsLocais() { const valor = ler(CHAVE_PERFIL_LOCAL,[]); return Array.isArray(valor) ? valor : []; }
+export function buildsLocais() { const valor = ler(CHAVE_PERFIL_LOCAL,[]); return Array.isArray(valor) ? valor.filter(build => build?.id !== "build-demo-1") : []; }
 export const categoriasMultiplas = new Set(["memoria_ram","ssd","hd","fan"]);
 export function itensCategoria(build,categoria) {
   const itens = build.componentes[categoria];
@@ -70,16 +70,11 @@ export function abrirBuild(parametros = new URLSearchParams(location.search)) {
         id:crypto.randomUUID(),travada:false});
     } catch { throw new Error("O link da build é inválido ou está incompleto."); }
   }
-  const id = parametros.get("id"), rascunhos = ler(CHAVE_RASCUNHOS,{});
+  const idSolicitado = parametros.get("id");
+  const id = idSolicitado === "build-demo-1" ? null : idSolicitado;
+  const rascunhos = ler(CHAVE_RASCUNHOS,{});
   const resumo = buildsLocais().find(b => b.id === id), existente = rascunhos[id] || resumo;
   if (existente) return normalizarBuild({...resumo,...existente});
-  if (id === "build-demo-1") return normalizarBuild({
-    id,titulo:"Setup Gamer 1440p",visibilidade:"publico",componentes:{
-      processador:{id:"SEED-CPU-02",quantidade:1},placa_mae:{id:"SEED-MB-03",quantidade:1},
-      memoria_ram:[{id:"SEED-RAM-01",quantidade:1}],placa_video:{id:"SEED-GPU-01",quantidade:1},
-      ssd:{id:"SEED-SSD-01",quantidade:1},fonte:{id:"SEED-PSU-01",quantidade:1},
-    },
-  });
   const nova = normalizarBuild({id:id || undefined});
   if (!id) {
     const planejamento = planejamentoLocal();

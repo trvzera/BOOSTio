@@ -24,6 +24,14 @@ class Peca(ModeloBase):
   def recarregar(self):
     db.session.refresh(self)
 
+  def to_catalogo(self):
+    dados = {coluna.name: getattr(self, coluna.name) for coluna in self.__table__.columns
+             if coluna.name not in ("preco_atualizado_em", "criado_em", "atualizado_em")}
+    dados["id"] = f"{self.__tablename__}:{self.id}"
+    dados["categoria"] = self.__tablename__
+    dados["link"] = dados.pop("kabum_external", None)
+    return dados
+
   def aplicar_cotacao(self, resultado, atualizado_em):
     if resultado["preco"] is not None:
       self.preco = float(resultado["preco"])
@@ -56,6 +64,17 @@ class Peca(ModeloBase):
   @classmethod
   def mostrar_pecas(cls):
     return cls.query.all()
+
+  @classmethod
+  def listar_disponiveis_ate(cls, preco_maximo: float, limite: int = 30):
+    pecas = (cls.query
+      .filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
+      .order_by(cls.preco.asc(), cls.id.asc())
+      .all())
+    if len(pecas) <= limite:
+      return pecas
+    # Distribui as opções pela faixa de preços, sem enviar o catálogo inteiro ao LLM.
+    return [pecas[indice * (len(pecas) - 1) // (limite - 1)] for indice in range(limite)]
 
 
   @classmethod

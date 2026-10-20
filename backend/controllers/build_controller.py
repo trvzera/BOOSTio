@@ -1,11 +1,19 @@
 from flask import Blueprint,request,jsonify
 from flask_login import login_required,current_user
-from utils.decorators import apenas_proprio_usuario
-from models import db,Build
+from models import db
 from sqlalchemy.exc import SQLAlchemyError
+from requests.exceptions import RequestException
 
 from services.build_service.listar_builds_service import ListarBuildService
 from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.buscar_build_service import BuscarBuildService
+from services.build_service.listar_catalogo_build_service import ListarCatalogoBuildService
+from services.build_service.criar_build_manual_service import CriarBuildManualService
+from services.build_service.atualizar_build_service import AtualizarBuildService
+from services.build_service.duplicar_build_service import DuplicarBuildService
+from services.build_service.definir_setup_atual_service import DefinirSetupAtualService
+from services.build_service.excluir_build_service import ExcluirBuildService
+from services.build_service.buscar_build_publica_service import BuscarBuildPublicaService
 
 build_bp = Blueprint("build",__name__,url_prefix='/build')
 
@@ -14,33 +22,120 @@ build_bp = Blueprint("build",__name__,url_prefix='/build')
 @login_required
 def mostrar_builds():
   try:
-    usuario_id = current_user.id
-    service = ListarBuildService()
-    builds = service.executar(usuario_id)
-
-    if builds is None:
-      return jsonify({"erro":"Usuario não encontrado"}),404
-
-    return jsonify({"mensagem":"Builds listadas com sucesso","builds":builds})
-  
+    builds = ListarBuildService().executar(current_user.id)
+    return jsonify({"builds": builds}),200
   except ValueError as e:
-    return jsonify({
-      "erro":str(e)
-    })
+    return jsonify({"erro": str(e)}),404
 
 @build_bp.post("/")
+@login_required
 def criar_build():
   try:
-    dados = request.get_json()
+    dados = request.get_json(silent=True)
+
+    if not isinstance(dados, dict):
+      return jsonify({"erro": "Envie um objeto JSON válido"}),400
+
     usuario_id = current_user.id
-    service = CriarBuildService()
-    build = service.executar(usuario_id, dados)
-    return jsonify({"mensagem":"Build criada com sucesso","build":build.to_dict()})
-  
-  except SQLAlchemyError as e:
+    build = CriarBuildService().executar(usuario_id, dados)
+    builds = ListarBuildService().executar(usuario_id)
+
+    return jsonify({"mensagem": "Build criada com sucesso", "build": build, "builds": builds}),201
+  except ValueError as e:
+    return jsonify({"erro": str(e)}),400
+
+  except RequestException:
+    return jsonify({"erro": "Não foi possível gerar a build agora"}),502
+
+  except SQLAlchemyError:
     db.session.rollback()
-    return jsonify({"erro":"Erro ao criar build"}),500
-  
-  except Exception as e:
-    return jsonify({"erro":str(e)}),400
-    
+    return jsonify({"erro": "Erro ao salvar a build"}),500
+
+  except Exception:
+    return jsonify({"erro": "Erro ao gerar a build"}),500
+
+
+@build_bp.get("/catalogo")
+@login_required
+def catalogo_build():
+  return jsonify({"pecas": ListarCatalogoBuildService().executar()}),200
+
+
+@build_bp.post("/manual")
+@login_required
+def criar_build_manual():
+  try:
+    return jsonify({"build": CriarBuildManualService().executar(current_user.id, request.get_json(silent=True))}),201
+  except ValueError as erro:
+    return jsonify({"erro": str(erro)}),400
+  except SQLAlchemyError:
+    db.session.rollback()
+    return jsonify({"erro": "Erro ao salvar a build"}),500
+
+
+@build_bp.get("/<build_id>")
+@login_required
+def buscar_build(build_id):
+  try:
+    build = BuscarBuildService().executar(current_user.id, build_id)
+    return jsonify({"build": build}),200
+  except ValueError as e:
+    return jsonify({"erro": str(e)}),404
+
+
+@build_bp.put("/<build_id>")
+@login_required
+def atualizar_build(build_id):
+  try:
+    return jsonify({"build": AtualizarBuildService().executar(current_user.id, build_id, request.get_json(silent=True))}),200
+  except ValueError as erro:
+    return jsonify({"erro": str(erro)}),400
+  except SQLAlchemyError:
+    db.session.rollback()
+    return jsonify({"erro": "Erro ao atualizar a build"}),500
+
+
+@build_bp.post("/<build_id>/duplicar")
+@login_required
+def duplicar_build(build_id):
+  try:
+    return jsonify({"build": DuplicarBuildService().executar(current_user.id, build_id)}),201
+  except ValueError as erro:
+    return jsonify({"erro": str(erro)}),400
+  except SQLAlchemyError:
+    db.session.rollback()
+    return jsonify({"erro": "Erro ao duplicar a build"}),500
+
+
+@build_bp.post("/<build_id>/setup-atual")
+@login_required
+def definir_setup_atual(build_id):
+  try:
+    DefinirSetupAtualService().executar(current_user.id, build_id)
+    return jsonify({"builds": ListarBuildService().executar(current_user.id)}),200
+  except ValueError as erro:
+    return jsonify({"erro": str(erro)}),404
+  except SQLAlchemyError:
+    db.session.rollback()
+    return jsonify({"erro": "Erro ao definir o setup atual"}),500
+
+
+@build_bp.delete("/<build_id>")
+@login_required
+def excluir_build(build_id):
+  try:
+    ExcluirBuildService().executar(current_user.id, build_id)
+    return "",204
+  except ValueError as erro:
+    return jsonify({"erro": str(erro)}),400
+  except SQLAlchemyError:
+    db.session.rollback()
+    return jsonify({"erro": "Erro ao excluir a build"}),500
+
+
+@build_bp.get("/<build_id>/publica")
+def buscar_build_publica(build_id):
+  try:
+    return jsonify({"build": BuscarBuildPublicaService().executar(build_id)}),200
+  except ValueError as erro:
+    return jsonify({"erro": str(erro)}),404

@@ -1,15 +1,14 @@
 import "../header.js";
 import "../auth/auth.js";
 import { carregarCatalogo, categorias, htmlSeguro as h, moeda, nomePeca } from "../build/catalogo.js";
-import { buildsLocais, CHAVE_PERFIL_LOCAL, guardarRascunho, itensSelecionados,
-  informacoesRam, informacoesArmazenamento } from "../build/estado.js";
+import { itensSelecionados, itensCategoria, informacoesRam, informacoesArmazenamento } from "../build/estado.js";
 import { modelosProntos, copiarModelo } from "../build/modelos.js";
 import { avaliarBuild } from "../build/compatibilidade.js";
 import { navegarPara } from "../components/page-loading.js";
 import { planejamentoLocal } from "../build/planejamento.js";
+import { carregarCatalogoConta, estadoParaConta } from "../build/conta.js";
+import { criarBuildManual } from "../api/build/builds.js";
 
-const LIMITE_LOCAL = 3;
-const MOTIVO_COTA = "Limite de três builds salvas neste navegador atingido. Exclua uma build em Minhas builds para usar um modelo como base.";
 const STATUS = {completa:"Peças preenchidas", incompleta:"Peças pendentes", atencao:"Requer atenção", erro:"Há incompatibilidades"};
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -28,23 +27,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function atualizarCota() {
-    const usadas = buildsLocais().length;
-    const cheia = usadas >= LIMITE_LOCAL;
-    cota.textContent = usadas + "/" + LIMITE_LOCAL + " builds salvas neste navegador";
-    cota.dataset.cheia = String(cheia);
+    cota.textContent = "As cópias são salvas na sua conta";
     lista.querySelectorAll("[data-usar-modelo]").forEach(botao => {
-      botao.dataset.disabledReason = cheia ? MOTIVO_COTA : "Aguarde a abertura do rascunho.";
-      botao.disabled = cheia || abrindo;
-      if (cheia) botao.title = MOTIVO_COTA;
-      else botao.removeAttribute("title");
+      botao.disabled = abrindo;
     });
-    return cheia;
+    return false;
   }
 
   formulario.addEventListener("submit",evento => evento.preventDefault());
-  window.addEventListener("storage",evento => {
-    if (evento.key === CHAVE_PERFIL_LOCAL || evento.key === null) atualizarCota();
-  });
   window.addEventListener("pageshow",() => { abrindo = false; atualizarCota(); });
   window.addEventListener("focus",atualizarCota);
   atualizarCota();
@@ -117,10 +107,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       budget.value = "";
       renderizar();
     });
-    lista.addEventListener("click",evento => {
+    lista.addEventListener("click",async evento => {
       const botao = evento.target.closest("[data-usar-modelo]");
       if (!botao || abrindo) return;
-      if (atualizarCota()) { informar(MOTIVO_COTA,true); return; }
       const modelo = modelos.find(({build}) => build.id === botao.dataset.usarModelo);
       if (!modelo) return;
       try {
@@ -129,12 +118,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         const copia = copiarModelo(modelo.build);
         const planejamento = planejamentoLocal();
         if (planejamento.usarBudget) copia.orcamento = planejamento.budget;
-        guardarRascunho(copia);
-        navegarPara("./configuracao-build.html?" + new URLSearchParams({id:copia.id}));
-      } catch {
+        const catalogoConta = await carregarCatalogoConta();
+        const componentes = {};
+        for (const categoria of Object.keys(copia.componentes)) {
+          const itens = itensCategoria(copia,categoria).map(item => {
+            const demonstrativa = catalogo.find(peca => peca.id === item.id && peca.categoria === categoria);
+            const real = catalogoConta.find(peca => peca.categoria === categoria && peca.fabricante === demonstrativa?.fabricante && peca.modelo === demonstrativa?.modelo);
+            return real ? {id:real.id,quantidade:item.quantidade} : {proprio:demonstrativa ? demonstrativa.fabricante + " " + demonstrativa.modelo : item.proprio,quantidade:item.quantidade};
+          });
+          componentes[categoria] = ["memoria_ram","ssd","hd","fan"].includes(categoria) ? itens : itens[0];
+        }
+        const {build} = await criarBuildManual(estadoParaConta({...copia,componentes}));
+        navegarPara("./configuracao-build.html?" + new URLSearchParams({build_id:build.id}));
+      } catch (erro) {
         abrindo = false;
         atualizarCota();
-        informar("Não foi possível guardar o rascunho. Permita o armazenamento local do navegador e tente novamente.",true);
+        informar(erro.message || "Não foi possível salvar a build na conta.",true);
       }
     });
     renderizar();

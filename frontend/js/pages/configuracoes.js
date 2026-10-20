@@ -4,7 +4,7 @@ import "../header.js";
 import "./budget-perfil.js";
 import "../services-carousel.js";
 import { caminhoLogin } from "../auth/auth.js";
-import { buscarUsuarioLogado } from "../api/usuario/buscarUsuarioLogado.js";
+import { carregarPerfil as buscarUsuarioLogado } from "../conta/perfil.js";
 import { atualizarUsuario } from "../api/usuario/atualizarUsuario.js";
 import { deletarUsuario } from "../api/usuario/deletarUsuario.js";
 import { formatarMesAno } from "../utils/formatarData.js";

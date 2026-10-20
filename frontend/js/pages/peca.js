@@ -8,16 +8,19 @@ import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { navegarPara } from "../components/page-loading.js";
 import { avisoCompraHtml } from "../build/acoes-build.js";
 import { salvarAlteracaoLocal } from "../build/autosalvar.js";
+import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta } from "../build/conta.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const main = document.querySelector("#product-main");
   try {
-    const parametros = new URLSearchParams(location.search), catalogo = await carregarCatalogo();
+    const parametros = new URLSearchParams(location.search);
+    const conta = parametros.get("build")?.startsWith("s-");
+    const catalogo = conta ? await carregarCatalogoConta() : await carregarCatalogo();
     const peca = catalogo.find((p) => p.id === parametros.get("id"));
     if (!peca) throw new Error("Peça não encontrada no catálogo.");
     const categoria = categorias.find((c) => c.id === peca.categoria);
-    let build = abrirBuild(new URLSearchParams({ id: parametros.get("build") || "" }));
-    guardarRascunho(build);
+    let build = conta ? await carregarBuildConta(parametros.get("build")) : abrirBuild(new URLSearchParams({ id: parametros.get("build") || "" }));
+    if (!conta) guardarRascunho(build);
     const detalhes = fichaTecnica(peca);
     let motivo = "";
     try { selecionarPecaCompativel(build,peca,catalogo); } catch (erro) { motivo = erro.message; }
@@ -45,12 +48,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     main.querySelector(".product-stores > p").insertAdjacentHTML("afterend",avisoCompraHtml());
     main.querySelectorAll(".store-logo").forEach(img => img.addEventListener("error",() => { img.hidden = true; img.nextElementSibling.hidden = false; },{once:true}));
     iniciarIcones(main);
-    main.querySelector("#add-product").onclick = () => {
+    main.querySelector("#add-product").onclick = async () => {
       try {
         build = selecionarPecaCompativel(build, peca, catalogo);
-        const salvo = salvarAlteracaoLocal(build,catalogo);
-        if (!salvo.salvo) { avisar(salvo.motivo); return; }
-        navegarPara("./configuracao-build.html?id=" + encodeURIComponent(build.id));
+        if (conta) await salvarBuildConta(build);
+        else {
+          const salvo = salvarAlteracaoLocal(build,catalogo);
+          if (!salvo.salvo) { avisar(salvo.motivo); return; }
+        }
+        navegarPara("./configuracao-build.html?" + new URLSearchParams({[conta ? "build_id" : "id"]:build.id}));
       } catch (erro) { avisar(erro.message); }
     };
   } catch (erro) { mostrarFalha(main, erro); }

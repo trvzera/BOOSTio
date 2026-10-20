@@ -1,5 +1,5 @@
 #builds-page { padding-top: var(--page-top); }
-#builds-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+#builds-list, #builds-account-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .build-card { min-width: 0; }
 .build-card-desc { max-width: 100%; }
 .build-card-title { min-width: 0; }
@@ -19,7 +19,7 @@
 .build-card:has(.build-menu-wrap.open) { z-index: 120; }
 .quota-actions { flex-shrink: 0; flex-wrap: wrap; }
 @media (max-width: 1100px) {
-  #builds-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #builds-list, #builds-account-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 850px) {
   .builds-quota-card { flex-direction: column; align-items: stretch; padding: 24px; }
@@ -29,7 +29,7 @@
 }
 @media (max-width: 650px) {
   #builds-page { width: calc(100% - 32px); padding-bottom: 96px; }
-  #builds-list { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  #builds-list, #builds-account-list { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .build-card, .builds-quota-card { padding: 20px; }
 }
 @media (max-width: 480px) {

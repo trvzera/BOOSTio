@@ -118,6 +118,27 @@ e as do radiador como instaladas; modelos com distribuição não informada prec
 de conferência para encaixes compartilhados. Não existe um seletor de posição física ainda.
 As medidas de GPU e os encaixes de radiador/fans ainda faltam na seed atual.
 
+#### Pendência: encaixe físico completo do gabinete
+
+`validarEncaixe()` já compara no frontend comprimento da GPU, altura do air cooler,
+tamanho nominal de radiador e tamanho/quantidade de fans, e a avaliação confere o
+formato da placa-mãe. Isso não equivale à confirmação de uma montagem física completa.
+A próxima integração deve preservar os dados do JSON e completar os campos ausentes,
+revalidando no Python com medidas do modelo/revisão corretos.
+
+O gabinete precisa informar limites internos por configuração e posição: GPU com e
+sem radiador frontal; altura/espessura da GPU e espaço dos conectores; radiador +
+fans no topo/frente e suas interferências com placa-mãe/RAM; altura do air cooler;
+formato/comprimento da fonte e baias de discos. Fans e radiadores podem disputar as
+mesmas posições, e fans inclusas podem ser removidas ou substituídas; a configuração
+instalada deve ser explícita antes de confirmar o encaixe. Dimensões externas do
+gabinete e o tamanho nominal de um radiador, isoladamente, não bastam.
+
+Retornar distinção entre encaixe confirmado com os dados conhecidos, incompatível
+e não verificado por falta de dados. Não inferir medidas pelo nome comercial nem
+transformar dado ausente em confirmação. Essa checagem é independente do benchmark
+de jogos e deve ser refeita ao trocar o gabinete ou qualquer peça que afete o espaço.
+
 O complemento exclusivo do catálogo demonstrativo usa as fichas de
 [ASUS PRIME A520M-K](https://www.asus.com/motherboards-components/motherboards/prime/prime-a520m-k/techspec/),
 [GIGABYTE B550M DS3H rev. 1.0/1.1/1.2/1.3](https://www.gigabyte.com/Motherboard/B550M-DS3H-rev-10-11-12-13/sp)
@@ -260,10 +281,27 @@ sem excluir a build. As demais mostram **Definir como setup atual**, com ícone 
 O menu de três pontos abre para baixo, ajustando a rolagem ao abrir se faltar espaço,
 sem cobrir os controles flutuantes; sua lista tem rolagem própria e glass mais forte.
 
-`js/build/planejamento.js` guarda budget, preferência de uso e ID de setup atual
-neste navegador. O formulário preenche o range quando a preferência está ativa;
-`build.orcamento` permite ajustar o limite sem alterar o budget registrado.
-Sincronização e separação por conta continuam dependentes do backend.
+`js/build/planejamento.js` mantém o ID de setup atual neste navegador, mas recebe o
+budget da conta apenas em memória. `js/conta/perfil.js` consulta `/auth/me` sem cache,
+compartilha solicitações simultâneas e descarta respostas antigas após logout ou
+salvamento. Formulário e editor aguardam essa consulta antes de aplicar a preferência;
+sem sessão/conexão não reaproveitam o budget legado do localStorage.
+
+`js/pages/budget-perfil.js` carrega valor e autorização e envia `PUT /usuarios/<id>/budget`
+por `js/api/usuario/atualizarBudgetUsuario.js`. A interface só confirma após resposta
+do servidor, permite tentar novamente em caso de falha e desativa consentimento sem
+valor positivo. O Python valida sessão, dono, intervalo e centavos, seguindo
+controller → service → modelo. O valor não aparece na listagem geral de usuários.
+
+O formulário preenche o range quando a preferência está ativa; `build.orcamento`
+permite ajustar o limite sem alterar o perfil. Rascunhos, builds já existentes e
+orçamento escolhido no formulário prevalecem sobre a preferência. As builds e o
+setup atual ainda não são sincronizados entre contas/dispositivos.
+
+No SQLite existente, executar em `backend/`: `python -m flask --app app migrar-budget`.
+`migrations/budget_usuario.py` cria backup e adiciona somente colunas ausentes em uma
+transação, incluindo `login_google` para bancos antigos; nunca recria usuários.
+Instalações novas recebem os campos por `db.create_all()`.
 
 `js/build/arquivos.js` exporta JSON e CSV versionados (`boostio-build`, versão 1).
 O CSV inclui metadados e uma linha por modelo com categoria, ID ou peça própria,

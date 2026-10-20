@@ -11,15 +11,22 @@ class Usuario(ModeloBase,UserMixin):
   verificado = db.Column(db.Boolean, default=False ,nullable= False)
   ativo = db.Column(db.Boolean, default=True ,nullable= False)
   login_google = db.Column(db.Boolean,default=False,nullable = False)
+  budget = db.Column(db.Numeric(12, 2), nullable=True)
+  usar_budget = db.Column(db.Boolean, default=False, server_default=db.false(), nullable=False)
 
-  def to_dict(self) -> dict:
-    return {
+  def to_dict(self, incluir_budget=False) -> dict:
+    dados = {
       "id":self.id,
       "nome": self.nome,
       "email": self.email,
       "verificado": self.verificado,
       "criado_em":self.criado_em
     }
+    # A listagem geral de usuários não deve expor o orçamento de cada conta.
+    if incluir_budget:
+      dados.update(budget=float(self.budget) if self.budget is not None else None,
+                   usar_budget=bool(self.usar_budget))
+    return dados
 
   def atualizar_dados(self, nome: str | None = None, email: str | None = None, senha: str | None = None,ativo = None) -> None:
     if nome is not None:
@@ -33,6 +40,11 @@ class Usuario(ModeloBase,UserMixin):
 
     if ativo is not None:
       self.ativo = ativo
+    db.session.commit()
+
+  def atualizar_budget(self, budget, usar_budget: bool) -> None:
+    self.budget = budget
+    self.usar_budget = usar_budget
     db.session.commit()
 
 
