@@ -21,6 +21,30 @@ class BuildSalva(ModeloBase):
     estado = db.Column(db.JSON, nullable=False)
 
     @classmethod
+    def criar_gerada_com_pecas_proprias(cls, usuario_id, dados, proprias, rede=None):
+        componentes = {}
+        for tipo, nome in proprias.items():
+            if tipo not in MODELOS:
+                continue
+            item = {"proprio": nome, "quantidade": 1}
+            componentes[tipo] = [item] if tipo in MULTIPLAS else item
+        for item in dados["componentes"]:
+            tipo = item["tipo"]
+            componente = {"id": item["id"], "quantidade": item["quantidade"]}
+            componentes[tipo] = [componente] if tipo in MULTIPLAS else componente
+        estado = cls.validar_estado({
+            "titulo": dados["nome"][:100], "descricao": dados["descricao"][:300],
+            "orcamento": dados["orcamento"], "rede": rede or {},
+            "incluirPerifericos": True,
+            "incluirRede": (rede or {}).get("tipo") in ("cabo", "wifi"),
+            "pecasExtras": {tipo: nome for tipo, nome in proprias.items() if tipo not in MODELOS},
+            "componentes": componentes,
+        })
+        build = cls(usuario_id=usuario_id, estado=estado)
+        build.salvar()
+        return build
+
+    @classmethod
     def migrar_geradas(cls, usuario_id):
         originais = Build.listar_por_usuario(usuario_id)
         existentes = {item.build_original_id for item in cls.query.filter_by(usuario_id=usuario_id).all()}
@@ -38,6 +62,7 @@ class BuildSalva(ModeloBase):
                     continue
                 item = {"id": peca.id, "quantidade": original.quantidade_de(tipo)}
                 estado["componentes"][tipo] = [item] if tipo in MULTIPLAS else item
+            estado["incluirPerifericos"] = any(tipo in estado["componentes"] for tipo in ("monitor", "teclado", "mouse", "fone"))
             db.session.add(cls(usuario_id=usuario_id, build_original_id=original.id, estado=estado))
         db.session.commit()
 
@@ -104,11 +129,17 @@ class BuildSalva(ModeloBase):
         orcamento = dados.get("orcamento")
         if orcamento is not None and (type(orcamento) not in (int, float) or not 0 <= orcamento <= 1000000):
             raise ValueError("Orçamento inválido")
+        pecas_extras = dados.get("pecasExtras", {})
+        if not isinstance(pecas_extras, dict) or set(pecas_extras) - {"webcam", "microfone"}:
+            raise ValueError("Peça própria extra inválida")
+        if any(not isinstance(nome, str) or not nome.strip() or len(nome.strip()) > 120 for nome in pecas_extras.values()):
+            raise ValueError("Modelo de peça própria extra inválido")
         return {
             "titulo": titulo.strip(), "descricao": descricao.strip(), "visibilidade": dados.get("visibilidade", "privado"),
             "travada": bool(dados.get("travada", False)), "orcamento": orcamento,
             "incluirPerifericos": bool(dados.get("incluirPerifericos", False)),
             "incluirRede": bool(dados.get("incluirRede", False)), "rede": dados.get("rede") or {},
+            "pecasExtras": {tipo: nome.strip() for tipo, nome in pecas_extras.items()},
             "componentes": limpos,
         }
 

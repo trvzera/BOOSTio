@@ -105,9 +105,11 @@ modal quando as peças obrigatórias estão preenchidas e não há erros de comp
 RAM e requisitos mínimos/recomendados ainda precisam de verificação separada. O
 mapeamento de hardware permanece parcialmente no frontend; as builds ainda são locais.
 
-O cache dura uma hora, fica em memória e é compartilhado apenas dentro do mesmo
-processo. Antes de usar múltiplos workers, cache e limites precisarão de armazenamento
-compartilhado. A fonte e a licença dos dados permanecem visíveis na interface.
+O cache atualizado dura uma hora. Se a FPSHQ não responder, uma consulta anterior
+da mesma combinação pode ser exibida por até 24 horas, com a data original indicada.
+O cache fica em memória e é compartilhado apenas dentro do mesmo processo. Antes de
+usar múltiplos workers, cache e limites precisarão de armazenamento compartilhado.
+A fonte e a licença dos dados permanecem visíveis na interface.
 
 ### Budget da conta
 

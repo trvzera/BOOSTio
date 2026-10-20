@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier
 from unittest.mock import Mock
 
 import pytest
@@ -45,7 +46,7 @@ def test_normaliza_e_preserva_ausencias_sem_aprovar_requisitos():
     assert resultado["ramAvaliada"] is False
     assert "verdict" not in resultado
     assert api.buscar.call_args.kwargs["allow_redirects"] is False
-    assert api.buscar.call_args.kwargs["timeout"] == (4, 15)
+    assert api.buscar.call_args.kwargs["timeout"] == (4, 10)
 
 
 @pytest.mark.parametrize("alteracao", [{"cpu": {"slug": "outra"}}, {"gpu": None}, {"game": {"slug": "outro"}}, {"res": "4K"}, {"preset": "low"}])
@@ -92,6 +93,40 @@ def test_consultas_simultaneas_identicas_usam_uma_so_chamada():
         resultados = list(pool.map(lambda usuario: ConsultarBenchmarkService(api).executar(CONSULTA, usuario), range(4)))
     assert len(resultados) == 4
     assert api.buscar.call_count == 1
+
+
+def test_consultas_diferentes_nao_ficam_presas_na_mesma_requisicao():
+    encontro = Barrier(2, timeout=3)
+
+    def buscar(_url, *, params, **_opcoes):
+        encontro.wait()
+        return resposta(game={"slug": params["game"], "name": params["game"]})
+
+    api = cliente(Mock(side_effect=buscar))
+    jogos = ["valorant", "cs2"]
+    while api.travar("fps", {**CONSULTA, "game": jogos[0]}) is api.travar("fps", {**CONSULTA, "game": jogos[1]}):
+        jogos[1] += "-x"
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        resultados = list(pool.map(lambda jogo: ConsultarBenchmarkService(api).executar({**CONSULTA, "game": jogo}, 1), jogos))
+    assert [item["consulta"]["game"] for item in resultados] == jogos
+
+
+def test_timeout_usa_ultima_consulta_valida_por_ate_24_horas():
+    tempo = [0]
+    api = cliente(relogio=lambda: tempo[0])
+    service = ConsultarBenchmarkService(api)
+    original = service.executar(CONSULTA, 1)
+    tempo[0] = 3601
+    api.buscar.side_effect = requests.Timeout()
+    reserva = service.executar(CONSULTA, 1)
+    assert reserva["fps"] == original["fps"]
+    assert reserva["consultadoEm"] == original["consultadoEm"]
+    assert reserva["cache"] is True
+    assert reserva["desatualizado"] is True
+    tempo[0] = 86401
+    with pytest.raises(ErroBenchmark) as erro:
+        service.executar(CONSULTA, 1)
+    assert erro.value.status == 504
 
 
 def test_limite_provedor_respeita_espera_e_permite_ler_cache():

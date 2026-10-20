@@ -7,7 +7,7 @@ class BuscarJogosBenchmarkService:
         self.cliente = cliente or cliente_fpshq
 
     def executar(self, dados, usuario_id):
-        with self.cliente.lock:
+        with self.cliente.travar("games", dados):
             return self._buscar(dados, usuario_id)
 
     def _buscar(self, dados, usuario_id):

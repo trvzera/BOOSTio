@@ -108,6 +108,17 @@ test("peças próprias não geram preço inventado ou sucesso de compatibilidade
   assert.ok(resultado.avisos.some((e) => e.includes("própria")));
 });
 
+test("peças próprias contam como selecionadas, com compatibilidade pendente", () => {
+  const build = base();
+  build.componentes.processador = {proprio:"AMD Ryzen 5 5600G",quantidade:1};
+  build.componentes.ssd = [{proprio:"Meu SSD",quantidade:1}];
+  const resultado = avaliarBuild(build,catalogo);
+  assert.ok(!resultado.faltam.includes("Processador"));
+  assert.ok(!resultado.faltam.includes("Armazenamento"));
+  assert.equal(resultado.preenchidos,avaliarBuild(base(),catalogo).preenchidos + 1);
+  assert.ok(resultado.avisos.some(aviso => aviso.includes("própria")));
+});
+
 test("privada não compartilha; pública gera uma cópia com acentos e componentes", () => {
   const build = base();
   assert.throws(() => linkCompartilhado(build), /pública/);
