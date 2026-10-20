@@ -17,7 +17,7 @@ class ConsultarBenchmarkService:
         self.cliente = cliente or cliente_fpshq
 
     def executar(self, dados, usuario_id):
-        with self.cliente.lock:
+        with self.cliente.travar("fps", dados):
             return self._consultar(dados, usuario_id)
 
     def _consultar(self, dados, usuario_id):
@@ -29,21 +29,27 @@ class ConsultarBenchmarkService:
             raise ValueError("Selecione uma resolução e uma qualidade válidas.")
         resposta = self.cliente.executar("fps", consulta, usuario_id)
         # O cache contém somente o contrato normalizado, nunca uma resposta inválida.
+
         if resposta["cache"]:
             return resposta
         bruto = resposta["dados"]
+
         for chave in ("game", "cpu", "gpu"):
             if not isinstance(bruto.get(chave), dict) or bruto[chave].get("slug") != consulta[chave]:
                 raise ErroBenchmark("O provedor não confirmou os modelos exatos solicitados.", "resposta")
+
         if str(bruto.get("res", "")).lower() != consulta["res"] or bruto.get("preset") != consulta["preset"]:
             raise ErroBenchmark("O provedor retornou ajustes diferentes dos solicitados.", "resposta")
         fps = numero(bruto.get("fps"))
+
         if fps is None:
             raise ErroBenchmark("Não há desempenho disponível para esta combinação e configuração.", "sem-dados", 422)
         intervalo = bruto.get("fps_range")
+
         if not (isinstance(intervalo, list) and len(intervalo) == 2 and all(numero(n) is not None for n in intervalo) and intervalo[0] <= intervalo[1]):
             intervalo = None
         matriz = bruto.get("matrix") if isinstance(bruto.get("matrix"), dict) else {}
+
         resultado = {
             "consulta": consulta, "jogo": str(bruto["game"].get("name") or consulta["game"])[:180],
             "fps": fps, "low1": numero(bruto.get("low1")), "intervalo": intervalo,

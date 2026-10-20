@@ -32,6 +32,12 @@ class Peca(ModeloBase):
   def buscar_por_id(cls, peca_id):
     return db.session.get(cls, peca_id)
 
+  @classmethod
+  def buscar_por_nome(cls, nome):
+    normalizado = " ".join(nome.split()).casefold()
+    return next((peca for peca in cls.query.all()
+                 if normalizado in (f"{peca.fabricante} {peca.modelo}".casefold(), peca.modelo.casefold())), None)
+
   def recarregar(self):
     db.session.refresh(self)
 

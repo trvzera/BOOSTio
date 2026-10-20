@@ -46,6 +46,9 @@ local continuam existindo; não equivalem ao salvamento no servidor.
 - **Implementado, dependente de configuração:** geração pelo formulário via LLM e
   coleta de preços da KaBuM por comandos. Chaves, cotas e rede precisam ser configuradas;
   esta revisão de interface não fez chamadas pagas de geração nem coleta real de preços.
+  A geração recebe as peças já possuídas e completa as categorias que faltam,
+  preservando conexão e reserva opcional para periféricos. Modelos próprios sem
+  correspondência no catálogo continuam com compatibilidade pendente de confirmação.
 - **A concluir:** compatibilidade física definitiva no Python, requisitos de jogos/RAM,
   monitoramento agendado dos preços da KaBuM, curadoria de modelos e validação completa dos
   fluxos da LLM e migração consentida das builds antigas do navegador.
@@ -130,9 +133,11 @@ disponibilidade da FPSHQ foi restabelecida**. Documentação: [API pública FPSH
 RAM e requisitos mínimos/recomendados ainda precisam de verificação separada. O
 mapeamento de hardware permanece parcialmente no frontend; as builds da conta já são persistidas.
 
-O cache dura uma hora, fica em memória e é compartilhado apenas dentro do mesmo
-processo. Antes de usar múltiplos workers, cache e limites precisarão de armazenamento
-compartilhado. A fonte e a licença dos dados permanecem visíveis na interface.
+O cache atualizado dura uma hora. Se a FPSHQ não responder, uma consulta anterior
+da mesma combinação pode ser exibida por até 24 horas, com a data original indicada.
+O cache fica em memória e é compartilhado apenas dentro do mesmo processo. Antes de
+usar múltiplos workers, cache e limites precisarão de armazenamento compartilhado.
+A fonte e a licença dos dados permanecem visíveis na interface.
 
 ### Desempenho em renderização — planejado
 

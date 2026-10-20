@@ -6,6 +6,7 @@ import { orcamentoValido, dividirOrcamento } from "../build/orcamento-formulario
 import { carregarPerfil } from "../conta/perfil.js";
 import { acompanharCarregamento } from "../components/page-loading.js";
 import { criarBuild, verificarEspacoBuild } from "../api/build/builds.js";
+import { pecasPropriasFormulario } from "../build/pecas-proprias.js";
 import { buscarUsuarioLogado } from "../api/usuario/buscarUsuarioLogado.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { iniciarControlesNumericos } from "../components/number-stepper.js";
@@ -85,7 +86,8 @@ const perguntas = [
       ["hd", "HD"],
       ["fonte", "Fonte"],
       ["gabinete", "Gabinete"],
-      ["cooler", "Cooler / Water cooler"],
+      ["cooler", "Air cooler"],
+      ["water-cooler", "Water cooler"],
       ["fans", "Fans"],
       ["monitor", "Monitor"],
       ["teclado", "Teclado"],
@@ -113,6 +115,7 @@ const exemplosPecas = {
   fonte: "Ex.: Corsair CV650 650 W",
   gabinete: "Ex.: Montech Air 100",
   cooler: "Ex.: DeepCool AK400",
+  "water-cooler": "Ex.: Corsair H100i",
   fans: "Ex.: Kit 3 fans Rise Mode 120 mm",
   monitor: "Ex.: LG UltraGear 24GN60R-B",
   teclado: "Ex.: Redragon Kumara K552",
@@ -241,7 +244,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     void conteudo.offsetWidth;
     conteudo.classList.add("question-enter");
     conteudo.classList.toggle("pieces-question-content", pergunta.chave === "pecas");
-    const rotuloAvancar = indiceAtual === perguntas.length - 1 ? (respostas.pecas?.some(p => p !== "nenhuma") ? "Abrir editor" : "Gerar build") : "Avançar";
+    const rotuloAvancar = indiceAtual === perguntas.length - 1 ? "Gerar build" : "Avançar";
     const campos = pergunta.chave === "rede" ? '<div id="form-network"></div>' : `<fieldset class="question-options ${pergunta.multipla ? "pieces-grid" : ""}"><legend class="sr-only">${pergunta.titulo}</legend>${opcoesHtml(pergunta)}</fieldset>`;
     conteudo.innerHTML = `
       <div class="options-heading">
@@ -509,14 +512,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       const sessao = await buscarUsuarioLogado();
       if (!sessao.auth) throw Object.assign(new Error("Entre na sua conta para salvar a build."),{status:401});
       await verificarEspacoBuild();
-      if (respostas.pecas?.some(peca => peca !== "nenhuma")) {
-        sessionStorage.setItem("boostio:respostas-formulario", JSON.stringify(respostas));
-        painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Configure os componentes da sua build</h1><p class="font-2-s">Suas peças próprias serão levadas ao editor para completar a montagem.</p></div>`;
-        conteudo.innerHTML = `<div class="build-loading" role="status"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-l">Preparando o editor</h2></div>`;
-        window.location.href = paginaConfiguracaoBuild + "?formulario=1";
-        return;
-      }
-
       painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Gerando sua build</h1><p class="font-2-s">Vamos selecionar peças compatíveis dentro do seu orçamento.</p></div>`;
       conteudo.innerHTML = `<div class="build-loading"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-m" role="status" id="generation-message">Analisando seu perfil</h2><p class="font-2-xs">A seleção pode levar alguns instantes. Aguarde nesta página.</p></div>`;
       const frases = ["Analisando seu perfil", "Buscando peças para o seu orçamento", "Pensando no equilíbrio da configuração", "Escolhendo as melhores peças para o seu uso"];
@@ -531,7 +526,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         ? respostas.orcamentoPersonalizado : faixas[respostas.orcamento];
       const utilidade = perguntas[0].opcoes.find(opcao => opcao[0] === respostas.objetivo)?.[1] || respostas.objetivo;
 
-      const resposta = await criarBuild({nome: `PC para ${utilidade}`, descricao: `Montagem para ${utilidade}.`, utilidade, orcamento, percentual_perifericos:respostas.incluirPerifericos ? respostas.percentualPerifericos : 0});
+      const resposta = await criarBuild({nome: `PC para ${utilidade}`, descricao: `Montagem para ${utilidade}.`, utilidade, orcamento,
+        percentual_perifericos:respostas.incluirPerifericos ? respostas.percentualPerifericos : 0,
+        pecas_proprias:pecasPropriasFormulario(respostas),rede:respostas.rede});
       window.location.href = `${paginaConfiguracaoBuild}?build_id=${encodeURIComponent(resposta.build.id)}`;
     } catch (erro) {
       gerando = false;

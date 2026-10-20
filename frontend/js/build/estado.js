@@ -59,6 +59,9 @@ export function normalizarBuild(valor = {}) {
     incluirPerifericos:typeof valor.incluirPerifericos === "boolean" ? valor.incluirPerifericos : perifericos.some(cat => componentes[cat]),
     incluirRede:typeof valor.incluirRede === "boolean" ? valor.incluirRede : acessoriosRede.some(cat => componentes[cat]) || ["cabo","wifi"].includes(valor.rede?.tipo),
     rede:normalizarRede(valor.rede),
+    pecasExtras:Object.fromEntries(Object.entries(valor.pecasExtras || {})
+      .filter(([tipo,nome]) => ["webcam","microfone"].includes(tipo) && typeof nome === "string" && nome.trim())
+      .map(([tipo,nome]) => [tipo,nome.trim().slice(0,120)])),
     orcamento:valor.orcamento != null && Number.isFinite(Number(valor.orcamento)) && Number(valor.orcamento) >= 0 && Number(valor.orcamento) <= 1000000 ? Number(valor.orcamento) : null,
     componentes,
   };
@@ -81,7 +84,7 @@ export function abrirBuild(parametros = new URLSearchParams(location.search), co
     const planejamento = planejamentoLocal();
     if (planejamento.usarBudget) nova.orcamento = planejamento.budget;
     const mapa = {processador:"processador","placa-mae":"placa_mae","placa-video":"placa_video",
-      memoria:"memoria_ram",ssd:"ssd",hd:"hd",fonte:"fonte",gabinete:"gabinete",cooler:"air_cooler",
+      memoria:"memoria_ram",ssd:"ssd",hd:"hd",fonte:"fonte",gabinete:"gabinete",cooler:"air_cooler","water-cooler":"water_cooler",
       fans:"fan",monitor:"monitor",teclado:"teclado",mouse:"mouse",headset:"fone"};
     try {
       const formulario = JSON.parse(sessionStorage.getItem("boostio:respostas-formulario") || "{}");

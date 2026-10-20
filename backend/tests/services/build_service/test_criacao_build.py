@@ -41,6 +41,17 @@ def autenticar(cliente):
         sessao["_fresh"] = True
 
 
+def cadastrar_pecas(tipos):
+    for tipo in tipos:
+        modelo = MODELOS[tipo]
+        dados = {"fabricante": "Teste", "modelo": tipo, "preco": 100, "consumo_energia": 1}
+        for coluna in modelo.__table__.columns:
+            if coluna.name not in dados and not coluna.nullable and not coluna.primary_key and not coluna.default and not coluna.server_default:
+                dados[coluna.name] = "Teste" if coluna.type.python_type is str else 1
+        db.session.add(modelo(**dados))
+    db.session.commit()
+
+
 def test_limite_em_manual_importacao_duplicacao_e_llm(app_build, mocker):
     llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
     cliente = app_build.test_client()
@@ -116,18 +127,20 @@ def test_divisao_exata_do_orcamento_e_prompt():
 
 
 def resposta_com_perifericos():
-    itens = [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in ("processador", "monitor", "teclado", "mouse", "fone")]
-    catalogo = {item["tipo"]: [{"id": 1, "fabricante": "Teste", "modelo": item["tipo"], "preco": 900 if item["tipo"] == "processador" else 50}] for item in itens}
+    itens = [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in
+             ("processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "monitor", "teclado", "mouse", "fone")]
+    catalogo = {item["tipo"]: [{"id": 1, "fabricante": "Teste", "modelo": item["tipo"],
+                "preco": 800 if item["tipo"] == "processador" else 50 if item["tipo"] in CriarBuildService.PERIFERICOS else 20}] for item in itens}
     return {**PEDIDO, "componentes": itens}, catalogo
 
 
 def test_nao_aceita_ia_gastando_reserva_do_pc_ou_perifericos():
     build, catalogo = resposta_com_perifericos()
     assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1100
-    catalogo["processador"][0]["preco"] = 1250
+    catalogo["processador"][0]["preco"] = 1150
     with pytest.raises(ValueError, match="divisão"):
         CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)
-    catalogo["processador"][0]["preco"] = 900
+    catalogo["processador"][0]["preco"] = 800
     catalogo["monitor"][0]["preco"] = 200
     with pytest.raises(ValueError, match="divisão"):
         CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)
@@ -143,14 +156,7 @@ def test_faltam_perifericos_na_resposta():
 def test_geracao_persiste_original_e_estado_em_uma_transacao(app_build, mocker):
     tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "monitor", "teclado", "mouse", "fone"]
     with app_build.app_context():
-        for tipo in tipos:
-            modelo = MODELOS[tipo]
-            dados = {"fabricante": "Teste", "modelo": tipo, "preco": 100, "consumo_energia": 1}
-            for coluna in modelo.__table__.columns:
-                if coluna.name not in dados and not coluna.nullable and not coluna.primary_key and not coluna.default and not coluna.server_default:
-                    dados[coluna.name] = "Teste" if coluna.type.python_type is str else 1
-            db.session.add(modelo(**dados))
-        db.session.commit()
+        cadastrar_pecas(tipos)
         llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
             "nome": "PC gerado", "descricao": "Com periféricos", "utilidade": "Jogos",
             "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos],
@@ -180,3 +186,54 @@ def test_orcamento_nao_aceita_fracao_de_centavo(app_build, mocker):
     with app_build.app_context(), pytest.raises(ValueError, match="casas decimais"):
         CriarBuildService().executar(1, {**PEDIDO, "orcamento": 5000.001})
     llm.assert_not_called()
+
+
+@pytest.mark.parametrize("percentual", [0, 20])
+def test_geracao_com_pecas_proprias_preserva_reserva_rede_e_extras(app_build, mocker, percentual):
+    base = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd"]
+    perifericos = ["monitor", "teclado", "mouse", "fone"]
+    proprias = {"processador": "Teste processador", "monitor": "Meu monitor", "webcam": "Minha webcam"}
+    novas = base[1:] + (perifericos[1:] if percentual else [])
+    rede = {"tipo": "cabo", "possuiAcessorio": True}
+    with app_build.app_context():
+        cadastrar_pecas(base + perifericos)
+        llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
+            **PEDIDO, "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in novas],
+        })
+        resultado = CriarBuildService().executar(1, {**PEDIDO, "pecas_proprias": proprias, "rede": rede,
+                                                  "percentual_perifericos": percentual})
+        estado = resultado["estado"]
+        assert estado["percentualPerifericos"] == percentual
+        assert estado["rede"] == rede and estado["incluirRede"]
+        assert estado["pecasExtras"] == {"webcam": "Minha webcam"}
+        assert estado["componentes"]["processador"] == {"proprio": "Teste processador", "quantidade": 1}
+        assert estado["componentes"]["monitor"] == {"proprio": "Meu monitor", "quantidade": 1}
+        assert resultado["preco_total"] == 100 * len(novas)
+        assert Build.query.count() == 0 and BuildSalva.query.count() == 1
+        assert "PEÇAS QUE O USUÁRIO JÁ POSSUI" in llm.call_args.args[0]
+        if not percentual:
+            assert "Não inclua periféricos novos" in llm.call_args.args[0]
+            assert not set(perifericos[1:]) & set(estado["componentes"])
+        salva = BuildSalva.buscar(1, resultado["id"])
+        salva.salvar_estado({**estado, "titulo": "Renomeada"})
+        copia = DuplicarBuildService().executar(1, resultado["id"])
+        assert copia["estado"]["pecasExtras"] == estado["pecasExtras"]
+        assert copia["estado"]["percentualPerifericos"] == percentual
+
+
+def test_pecas_proprias_reverificam_quota_apos_llm(app_build, mocker):
+    tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd"]
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+        for _ in range(2):
+            CriarBuildManualService().executar(1, ESTADO)
+
+        def ocupar_ultima_vaga(*_args):
+            CriarBuildManualService().executar(1, ESTADO)
+            return {**PEDIDO, "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos[1:]]}
+
+        llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=ocupar_ultima_vaga)
+        with pytest.raises(LimiteBuildsError):
+            CriarBuildService().executar(1, {**PEDIDO, "pecas_proprias": {"processador": "Minha CPU"}})
+        llm.assert_called_once()
+        assert BuildSalva.query.count() == 3 and Build.query.count() == 0

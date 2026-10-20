@@ -4,6 +4,7 @@ import { validarEncaixe, conexaoDisco } from "./hardware.js";
 
 export function avaliarBuild(build,catalogo) {
   const get = cat => catalogo.find(p => p.id === itensCategoria(build,cat)[0]?.id && p.categoria === cat);
+  const tem = cat => itensCategoria(build,cat).length > 0;
   const erros = [], avisos = [], dicas = [], infoRam = informacoesRam(build,catalogo);
   const cpu = get("processador"), placa = get("placa_mae"), fonte = get("fonte"), gabinete = get("gabinete");
   const rams = infoRam.itens.filter(r => r.peca);
@@ -17,10 +18,10 @@ export function avaliarBuild(build,catalogo) {
     preco += Number(peca.preco || 0) * item.quantidade;
     if (![...perifericos,...acessoriosRede,"fonte"].includes(categoria)) watts += Number(peca.consumo_energia || 0) * item.quantidade;
   }
-  const faltam = categorias.filter(c => c.obrigatoria && (c.id === "memoria_ram" ? !rams.length : !get(c.id))).map(c => c.nome);
-  if (!get("ssd") && !get("hd")) faltam.push("Armazenamento");
-  if (cpu && !cpu.videointegrado && !get("placa_video")) faltam.push("Placa de vídeo");
-  if (cpu && !cpu.cooler && !get("air_cooler") && !get("water_cooler")) faltam.push("Cooler para o processador");
+  const faltam = categorias.filter(c => c.obrigatoria && !tem(c.id)).map(c => c.nome);
+  if (!tem("ssd") && !tem("hd")) faltam.push("Armazenamento");
+  if (cpu && !cpu.videointegrado && !tem("placa_video")) faltam.push("Placa de vídeo");
+  if (cpu && !cpu.cooler && !tem("air_cooler") && !tem("water_cooler")) faltam.push("Cooler para o processador");
   if (cpu && placa && String(cpu.soquete).toUpperCase() !== String(placa.socket).toUpperCase())
     erros.push("O socket do processador (" + cpu.soquete + ") difere da placa-mãe (" + placa.socket + ").");
   for (const {peca:ram} of rams) {
@@ -38,7 +39,7 @@ export function avaliarBuild(build,catalogo) {
   if (fonte && watts > potencia) erros.push("O consumo estimado supera a potência da fonte.");
   else if (fonte && watts > 0 && watts === potencia)
     avisos.push("A potência da fonte é igual ao consumo estimado, sem margem para picos de energia.");
-  if (cpu && !cpu.videointegrado && !get("placa_video")) avisos.push("Este processador precisa de uma placa de vídeo para exibir imagem.");
+  if (cpu && !cpu.videointegrado && !tem("placa_video")) avisos.push("Este processador precisa de uma placa de vídeo para exibir imagem.");
   if (get("adaptador_wifi")) dicas.push("Confira a interface USB/PCIe do adaptador, as conexões livres e a compatibilidade com o roteador.");
   if (get("cabo_rede")) dicas.push("Confira o comprimento e a categoria do cabo, a velocidade da porta Ethernet e do roteador.");
   for (const tipo of ["air_cooler","water_cooler"]) {
@@ -51,7 +52,7 @@ export function avaliarBuild(build,catalogo) {
         erros.push("O cooler não lista o socket do processador.");
     }
   }
-  if (get("air_cooler") && get("water_cooler")) erros.push("Escolha apenas um cooler para o processador.");
+  if (tem("air_cooler") && tem("water_cooler")) erros.push("Escolha apenas um cooler para o processador.");
   const formatos = String(gabinete?.formatos_placa_mae || "").toUpperCase().split(/[,;/]+/).map(v => v.trim());
   if (placa && gabinete?.formatos_placa_mae && !formatos.includes(String(placa.formato).toUpperCase()))
     erros.push("O gabinete não lista o formato da placa-mãe.");
@@ -69,10 +70,10 @@ export function avaliarBuild(build,catalogo) {
     fans:itensSelecionados(build,catalogo).filter(p => p.categoria === "fan")});
   erros.push(...encaixe.erros); dicas.push(...encaixe.avisos);
   const grupos = ["processador","placa_mae","memoria_ram","armazenamento","placa_video","fonte","gabinete","fan","refrigeracao"];
-  const preenchidos = grupos.filter(cat => cat === "armazenamento" ? get("ssd") || get("hd")
-    : cat === "refrigeracao" ? get("air_cooler") || get("water_cooler") || cpu?.cooler
-    : cat === "placa_video" ? get(cat) || cpu?.videointegrado
-    : cat === "memoria_ram" ? rams.length : get(cat)).length;
+  const preenchidos = grupos.filter(cat => cat === "armazenamento" ? tem("ssd") || tem("hd")
+    : cat === "refrigeracao" ? tem("air_cooler") || tem("water_cooler") || cpu?.cooler
+    : cat === "placa_video" ? tem(cat) || cpu?.videointegrado
+    : tem(cat)).length;
   return {erros:[...new Set(erros)],avisos:[...new Set(avisos)],dicas:[...new Set(dicas)],faltam,preco,watts:Math.round(watts),
     preenchidos,total:grupos.length,status:erros.length ? "erro" : faltam.length ? "incompleta" : avisos.length ? "atencao" : "completa"};
 }

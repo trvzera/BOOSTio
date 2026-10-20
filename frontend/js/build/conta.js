@@ -33,7 +33,7 @@ export function estadoParaConta(build) {
     travada:build.travada,orcamento:build.orcamento,
     incluirPerifericos:build.incluirPerifericos,incluirRede:build.incluirRede,
     percentualPerifericos:build.percentualPerifericos || 0,
-    rede:build.rede,componentes:build.componentes,
+    rede:build.rede,pecasExtras:build.pecasExtras,componentes:build.componentes,
   };
 }
 

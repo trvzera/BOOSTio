@@ -46,6 +46,14 @@ test("respostas crescem com conteúdo em vez de ocultar a barra de rolagem", asy
   assert.doesNotMatch(orcamento,/\.budget-fields \{[^}]*overflow-y: auto/);
 });
 
+test("geração preserva peças próprias, conexão e reserva com verificação de vagas", async () => {
+  const forms = await readFile(new URL("../js/pages/forms.js",import.meta.url),"utf8");
+  assert.match(forms,/await verificarEspacoBuild\(\)/);
+  assert.match(forms,/pecas_proprias:pecasPropriasFormulario\(respostas\),rede:respostas\.rede/);
+  assert.match(forms,/percentual_perifericos:respostas\.incluirPerifericos \? respostas\.percentualPerifericos : 0/);
+  assert.doesNotMatch(forms,/window\.location\.href = paginaConfiguracaoBuild \+ "\?formulario=1"/);
+});
+
 test("erro ocupa o card central e revisar orçamento restaura as perguntas", async () => {
   const forms = await readFile(new URL("../js/pages/forms.js",import.meta.url),"utf8");
   const css = await readFile(new URL("../styles/responsividades/r-forms.css",import.meta.url),"utf8");
