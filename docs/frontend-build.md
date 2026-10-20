@@ -1,8 +1,57 @@
 # Editor de build e efeitos de scroll
 
+Após a integração da `main` em 20/10/2026, as montagens da conta usam
+`pages/builds-conta.js`, `/build/` e `/build/catalogo`; `builds.js` foi substituído.
+O texto abaixo também documenta modos legados e etapas anteriores. O estado atual
+dos requisitos está no README; a revisão de acessibilidade/performance está em
+[qualidade-frontend.md](qualidade-frontend.md).
+
+### Atualização de criação, orçamento e menus — 20/10/2026
+
+- `BuildSalva.criar_limitada` serializa a escrita por usuário no banco e limita a
+  três builds. Criação manual, importação, modelos, duplicação e geração usam esse
+  ponto; a LLM recebe uma checagem antecipada e outra ao persistir. Não se mantém
+  lock durante a chamada externa. Resultado gerado e estado são salvos na mesma
+  transação; montagens com peças próprias usam a mesma proteção ao persistir o estado.
+  A quota responde `409 / codigo: limite-builds`, sem apagar dados antigos.
+- O formulário usa tetos **Até**, slider de R$ 100 em R$ 100 e entrada com centavos.
+  Reserva opcional de 1–99% do total para periféricos: `percentual_perifericos` no
+  pedido, `percentualPerifericos` no estado. O Python divide em centavos, inclui
+  o catálogo de periféricos e confere os dois subtotais; catálogo insuficiente ou
+  saída da IA fora da divisão retorna erro, sem salvar uma build parcial.
+- O formulário envia `pecas_proprias`, rede e reserva para a geração pela LLM,
+  que completa apenas as categorias ainda não possuídas. O resultado abre no editor
+  pelo `build_id`; mantém os Lotties, controles e feedback de erro da interface.
+  Webcam/microfone próprios são preservados em `pecasExtras`. Identificação completa
+  dos modelos e compatibilidade definitiva das peças próprias continuam pendentes.
+- Frases na espera mudam a cada quatro segundos, sem porcentagem ou etapas reais.
+  Erro preserva respostas e permite repetir/revisar. A altura do formulário acompanha
+  o conteúdo, sem scroll interno nas respostas; listas longas usam a rolagem da página.
+- `components/number-stepper.js` mantém inputs nativos com botões explícitos de
+  aumentar/diminuir: orçamento de R$ 100 em R$ 100 sem perder centavos; porcentagem e
+  rede seguem seus passos e limites. Os controles preservam Tab/Enter e não recriam
+  os campos de rede durante a edição. Os Lotties de navegação são iniciados após
+  renderizar cada etapa; Voltar usa a orientação inversa. Font Awesome não é necessário
+  no formulário. Erros ocupam uma única célula do grid e ficam centralizados; revisar
+  o orçamento restaura a disposição normal sem perder as respostas.
+  Regressões em `frontend/tests/formulario-ui.test.mjs`; a interface foi conferida
+  em celular, tablet, desktop e paisagem com respostas simuladas, sem iniciar o Flask
+  nem acessar/migrar o banco real.
+- Os menus da conta renderizam `iconeAnimado`, carregam os JSONs ao remover `inert`
+  na abertura e usam Popover API quando disponível para escapar do recorte/glass
+  do card. Menu fecha por Escape, clique externo, rolagem da página ou resize.
+- FPSHQ: diagnóstico externo terminou em timeout após conexão/TLS. Falhas TLS/rede
+  têm códigos próprios; timeout é 504 e indisponibilidade HTTP do provedor é 503.
+  A pausa retorna `Retry-After` (também após falha de conexão), sem repetição automática.
+  Cache válido continua disponível. Não foi demonstrada recuperação do provedor.
+
+Os trechos históricos abaixo sobre quota apenas local e ausência de CRUD não
+descrevem os fluxos atuais da conta; consultar este bloco e o README.
+
 Abra pelo Live Server:
 
-- `frontend/pages/configuracao-build.html`: editor vazio.
+- `frontend/pages/configuracao-build.html`: cria uma montagem vazia na conta, com sessão.
+- `frontend/pages/configuracao-build.html?build_id=s-ID`: edita uma montagem da conta.
 - `frontend/pages/configuracao-build.html?id=build-demo-1`: configuração de exemplo.
 - `frontend/pages/pecas.html?categoria=processador`: catálogo por categoria.
 - `frontend/pages/peca.html?id=SEED-CPU-02`: ficha técnica e lojas.
@@ -10,10 +59,9 @@ Abra pelo Live Server:
 - `frontend/pages/sobre.html`: apresentação da BOOSTio, proposta, ferramentas e estágio do projeto.
 - `frontend/testes.html`: demonstração que usa o mesmo menu hamburger das demais páginas.
 
-O catálogo demonstrativo é uma cópia das 750 peças de
-`backend/services/peca_service/popular_pecas_service.py`, criada em 28/09/2026.
-Os preços da seed são gerados para demonstração, não cotações atuais.
-Não foram executados o Flask, a seed nem o scraper para montar essa cópia.
+O catálogo JSON existente reúne as 750 peças já coletadas para o projeto e continua
+nos modelos/fluxos legados. A montagem da conta busca o catálogo do backend. Essa
+integração não equivale a monitoramento atualizado das ofertas das três lojas.
 Quando a seed mudar, o JSON não se atualiza sozinho.
 
 ## Como funciona o blur no scroll
@@ -539,9 +587,9 @@ Login e cadastro têm altura livre, e os modais são limitados pela altura visí
 com rolagem interna. Campos no mobile usam pelo menos 16px, sem reduzir a tela
 inteira com `scale()`. O detalhamento de compatibilidade abre no fluxo no mobile.
 
-No formulário, opções e campos de rede rolam dentro da sua área, preservando os
-botões de navegação. Em telas baixas na horizontal, o cartão ganha altura e a página
-pode rolar, em vez de espremer ou esconder os campos. O resumo expandido do editor
+No formulário, opções, orçamento e rede crescem com o conteúdo sem scroll interno;
+quando necessário, a página rola normalmente, sem espremer ou esconder os campos.
+Botões de navegação permanecem ao final da etapa. O resumo expandido do editor
 deixa de ser fixo para não prender os controles abaixo da tela. Menus dos cards de
 build abrem para baixo e limitam sua altura ao espaço disponível; a
 posição é recalculada ao rolar ou redimensionar. Botões bloqueados mantêm a largura

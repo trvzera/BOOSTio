@@ -10,12 +10,24 @@ document.addEventListener("DOMContentLoaded", () => {
     "#main-page video, #about-page video",
   );
   const visiveis = new Set();
+  const movimentoReduzido = matchMedia("(prefers-reduced-motion: reduce)");
+  const controleMovimento = document.querySelector(".video-motion-toggle");
+  let pausado = movimentoReduzido.matches || Boolean(navigator.connection?.saveData);
+
+  function atualizarControle() {
+    const texto = pausado ? "Reproduzir animações" : "Pausar animações";
+    controleMovimento.textContent = texto;
+    controleMovimento.setAttribute("aria-label",texto + " de fundo");
+    controleMovimento.dataset.paused = String(pausado);
+  }
 
   function atualizarReproducao() {
     videos.forEach((video) => {
-      if (document.hidden || !visiveis.has(video)) {
+      if (pausado || document.hidden || !visiveis.has(video)) {
         video.pause();
       } else if (video.paused) {
+        const source = video.querySelector("source[data-src]");
+        if (source) { source.src = source.dataset.src; source.removeAttribute("data-src"); video.load(); }
         video.play().catch(() => {});
       }
     });
@@ -34,4 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   videos.forEach((video) => observador.observe(video));
   document.addEventListener("visibilitychange", atualizarReproducao);
+  controleMovimento.addEventListener("click",() => { pausado = !pausado; atualizarControle(); atualizarReproducao(); });
+  movimentoReduzido.addEventListener("change",evento => { pausado = evento.matches; atualizarControle(); atualizarReproducao(); });
+  atualizarControle();
 });

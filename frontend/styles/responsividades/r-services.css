@@ -26,8 +26,9 @@
   #cards-grid::-webkit-scrollbar { display: none; }
   .card-service { flex: 0 0 min(75%, 460px); max-width: 460px; scroll-snap-align: center; cursor: pointer; }
   .scroll-dots { display: flex; justify-content: center; gap: 8px; margin-top: 16px; }
-  .scroll-dots .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cor-2); cursor: pointer; transition: .2s var(--ease); }
-  .scroll-dots .dot.active { background: var(--cor-p1); width: 20px; border-radius: 4px; }
+  .scroll-dots .dot { position: relative; width: 32px; height: 32px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+  .scroll-dots .dot::before { content: ""; position: absolute; top: 12px; left: 12px; width: 8px; height: 8px; border-radius: 50%; background: var(--cor-2); transition: background .2s ease, width .2s ease, left .2s ease; }
+  .scroll-dots .dot.active::before { background: var(--cor-p1); width: 20px; left: 6px; border-radius: 4px; }
 }
 @media (max-width: 700px) {
   #services-h1 { font-size: 2.4rem; }

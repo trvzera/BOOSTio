@@ -6,6 +6,7 @@ import { criarUsuario } from "../api/usuario/criarUsuario.js";
 import { entrarComGoogle } from "../api/usuario/entrarComGoogle.js";
 import { enviarEmailVerificar } from "../api/email/enviarEmailVerificar.js";
 import { conferirEmailVerificar } from "../api/email/conferirEmailVerificar.js";
+import { iniciarCodigoVerificacao } from "../components/verification-code.js";
 import {
   registrarAnimacao,
   destruirTodas,
@@ -276,40 +277,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
 
-    inputsCodigo.forEach((input, indice) => {
-      input.addEventListener("input", () => {
-        input.value = input.value.replace(/\D/g, "").slice(0, 1);
-
-        if (input.value && indice < inputsCodigo.length - 1) {
-          inputsCodigo[indice + 1].focus();
-        }
-
-        validarCodigoCompleto();
-      });
-
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Backspace" && !input.value && indice > 0) {
-          inputsCodigo[indice - 1].focus();
-        }
-      });
-
-      input.addEventListener("paste", (e) => {
-        e.preventDefault();
-        const colado = (e.clipboardData || window.clipboardData)
-          .getData("text")
-          .replace(/\D/g, "")
-          .slice(0, inputsCodigo.length);
-
-        colado.split("").forEach((digito, i) => {
-          if (inputsCodigo[i]) inputsCodigo[i].value = digito;
-        });
-
-        const proximo =
-          inputsCodigo[Math.min(colado.length, inputsCodigo.length - 1)];
-        proximo.focus();
-        validarCodigoCompleto();
-      });
-    });
+    iniciarCodigoVerificacao(inputsCodigo,validarCodigoCompleto);
 
     botaoConfirmarCodigo.addEventListener("click", async () => {
       if (!usuarioCriado) return;

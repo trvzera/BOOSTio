@@ -7,20 +7,24 @@
   <title>Sobre nós — BOOSTio</title>
   <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
   <link rel="stylesheet" href="../styles/style.css">
+  <noscript><link rel="stylesheet" href="../styles/componentes/no-script.css"></noscript>
   <meta name="description" content="Conheça a BOOSTio: uma plataforma para planejar a montagem e o upgrade de computadores, organizar o orçamento e consultar a compatibilidade das peças.">
+  <link rel="preload" href="../fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <script type="module" src="../js/pages/loading.js" defer></script>
   <script type="module" src="../js/pages/sobre.js" defer></script>
 </head>
 
 <body class="company-page">
+  <a class="skip-link" href="#company-main" aria-label="Pular para o conteúdo principal">Pular para o conteúdo principal</a>
   <div id="loading-screen">
-    <video id="loading-video" autoplay muted playsinline>
+    <video id="loading-video" width="1000" height="1000" autoplay muted playsinline aria-hidden="true" tabindex="-1">
       <source src="../video/loading-toggle.webm" type="video/webm">
     </video>
   </div>
   <div data-site-navigation></div>
 
-  <main id="company-main">
+  <main id="company-main" tabindex="-1">
     <div class="decoration decoration-1"></div>
     <div class="decoration decoration-2"></div>
 
@@ -108,7 +112,7 @@
     <footer>
       <div id="top-footer">
         <div id="footer-hero">
-          <img src="../imgs/logo.webp" alt="Logo BOOSTio">
+          <img src="../imgs/logo.webp" alt="Logo BOOSTio" width="668" height="237" decoding="async" loading="lazy">
           <p class="font-2-s">A BOOSTio é uma plataforma desenvolvida para simplificar a montagem e o upgrade de computadores.</p>
         </div>
         <nav id="footer-nav" aria-label="Páginas do site">

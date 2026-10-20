@@ -5,8 +5,11 @@ from email.utils import parsedate_to_datetime
 from threading import RLock
 import math
 import time
+import logging
 
 import requests
+
+logger = logging.getLogger(__name__)
 
 
 class ErroBenchmark(Exception):
@@ -36,6 +39,7 @@ class FpshqService:
         self.dia = deque()
         self.usuarios = OrderedDict()
         self.bloqueado_ate = 0
+        self.falha_temporaria = None
         self.lock = RLock()
         self.chaves = [RLock() for _ in range(32)]
 
@@ -56,21 +60,36 @@ class FpshqService:
             if salvo and agora - salvo[0] >= self.TTL_RESERVA:
                 self.cache.pop(chave, None)
                 salvo = None
+            if self.falha_temporaria:
+                ate, mensagem, codigo, status = self.falha_temporaria
+                if agora < ate:
+                    if salvo:
+                        return {**deepcopy(salvo[1]), "cache": True, "desatualizado": True}
+                    raise ErroBenchmark(mensagem, codigo, status, math.ceil(ate - agora))
+                self.falha_temporaria = None
             self._validar_limites(agora, usuario_id)
+        # Consultas diferentes não seguram o lock global durante o acesso à rede.
         try:
             resposta = self.buscar(
                 self.BASE_URL + caminho, params={**parametros, "lang": "pt"},
-                headers={"Accept": "application/json"}, timeout=(4, 10),
+                headers={"Accept": "application/json", "User-Agent": "BOOSTio/1.0 (benchmark)"}, timeout=(4, 10),
                 allow_redirects=False,
             )
-        except requests.Timeout as erro:
+        except requests.Timeout as causa:
+            erro = self._falhar("A FPSHQ não respondeu a tempo. Aguarde antes de tentar novamente.", "timeout", 504, 30, causa)
             if salvo:
                 return {**deepcopy(salvo[1]), "cache": True, "desatualizado": True}
-            raise ErroBenchmark("A FPSHQ demorou demais para responder. Tente novamente mais tarde.", "timeout", 504) from erro
-        except requests.RequestException as erro:
+            raise erro from causa
+        except requests.exceptions.SSLError as causa:
+            erro = self._falhar("Não foi possível validar a conexão segura com a FPSHQ. O servidor precisa verificar seus certificados.", "tls", 503, 60, causa)
             if salvo:
                 return {**deepcopy(salvo[1]), "cache": True, "desatualizado": True}
-            raise ErroBenchmark("O serviço de desempenho está indisponível no momento.", "rede", 503) from erro
+            raise erro from causa
+        except requests.RequestException as causa:
+            erro = self._falhar("O servidor não conseguiu se conectar à FPSHQ. Tente novamente em instantes.", "rede", 503, 30, causa)
+            if salvo:
+                return {**deepcopy(salvo[1]), "cache": True, "desatualizado": True}
+            raise erro from causa
         if resposta.status_code == 429:
             espera = self._espera(resposta.headers.get("Retry-After"))
             with self.lock:
@@ -78,8 +97,12 @@ class FpshqService:
             raise ErroBenchmark("O limite de consultas foi atingido. Aguarde para tentar novamente.", "limite", 429, espera)
         if resposta.status_code == 404:
             raise ErroBenchmark("Jogo ou componente sem correspondência no provedor.", "nao-encontrado", 404)
-        if resposta.status_code >= 500 and salvo:
-            return {**deepcopy(salvo[1]), "cache": True, "desatualizado": True}
+        if resposta.status_code >= 500:
+            erro = self._falhar("A FPSHQ está temporariamente indisponível. Nenhum FPS foi estimado pela BOOSTio.",
+                                "provedor", 503, self._espera(resposta.headers.get("Retry-After")))
+            if salvo:
+                return {**deepcopy(salvo[1]), "cache": True, "desatualizado": True}
+            raise erro
         if resposta.status_code != 200:
             raise ErroBenchmark("O provedor não conseguiu atender à consulta agora.")
         try:
@@ -89,6 +112,13 @@ class FpshqService:
         if not isinstance(dados, dict) or dados.get("ok") is not True:
             raise ErroBenchmark("Não há dados disponíveis para esta consulta.", "sem-dados", 422)
         return {"dados": dados, "consultadoEm": int(self.data_atual() * 1000), "cache": False}
+
+    def _falhar(self, mensagem, codigo, status, espera, causa=None):
+        # Registra a categoria, nunca a sessão/conta nem conteúdo de respostas externas.
+        logger.warning("FPSHQ: %s (%s)", codigo, type(causa).__name__ if causa else status)
+        with self.lock:
+            self.falha_temporaria = (self.relogio() + espera, mensagem, codigo, status)
+        return ErroBenchmark(mensagem, codigo, status, espera)
 
     def salvar(self, caminho, parametros, resultado):
         # Apenas serviços que validaram o conteúdo podem inserir respostas no cache.

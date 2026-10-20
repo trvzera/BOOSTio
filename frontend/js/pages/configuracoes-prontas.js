@@ -7,7 +7,7 @@ import { avaliarBuild } from "../build/compatibilidade.js";
 import { navegarPara } from "../components/page-loading.js";
 import { planejamentoLocal } from "../build/planejamento.js";
 import { carregarCatalogoConta, estadoParaConta } from "../build/conta.js";
-import { criarBuildManual } from "../api/build/builds.js";
+import { criarBuildManual, verificarEspacoBuild } from "../api/build/builds.js";
 
 const STATUS = {completa:"Peças preenchidas", incompleta:"Peças pendentes", atencao:"Requer atenção", erro:"Há incompatibilidades"};
 
@@ -115,6 +115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       try {
         abrindo = true;
         atualizarCota();
+        await verificarEspacoBuild();
         const copia = copiarModelo(modelo.build);
         const planejamento = planejamentoLocal();
         if (planejamento.usarBudget) copia.orcamento = planejamento.budget;

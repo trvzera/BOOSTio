@@ -1,6 +1,7 @@
 from flask import Blueprint,request,jsonify
 from flask_login import login_required,current_user
 from models import db
+from models.build_salva import LimiteBuildsError
 from sqlalchemy.exc import SQLAlchemyError
 from requests.exceptions import RequestException, HTTPError, Timeout, ConnectionError
 
@@ -18,12 +19,17 @@ from services.build_service.buscar_build_publica_service import BuscarBuildPubli
 build_bp = Blueprint("build",__name__,url_prefix='/build')
 
 
+@build_bp.errorhandler(LimiteBuildsError)
+def limite_builds(erro):
+  return jsonify({"erro": str(erro), "codigo": "limite-builds", "limite": 3}),409
+
+
 @build_bp.get("/")
 @login_required
 def mostrar_builds():
   try:
     builds = ListarBuildService().executar(current_user.id)
-    return jsonify({"builds": builds}),200
+    return jsonify({"builds": builds, "limite": 3}),200
   except ValueError as e:
     return jsonify({"erro": str(e)}),404
 
@@ -48,6 +54,8 @@ def criar_build():
     builds = ListarBuildService().executar(usuario_id)
 
     return jsonify({"mensagem": "Build criada com sucesso", "build": build, "builds": builds}),201
+  except LimiteBuildsError:
+    raise
   except ValueError as e:
     return jsonify({"erro": str(e)}),400
 
@@ -73,6 +81,8 @@ def catalogo_build():
 def criar_build_manual():
   try:
     return jsonify({"build": CriarBuildManualService().executar(current_user.id, request.get_json(silent=True))}),201
+  except LimiteBuildsError:
+    raise
   except ValueError as erro:
     return jsonify({"erro": str(erro)}),400
   except SQLAlchemyError:
@@ -107,6 +117,8 @@ def atualizar_build(build_id):
 def duplicar_build(build_id):
   try:
     return jsonify({"build": DuplicarBuildService().executar(current_user.id, build_id)}),201
+  except LimiteBuildsError:
+    raise
   except ValueError as erro:
     return jsonify({"erro": str(erro)}),400
   except SQLAlchemyError:

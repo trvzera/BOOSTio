@@ -1,5 +1,5 @@
 import json
-from decimal import Decimal
+from decimal import Decimal, ROUND_DOWN
 from math import isfinite
 
 from models import Build, BuildSalva, Usuario
@@ -10,7 +10,7 @@ from services.llm_service.llm_service import LLMService
 
 class CriarBuildService:
   EXTRAS_PROPRIOS = ("webcam", "microfone")
-  PERIFERICOS = ("monitor", "teclado", "mouse", "fone")
+  PERIFERICOS = {"monitor", "teclado", "mouse", "fone"}
   CAMPOS_PECAS = (
     "id", "fabricante", "modelo", "preco", "consumo_energia",
     "soquete", "socket", "tipo_memoria", "ddr", "capacidade_gb",
@@ -24,49 +24,56 @@ class CriarBuildService:
     validacao_campos(dados, ["nome", "descricao", "utilidade", "orcamento"])
     if not Usuario.buscar_por_id(usuario_id):
       raise ValueError("Usuario não encontrado")
+    BuildSalva.verificar_espaco(usuario_id)
 
     if isinstance(dados["orcamento"], bool):
       raise ValueError("O orçamento deve ser um número positivo")
     orcamento = float(dados["orcamento"])
-
-    if not isfinite(orcamento) or orcamento <= 0:
+    if not isfinite(orcamento) or not 0 < orcamento <= 1000000:
       raise ValueError("O orçamento deve ser um número positivo")
-
+    if Decimal(str(orcamento)) != Decimal(str(orcamento)).quantize(Decimal("0.01")):
+      raise ValueError("O orçamento deve ter no máximo duas casas decimais")
+    percentual = dados.get("percentual_perifericos", 0)
+    if type(percentual) is not int or not 0 <= percentual <= 99:
+      raise ValueError("A porcentagem para periféricos deve ser de 0 a 99")
+    limite_pc, limite_perifericos = self._dividir_orcamento(orcamento, percentual)
     rede = dados.get("rede") or {}
     if not isinstance(rede, dict):
       raise ValueError("Dados de rede inválidos")
     proprias = self._pecas_proprias(dados.get("pecas_proprias", {}))
-    margem = min(orcamento / 2, max(800, orcamento * 0.25))
+    margem = min(float(limite_pc) / 2, max(800, float(limite_pc) * 0.25))
 
     excluidas = set(proprias)
     if {"ssd", "hd"} & excluidas:
       excluidas.update(("ssd", "hd"))
     if {"air_cooler", "water_cooler"} & excluidas:
       excluidas.update(("air_cooler", "water_cooler"))
-    catalogo = self._gerar_catalogo(orcamento - margem, excluidas)
+    catalogo = self._gerar_catalogo(float(limite_pc) - margem, float(limite_perifericos), excluidas)
+    disponiveis = set(catalogo) | set(proprias)
+    obrigatorias = {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"}
+    if not obrigatorias <= disponiveis or not {"ssd", "hd"} & disponiveis:
+      raise ValueError("Não há peças suficientes para montar um PC nesse orçamento")
+    if percentual and not self.PERIFERICOS <= disponiveis:
+      raise ValueError("Não há periféricos suficientes no catálogo para a reserva escolhida. Ajuste a porcentagem ou monte manualmente.")
 
-    obrigatorias = ("processador", "placa_mae", "memoria_ram", "fonte", "gabinete", *self.PERIFERICOS)
-
-    if any(tipo not in catalogo and tipo not in proprias for tipo in obrigatorias) or not ({"ssd", "hd"} & (set(catalogo) | set(proprias))):
-      raise ValueError("Não há peças suficientes para montar um setup completo nesse orçamento")
-
-    resposta = LLMService().executar(self._criar_prompt(dados, orcamento, margem, catalogo,
-                                                       self._detalhes_proprias(proprias)), modelo)
-
+    resposta = LLMService().executar(self._criar_prompt(
+      dados, orcamento, margem, catalogo, percentual, self._detalhes_proprias(proprias)), modelo)
     build = json.loads(resposta) if isinstance(resposta, str) else resposta
-
-    dados_build = self._validar_build(build, catalogo, orcamento, proprias)
-
+    dados_build = self._validar_build(build, catalogo, orcamento, percentual, proprias)
     if proprias:
-      return BuildSalva.criar_gerada_com_pecas_proprias(usuario_id, dados_build, proprias, rede).to_dict()
-    
-    BuildSalva.migrar_geradas(usuario_id)
-    gerada = Build.criar_gerada(usuario_id, dados_build)
-    BuildSalva.migrar_geradas(usuario_id)
-    salva = BuildSalva.buscar(usuario_id, gerada.id)
-    salva.salvar_estado({**salva.estado, "descricao": dados_build["descricao"][:300], "orcamento": orcamento,
-                        "rede": rede, "incluirRede": rede.get("tipo") in ("cabo", "wifi"), "incluirPerifericos": True})
-    return salva.to_dict()
+      return BuildSalva.criar_gerada_com_pecas_proprias(usuario_id, dados_build, proprias, rede, percentual).to_dict()
+
+    componentes = {}
+    for item in dados_build["componentes"]:
+      selecao = {"id": item["id"], "quantidade": item["quantidade"]}
+      componentes[item["tipo"]] = [selecao] if item["tipo"] in Build.QUANTIDADES else selecao
+    estado = BuildSalva.validar_estado({
+      "titulo": dados_build["nome"][:100], "descricao": dados_build["descricao"][:300],
+      "orcamento": orcamento, "componentes": componentes, "rede": rede,
+      "incluirRede": rede.get("tipo") in ("cabo", "wifi"),
+      "incluirPerifericos": percentual > 0, "percentualPerifericos": percentual,
+    })
+    return BuildSalva.criar_limitada(usuario_id, estado, gerada=dados_build).to_dict()
 
   @classmethod
   def _pecas_proprias(cls, valor):
@@ -95,21 +102,28 @@ class CriarBuildService:
     }
 
   @classmethod
-  def _gerar_catalogo(cls, preco_maximo, excluidas=()):
+  def _gerar_catalogo(cls, preco_maximo, reserva_perifericos=0, excluidas=()):
     catalogo = {}
     for modelo in MODELOS_PECAS:
-      if modelo.__tablename__ in excluidas:
+      periferico = modelo.__tablename__ in cls.PERIFERICOS
+      if modelo.__tablename__ in excluidas or (periferico and not reserva_perifericos):
         continue
-      pecas = modelo.listar_disponiveis_ate(preco_maximo, limite=8)
+      pecas = modelo.listar_disponiveis_ate(reserva_perifericos if periferico else preco_maximo, limite=8)
       if pecas:
         catalogo[modelo.__tablename__] = [cls._campos_pecas(peca) for peca in pecas]
     return catalogo
 
   @staticmethod
-  def _criar_prompt(dados, orcamento, margem, catalogo, proprias=None):
+  def _criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None):
     pedido = {campo: dados[campo] for campo in ("nome", "descricao", "utilidade")}
     proprias = proprias or {}
-    teto_peca = orcamento - margem
+    pc, perifericos = CriarBuildService._dividir_orcamento(orcamento, percentual)
+    teto_peca = float(pc) - margem
+    regra_perifericos = (
+      "Complete monitor, teclado, mouse e fone (headset), exceto os já possuídos; "
+      "a soma dos periféricos novos não pode ultrapassar a reserva exclusiva."
+      if percentual else "Não inclua periféricos novos. Preserve apenas os que o usuário já possui."
+    )
 
     exemplo_saida = {
         "nome": "<nome do pedido>",
@@ -144,18 +158,20 @@ class CriarBuildService:
 
         "# ORÇAMENTO\n"
         f"- Orçamento total (teto rígido): R$ {orcamento:.2f}.\n"
-        f"- O catálogo contém apenas peças de até R$ {teto_peca:.2f} cada. "
+        f"- Limite para o PC: R$ {pc:.2f}. Reserva exclusiva para periféricos: R$ {perifericos:.2f} ({percentual}%).\n"
+        "- Não transfira a reserva dos periféricos para o PC nem o contrário. Peças próprias não consomem o orçamento.\n"
+        f"- O catálogo do PC contém apenas peças de até R$ {teto_peca:.2f} cada. "
         f"A margem de R$ {margem:.2f} serviu somente para filtrar peças "
         "caras demais para este orçamento; não é um valor fixo a gastar "
-        "nem uma reserva extra a somar ao total.\n"
+        "nem uma reserva extra a somar ao total. Periféricos usam o teto da reserva exclusiva.\n"
         "- A soma de (preço × quantidade) apenas das peças novas deve ser "
         f"menor ou igual a R$ {orcamento:.2f}. Some item por item antes de responder.\n"
         "- Primeiro considere as peças próprias e calcule o custo das peças novas "
         "necessárias para um setup completo e compatível: "
-        "CPU, placa_mae, RAM, armazenamento, fonte, gabinete, monitor, teclado, mouse e fone; inclua uma "
+        "CPU, placa_mae, RAM, armazenamento, fonte e gabinete; inclua uma "
         "placa_video se o processador não tiver vídeo integrado ou se o uso exigir. "
-        "Inclua cooler quando o processador não trouxer um. Reserve parte do orçamento "
-        "para os quatro periféricos antes de escolher upgrades. Considere as quantidades na soma.\n"
+        "Inclua cooler quando o processador não trouxer um. Respeite a escolha de incluir "
+        "periféricos e os limites separados antes de escolher upgrades. Considere as quantidades na soma.\n"
         "- Depois distribua o saldo pelas peças que mais melhoram o uso solicitado. "
         "Para jogos, não deixe a placa_video apenas com o que sobrar; para trabalho "
         "sem necessidade de GPU dedicada, prefira CPU, RAM e SSD adequados. "
@@ -185,7 +201,7 @@ class CriarBuildService:
         "Nunca invente peças, IDs, preços ou especificações.\n"
         "2. A configuração final (peças próprias + novas) deve ter exatamente um processador, uma placa_mae, uma memoria_ram "
         "(com quantidade de pentes conforme a regra de dual channel abaixo), "
-        "uma fonte, um gabinete, um monitor, um teclado, um mouse e um fone.\n"
+        "uma fonte e um gabinete. Para periféricos, siga a regra escolhida no pedido.\n"
         "3. A configuração final deve ter ao menos um armazenamento (ssd ou hd). "
         "Prefira ssd quando o orçamento permitir.\n"
         "4. Não repita categorias já possuídas nem entre as peças novas. Use quantidade 1 para tudo, "
@@ -195,7 +211,7 @@ class CriarBuildService:
         "Entre opções equivalentes, decida por especificação, compatibilidade e preço.\n\n"
 
         "# MEMÓRIA RAM: DUAL CHANNEL\n"
-        "- Priorize configurações que ativem dual channel: quantidade par de pentes "
+        "- Para memórias novas, priorize configurações que ativem dual channel: quantidade par de pentes "
         "(2 ou 4, conforme os slots da placa_mae), todos do mesmo modelo.\n"
         "- Prefira 2 pentes de capacidade menor a 1 pente de capacidade maior "
         "com a mesma capacidade total, desde que a placa_mae tenha 2 ou mais slots.\n"
@@ -215,8 +231,7 @@ class CriarBuildService:
         "(o PC precisa ter saída de vídeo).\n\n"
 
         "# PERIFÉRICOS\n"
-        "- Complete obrigatoriamente monitor, teclado, mouse e fone (headset), "
-        "exceto as categorias já possuídas pelo usuário.\n"
+        f"- {regra_perifericos}\n"
         "- Cada periférico novo entra com quantidade 1 e conta no orçamento total.\n"
         "- Escolha o monitor de acordo com a capacidade gráfica e o uso do PC, "
         "considerando resolução e taxa de atualização quando constarem no catálogo.\n"
@@ -241,7 +256,7 @@ class CriarBuildService:
         "3. Socket, memória, gabinete, fonte e armazenamento são compatíveis?\n"
         "4. A memória usa quantidade par de pentes (dual channel) quando possível?\n"
         "5. O vídeo integrado foi verificado antes de decidir pela placa_video?\n"
-        "6. Monitor, teclado, mouse e fone estão presentes, contando os já possuídos?\n"
+        "6. Os periféricos respeitam a escolha de inclusão, a reserva e as peças já possuídas?\n"
         "7. Há categorias repetidas ou quantidades fora da regra?\n"
         "8. A distribuição do orçamento reflete o perfil de uso e inclui "
         "todas as peças necessárias antes dos upgrades?\n"
@@ -262,38 +277,54 @@ class CriarBuildService:
     )
 
   @staticmethod
-  def _validar_build(build, catalogo, orcamento, proprias=None):
+  def _validar_build(build, catalogo, orcamento, percentual=0, proprias=None):
     if not isinstance(build, dict) or not isinstance(build.get("componentes"), list):
       raise ValueError("A IA não retornou uma build válida")
     validacao_campos(build, ["nome", "descricao", "utilidade", "componentes"])
-
+    if any(not isinstance(build[campo], str) or not build[campo].strip() for campo in ("nome", "descricao", "utilidade")):
+      raise ValueError("A IA retornou textos inválidos para a build")
     pecas = {(tipo, peca["id"]): peca for tipo, itens in catalogo.items() for peca in itens}
     proprias = proprias or {}
-    tipos = [componente.get("tipo") for componente in build["componentes"] if isinstance(componente, dict)]
-    if any(not isinstance(tipo, str) for tipo in tipos) or len(tipos) != len(set(tipos)) or set(tipos) & set(proprias):
-      raise ValueError("A IA repetiu uma categoria de peça")
-    finais = set(tipos) | set(proprias)
-    if not {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete", *CriarBuildService.PERIFERICOS} <= finais or not {"ssd", "hd"} & finais:
-      raise ValueError("A IA não completou as peças obrigatórias da build")
-
-    total = 0
-
+    tipos = []
+    total = Decimal(0)
+    total_perifericos = Decimal(0)
     for componente in build["componentes"]:
       if not isinstance(componente, dict):
         raise ValueError("A IA retornou um componente inválido")
-      peca = pecas.get((componente.get("tipo"), componente.get("id")))
+      tipo = componente.get("tipo")
+      if not isinstance(tipo, str) or type(componente.get("id")) is not int:
+        raise ValueError("A IA retornou um ID de peça inválido")
+      if tipo in tipos or tipo in proprias:
+        raise ValueError("A IA repetiu uma categoria de peça")
+      tipos.append(tipo)
+      peca = pecas.get((tipo, componente["id"]))
       quantidade = componente.get("quantidade", 1)
-
-      if peca is None or type(quantidade) is not int or quantidade < 1:
+      if peca is None or type(quantidade) is not int or not 1 <= quantidade <= (64 if tipo in Build.QUANTIDADES else 1):
         raise ValueError("A IA escolheu uma peça ou quantidade inválida")
       componente["nome"] = f'{peca["fabricante"]} {peca["modelo"]}'
+      componente["quantidade"] = quantidade
       componente["preco"] = peca["preco"]
-      total += peca["preco"] * quantidade
+      preco = Decimal(str(peca["preco"])) * quantidade
+      total += preco
+      if tipo in CriarBuildService.PERIFERICOS:
+        total_perifericos += preco
 
-    if total > orcamento:
+    pc, perifericos = CriarBuildService._dividir_orcamento(orcamento, percentual)
+    if total > Decimal(str(orcamento)):
       raise ValueError("A build gerada ultrapassou o orçamento")
-
+    if total_perifericos > perifericos or total - total_perifericos > pc:
+      raise ValueError("A build gerada não respeitou a divisão do orçamento entre PC e periféricos. Tente novamente ou ajuste os valores.")
+    finais = set(tipos) | set(proprias)
+    if percentual and not CriarBuildService.PERIFERICOS <= finais:
+      raise ValueError("A IA não incluiu os periféricos solicitados. Tente novamente.")
+    if not {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"} <= finais or not {"ssd", "hd"} & finais:
+      raise ValueError("A IA não completou as peças obrigatórias da build")
     build["orcamento"] = orcamento
-    build["preco_total"] = round(total, 2)
-
+    build["preco_total"] = float(round(total, 2))
     return build
+
+  @staticmethod
+  def _dividir_orcamento(orcamento, percentual):
+    total = Decimal(str(orcamento)).quantize(Decimal("0.01"), rounding=ROUND_DOWN)
+    perifericos = (total * percentual / 100).quantize(Decimal("0.01"), rounding=ROUND_DOWN)
+    return total - perifericos, perifericos

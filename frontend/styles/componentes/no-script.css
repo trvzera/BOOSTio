@@ -1,0 +1,2 @@
+/* Carregado apenas quando JavaScript está desativado, sem piscar o conteúdo normal. */
+#loading-screen { display: none !important; }

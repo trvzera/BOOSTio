@@ -5,18 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Builds prontas — BOOSTio</title>
   <meta name="description" content="Explore três configurações demonstrativas, filtre por objetivo e budget e abra uma cópia independente para personalizar na BOOSTio.">
+  <link rel="preload" href="../fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
   <link rel="stylesheet" href="../styles/style.css">
+  <noscript><link rel="stylesheet" href="../styles/componentes/no-script.css"></noscript>
   <script type="module" src="../js/pages/loading.js" defer></script>
   <script type="module" src="../js/pages/configuracoes-prontas.js" defer></script>
 </head>
 <body id="configuracoes-prontas" class="prontas-page">
-  <div id="loading-screen"><video id="loading-video" autoplay muted playsinline><source src="../video/loading-toggle.webm" type="video/webm"></video></div>
+  <a class="skip-link" href="#prontas-main" aria-label="Pular para o conteúdo principal">Pular para o conteúdo principal</a>
+  <div id="loading-screen"><video id="loading-video" width="1000" height="1000" autoplay muted playsinline aria-hidden="true" tabindex="-1"><source src="../video/loading-toggle.webm" type="video/webm"></video></div>
   <div data-site-navigation></div>
   <div class="decoration decoration-1" aria-hidden="true"></div>
   <div class="decoration decoration-2" aria-hidden="true"></div>
 
-  <main id="prontas-main" class="prontas-main">
+  <main id="prontas-main" class="prontas-main" tabindex="-1">
     <header class="prontas-heading">
       <a class="prontas-voltar" href="./index.html" aria-label="Voltar ao início"><span class="ui-lottie" data-lottie="arrow" data-direction="back" aria-hidden="true"><span class="ui-icon-fallback">→</span></span>Voltar ao início</a>
       <p class="prontas-eyebrow">Um ponto de partida para sua montagem</p>
@@ -60,7 +64,7 @@
     <footer>
       <div id="top-footer">
         <div id="footer-hero">
-          <img src="../imgs/logo.webp" alt="Logo BOOSTio">
+          <img src="../imgs/logo.webp" alt="Logo BOOSTio" width="668" height="237" decoding="async" loading="lazy">
           <p class="font-2-s">A BOOSTio é uma plataforma desenvolvida para simplificar a montagem e o upgrade de computadores.</p>
         </div>
         <nav id="footer-nav" aria-label="Páginas da BOOSTio">

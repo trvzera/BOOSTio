@@ -2,11 +2,14 @@ import "../header.js";
 import "../auth/auth.js";
 import { normalizarRede, vincularRede } from "../build/rede.js";
 import { planejamentoLocal } from "../build/planejamento.js";
+import { orcamentoValido, dividirOrcamento } from "../build/orcamento-formulario.js";
 import { carregarPerfil } from "../conta/perfil.js";
 import { acompanharCarregamento } from "../components/page-loading.js";
-import { criarBuild } from "../api/build/builds.js";
+import { criarBuild, verificarEspacoBuild } from "../api/build/builds.js";
 import { pecasPropriasFormulario } from "../build/pecas-proprias.js";
 import { buscarUsuarioLogado } from "../api/usuario/buscarUsuarioLogado.js";
+import { iconeAnimado, iniciarIcones } from "../components/ui.js";
+import { iniciarControlesNumericos } from "../components/number-stepper.js";
 import {
   registrarAnimacao,
   destruirAnimacao,
@@ -50,17 +53,17 @@ const perguntas = [
     tag: "Etapa 02",
     titulo: "Quanto pretende investir na sua build?",
     descricao:
-      "Escolha uma faixa ou ajuste livremente o valor no controle abaixo.",
+      "Escolha um teto de orçamento, ajuste pelo controle ou digite o valor exato.",
     opcoes: [
       ["ate-3000", "Até R$ 3.000", "Configuração essencial e econômica."],
       [
         "3000-5000",
-        "De R$ 3.000 a R$ 5.000",
+        "Até R$ 5.000",
         "Desempenho equilibrado para o dia a dia.",
       ],
       [
         "5000-8000",
-        "De R$ 5.000 a R$ 8.000",
+        "Até R$ 8.000",
         "Mais potência para jogos e tarefas exigentes.",
       ],
     ],
@@ -140,7 +143,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const moeda = new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   });
 
   function escaparHtml(valor = "") {
@@ -159,7 +162,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       item.disabled = perguntas.slice(0,indice).some((_,i) => !etapaRespondida(i));
       item.querySelector(".form-step-number").innerHTML =
         indice < indiceAtual
-          ? '<i class="fa-solid fa-check"></i>'
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>'
           : String(indice + 1).padStart(2, "0");
     });
     document
@@ -206,33 +209,59 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function rangeHtml() {
-    const valor = respostas.orcamentoPersonalizado ?? 5000;
+    const recebido = respostas.orcamentoPersonalizado ?? 5000;
+    const valor = Number.isFinite(recebido) ? recebido : "";
     const maximo = Math.max(20000,valor);
     const isActive = respostas.orcamento === "personalizado" ? "active" : "";
-    return `<div class="budget-range ${isActive}"><div><span class="font-1-m-b">Orçamento personalizado</span><strong class="font-2-xs" id="budget-value">${moeda.format(valor)}</strong></div><input type="range" id="budget-range" min="0" max="${maximo}" step="any" value="${valor}" style="--range-progress: ${progressoRange(valor)}%" aria-label="Valor do orçamento personalizado"><div class="range-labels"><span class="font-2-xs">R$ 0</span><span class="font-2-xs">${moeda.format(maximo)}</span></div></div>`;
+    return `<div class="budget-range ${isActive}"><div><label class="font-1-m-b" for="budget-input">Orçamento personalizado (R$)</label><strong class="font-2-xs" id="budget-value">${valor === "" ? "Informe um valor" : moeda.format(valor)}</strong></div><input id="budget-input" type="number" inputmode="decimal" min="0.01" max="1000000" step="0.01" data-number-step="100" value="${valor}" aria-describedby="budget-help"><input type="range" id="budget-range" min="0" max="${Math.ceil(maximo / 100) * 100}" step="100" value="${Math.round(valor / 100) * 100}" style="--range-progress: ${progressoRange(valor)}%" aria-label="Ajustar orçamento de cem em cem reais"><p id="budget-help" class="font-2-xs">Controle e setas de R$ 100 em R$ 100. Digite para usar outro valor.</p></div>
+      <fieldset class="peripheral-budget"><legend class="font-1-xs">Quer incluir periféricos nesse valor?</legend><label class="peripheral-budget-toggle ui-check"><input type="checkbox" id="budget-peripherals" ${respostas.incluirPerifericos ? "checked" : ""}>${iconeAnimado("checkbox")}<span class="peripheral-budget-label">Reservar parte do total para monitor, teclado, mouse e headset</span></label><div id="peripheral-allocation" ${respostas.incluirPerifericos ? "" : "hidden"}><label for="peripheral-percent">Porcentagem para periféricos</label><div class="peripheral-percent-field"><input type="number" id="peripheral-percent" min="1" max="99" step="1" inputmode="numeric" value="${respostas.percentualPerifericos ?? 20}"><span aria-hidden="true">%</span></div><p id="peripheral-budget-summary" class="font-2-xs" aria-live="polite"></p></div></fieldset>`;
+  }
+
+  const faixas = {"ate-3000":3000,"3000-5000":5000,"5000-8000":8000};
+  const valorOrcamento = () => respostas.orcamento === "personalizado" ? respostas.orcamentoPersonalizado : faixas[respostas.orcamento];
+  function atualizarReserva() {
+    const valor = valorOrcamento() || 0;
+    const percentual = respostas.incluirPerifericos ? respostas.percentualPerifericos ?? 20 : 0;
+    const divisao = dividirOrcamento(valor,percentual);
+    const resumo = conteudo.querySelector("#peripheral-budget-summary");
+    if (resumo) resumo.textContent = divisao
+      ? `${moeda.format(divisao.perifericos)} para periféricos · ${moeda.format(divisao.pc)} para o PC. O total não aumenta.` : "Informe um orçamento válido e uma porcentagem inteira de 1 a 99.";
+    conteudo.querySelector("#next-question").disabled = !podeAvancar();
   }
 
   function progressoRange(valor) {
-    return valor / Math.max(20000,respostas.orcamentoPersonalizado || 0) * 100;
+    return Number.isFinite(valor) ? Math.min(100,Math.max(0,valor / Math.max(20000,respostas.orcamentoPersonalizado || 0) * 100)) : 0;
   }
 
   function renderizarPergunta() {
     limparCheckboxesLottie();
     const geracao = geracaoPergunta;
     const pergunta = perguntas[indiceAtual];
+    delete document.querySelector("#questions").dataset.formState;
+    conteudo.dataset.question = pergunta.chave;
     renderizarPainel(pergunta);
     conteudo.classList.remove("question-enter");
     void conteudo.offsetWidth;
     conteudo.classList.add("question-enter");
     conteudo.classList.toggle("pieces-question-content", pergunta.chave === "pecas");
     const rotuloAvancar = indiceAtual === perguntas.length - 1 ? "Gerar build" : "Avançar";
-    conteudo.innerHTML = `<div class="options-heading"><p class="font-1-m-b">${pergunta.chave === "rede" ? "Planeje sua conexão" : pergunta.multipla ? "Selecione as opções aplicáveis" : "Escolha uma opção"}</p><span class="font-2-xs">${indiceAtual + 1} de ${perguntas.length}</span></div>${pergunta.chave === "rede" ? '<div id="form-network"></div>' : `<fieldset class="question-options ${pergunta.multipla ? "pieces-grid" : ""}"><legend class="sr-only">${pergunta.titulo}</legend>${opcoesHtml(pergunta)}</fieldset>`}${pergunta.chave === "orcamento" ? rangeHtml() : ""}<div id="form-navigation"><button type="button" class="btn-ghost" aria-label="Etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}><i class="fa-solid fa-arrow-left"></i> Etapa anterior</button><button type="button" class="btn-primary-form" id="next-question" aria-label="${rotuloAvancar}" ${podeAvancar() ? "" : "disabled"}>${rotuloAvancar} <i class="fa-solid fa-arrow-right"></i></button></div>`;
-    if (pergunta.chave === "rede") vincularRede(conteudo.querySelector("#form-network"),respostas.rede,{prefixo:"form-rede",aoAlterar:rede => {
+    const campos = pergunta.chave === "rede" ? '<div id="form-network"></div>' : `<fieldset class="question-options ${pergunta.multipla ? "pieces-grid" : ""}"><legend class="sr-only">${pergunta.titulo}</legend>${opcoesHtml(pergunta)}</fieldset>`;
+    conteudo.innerHTML = `
+      <div class="options-heading">
+        <p class="font-1-m-b">${pergunta.chave === "rede" ? "Planeje sua conexão" : pergunta.multipla ? "Selecione as opções aplicáveis" : "Escolha uma opção"}</p>
+        <span class="font-2-xs">${indiceAtual + 1} de ${perguntas.length}</span>
+      </div>
+      ${pergunta.chave === "orcamento" ? `<div class="budget-fields">${campos}${rangeHtml()}</div>` : campos}
+      <div id="form-navigation">
+        <button type="button" class="btn-ghost" id="previous-question" aria-label="Etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}>${iconeAnimado("arrow","back")}<span>Voltar</span></button>
+        <button type="button" class="btn-primary-form" id="next-question" aria-label="${rotuloAvancar}" ${podeAvancar() ? "" : "disabled"}><span>${rotuloAvancar}</span>${iconeAnimado("arrow")}</button>
+      </div>`;
+    if (pergunta.chave === "rede") vincularRede(conteudo.querySelector("#form-network"),respostas.rede,{prefixo:"form-rede",aoRenderizar:iniciarControlesNumericos,aoAlterar:rede => {
       respostas.rede = rede;
       conteudo.querySelector("#next-question").disabled = !podeAvancar();
     }});
     conteudo
-      .querySelector(".btn-ghost")
+      .querySelector("#previous-question")
       .addEventListener("click", () => navegarPara(indiceAtual - 1));
     conteudo
       .querySelectorAll(`.question-options input[name="${pergunta.chave}"]`)
@@ -242,11 +271,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     conteudo
       .querySelector("#budget-range")
       ?.addEventListener("input", atualizarRange);
+    conteudo.querySelector("#budget-input")?.addEventListener("input", atualizarRange);
+    conteudo.querySelector("#budget-peripherals")?.addEventListener("change", evento => {
+      respostas.incluirPerifericos = evento.target.checked;
+      respostas.percentualPerifericos ??= 20;
+      conteudo.querySelector("#peripheral-allocation").hidden = !evento.target.checked;
+      atualizarReserva(); atualizarMenu();
+    });
+    conteudo.querySelector("#peripheral-percent")?.addEventListener("input", evento => {
+      respostas.percentualPerifericos = evento.target.valueAsNumber;
+      atualizarReserva(); atualizarMenu();
+    });
     conteudo.querySelector("#next-question").addEventListener("click", avancar);
+    if (pergunta.chave === "orcamento") atualizarReserva();
     if (pergunta.multipla) {
       vincularCamposDetalhesPecas();
       iniciarCheckboxesLottie(geracao).catch(() => {});
     }
+    iniciarControlesNumericos(conteudo);
+    iniciarIcones(conteudo);
   }
 
   function vincularCamposDetalhesPecas() {
@@ -352,7 +395,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   function etapaRespondida(indice) {
     if (perguntas[indice].chave === "rede") return true;
     if (perguntas[indice].chave === "orcamento")
-      return Boolean(respostas.orcamento);
+      return orcamentoValido(valorOrcamento()) &&
+        (!respostas.incluirPerifericos || Number.isInteger(respostas.percentualPerifericos) && respostas.percentualPerifericos > 0 && respostas.percentualPerifericos < 100);
     const resposta = respostas[perguntas[indice].chave];
     if (!Array.isArray(resposta)) return Boolean(resposta);
     if (resposta.length === 0) return false;
@@ -394,20 +438,35 @@ document.addEventListener("DOMContentLoaded", async () => {
       sincronizarCamposDetalhesPecas();
     }
     if (pergunta.chave === "orcamento") {
+      const valor = faixas[input.value];
+      respostas.orcamentoPersonalizado = valor;
+      conteudo.querySelector("#budget-input").value = valor;
+      conteudo.querySelector("#budget-input").dispatchEvent(new Event("change",{bubbles:true}));
+      conteudo.querySelector("#budget-range").value = valor;
+      conteudo.querySelector("#budget-value").textContent = moeda.format(valor);
       const budgetRange = conteudo.querySelector(".budget-range");
       if (budgetRange) budgetRange.classList.remove("active");
+      atualizarReserva();
     }
     conteudo.querySelector("#next-question").disabled = !podeAvancar();
     atualizarMenu();
   }
 
   function atualizarRange(evento) {
-    respostas.orcamentoPersonalizado = Number(evento.target.value);
+    respostas.orcamentoPersonalizado = evento.target.valueAsNumber;
     respostas.orcamento = "personalizado";
-    conteudo.querySelector("#budget-value").textContent = moeda.format(
-      respostas.orcamentoPersonalizado,
-    );
-    evento.target.style.setProperty(
+    conteudo.querySelector("#budget-value").textContent = Number.isFinite(respostas.orcamentoPersonalizado) ? moeda.format(respostas.orcamentoPersonalizado) : "Informe um valor";
+    evento.target.setAttribute("aria-invalid",String(!orcamentoValido(respostas.orcamentoPersonalizado)));
+    const slider = conteudo.querySelector("#budget-range"), numero = conteudo.querySelector("#budget-input");
+    if (evento.target === slider) {
+      numero.value = slider.value;
+      numero.dispatchEvent(new Event("change",{bubbles:true}));
+    }
+    else if (orcamentoValido(respostas.orcamentoPersonalizado)) {
+      slider.max = Math.ceil(Math.max(20000,respostas.orcamentoPersonalizado) / 100) * 100;
+      slider.value = Math.round(respostas.orcamentoPersonalizado / 100) * 100;
+    }
+    slider.style.setProperty(
       "--range-progress",
       `${progressoRange(respostas.orcamentoPersonalizado)}%`,
     );
@@ -416,11 +475,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     const budgetRange = conteudo.querySelector(".budget-range");
     if (budgetRange) budgetRange.classList.add("active");
-    conteudo.querySelector("#next-question").disabled = false;
+    atualizarReserva();
     atualizarMenu();
   }
 
   let gerando = false;
+  let mensagensGeracao;
+  const pararMensagens = () => clearInterval(mensagensGeracao);
+  window.addEventListener("pagehide",pararMensagens);
   function avancar() {
     if (gerando || !podeAvancar()) return;
     if (indiceAtual === perguntas.length - 1) {
@@ -440,28 +502,45 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function mostrarGerando() {
+    if (gerando) return;
     gerando = true;
+    document.querySelector("#questions").dataset.formState = "loading";
+    conteudo.querySelectorAll("#form-navigation button, #tentar-gerar-build").forEach(botao => botao.disabled = true);
+    document.querySelectorAll(".form-step").forEach(botao => botao.disabled = true);
     limparCheckboxesLottie();
-    atualizarMenu();
-    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Gerando sua build</h1><p class="font-2-s">Vamos selecionar peças compatíveis dentro do seu orçamento.</p></div>`;
-    conteudo.innerHTML = `<div class="build-loading" role="status"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-l">Consultando as peças</h2></div>`;
-    const faixas = {"ate-3000": 3000, "3000-5000": 5000, "5000-8000": 8000};
-    const orcamento = respostas.orcamento === "personalizado"
-      ? respostas.orcamentoPersonalizado : faixas[respostas.orcamento];
-    const utilidade = perguntas[0].opcoes.find(opcao => opcao[0] === respostas.objetivo)?.[1] || respostas.objetivo;
-    const pecasProprias = pecasPropriasFormulario(respostas);
-
     try {
       const sessao = await buscarUsuarioLogado();
-      if (!sessao.auth) throw new Error("Entre na sua conta para salvar a build.");
-      const resposta = await criarBuild({nome: `PC para ${utilidade}`, descricao: `Montagem para ${utilidade}.`, utilidade, orcamento, pecas_proprias:pecasProprias, rede:respostas.rede});
+      if (!sessao.auth) throw Object.assign(new Error("Entre na sua conta para salvar a build."),{status:401});
+      await verificarEspacoBuild();
+      painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Gerando sua build</h1><p class="font-2-s">Vamos selecionar peças compatíveis dentro do seu orçamento.</p></div>`;
+      conteudo.innerHTML = `<div class="build-loading"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-m" role="status" id="generation-message">Analisando seu perfil</h2><p class="font-2-xs">A seleção pode levar alguns instantes. Aguarde nesta página.</p></div>`;
+      const frases = ["Analisando seu perfil", "Buscando peças para o seu orçamento", "Pensando no equilíbrio da configuração", "Escolhendo as melhores peças para o seu uso"];
+      let frase = 0;
+      pararMensagens();
+      mensagensGeracao = setInterval(() => {
+        const mensagem = conteudo.querySelector("#generation-message");
+        if (!mensagem) return pararMensagens();
+        mensagem.textContent = frases[++frase % frases.length];
+      },4000);
+      const orcamento = respostas.orcamento === "personalizado"
+        ? respostas.orcamentoPersonalizado : faixas[respostas.orcamento];
+      const utilidade = perguntas[0].opcoes.find(opcao => opcao[0] === respostas.objetivo)?.[1] || respostas.objetivo;
+
+      const resposta = await criarBuild({nome: `PC para ${utilidade}`, descricao: `Montagem para ${utilidade}.`, utilidade, orcamento,
+        percentual_perifericos:respostas.incluirPerifericos ? respostas.percentualPerifericos : 0,
+        pecas_proprias:pecasPropriasFormulario(respostas),rede:respostas.rede});
       window.location.href = `${paginaConfiguracaoBuild}?build_id=${encodeURIComponent(resposta.build.id)}`;
     } catch (erro) {
       gerando = false;
-      conteudo.innerHTML = `<div class="question-intro" role="alert"><h2 class="font-1-m">Não foi possível gerar sua build</h2><p id="erro-gerar-build" class="font-2-s"></p><button type="button" id="tentar-gerar-build" class="btn-primary" aria-label="Tentar gerar build novamente">Tentar novamente</button><a href="./login.html" class="btn-ghost" aria-label="Entrar na conta">Entrar na conta</a></div>`;
+      document.querySelector("#questions").dataset.formState = "error";
+      atualizarMenu();
+      const semEspaco = erro.codigo === "limite-builds";
+      conteudo.innerHTML = `<div class="build-generation-error"><h2 class="font-1-m" tabindex="-1">${semEspaco ? "Suas três vagas estão ocupadas" : "Não foi possível gerar sua build"}</h2><p id="erro-gerar-build" class="font-2-s" role="alert"></p><div class="generation-actions">${semEspaco ? '<a href="./builds.html" class="btn-primary" aria-label="Gerenciar minhas builds">Minhas builds</a>' : '<button type="button" id="tentar-gerar-build" class="btn-primary" aria-label="Tentar gerar build novamente">Tentar novamente</button>'}<button type="button" id="revisar-orcamento" class="btn-secondary" aria-label="Revisar orçamento">Revisar orçamento</button>${erro.status === 401 ? '<a href="./login.html" class="btn-ghost" aria-label="Entrar na conta">Entrar na conta</a>' : ""}</div></div>`;
       conteudo.querySelector("#erro-gerar-build").textContent = erro.message;
-      conteudo.querySelector("#tentar-gerar-build").addEventListener("click", mostrarGerando);
-    }
+      conteudo.querySelector("#tentar-gerar-build")?.addEventListener("click", mostrarGerando);
+      conteudo.querySelector("#revisar-orcamento").addEventListener("click",() => navegarPara(1));
+      conteudo.querySelector("h2").focus({preventScroll:true});
+    } finally { pararMensagens(); }
   }
 
   document

@@ -4,28 +4,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BOOSTio</title>
+  <title>BOOSTio — Monte e planeje seu computador</title>
   <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
   <link rel="stylesheet" href="../styles/style.css">
-  <meta name="description" content="A Boostio é uma plataforma que simplifica a montagem de computadores,
-  ajudando você a escolher as peças ideais com base no seu objetivo,
-  orçamento e necessidade, tudo com precisão e confiança.">
+  <noscript><link rel="stylesheet" href="../styles/componentes/no-script.css"></noscript>
+  <meta name="description" content="Planeje seu PC com a BOOSTio: escolha peças, consulte compatibilidade, organize seu orçamento e explore configurações para jogos, estudos e trabalho.">
+  <link rel="preload" href="../fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <script type="module" src="../js/pages/loading.js" defer></script>
   <script type="module" src="../js/pages/index.js" defer></script>
 </head>
 
 <body id="inicio" class="home-page">
+  <a class="skip-link" href="#main-content" aria-label="Pular para o conteúdo principal">Pular para o conteúdo principal</a>
   <div id="loading-screen">
-    <video id="loading-video" autoplay muted playsinline>
+    <video id="loading-video" width="1000" height="1000" autoplay muted playsinline aria-hidden="true" tabindex="-1">
       <source src="../video/loading-toggle.webm" type="video/webm">
     </video>
   </div>
   <div data-site-navigation></div>
-  <main role="main">
+  <main id="main-content" tabindex="-1">
+    <button type="button" class="video-motion-toggle btn-secondary" aria-label="Pausar animações de fundo" aria-controls="hero-motion pc-video">Pausar animações</button>
 
     <section id="main-page">
-      <video autoplay muted loop playsinline preload="metadata">
-        <source src="../video/background.webm">
+      <video id="hero-motion" muted loop playsinline preload="none" poster="../imgs/background-poster.jpg" aria-hidden="true" tabindex="-1">
+        <source data-src="../video/background.webm" type="video/webm">
         Seu navegador não suporta vídeos.
       </video>
       <h1 id="main-title" class="font-1-xxl">Menos Dúvidas, Mais <span>Desempenho</span> <br>Vamos montar juntos!</h1>
@@ -44,45 +47,45 @@
           <a href="./formulario.html" class="btn-primary" aria-label="Monte o seu computador: ir para o formulário de montagem">Monte o seu</a>
         </div>
         <span id="about-line"></span>
-        <video id="pc-video" muted loop playsinline preload="metadata">
-          <source src="../video/pc.webm">
+        <video id="pc-video" muted loop playsinline preload="none" poster="../imgs/pc-poster.jpg" aria-hidden="true" tabindex="-1">
+          <source data-src="../video/pc.webm" type="video/webm">
         </video>
       </div>
     </section>
 
     <section id="services-page">
       <div id="services-container">
-        <h1 id="services-h1" class="font-1-xl" data-reveal>Você está a <span>3 etapas</span><br> do seu setup dos sonhos</h1>
+        <h2 id="services-h1" class="font-1-xl" data-reveal>Você está a <span>3 etapas</span><br> do seu setup dos sonhos</h2>
         <p id="services-p" class="font-2-s" data-reveal data-reveal-delay="80ms">
           Do formulário à montagem final, cada etapa foi pensada pra eliminar dúvidas técnicas e te dar controle total sobre o resultado.
         </p>
         <div id="cards-grid">
           <div class="card-service" data-reveal data-reveal-delay="0ms">
             <div class="card-container">
-              <h1 class="card-index font-1-xxl">01</h1>
-              <h2 class="card-title font-1-xl">Responda o formulário</h2>
+              <span class="card-index font-1-xxl" aria-hidden="true">01</span>
+              <h3 class="card-title font-1-xl">Responda o formulário</h3>
               <p class="card-desc font-2-s">Informe seu orçamento, como pretende usar o computador e quais peças já possui. Suas respostas ajudam a escolher os componentes para a sua build.</p>
             </div>
           </div>
           <div class="card-service" data-reveal data-reveal-delay="80ms">
             <div class="card-container">
-              <h1 class="card-index font-1-xxl">02</h1>
-              <h2 class="card-title font-1-xl">Refine seu setup</h2>
+              <span class="card-index font-1-xxl" aria-hidden="true">02</span>
+              <h3 class="card-title font-1-xl">Refine seu setup</h3>
               <p class="card-desc font-2-s">Confira a configuração sugerida, compare preços e ajuste os componentes. Depois, salve a build no seu perfil ou compartilhe para receber sugestões.</p>
             </div>
           </div>
           <div class="card-service" data-reveal data-reveal-delay="160ms">
             <div class="card-container">
-              <h1 class="card-index font-1-xxl">03</h1>
-              <h2 class="card-title font-1-xl">Aproveite!</h2>
+              <span class="card-index font-1-xxl" aria-hidden="true">03</span>
+              <h3 class="card-title font-1-xl">Aproveite!</h3>
               <p class="card-desc font-2-s">Com a lista de peças definida, acesse as lojas para comprar os componentes. A build fica salva para consultar durante a montagem e em futuros upgrades.</p>
             </div>
           </div>
         </div>
-        <div class="scroll-dots">
-          <span class="dot active" data-index="0"></span>
-          <span class="dot" data-index="1"></span>
-          <span class="dot" data-index="2"></span>
+        <div class="scroll-dots" role="group" aria-label="Etapas da montagem">
+          <button type="button" class="dot active" data-index="0" aria-label="Ver etapa 1: responda o formulário" aria-pressed="true"></button>
+          <button type="button" class="dot" data-index="1" aria-label="Ver etapa 2: refine seu setup" aria-pressed="false"></button>
+          <button type="button" class="dot" data-index="2" aria-label="Ver etapa 3: aproveite" aria-pressed="false"></button>
         </div>
       </div>
     </section>
@@ -113,7 +116,7 @@
       <footer>
         <div id="top-footer">
           <div id="footer-hero">
-            <img src="../imgs/logo.webp" alt="Logo BOOSTio">
+            <img src="../imgs/logo.webp" alt="Logo BOOSTio" width="668" height="237" decoding="async" loading="lazy">
             <p class="font-2-s">A BOOSTio é uma plataforma desenvolvida para simplificar a montagem e o upgrade de computadores.</p>
           </div>
           <nav id="footer-nav">

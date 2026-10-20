@@ -30,7 +30,10 @@ document.addEventListener("DOMContentLoaded",async () => {
       return;
     }
     if (buildId === null && !parametros.has("id") && !parametros.has("compartilhar")) {
-      const nova = await criarBuildManual(estadoParaConta({titulo:"Minha build",descricao:"",visibilidade:"privado",travada:false,orcamento:null,incluirPerifericos:false,incluirRede:false,rede:{},componentes:{}}));
+      const formulario = parametros.get("formulario") === "1";
+      const estadoInicial = formulario ? abrirBuild(new URLSearchParams(),false) : {titulo:"Minha build",descricao:"",visibilidade:"privado",travada:false,orcamento:null,incluirPerifericos:false,incluirRede:false,rede:{},componentes:{}};
+      const nova = await criarBuildManual(estadoParaConta(estadoInicial));
+      if (formulario) sessionStorage.removeItem("boostio:respostas-formulario");
       buildId = nova.build.id;
       history.replaceState(null,"","./configuracao-build.html?" + new URLSearchParams({build_id:buildId}));
     }
@@ -104,10 +107,13 @@ document.addEventListener("DOMContentLoaded",async () => {
         (categoria.id === "fan" ? '<button type="button" class="btn-ghost ram-add-model" data-category="fan" aria-label="Adicionar outro modelo de fan" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("plus") + 'Adicionar outro modelo de fan</button>' : "") +
         (categoria.rede && itens.length < tipos.length ? '<button type="button" class="btn-ghost ram-add-model" data-category="rede" aria-label="Adicionar outro acessório de rede" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("plus") + 'Adicionar outro acessório de rede</button>' : "") + '</section>';
       const incluido = cooler && cpu?.cooler, total = catalogo.filter(p => tipos.includes(p.categoria)).length;
+      const acao = categoria.rede ? "Adicionar cabo ou adaptador" : "Selecionar componente";
+      const dica = categoria.rede ? resumoRede(build.rede) + (total ? " · escolha um modelo no catálogo" : " · produtos ainda não cadastrados")
+        : incluido ? "Cooler incluso no processador" + (cpu.modelo_cooler ? " · " + cpu.modelo_cooler : "") + ". Adicional opcional."
+          : cooler ? "Air cooler e water cooler" : categoria.armazenamento ? "SSD ou HD · escolha ao menos um armazenamento" : "Escolha um modelo no catálogo";
       return '<section class="component-group">' + cabecalho + '<article class="component-row glass-card"><button type="button" class="component-empty' + (perifericos.includes(categoria.id) ? ' component-empty-peripheral' : '') + '" data-category="' + categoria.id +
-        '" aria-label="' + (categoria.rede ? 'Adicionar cabo ou adaptador' : 'Selecionar componente') + ': ' + h(categoria.nome) + '" ' + bloqueado(build.travada,trancada) + '><div><span class="component-empty-label">' + (categoria.rede ? 'Adicionar cabo ou adaptador' : 'Selecionar componente') + '</span><p>' + (categoria.rede ? h(resumoRede(build.rede)) + (total ? ' · escolha um modelo no catálogo' : ' · produtos ainda não cadastrados') : incluido ? 'Cooler incluso no processador' + (cpu.modelo_cooler ? " · " + h(cpu.modelo_cooler) : "") + ". Adicional opcional."
-          : cooler ? "Air cooler e water cooler" : categoria.armazenamento ? "SSD ou HD · escolha ao menos um armazenamento" : "Escolha um modelo no catálogo") +
-        '</p></div><span class="component-add" aria-label="' + total + ' modelos no catálogo">' + iconeAnimado("plus") + '</span></button></article></section>';
+        '" aria-label="' + h(acao + " " + dica + ": " + categoria.nome + " · " + total + " modelos no catálogo") + '" ' + bloqueado(build.travada,trancada) + '><div><span class="component-empty-label">' + acao + '</span> <p>' + h(dica) +
+        '</p></div><span class="component-add" aria-hidden="true">' + iconeAnimado("plus") + '</span></button></article></section>';
     }
     function renderizar() {
       // Preserva o checkbox e sua instância Lottie durante as atualizações da build.

@@ -103,7 +103,7 @@ class Build(ModeloBase):
         return getattr(self, atributo) or 0
  
     @classmethod
-    def criar_gerada(cls, usuario_id: int, dados: dict) -> "Build":
+    def criar_gerada(cls, usuario_id: int, dados: dict, confirmar=True) -> "Build":
         componentes = dados["componentes"]
         por_tipo = {item["tipo"]: item for item in componentes}
         if len(por_tipo) != len(componentes):
@@ -120,7 +120,9 @@ class Build(ModeloBase):
             if tipo in cls.QUANTIDADES:
                 setattr(build, cls.QUANTIDADES[tipo], item["quantidade"])
         db.session.add(build)
-        db.session.commit()
+        db.session.flush()
+        if confirmar:
+            db.session.commit()
         return build
 
     def to_dict(self, incluir_links: bool = False) -> dict:
