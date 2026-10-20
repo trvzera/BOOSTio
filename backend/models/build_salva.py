@@ -35,7 +35,7 @@ class BuildSalva(ModeloBase):
         estado = cls.validar_estado({
             "titulo": dados["nome"][:100], "descricao": dados["descricao"][:300],
             "orcamento": dados["orcamento"], "rede": rede or {},
-            "incluirPerifericos": any(tipo in proprias for tipo in ("monitor", "teclado", "mouse", "fone")),
+            "incluirPerifericos": True,
             "incluirRede": (rede or {}).get("tipo") in ("cabo", "wifi"),
             "pecasExtras": {tipo: nome for tipo, nome in proprias.items() if tipo not in MODELOS},
             "componentes": componentes,
@@ -62,6 +62,7 @@ class BuildSalva(ModeloBase):
                     continue
                 item = {"id": peca.id, "quantidade": original.quantidade_de(tipo)}
                 estado["componentes"][tipo] = [item] if tipo in MULTIPLAS else item
+            estado["incluirPerifericos"] = any(tipo in estado["componentes"] for tipo in ("monitor", "teclado", "mouse", "fone"))
             db.session.add(cls(usuario_id=usuario_id, build_original_id=original.id, estado=estado))
         db.session.commit()
 

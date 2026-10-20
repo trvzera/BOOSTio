@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 from math import isfinite
 
 from models import Build, BuildSalva, Usuario
@@ -9,11 +10,14 @@ from services.llm_service.llm_service import LLMService
 
 class CriarBuildService:
   EXTRAS_PROPRIOS = ("webcam", "microfone")
+  PERIFERICOS = ("monitor", "teclado", "mouse", "fone")
   CAMPOS_PECAS = (
     "id", "fabricante", "modelo", "preco", "consumo_energia",
     "soquete", "socket", "tipo_memoria", "ddr", "capacidade_gb",
     "potencia_w", "formato", "formatos_placa_mae", "memoria_gb",
-    "videointegrado", "cooler", "quantidade_pentes",
+    "videointegrado", "cooler", "quantidade_pentes", "conexao",
+    "tamanho_polegadas", "resolucao", "taxa_atualizacao_hz",
+    "tipo_painel", "layout", "switch", "mecanico", "dpi_max", "microfone",
   )
 
   def executar(self, usuario_id, dados, modelo="gemini-3.5-flash-lite"):
@@ -41,10 +45,10 @@ class CriarBuildService:
       excluidas.update(("air_cooler", "water_cooler"))
     catalogo = self._gerar_catalogo(orcamento - margem, excluidas)
 
-    obrigatorias = ("processador", "placa_mae", "memoria_ram", "fonte", "gabinete")
+    obrigatorias = ("processador", "placa_mae", "memoria_ram", "fonte", "gabinete", *self.PERIFERICOS)
 
     if any(tipo not in catalogo and tipo not in proprias for tipo in obrigatorias) or not ({"ssd", "hd"} & (set(catalogo) | set(proprias))):
-      raise ValueError("Não há peças suficientes para montar um PC nesse orçamento")
+      raise ValueError("Não há peças suficientes para montar um setup completo nesse orçamento")
 
     resposta = LLMService().executar(self._criar_prompt(dados, orcamento, margem, catalogo,
                                                        self._detalhes_proprias(proprias)), modelo)
@@ -61,7 +65,7 @@ class CriarBuildService:
     BuildSalva.migrar_geradas(usuario_id)
     salva = BuildSalva.buscar(usuario_id, gerada.id)
     salva.salvar_estado({**salva.estado, "descricao": dados_build["descricao"][:300], "orcamento": orcamento,
-                        "rede": rede, "incluirRede": rede.get("tipo") in ("cabo", "wifi")})
+                        "rede": rede, "incluirRede": rede.get("tipo") in ("cabo", "wifi"), "incluirPerifericos": True})
     return salva.to_dict()
 
   @classmethod
@@ -86,7 +90,7 @@ class CriarBuildService:
   @classmethod
   def _campos_pecas(cls, peca):
     return {
-      campo: valor for campo in cls.CAMPOS_PECAS
+      campo: float(valor) if isinstance(valor, Decimal) else valor for campo in cls.CAMPOS_PECAS
       if (valor := getattr(peca, campo, None)) is not None
     }
 
@@ -94,7 +98,7 @@ class CriarBuildService:
   def _gerar_catalogo(cls, preco_maximo, excluidas=()):
     catalogo = {}
     for modelo in MODELOS_PECAS:
-      if modelo.__tablename__ in ("monitor", "teclado", "mouse", "fone") or modelo.__tablename__ in excluidas:
+      if modelo.__tablename__ in excluidas:
         continue
       pecas = modelo.listar_disponiveis_ate(preco_maximo, limite=8)
       if pecas:
@@ -147,11 +151,11 @@ class CriarBuildService:
         "- A soma de (preço × quantidade) apenas das peças novas deve ser "
         f"menor ou igual a R$ {orcamento:.2f}. Some item por item antes de responder.\n"
         "- Primeiro considere as peças próprias e calcule o custo das peças novas "
-        "necessárias para uma configuração completa e compatível: "
-        "CPU, placa_mae, RAM, armazenamento, fonte e gabinete; inclua uma "
+        "necessárias para um setup completo e compatível: "
+        "CPU, placa_mae, RAM, armazenamento, fonte, gabinete, monitor, teclado, mouse e fone; inclua uma "
         "placa_video se o processador não tiver vídeo integrado ou se o uso exigir. "
-        "Inclua cooler quando o processador não trouxer um e reserve espaço para "
-        "periféricos somente se forem pedidos. Considere as quantidades na soma.\n"
+        "Inclua cooler quando o processador não trouxer um. Reserve parte do orçamento "
+        "para os quatro periféricos antes de escolher upgrades. Considere as quantidades na soma.\n"
         "- Depois distribua o saldo pelas peças que mais melhoram o uso solicitado. "
         "Para jogos, não deixe a placa_video apenas com o que sobrar; para trabalho "
         "sem necessidade de GPU dedicada, prefira CPU, RAM e SSD adequados. "
@@ -181,7 +185,7 @@ class CriarBuildService:
         "Nunca invente peças, IDs, preços ou especificações.\n"
         "2. A configuração final (peças próprias + novas) deve ter exatamente um processador, uma placa_mae, uma memoria_ram "
         "(com quantidade de pentes conforme a regra de dual channel abaixo), "
-        "uma fonte e um gabinete.\n"
+        "uma fonte, um gabinete, um monitor, um teclado, um mouse e um fone.\n"
         "3. A configuração final deve ter ao menos um armazenamento (ssd ou hd). "
         "Prefira ssd quando o orçamento permitir.\n"
         "4. Não repita categorias já possuídas nem entre as peças novas. Use quantidade 1 para tudo, "
@@ -211,13 +215,13 @@ class CriarBuildService:
         "(o PC precisa ter saída de vídeo).\n\n"
 
         "# PERIFÉRICOS\n"
-        "- Inclua periféricos (por exemplo monitor, teclado, mouse, headset) "
-        "somente se o pedido mencionar que precisa deles, e apenas dos tipos "
-        "que existirem no catálogo.\n"
-        "- Cada periférico entra com quantidade 1 e conta no orçamento total.\n"
-        "- Se o pedido pedir um periférico que não exista no catálogo, "
-        "não invente: monte o PC sem ele.\n"
-        "- Se o pedido não mencionar periféricos, não inclua nenhum.\n\n"
+        "- Complete obrigatoriamente monitor, teclado, mouse e fone (headset), "
+        "exceto as categorias já possuídas pelo usuário.\n"
+        "- Cada periférico novo entra com quantidade 1 e conta no orçamento total.\n"
+        "- Escolha o monitor de acordo com a capacidade gráfica e o uso do PC, "
+        "considerando resolução e taxa de atualização quando constarem no catálogo.\n"
+        "- Se faltar uma dessas categorias no catálogo e o usuário não a possuir, "
+        "retorne o JSON de erro; nunca invente um produto.\n\n"
 
         "# COMPATIBILIDADE (confira cada item)\n"
         "- Socket: o do processador deve ser igual ao da placa_mae.\n"
@@ -237,7 +241,7 @@ class CriarBuildService:
         "3. Socket, memória, gabinete, fonte e armazenamento são compatíveis?\n"
         "4. A memória usa quantidade par de pentes (dual channel) quando possível?\n"
         "5. O vídeo integrado foi verificado antes de decidir pela placa_video?\n"
-        "6. Os periféricos só aparecem se foram pedidos?\n"
+        "6. Monitor, teclado, mouse e fone estão presentes, contando os já possuídos?\n"
         "7. Há categorias repetidas ou quantidades fora da regra?\n"
         "8. A distribuição do orçamento reflete o perfil de uso e inclui "
         "todas as peças necessárias antes dos upgrades?\n"
@@ -269,7 +273,7 @@ class CriarBuildService:
     if any(not isinstance(tipo, str) for tipo in tipos) or len(tipos) != len(set(tipos)) or set(tipos) & set(proprias):
       raise ValueError("A IA repetiu uma categoria de peça")
     finais = set(tipos) | set(proprias)
-    if not {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"} <= finais or not {"ssd", "hd"} & finais:
+    if not {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete", *CriarBuildService.PERIFERICOS} <= finais or not {"ssd", "hd"} & finais:
       raise ValueError("A IA não completou as peças obrigatórias da build")
 
     total = 0
