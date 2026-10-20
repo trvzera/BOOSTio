@@ -1,5 +1,15 @@
 import { fetchComErro } from "../_shared/fetchComErro.js";
 
+export const LIMITE_BUILDS = 3;
+export async function verificarEspacoBuild() {
+  const resposta = await listarBuilds();
+  if (resposta.builds.length >= LIMITE_BUILDS) {
+    const erro = new Error("Você atingiu o limite de três builds. Exclua uma para liberar espaço.");
+    erro.codigo = "limite-builds";
+    throw erro;
+  }
+}
+
 export function criarBuild(dados) {
   return fetchComErro("/build/", { method: "POST", body: JSON.stringify(dados) });
 }

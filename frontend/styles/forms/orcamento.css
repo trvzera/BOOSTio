@@ -13,7 +13,7 @@
 .budget-range.active {
   filter: saturate(100%);
 }
-.budget-range > div > span {
+.budget-range > div > span, .budget-range label {
   color: var(--cor-6);
 }
 .budget-range strong {
@@ -29,7 +29,7 @@
   font-size: 1.4rem;
   line-height: 1;
 }
-.budget-range input {
+.budget-range input[type="range"] {
   grid-column: 1 / -1;
   width: 100%;
   height: 34px;
@@ -41,8 +41,8 @@
   background-color: var(--cor-p6);
   cursor: pointer;
 }
-.budget-range input::-webkit-slider-thumb {
-  width: 44px;
+.budget-range input[type="range"]::-webkit-slider-thumb {
+  width: 24px;
   height: 24px;
   appearance: none;
   border: 1px solid var(--cor-p1);
@@ -50,7 +50,7 @@
   background: var(--cor-p3);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
-.budget-range input::-moz-range-thumb {
+.budget-range input[type="range"]::-moz-range-thumb {
   width: 20px;
   height: 20px;
   border: 2px solid #278fff;
@@ -58,6 +58,37 @@
   background: var(--cor-p1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
+.budget-range #budget-input, .peripheral-percent-field input {
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--cor-3);
+  border-radius: 12px;
+  background: var(--cor-0);
+  color: var(--cor-6);
+  font: 400 .875rem var(--font-body);
+}
+.budget-range #budget-input { max-width: 180px; justify-self: end; }
+.budget-range > p { grid-column: 1 / -1; margin: 0; color: var(--cor-4); }
+.peripheral-budget {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--cor-2);
+  border-radius: 14px;
+  color: var(--cor-6);
+  font: 400 .8125rem/1.5 var(--font-body);
+}
+.peripheral-budget legend { padding: 0 6px; }
+.budget-fields { flex: 1; min-height: 0; min-width: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 16px; padding-right: 8px; }
+.budget-fields > * { flex-shrink: 0; }
+.budget-fields > .question-options { flex: none; overflow: visible; }
+.peripheral-budget-toggle { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+.peripheral-budget-toggle input { flex-shrink: 0; width: 20px; height: 20px; margin: 0; accent-color: var(--cor-p1); }
+#peripheral-allocation:not([hidden]) { display: grid; grid-template-columns: minmax(0,1fr) 90px; align-items: center; gap: 12px; margin-top: 16px; }
+.peripheral-percent-field { display: flex; align-items: center; gap: 6px; }
+#peripheral-budget-summary { grid-column: 1 / -1; margin: 0; color: var(--cor-4); }
 .range-labels {
   display: flex;
   grid-column: 1 / -1;

@@ -6,6 +6,35 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Atualização de criação, orçamento e menus — 20/10/2026
+
+- `BuildSalva.criar_limitada` serializa a escrita por usuário no banco e limita a
+  três builds. Criação manual, importação, modelos, duplicação e geração usam esse
+  ponto; a LLM recebe uma checagem antecipada e outra ao persistir. Não se mantém
+  lock durante a chamada externa. Resultado gerado e estado são salvos na mesma
+  transação. A quota responde `409 / codigo: limite-builds`, sem apagar dados antigos.
+- O formulário usa tetos **Até**, slider de R$ 100 em R$ 100 e entrada com centavos.
+  Reserva opcional de 1–99% do total para periféricos: `percentual_perifericos` no
+  pedido, `percentualPerifericos` no estado. O Python divide em centavos, inclui
+  o catálogo de periféricos e confere os dois subtotais; catálogo insuficiente ou
+  saída da IA fora da divisão retorna erro, sem salvar uma build parcial.
+- Peças próprias suportadas, rede e reserva seguem ao editor por `?formulario=1`;
+  as respostas só são removidas da sessão após criar. Identificação completa de
+  modelos e categorias ausentes no banco continuam pendentes.
+- Frases na espera mudam a cada quatro segundos, sem porcentagem ou etapas reais.
+  Erro preserva respostas e permite repetir/revisar. A etapa de orçamento tem sua
+  própria área de campos roláveis, mantendo navegação acessível.
+- Os menus da conta renderizam `iconeAnimado`, carregam os JSONs ao remover `inert`
+  na abertura e usam Popover API quando disponível para escapar do recorte/glass
+  do card. Menu fecha por Escape, clique externo, rolagem da página ou resize.
+- FPSHQ: diagnóstico externo terminou em timeout após conexão/TLS. Falhas TLS/rede
+  têm códigos próprios; timeout é 504 e indisponibilidade HTTP do provedor é 503.
+  A pausa retorna `Retry-After` (também após falha de conexão), sem repetição automática.
+  Cache válido continua disponível. Não foi demonstrada recuperação do provedor.
+
+Os trechos históricos abaixo sobre quota apenas local e ausência de CRUD não
+descrevem os fluxos atuais da conta; consultar este bloco e o README.
+
 Abra pelo Live Server:
 
 - `frontend/pages/configuracao-build.html`: cria uma montagem vazia na conta, com sessão.

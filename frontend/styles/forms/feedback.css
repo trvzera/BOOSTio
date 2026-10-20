@@ -16,6 +16,16 @@
 .build-loading p {
   color: var(--cor-4);
 }
+.build-loading { padding: 32px 16px; min-height: 220px; }
+#generation-message { min-height: 3em; max-width: 32ch; text-wrap: balance; }
+.build-generation-error { display: grid; align-content: center; gap: 16px; min-height: 220px; padding: 24px 8px; }
+.build-generation-error h2 { color: var(--cor-6); }
+.build-generation-error p { color: var(--cor-4); overflow-wrap: anywhere; }
+.generation-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+@media (max-width: 480px) {
+  .generation-actions { flex-direction: column; align-items: stretch; }
+  .generation-actions > * { text-align: center; }
+}
 .build-loader {
   width: 58px;
   height: 58px;

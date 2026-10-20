@@ -127,7 +127,7 @@ def test_limites_por_usuario_globais_e_cache_limitado():
         BuscarJogosBenchmarkService(api).executar({"q": "novo"}, 2)
 
 
-@pytest.mark.parametrize("status,esperado", [(404, 404), (503, 502), (302, 502)])
+@pytest.mark.parametrize("status,esperado", [(404, 404), (503, 503), (302, 502)])
 def test_erros_http_sem_cache(status, esperado):
     api = cliente(Mock(return_value=Mock(status_code=status, headers={})))
     with pytest.raises(ErroBenchmark) as erro:
@@ -145,6 +145,31 @@ def test_timeout_rede_e_json_invalido(falha, status):
     api = cliente(Mock(return_value=Mock(status_code=200, headers={}, json=Mock(side_effect=ValueError()))))
     with pytest.raises(ErroBenchmark, match="inválida"):
         ConsultarBenchmarkService(api).executar(CONSULTA, 1)
+
+
+@pytest.mark.parametrize("falha,codigo,status", [
+    (requests.exceptions.SSLError(), "tls", 503),
+    (requests.ConnectionError(), "rede", 503),
+    (requests.Timeout(), "timeout", 504),
+])
+def test_falha_temporaria_pausa_rede_sem_bloquear_cache(falha, codigo, status):
+    tempo = [0]
+    api = cliente(relogio=lambda: tempo[0])
+    service = ConsultarBenchmarkService(api)
+    service.executar(CONSULTA, 1)
+    api.buscar.side_effect = falha
+    with pytest.raises(ErroBenchmark) as erro:
+        service.executar({**CONSULTA, "game": "cs2"}, 1)
+    assert (erro.value.codigo, erro.value.status) == (codigo, status)
+    assert erro.value.espera > 0
+    espera = erro.value.espera
+    assert service.executar(CONSULTA, 2)["cache"] is True
+    with pytest.raises(ErroBenchmark):
+        service.executar({**CONSULTA, "game": "fortnite"}, 2)
+    assert api.buscar.call_count == 2
+    tempo[0] = espera + 1
+    api.buscar.side_effect = None
+    assert service.executar(CONSULTA, 1)["fps"] == 288
 
 
 def test_busca_valida_filtra_e_limita_resultados():

@@ -30,7 +30,10 @@ document.addEventListener("DOMContentLoaded",async () => {
       return;
     }
     if (buildId === null && !parametros.has("id") && !parametros.has("compartilhar")) {
-      const nova = await criarBuildManual(estadoParaConta({titulo:"Minha build",descricao:"",visibilidade:"privado",travada:false,orcamento:null,incluirPerifericos:false,incluirRede:false,rede:{},componentes:{}}));
+      const formulario = parametros.get("formulario") === "1";
+      const estadoInicial = formulario ? abrirBuild(new URLSearchParams(),false) : {titulo:"Minha build",descricao:"",visibilidade:"privado",travada:false,orcamento:null,incluirPerifericos:false,incluirRede:false,rede:{},componentes:{}};
+      const nova = await criarBuildManual(estadoParaConta(estadoInicial));
+      if (formulario) sessionStorage.removeItem("boostio:respostas-formulario");
       buildId = nova.build.id;
       history.replaceState(null,"","./configuracao-build.html?" + new URLSearchParams({build_id:buildId}));
     }

@@ -2,6 +2,8 @@ from datetime import timezone
 
 from . import db, ModeloBase
 from .build import Build
+from .usuario import Usuario
+from sqlalchemy import update
 from . import Processador, PlacaMae, PlacaVideo, MemoriaRAM, SSD, HD, Fonte, Gabinete
 from . import WaterCooler, AirCooler, Fan, Fone, Teclado, Mouse, Monitor
 
@@ -13,15 +15,47 @@ MODELOS = {modelo.__tablename__: modelo for modelo in (
 MULTIPLAS = {"memoria_ram", "ssd", "hd", "fan"}
 
 
+class LimiteBuildsError(ValueError):
+    def __init__(self):
+        super().__init__("Você atingiu o limite de três builds. Exclua uma para liberar espaço.")
+
+
 class BuildSalva(ModeloBase):
     __tablename__ = "build_salva"
 
     usuario_id = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=False)
     build_original_id = db.Column(db.Integer, db.ForeignKey("build.id"), unique=True)
     estado = db.Column(db.JSON, nullable=False)
+    LIMITE = 3
 
     @classmethod
-    def migrar_geradas(cls, usuario_id):
+    def verificar_espaco(cls, usuario_id):
+        cls.migrar_geradas(usuario_id)
+        if cls.query.filter_by(usuario_id=usuario_id).count() >= cls.LIMITE:
+            raise LimiteBuildsError()
+
+    @classmethod
+    def criar_limitada(cls, usuario_id, estado, gerada=None):
+        """Serializa a escrita por usuário; nunca mantém lock durante a chamada à LLM."""
+        try:
+            # UPDATE também serializa no SQLite, onde SELECT FOR UPDATE não tem efeito.
+            resultado = db.session.execute(update(Usuario).where(Usuario.id == usuario_id).values(id=Usuario.id))
+            if resultado.rowcount != 1:
+                raise ValueError("Usuário não encontrado")
+            cls.migrar_geradas(usuario_id, confirmar=False)
+            if cls.query.filter_by(usuario_id=usuario_id).count() >= cls.LIMITE:
+                raise LimiteBuildsError()
+            original = Build.criar_gerada(usuario_id, gerada, confirmar=False) if gerada else None
+            build = cls(usuario_id=usuario_id, estado=estado, build_original_id=original.id if original else None)
+            db.session.add(build)
+            db.session.commit()
+            return build
+        except Exception:
+            db.session.rollback()
+            raise
+
+    @classmethod
+    def migrar_geradas(cls, usuario_id, confirmar=True):
         originais = Build.listar_por_usuario(usuario_id)
         existentes = {item.build_original_id for item in cls.query.filter_by(usuario_id=usuario_id).all()}
         for original in originais:
@@ -39,7 +73,9 @@ class BuildSalva(ModeloBase):
                 item = {"id": peca.id, "quantidade": original.quantidade_de(tipo)}
                 estado["componentes"][tipo] = [item] if tipo in MULTIPLAS else item
             db.session.add(cls(usuario_id=usuario_id, build_original_id=original.id, estado=estado))
-        db.session.commit()
+        db.session.flush()
+        if confirmar:
+            db.session.commit()
 
     @classmethod
     def listar_por_usuario(cls, usuario_id):
@@ -104,10 +140,14 @@ class BuildSalva(ModeloBase):
         orcamento = dados.get("orcamento")
         if orcamento is not None and (type(orcamento) not in (int, float) or not 0 <= orcamento <= 1000000):
             raise ValueError("Orçamento inválido")
+        percentual = dados.get("percentualPerifericos", 0)
+        if type(percentual) is not int or not 0 <= percentual <= 99:
+            raise ValueError("A porcentagem para periféricos deve ser de 0 a 99")
         return {
             "titulo": titulo.strip(), "descricao": descricao.strip(), "visibilidade": dados.get("visibilidade", "privado"),
             "travada": bool(dados.get("travada", False)), "orcamento": orcamento,
             "incluirPerifericos": bool(dados.get("incluirPerifericos", False)),
+            "percentualPerifericos": percentual,
             "incluirRede": bool(dados.get("incluirRede", False)), "rede": dados.get("rede") or {},
             "componentes": limpos,
         }

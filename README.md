@@ -46,7 +46,12 @@ local continuam existindo; não equivalem ao salvamento no servidor.
   esta revisão de interface não fez chamadas pagas de geração nem coleta real de preços.
 - **A concluir:** compatibilidade física definitiva no Python, requisitos de jogos/RAM,
   ofertas atualizadas nas três lojas, curadoria de modelos e validação completa dos
-  fluxos da LLM, quota e migração consentida das builds antigas do navegador.
+  fluxos da LLM e migração consentida das builds antigas do navegador.
+
+**Limite por conta:** até três builds, conferido pelo Python para montagem manual,
+geração, importação, cópia de modelo e duplicação. A escrita é serializada no banco
+para duas criações simultâneas não ocuparem a mesma vaga. Configurações antigas
+que já ultrapassaram o limite são preservadas; novas criações ficam bloqueadas.
 
 ### Catálogo e dados
 
@@ -75,7 +80,7 @@ Os **20 requisitos do produto** estão preservados abaixo.
 | 2 | Cadastrar o setup atual | **Conectado.** Definir/remover setup atual na conta; peças próprias identificadas no editor. |
 | 3 | Pesquisar peças e compatibilidade | **Parcial.** Catálogo da conta conectado; compatibilidade técnica ainda exige validação definitiva no Python. |
 | 4 | Montar o setup por formulário | **Parcial.** Geração pela LLM implementada e salva na conta; validar chave/cotas, contexto completo e compatibilidade do resultado. |
-| 5 | Salvar configurações | **Conectado.** Builds e rascunhos incompletos salvos na conta; revisar quota e migração dos dados locais antigos. |
+| 5 | Salvar configurações | **Conectado.** Builds e rascunhos incompletos salvos na conta, com limite de três; falta migração consentida dos dados locais antigos. |
 | 6 | Excluir configurações salvas | **Conectado.** Exclusão autenticada, com verificação de dono e tranca. |
 | 7 | Comparar configurações salvas | **Parcial.** Comparador usa builds da conta; falta comparar desempenho medido nas mesmas condições. |
 | 8 | Compartilhar configurações por link | **Conectado.** URL por ID e leitura pública condicionada à visibilidade; links legados continuam sendo cópias independentes. |
@@ -84,11 +89,11 @@ Os **20 requisitos do produto** estão preservados abaixo.
 | 11 | Editar configurações salvas | **Conectado.** Editor salva componentes e detalhes na conta, respeitando a tranca. |
 | 12 | Consultar preços das peças pelo site | **Parcial.** Coleta e histórico de tentativas da KaBuM implementados por comandos; completar automação, integração visual e outras lojas. |
 | 13 | Ver compatibilidade e consumo de energia | **Parcial.** Validações e consumo estimado; faltam revalidação em Python e encaixe físico completo do gabinete. |
-| 14 | Incluir periféricos no setup e no orçamento | **Parcial.** Periféricos entram no total; rede tem planejamento próprio, mas cabos/adaptadores ainda precisam de produtos no catálogo. |
+| 14 | Incluir periféricos no setup e no orçamento | **Parcial.** Reserva percentual opcional no formulário, validada na geração pelo Python; cabos/adaptadores ainda precisam de produtos no catálogo. |
 | 15 | Registrar budget no perfil | **Conectado.** Valor/autorização persistidos e formulário preenchido; alinhar o valor inicial da criação manual da conta. |
 | 16 | Baixar a build em JSON e CSV | **Conectado.** Arquivos gerados no navegador a partir das builds da conta; formato versionado. |
 | 17 | Alterar a visibilidade da build | **Conectado.** Estado persistido e conferido na leitura pública pelo servidor. |
-| 18 | Duplicar a build | **Conectado.** Cópia independente na conta; revisar a política de quota. |
+| 18 | Duplicar a build | **Conectado.** Cópia independente na conta, respeitando o limite de três. |
 | 19 | Definir nome e descrição | **Conectado.** Edição e validação de limites no Python. |
 | 20 | Importar builds em CSV ou JSON | **Conectado.** Prévia/validação no frontend e criação na conta com IDs e quantidades conferidos no servidor. |
 
@@ -103,6 +108,13 @@ modal quando as peças obrigatórias estão preenchidas e não há erros de comp
 - São exibidos FPS médio e 1% low quando disponíveis. **Comparar ajustes** utiliza
   a matriz recebida, sem uma nova consulta ao trocar a qualidade da comparação.
 - Modelos sem correspondência cadastrada não são substituídos por peças parecidas.
+- Falhas de conexão/TLS, timeout e indisponibilidade do provedor têm códigos próprios
+  e uma pausa com `Retry-After`; resultados válidos em cache continuam acessíveis.
+  Não há repetição automática nem FPS inventado como alternativa a uma falha.
+
+Na consulta externa de 20/10/2026, a conexão/TLS foi concluída, mas não houve resposta
+HTTP dentro de 25 segundos. O tratamento foi testado; isso **não comprova que a
+disponibilidade da FPSHQ foi restabelecida**. Documentação: [API pública FPSHQ](https://fpshq.com/pt/api/).
 
 **Não é um benchmark executado na máquina nem uma aprovação dos requisitos do jogo.**
 RAM e requisitos mínimos/recomendados ainda precisam de verificação separada. O
@@ -124,6 +136,18 @@ O antigo budget local não é importado automaticamente para nenhuma conta. Entr
 salve o valor nas configurações para sincronizá-lo entre dispositivos. As builds e a
 escolha de setup atual da conta são persistidas; os modos legados continuam locais.
 
+No formulário, os atalhos indicam **Até R$ 3.000 / 5.000 / 8.000**. O slider varia
+de R$ 100 em R$ 100, com campo para digitar um valor exato, incluindo centavos.
+A opção de reservar orçamento para monitor, teclado, mouse e headset aceita de 1%
+a 99% do **mesmo total**. Por exemplo: R$ 5.000 com 20% reserva R$ 1.000 para
+periféricos e R$ 4.000 para o PC; a geração rejeita resultados que excedam qualquer
+parcela. Sem a opção, o total fica para o PC. Catálogo insuficiente gera orientação,
+não componentes inventados. A reserva também é preservada no estado da build.
+
+Durante a geração, frases rotativas tornam a espera mais clara. Elas não representam
+etapas ou progresso real informado pela LLM. Falhas permitem tentar novamente ou
+revisar o orçamento sem perder as respostas.
+
 ### Compra e lojas
 
 **Comprar build** existe apenas dentro do editor: reúne quantidades, links e preços
@@ -138,11 +162,12 @@ e devolução devem ser conferidos diretamente com o vendedor.
 ### 1. Consolidar a integração das builds
 
 - Cobrir o CRUD já implementado com testes de propriedade, tranca, visibilidade,
-  múltiplos componentes e conflitos de salvamento; definir/aplicar quota no servidor.
+  múltiplos componentes e conflitos de salvamento. Quota e criação concorrente já têm testes.
 - Validar os casos-limite de orçamento e planejamento de rede, sem confiar nos dados do cliente.
 - Migrar dados locais com confirmação, alinhar IDs e manter o salvamento automático seguro.
 - Aplicar o budget autorizado do perfil na criação manual, hoje iniciada com orçamento vazio.
-- Transferir peças próprias e rede do formulário à nova montagem da conta, além do fluxo legado.
+- Completar identificação das peças próprias e suporte a categorias ainda ausentes
+  no banco (como webcam/microfone); o formulário já encaminha os tipos suportados e rede ao editor.
 
 ### 2. Completar compatibilidade e encaixe físico
 
@@ -273,6 +298,9 @@ Os cenários automatizados de benchmark usam respostas controladas para não dep
 da disponibilidade do provedor nem consumir suas cotas durante a execução dos testes.
 Os testes de budget usam SQLite temporário e verificam autorização, centavos,
 separação entre contas, remoção, persistência entre sessões e migração com backup.
+Os de criação verificam quota em todos os caminhos, disputa pela última vaga,
+preservação de contas acima do limite, reserva de periféricos e persistência atômica
+da geração com respostas simuladas, sem chamar uma LLM paga.
 
 A revisão de qualidade cobre as 16 telas, incluindo teclado, modais, metadados,
 movimento reduzido e testes de regressão. Consulte os resultados e limites da

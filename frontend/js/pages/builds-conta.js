@@ -1,6 +1,6 @@
 import "../header.js";
 import "../auth/auth.js";
-import { listarBuilds, criarBuildManual, atualizarBuild, duplicarBuild, excluirBuild, definirSetupAtual } from "../api/build/builds.js";
+import { listarBuilds, criarBuildManual, atualizarBuild, duplicarBuild, excluirBuild, definirSetupAtual, LIMITE_BUILDS, verificarEspacoBuild } from "../api/build/builds.js";
 import { carregarCatalogoConta, buildDaConta, estadoParaConta, linkBuildConta } from "../build/conta.js";
 import { htmlSeguro as h, moeda } from "../build/catalogo.js";
 import { avaliarBuild } from "../build/compatibilidade.js";
@@ -22,6 +22,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const inputTitulo = document.querySelector("#edit-title");
   const inputDescricao = document.querySelector("#edit-description");
   let salvas = [], catalogo = [], idEdicao = null, idExclusao = null;
+  let carregadas = false, criando = false;
+  const lotado = () => salvas.length >= LIMITE_BUILDS;
+  for (const id of ["#btn-create-build","#btn-import-build"]) {
+    const botao = document.querySelector(id);
+    botao.disabled = true;
+    botao.dataset.disabledReason = "Aguarde o carregamento das suas builds.";
+  }
 
   function avisar(mensagem) {
     document.querySelector("#toast-text").textContent = mensagem;
@@ -42,7 +49,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function carregar() {
     try {
       const [resposta, pecas] = await Promise.all([listarBuilds(), carregarCatalogoConta()]);
-      salvas = resposta.builds || []; catalogo = pecas;
+      salvas = resposta.builds || []; catalogo = pecas; carregadas = true;
       renderizar();
     } catch (erro) { status.hidden = false; status.textContent = erro.message; }
   }
@@ -52,17 +59,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     const progresso = Math.round(avaliacao.preenchidos / avaliacao.total * 100);
     const trancada = build.travada, setup = Boolean(dados.estado?.setupAtual);
     const classe = avaliacao.erros.length ? "error" : avaliacao.avisos.length ? "warning" : progresso === 100 ? "complete" : "incomplete";
-    const opcao = (acao, texto, desabilitada = false) => `<button type="button" class="build-menu-item" data-acao="${acao}" aria-label="${h(texto)}: ${h(build.titulo)}" ${desabilitada ? "disabled" : ""}>${h(texto)}</button>`;
+    const icones = {benchmark:"magic",melhorias:"magnifying","setup-atual":"circledot",trancar:"lock",visibilidade:"visibility",editar:"pencil",duplicar:"clone","copiar-link":"copy","baixar-csv":"download","baixar-json":"download",deletar:"trash"};
+    const opcao = (acao, texto, desabilitada = false, motivo = "") => `<button type="button" class="build-menu-item${acao === "deletar" ? " danger-menu-item" : ""}" data-acao="${acao}" aria-label="${h(texto)}: ${h(build.titulo)}" ${desabilitada ? `disabled data-disabled-reason="${h(motivo || (trancada ? "Destranque a build para usar esta opção." : "Torne a build pública para compartilhar o link."))}"` : ""}>${iconeAnimado(icones[acao],"internal",{invertido:acao === "setup-atual" && setup})}<span>${h(texto)}</span></button>`;
     const menuId = "build-options-" + encodeURIComponent(build.id);
     return `<article class="build-card build-account-card ${classe} ${trancada ? "locked" : ""}" data-id="${h(build.id)}">
       <div class="build-card-top"><div class="build-title-line"><span class="compatibility-marker" role="img" aria-label="${progresso}% completo"></span><h2 class="build-card-title font-1-m-b"><a href="${url(build)}" aria-label="Abrir configuração de ${h(build.titulo)}">${h(build.titulo)}</a></h2>${trancada ? '<i class="fa-solid fa-lock build-card-lock" aria-hidden="true"></i>' : ""}${setup ? '<span class="build-card-current">Setup atual</span>' : ""}</div>
       <div class="build-menu-wrap"><button type="button" class="build-menu-trigger" aria-label="Abrir menu da build ${h(build.titulo)}" aria-expanded="false" aria-controls="${menuId}">${iconeAnimado("dots")}</button><div class="build-menu" id="${menuId}" role="group" aria-label="Opções da build ${h(build.titulo)}" aria-hidden="true" inert>
-        ${opcao("benchmark","Testar build",Boolean(motivoBenchmark(build,catalogo)))}
+        ${opcao("benchmark","Testar build",Boolean(motivoBenchmark(build,catalogo)),motivoBenchmark(build,catalogo))}
         ${opcao("melhorias","Buscar melhorias",trancada)}
         ${opcao("setup-atual",setup ? "Remover como setup atual" : "Definir como setup atual")}
         <span class="build-menu-divider"></span>${opcao("trancar",trancada ? "Destrancar build" : "Trancar build")}
         ${opcao("visibilidade",build.visibilidade === "publico" ? "Tornar privado" : "Tornar público",trancada)}
-        ${opcao("editar","Editar detalhes",trancada)}${opcao("duplicar","Duplicar build")}
+        ${opcao("editar","Editar detalhes",trancada)}${opcao("duplicar","Duplicar build",lotado(),"Limite de três builds atingido. Exclua uma para duplicar.")}
         ${opcao("copiar-link","Copiar link",build.visibilidade !== "publico")}
         <span class="build-menu-divider"></span>${opcao("baixar-csv","Baixar build (CSV)")}${opcao("baixar-json","Baixar build (JSON)")}
         <span class="build-menu-divider"></span>${opcao("deletar","Deletar build",trancada)}
@@ -76,7 +84,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     status.hidden = salvas.length > 0;
     status.textContent = salvas.length ? "" : "Você ainda não tem builds salvas na conta.";
     lista.innerHTML = salvas.map(card).join("");
-    document.querySelector("#quota-count").textContent = String(salvas.length);
+    document.querySelector("#quota-count").textContent = `${salvas.length} / ${LIMITE_BUILDS}`;
+    document.querySelector("#quota-progress").setAttribute("aria-valuenow",String(Math.min(LIMITE_BUILDS,salvas.length)));
+    document.querySelector("#quota-fill").style.width = `${Math.min(100,salvas.length / LIMITE_BUILDS * 100)}%`;
+    document.querySelector("#quota-help").textContent = lotado() ? "Limite atingido. Exclua uma build para liberar espaço." : "Até três builds salvas na sua conta";
+    for (const id of ["#btn-create-build","#btn-import-build"]) {
+      const botao = document.querySelector(id);
+      botao.disabled = lotado();
+      botao.dataset.disabledReason = "Limite de três builds atingido. Exclua uma para liberar espaço.";
+    }
     document.querySelector("#btn-compare-builds").disabled = salvas.length < 2;
     iniciarIcones(lista);
   }
@@ -87,6 +103,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     const botao = wrap.querySelector(".build-menu-trigger"), menu = wrap.querySelector(".build-menu");
     botao.setAttribute("aria-expanded",String(aberto));
     menu.inert = !aberto; menu.setAttribute("aria-hidden",String(!aberto));
+    if (typeof menu.showPopover === "function") {
+      menu.popover = "manual";
+      if (aberto) {
+        menu.showPopover();
+        const r = botao.getBoundingClientRect();
+        const topo = Math.min(r.bottom + 8,innerHeight - 172);
+        menu.style.top = Math.max(12,topo) + "px";
+        menu.style.left = Math.max(12,Math.min(r.right - menu.offsetWidth,innerWidth - menu.offsetWidth - 12)) + "px";
+        menu.style.maxHeight = Math.max(160,innerHeight - topo - 12) + "px";
+      } else if (menu.matches(":popover-open")) menu.hidePopover();
+    }
+    if (aberto) iniciarIcones(menu);
   }
 
   lista.addEventListener("click", async evento => {
@@ -144,6 +172,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.addEventListener("click", evento => {
     if (!lista.contains(evento.target)) lista.querySelectorAll(".build-menu-wrap.open").forEach(item => alternarMenu(item,false));
   });
+  const fecharMenus = () => lista.querySelectorAll(".build-menu-wrap.open").forEach(item => alternarMenu(item,false));
+  window.addEventListener("resize",fecharMenus);
+  window.addEventListener("scroll",fecharMenus,{passive:true});
   document.addEventListener("keydown", evento => {
     if (evento.key !== "Escape") return;
     lista.querySelectorAll(".build-menu-wrap.open").forEach(wrap => {
@@ -152,15 +183,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   document.querySelector("#btn-create-build").onclick = () => {
+    if (!carregadas || lotado() || criando) return;
     const dialogo = abrirDialogoBuild("Como você quer criar sua build?",'<div class="build-create-options"><button type="button" class="build-create-option" data-criar="manual" aria-label="Criar build manualmente"><strong>Montagem manual</strong><span>Escolha peça por peça do catálogo.</span></button><a class="build-create-option" href="./formulario.html" aria-label="Criar build pelo formulário inteligente"><strong>Formulário inteligente</strong><span>Informe objetivo e orçamento para gerar a build.</span></a></div>');
-    dialogo.querySelector('[data-criar="manual"]').onclick = async () => {
+    dialogo.querySelector('[data-criar="manual"]').onclick = async evento => {
+      if (criando) return;
+      criando = true; evento.currentTarget.disabled = true;
       try {
+        await verificarEspacoBuild();
         const {build} = await criarBuildManual(estadoParaConta({titulo:"Minha build",descricao:"",visibilidade:"privado",travada:false,orcamento:null,incluirPerifericos:false,incluirRede:false,rede:{},componentes:{}}));
         navegarPara(url(build));
-      } catch (erro) { avisar(erro.message); }
+      } catch (erro) { avisar(erro.message); criando = false; dialogo.close(); await carregar(); }
     };
   };
   document.querySelector("#btn-import-build").onclick = () => {
+    if (!carregadas || lotado() || criando) return;
     const dialogo = abrirDialogoBuild("Importar build",'<p class="planning-help">Selecione um JSON ou CSV de build (até 1 MB).</p><input type="file" id="build-import-file" accept=".json,.csv" aria-label="Arquivo da build"><p id="build-import-status" role="status"></p><button type="button" class="btn-primary" id="build-import-confirm" aria-label="Importar build selecionada" disabled>Importar build</button>');
     let candidata;
     const feedback = dialogo.querySelector("#build-import-status"), confirmar = dialogo.querySelector("#build-import-confirm");
@@ -172,8 +208,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       } catch (erro) { candidata = null; confirmar.disabled = true; feedback.textContent = erro.message; }
     };
     confirmar.onclick = async () => {
-      try { await criarBuildManual(estadoParaConta(candidata)); dialogo.close(); await carregar(); avisar("Build importada na conta."); }
+      if (criando || !candidata) return;
+      criando = true; confirmar.disabled = true;
+      try { await verificarEspacoBuild(); await criarBuildManual(estadoParaConta(candidata)); dialogo.close(); await carregar(); avisar("Build importada na conta."); }
       catch (erro) { feedback.textContent = erro.message; }
+      finally { criando = false; confirmar.disabled = !candidata; }
     };
   };
   document.querySelector("#btn-compare-builds").onclick = () => {
