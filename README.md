@@ -225,6 +225,17 @@ O backend atende em `http://127.0.0.1:5000`. Ao iniciar por `app.py`, ele cria a
 tabelas ausentes e executa o cadastro inicial das peças. **A atualização automática
 de preços permanece pausada.**
 
+Para repor os links conhecidos em um banco já populado e consultar preços reais:
+
+```bash
+python -m flask --app app pecas-restaurar-links
+python -m flask --app app precos-atualizar
+```
+
+O primeiro comando preserva links já cadastrados. O segundo pode ser executado
+diariamente; registra preço e estoque apenas quando a loja fornece uma oferta
+válida. Peças sem cotação continuam fora das sugestões de builds.
+
 ### Frontend
 
 Sirva a raiz do projeto com o **Live Server** do VS Code, na porta `5500`:

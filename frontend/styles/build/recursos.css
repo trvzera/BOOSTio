@@ -25,6 +25,7 @@ body:has(.build-action-dialog[open]), body:has(.compare-dialog[open]) { overflow
 .build-create-dialog { width: min(760px,calc(100vw - 32px)); }
 .build-create-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; margin-top: 24px; }
 .build-create-option { display: flex; flex-direction: column; gap: 14px; padding: 24px; border: 1px solid var(--glass-border); border-radius: var(--radius-card); background: #ffffff04; color: var(--cor-6); text-decoration: none; transition: border-color var(--motion-fast) ease, background var(--motion-fast) ease; }
+.build-create-option:is(button) { text-align: left; cursor: pointer; }
 .build-create-option:hover { border-color: var(--cor-p1); background: #007bff0a; }
 .build-create-option > strong { font: 500 1.1rem/1.4 var(--font-heading); }
 .build-create-option > span:not(.build-create-option-action) { color: var(--cor-4); font: 400 .8rem/1.7 var(--font-body); }

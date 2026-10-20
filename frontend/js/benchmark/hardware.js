@@ -12,6 +12,7 @@ const cpus = new Map([
 ].map(([modelo,slug]) => [modelo.toLowerCase(),slug]));
 const gpus = new Map([
   ["GeForce RTX 3060",12,"rtx-3060"], ["Alpha RTX 3060",12,"rtx-3060"],
+  ["GeForce RTX5050 8GB GDDR6",8,"rtx-5050"], ["GeForce RTX 5050",8,"rtx-5050"],
   ["GeForce RTX 3060 Ti",8,"rtx-3060-ti"], ["GeForce RTX 4060",8,"rtx-4060"],
   ["GeForce GTX 1660 Super",6,"gtx-1660-super"], ["GeForce GTX 1660",6,"gtx-1660"],
   ["GeForce GTX 1050 Ti",4,"gtx-1050-ti"], ["Radeon RX 6750 XT",12,"rx-6750-xt"],

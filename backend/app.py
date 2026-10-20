@@ -9,8 +9,8 @@ from controllers.usuario_controller import usuario_bp
 from controllers.auth_controller import auth_bp
 from controllers.email_controller import email_bp
 from controllers.benchmark_controller import benchmark_bp
+from controllers.build_controller import build_bp
 from services.peca_service.popular_pecas_service import PopularPecasService
-from services.peca_service.atualizar_precos_service import AtualizarPrecosService
 from migrations.budget_usuario import registrar_migracao_budget
 
 load_dotenv()
@@ -28,17 +28,26 @@ mail.init_app(app)
 configurar_oauth(app)
 
 #flask cors permite o fornt consumir a api do back, e salvar os cookies, quando o front estiver nessas urls
-CORS(app, supports_credentials=True, origins=["http://localhost:5500", "http://127.0.0.1:5500"])
+CORS(app, supports_credentials=True, origins=[
+    "http://localhost:5500", "http://127.0.0.1:5500",
+    "http://localhost:5501", "http://127.0.0.1:5501",
+])
 
 app.register_blueprint(usuario_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(email_bp)
 app.register_blueprint(benchmark_bp)
+app.register_blueprint(build_bp)
 registrar_migracao_budget(app, db)
+
+with app.app_context():
+    db.create_all()
+
+from commands.precos import registrar_comandos_precos
+registrar_comandos_precos(app)
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        PopularPecasService().executar()
-        # AtualizarPrecosService().executar()  # Pausado enquanto o catálogo é revisado.
+        PopularPecasService().executar(atualizar_precos=False)
     app.run(debug=True)

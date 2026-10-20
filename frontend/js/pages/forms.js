@@ -4,6 +4,8 @@ import { normalizarRede, vincularRede } from "../build/rede.js";
 import { planejamentoLocal } from "../build/planejamento.js";
 import { carregarPerfil } from "../conta/perfil.js";
 import { acompanharCarregamento } from "../components/page-loading.js";
+import { criarBuild } from "../api/build/builds.js";
+import { buscarUsuarioLogado } from "../api/usuario/buscarUsuarioLogado.js";
 import {
   registrarAnimacao,
   destruirAnimacao,
@@ -415,8 +417,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     atualizarMenu();
   }
 
+  let gerando = false;
   function avancar() {
-    if (!podeAvancar()) return;
+    if (gerando || !podeAvancar()) return;
     if (indiceAtual === perguntas.length - 1) {
       mostrarGerando();
       return;
@@ -433,18 +436,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  function mostrarGerando() {
+  async function mostrarGerando() {
+    gerando = true;
     limparCheckboxesLottie();
     atualizarMenu();
-    sessionStorage.setItem(
-      "boostio:respostas-formulario",
-      JSON.stringify(respostas),
-    );
-    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Configure os componentes da sua build</h1><p class="font-2-s">Suas peças próprias serão levadas ao editor. Selecione os modelos no catálogo para iniciar as verificações de compatibilidade.</p></div>`;
-    conteudo.innerHTML = `<div class="build-loading" role="status"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-l">Preparando o editor</h2><p class="font-2-s">Você poderá escolher, alterar e remover os componentes.</p></div>`;
-    window.setTimeout(() => {
+    if (respostas.pecas?.some(peca => peca !== "nenhuma")) {
+      sessionStorage.setItem("boostio:respostas-formulario", JSON.stringify(respostas));
+      painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Configure os componentes da sua build</h1><p class="font-2-s">Suas peças próprias serão levadas ao editor para completar a montagem.</p></div>`;
+      conteudo.innerHTML = `<div class="build-loading" role="status"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-l">Preparando o editor</h2></div>`;
       window.location.href = paginaConfiguracaoBuild;
-    }, 2600);
+      return;
+    }
+
+    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Gerando sua build</h1><p class="font-2-s">Vamos selecionar peças compatíveis dentro do seu orçamento.</p></div>`;
+    conteudo.innerHTML = `<div class="build-loading" role="status"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-l">Consultando as peças</h2></div>`;
+    const faixas = {"ate-3000": 3000, "3000-5000": 5000, "5000-8000": 8000};
+    const orcamento = respostas.orcamento === "personalizado"
+      ? respostas.orcamentoPersonalizado : faixas[respostas.orcamento];
+    const utilidade = perguntas[0].opcoes.find(opcao => opcao[0] === respostas.objetivo)?.[1] || respostas.objetivo;
+
+    try {
+      const sessao = await buscarUsuarioLogado();
+      if (!sessao.auth) throw new Error("Entre na sua conta para salvar a build.");
+      const resposta = await criarBuild({nome: `PC para ${utilidade}`, descricao: `Montagem para ${utilidade}.`, utilidade, orcamento});
+      window.location.href = `${paginaConfiguracaoBuild}?build_id=${encodeURIComponent(resposta.build.id)}`;
+    } catch (erro) {
+      gerando = false;
+      conteudo.innerHTML = `<div class="question-intro" role="alert"><h2 class="font-1-m">Não foi possível gerar sua build</h2><p id="erro-gerar-build" class="font-2-s"></p><button type="button" id="tentar-gerar-build" class="btn-primary" aria-label="Tentar gerar build novamente">Tentar novamente</button><a href="./login.html" class="btn-ghost" aria-label="Entrar na conta">Entrar na conta</a></div>`;
+      conteudo.querySelector("#erro-gerar-build").textContent = erro.message;
+      conteudo.querySelector("#tentar-gerar-build").addEventListener("click", mostrarGerando);
+    }
   }
 
   document

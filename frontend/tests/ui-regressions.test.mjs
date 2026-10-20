@@ -79,24 +79,25 @@ test("seta de voltar mantém direção independente da animação", () => {
 });
 test("menu dos cards usa dots Lottie e mantém alternativa estática acessível",async () => {
   const html = await readFile(new URL("../pages/builds.html",import.meta.url),"utf8");
-  const js = await readFile(new URL("../js/pages/builds.js",import.meta.url),"utf8");
+  const js = await readFile(new URL("../js/pages/builds-conta.js",import.meta.url),"utf8");
   const ui = await readFile(new URL("../js/components/ui.js",import.meta.url),"utf8");
   const icone = iconeAnimado("dots");
   await access(new URL("../lottie/dots.json",import.meta.url));
   assert.match(ui,/dots:"dots\.json"/);
   assert.match(js,/\$\{iconeAnimado\("dots"\)\}/);
-  assert.match(html,/class="build-menu-trigger"[^>]*>\s*<span class="ui-lottie" data-lottie="dots"/);
+  assert.match(html,/src="\.\.\/js\/pages\/builds-conta\.js"/);
+  assert.match(js,/class="build-menu-trigger"[^>]*>\$\{iconeAnimado\("dots"\)\}/);
   assert.match(icone,/aria-hidden="true"/);
   assert.equal([...icone.matchAll(/<circle\b/g)].length,3);
 });
 test("criar build oferece manual ou formulário, sem dois atalhos divergentes",async () => {
   const html = await readFile(new URL("../pages/builds.html",import.meta.url),"utf8");
-  const js = await readFile(new URL("../js/pages/builds.js",import.meta.url),"utf8");
+  const js = await readFile(new URL("../js/pages/builds-conta.js",import.meta.url),"utf8");
   assert.doesNotMatch(html,/id="btn-create-build-form"/);
   assert.match(js,/Como você quer criar sua build/);
   assert.match(js,/Montagem manual/);
   assert.match(js,/Formulário inteligente/);
-  assert.match(js,/menu\.showPopover\(\)/);
+  assert.match(js,/criarBuildManual/);
 });
 test("fechar e voltar compartilham controles visuais sem alterar a tipografia global",async () => {
   const css = await readFile(new URL("../styles/componentes/navigation-controls.css",import.meta.url),"utf8");

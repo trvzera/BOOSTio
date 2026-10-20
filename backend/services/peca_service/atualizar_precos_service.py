@@ -1,86 +1,101 @@
-from models import (
-  db,
-  PlacaMae,
-  PlacaVideo,
-  Processador,
-  SSD,
-  WaterCooler,
-  MemoriaRAM,
-  HD,
-  Fonte,
-  Gabinete,
-  AirCooler,
-  Fan,
-  Fone,
-  Teclado,
-  Mouse,
-  Monitor,
-)
-from ..scapring_service.buscar_dados_scapring_service import BuscarDadosScapringService,ProdutoEsgotadoError,PrecoNaoEncontradoError
+import time
+from datetime import datetime, timedelta, timezone
+
+import requests
+
+from models import ConsultaPreco, ControleColeta
+from .modelos_pecas import MODELOS_PECAS
+from services.preco_service.buscar_preco_kabum_service import BuscarPrecoKabumService
+from services.preco_service.reservar_consulta_service import ReservarConsultaService
+from services.preco_service.validar_link_service import ValidarLinkService
+
 
 class AtualizarPrecosService:
-  def executar(self):
-    modelos = [
-      PlacaMae,
-      Processador,
-      SSD,
-      PlacaVideo,
-      WaterCooler,
-      MemoriaRAM,
-      HD,
-      Fonte,
-      Gabinete,
-      AirCooler,
-      Fan,
-      Fone,
-      Teclado,
-      Mouse,
-      Monitor,
-    ]
+    def executar(self, limite: int | None = None, intervalo: float = 1.0):
+        if limite is not None and limite < 1:
+            raise ValueError("O limite deve ser positivo")
 
-    pecas_atualizadas = []
-    links_de_busca = 0
-    falhas = 0
-    scraper = BuscarDadosScapringService()
+        if intervalo < 0:
+            raise ValueError("O intervalo não pode ser negativo")
 
-    try:
-      for modelo in modelos:
-        pecas = modelo.mostrar_pecas()
+        ControleColeta.inicializar()
 
-        for peca in pecas:
-          if "/produto/" not in (peca.link or ""):
-            links_de_busca += 1
-            continue
+        resumo = {"consultas": 0, "atualizadas": 0, "falhas": 0, "ignoradas": 0}
 
-          try:
-            preco_atual = scraper.executar(peca.link)
-          except (PrecoNaoEncontradoError, ValueError) as e:
-            print(f"[AtualizarPrecos] {peca.modelo}: {e} | {peca.link}")
-            falhas += 1
-            continue
-          except ProdutoEsgotadoError as e:
-            print(f"[AtualizarPrecos] {peca.modelo}: {e} | {peca.link}")
-            peca.esgotado = True
-            falhas += 1
-            continue
-          except Exception as e:
-            print(f"[AtualizarPrecos] {peca.modelo}: erro ao acessar {peca.link}: {e}")
-            falhas += 1
-            continue
+        for classe, peca in self._selecionar_pecas():
+            if limite is not None and resumo["consultas"] >= limite:
+                break
+            try:
+                ValidarLinkService().executar(peca.kabum_external)
+            except ValueError:
+                resumo["ignoradas"] += 1
+                continue
 
-          if preco_atual is not None and preco_atual != peca.preco:
-            peca.preco = preco_atual
-            pecas_atualizadas.append(peca)
+            if resumo["consultas"] and intervalo:
+                time.sleep(intervalo)
 
-      db.session.commit()
+            agora = datetime.now(timezone(timedelta(hours=-3)))
+            consulta = ReservarConsultaService().executar(classe, peca, agora)
 
-      print(
-        f"[AtualizarPrecos] {len(pecas_atualizadas)} precos atualizados, {falhas} falhas, "
-        f"{links_de_busca} pecas ignoradas por ainda terem link de busca (sem link de produto)"
-      )
+            if consulta is None:
+                continue
 
-    except Exception:
-        db.session.rollback()
-        raise
+            resumo["consultas"] += 1
 
-    return pecas_atualizadas
+            if not self._consultar(consulta, resumo):
+                break
+
+        return resumo
+
+    def _selecionar_pecas(self):
+        ultimas = ConsultaPreco.ultimas_por_url()
+        hoje = datetime.now(timezone(timedelta(hours=-3))).date().isoformat()
+        consultadas_hoje = ConsultaPreco.consultadas_no_dia(hoje)
+        candidatas = [
+            (classe, peca) for classe in MODELOS_PECAS
+            for peca in classe.com_link_kabum()
+            if (classe.__tablename__, peca.id, peca.kabum_external) not in consultadas_hoje
+        ]
+        essenciais = ("processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "hd")
+        return sorted(candidatas, key=lambda par: (
+            ultimas.get(par[1].kabum_external, 0),
+            par[0].__tablename__ not in essenciais, par[1].id,
+            essenciais.index(par[0].__tablename__) if par[0].__tablename__ in essenciais else par[0].__tablename__,
+        ))
+
+    def _consultar(self, consulta, resumo):
+        classe = next(c for c in MODELOS_PECAS if c.__tablename__ == consulta.tabela_peca)
+        peca = classe.buscar_por_id(consulta.peca_id)
+        if peca is None or peca.kabum_external != consulta.url:
+            consulta.ignorar()
+            resumo["ignoradas"] += 1
+            return True
+        continuar = True
+        try:
+            resultado = BuscarPrecoKabumService().executar(consulta.url)
+            peca.recarregar()
+            if peca.kabum_external != consulta.url:
+                consulta.status = "ignorada"
+                resumo["ignoradas"] += 1
+            else:
+                peca.aplicar_cotacao(resultado, datetime.now(timezone.utc).replace(tzinfo=None))
+                consulta.status = "concluida"
+                consulta.erro = None
+                resumo["atualizadas"] += 1
+        except requests.HTTPError as erro:
+            status = erro.response.status_code if erro.response is not None else 0
+            consulta.status = "falha"
+            consulta.erro = f"KaBuM HTTP {status}"
+            resumo["falhas"] += 1
+            continuar = status not in {401, 403, 429} and status < 500
+        except requests.RequestException:
+            consulta.status = "falha"
+            consulta.erro = "Falha de rede na coleta"
+            resumo["falhas"] += 1
+            continuar = False
+        except ValueError as erro:
+            consulta.status = "falha"
+            consulta.erro = str(erro)[:300]
+            resumo["falhas"] += 1
+        consulta.confirmar()
+        return continuar

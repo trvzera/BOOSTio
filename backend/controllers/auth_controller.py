@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint,request,jsonify,redirect,url_for,current_app
 from flask_login import LoginManager, UserMixin, login_user,logout_user, login_required, current_user
 from models import db,Usuario

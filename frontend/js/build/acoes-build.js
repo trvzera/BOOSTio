@@ -31,6 +31,12 @@ export function abrirDialogoBuild(titulo,conteudo) {
 }
 export function motivoBenchmark(build,catalogo) {
   const avaliacao = avaliarBuild(build,catalogo);
+  if (String(build.id).startsWith("s-")) {
+    if (!itensCategoria(build,"processador").length || !itensCategoria(build,"placa_video").length)
+      return "Escolha CPU e placa de vídeo dedicada para testar o desempenho.";
+    if (avaliacao.erros.length) return "Resolva os erros de compatibilidade antes de testar o desempenho.";
+    return "";
+  }
   if (avaliacao.preenchidos !== avaliacao.total) return "Complete 100% das peças da build para testar o desempenho.";
   if (avaliacao.erros.length) return "Resolva os erros de compatibilidade antes de testar o desempenho.";
   return "";
@@ -51,10 +57,10 @@ export function abrirBenchmark(build,catalogo) {
 export function abrirCompraBuild(build,catalogo) {
   const itens = itensSelecionados(build,catalogo);
   if (!itens.length) throw new Error("Adicione pelo menos uma peça à build para consultar lojas.");
-  const linhas = itens.map(({item,peca}) => '<article class="build-purchase-item"><h3 class="font-1-m-b">' + h(peca ? nomePeca(peca) : item.proprio || "Modelo não encontrado") + '</h3><p class="planning-help">Quantidade: ' + item.quantidade + (peca ? ' · referência demonstrativa: ' + moeda(Number(peca.preco || 0) * item.quantidade) : ' · peça própria, sem compra indicada') + '</p>' +
+  const linhas = itens.map(({item,peca}) => '<article class="build-purchase-item"><h3 class="font-1-m-b">' + h(peca ? nomePeca(peca) : item.proprio || "Modelo não encontrado") + '</h3><p class="planning-help">Quantidade: ' + item.quantidade + (peca ? ' · preço de referência: ' + moeda(Number(peca.preco || 0) * item.quantidade) : ' · peça própria, sem compra indicada') + '</p>' +
     (peca ? '<div class="build-store-links">' + ofertasPeca(peca).map(oferta => '<a class="build-store-link" href="' + h(oferta.url) + '" target="_blank" rel="noopener noreferrer" aria-label="' + (oferta.direta ? 'Comprar na ' : 'Buscar na ') + h(oferta.loja) + ' ' + h(oferta.preco != null ? moeda(oferta.preco) + ' por unidade' : 'Preço a consultar') + ': ' + h(nomePeca(peca)) + '"><img src="' + h(oferta.logo) + '" alt="' + h(oferta.loja) + '"><span>' + (oferta.direta ? 'Comprar na ' : 'Buscar na ') + h(oferta.loja) + '</span> <strong>' + (oferta.preco != null ? moeda(oferta.preco) + ' por unidade' : 'Preço a consultar') + '</strong></a>').join("") + '</div>' : '') + '</article>').join("");
   const rede = normalizarRede(build.rede);
   const extra = build.incluirRede && rede.tipo !== "indefinido" && rede.possuiAcessorio === false &&
     !itens.some(({categoria}) => categoria === (rede.tipo === "cabo" ? "cabo_rede" : "adaptador_wifi")) ? '<div class="benchmark-empty"><strong>Acessório de rede a incluir</strong><p>' + h(resumoRede(rede)) + (rede.comprimentoCaboM ? ' · ' + rede.comprimentoCaboM + ' m' : '') + '. Escolha um produto com as especificações necessárias na loja. Esse acessório ainda não tem oferta cadastrada.</p></div>' : '';
-  return abrirDialogoBuild("Comprar build",'<p class="planning-help">' + h(build.titulo) + ' · escolha onde comprar cada peça. As quantidades não são enviadas automaticamente ao carrinho da loja. Preços demonstrativos não são ofertas confirmadas.</p>' + avisoCompraHtml() + '<div class="build-purchase-list">' + linhas + '</div>' + extra);
+  return abrirDialogoBuild("Comprar build",'<p class="planning-help">' + h(build.titulo) + ' · escolha onde comprar cada peça. As quantidades não são enviadas automaticamente ao carrinho da loja. Os preços podem mudar na loja.</p>' + avisoCompraHtml() + '<div class="build-purchase-list">' + linhas + '</div>' + extra);
 }

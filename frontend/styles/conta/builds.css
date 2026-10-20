@@ -51,7 +51,7 @@
 .quota-copy {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: var(--espacamento-12);
 }
 
@@ -134,11 +134,17 @@
   cursor: not-allowed;
 }
 
-#builds-list {
+#builds-list, #builds-account-list {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--espacamento-16);
 }
+
+.builds-account-section { margin: var(--espacamento-24) 0; }
+#builds-account-title, #builds-account-status { color: var(--cor-6); }
+.builds-local-title { color: var(--cor-6); margin-bottom: var(--espacamento-12); }
+.build-account-card { cursor: pointer; }
+.build-account-card .build-card-title a { color: inherit; }
 
 .build-card {
   position: relative;

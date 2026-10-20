@@ -90,6 +90,8 @@
   min-height: 88px;
   padding: var(--espacamento-20);
 }
+.build-saved-piece .component-selected-main { grid-template-columns: 44px minmax(0, 1fr) auto; }
+.build-saved-back { display: block; margin-top: var(--espacamento-20); text-align: center; }
 .component-image-link { flex: 0 0 64px; border-radius: 14px; }
 .component-image { flex: 0 0 44px; }
 .component-image img { width: 44px; height: 44px; object-fit: contain; }
