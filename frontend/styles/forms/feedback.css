@@ -18,12 +18,14 @@
 }
 .build-loading { padding: 32px 16px; min-height: 220px; }
 #generation-message { min-height: 3em; max-width: 32ch; text-wrap: balance; }
-.build-generation-error { display: grid; align-content: center; gap: 16px; min-height: 220px; padding: 24px 8px; }
+.build-generation-error { display: grid; align-content: center; justify-items: center; gap: 20px; width: 100%; max-width: 600px; min-height: 280px; margin: auto; padding: 24px 8px; text-align: center; }
 .build-generation-error h2 { color: var(--cor-6); }
-.build-generation-error p { color: var(--cor-4); overflow-wrap: anywhere; }
-.generation-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.build-generation-error h2 { max-width: 30ch; text-wrap: balance; }
+.build-generation-error h2:focus { outline: none; }
+.build-generation-error p { max-width: 52ch; color: var(--cor-4); overflow-wrap: anywhere; font-size: .9375rem; line-height: 1.7; }
+.generation-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; align-items: center; width: 100%; }
 @media (max-width: 480px) {
-  .generation-actions { flex-direction: column; align-items: stretch; }
+  .generation-actions { flex-direction: column; align-items: stretch; max-width: 320px; }
   .generation-actions > * { text-align: center; }
 }
 .build-loader {

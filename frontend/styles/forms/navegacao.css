@@ -37,6 +37,10 @@
   font-size: 0.82rem;
   transition: 0.2s var(--ease);
 }
+#form-navigation > button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; }
+#form-navigation > .disabled-tip-anchor > button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; }
+#form-navigation .ui-lottie { flex: 0 0 20px; }
+.form-step-number svg { width: 18px; height: 18px; }
 .btn-back:hover {
   border-color: var(--cor-p1);
   color: var(--cor-p1);

@@ -7,6 +7,8 @@ import { carregarPerfil } from "../conta/perfil.js";
 import { acompanharCarregamento } from "../components/page-loading.js";
 import { criarBuild, verificarEspacoBuild } from "../api/build/builds.js";
 import { buscarUsuarioLogado } from "../api/usuario/buscarUsuarioLogado.js";
+import { iconeAnimado, iniciarIcones } from "../components/ui.js";
+import { iniciarControlesNumericos } from "../components/number-stepper.js";
 import {
   registrarAnimacao,
   destruirAnimacao,
@@ -157,7 +159,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       item.disabled = perguntas.slice(0,indice).some((_,i) => !etapaRespondida(i));
       item.querySelector(".form-step-number").innerHTML =
         indice < indiceAtual
-          ? '<i class="fa-solid fa-check"></i>'
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>'
           : String(indice + 1).padStart(2, "0");
     });
     document
@@ -204,10 +206,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function rangeHtml() {
-    const valor = respostas.orcamentoPersonalizado ?? 5000;
+    const recebido = respostas.orcamentoPersonalizado ?? 5000;
+    const valor = Number.isFinite(recebido) ? recebido : "";
     const maximo = Math.max(20000,valor);
     const isActive = respostas.orcamento === "personalizado" ? "active" : "";
-    return `<div class="budget-range ${isActive}"><div><label class="font-1-m-b" for="budget-input">Orçamento personalizado (R$)</label><strong class="font-2-xs" id="budget-value">${moeda.format(valor)}</strong></div><input id="budget-input" type="number" inputmode="decimal" min="0.01" max="1000000" step="0.01" value="${valor}" aria-describedby="budget-help"><input type="range" id="budget-range" min="0" max="${Math.ceil(maximo / 100) * 100}" step="100" value="${Math.round(valor / 100) * 100}" style="--range-progress: ${progressoRange(valor)}%" aria-label="Ajustar orçamento de cem em cem reais"><p id="budget-help" class="font-2-xs">Controle de R$ 100 em R$ 100. Para outro valor, use o campo.</p></div>
+    return `<div class="budget-range ${isActive}"><div><label class="font-1-m-b" for="budget-input">Orçamento personalizado (R$)</label><strong class="font-2-xs" id="budget-value">${valor === "" ? "Informe um valor" : moeda.format(valor)}</strong></div><input id="budget-input" type="number" inputmode="decimal" min="0.01" max="1000000" step="0.01" data-number-step="100" value="${valor}" aria-describedby="budget-help"><input type="range" id="budget-range" min="0" max="${Math.ceil(maximo / 100) * 100}" step="100" value="${Math.round(valor / 100) * 100}" style="--range-progress: ${progressoRange(valor)}%" aria-label="Ajustar orçamento de cem em cem reais"><p id="budget-help" class="font-2-xs">Controle e setas de R$ 100 em R$ 100. Digite para usar outro valor.</p></div>
       <fieldset class="peripheral-budget"><legend class="font-1-xs">Quer incluir periféricos nesse valor?</legend><label class="peripheral-budget-toggle"><input type="checkbox" id="budget-peripherals" ${respostas.incluirPerifericos ? "checked" : ""}>Reservar parte do total para monitor, teclado, mouse e headset</label><div id="peripheral-allocation" ${respostas.incluirPerifericos ? "" : "hidden"}><label for="peripheral-percent">Porcentagem para periféricos</label><div class="peripheral-percent-field"><input type="number" id="peripheral-percent" min="1" max="99" step="1" inputmode="numeric" value="${respostas.percentualPerifericos ?? 20}"><span aria-hidden="true">%</span></div><p id="peripheral-budget-summary" class="font-2-xs" aria-live="polite"></p></div></fieldset>`;
   }
 
@@ -231,6 +234,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     limparCheckboxesLottie();
     const geracao = geracaoPergunta;
     const pergunta = perguntas[indiceAtual];
+    delete document.querySelector("#questions").dataset.formState;
+    conteudo.dataset.question = pergunta.chave;
     renderizarPainel(pergunta);
     conteudo.classList.remove("question-enter");
     void conteudo.offsetWidth;
@@ -245,15 +250,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
       ${pergunta.chave === "orcamento" ? `<div class="budget-fields">${campos}${rangeHtml()}</div>` : campos}
       <div id="form-navigation">
-        <button type="button" class="btn-ghost" aria-label="Etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}><i class="fa-solid fa-arrow-left"></i> Etapa anterior</button>
-        <button type="button" class="btn-primary-form" id="next-question" aria-label="${rotuloAvancar}" ${podeAvancar() ? "" : "disabled"}>${rotuloAvancar} <i class="fa-solid fa-arrow-right"></i></button>
+        <button type="button" class="btn-ghost" id="previous-question" aria-label="Etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}>${iconeAnimado("arrow","back")}<span>Voltar</span></button>
+        <button type="button" class="btn-primary-form" id="next-question" aria-label="${rotuloAvancar}" ${podeAvancar() ? "" : "disabled"}><span>${rotuloAvancar}</span>${iconeAnimado("arrow")}</button>
       </div>`;
-    if (pergunta.chave === "rede") vincularRede(conteudo.querySelector("#form-network"),respostas.rede,{prefixo:"form-rede",aoAlterar:rede => {
+    if (pergunta.chave === "rede") vincularRede(conteudo.querySelector("#form-network"),respostas.rede,{prefixo:"form-rede",aoRenderizar:iniciarControlesNumericos,aoAlterar:rede => {
       respostas.rede = rede;
       conteudo.querySelector("#next-question").disabled = !podeAvancar();
     }});
     conteudo
-      .querySelector(".btn-ghost")
+      .querySelector("#previous-question")
       .addEventListener("click", () => navegarPara(indiceAtual - 1));
     conteudo
       .querySelectorAll(`.question-options input[name="${pergunta.chave}"]`)
@@ -280,6 +285,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       vincularCamposDetalhesPecas();
       iniciarCheckboxesLottie(geracao).catch(() => {});
     }
+    iniciarControlesNumericos(conteudo);
+    iniciarIcones(conteudo);
   }
 
   function vincularCamposDetalhesPecas() {
@@ -431,6 +438,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const valor = faixas[input.value];
       respostas.orcamentoPersonalizado = valor;
       conteudo.querySelector("#budget-input").value = valor;
+      conteudo.querySelector("#budget-input").dispatchEvent(new Event("change",{bubbles:true}));
       conteudo.querySelector("#budget-range").value = valor;
       conteudo.querySelector("#budget-value").textContent = moeda.format(valor);
       const budgetRange = conteudo.querySelector(".budget-range");
@@ -447,7 +455,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     conteudo.querySelector("#budget-value").textContent = Number.isFinite(respostas.orcamentoPersonalizado) ? moeda.format(respostas.orcamentoPersonalizado) : "Informe um valor";
     evento.target.setAttribute("aria-invalid",String(!orcamentoValido(respostas.orcamentoPersonalizado)));
     const slider = conteudo.querySelector("#budget-range"), numero = conteudo.querySelector("#budget-input");
-    if (evento.target === slider) numero.value = slider.value;
+    if (evento.target === slider) {
+      numero.value = slider.value;
+      numero.dispatchEvent(new Event("change",{bubbles:true}));
+    }
     else if (orcamentoValido(respostas.orcamentoPersonalizado)) {
       slider.max = Math.ceil(Math.max(20000,respostas.orcamentoPersonalizado) / 100) * 100;
       slider.value = Math.round(respostas.orcamentoPersonalizado / 100) * 100;
@@ -490,6 +501,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function mostrarGerando() {
     if (gerando) return;
     gerando = true;
+    document.querySelector("#questions").dataset.formState = "loading";
     conteudo.querySelectorAll("#form-navigation button, #tentar-gerar-build").forEach(botao => botao.disabled = true);
     document.querySelectorAll(".form-step").forEach(botao => botao.disabled = true);
     limparCheckboxesLottie();
@@ -523,12 +535,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       window.location.href = `${paginaConfiguracaoBuild}?build_id=${encodeURIComponent(resposta.build.id)}`;
     } catch (erro) {
       gerando = false;
+      document.querySelector("#questions").dataset.formState = "error";
       atualizarMenu();
       const semEspaco = erro.codigo === "limite-builds";
-      conteudo.innerHTML = `<div class="build-generation-error" role="alert"><h2 class="font-1-m">${semEspaco ? "Suas três vagas estão ocupadas" : "Não foi possível gerar sua build"}</h2><p id="erro-gerar-build" class="font-2-s"></p><div class="generation-actions">${semEspaco ? '<a href="./builds.html" class="btn-primary" aria-label="Gerenciar minhas builds">Minhas builds</a>' : '<button type="button" id="tentar-gerar-build" class="btn-primary" aria-label="Tentar gerar build novamente">Tentar novamente</button>'}<button type="button" id="revisar-orcamento" class="btn-secondary" aria-label="Revisar orçamento">Revisar orçamento</button>${erro.status === 401 ? '<a href="./login.html" class="btn-ghost" aria-label="Entrar na conta">Entrar na conta</a>' : ""}</div></div>`;
+      conteudo.innerHTML = `<div class="build-generation-error"><h2 class="font-1-m" tabindex="-1">${semEspaco ? "Suas três vagas estão ocupadas" : "Não foi possível gerar sua build"}</h2><p id="erro-gerar-build" class="font-2-s" role="alert"></p><div class="generation-actions">${semEspaco ? '<a href="./builds.html" class="btn-primary" aria-label="Gerenciar minhas builds">Minhas builds</a>' : '<button type="button" id="tentar-gerar-build" class="btn-primary" aria-label="Tentar gerar build novamente">Tentar novamente</button>'}<button type="button" id="revisar-orcamento" class="btn-secondary" aria-label="Revisar orçamento">Revisar orçamento</button>${erro.status === 401 ? '<a href="./login.html" class="btn-ghost" aria-label="Entrar na conta">Entrar na conta</a>' : ""}</div></div>`;
       conteudo.querySelector("#erro-gerar-build").textContent = erro.message;
       conteudo.querySelector("#tentar-gerar-build")?.addEventListener("click", mostrarGerando);
       conteudo.querySelector("#revisar-orcamento").addEventListener("click",() => navegarPara(1));
+      conteudo.querySelector("h2").focus({preventScroll:true});
     } finally { pararMensagens(); }
   }
 

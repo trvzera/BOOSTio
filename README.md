@@ -166,6 +166,12 @@ Durante a geração, frases rotativas tornam a espera mais clara. Elas não repr
 etapas ou progresso real informado pela LLM. Falhas permitem tentar novamente ou
 revisar o orçamento sem perder as respostas.
 
+O formulário ajusta a altura ao conteúdo, sem rolagem interna nas respostas. Listas
+longas usam a rolagem normal da página, especialmente no celular. Orçamento,
+porcentagem e campos numéricos de rede têm setas visíveis para aumentar/diminuir,
+mantendo digitação e limites. A navegação usa Lotties direcionados; falhas de geração
+são apresentadas no centro do card, sem manter um título de carregamento ao lado.
+
 ### Compra e lojas
 
 **Comprar build** existe apenas dentro do editor: reúne quantidades, links e preços

@@ -22,8 +22,18 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
   as respostas só são removidas da sessão após criar. Identificação completa de
   modelos e categorias ausentes no banco continuam pendentes.
 - Frases na espera mudam a cada quatro segundos, sem porcentagem ou etapas reais.
-  Erro preserva respostas e permite repetir/revisar. A etapa de orçamento tem sua
-  própria área de campos roláveis, mantendo navegação acessível.
+  Erro preserva respostas e permite repetir/revisar. A altura do formulário acompanha
+  o conteúdo, sem scroll interno nas respostas; listas longas usam a rolagem da página.
+- `components/number-stepper.js` mantém inputs nativos com botões explícitos de
+  aumentar/diminuir: orçamento de R$ 100 em R$ 100 sem perder centavos; porcentagem e
+  rede seguem seus passos e limites. Os controles preservam Tab/Enter e não recriam
+  os campos de rede durante a edição. Os Lotties de navegação são iniciados após
+  renderizar cada etapa; Voltar usa a orientação inversa. Font Awesome não é necessário
+  no formulário. Erros ocupam uma única célula do grid e ficam centralizados; revisar
+  o orçamento restaura a disposição normal sem perder as respostas.
+  Regressões em `frontend/tests/formulario-ui.test.mjs`; a interface foi conferida
+  em celular, tablet, desktop e paisagem com respostas simuladas, sem iniciar o Flask
+  nem acessar/migrar o banco real.
 - Os menus da conta renderizam `iconeAnimado`, carregam os JSONs ao remover `inert`
   na abertura e usam Popover API quando disponível para escapar do recorte/glass
   do card. Menu fecha por Escape, clique externo, rolagem da página ou resize.
@@ -574,9 +584,9 @@ Login e cadastro têm altura livre, e os modais são limitados pela altura visí
 com rolagem interna. Campos no mobile usam pelo menos 16px, sem reduzir a tela
 inteira com `scale()`. O detalhamento de compatibilidade abre no fluxo no mobile.
 
-No formulário, opções e campos de rede rolam dentro da sua área, preservando os
-botões de navegação. Em telas baixas na horizontal, o cartão ganha altura e a página
-pode rolar, em vez de espremer ou esconder os campos. O resumo expandido do editor
+No formulário, opções, orçamento e rede crescem com o conteúdo sem scroll interno;
+quando necessário, a página rola normalmente, sem espremer ou esconder os campos.
+Botões de navegação permanecem ao final da etapa. O resumo expandido do editor
 deixa de ser fixo para não prender os controles abaixo da tela. Menus dos cards de
 build abrem para baixo e limitam sua altura ao espaço disponível; a
 posição é recalculada ao rolar ou redimensionar. Botões bloqueados mantêm a largura
