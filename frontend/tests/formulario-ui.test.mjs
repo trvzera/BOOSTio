@@ -28,6 +28,15 @@ test("navegação usa Lotties direcionados e não depende mais do Font Awesome",
   assert.doesNotMatch(html,/font-awesome/);
 });
 
+test("reserva de periféricos usa checkbox nativo com Lottie compartilhado e restaura a seleção", async () => {
+  const forms = await readFile(new URL("../js/pages/forms.js",import.meta.url),"utf8");
+  const css = await readFile(new URL("../styles/forms/orcamento.css",import.meta.url),"utf8");
+  assert.match(forms,/<label class="peripheral-budget-toggle ui-check"><input type="checkbox" id="budget-peripherals" \$\{respostas\.incluirPerifericos \? "checked" : ""\}>\$\{iconeAnimado\("checkbox"\)\}<span class="peripheral-budget-label">/);
+  assert.match(forms,/iniciarIcones\(conteudo\)/);
+  assert.match(css,/\.peripheral-budget-toggle\.ui-check \{[^}]*align-items: flex-start/);
+  assert.doesNotMatch(css,/\.peripheral-budget-toggle[^}]*\bwidth: 20px/);
+});
+
 test("respostas crescem com conteúdo em vez de ocultar a barra de rolagem", async () => {
   const css = await readFile(new URL("../styles/responsividades/r-forms.css",import.meta.url),"utf8");
   const orcamento = await readFile(new URL("../styles/forms/orcamento.css",import.meta.url),"utf8");

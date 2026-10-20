@@ -84,8 +84,9 @@
 .budget-fields { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
 .budget-fields > * { flex-shrink: 0; }
 .budget-fields > .question-options { flex: none; overflow: visible; }
-.peripheral-budget-toggle { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
-.peripheral-budget-toggle input { flex-shrink: 0; width: 20px; height: 20px; margin: 0; accent-color: var(--cor-p1); }
+.peripheral-budget-toggle.ui-check { display: flex; align-items: flex-start; }
+.peripheral-budget-toggle > input { margin: 0; }
+.peripheral-budget-label { min-width: 0; padding-top: 4px; }
 #peripheral-allocation:not([hidden]) { display: grid; grid-template-columns: minmax(0,1fr) 144px; align-items: center; gap: 12px; margin-top: 16px; }
 .peripheral-percent-field { display: flex; align-items: center; gap: 6px; }
 #peripheral-budget-summary { grid-column: 1 / -1; margin: 0; color: var(--cor-4); }

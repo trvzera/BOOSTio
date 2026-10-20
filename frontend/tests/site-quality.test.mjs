@@ -33,6 +33,13 @@ test("páginas privadas e técnicas não são publicadas nos mecanismos de busca
     assert.doesNotMatch(await ler(new URL(nome+".html",paginas)),/name="robots" content="noindex/,nome);
 });
 
+test("atalho de acessibilidade só fica visível com foco de teclado",async () => {
+  const css = await ler(new URL("../styles/utilitarios/acessibilidade.css",import.meta.url));
+  assert.match(css,/\.skip-link \{[^}]*transform: translateY\(calc\(-100% - 20px\)\)/s);
+  assert.match(css,/\.skip-link:focus-visible \{ transform: none; \}/);
+  assert.doesNotMatch(css,/\.skip-link:focus\s*\{/);
+});
+
 test("fontes originais são antecipadas sem alterar a família e imagens reservam espaço",async () => {
   for (const url of arquivos) {
     const html = await ler(url);

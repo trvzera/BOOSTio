@@ -23,7 +23,7 @@
   font: 500 1rem/1.4 "Lexend", sans-serif;
   transform: translateY(calc(-100% - 20px));
 }
-.skip-link:focus { transform: none; }
+.skip-link:focus-visible { transform: none; }
 main:focus { outline: none; }
 .checkbox-wrapper:has(input:focus-visible) {
   outline: 2px solid var(--cor-p1);
