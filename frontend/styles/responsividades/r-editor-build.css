@@ -9,7 +9,7 @@
 .ram-controls .disabled-tip-anchor { padding: 0; }
 .ram-controls .disabled-tip-anchor > button { width: 100%; }
 .builder-demo, .compatibility-trigger { max-width: 100%; }
-.build-sidebar { min-width: 0; }
+.build-sidebar { min-width: 0; top: min(88px,calc(100dvh - var(--summary-height,0px) - 16px)); }
 /* Expandir os detalhes não desativa o sticky; telas baixas/móveis usam o fluxo normal. */
 .catalog-toolbar { grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 1fr)); }
 .product-actions { flex-wrap: wrap; }

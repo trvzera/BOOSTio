@@ -6,6 +6,42 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Busca de melhorias e responsividade — 21/10/2026
+
+- `build/melhorias.js` separa as sugestões e a prévia em duas colunas no desktop.
+  Até 900 px, usa abas **Escolher peças** e **Revisar trocas**, com contador,
+  navegação pelas setas/Home/End e foco preservado após selecionar/remover peças.
+- O seletor recolhível inclui todas as categorias, sem ocupar a tela inteira de
+  início. Os cards mostram foto/alternativa neutra, modelo, preço e seleção. A ordem
+  é explicitamente por preço, não uma promessa de ganho de desempenho.
+- A revisão mostra todas as peças/quantidades antigas da categoria, a nova unidade
+  ou kit, custo das compras e saldo do budget combinado. O comparativo do total
+  fica recolhido. Dicas de conferência são azuis; avisos reais e erros têm tons próprios.
+  RAM/discos/fans continuam substituindo a categoria por uma unidade/kit, como
+  informado na interface; quantidades adicionais são ajustadas no editor.
+- `build/melhorias.css` e `responsividades/r-melhorias.css` mantêm cabeçalho e
+  confirmação visíveis e a rolagem dentro da área ativa. Celulares usam tela cheia,
+  com safe areas; tablets, paisagem e monitores largos têm adaptações próprias.
+  VisualViewport acompanha teclado/área visível. Texto grande ou altura extrema
+  habilitam rolagem do diálogo, evitando conteúdo inalcançável. Observadores e
+  listeners são removidos ao fechar. A posição não recebe transições de layout.
+- O editor espera a conclusão do salvamento antes de fechar. Em caso de falha,
+  restaura a base e mantém as escolhas para tentar novamente. Escape, fundo e
+  fechamento ficam bloqueados durante o envio. Cancelar não altera a build. Após
+  aplicar, o foco retorna ao novo botão do editor ou menu do card atualizado.
+- A altura real do resumo do editor ajusta seu limite sticky, permitindo alcançar
+  **Buscar melhorias** mesmo quando o conteúdo é maior que a viewport. O observer
+  é reconectado no retorno pelo histórico com cache de página.
+- Menus dos cards são preparados como popovers já na renderização. Antes, o menu
+  invisível ainda podia ampliar a área rolável; a primeira abertura retirava essa
+  área, provocava um salto na página e o listener de scroll fechava o próprio menu.
+- Validação: 230 testes Node e 403 verificações Chrome com API simulada. Matriz:
+  320×568, 360×640, 390×844, 430×932, 540×720, 768×1024, 1024×768, 1280×800,
+  1440×900, 1920×1080, 2560×1440, 844×390 e 667×375; texto a 200%, resize,
+  teclado, orçamento insuficiente, seleção múltipla, cancelamento, falha/repetição
+  e salvamento lento. Abertura pelo menu testada em 320/768/1440 px. Sem executar
+  backend, migrar banco, consumir LLM ou alterar a API de desempenho.
+
 ### Comparação, modelos e revisão da geração — 21/10/2026
 
 - Minhas builds destaca a comparação em um bloco próprio, liberado com pelo menos
@@ -552,8 +588,8 @@ quantidades e IDs, sem confiar em preços/consumo enviados no arquivo. Gera novo
 preserva planejamento e nunca reutiliza a visibilidade pública ou tranca da origem.
 
 `js/build/comparacao.js` abre o comparador da lista real de builds locais.
-`js/build/melhorias.js` monta uma prévia de trocas CPU/GPU dentro de um budget combinado
-e somente altera a build após confirmação. Rankings de desempenho e de vendas aguardam
+`js/build/melhorias.js` monta uma prévia de trocas das categorias do catálogo dentro de um
+budget combinado e somente altera a build após confirmação. Rankings de desempenho e de vendas aguardam
 dados externos. `js/build/modelos.js` mantém exemplos versionados para a vitrine.
 
 `js/build/acoes-build.js` compartilha os modais de compra e benchmark e o aviso sobre

@@ -91,6 +91,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     status.classList.toggle("builds-empty",salvas.length === 0);
     status.innerHTML = salvas.length ? "" : '<strong class="font-1-m-b">Suas próximas ideias começam aqui</strong><p class="font-2-xs">Você ainda não tem builds salvas. Crie uma montagem ou escolha uma build pronta para personalizar.</p><div class="builds-empty-actions"><button type="button" class="btn-primary" data-empty-create aria-label="Criar minha primeira build">Criar minha primeira build</button><a class="btn-secondary" href="./configuracoes-prontas.html" aria-label="Explorar builds prontas">Explorar builds prontas</a></div>';
     lista.innerHTML = salvas.map(card).join("");
+    // Não deixa o menu invisível aumentar a rolagem e causar um salto ao abri-lo.
+    lista.querySelectorAll(".build-menu").forEach(menu => {
+      if (typeof menu.showPopover === "function") menu.popover = "manual";
+    });
     document.querySelector("#quota-count").textContent = `${salvas.length} / ${LIMITE_BUILDS}`;
     document.querySelector("#quota-progress").setAttribute("aria-valuenow",String(Math.min(LIMITE_BUILDS,salvas.length)));
     document.querySelector("#quota-fill").style.width = `${Math.min(100,salvas.length / LIMITE_BUILDS * 100)}%`;
@@ -147,10 +151,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     alternarMenu(wrap,false); wrap.querySelector(".build-menu-trigger").focus({preventScroll:true});
     try {
       if (acao === "benchmark") abrirBenchmark(build,catalogo);
-      else if (acao === "melhorias") abrirMelhorias(build,catalogo,async proxima => {
-        await atualizar(build.id,estadoParaConta(proxima));
-        avisar("Melhorias salvas na conta.");
-      });
+      else if (acao === "melhorias") {
+        const janela = abrirMelhorias(build,catalogo,async proxima => {
+          await atualizar(build.id,estadoParaConta(proxima));
+          avisar("Melhorias salvas na conta.");
+        });
+        janela.addEventListener("close",() => {
+          if (janela.returnValue !== "aplicar") return;
+          [...lista.querySelectorAll(".build-card")].find(card => card.dataset.id === build.id)?.querySelector(".build-menu-trigger")?.focus({preventScroll:true});
+        },{once:true});
+      }
       else if (acao === "setup-atual") {
         const remover = Boolean(dados.estado?.setupAtual);
         await definirSetupAtual(build.id);

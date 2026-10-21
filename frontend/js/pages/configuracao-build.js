@@ -42,6 +42,18 @@ document.addEventListener("DOMContentLoaded",async () => {
     let build = conta ? await acompanharCarregamento(carregarBuildConta(buildId)) : abrirBuild();
     let filaSalvamento = Promise.resolve();
     let falhaSalvamento = null;
+    // Um resumo mais alto que a tela precisa poder subir ao rolar até as ações.
+    const observarResumo = typeof ResizeObserver === "function" ? new ResizeObserver(entradas => {
+      for (const {target} of entradas) {
+        const altura = Math.ceil(target.getBoundingClientRect().height) + "px";
+        if (target.style.getPropertyValue("--summary-height") !== altura) target.style.setProperty("--summary-height",altura);
+      }
+    }) : null;
+    window.addEventListener("pagehide",() => observarResumo?.disconnect());
+    window.addEventListener("pageshow",evento => {
+      const resumo = main.querySelector(".build-sidebar");
+      if (evento.persisted && resumo) observarResumo?.observe(resumo);
+    });
     let mensagemSalvamento = conta ? "Alterações são salvas automaticamente na sua conta." : "Alterações são salvas automaticamente neste navegador.", tomSalvamento = "info";
     if (build.travada) mensagemSalvamento = "Build trancada. Destranque-a para alterar e salvar.";
     else if (!conta && buildsLocais().length >= 3 && !buildsLocais().some(item => item.id === build.id)) {
@@ -142,6 +154,7 @@ document.addEventListener("DOMContentLoaded",async () => {
         '</p></div><span class="component-add" aria-hidden="true">' + iconeAnimado("plus") + '</span></button></article></section>';
     }
     function renderizar() {
+      observarResumo?.disconnect();
       // Preserva o checkbox e sua instância Lottie durante as atualizações da build.
       const opcoes = main.querySelector(".builder-options");
       const detalhesAbertos = main.querySelector(".summary-metadata")?.open;
@@ -179,7 +192,20 @@ document.addEventListener("DOMContentLoaded",async () => {
       main.querySelector("#build-description").oninput = e => { if (!build.travada) { build.descricao = e.target.value; persistir(); } };
       main.querySelector("#benchmark-build").onclick = () => { try { abrirBenchmark(build,catalogo); } catch (erro) { avisar(erro.message); } };
       main.querySelector("#buy-configuration").onclick = () => { try { abrirCompraBuild(build,catalogo); } catch (erro) { avisar(erro.message); } };
-      main.querySelector("#improve-configuration").onclick = () => { try { abrirMelhorias(build,catalogo,proxima => { build = proxima; persistir(); renderizar(); }); } catch (erro) { avisar(erro.message); } };
+      main.querySelector("#improve-configuration").onclick = () => {
+        try {
+          const janela = abrirMelhorias(build,catalogo,async proxima => {
+            const anterior = build;
+            build = proxima; persistir();
+            if (conta) {
+              await filaSalvamento;
+              if (falhaSalvamento) { build = anterior; throw falhaSalvamento; }
+            }
+            renderizar();
+          });
+          janela.addEventListener("close",() => { if (janela.returnValue === "aplicar") main.querySelector("#improve-configuration")?.focus({preventScroll:true}); },{once:true});
+        } catch (erro) { avisar(erro.message); }
+      };
       main.querySelector("#save-configuration").dataset.disabledReason = build.travada ? trancada : "Informe o nome da build para salvar.";
       main.querySelector("#save-configuration").disabled = build.travada || !build.titulo.trim();
       main.querySelector("#rename-build").onclick = editarNome;
@@ -222,6 +248,7 @@ document.addEventListener("DOMContentLoaded",async () => {
         try { if (conta) { await filaSalvamento; if (falhaSalvamento) throw falhaSalvamento; } copiarTexto(conta ? linkBuildConta(build.id) : linkCompartilhado(build)); } catch (erro) { avisar(erro.message); }
       };
       iniciarIndicadores(main); iniciarDetalhesAnimados(main); iniciarIcones(main);
+      observarResumo?.observe(main.querySelector(".build-sidebar"));
     }
     function persistir() {
       if (conta) {
