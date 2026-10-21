@@ -55,6 +55,7 @@ export function normalizarBuild(valor = {}) {
     criadoEm:Number.isFinite(data.getTime()) ? data.toISOString() : new Date().toISOString(),
     visibilidade:valor.visibilidade === "publico" ? "publico" : "privado",
     travada:Boolean(valor.travada),
+    percentualPerifericos:Number.isInteger(valor.percentualPerifericos) && valor.percentualPerifericos >= 0 && valor.percentualPerifericos <= 99 ? valor.percentualPerifericos : 0,
     incluirPerifericos:typeof valor.incluirPerifericos === "boolean" ? valor.incluirPerifericos : perifericos.some(cat => componentes[cat]),
     incluirRede:typeof valor.incluirRede === "boolean" ? valor.incluirRede : acessoriosRede.some(cat => componentes[cat]) || ["cabo","wifi"].includes(valor.rede?.tipo),
     rede:normalizarRede(valor.rede),
@@ -65,7 +66,7 @@ export function normalizarBuild(valor = {}) {
     componentes,
   };
 }
-export function abrirBuild(parametros = new URLSearchParams(location.search)) {
+export function abrirBuild(parametros = new URLSearchParams(location.search), consumirFormulario = true) {
   const compartilhada = parametros.get("compartilhar");
   if (compartilhada) {
     try {
@@ -91,11 +92,14 @@ export function abrirBuild(parametros = new URLSearchParams(location.search)) {
       nova.incluirRede = nova.rede.tipo !== "indefinido";
       const faixas = {"ate-3000":3000,"3000-5000":5000,"5000-8000":8000};
       nova.orcamento = formulario.orcamento === "personalizado" ? formulario.orcamentoPersonalizado : faixas[formulario.orcamento] ?? nova.orcamento;
+      nova.percentualPerifericos = formulario.incluirPerifericos ? formulario.percentualPerifericos || 0 : 0;
+      if (formulario.incluirPerifericos) nova.incluirPerifericos = true;
       for (const [chave,modelo] of Object.entries(formulario.pecasDetalhes || {})) {
         if (mapa[chave] && typeof modelo === "string" && modelo.trim())
           nova.componentes[mapa[chave]] = {proprio:modelo.trim(),quantidade:1};
       }
-      sessionStorage.removeItem("boostio:respostas-formulario");
+      nova.incluirPerifericos ||= perifericos.some(categoria => nova.componentes[categoria]);
+      if (consumirFormulario) sessionStorage.removeItem("boostio:respostas-formulario");
     } catch { /* Funciona também sem o formulário. */ }
   }
   return normalizarBuild(nova);

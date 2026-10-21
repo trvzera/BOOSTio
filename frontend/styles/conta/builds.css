@@ -234,6 +234,24 @@
   gap: var(--espacamento-12);
 }
 .build-title-line { flex: 1; }
+.build-account-card { --indicator-color: var(--cor-p1); }
+.build-account-card.error { --indicator-color: var(--status-error); }
+.build-account-card.warning { --indicator-color: var(--status-warning); }
+.build-account-card .build-title-line { position: relative; flex-wrap: wrap; align-items: center; gap: 6px; padding-left: 8px; }
+.build-account-card .build-indicator { position: absolute; left: 0; top: 0; }
+.build-account-card .build-indicator :is(.compatibility-trigger,.compatibility-marker) { width: 8px; }
+.build-account-card .build-card-title { flex: 1; min-width: 0; line-height: 1.4; overflow-wrap: anywhere; }
+.build-account-card .build-card-lock { flex-shrink: 0; margin: 0; }
+.build-card-current { color: var(--cor-p1); font: 500 .6875rem/1.5 var(--font-body); flex-basis: 100%; }
+.build-account-card .build-card-desc { line-height: 1.6; overflow-wrap: anywhere; }
+.build-account-card .build-card-bottom { align-items: baseline; }
+.build-account-card .build-visibility { font: 400 .75rem/1.5 var(--font-body); }
+.build-account-card .build-card-date { font-size: .6875rem; line-height: 1.5; }
+#builds-account-title { margin-bottom: 16px; }
+#quota-help { margin: 0; color: var(--cor-4); }
+.build-menu-item > .ui-lottie { width: 20px; height: 20px; flex: 0 0 20px; }
+.build-menu-item > span:last-child { min-width: 0; }
+.build-menu-item[data-acao="benchmark"] { color: var(--cor-p1); }
 .build-card:has(.build-indicator[data-open]) { z-index: 110; }
 
 .build-status {
@@ -450,3 +468,5 @@
 #delete-build-modal .modal-box h3 {
   color: var(--cor-d1);
 }
+.build-account-card.incomplete { --indicator-color: var(--status-warning); }
+.build-menu-divider { display: block; flex-shrink: 0; height: 1px; min-height: 1px; margin: .5rem .75rem; background: var(--glass-border); }

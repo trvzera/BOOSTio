@@ -14,25 +14,21 @@ export function iniciarNavegacao() {
     logo.className = "site-brand";
     logo.href = pagina("index.html");
     logo.setAttribute("aria-label", "BOOSTio — página inicial");
-    logo.innerHTML = '<img src="' + new URL("../imgs/logo.webp", import.meta.url).href + '" alt="BOOSTio" width="100" height="20">';
-    document.body.prepend(logo);
+    logo.innerHTML = '<img src="' + new URL("../imgs/logo.webp", import.meta.url).href + '" alt="BOOSTio" width="668" height="237" decoding="async">';
+    const atalho = document.querySelector(".skip-link");
+    if (atalho) atalho.after(logo); else document.body.prepend(logo);
   }
   const links = (itens, perfil = false) => itens.map(item =>
     '<a class="' + (perfil ? 'profile-link font-1-s' : 'site-menu-link') + '" href="' + pagina(item.pagina) + '" aria-label="Ir para ' + item.rotulo + '"' +
     (location.pathname.endsWith("/" + item.pagina) ? ' aria-current="page"' : "") + '>' +
     '<span class="site-menu-link-label">' + (item.icone ? iconeAnimado(item.icone) : "") +
-    '<span>' + item.rotulo + '</span></span>' + (perfil ? "" : iconeAnimado("arrow")) + '</a>'
+    '<span>' + item.rotulo + '</span></span></a>'
   ).join("");
   const conta = [
     {pagina:"builds.html", rotulo:"Builds", icone:"build"},
     {pagina:"configuracoes.html", rotulo:"Configurações", icone:"user"},
   ];
-  const home = document.body.id === "inicio" || location.pathname.endsWith("/index.html");
-  const linksMenu = home ? [...linksAutenticado,
-    {pagina:"index.html#about-page",rotulo:"Sobre a BOOSTio"},
-    {pagina:"index.html#services-page",rotulo:"Como funciona"},
-    {pagina:"index.html#build-page",rotulo:"Começar montagem"},
-  ] : linksAutenticado;
+  const linksMenu = linksAutenticado;
   host.innerHTML =
     '<div id="profile" class="site-profile"><button type="button" class="profile-toggle" aria-label="Abrir menu do perfil" aria-expanded="false" aria-controls="profile-options">' +
     iconeAnimado("profile") + '</button><nav id="profile-options" class="profile-panel" aria-label="Menu do perfil" aria-hidden="true" inert>' +
@@ -56,6 +52,7 @@ export function iniciarNavegacao() {
       painel.setAttribute("aria-hidden", String(!aberto));
       botao.setAttribute("aria-expanded", String(aberto));
       botao.setAttribute("aria-label", (aberto ? "Fechar " : "Abrir ") + rotulo);
+      if (aberto) iniciarIcones(painel);
     }};
     const abrir = () => {
       controles.forEach(outro => { if (outro !== controle) outro.alternar(false); });
@@ -99,10 +96,11 @@ export function iniciarNavegacao() {
 }
 
 export function atualizarNavegacao(autenticado) {
-  const {host, perfil, hamburger, preview} = iniciarNavegacao();
+  const {host, perfil, hamburger} = iniciarNavegacao();
   host.querySelector("[data-profile-guest]").hidden = Boolean(autenticado);
   host.querySelector("[data-profile-user]").hidden = !autenticado;
-  hamburger.container.hidden = !autenticado && !preview;
+  hamburger.container.hidden = false; // Visitantes também acessam a navegação pública.
+  iniciarIcones(host);
   perfil.alternar(false);
   hamburger.alternar(false);
 }

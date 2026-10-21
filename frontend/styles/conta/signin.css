@@ -242,6 +242,11 @@
 }
 
 .code-input {
+  color: var(--cor-6);
+  background: var(--cor-1);
+  border: 1px solid var(--cor-3);
+  border-radius: .75rem;
+  font-family: var(--font-heading);
   width: 52px;
   height: 60px;
   text-align: center;
@@ -254,6 +259,9 @@
   opacity: 0.35;
   cursor: not-allowed;
 }
+#verify-email-box { color: var(--cor-6); }
+#verify-email-box p { color: var(--cor-5); }
+#verify-email-box .form-error { color: var(--status-error); }
 
 /* LOGIN */
 #login-page {

@@ -4,26 +4,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Montar sua builds</title>
-  <link rel="icon" type="image/x-icon" href="../imgs/favicon.webp">
+  <title>Formulário de montagem — BOOSTio</title>
+  <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
   <link rel="stylesheet" href="../styles/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-  <meta name="description" content="A Boostio é uma plataforma que simplifica a montagem de computadores,
-  ajudando você a escolher as peças ideais com base no seu objetivo,
-  orçamento e necessidade, tudo com precisão e confiança.">
+  <noscript><link rel="stylesheet" href="../styles/componentes/no-script.css"></noscript>
+  <meta name="description" content="Informe seu objetivo, orçamento, peças existentes e conexão para planejar sua configuração de computador com a BOOSTio.">
+  <meta name="robots" content="noindex,follow">
+  <link rel="preload" href="../fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <script type="module" src="../js/pages/loading.js" defer></script>
   <script type="module" src="../js/pages/forms.js"></script>
 </head>
 
-<body class="form-page">
+<body class="form-page" data-private-page>
+  <a class="skip-link" href="#forms-page" aria-label="Pular para o conteúdo principal">Pular para o conteúdo principal</a>
   <div id="loading-screen">
-    <video id="loading-video" autoplay muted playsinline>
+    <video id="loading-video" width="1000" height="1000" autoplay muted playsinline aria-hidden="true" tabindex="-1">
       <source src="../video/loading-toggle.webm" type="video/webm">
     </video>
   </div>
   <div data-site-navigation></div>
 
-  <main id="forms-page">
+  <main id="forms-page" tabindex="-1">
 
     <div class="decoration decoration-1"></div>
     <div class="decoration decoration-2"></div>
@@ -36,13 +38,15 @@
       </a>
 
       <nav id="forms-header" aria-label="Navegação entre etapas do formulário">
-        <button type="button" class="form-step active" data-step="0" aria-label="01 Objetivo: ir para a etapa 1"><span class="form-step-number font-1-xs">01</span><span class="font-1-xs">Objetivo</span></button>
+        <button type="button" class="form-step active" data-step="0" aria-label="01 Objetivo: ir para a etapa 1"><span class="form-step-number font-1-xs">01</span> <span class="font-1-xs">Objetivo</span></button>
         <div class="form-bar" data-bar="0"></div>
-        <button type="button" class="form-step" data-step="1" aria-label="02 Orçamento: ir para a etapa 2"><span class="form-step-number font-1-xs">02</span><span class="font-1-xs">Orçamento</span></button>
+        <button type="button" class="form-step" data-step="1" aria-label="02 Orçamento: ir para a etapa 2"><span class="form-step-number font-1-xs">02</span> <span class="font-1-xs">Orçamento</span></button>
         <div class="form-bar" data-bar="1"></div>
-        <button type="button" class="form-step" data-step="2" aria-label="03 Suas peças: ir para a etapa 3"><span class="form-step-number font-1-xs">03</span><span class="font-1-xs">Suas peças</span></button>
+        <button type="button" class="form-step" data-step="2" aria-label="03 Suas peças: ir para a etapa 3"><span class="form-step-number font-1-xs">03</span> <span class="font-1-xs">Suas peças</span></button>
         <div class="form-bar" data-bar="2"></div>
-        <button type="button" class="form-step" data-step="3" aria-label="04 Conexão: ir para a etapa 4"><span class="form-step-number font-1-xs">04</span><span class="font-1-xs">Conexão</span></button>
+        <button type="button" class="form-step" data-step="3" aria-label="04 Periféricos: ir para a etapa 4"><span class="form-step-number font-1-xs">04</span> <span class="font-1-xs">Periféricos</span></button>
+        <div class="form-bar" data-bar="3"></div>
+        <button type="button" class="form-step" data-step="4" aria-label="05 Conexão: ir para a etapa 5"><span class="form-step-number font-1-xs">05</span> <span class="font-1-xs">Conexão</span></button>
       </nav>
 
       <section id="questions">

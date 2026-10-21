@@ -246,5 +246,13 @@
 .compatibility-popover[data-open] .compatibility-details { opacity: 1; visibility: visible; pointer-events: auto; transform: none; filter: none; }
 .compatibility-details h2 { font-size: var(--text-body); margin-bottom: 12px; }
 .compatibility-details h3 { font: 600 .85rem/1.5 var(--font-heading); color: var(--cor-6); }
+.compatibility-details { max-height: min(70svh,32rem); overflow-y: auto; }
+.compatibility-details > .compatibility-assessment { color: var(--cor-p1); font: 500 .8rem/1.5 var(--font-heading); margin: .75rem 0; }
+.compatibility-details > .compatibility-assessment[data-status="incompativel"] { color: var(--status-error); }
+.compatibility-scope, .compatibility-unknown { color: var(--text-secondary); font: 400 .75rem/1.6 var(--font-body); margin: .75rem 0; }
+.compatibility-unknown summary { min-height: 2.75rem; cursor: pointer; color: var(--cor-p1); }
+.compatibility-unknown ul { padding-left: 1rem; list-style: disc; }
 .compatibility-messages li { font-size: var(--text-caption); }
 .compatibility-messages li.tip { border-color: var(--cor-p1); }
+.builder-page-main { min-height: 100svh; }
+.integrated-video-note { margin: 0 0 1.25rem; padding: .85rem 1rem; border: 1px solid rgba(0,123,255,.25); border-radius: .85rem; background: rgba(0,123,255,.06); color: var(--cor-5); font: 400 .85rem/1.6 var(--font-body); }

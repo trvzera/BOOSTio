@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function centerCard(card) {
     const target =
       card.offsetLeft + card.offsetWidth / 2 - cardsGrid.clientWidth / 2;
-    cardsGrid.scrollTo({ left: target, behavior: "smooth" });
+    cardsGrid.scrollTo({ left: target, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
   }
 
   cards.forEach((card) => {
@@ -44,9 +44,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    dots.forEach((dot, index) =>
-      dot.classList.toggle("active", index === closestIndex),
-    );
+    dots.forEach((dot, index) => {
+      dot.classList.toggle("active", index === closestIndex);
+      dot.setAttribute("aria-pressed",String(index === closestIndex));
+    });
   }
 
   window.addEventListener("resize", updateActiveDot);

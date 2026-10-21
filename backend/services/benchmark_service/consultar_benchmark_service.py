@@ -29,34 +29,35 @@ class ConsultarBenchmarkService:
             raise ValueError("Selecione uma resolução e uma qualidade válidas.")
         resposta = self.cliente.executar("fps", consulta, usuario_id)
         # O cache contém somente o contrato normalizado, nunca uma resposta inválida.
-        
+
         if resposta["cache"]:
             return resposta
         bruto = resposta["dados"]
-        
+
         for chave in ("game", "cpu", "gpu"):
             if not isinstance(bruto.get(chave), dict) or bruto[chave].get("slug") != consulta[chave]:
                 raise ErroBenchmark("O provedor não confirmou os modelos exatos solicitados.", "resposta")
-        
+
         if str(bruto.get("res", "")).lower() != consulta["res"] or bruto.get("preset") != consulta["preset"]:
             raise ErroBenchmark("O provedor retornou ajustes diferentes dos solicitados.", "resposta")
         fps = numero(bruto.get("fps"))
-        
+
         if fps is None:
             raise ErroBenchmark("Não há desempenho disponível para esta combinação e configuração.", "sem-dados", 422)
         intervalo = bruto.get("fps_range")
-        
+
         if not (isinstance(intervalo, list) and len(intervalo) == 2 and all(numero(n) is not None for n in intervalo) and intervalo[0] <= intervalo[1]):
             intervalo = None
         matriz = bruto.get("matrix") if isinstance(bruto.get("matrix"), dict) else {}
-        
+        linhas = {res: matriz.get(res, matriz.get(res.lower())) for res in ("1080p", "1440p", "4K")}
+
         resultado = {
             "consulta": consulta, "jogo": str(bruto["game"].get("name") or consulta["game"])[:180],
             "fps": fps, "low1": numero(bruto.get("low1")), "intervalo": intervalo,
             "origem": bruto.get("source") if bruto.get("source") in ("measured", "model") else "unknown",
             "base": bruto.get("basis") if bruto.get("basis") in ("measured", "aggregate", "model") else None,
             "confianca": bruto.get("confidence") if bruto.get("confidence") in ("high", "medium", "low") else None,
-            "matriz": {res: {q: numero(matriz[res].get(q)) if isinstance(matriz.get(res), dict) else None for q in QUALIDADES} for res in ("1080p", "1440p", "4K")},
+            "matriz": {res: {q: numero(linhas[res].get(q)) if isinstance(linhas[res], dict) else None for q in QUALIDADES} for res in linhas},
             "url": "https://fpshq.com/pt/games/" + consulta["game"] + "/",
             "consultadoEm": resposta["consultadoEm"], "cache": False,
             "requisitosVerificados": False, "ramAvaliada": False,

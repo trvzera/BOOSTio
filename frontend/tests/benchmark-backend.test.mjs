@@ -66,6 +66,12 @@ test("painel do modal identifica campos, mostra cinco jogos por controle e isola
   assert.match(resultado,/<section class="fpshq-alternatives"/);
   assert.doesNotMatch(resultado,/<details class="fpshq-alternatives"/);
 });
+test("cache de reserva tem aviso visível sem precisar expandir os detalhes",() => {
+  const html = resultadoDesempenhoHtml({consulta,jogo:"Valorant",fps:288,low1:null,matriz:{},consultadoEm:1,desatualizado:true,cache:true});
+  assert.match(html,/<p class="fpshq-cache-notice" role="status">/);
+  assert.ok(html.indexOf('fpshq-cache-notice')<html.indexOf('fpshq-data-details'));
+  assert.ok(html.includes('não foram atualizados'));
+});
 test("produção e laboratório usam o mesmo controlador, sem cliente direto da FPSHQ",async () => {
   for (const arquivo of ["../js/build/acoes-build.js","../js/benchmark/interface.js","../js/pages/test-benchmark.js"])
     assert.doesNotMatch(await readFile(new URL(arquivo,import.meta.url),"utf8"),/experimentos\/fpshq|criarClienteFPSHQ/);

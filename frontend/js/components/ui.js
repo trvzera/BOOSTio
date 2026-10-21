@@ -6,8 +6,10 @@ const arquivos = {
   arrow:"arrow.json", chevron:"chavron.json", checkbox:"checkbox.json", hamburger:"hamburger.json",
   login:"login.json", signup:"logon.json", build:"build.json", user:"user.json", profile:"profile.json", logout:"logout-lt.json",
   circledot:"circledot.json", magnifying:"magnifying.json", magic:"magic.json", dots:"dots.json",
+  lock:"buildLock.json", visibility:"buildPublic.json", pencil:"buildPencil.json", clone:"buildClone.json", copy:"buildCopy.json", download:"buildDownload.json",
 };
 const alternativas = {plus:"+",trash:"×",cart:"↗",import:"→",arrow:"→",chevron:"⌄",checkbox:"✓",
+  lock:"▣",visibility:"◉",pencil:"✎",clone:"▢",copy:"⧉",download:"↓",
   dots:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="20" cy="12" r="2"/></svg>',
   hamburger:"☰",login:"→",signup:"+",build:"▦",user:"●",
   profile:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></svg>',logout:"←",
@@ -31,6 +33,7 @@ export function iniciarIcones(raiz = document) {
     }
   }
   raiz.querySelectorAll("[data-lottie]:not([data-lottie-initialized])").forEach(async elemento => {
+    if (elemento.closest("[inert], [hidden]")) return;
     elemento.dataset.lottieInitialized = "";
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     elemento.id ||= "ui-lottie-" + (++sequencia);
@@ -49,7 +52,10 @@ export function iniciarIcones(raiz = document) {
         if (controle?.disabled || input?.disabled || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
         animacao.setDirection(direcao); animacao.play();
       };
-      const atualizarEstado = () => mover(aberto() ? 1 : -1);
+      const atualizarEstado = () => {
+        if (input?.disabled) { animacao.goToAndStop(aberto() ? animacao.totalFrames - 1 : 0,true); return; }
+        mover(aberto() ? 1 : -1);
+      };
       const entrar = () => { if (!alternavel || !aberto()) mover(invertido ? -1 : 1); };
       const sair = () => { if (!alternavel || !aberto()) mover(invertido ? 1 : -1); };
       let observador;
@@ -161,6 +167,7 @@ export function iniciarUI() {
       if (!ancora) return;
       if (controle.disabled && !ancora.classList.contains("disabled-tip-anchor")) {
         ancora = document.createElement("span"); ancora.className = "disabled-tip-anchor"; ancora.tabIndex = 0;
+        ancora.setAttribute("role","group");
         controle.before(ancora); ancora.append(controle);
         ancora.addEventListener("pointerenter",() => mostrar(ancora));
         ancora.addEventListener("pointerleave",esconder);

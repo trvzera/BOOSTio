@@ -20,7 +20,7 @@
 }
 
 .terms-header p {
-  color: var(--cor-3);
+  color: var(--text-secondary);
   margin-bottom: var(--espacamento-12);
 }
 
@@ -39,7 +39,7 @@
 }
 
 .terms-clause p {
-  color: var(--cor-3);
+  color: var(--text-secondary);
   line-height: 1.7;
   margin-bottom: var(--espacamento-12);
 }
@@ -57,7 +57,7 @@
 }
 
 .terms-list li {
-  color: var(--cor-3);
+  color: var(--text-secondary);
   line-height: 1.7;
   list-style: disc;
 }
@@ -81,7 +81,7 @@
 
 .terms-signature {
   margin-top: var(--espacamento-16);
-  color: var(--cor-3);
+  color: var(--text-secondary);
 }
 
 .terms-signature a {

@@ -30,7 +30,10 @@ document.addEventListener("DOMContentLoaded",async () => {
       return;
     }
     if (buildId === null && !parametros.has("id") && !parametros.has("compartilhar")) {
-      const nova = await criarBuildManual(estadoParaConta({titulo:"Minha build",descricao:"",visibilidade:"privado",travada:false,orcamento:null,incluirPerifericos:false,incluirRede:false,rede:{},componentes:{}}));
+      const formulario = parametros.get("formulario") === "1";
+      const estadoInicial = formulario ? abrirBuild(new URLSearchParams(),false) : {titulo:"Minha build",descricao:"",visibilidade:"privado",travada:false,incluirPerifericos:false,incluirRede:false,rede:{},componentes:{}};
+      const nova = await criarBuildManual(estadoParaConta(estadoInicial));
+      if (formulario) sessionStorage.removeItem("boostio:respostas-formulario");
       buildId = nova.build.id;
       history.replaceState(null,"","./configuracao-build.html?" + new URLSearchParams({build_id:buildId}));
     }
@@ -66,6 +69,8 @@ document.addEventListener("DOMContentLoaded",async () => {
       ].filter(Boolean).join(" · ") : "";
       const resumo = ram && peca ? item.quantidade + " kit(s) · " + item.quantidade * (peca.quantidade_pentes || 1) + " pentes · " + peca.ddr + " · " + peca.frequencia_mhz + " MHz"
         : slotsPlaca || (peca ? "Selecionado" : "Peça própria · identifique o modelo para validar.");
+      const cotacao = peca && Number(peca.preco) > 0;
+      const disponibilidade = peca?.esgotado ? "Sem estoque confirmado no catálogo. Consulte a loja ou substitua a peça." : peca && !cotacao ? "Preço ainda não disponível no catálogo." : "";
       let razaoDuplicar = "";
       if (multipla && peca) { try { selecionarPecaCompativel(build,peca,catalogo); } catch (erro) { razaoDuplicar = erro.message; } }
       const unidades = ram ? item.quantidade * (peca?.quantidade_pentes || 1) : categoria === "fan" ? item.quantidade * (peca?.quantidade || 1) : item.quantidade;
@@ -73,9 +78,9 @@ document.addEventListener("DOMContentLoaded",async () => {
       return '<article class="component-row component-selected glass-card"><div class="component-selected-main"><div class="component-image">' +
         imagemPeca(peca || {categoria}) + '</div><div class="component-copy">' +
         (peca ? '<a class="component-model font-1-m-b" href="' + detalhe + '" aria-label="Ver detalhes de ' + h(titulo) + '">' + h(titulo) + '</a>' : '<h3 class="component-model font-1-m-b">' + h(titulo) + '</h3>') +
-        '<p>' + h(resumo) + '</p></div><div class="component-purchase">' +
+        '<p>' + h(resumo) + '</p>' + (disponibilidade ? '<p class="component-availability">' + h(disponibilidade) + '</p>' : '') + '</div><div class="component-purchase">' +
         (peca ? '<a class="component-buy btn-primary" href="' + h(oferta.url) + '" target="_blank" rel="noopener noreferrer" aria-label="' + (oferta.direta ? "Comprar" : "Buscar") + ' ' + h(titulo) + ' na ' + h(oferta.loja) + ' em uma nova aba">' +
-          iconeAnimado("cart") + (oferta.direta ? "Comprar" : "Buscar") + '</a><strong>' + moeda(peca.preco * item.quantidade) + '</strong>' : '<span class="font-2-xs">Já possuo</span>') +
+          iconeAnimado("cart") + (oferta.direta ? "Comprar" : "Buscar") + '</a><strong>' + (cotacao ? moeda(peca.preco * item.quantidade) : 'Preço a consultar') + '</strong>' : '<span class="font-2-xs">Já possuo</span>') +
         '</div><button class="component-remove" type="button" data-remove="' + categoria + '" data-item="' + h(item.id || item.proprio) +
         '" aria-label="Remover ' + h(titulo) + '" title="Remover peça" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("trash") + '</button></div>' +
         (multipla && peca ? '<div class="ram-controls"><span class="component-quantity"><strong>' + unidades + '</strong> ' + nomeUnidades +
@@ -104,20 +109,25 @@ document.addEventListener("DOMContentLoaded",async () => {
         (categoria.id === "fan" ? '<button type="button" class="btn-ghost ram-add-model" data-category="fan" aria-label="Adicionar outro modelo de fan" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("plus") + 'Adicionar outro modelo de fan</button>' : "") +
         (categoria.rede && itens.length < tipos.length ? '<button type="button" class="btn-ghost ram-add-model" data-category="rede" aria-label="Adicionar outro acessório de rede" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("plus") + 'Adicionar outro acessório de rede</button>' : "") + '</section>';
       const incluido = cooler && cpu?.cooler, total = catalogo.filter(p => tipos.includes(p.categoria)).length;
+      const acao = categoria.rede ? "Adicionar cabo ou adaptador" : "Selecionar componente";
+      const dica = categoria.rede ? resumoRede(build.rede) + (total ? " · escolha um modelo no catálogo" : " · produtos ainda não cadastrados")
+        : incluido ? "Cooler incluso no processador" + (cpu.modelo_cooler ? " · " + cpu.modelo_cooler : "") + ". Adicional opcional."
+          : cooler ? "Air cooler e water cooler" : categoria.armazenamento ? "SSD ou HD · escolha ao menos um armazenamento" : "Escolha um modelo no catálogo";
       return '<section class="component-group">' + cabecalho + '<article class="component-row glass-card"><button type="button" class="component-empty' + (perifericos.includes(categoria.id) ? ' component-empty-peripheral' : '') + '" data-category="' + categoria.id +
-        '" aria-label="' + (categoria.rede ? 'Adicionar cabo ou adaptador' : 'Selecionar componente') + ': ' + h(categoria.nome) + '" ' + bloqueado(build.travada,trancada) + '><div><span class="component-empty-label">' + (categoria.rede ? 'Adicionar cabo ou adaptador' : 'Selecionar componente') + '</span><p>' + (categoria.rede ? h(resumoRede(build.rede)) + (total ? ' · escolha um modelo no catálogo' : ' · produtos ainda não cadastrados') : incluido ? 'Cooler incluso no processador' + (cpu.modelo_cooler ? " · " + h(cpu.modelo_cooler) : "") + ". Adicional opcional."
-          : cooler ? "Air cooler e water cooler" : categoria.armazenamento ? "SSD ou HD · escolha ao menos um armazenamento" : "Escolha um modelo no catálogo") +
-        '</p></div><span class="component-add" aria-label="' + total + ' modelos no catálogo">' + iconeAnimado("plus") + '</span></button></article></section>';
+        '" aria-label="' + h(acao + " " + dica + ": " + categoria.nome + " · " + total + " modelos no catálogo") + '" ' + bloqueado(build.travada,trancada) + '><div><span class="component-empty-label">' + acao + '</span> <p>' + h(dica) +
+        '</p></div><span class="component-add" aria-hidden="true">' + iconeAnimado("plus") + '</span></button></article></section>';
     }
     function renderizar() {
       // Preserva o checkbox e sua instância Lottie durante as atualizações da build.
       const opcoes = main.querySelector(".builder-options");
       const detalhesAbertos = main.querySelector(".summary-metadata")?.open;
       const resultado = avaliarBuild(build,catalogo);
+      const cpuSelecionada = catalogo.find(p => p.categoria === "processador" && p.id === itensCategoria(build,"processador")[0]?.id);
+      const avisoVideo = cpuSelecionada?.videointegrado ? '<p class="integrated-video-note">Este processador possui vídeo integrado' + (cpuSelecionada.modelo_videointegrado ? ': ' + h(cpuSelecionada.modelo_videointegrado) : '') + '. ' + (itensCategoria(build,"placa_video").length ? 'A build também inclui uma placa de vídeo dedicada.' : 'É possível usar imagem sem uma placa de vídeo dedicada. Jogos e tarefas gráficas exigentes podem precisar de uma GPU separada.') + '</p>' : '';
       const categorias = categoriasEditor.filter(c => (build.incluirPerifericos || !perifericos.includes(c.id)) && (build.incluirRede || !c.rede));
       main.innerHTML = '<header class="builder-heading"><div><a class="builder-back font-1-xs" href="./builds.html" aria-label="Voltar para Minhas builds">' + iconeAnimado("arrow","back") + 'Voltar para Minhas builds</a><div class="builder-title-line">' + indicadorBuild(resultado,"compatibility-details") +
         '<h1>Configure sua build</h1></div><p>Escolha os componentes da sua configuração.</p></div><button type="button" class="btn-primary benchmark-trigger" id="benchmark-build" aria-label="Testar build" ' + bloqueado(Boolean(motivoBenchmark(build,catalogo)),motivoBenchmark(build,catalogo)) + '>' + iconeAnimado("magic") + 'Testar build</button></header>' +
-        '<div class="builder-layout"><section class="component-list" aria-label="Componentes"><div class="builder-options"><label class="ui-check font-2-xs"><input type="checkbox" id="include-peripherals" ' + (build.incluirPerifericos ? "checked " : "") +
+        avisoVideo + '<div class="builder-layout"><section class="component-list" aria-label="Componentes"><div class="builder-options"><label class="ui-check font-2-xs"><input type="checkbox" id="include-peripherals" ' + (build.incluirPerifericos ? "checked " : "") +
         bloqueado(build.travada,trancada) + '>' + iconeAnimado("checkbox") + '<span>Incluir periféricos</span></label><label class="ui-check font-2-xs"><input type="checkbox" id="include-network" ' + (build.incluirRede ? "checked " : "") + bloqueado(build.travada,trancada) + '>' + iconeAnimado("checkbox") + '<span>Incluir rede</span></label></div>' + categorias.map(grupo).join("") +
         '</section><aside class="build-sidebar"><section class="build-summary glass-card"><span class="summary-eyebrow">Total da configuração</span><strong class="summary-total">' + moeda(resultado.preco) +
         '</strong><div class="summary-power"><span>Consumo estimado do PC</span><strong>' + resultado.watts + ' W</strong></div>' +
@@ -127,7 +137,7 @@ document.addEventListener("DOMContentLoaded",async () => {
         '><option value="privado" ' + (build.visibilidade === "privado" ? "selected" : "") + '>Privada</option><option value="publico" ' + (build.visibilidade === "publico" ? "selected" : "") +
         '>Pública</option></select><label for="build-description">Descrição</label><textarea class="input-text" id="build-description" rows="4" maxlength="300" ' + bloqueado(build.travada,trancada) + '>' + h(build.descricao) + '</textarea><label for="build-budget">Orçamento desta build (R$)</label><input class="input-text" id="build-budget" type="number" min="0" max="1000000" step="any" inputmode="decimal" value="' + h(build.orcamento ?? "") + '" placeholder="Sem limite definido" ' + bloqueado(build.travada,trancada) + '></div></details><p class="planning-help" id="build-budget-note"></p><p class="build-autosave-status" id="build-autosave-status" role="status" aria-live="polite" data-tone="' + tomSalvamento + '">' + h(mensagemSalvamento) + '</p><button class="btn-primary" type="button" id="save-configuration" aria-label="Salvar build e voltar">Salvar build e voltar</button><button class="btn-secondary" type="button" id="buy-configuration" aria-label="Comprar build" ' + bloqueado(!Object.keys(build.componentes).length,"Adicione uma peça para consultar as lojas.") + '>' + iconeAnimado("cart") + 'Comprar build</button><button class="btn-secondary" type="button" id="improve-configuration" aria-label="Buscar melhorias" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("magnifying") + 'Buscar melhorias</button><button class="btn-secondary" type="button" id="share-configuration" aria-label="Compartilhar build" ' +
         bloqueado(build.visibilidade !== "publico","Torne a build pública para compartilhar.") +
-        '>Compartilhar</button><p class="summary-note">' + (conta ? 'Preços atuais do catálogo, sem frete. Alterações salvas na conta.' : 'Preços demonstrativos, sem frete. Salvamento local neste navegador.') + '</p>' + avisoCompraHtml() +
+        '>Compartilhar</button><p class="summary-note">' + (conta ? 'Soma dos preços disponíveis no catálogo, sem frete. Peças sem cotação não entram no total. Alterações salvas na conta.' : 'Preços demonstrativos, sem frete. Salvamento local neste navegador.') + '</p>' + avisoCompraHtml() +
         (Object.keys(build.pecasExtras || {}).length ? '<p class="summary-note">Peças próprias adicionais: ' + Object.entries(build.pecasExtras).map(([tipo,nome]) => h(tipo === "microfone" ? "Microfone: " : "Webcam: ") + h(nome)).join(" · ") + '.</p>' : "") +
         (build.travada ? '<p class="summary-note">Build trancada. Destranque-a em Minhas builds.</p>' : "") + '</section></aside></div>';
       if (opcoes) main.querySelector(".builder-options").replaceWith(opcoes);
@@ -191,9 +201,14 @@ document.addEventListener("DOMContentLoaded",async () => {
       if (conta) {
         const atual = structuredClone(build);
         mensagemSalvamento = "Salvando na sua conta…";
-        filaSalvamento = filaSalvamento.then(() => salvarBuildConta(atual)).then(() => {
+        filaSalvamento = filaSalvamento.then(() => salvarBuildConta(atual)).then(resposta => {
           falhaSalvamento = null;
           mensagemSalvamento = "Salvo na sua conta."; tomSalvamento = "info";
+          if (resposta.build?.compatibilidade && JSON.stringify(build.componentes) === JSON.stringify(atual.componentes)) {
+            build.compatibilidade = resposta.build.compatibilidade;
+            const titulo = main.querySelector('.builder-title-line'), indicador = titulo?.querySelector('.build-indicator');
+            if (indicador) { indicador.outerHTML = indicadorBuild(avaliarBuild(build,catalogo),'compatibility-details'); iniciarIndicadores(titulo); }
+          }
           const status = main.querySelector("#build-autosave-status");
           if (status) { status.textContent = mensagemSalvamento; status.dataset.tone = tomSalvamento; }
         }).catch(erro => {

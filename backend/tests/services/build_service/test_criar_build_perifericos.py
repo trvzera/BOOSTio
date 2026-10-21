@@ -25,20 +25,20 @@ class CriarBuildPerifericosTest(unittest.TestCase):
             ],
         }
 
-    def test_exige_todos_os_perifericos(self):
+    def test_exige_todos_os_perifericos_quando_solicitados(self):
         for tipo in CriarBuildService.PERIFERICOS:
             with self.subTest(tipo=tipo):
                 build = {**self.build, "componentes": [
                     item.copy() for item in self.build["componentes"] if item["tipo"] != tipo
                 ]}
-                with self.assertRaisesRegex(ValueError, "não completou"):
-                    CriarBuildService._validar_build(build, self.catalogo, 2000)
+                with self.assertRaisesRegex(ValueError, "não incluiu"):
+                    CriarBuildService._validar_build(build, self.catalogo, 2000, percentual=20)
 
     def test_peca_propria_satisfaz_categoria_sem_custo(self):
         build = {**self.build, "componentes": [
             item.copy() for item in self.build["componentes"] if item["tipo"] != "monitor"
         ]}
-        validada = CriarBuildService._validar_build(build, self.catalogo, 2000, {"monitor": "Meu monitor"})
+        validada = CriarBuildService._validar_build(build, self.catalogo, 2000, percentual=20, proprias={"monitor": "Meu monitor"})
         self.assertEqual(validada["preco_total"], 900)
 
     def test_catalogo_envia_dados_do_monitor_em_json(self):
@@ -49,7 +49,7 @@ class CriarBuildPerifericosTest(unittest.TestCase):
         )
         modelo = SimpleNamespace(__tablename__="monitor", listar_disponiveis_ate=lambda *args, **kwargs: [monitor])
         with patch("services.build_service.criar_build_service.MODELOS_PECAS", (modelo,)):
-            catalogo = CriarBuildService._gerar_catalogo(1000)
+            catalogo = CriarBuildService._gerar_catalogo(1000, reserva_perifericos=1000)
         self.assertEqual(json.loads(json.dumps(catalogo))["monitor"][0]["tamanho_polegadas"], 23.8)
 
     def test_rede_exige_somente_o_acessorio_escolhido(self):

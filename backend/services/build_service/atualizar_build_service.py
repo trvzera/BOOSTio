@@ -1,4 +1,5 @@
 from models import BuildSalva
+from .avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
 
 class AtualizarBuildService:
@@ -7,4 +8,4 @@ class AtualizarBuildService:
         if build is None:
             raise ValueError("Build não encontrada")
         build.salvar_estado(dados)
-        return build.to_dict(incluir_links=True)
+        return AvaliarCompatibilidadeService().para_resposta(build, incluir_links=True)

@@ -1,8 +1,147 @@
 # Editor de build e efeitos de scroll
 
+Após a integração da `main` em 20/10/2026, as montagens da conta usam
+`pages/builds-conta.js`, `/build/` e `/build/catalogo`; `builds.js` foi substituído.
+O texto abaixo também documenta modos legados e etapas anteriores. O estado atual
+dos requisitos está no README; a revisão de acessibilidade/performance está em
+[qualidade-frontend.md](qualidade-frontend.md).
+
+### Budget manual e informação não verificada — 20/10/2026
+
+- A criação manual omite `orcamento` quando deve usar o padrão da conta. O Python
+  lê o budget do proprietário autenticado somente com `usar_budget=true` e valor
+  positivo. `orcamento:null` explícito mantém a montagem sem teto; valores explícitos,
+  importações, duplicações e builds existentes não são sobrescritos pela preferência.
+- `AvaliarCompatibilidadeService` consulta as peças por IDs nos modelos atuais,
+  sem nova coleta ou migração. As respostas de criação, edição, listagem e leitura
+  incluem `compatibilidade`: `incompativel`, `nao_verificado` ou `sem_conflitos`.
+  Cada regra também tem seu resultado; uma regra aprovada não aprova toda a montagem.
+  O diagnóstico é calculado, não aceito do frontend nem armazenado no estado editável.
+- O serviço identifica conflitos demonstráveis com os dados disponíveis (socket,
+  DDR, pentes/slots/capacidade, formatos, conexões e potência), sem rejeitar rascunhos.
+  Medida ausente/zero, peça própria não identificada, BIOS, QVL, conectores, baias,
+  interferências e distribuição detalhada de fans/radiadores ficam não verificados.
+  `dimensoes` ambíguo não vira altura do cooler; suporte genérico a water cooler
+  não equivale a suporte a 360 mm. A validação completa e o bloqueio de geração
+  tecnicamente inválida continuam pendentes; isto não homologa a saída da LLM.
+- O editor mostra a avaliação no popover. Após salvar, atualiza somente o diagnóstico
+  se os componentes ainda forem os mesmos da requisição, sem recriar os Lotties.
+  Alterações locais sem retorno do Python não recebem aprovação automática.
+- Como obter as especificações: usar a categoria/ID para carregar o registro e
+  `Peca.to_catalogo()`. O contrato atual já fornece `soquete`, `socket`, DDR e alguns
+  limites. Conferir os dados já coletados antes de cadastrar o que falta, mantendo
+  nomes de campo, unidades (mm, W, GB) e referência técnica por modelo/part number.
+  Para completar medidas, preferir manual/ficha do fabricante. Falta de informação
+  permanece explícita; nunca inferir dimensões do nome ou do tamanho externo da caixa.
+  Não foi executada atualização de catálogo, banco ou modelo nesta rodada.
+- Controle de pausa removido da home e do menu. Vídeos decorativos não ficam em
+  loop e reproduzem no máximo cinco segundos; movimento reduzido/economia de dados
+  mantêm o poster. O loader não foi alterado.
+- “Mais vendida” removida das sugestões e do laboratório; não há fonte de vendas
+  confiável no escopo atual. Melhor preço continua disponível.
+- FPSHQ: alguns probes retornaram HTTP 200, mas consultas seguintes (inclusive pelo
+  serviço Python e por HTTP/1.1/2) expiraram sem corpo. Não foi validado nesta rodada
+  um resultado normalizado real nem demonstrada recuperação estável. Sem trocar CPU,
+  inventar FPS, relaxar TLS ou repetir automaticamente. Cache de reserva tem aviso
+  visível e data; matriz aceita rótulo `4k` ou `4K` sem preencher presets ausentes.
+  Validação: 176 testes JavaScript, 109 Python (+4 subtestes) e 91 checks de navegador
+  com API simulada. Consultas públicas reais foram somente de leitura; nenhuma LLM
+  paga, execução do `app.py` ou acesso ao banco real foi usado nesses testes.
+
+### Atualização de criação, orçamento e menus — 20/10/2026
+
+- Visitantes acessam apenas início, termos, sobre, contato, login/cadastro,
+  recuperação de conta e erro. Páginas internas são marcadas com `data-private-page`,
+  ficam ocultas/inertes até confirmar a sessão e redirecionam ao login também em
+  caso de falha de rede. A guarda de UI não substitui `login_required` no Python:
+  o Live Server continua servindo HTML estático, sem dados privados embutidos.
+- `Testar build` primeiro permite escolher jogos/FPSHQ ou renderização/Blender.
+  Trocar de modo ou fechar o modal cancela a consulta do painel anterior.
+  `/benchmark/blender` exige login e consulta o JSON público oficial, com cache
+  de uma hora e limites locais. Filtra o nome exato, tipo, versão e método;
+  mostra mediana em amostras/min e número de resultados, nunca FPS ou tempo garantido.
+  A fonte pode agregar variantes de VRAM sob um mesmo nome. A integração com
+  Blender foi validada por consulta pública de CPU e por testes isolados. O prefixo
+  Intel `12th Gen` e marcas `(R)/(TM)` são normalizados sem remover o sufixo do SKU;
+  isso corrige a consulta de `i3-12100F`. Modelo realmente ausente continua sendo 422.
+- Dez modelos sem periféricos cobrem estudos, produtividade, programação, jogos,
+  criação e Blender. A vitrine usa os preços/IDs do catálogo da conta; o JSON local
+  só ajuda a resolver referências já cadastradas. Não cria peças próprias fictícias
+  quando falta um produto: permite copiar como base editável e sinaliza a pendência
+  no editor. Cartões compactos não expandem peças; a consulta fica dentro da build.
+  Preço zero/ausente é mostrado como preço a consultar, não como produto gratuito.
+  Curadoria gerenciável
+  no servidor e atualização contínua de preços continuam pendentes.
+
+- `BuildSalva.criar_limitada` serializa a escrita por usuário no banco e limita a
+  três builds. Criação manual, importação, modelos, duplicação e geração usam esse
+  ponto; a LLM recebe uma checagem antecipada e outra ao persistir. Não se mantém
+  lock durante a chamada externa. Resultado gerado e estado são salvos na mesma
+  transação; montagens com peças próprias usam a mesma proteção ao persistir o estado.
+  A quota responde `409 / codigo: limite-builds`, sem apagar dados antigos.
+  O mesmo ponto exige e-mail verificado (`403 / codigo: email-nao-verificado`),
+  inclusive em requisições diretas. O formulário verifica ambas as condições antes
+  de liberar a página, com nova validação antes de gerar.
+- O formulário usa tetos **Até**, slider de R$ 100 em R$ 100 e entrada com centavos.
+  Agora tem cinco etapas: objetivo, orçamento, peças do PC, periféricos e conexão.
+  A etapa de periféricos distingue não incluir, comprar todos ou reaproveitar alguns;
+  os já possuídos exigem modelo e usam o checkbox Lottie compartilhado.
+  A porcentagem de 1–99% é uma **meta flexível**, não dois tetos independentes.
+  `percentual_perifericos` vai no pedido e `percentualPerifericos` no estado. O Python
+  permite redistribuir a sobra entre PC e periféricos, mas valida o teto total e a
+  presença dos itens solicitados. Não inventa produtos nem força gastar a sobra.
+- O formulário envia `pecas_proprias`, rede e meta para a geração pela LLM,
+  que completa apenas as categorias ainda não possuídas. O resultado abre no editor
+  pelo `build_id`; mantém os Lotties, controles e feedback de erro da interface.
+  Webcam/microfone próprios são preservados em `pecasExtras`. Identificação completa
+  dos modelos e compatibilidade definitiva das peças próprias continuam pendentes.
+- Frases na espera mudam a cada quatro segundos, sem porcentagem ou etapas reais.
+  Erro preserva respostas e permite repetir/revisar. A altura do formulário acompanha
+  o conteúdo. Somente as listas longas de peças próprias/periféricos possuem rolagem
+  interna; orçamento e rede continuam sem recorte interno.
+- `components/number-stepper.js` mantém inputs nativos com botões explícitos de
+  aumentar/diminuir: orçamento de R$ 100 em R$ 100 sem perder centavos; porcentagem e
+  rede seguem seus passos e limites. Os controles preservam Tab/Enter e não recriam
+  os campos de rede durante a edição. Os Lotties de navegação são iniciados após
+  renderizar cada etapa; Voltar usa a orientação inversa. Font Awesome não é necessário
+  no formulário. Erros ocupam uma única célula do grid e ficam centralizados; revisar
+  o orçamento restaura a disposição normal sem perder as respostas.
+  Regressões em `frontend/tests/formulario-ui.test.mjs`; a interface foi conferida
+  em celular, tablet, desktop e paisagem com respostas simuladas, sem iniciar o Flask
+  nem acessar/migrar o banco real.
+- Os menus da conta renderizam `iconeAnimado`, carregam os JSONs ao remover `inert`
+  na abertura e usam Popover API quando disponível para escapar do recorte/glass
+  do card. Menu fecha por Escape, clique externo, rolagem da página ou resize.
+- FPSHQ: diagnóstico externo terminou em timeout após conexão/TLS. Falhas TLS/rede
+  têm códigos próprios; timeout é 504 e indisponibilidade HTTP do provedor é 503.
+  A pausa retorna `Retry-After` (também após falha de conexão), sem repetição automática.
+  Cache válido continua disponível. Não foi demonstrada recuperação do provedor.
+- O hamburger reúne Início, Criar build, Termos e Sobre, sem setas nem repetir
+  Builds/Configurações/Sair do perfil. O controle de animações da home foi removido
+  na atualização acima. A escolha de criação destaca o formulário à
+  esquerda; montagem manual fica à direita.
+- Busca de melhorias permite selecionar todas as categorias do catálogo. Os
+  resultados e a prévia rolam em áreas próprias, mantendo ações do diálogo visíveis.
+  O catálogo informa vídeo integrado no editor. Indicador de build incompleta usa
+  amarelo, enquanto o preenchimento da barra de progresso permanece azul.
+- Falhas de conexão ganham mensagem de internet indisponível quando confirmada
+  por `navigator.onLine`; falha genérica de rede/servidor não é confundida com 5xx
+  do provedor de benchmark. Modal de código e resultados Blender usam a tipografia
+  e cores do site; checkbox de budget do perfil usa o Lottie compartilhado.
+
+Validação desta rodada: 173 testes JavaScript, 86 testes Python (+ 4 subtestes)
+e 184 verificações de navegador com respostas controladas. Incluem acesso/quota,
+cinco etapas, posse de periféricos, copiar modelos, selecionar o benchmark e aplicar
+SSD/fonte/monitor juntos. Conferência visual em celular, tablet, desktop e paisagem.
+Nenhuma migração, execução do `app.py`, geração paga pela LLM ou atualização de preços.
+
+Os trechos históricos abaixo sobre quota apenas local e ausência de CRUD não
+descrevem os fluxos atuais da conta; consultar este bloco e o README.
+
 Abra pelo Live Server:
 
-- `frontend/pages/configuracao-build.html`: editor vazio.
+- `frontend/pages/configuracao-build.html`: cria uma montagem vazia na conta, com sessão.
+- `frontend/pages/configuracao-build.html?build_id=s-ID`: edita uma montagem da conta.
 - `frontend/pages/configuracao-build.html?id=build-demo-1`: configuração de exemplo.
 - `frontend/pages/pecas.html?categoria=processador`: catálogo por categoria.
 - `frontend/pages/peca.html?id=SEED-CPU-02`: ficha técnica e lojas.
@@ -10,10 +149,9 @@ Abra pelo Live Server:
 - `frontend/pages/sobre.html`: apresentação da BOOSTio, proposta, ferramentas e estágio do projeto.
 - `frontend/testes.html`: demonstração que usa o mesmo menu hamburger das demais páginas.
 
-O catálogo demonstrativo é uma cópia das 750 peças de
-`backend/services/peca_service/popular_pecas_service.py`, criada em 28/09/2026.
-Os preços da seed são gerados para demonstração, não cotações atuais.
-Não foram executados o Flask, a seed nem o scraper para montar essa cópia.
+O catálogo JSON existente reúne as 750 peças já coletadas para o projeto e continua
+nos modelos/fluxos legados. A montagem da conta busca o catálogo do backend. Essa
+integração não equivale a monitoramento atualizado das ofertas das três lojas.
 Quando a seed mudar, o JSON não se atualiza sozinho.
 
 ## Como funciona o blur no scroll
@@ -538,9 +676,9 @@ Login e cadastro têm altura livre, e os modais são limitados pela altura visí
 com rolagem interna. Campos no mobile usam pelo menos 16px, sem reduzir a tela
 inteira com `scale()`. O detalhamento de compatibilidade abre no fluxo no mobile.
 
-No formulário, opções e campos de rede rolam dentro da sua área, preservando os
-botões de navegação. Em telas baixas na horizontal, o cartão ganha altura e a página
-pode rolar, em vez de espremer ou esconder os campos. O resumo expandido do editor
+No formulário, opções, orçamento e rede crescem com o conteúdo sem scroll interno;
+quando necessário, a página rola normalmente, sem espremer ou esconder os campos.
+Botões de navegação permanecem ao final da etapa. O resumo expandido do editor
 deixa de ser fixo para não prender os controles abaixo da tela. Menus dos cards de
 build abrem para baixo e limitam sua altura ao espaço disponível; a
 posição é recalculada ao rolar ou redimensionar. Botões bloqueados mantêm a largura

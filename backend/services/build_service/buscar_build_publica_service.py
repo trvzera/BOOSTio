@@ -1,4 +1,5 @@
 from models import BuildSalva
+from .avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
 
 class BuscarBuildPublicaService:
@@ -6,4 +7,4 @@ class BuscarBuildPublicaService:
         build = BuildSalva.buscar_publica(identificador)
         if build is None:
             raise ValueError("Build não encontrada")
-        return build.to_dict(incluir_links=True)
+        return AvaliarCompatibilidadeService().para_resposta(build, incluir_links=True)

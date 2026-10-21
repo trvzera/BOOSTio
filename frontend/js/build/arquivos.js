@@ -71,6 +71,8 @@ function validarMetadados(build) {
       build.criadoEm === "" || !Number.isFinite(new Date(build.criadoEm).getTime())))
     falhar("Data de criação inválida.");
   if (tem(build,"orcamento")) validarNumero(build.orcamento,"orcamento",1000000);
+  if (tem(build,"percentualPerifericos") && (!Number.isInteger(build.percentualPerifericos) || build.percentualPerifericos < 0 || build.percentualPerifericos > 99))
+    falhar("Porcentagem de periféricos inválida.");
   if (tem(build,"rede")) {
     const rede = build.rede;
     if (!objeto(rede)) falhar("Rede inválida.");

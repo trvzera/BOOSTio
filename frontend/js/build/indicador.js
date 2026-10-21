@@ -8,10 +8,15 @@ export function indicadorBuild(resultado,id) {
   const problemas = resultado.erros.length + faltam.length + resultado.avisos.length;
   const tom = resultado.erros.length ? "erro" : problemas ? "aviso" : "ok";
   const nome = tom === "erro" ? "Ver incompatibilidades" : problemas ? "Ver pendências da build" : "Ver dicas da build";
+  const diagnostico = resultado.compatibilidade;
+  const desconhecidas = Array.isArray(diagnostico?.naoVerificado) ? diagnostico.naoVerificado : [];
+  const avaliacao = diagnostico ? '<p class="compatibility-assessment" data-status="' + h(diagnostico.status) + '">' + h(diagnostico.rotulo) + '</p>' +
+    (desconhecidas.length ? '<details class="compatibility-unknown"><summary>' + desconhecidas.length + (desconhecidas.length === 1 ? ' verificação sem dados suficientes' : ' verificações sem dados suficientes') + '</summary><ul>' + desconhecidas.map(v => '<li>' + h(v.mensagem) + '</li>').join('') + '</ul></details>' : '') +
+    '<p class="compatibility-scope">' + h(diagnostico.aviso || 'Avaliação limitada às especificações disponíveis.') + '</p>' : '';
   return '<div class="compatibility-popover build-indicator ' + tom + '">' +
-    (pendencias.length ? '<button type="button" class="compatibility-trigger" aria-label="' + nome + '" aria-controls="' + h(id) + '" aria-expanded="false"></button>' +
+    (pendencias.length || diagnostico ? '<button type="button" class="compatibility-trigger" aria-label="' + nome + '" aria-controls="' + h(id) + '" aria-expanded="false"></button>' +
       '<div id="' + h(id) + '" class="compatibility-details glass-card" role="region" aria-label="Compatibilidade da build" aria-hidden="true" inert>' +
-      '<h3>' + (problemas ? 'O que precisa de atenção' : 'Dicas para conferir') + '</h3><ul class="compatibility-messages">' + pendencias.map((texto,i) => '<li class="' + (i < resultado.erros.length ? 'error' : i < problemas ? 'warning' : 'tip') + '">' + h(texto) + '</li>').join("") +
+      '<h3>' + (problemas ? 'O que precisa de atenção' : 'Verificações e dicas') + '</h3>' + avaliacao + '<ul class="compatibility-messages">' + pendencias.map((texto,i) => '<li class="' + (i < resultado.erros.length ? 'error' : i < problemas ? 'warning' : 'tip') + '">' + h(texto) + '</li>').join("") +
       '</ul></div>'
       : '<span class="compatibility-marker" aria-label="Sem conflitos detectados"></span>') + '</div>';
 }

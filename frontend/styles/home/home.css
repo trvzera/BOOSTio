@@ -1,4 +1,6 @@
 #main-page {
+  isolation: isolate;
+  z-index: 0;
   width: 100%;
   height: 100vh;
   position: relative;
@@ -39,3 +41,4 @@
 .home-page .btn-primary:hover {
   transform: translateY(-5px);
 }
+.home-page :is(.site-brand, .site-profile, .site-menu) { transform: translateZ(0); }

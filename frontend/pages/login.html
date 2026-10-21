@@ -4,42 +4,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Entrar na conta</title>
-  <link rel="icon" type="image/x-icon" href="../imgs/favicon.webp">
+  <title>Entrar na conta — BOOSTio</title>
+  <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
   <link rel="stylesheet" href="../styles/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-  <meta name="description" content="A Boostio é uma plataforma que simplifica a montagem de computadores,
-  ajudando você a escolher as peças ideais com base no seu objetivo,
-  orçamento e necessidade, tudo com precisão e confiança.">
+  <noscript><link rel="stylesheet" href="../styles/componentes/no-script.css"></noscript>
+  <meta name="description" content="Entre na sua conta BOOSTio para acessar suas builds, seu orçamento e as ferramentas de montagem de computadores.">
+  <meta name="robots" content="noindex,follow">
+  <link rel="preload" href="../fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <script type="module" src="../js/pages/loading.js" defer></script>
   <script type="module" src="../js/pages/login.js" defer></script>
 </head>
 
 <body class="login-page-body">
+  <a class="skip-link" href="#login-page" aria-label="Pular para o conteúdo principal">Pular para o conteúdo principal</a>
   <div id="loading-screen">
-    <video id="loading-video" autoplay muted playsinline>
+    <video id="loading-video" width="1000" height="1000" autoplay muted playsinline aria-hidden="true" tabindex="-1">
       <source src="../video/loading-toggle.webm" type="video/webm">
     </video>
   </div>
   <div data-site-navigation></div>
 
-  <main id="login-page">
+  <main id="login-page" tabindex="-1">
     <div class="decoration decoration-1"></div>
     <div class="decoration decoration-2"></div>
 
     <div id="login-container">
-      <img src="../imgs/logo.webp" alt="Logo">
+      <img src="../imgs/logo.webp" alt="Logo" width="668" height="237" decoding="async">
       <h1 id="login-title" class="font-1-l">Bem-vindo(a) de volta!</h1>
       <p id="login-description" class="font-2-xs">Primeira vez aqui? <a href="./signin.html" aria-label="Crie uma conta! Abrir cadastro">Crie uma conta!</a></p>
 
-      <form id="login-form">
-        <input type="email" placeholder="Seu e-mail" class="input-text" id="email" required>
+      <form id="login-form" method="post">
+        <label class="sr-only" for="email">Seu e-mail</label>
+        <input type="email" name="email" autocomplete="username" placeholder="Seu e-mail" class="input-text" id="email" required>
         <div class="password-input-wrapper">
-          <input type="password" placeholder="Sua senha" class="input-text" id="password" required>
+          <label class="sr-only" for="password">Sua senha</label>
+          <input type="password" name="password" autocomplete="current-password" placeholder="Sua senha" class="input-text" id="password" required aria-describedby="login-error">
           <button type="button" class="password-toggle fa-eye-slash" data-target="password" aria-label="Mostrar senha" aria-pressed="false" aria-controls="password"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button>
         </div>
 
-        <p id="login-error" class="font-1-xs form-error"></p>
+        <p id="login-error" class="font-1-xs form-error" role="alert"></p>
         <button type="submit" class="btn-login" id="btn-sign-in" aria-label="Entrar na conta" disabled>Entrar</button>
         <a href="./esqueci-senha.html" id="forgot-password-link" class="font-1-s" aria-label="Esqueceu a sua senha? Recuperar senha">Esqueceu a sua senha?</a>
       </form>

@@ -21,6 +21,16 @@ export function criarClienteBenchmark({requisitar = fetchComErro,timeoutMs = 250
     }
   }
   return {
+    consultarBlender({dispositivo,tipo},opcoes) {
+      if (typeof dispositivo !== "string" || !/^[A-Za-z0-9() +._/\-]{2,160}$/.test(dispositivo) || !["cpu","gpu"].includes(tipo))
+        return Promise.reject(new Error("Selecione uma CPU ou GPU identificada para o Blender."));
+      return enviar("blender",{dispositivo,tipo},opcoes).then(dados => {
+        const identidade = nome => String(nome).replace(/^\d{2}(st|nd|rd|th) Gen\s+/i,"").replace(/\((R|TM)\)/gi,"").toLowerCase();
+        if (identidade(dados.dispositivo) !== identidade(dispositivo) || dados.tipo !== tipo || !Number.isFinite(dados.score) || dados.score < 0 || !Number.isInteger(dados.quantidade) || dados.quantidade < 1 || !/^\d+\.\d+\.\d+$/.test(dados.versao || "") || !["CPU","CUDA","OPTIX","HIP","METAL","ONEAPI"].includes(dados.metodo) || !Number.isFinite(dados.consultadoEm) || !String(dados.url).startsWith("https://opendata.blender.org/benchmarks/query/?"))
+          throw new Error("Resposta do Blender inválida. Nenhuma pontuação foi estimada.");
+        return dados;
+      });
+    },
     consultar({game,cpu,gpu,res = "1080p",preset = "high"},opcoes) {
       if (![game,cpu,gpu].every(v => typeof v === "string" && SLUG.test(v)) || !["1080p","1440p","4k"].includes(res) || !["low","medium","high","ultra"].includes(preset))
         return Promise.reject(new Error("Selecione um jogo e modelos de CPU e GPU reconhecidos, com ajustes válidos."));

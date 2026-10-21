@@ -21,10 +21,12 @@ export function buildDaConta(dados) {
       ? (Array.isArray(selecao) ? selecao : [selecao]).map(converter)
       : converter(selecao);
   }
-  return normalizarBuild({
+  const build = normalizarBuild({
     ...estado,id:dados.id,titulo:dados.nome,descricao:dados.descricao,
     criadoEm:dados.criado_em,componentes,
   });
+  if (["incompativel","nao_verificado","sem_conflitos"].includes(dados.compatibilidade?.status)) build.compatibilidade = dados.compatibilidade;
+  return build;
 }
 
 export function estadoParaConta(build) {
@@ -32,6 +34,7 @@ export function estadoParaConta(build) {
     titulo:build.titulo,descricao:build.descricao,visibilidade:build.visibilidade,
     travada:build.travada,orcamento:build.orcamento,
     incluirPerifericos:build.incluirPerifericos,incluirRede:build.incluirRede,
+    percentualPerifericos:build.percentualPerifericos || 0,
     rede:build.rede,pecasExtras:build.pecasExtras,componentes:build.componentes,
   };
 }

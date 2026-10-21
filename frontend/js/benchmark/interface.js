@@ -65,7 +65,7 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
       clearInterval(cooldown);
       cooldown = setInterval(() => {
         restante--;
-        if (restante > 0) informar("Aguarde " + restante + " s para consultar novamente.","error",alvo);
+        if (restante > 0) informar(erro.message + " Aguarde " + restante + " s para consultar novamente.","error",alvo);
         else { clearInterval(cooldown); ocupado = false; acaoAtual = ""; controles(); informar("Você já pode consultar novamente.","info",alvo); }
       },1000);
     }

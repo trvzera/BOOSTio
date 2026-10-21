@@ -2,6 +2,8 @@ from datetime import timezone
 
 from . import db, ModeloBase
 from .build import Build
+from .usuario import Usuario
+from sqlalchemy import update
 from . import Processador, PlacaMae, PlacaVideo, MemoriaRAM, SSD, HD, Fonte, Gabinete
 from . import WaterCooler, AirCooler, Fan, Fone, Teclado, Mouse, Monitor
 from . import PlacaRede, CaboRede
@@ -14,15 +16,59 @@ MODELOS = {modelo.__tablename__: modelo for modelo in (
 MULTIPLAS = {"memoria_ram", "ssd", "hd", "fan"}
 
 
+class LimiteBuildsError(ValueError):
+    def __init__(self):
+        super().__init__("Você atingiu o limite de três builds. Exclua uma para liberar espaço.")
+
+
+class EmailNaoVerificadoError(PermissionError):
+    def __init__(self):
+        super().__init__("Verifique seu e-mail nas configurações do perfil antes de criar uma build.")
+
+
 class BuildSalva(ModeloBase):
     __tablename__ = "build_salva"
 
     usuario_id = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=False)
     build_original_id = db.Column(db.Integer, db.ForeignKey("build.id"), unique=True)
     estado = db.Column(db.JSON, nullable=False)
+    LIMITE = 3
 
     @classmethod
-    def criar_gerada_com_pecas_proprias(cls, usuario_id, dados, proprias, rede=None):
+    def verificar_espaco(cls, usuario_id):
+        usuario = db.session.get(Usuario, usuario_id)
+        if usuario is None:
+            raise ValueError("Usuário não encontrado")
+        if not usuario.verificado:
+            raise EmailNaoVerificadoError()
+        cls.migrar_geradas(usuario_id)
+        if cls.query.filter_by(usuario_id=usuario_id).count() >= cls.LIMITE:
+            raise LimiteBuildsError()
+
+    @classmethod
+    def criar_limitada(cls, usuario_id, estado, gerada=None):
+        """Serializa a escrita por usuário; nunca mantém lock durante a chamada à LLM."""
+        try:
+            # UPDATE também serializa no SQLite, onde SELECT FOR UPDATE não tem efeito.
+            resultado = db.session.execute(update(Usuario).where(Usuario.id == usuario_id).values(id=Usuario.id))
+            if resultado.rowcount != 1:
+                raise ValueError("Usuário não encontrado")
+            if not db.session.get(Usuario, usuario_id).verificado:
+                raise EmailNaoVerificadoError()
+            cls.migrar_geradas(usuario_id, confirmar=False)
+            if cls.query.filter_by(usuario_id=usuario_id).count() >= cls.LIMITE:
+                raise LimiteBuildsError()
+            original = Build.criar_gerada(usuario_id, gerada, confirmar=False) if gerada else None
+            build = cls(usuario_id=usuario_id, estado=estado, build_original_id=original.id if original else None)
+            db.session.add(build)
+            db.session.commit()
+            return build
+        except Exception:
+            db.session.rollback()
+            raise
+
+    @classmethod
+    def criar_gerada_com_pecas_proprias(cls, usuario_id, dados, proprias, rede=None, percentual=0):
         componentes = {}
         for tipo, nome in proprias.items():
             if tipo not in MODELOS:
@@ -36,17 +82,16 @@ class BuildSalva(ModeloBase):
         estado = cls.validar_estado({
             "titulo": dados["nome"][:100], "descricao": dados["descricao"][:300],
             "orcamento": dados["orcamento"], "rede": rede or {},
-            "incluirPerifericos": True,
+            "incluirPerifericos": percentual > 0 or any(tipo in componentes for tipo in ("monitor", "teclado", "mouse", "fone")),
+            "percentualPerifericos": percentual,
             "incluirRede": (rede or {}).get("tipo") in ("cabo", "wifi"),
             "pecasExtras": {tipo: nome for tipo, nome in proprias.items() if tipo not in MODELOS},
             "componentes": componentes,
         })
-        build = cls(usuario_id=usuario_id, estado=estado)
-        build.salvar()
-        return build
+        return cls.criar_limitada(usuario_id, estado)
 
     @classmethod
-    def migrar_geradas(cls, usuario_id):
+    def migrar_geradas(cls, usuario_id, confirmar=True):
         originais = Build.listar_por_usuario(usuario_id)
         existentes = {item.build_original_id for item in cls.query.filter_by(usuario_id=usuario_id).all()}
         for original in originais:
@@ -65,7 +110,9 @@ class BuildSalva(ModeloBase):
                 estado["componentes"][tipo] = [item] if tipo in MULTIPLAS else item
             estado["incluirPerifericos"] = any(tipo in estado["componentes"] for tipo in ("monitor", "teclado", "mouse", "fone"))
             db.session.add(cls(usuario_id=usuario_id, build_original_id=original.id, estado=estado))
-        db.session.commit()
+        db.session.flush()
+        if confirmar:
+            db.session.commit()
 
     @classmethod
     def listar_por_usuario(cls, usuario_id):
@@ -130,6 +177,9 @@ class BuildSalva(ModeloBase):
         orcamento = dados.get("orcamento")
         if orcamento is not None and (type(orcamento) not in (int, float) or not 0 <= orcamento <= 1000000):
             raise ValueError("Orçamento inválido")
+        percentual = dados.get("percentualPerifericos", 0)
+        if type(percentual) is not int or not 0 <= percentual <= 99:
+            raise ValueError("A porcentagem para periféricos deve ser de 0 a 99")
         pecas_extras = dados.get("pecasExtras", {})
         if not isinstance(pecas_extras, dict) or set(pecas_extras) - {"webcam", "microfone"}:
             raise ValueError("Peça própria extra inválida")
@@ -139,6 +189,7 @@ class BuildSalva(ModeloBase):
             "titulo": titulo.strip(), "descricao": descricao.strip(), "visibilidade": dados.get("visibilidade", "privado"),
             "travada": bool(dados.get("travada", False)), "orcamento": orcamento,
             "incluirPerifericos": bool(dados.get("incluirPerifericos", False)),
+            "percentualPerifericos": percentual,
             "incluirRede": bool(dados.get("incluirRede", False)), "rede": dados.get("rede") or {},
             "pecasExtras": {tipo: nome.strip() for tipo, nome in pecas_extras.items()},
             "componentes": limpos,
