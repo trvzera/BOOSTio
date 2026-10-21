@@ -8,25 +8,55 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
 
 ### Atualização de criação, orçamento e menus — 20/10/2026
 
+- Visitantes acessam apenas início, termos, sobre, contato, login/cadastro,
+  recuperação de conta e erro. Páginas internas são marcadas com `data-private-page`,
+  ficam ocultas/inertes até confirmar a sessão e redirecionam ao login também em
+  caso de falha de rede. A guarda de UI não substitui `login_required` no Python:
+  o Live Server continua servindo HTML estático, sem dados privados embutidos.
+- `Testar build` primeiro permite escolher jogos/FPSHQ ou renderização/Blender.
+  Trocar de modo ou fechar o modal cancela a consulta do painel anterior.
+  `/benchmark/blender` exige login e consulta o JSON público oficial, com cache
+  de uma hora e limites locais. Filtra o nome exato, tipo, versão e método;
+  mostra mediana em amostras/min e número de resultados, nunca FPS ou tempo garantido.
+  A fonte pode agregar variantes de VRAM sob um mesmo nome. A integração com
+  Blender foi validada por consulta pública de CPU e por testes isolados. O prefixo
+  Intel `12th Gen` e marcas `(R)/(TM)` são normalizados sem remover o sufixo do SKU;
+  isso corrige a consulta de `i3-12100F`. Modelo realmente ausente continua sendo 422.
+- Dez modelos sem periféricos cobrem estudos, produtividade, programação, jogos,
+  criação e Blender. A vitrine usa os preços/IDs do catálogo da conta; o JSON local
+  só ajuda a resolver referências já cadastradas. Não cria peças próprias fictícias
+  quando falta um produto: permite copiar como base editável e sinaliza a pendência
+  no editor. Cartões compactos não expandem peças; a consulta fica dentro da build.
+  Preço zero/ausente é mostrado como preço a consultar, não como produto gratuito.
+  Curadoria gerenciável
+  no servidor e atualização contínua de preços continuam pendentes.
+
 - `BuildSalva.criar_limitada` serializa a escrita por usuário no banco e limita a
   três builds. Criação manual, importação, modelos, duplicação e geração usam esse
   ponto; a LLM recebe uma checagem antecipada e outra ao persistir. Não se mantém
   lock durante a chamada externa. Resultado gerado e estado são salvos na mesma
   transação; montagens com peças próprias usam a mesma proteção ao persistir o estado.
   A quota responde `409 / codigo: limite-builds`, sem apagar dados antigos.
+  O mesmo ponto exige e-mail verificado (`403 / codigo: email-nao-verificado`),
+  inclusive em requisições diretas. O formulário verifica ambas as condições antes
+  de liberar a página, com nova validação antes de gerar.
 - O formulário usa tetos **Até**, slider de R$ 100 em R$ 100 e entrada com centavos.
-  Reserva opcional de 1–99% do total para periféricos: `percentual_perifericos` no
-  pedido, `percentualPerifericos` no estado. O Python divide em centavos, inclui
-  o catálogo de periféricos e confere os dois subtotais; catálogo insuficiente ou
-  saída da IA fora da divisão retorna erro, sem salvar uma build parcial.
-- O formulário envia `pecas_proprias`, rede e reserva para a geração pela LLM,
+  Agora tem cinco etapas: objetivo, orçamento, peças do PC, periféricos e conexão.
+  A etapa de periféricos distingue não incluir, comprar todos ou reaproveitar alguns;
+  os já possuídos exigem modelo e usam o checkbox Lottie compartilhado.
+  A porcentagem de 1–99% é uma **meta flexível**, não dois tetos independentes.
+  `percentual_perifericos` vai no pedido e `percentualPerifericos` no estado. O Python
+  permite redistribuir a sobra entre PC e periféricos, mas valida o teto total e a
+  presença dos itens solicitados. Não inventa produtos nem força gastar a sobra.
+- O formulário envia `pecas_proprias`, rede e meta para a geração pela LLM,
   que completa apenas as categorias ainda não possuídas. O resultado abre no editor
   pelo `build_id`; mantém os Lotties, controles e feedback de erro da interface.
   Webcam/microfone próprios são preservados em `pecasExtras`. Identificação completa
   dos modelos e compatibilidade definitiva das peças próprias continuam pendentes.
 - Frases na espera mudam a cada quatro segundos, sem porcentagem ou etapas reais.
   Erro preserva respostas e permite repetir/revisar. A altura do formulário acompanha
-  o conteúdo, sem scroll interno nas respostas; listas longas usam a rolagem da página.
+  o conteúdo. Somente as listas longas de peças próprias/periféricos possuem rolagem
+  interna; orçamento e rede continuam sem recorte interno.
 - `components/number-stepper.js` mantém inputs nativos com botões explícitos de
   aumentar/diminuir: orçamento de R$ 100 em R$ 100 sem perder centavos; porcentagem e
   rede seguem seus passos e limites. Os controles preservam Tab/Enter e não recriam
@@ -44,6 +74,24 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
   têm códigos próprios; timeout é 504 e indisponibilidade HTTP do provedor é 503.
   A pausa retorna `Retry-After` (também após falha de conexão), sem repetição automática.
   Cache válido continua disponível. Não foi demonstrada recuperação do provedor.
+- O hamburger reúne Início, Criar build, Termos e Sobre, sem setas nem repetir
+  Builds/Configurações/Sair do perfil. O controle de animações da home fica dentro
+  dele, sem botão flutuante extra. A escolha de criação destaca o formulário à
+  esquerda; montagem manual fica à direita.
+- Busca de melhorias permite selecionar todas as categorias do catálogo. Os
+  resultados e a prévia rolam em áreas próprias, mantendo ações do diálogo visíveis.
+  O catálogo informa vídeo integrado no editor. Indicador de build incompleta usa
+  amarelo, enquanto o preenchimento da barra de progresso permanece azul.
+- Falhas de conexão ganham mensagem de internet indisponível quando confirmada
+  por `navigator.onLine`; falha genérica de rede/servidor não é confundida com 5xx
+  do provedor de benchmark. Modal de código e resultados Blender usam a tipografia
+  e cores do site; checkbox de budget do perfil usa o Lottie compartilhado.
+
+Validação desta rodada: 173 testes JavaScript, 86 testes Python (+ 4 subtestes)
+e 184 verificações de navegador com respostas controladas. Incluem acesso/quota,
+cinco etapas, posse de periféricos, copiar modelos, selecionar o benchmark e aplicar
+SSD/fonte/monitor juntos. Conferência visual em celular, tablet, desktop e paisagem.
+Nenhuma migração, execução do `app.py`, geração paga pela LLM ou atualização de preços.
 
 Os trechos históricos abaixo sobre quota apenas local e ausência de CRUD não
 descrevem os fluxos atuais da conta; consultar este bloco e o README.

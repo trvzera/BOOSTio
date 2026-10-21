@@ -16,7 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function atualizarControle() {
     const texto = pausado ? "Reproduzir animações" : "Pausar animações";
-    controleMovimento.textContent = texto;
+    const label = controleMovimento.querySelector("[data-motion-label]");
+    if (label) label.textContent = texto;
     controleMovimento.setAttribute("aria-label",texto + " de fundo");
     controleMovimento.dataset.paused = String(pausado);
   }

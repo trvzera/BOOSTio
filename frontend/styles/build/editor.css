@@ -249,3 +249,4 @@
 .compatibility-messages li { font-size: var(--text-caption); }
 .compatibility-messages li.tip { border-color: var(--cor-p1); }
 .builder-page-main { min-height: 100svh; }
+.integrated-video-note { margin: 0 0 1.25rem; padding: .85rem 1rem; border: 1px solid rgba(0,123,255,.25); border-radius: .85rem; background: rgba(0,123,255,.06); color: var(--cor-5); font: 400 .85rem/1.6 var(--font-body); }

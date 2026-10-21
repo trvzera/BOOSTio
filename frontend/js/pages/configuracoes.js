@@ -397,6 +397,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     await acompanharCarregamento(trocarDadosConfigs());
+    if (new URLSearchParams(location.search).has("verificar")) abrirModalVerificacao();
   } catch (erro) {
     console.error("Erro ao iniciar a página de configurações:", erro);
   }

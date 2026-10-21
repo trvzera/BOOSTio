@@ -27,7 +27,7 @@ def app_build(tmp_path):
     app.register_blueprint(build_bp)
     with app.app_context():
         db.create_all()
-        db.session.add_all([Usuario(nome="A", email="a@example.test"), Usuario(nome="B", email="b@example.test")])
+        db.session.add_all([Usuario(nome="A", email="a@example.test",verificado=True), Usuario(nome="B", email="b@example.test",verificado=True)])
         db.session.commit()
     yield app
     with app.app_context():
@@ -134,15 +134,16 @@ def resposta_com_perifericos():
     return {**PEDIDO, "componentes": itens}, catalogo
 
 
-def test_nao_aceita_ia_gastando_reserva_do_pc_ou_perifericos():
+def test_meta_flexivel_permite_realocar_saldo_mas_nunca_ultrapassar_total():
     build, catalogo = resposta_com_perifericos()
     assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1100
     catalogo["processador"][0]["preco"] = 1150
-    with pytest.raises(ValueError, match="divisão"):
-        CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)
+    assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1450
     catalogo["processador"][0]["preco"] = 800
     catalogo["monitor"][0]["preco"] = 200
-    with pytest.raises(ValueError, match="divisão"):
+    assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1250
+    catalogo["processador"][0]["preco"] = 1500
+    with pytest.raises(ValueError, match="Não foi possível gerar uma configuração dentro do orçamento"):
         CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)
 
 
@@ -167,7 +168,7 @@ def test_geracao_persiste_original_e_estado_em_uma_transacao(app_build, mocker):
         assert resposta["preco_total"] == 1000
         assert len(resposta["componentes"]) == 10
         assert Build.query.count() == BuildSalva.query.count() == 1
-        assert "Reserva exclusiva para periféricos: R$ 1000.00" in llm.call_args.args[0]
+        assert "Meta para periféricos: R$ 1000.00" in llm.call_args.args[0]
         assert len(BuildSalva.listar_por_usuario(1)) == 1
 
 
@@ -237,3 +238,20 @@ def test_pecas_proprias_reverificam_quota_apos_llm(app_build, mocker):
             CriarBuildService().executar(1, {**PEDIDO, "pecas_proprias": {"processador": "Minha CPU"}})
         llm.assert_called_once()
         assert BuildSalva.query.count() == 3 and Build.query.count() == 0
+
+
+def test_email_nao_verificado_bloqueia_todas_as_criacoes_sem_chamar_llm(app_build, mocker):
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    existente = cliente.post("/build/manual", json=ESTADO).json["build"]["id"]
+    with app_build.app_context():
+        db.session.get(Usuario,1).verificado = False
+        db.session.commit()
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
+    for rota,dados in [("/build/manual",ESTADO),("/build/",PEDIDO),(f"/build/{existente}/duplicar",None)]:
+        resposta = cliente.post(rota,json=dados)
+        assert resposta.status_code == 403
+        assert resposta.json["codigo"] == "email-nao-verificado"
+    llm.assert_not_called()
+    with app_build.app_context():
+        assert BuildSalva.query.count() == 1

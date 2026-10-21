@@ -158,3 +158,20 @@
   .fpshq-panel .fpshq-resolution-card { padding: 10px 12px; }
   .fpshq-panel form .test-actions > button { width: 100%; }
 }
+.benchmark-type-picker { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1rem 0 1.5rem; }
+.benchmark-type-picker button { flex: 1 1 12rem; }
+.benchmark-type-picker [aria-pressed="true"] { color: var(--cor-p1); border-color: var(--cor-p1); background: rgba(0,123,255,.08); }
+.blender-panel { display: grid; gap: 1rem; min-width: 0; font: 400 1rem/1.6 var(--font-body); color: var(--cor-6); }
+.blender-panel form { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem; }
+.blender-panel .test-field { display: grid; gap: .5rem; flex: 1 1 15rem; min-width: 0; font: 500 .8rem/1.4 var(--font-heading); }
+.blender-panel select { width: 100%; max-width: 100%; min-height: 2.75rem; padding: .65rem .75rem; border: 1px solid var(--glass-border); border-radius: .75rem; background: var(--cor-1); color: var(--cor-6); font: 400 .85rem/1.4 var(--font-body); }
+.blender-panel select:focus-visible { outline: 2px solid var(--cor-p1); outline-offset: 2px; }
+.blender-panel .test-feedback { font-size: .85rem; color: var(--text-secondary); }
+.blender-panel .test-feedback[data-tone="error"] { color: var(--status-error); }
+.blender-panel form button { min-height: 2.75rem; }
+.blender-score { padding: 1.25rem; border: 1px solid var(--glass-border); border-radius: var(--radius-card); background: var(--glass-background); display: grid; gap: .75rem; }
+.blender-score h3 { font: 500 1rem/1.5 var(--font-heading); overflow-wrap: anywhere; }
+.blender-score > strong { color: var(--cor-p1); font: 600 clamp(1.6rem,5vw,2.4rem)/1.3 var(--font-heading); }
+.blender-score strong small { display: block; font: 400 .8rem/1.5 var(--font-body); color: var(--text-secondary); }
+.blender-score p, .blender-score a { font-size: .85rem; }
+.blender-score a { color: var(--cor-p1); }

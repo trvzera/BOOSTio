@@ -52,7 +52,10 @@ export function iniciarIcones(raiz = document) {
         if (controle?.disabled || input?.disabled || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
         animacao.setDirection(direcao); animacao.play();
       };
-      const atualizarEstado = () => mover(aberto() ? 1 : -1);
+      const atualizarEstado = () => {
+        if (input?.disabled) { animacao.goToAndStop(aberto() ? animacao.totalFrames - 1 : 0,true); return; }
+        mover(aberto() ? 1 : -1);
+      };
       const entrar = () => { if (!alternavel || !aberto()) mover(invertido ? -1 : 1); };
       const sair = () => { if (!alternavel || !aberto()) mover(invertido ? 1 : -1); };
       let observador;

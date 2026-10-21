@@ -74,7 +74,7 @@ const perguntas = [
     tag: "Etapa 03",
     titulo: "O que você já possui?",
     descricao:
-      "Marque todas as peças e periféricos que pretende reaproveitar e informe o modelo de cada item. Se estiver começando do zero, marque a primeira opção.",
+      "Marque as peças do computador que pretende reaproveitar e informe o modelo de cada item. Se estiver começando do zero, marque a primeira opção.",
     multipla: true,
     opcoes: [
       ["nenhuma", "Ainda não tenho peças"],
@@ -89,16 +89,20 @@ const perguntas = [
       ["cooler", "Air cooler"],
       ["water-cooler", "Water cooler"],
       ["fans", "Fans"],
-      ["monitor", "Monitor"],
-      ["teclado", "Teclado"],
-      ["mouse", "Mouse"],
-      ["headset", "Headset / Fone"],
-      ["webcam", "Webcam"],
-      ["microfone", "Microfone"],
     ],
   },
   {
-    chave:"rede",etapa:"Conexão",tag:"Etapa 04",
+    chave:"perifericos",etapa:"Periféricos",tag:"Etapa 04",
+    titulo:"Quer incluir periféricos na montagem?",
+    descricao:"Monitor, teclado, mouse e headset também entram no orçamento. Informe o que já possui e uma meta para os novos itens.",
+    opcoes:[
+      ["sem-perifericos","Não incluir periféricos novos","Vou montar apenas o computador."],
+      ["todos-perifericos","Preciso de todos","Incluir monitor, teclado, mouse e headset."],
+      ["alguns-perifericos","Já possuo alguns ou todos","Informe o que vai reaproveitar; incluímos somente o que faltar."],
+    ],
+  },
+  {
+    chave:"rede",etapa:"Conexão",tag:"Etapa 05",
     titulo:"Como seu PC vai se conectar à internet?",
     descricao:"Informe se usará cabo de rede ou Wi-Fi e se já possui o necessário. Você poderá adicionar o acessório pelo catálogo da build quando houver produtos cadastrados.",
     opcoes:[],
@@ -214,7 +218,42 @@ document.addEventListener("DOMContentLoaded", async () => {
     const maximo = Math.max(20000,valor);
     const isActive = respostas.orcamento === "personalizado" ? "active" : "";
     return `<div class="budget-range ${isActive}"><div><label class="font-1-m-b" for="budget-input">Orçamento personalizado (R$)</label><strong class="font-2-xs" id="budget-value">${valor === "" ? "Informe um valor" : moeda.format(valor)}</strong></div><input id="budget-input" type="number" inputmode="decimal" min="0.01" max="1000000" step="0.01" data-number-step="100" value="${valor}" aria-describedby="budget-help"><input type="range" id="budget-range" min="0" max="${Math.ceil(maximo / 100) * 100}" step="100" value="${Math.round(valor / 100) * 100}" style="--range-progress: ${progressoRange(valor)}%" aria-label="Ajustar orçamento de cem em cem reais"><p id="budget-help" class="font-2-xs">Controle e setas de R$ 100 em R$ 100. Digite para usar outro valor.</p></div>
-      <fieldset class="peripheral-budget"><legend class="font-1-xs">Quer incluir periféricos nesse valor?</legend><label class="peripheral-budget-toggle ui-check"><input type="checkbox" id="budget-peripherals" ${respostas.incluirPerifericos ? "checked" : ""}>${iconeAnimado("checkbox")}<span class="peripheral-budget-label">Reservar parte do total para monitor, teclado, mouse e headset</span></label><div id="peripheral-allocation" ${respostas.incluirPerifericos ? "" : "hidden"}><label for="peripheral-percent">Porcentagem para periféricos</label><div class="peripheral-percent-field"><input type="number" id="peripheral-percent" min="1" max="99" step="1" inputmode="numeric" value="${respostas.percentualPerifericos ?? 20}"><span aria-hidden="true">%</span></div><p id="peripheral-budget-summary" class="font-2-xs" aria-live="polite"></p></div></fieldset>`;
+      `;
+  }
+
+  const listaPerifericos = [["monitor","Monitor"],["teclado","Teclado"],["mouse","Mouse"],["headset","Headset / Fone"],["webcam","Webcam"],["microfone","Microfone"]];
+  function atualizarPreferenciaPerifericos() {
+    const proprios = respostas.perifericos === "alguns-perifericos" ? respostas.perifericosProprios || [] : [];
+    const faltam = ["monitor","teclado","mouse","headset"].some(tipo => !proprios.includes(tipo));
+    respostas.incluirPerifericos = respostas.perifericos === "todos-perifericos" || respostas.perifericos === "alguns-perifericos" && faltam;
+    respostas.percentualPerifericos ??= 20;
+  }
+  function renderizarCamposPerifericos() {
+    atualizarPreferenciaPerifericos();
+    const alvo = conteudo.querySelector("#perifericos-fields");
+    if (!alvo) return;
+    if (!respostas.perifericos || respostas.perifericos === "sem-perifericos") { alvo.replaceChildren(); return; }
+    const proprios = respostas.perifericosProprios || [];
+    alvo.innerHTML = (respostas.perifericos === "alguns-perifericos" ? '<fieldset class="peripheral-owned-list"><legend>Quais periféricos você já possui?</legend>' +
+      listaPerifericos.map(([tipo,nome]) => '<div class="peripheral-owned" data-owned="' + tipo + '"><label class="ui-check"><input type="checkbox" data-owned-peripheral="' + tipo + '" ' + (proprios.includes(tipo) ? 'checked' : '') + '>' + iconeAnimado("checkbox") + '<span>' + nome + '</span></label>' + (proprios.includes(tipo) ? detalhePecaHtml(tipo,nome) : '') + '</div>').join("") + '</fieldset>' : '') +
+      '<div class="peripheral-budget" id="peripheral-allocation" ' + (respostas.incluirPerifericos ? '' : 'hidden') + '><label for="peripheral-percent">Meta do orçamento para periféricos</label><div class="peripheral-percent-field"><input type="number" id="peripheral-percent" min="1" max="99" step="1" inputmode="numeric" value="' + respostas.percentualPerifericos + '"><span aria-hidden="true">%</span></div><p id="peripheral-budget-summary" class="font-2-xs" aria-live="polite"></p><p class="font-2-xs">É uma referência, não um gasto obrigatório. O saldo pode ser usado nas peças do PC, sempre dentro do orçamento total.</p></div>';
+    alvo.querySelectorAll("[data-owned-peripheral]").forEach(input => input.addEventListener("change",() => {
+      const escolhidos = new Set(respostas.perifericosProprios || []), tipo = input.dataset.ownedPeripheral;
+      if (input.checked) escolhidos.add(tipo); else escolhidos.delete(tipo);
+      respostas.perifericosProprios = [...escolhidos];
+      const item = input.closest(".peripheral-owned");
+      if (input.checked && !item.querySelector(".piece-detail")) item.insertAdjacentHTML("beforeend",detalhePecaHtml(tipo,listaPerifericos.find(p=>p[0] === tipo)[1]));
+      else if (!input.checked) { item.querySelector(".piece-detail")?.remove(); delete respostas.pecasDetalhes?.[tipo]; }
+      atualizarPreferenciaPerifericos();
+      alvo.querySelector("#peripheral-allocation").hidden = !respostas.incluirPerifericos;
+      vincularCamposDetalhesPecas(); atualizarReserva(); atualizarMenu();
+    }));
+    alvo.querySelector("#peripheral-percent")?.addEventListener("input",evento => {
+      respostas.percentualPerifericos = evento.target.valueAsNumber;
+      atualizarReserva(); atualizarMenu();
+    });
+    vincularCamposDetalhesPecas();
+    iniciarControlesNumericos(alvo); iniciarIcones(alvo); atualizarReserva();
   }
 
   const faixas = {"ate-3000":3000,"3000-5000":5000,"5000-8000":8000};
@@ -225,7 +264,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const divisao = dividirOrcamento(valor,percentual);
     const resumo = conteudo.querySelector("#peripheral-budget-summary");
     if (resumo) resumo.textContent = divisao
-      ? `${moeda.format(divisao.perifericos)} para periféricos · ${moeda.format(divisao.pc)} para o PC. O total não aumenta.` : "Informe um orçamento válido e uma porcentagem inteira de 1 a 99.";
+      ? `${moeda.format(divisao.perifericos)} de referência para periféricos · ${moeda.format(divisao.pc)} de referência para o PC; a sobra pode ser redistribuída.` : "Informe um orçamento válido e uma porcentagem inteira de 1 a 99.";
     conteudo.querySelector("#next-question").disabled = !podeAvancar();
   }
 
@@ -252,6 +291,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <span class="font-2-xs">${indiceAtual + 1} de ${perguntas.length}</span>
       </div>
       ${pergunta.chave === "orcamento" ? `<div class="budget-fields">${campos}${rangeHtml()}</div>` : campos}
+      ${pergunta.chave === "perifericos" ? '<div id="perifericos-fields"></div>' : ""}
       <div id="form-navigation">
         <button type="button" class="btn-ghost" id="previous-question" aria-label="Etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}>${iconeAnimado("arrow","back")}<span>Voltar</span></button>
         <button type="button" class="btn-primary-form" id="next-question" aria-label="${rotuloAvancar}" ${podeAvancar() ? "" : "disabled"}><span>${rotuloAvancar}</span>${iconeAnimado("arrow")}</button>
@@ -272,16 +312,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       .querySelector("#budget-range")
       ?.addEventListener("input", atualizarRange);
     conteudo.querySelector("#budget-input")?.addEventListener("input", atualizarRange);
-    conteudo.querySelector("#budget-peripherals")?.addEventListener("change", evento => {
-      respostas.incluirPerifericos = evento.target.checked;
-      respostas.percentualPerifericos ??= 20;
-      conteudo.querySelector("#peripheral-allocation").hidden = !evento.target.checked;
-      atualizarReserva(); atualizarMenu();
-    });
-    conteudo.querySelector("#peripheral-percent")?.addEventListener("input", evento => {
-      respostas.percentualPerifericos = evento.target.valueAsNumber;
-      atualizarReserva(); atualizarMenu();
-    });
+    if (pergunta.chave === "perifericos") renderizarCamposPerifericos();
     conteudo.querySelector("#next-question").addEventListener("click", avancar);
     if (pergunta.chave === "orcamento") atualizarReserva();
     if (pergunta.multipla) {
@@ -394,9 +425,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function etapaRespondida(indice) {
     if (perguntas[indice].chave === "rede") return true;
-    if (perguntas[indice].chave === "orcamento")
-      return orcamentoValido(valorOrcamento()) &&
-        (!respostas.incluirPerifericos || Number.isInteger(respostas.percentualPerifericos) && respostas.percentualPerifericos > 0 && respostas.percentualPerifericos < 100);
+    if (perguntas[indice].chave === "orcamento") return orcamentoValido(valorOrcamento());
+    if (perguntas[indice].chave === "perifericos") {
+      if (!respostas.perifericos) return false;
+      if (respostas.perifericos === "alguns-perifericos" && (!(respostas.perifericosProprios?.length) || !respostas.perifericosProprios.every(tipo => respostas.pecasDetalhes?.[tipo]?.trim()))) return false;
+      return !respostas.incluirPerifericos || Number.isInteger(respostas.percentualPerifericos) && respostas.percentualPerifericos > 0 && respostas.percentualPerifericos < 100;
+    }
     const resposta = respostas[perguntas[indice].chave];
     if (!Array.isArray(resposta)) return Boolean(resposta);
     if (resposta.length === 0) return false;
@@ -419,7 +453,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         escolhidas.clear();
         if (input.checked) {
           escolhidas.add("nenhuma");
-          respostas.pecasDetalhes = {};
+          for (const [tipo] of pergunta.opcoes) delete respostas.pecasDetalhes?.[tipo];
         }
       } else {
         escolhidas.delete("nenhuma");
@@ -437,6 +471,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       sincronizarCheckboxesLottie();
       sincronizarCamposDetalhesPecas();
     }
+    if (pergunta.chave === "perifericos") renderizarCamposPerifericos();
     if (pergunta.chave === "orcamento") {
       const valor = faixas[input.value];
       respostas.orcamentoPersonalizado = valor;

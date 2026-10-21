@@ -59,7 +59,7 @@ test("sessão encerrada ou falha de rede não reutiliza budget de outra consulta
   assert.equal(planejamentoLocal().budget,null);
   atualizarPerfil(usuario(2,4000));
   globalThis.fetch = async () => { throw new TypeError("offline"); };
-  await assert.rejects(carregarPerfil(),/offline/);
+  await assert.rejects(carregarPerfil(),/conectar|conexão/);
   assert.equal(planejamentoLocal().budget,null);
   globalThis.fetch = async () => json({auth:true,usuario:usuario(2,4000,false)});
   await carregarPerfil();

@@ -1,7 +1,7 @@
 from flask import Blueprint,request,jsonify
 from flask_login import login_required,current_user
 from models import db
-from models.build_salva import LimiteBuildsError
+from models.build_salva import LimiteBuildsError, EmailNaoVerificadoError
 from sqlalchemy.exc import SQLAlchemyError
 from requests.exceptions import RequestException, HTTPError, Timeout, ConnectionError
 
@@ -17,6 +17,11 @@ from services.build_service.excluir_build_service import ExcluirBuildService
 from services.build_service.buscar_build_publica_service import BuscarBuildPublicaService
 
 build_bp = Blueprint("build",__name__,url_prefix='/build')
+
+
+@build_bp.errorhandler(EmailNaoVerificadoError)
+def verificar_email_antes_de_criar(erro):
+  return jsonify({"erro": str(erro), "codigo": "email-nao-verificado"}),403
 
 
 @build_bp.errorhandler(LimiteBuildsError)
@@ -54,7 +59,7 @@ def criar_build():
     builds = ListarBuildService().executar(usuario_id)
 
     return jsonify({"mensagem": "Build criada com sucesso", "build": build, "builds": builds}),201
-  except LimiteBuildsError:
+  except (LimiteBuildsError, EmailNaoVerificadoError):
     raise
   except ValueError as e:
     return jsonify({"erro": str(e)}),400

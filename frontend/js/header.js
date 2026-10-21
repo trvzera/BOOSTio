@@ -22,18 +22,13 @@ export function iniciarNavegacao() {
     '<a class="' + (perfil ? 'profile-link font-1-s' : 'site-menu-link') + '" href="' + pagina(item.pagina) + '" aria-label="Ir para ' + item.rotulo + '"' +
     (location.pathname.endsWith("/" + item.pagina) ? ' aria-current="page"' : "") + '>' +
     '<span class="site-menu-link-label">' + (item.icone ? iconeAnimado(item.icone) : "") +
-    '<span>' + item.rotulo + '</span></span>' + (perfil ? "" : iconeAnimado("arrow")) + '</a>'
+    '<span>' + item.rotulo + '</span></span></a>'
   ).join("");
   const conta = [
     {pagina:"builds.html", rotulo:"Builds", icone:"build"},
     {pagina:"configuracoes.html", rotulo:"Configurações", icone:"user"},
   ];
-  const home = document.body.id === "inicio" || location.pathname.endsWith("/index.html");
-  const linksMenu = home ? [...linksAutenticado,
-    {pagina:"index.html#about-page",rotulo:"Sobre a BOOSTio"},
-    {pagina:"index.html#services-page",rotulo:"Como funciona"},
-    {pagina:"index.html#build-page",rotulo:"Começar montagem"},
-  ] : linksAutenticado;
+  const linksMenu = linksAutenticado;
   host.innerHTML =
     '<div id="profile" class="site-profile"><button type="button" class="profile-toggle" aria-label="Abrir menu do perfil" aria-expanded="false" aria-controls="profile-options">' +
     iconeAnimado("profile") + '</button><nav id="profile-options" class="profile-panel" aria-label="Menu do perfil" aria-hidden="true" inert>' +
@@ -47,6 +42,12 @@ export function iniciarNavegacao() {
     '<span class="ui-lottie hamburger-animation" data-lottie="hamburger" aria-hidden="true"><span class="ui-icon-fallback hamburger-fallback"><span></span><span></span><span></span></span></span></button></div>';
 
   const controles = [];
+  const movimento = document.querySelector(".video-motion-toggle");
+  if (movimento) {
+    movimento.classList.add("site-menu-link","menu-motion-toggle");
+    movimento.innerHTML = '<span class="site-menu-link-label">' + iconeAnimado("magic") + '<span data-motion-label>Pausar animações</span></span>';
+    host.querySelector("#site-menu-panel .site-menu-group").append(movimento);
+  }
   function configurar(container, painel, botao, rotulo, hover = false) {
     let fixado = false, fechamento;
     const controle = {container, painel, botao, alternar(aberto) {
@@ -101,10 +102,10 @@ export function iniciarNavegacao() {
 }
 
 export function atualizarNavegacao(autenticado) {
-  const {host, perfil, hamburger, preview} = iniciarNavegacao();
+  const {host, perfil, hamburger} = iniciarNavegacao();
   host.querySelector("[data-profile-guest]").hidden = Boolean(autenticado);
   host.querySelector("[data-profile-user]").hidden = !autenticado;
-  hamburger.container.hidden = !autenticado && !preview;
+  hamburger.container.hidden = false; // Visitantes também acessam navegação pública e controle de movimento.
   iniciarIcones(host);
   perfil.alternar(false);
   hamburger.alternar(false);

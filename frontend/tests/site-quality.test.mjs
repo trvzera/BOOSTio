@@ -26,10 +26,10 @@ test("cada página tem título e descrição próprios, idioma e atalho para o c
 });
 
 test("páginas privadas e técnicas não são publicadas nos mecanismos de busca",async () => {
-  for (const nome of ["login","signin","esqueci-senha","reset-senha","builds","configuracoes","configuracao-build","pecas","peca","formulario","erro"])
+  for (const nome of ["login","signin","esqueci-senha","reset-senha","builds","configuracoes","configuracao-build","configuracoes-prontas","pecas","peca","formulario","erro"])
     assert.match(await ler(new URL(nome+".html",paginas)),/<meta name="robots" content="noindex,/,nome);
   assert.match(await ler(new URL("../testes.html",import.meta.url)),/name="robots" content="noindex,/);
-  for (const nome of ["index","sobre","termos","configuracoes-prontas"])
+  for (const nome of ["index","sobre","termos"])
     assert.doesNotMatch(await ler(new URL(nome+".html",paginas)),/name="robots" content="noindex/,nome);
 });
 

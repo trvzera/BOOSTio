@@ -47,3 +47,6 @@
 .profile-link:hover .ui-lottie { color: inherit; }
 .profile-logout, .profile-logout .ui-lottie { color: var(--status-error); }
 @media (prefers-reduced-motion: reduce) { .site-profile * { transition: none !important; } }
+.video-motion-toggle:not(.menu-motion-toggle) { display: none; }
+.site-menu-panel .menu-motion-toggle { position: static; inset: auto; width: 100%; max-width: none; border: 0; box-shadow: none; border-radius: var(--radius-control); background: transparent; text-align: left; }
+.profile-panel [data-lottie="user"] svg { transform: scale(1.25); }

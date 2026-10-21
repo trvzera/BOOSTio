@@ -2,6 +2,7 @@ import { carregarPerfil, atualizarPerfil, limparPerfil, revisaoPerfil } from "..
 import { atualizarBudgetUsuario } from "../api/usuario/atualizarBudgetUsuario.js";
 import { acompanharCarregamento } from "../components/page-loading.js";
 import { moeda } from "../build/catalogo.js";
+import { iniciarIcones } from "../components/ui.js";
 
 document.addEventListener("DOMContentLoaded",() => {
   const form = document.querySelector("#budget-profile-form");
@@ -13,7 +14,10 @@ document.addEventListener("DOMContentLoaded",() => {
   function autorizarUso() {
     const positivo = input.value !== "" && input.validity.valid && Number(input.value) > 0;
     usar.disabled = ocupado || !usuarioId || !positivo;
-    if (!positivo) usar.checked = false;
+    if (!positivo && usar.checked) {
+      usar.checked = false;
+      usar.dispatchEvent(new Event("change",{bubbles:true}));
+    }
   }
   function bloquear(valor) {
     ocupado = valor;
@@ -34,11 +38,13 @@ document.addEventListener("DOMContentLoaded",() => {
       usuarioId = resposta.usuario.id;
       input.value = resposta.usuario.budget ?? "";
       usar.checked = resposta.usuario.usar_budget === true;
+      iniciarIcones(form);
+      usar.dispatchEvent(new Event("change",{bubbles:true}));
       aviso("Budget sincronizado com sua conta.","info");
     } catch (erro) {
       usuarioId = null; input.value = ""; usar.checked = false;
       aviso(erro.message || "Não foi possível carregar o budget. Tente novamente.","error");
-    } finally { bloquear(false); }
+    } finally { bloquear(false); usar.dispatchEvent(new Event("change",{bubbles:true})); }
   }
   input.addEventListener("input",autorizarUso);
   form.addEventListener("submit",async evento => {
