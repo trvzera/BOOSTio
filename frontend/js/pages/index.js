@@ -10,20 +10,13 @@ document.addEventListener("DOMContentLoaded", () => {
     "#main-page video, #about-page video",
   );
   const visiveis = new Set();
+  const encerrados = new WeakSet();
   const movimentoReduzido = matchMedia("(prefers-reduced-motion: reduce)");
-  const controleMovimento = document.querySelector(".video-motion-toggle");
   let pausado = movimentoReduzido.matches || Boolean(navigator.connection?.saveData);
-
-  function atualizarControle() {
-    const texto = pausado ? "Reproduzir animações" : "Pausar animações";
-    controleMovimento.textContent = texto;
-    controleMovimento.setAttribute("aria-label",texto + " de fundo");
-    controleMovimento.dataset.paused = String(pausado);
-  }
 
   function atualizarReproducao() {
     videos.forEach((video) => {
-      if (pausado || document.hidden || !visiveis.has(video)) {
+      if (pausado || document.hidden || !visiveis.has(video) || encerrados.has(video)) {
         video.pause();
       } else if (video.paused) {
         const source = video.querySelector("source[data-src]");
@@ -44,9 +37,21 @@ document.addEventListener("DOMContentLoaded", () => {
     { threshold: 0.05 },
   );
 
-  videos.forEach((video) => observador.observe(video));
+  // Sem botão de pausa, a decoração não fica em loop: no máximo cinco segundos
+  // de reprodução por vídeo. Movimento reduzido/economia de dados mantêm o poster.
+  videos.forEach((video) => {
+    let prazo;
+    const encerrar = () => { encerrados.add(video); clearTimeout(prazo); video.pause(); };
+    video.addEventListener("playing",() => {
+      clearTimeout(prazo);
+      if (encerrados.has(video)) { video.pause(); return; }
+      prazo = setTimeout(encerrar,Math.max(0,5 - video.currentTime) * 1000);
+    });
+    video.addEventListener("pause",() => clearTimeout(prazo));
+    video.addEventListener("ended",encerrar);
+    video.addEventListener("timeupdate",() => { if (video.currentTime >= 5) encerrar(); });
+    observador.observe(video);
+  });
   document.addEventListener("visibilitychange", atualizarReproducao);
-  controleMovimento.addEventListener("click",() => { pausado = !pausado; atualizarControle(); atualizarReproducao(); });
-  movimentoReduzido.addEventListener("change",evento => { pausado = evento.matches; atualizarControle(); atualizarReproducao(); });
-  atualizarControle();
+  movimentoReduzido.addEventListener("change",evento => { pausado = evento.matches || Boolean(navigator.connection?.saveData); atualizarReproducao(); });
 });

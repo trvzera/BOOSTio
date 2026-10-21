@@ -3,9 +3,10 @@ import { itensSelecionados, itensCategoria, informacoesRam } from "./estado.js";
 import { avaliarBuild } from "./compatibilidade.js";
 import { normalizarRede, resumoRede } from "./rede.js";
 import { iniciarIcones } from "../components/ui.js";
-import { hardwareBenchmark } from "../benchmark/hardware.js";
+import { hardwareBenchmark, hardwareBlender } from "../benchmark/hardware.js";
 import { painelBenchmarkHtml } from "../benchmark/painel.js";
 import { iniciarPainelBenchmark } from "../benchmark/interface.js";
+import { painelBlenderHtml, iniciarPainelBlender } from "../benchmark/blender.js";
 
 export function avisoCompraHtml() {
   return '<p class="purchase-notice">A BOOSTio não vende, entrega ou processa pagamentos de peças e periféricos. Os links abrem lojas de terceiros, responsáveis pela venda e pelo atendimento da compra. Confira preço, estoque, frete, garantia e devolução diretamente na loja.</p>';
@@ -32,8 +33,8 @@ export function abrirDialogoBuild(titulo,conteudo) {
 export function motivoBenchmark(build,catalogo) {
   const avaliacao = avaliarBuild(build,catalogo);
   if (String(build.id).startsWith("s-")) {
-    if (!itensCategoria(build,"processador").length || !itensCategoria(build,"placa_video").length)
-      return "Escolha CPU e placa de vídeo dedicada para testar o desempenho.";
+    if (!itensCategoria(build,"processador").length)
+      return "Escolha um processador para consultar os testes de desempenho.";
     if (avaliacao.erros.length) return "Resolva os erros de compatibilidade antes de testar o desempenho.";
     return "";
   }
@@ -48,9 +49,23 @@ export function abrirBenchmark(build,catalogo) {
   const cpu = peca("processador"), gpu = peca("placa_video"), ram = informacoesRam(build,catalogo);
   const prefixo = "build-fpshq";
   const dialogo = abrirDialogoBuild("Desempenho esperado",'<p class="planning-help">' + h(build.titulo) + '</p>' +
-    painelBenchmarkHtml({prefixo,hardware:nomePeca(cpu) + " · " + (gpu ? nomePeca(gpu) : "Vídeo integrado"),memoria:ram.capacidade}));
+    '<div class="benchmark-type-picker" role="group" aria-label="Escolha o tipo de teste"><button type="button" class="btn-secondary" data-benchmark-type="games" aria-pressed="false" aria-label="Selecionar teste de desempenho em jogos">Jogos · FPS</button><button type="button" class="btn-secondary" data-benchmark-type="blender" aria-pressed="false" aria-label="Selecionar teste de renderização no Blender">Blender · Renderização</button></div><div data-benchmark-content><p class="planning-help">Escolha qual desempenho deseja consultar. Nenhum teste é executado no seu computador.</p></div>');
   dialogo.classList.add("benchmark-dialog");
-  const limpar = iniciarPainelBenchmark(dialogo,{prefixo,hardware:hardwareBenchmark(cpu,gpu)});
+  let limpar;
+  dialogo.querySelectorAll("[data-benchmark-type]").forEach(botao => botao.addEventListener("click",() => {
+    if (botao.getAttribute("aria-pressed") === "true") return;
+    limpar?.();
+    dialogo.querySelectorAll("[data-benchmark-type]").forEach(outro => outro.setAttribute("aria-pressed",String(outro === botao)));
+    const conteudo = dialogo.querySelector("[data-benchmark-content]");
+    if (botao.dataset.benchmarkType === "games") {
+      conteudo.innerHTML = painelBenchmarkHtml({prefixo,hardware:nomePeca(cpu) + " · " + (gpu ? nomePeca(gpu) : "Vídeo integrado"),memoria:ram.capacidade});
+      limpar = iniciarPainelBenchmark(dialogo,{prefixo,hardware:hardwareBenchmark(cpu,gpu)});
+    } else {
+      const dispositivos = hardwareBlender(cpu,gpu);
+      conteudo.innerHTML = painelBlenderHtml(dispositivos);
+      limpar = iniciarPainelBlender(dialogo,dispositivos);
+    }
+  }));
   dialogo.addEventListener("close",() => limpar?.(),{once:true});
   return dialogo;
 }

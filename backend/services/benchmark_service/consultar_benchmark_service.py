@@ -49,6 +49,7 @@ class ConsultarBenchmarkService:
         if not (isinstance(intervalo, list) and len(intervalo) == 2 and all(numero(n) is not None for n in intervalo) and intervalo[0] <= intervalo[1]):
             intervalo = None
         matriz = bruto.get("matrix") if isinstance(bruto.get("matrix"), dict) else {}
+        linhas = {res: matriz.get(res, matriz.get(res.lower())) for res in ("1080p", "1440p", "4K")}
 
         resultado = {
             "consulta": consulta, "jogo": str(bruto["game"].get("name") or consulta["game"])[:180],
@@ -56,7 +57,7 @@ class ConsultarBenchmarkService:
             "origem": bruto.get("source") if bruto.get("source") in ("measured", "model") else "unknown",
             "base": bruto.get("basis") if bruto.get("basis") in ("measured", "aggregate", "model") else None,
             "confianca": bruto.get("confidence") if bruto.get("confidence") in ("high", "medium", "low") else None,
-            "matriz": {res: {q: numero(matriz[res].get(q)) if isinstance(matriz.get(res), dict) else None for q in QUALIDADES} for res in ("1080p", "1440p", "4K")},
+            "matriz": {res: {q: numero(linhas[res].get(q)) if isinstance(linhas[res], dict) else None for q in QUALIDADES} for res in linhas},
             "url": "https://fpshq.com/pt/games/" + consulta["game"] + "/",
             "consultadoEm": resposta["consultadoEm"], "cache": False,
             "requisitosVerificados": False, "ramAvaliada": False,

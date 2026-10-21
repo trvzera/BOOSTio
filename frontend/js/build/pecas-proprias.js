@@ -4,7 +4,8 @@ const tipos = {
 };
 
 export function pecasPropriasFormulario(respostas) {
-  return Object.fromEntries((respostas.pecas || []).filter(peca => peca !== "nenhuma")
+  const escolhidas = [...(respostas.pecas || []),...(respostas.perifericos === "alguns-perifericos" ? respostas.perifericosProprios || [] : [])];
+  return Object.fromEntries(escolhidas.filter(peca => peca !== "nenhuma")
     .map(peca => [tipos[peca] || peca,respostas.pecasDetalhes?.[peca]?.trim()])
     .filter(([,modelo]) => modelo));
 }

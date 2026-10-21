@@ -1,13 +1,10 @@
-import { htmlSeguro as h, moeda, nomePeca } from "./catalogo.js";
+import { htmlSeguro as h, moeda, nomePeca, categorias as categoriasCatalogo, perifericos, acessoriosRede } from "./catalogo.js";
 import { itensCategoria } from "./estado.js";
 import { avaliarBuild, selecionarPecaCompativel } from "./compatibilidade.js";
 import { planejamentoLocal } from "./planejamento.js";
 import { abrirDialogoBuild } from "./acoes-build.js";
 
-const CATEGORIAS = [
-  {id:"processador", nome:"Processador · CPU", sigla:"CPU"},
-  {id:"placa_video", nome:"Placa de vídeo · GPU", sigla:"GPU"},
-];
+const CATEGORIAS = categoriasCatalogo;
 const MOTIVO_TRAVA = "Destranque a build para buscar e aplicar melhorias.";
 const MOTIVO_BUDGET = "Informe um budget entre R$ 0,01 e R$ 1.000.000 para as novas peças.";
 const centavos = valor => valor == null || String(valor).trim() === "" || !["number","string"].includes(typeof valor)
@@ -21,30 +18,31 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     throw new Error("Informe uma build, o catálogo e o callback para aplicar as alterações.");
 
   const original = structuredClone(build);
-  const categorias = new Set(CATEGORIAS.map(categoria => categoria.id));
+  const categorias = new Set(["processador","placa_video"]);
   let trocas = new Map(), aplicando = false, aplicada = false, totalExibido;
   const budgetInicial = planejamentoLocal().budget ?? build.orcamento;
   const dialogo = abrirDialogoBuild("Buscar melhorias",'<div class="upgrade-real-panel">'
-    + '<p class="planning-help">' + h(build.titulo) + ' · escolha CPU, GPU ou as duas categorias. As escolhas entram primeiro na prévia.</p>'
-    + '<div class="planning-grid"><label class="planning-field" for="upgrade-real-budget"><span>Budget combinado das novas peças (R$)</span>'
+    + '<p class="planning-help">' + h(build.titulo) + '</p>'
+    + '<div class="planning-grid"><label class="planning-field" for="upgrade-real-budget"><span>Budget para trocas (R$)</span>'
     + '<input id="upgrade-real-budget" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" value="'
     + h(budgetInicial ?? "") + '" aria-describedby="upgrade-real-budget-help"></label>'
     + '<label class="planning-field" for="upgrade-real-order"><span>Ordenar por</span><select id="upgrade-real-order" aria-describedby="upgrade-real-order-help">'
     + '<option value="preco">Menor preço</option>'
     + '<option value="desempenho" disabled title="Faltam benchmarks comparáveis.">Melhor desempenho — indisponível: faltam benchmarks comparáveis</option>'
-    + '<option value="vendas" disabled title="Faltam dados de vendas.">Mais vendida — indisponível: faltam dados de vendas</option></select></label></div>'
-    + '<p class="planning-help" id="upgrade-real-budget-help">O limite cobre a soma dos preços integrais das novas peças, sem descontar as antigas. Alterar este valor vale apenas para este diálogo.</p>'
-    + '<p class="planning-help" id="upgrade-real-order-help">Melhor desempenho: faltam benchmarks comparáveis. Mais vendida: faltam dados de vendas. Preço menor não comprova ganho de desempenho. Os preços do catálogo podem ser demonstrativos.</p>'
+    + '</select></label></div>'
+    + '<details class="upgrade-real-help"><summary>Como funcionam as trocas</summary><p class="planning-help" id="upgrade-real-budget-help">Budget só para peças novas, sem descontar as antigas. RAM, discos e fans substituem a categoria por uma unidade/kit; ajuste quantidades no editor.</p></details>'
+    + '<span class="sr-only" id="upgrade-real-order-help">Somente preço está disponível; ganho de desempenho ainda não foi medido.</span>'
     + '<fieldset class="upgrade-real-categories"><legend>Categorias para buscar</legend>'
     + CATEGORIAS.map(categoria => '<label><input type="checkbox" name="upgrade-real-category" value="' + categoria.id
-      + '" checked> ' + categoria.nome + '</label>').join("") + '</fieldset>'
+      + '" ' + (categorias.has(categoria.id) ? 'checked' : '') + '> ' + categoria.nome + '</label>').join("") + '</fieldset>'
     + '<p class="planning-help" id="upgrade-real-feedback" role="status" aria-live="polite" aria-atomic="true"></p>'
-    + '<div class="upgrade-real-results" id="upgrade-real-results"></div>'
+    + '<div class="upgrade-real-workspace"><div class="upgrade-real-results" id="upgrade-real-results" tabindex="0" role="region" aria-label="Peças sugeridas"></div>'
     + '<section class="upgrade-real-preview" aria-labelledby="upgrade-real-preview-title"><h3 id="upgrade-real-preview-title" tabindex="-1">Prévia das alterações</h3>'
-    + '<div id="upgrade-real-differences"></div></section>'
+    + '<div id="upgrade-real-differences"></div></section></div>'
     + '<p class="planning-help" id="upgrade-real-apply-reason" aria-live="polite"></p>'
     + '<div class="build-action-actions"><button type="button" class="upgrade-real-button" data-upgrade-action="cancelar" aria-label="Cancelar alterações e fechar">Cancelar</button>'
     + '<button type="button" class="upgrade-real-button upgrade-real-primary" data-upgrade-action="aplicar" aria-label="Aplicar alterações" aria-describedby="upgrade-real-apply-reason">Aplicar alterações</button></div></div>');
+  dialogo.classList.add("upgrade-dialog");
   const campoBudget = dialogo.querySelector("#upgrade-real-budget");
   const ordem = dialogo.querySelector("#upgrade-real-order");
   const resultados = dialogo.querySelector("#upgrade-real-results");
@@ -95,6 +93,8 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
       // O seletor normaliza a build. Copiar só o componente preserva rede, orçamento e metadados.
       proxima.componentes[peca.categoria] = validada.componentes[peca.categoria];
     }
+    if (pecas.some(peca => perifericos.includes(peca.categoria))) proxima.incluirPerifericos = true;
+    if (pecas.some(peca => acessoriosRede.includes(peca.categoria))) proxima.incluirRede = true;
     const avaliacao = avaliarBuild(proxima,catalogo);
     if (avaliacao.erros.length) throw new Error(avaliacao.erros.join(" "));
     return {build:proxima,avaliacao,gasto};
@@ -103,7 +103,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
   function renderizarResultados() {
     if (build.travada) { resultados.innerHTML = '<p class="planning-help">' + MOTIVO_TRAVA + '</p>'; return; }
     if (budget() == null) { resultados.innerHTML = '<p class="planning-help">' + MOTIVO_BUDGET + '</p>'; return; }
-    if (!categorias.size) { resultados.innerHTML = '<p class="planning-help">Selecione CPU, GPU ou ambas para consultar as opções.</p>'; return; }
+    if (!categorias.size) { resultados.innerHTML = '<p class="planning-help">Selecione uma ou mais categorias para consultar as peças.</p>'; return; }
     resultados.innerHTML = CATEGORIAS.filter(({id}) => categorias.has(id)).map(categoria => {
       const candidatas = [], conflitos = new Set();
       let foraDoBudget = 0, indisponiveis = 0;

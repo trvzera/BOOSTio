@@ -27,7 +27,7 @@ def app_build(tmp_path):
     app.register_blueprint(build_bp)
     with app.app_context():
         db.create_all()
-        db.session.add_all([Usuario(nome="A", email="a@example.test"), Usuario(nome="B", email="b@example.test")])
+        db.session.add_all([Usuario(nome="A", email="a@example.test",verificado=True), Usuario(nome="B", email="b@example.test",verificado=True)])
         db.session.commit()
     yield app
     with app.app_context():
@@ -126,6 +126,58 @@ def test_divisao_exata_do_orcamento_e_prompt():
     assert "R$ 4000.00" in prompt and "R$ 1000.00 (20%)" in prompt
 
 
+@pytest.mark.parametrize("permitido,valor,esperado", [(True, "4321.75", 4321.75), (False, "4321.75", None), (True, "0", None)])
+def test_manual_usa_budget_autorizado_da_propria_conta(app_build, permitido, valor, esperado):
+    with app_build.app_context():
+        usuario = db.session.get(Usuario, 1)
+        usuario.budget, usuario.usar_budget = Decimal(valor), permitido
+        db.session.commit()
+        resultado = CriarBuildManualService().executar(1, ESTADO)
+        assert resultado["estado"]["orcamento"] == esperado
+        assert resultado["compatibilidade"]["status"] == "nao_verificado"
+        assert CriarBuildManualService().executar(2, ESTADO)["estado"]["orcamento"] is None
+
+
+def test_manual_respeita_teto_explicito_e_nao_reescreve_edicao_ou_copia(app_build):
+    with app_build.app_context():
+        usuario = db.session.get(Usuario, 1)
+        usuario.budget, usuario.usar_budget = Decimal("5000"), True
+        db.session.commit()
+        resultado = CriarBuildManualService().executar(1, {**ESTADO, "orcamento": None})
+        assert resultado["estado"]["orcamento"] is None
+        original = BuildSalva.buscar(1, resultado["id"])
+        usuario.budget = Decimal("9000")
+        db.session.commit()
+        assert DuplicarBuildService().executar(1, original.to_dict()["id"])["estado"]["orcamento"] is None
+        assert CriarBuildManualService().executar(1, {**ESTADO, "orcamento": 1234.56})["estado"]["orcamento"] == 1234.56
+
+
+def test_rotas_recalculam_diagnostico_por_id_sem_confiar_no_front_e_preservam_rascunho(app_build):
+    with app_build.app_context():
+        cadastrar_pecas(["processador", "placa_mae"])
+        cpu = MODELOS["processador"].buscar_por_id(1)
+        placa = MODELOS["placa_mae"].buscar_por_id(1)
+        cpu.soquete, placa.socket = "AM4", "AM5"
+        db.session.commit()
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    estado = {**ESTADO, "visibilidade": "publico", "componentes": {"processador": {"id": 1}, "placa_mae": {"id": 1}},
+              "compatibilidade": {"status": "sem_conflitos"}}
+    resposta = cliente.post("/build/manual", json=estado)
+    assert resposta.status_code == 201  # Rascunho com conflito continua podendo ser salvo.
+    identificador = resposta.json["build"]["id"]
+    for build in (resposta.json["build"], cliente.get(f"/build/{identificador}").json["build"],
+                  cliente.get("/build/").json["builds"][0], cliente.get(f"/build/{identificador}/publica").json["build"]):
+        assert build["compatibilidade"]["status"] == "incompativel"
+        assert "compatibilidade" not in build["estado"]
+    with app_build.app_context():
+        MODELOS["placa_mae"].buscar_por_id(1).socket = "AM4"
+        db.session.commit()
+    resposta = cliente.put(f"/build/{identificador}", json=estado)
+    assert resposta.status_code == 200
+    assert resposta.json["build"]["compatibilidade"]["status"] == "nao_verificado"  # BIOS/encaixes ainda pendentes.
+
+
 def resposta_com_perifericos():
     itens = [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in
              ("processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "monitor", "teclado", "mouse", "fone")]
@@ -134,15 +186,16 @@ def resposta_com_perifericos():
     return {**PEDIDO, "componentes": itens}, catalogo
 
 
-def test_nao_aceita_ia_gastando_reserva_do_pc_ou_perifericos():
+def test_meta_flexivel_permite_realocar_saldo_mas_nunca_ultrapassar_total():
     build, catalogo = resposta_com_perifericos()
     assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1100
     catalogo["processador"][0]["preco"] = 1150
-    with pytest.raises(ValueError, match="divisão"):
-        CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)
+    assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1450
     catalogo["processador"][0]["preco"] = 800
     catalogo["monitor"][0]["preco"] = 200
-    with pytest.raises(ValueError, match="divisão"):
+    assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1250
+    catalogo["processador"][0]["preco"] = 1500
+    with pytest.raises(ValueError, match="Não foi possível gerar uma configuração dentro do orçamento"):
         CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)
 
 
@@ -167,7 +220,7 @@ def test_geracao_persiste_original_e_estado_em_uma_transacao(app_build, mocker):
         assert resposta["preco_total"] == 1000
         assert len(resposta["componentes"]) == 10
         assert Build.query.count() == BuildSalva.query.count() == 1
-        assert "Reserva exclusiva para periféricos: R$ 1000.00" in llm.call_args.args[0]
+        assert "Meta para periféricos: R$ 1000.00" in llm.call_args.args[0]
         assert len(BuildSalva.listar_por_usuario(1)) == 1
 
 
@@ -237,3 +290,20 @@ def test_pecas_proprias_reverificam_quota_apos_llm(app_build, mocker):
             CriarBuildService().executar(1, {**PEDIDO, "pecas_proprias": {"processador": "Minha CPU"}})
         llm.assert_called_once()
         assert BuildSalva.query.count() == 3 and Build.query.count() == 0
+
+
+def test_email_nao_verificado_bloqueia_todas_as_criacoes_sem_chamar_llm(app_build, mocker):
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    existente = cliente.post("/build/manual", json=ESTADO).json["build"]["id"]
+    with app_build.app_context():
+        db.session.get(Usuario,1).verificado = False
+        db.session.commit()
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
+    for rota,dados in [("/build/manual",ESTADO),("/build/",PEDIDO),(f"/build/{existente}/duplicar",None)]:
+        resposta = cliente.post(rota,json=dados)
+        assert resposta.status_code == 403
+        assert resposta.json["codigo"] == "email-nao-verificado"
+    llm.assert_not_called()
+    with app_build.app_context():
+        assert BuildSalva.query.count() == 1

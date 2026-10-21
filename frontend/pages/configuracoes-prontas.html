@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Builds prontas — BOOSTio</title>
-  <meta name="description" content="Explore três configurações demonstrativas, filtre por objetivo e budget e abra uma cópia independente para personalizar na BOOSTio.">
+  <meta name="description" content="Explore dez configurações para estudos, trabalho, jogos e Blender, sem periféricos. Filtre por orçamento e personalize uma cópia na BOOSTio.">
+  <meta name="robots" content="noindex,follow">
   <link rel="preload" href="../fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
@@ -13,7 +14,7 @@
   <script type="module" src="../js/pages/loading.js" defer></script>
   <script type="module" src="../js/pages/configuracoes-prontas.js" defer></script>
 </head>
-<body id="configuracoes-prontas" class="prontas-page">
+<body id="configuracoes-prontas" class="prontas-page" data-private-page>
   <a class="skip-link" href="#prontas-main" aria-label="Pular para o conteúdo principal">Pular para o conteúdo principal</a>
   <div id="loading-screen"><video id="loading-video" width="1000" height="1000" autoplay muted playsinline aria-hidden="true" tabindex="-1"><source src="../video/loading-toggle.webm" type="video/webm"></video></div>
   <div data-site-navigation></div>
@@ -22,10 +23,9 @@
 
   <main id="prontas-main" class="prontas-main" tabindex="-1">
     <header class="prontas-heading">
-      <a class="prontas-voltar" href="./index.html" aria-label="Voltar ao início"><span class="ui-lottie" data-lottie="arrow" data-direction="back" aria-hidden="true"><span class="ui-icon-fallback">→</span></span>Voltar ao início</a>
       <p class="prontas-eyebrow">Um ponto de partida para sua montagem</p>
       <h1>Builds prontas</h1>
-      <p>Explore três exemplos curados, confira as peças e personalize uma cópia no editor.</p>
+      <p>Dez pontos de partida para estudos, trabalho, jogos e criação. Escolha seu orçamento e personalize as peças, sem periféricos incluídos.</p>
     </header>
 
     <nav class="builds-page-switch" aria-label="Páginas de builds">
@@ -33,8 +33,8 @@
       <a href="./configuracoes-prontas.html" aria-label="Builds prontas" aria-current="page">Builds prontas</a>
     </nav>
 
-    <aside class="prontas-aviso glass-card" aria-label="Sobre os modelos demonstrativos">
-      <p><strong>Preços demonstrativos.</strong> Os totais e o filtro de budget usam o catálogo de exemplo. Confirme o preço e as condições de compra nas lojas.</p>
+    <aside class="prontas-aviso glass-card" aria-label="Sobre os modelos prontos">
+      <p><strong>Preços do catálogo.</strong> Os totais usam os valores cadastrados, majoritariamente da KaBuM, sem periféricos e sem frete. Não são cotações em tempo real; confirme preço e disponibilidade na loja.</p>
       <p>Você pode explorar as peças e abrir uma cópia para editar. A cópia será salva na sua conta.</p>
     </aside>
 
@@ -46,7 +46,7 @@
       <div class="prontas-campo">
         <label for="prontas-budget">Budget máximo (R$)</label>
         <input id="prontas-budget" type="number" min="0" max="1000000" step="0.01" inputmode="decimal" placeholder="Sem limite" aria-label="Filtrar por budget máximo em reais" aria-describedby="prontas-budget-ajuda prontas-feedback">
-        <small id="prontas-budget-ajuda">Compara totais demonstrativos. Vazio mostra qualquer valor.</small>
+        <small id="prontas-budget-ajuda">Compara os totais das peças disponíveis. Vazio mostra qualquer valor.</small>
       </div>
       <button type="reset" class="btn-ghost" aria-label="Limpar filtros de objetivo e budget">Limpar filtros</button>
     </form>

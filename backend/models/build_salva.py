@@ -20,6 +20,11 @@ class LimiteBuildsError(ValueError):
         super().__init__("Você atingiu o limite de três builds. Exclua uma para liberar espaço.")
 
 
+class EmailNaoVerificadoError(PermissionError):
+    def __init__(self):
+        super().__init__("Verifique seu e-mail nas configurações do perfil antes de criar uma build.")
+
+
 class BuildSalva(ModeloBase):
     __tablename__ = "build_salva"
 
@@ -30,6 +35,11 @@ class BuildSalva(ModeloBase):
 
     @classmethod
     def verificar_espaco(cls, usuario_id):
+        usuario = db.session.get(Usuario, usuario_id)
+        if usuario is None:
+            raise ValueError("Usuário não encontrado")
+        if not usuario.verificado:
+            raise EmailNaoVerificadoError()
         cls.migrar_geradas(usuario_id)
         if cls.query.filter_by(usuario_id=usuario_id).count() >= cls.LIMITE:
             raise LimiteBuildsError()
@@ -42,6 +52,8 @@ class BuildSalva(ModeloBase):
             resultado = db.session.execute(update(Usuario).where(Usuario.id == usuario_id).values(id=Usuario.id))
             if resultado.rowcount != 1:
                 raise ValueError("Usuário não encontrado")
+            if not db.session.get(Usuario, usuario_id).verificado:
+                raise EmailNaoVerificadoError()
             cls.migrar_geradas(usuario_id, confirmar=False)
             if cls.query.filter_by(usuario_id=usuario_id).count() >= cls.LIMITE:
                 raise LimiteBuildsError()

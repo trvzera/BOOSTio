@@ -17,6 +17,8 @@ const gpus = new Map([
   ["GeForce GTX 1660 Super",6,"gtx-1660-super"], ["GeForce GTX 1660",6,"gtx-1660"],
   ["GeForce GTX 1050 Ti",4,"gtx-1050-ti"], ["Radeon RX 6750 XT",12,"rx-6750-xt"],
   ["RX 7600 Challenger Radeon",8,"rx-7600"],
+  ["RTX 5060 Shadow 2X OC GeForce",8,"rtx-5060"],
+  ["Swift RX 9070 XT TRIPLE FAN",16,"rx-9070-xt"],
 ].map(([modelo,gb,slug]) => [modelo.toLowerCase() + ":" + gb,slug]));
 
 export function hardwareBenchmark(cpu,gpu) {
@@ -25,4 +27,14 @@ export function hardwareBenchmark(cpu,gpu) {
   const video = gpus.get(String(gpu.modelo || "").trim().toLowerCase() + ":" + Number(gpu.memoria_gb));
   if (!processador || !video) return {motivo:"Uma das peças ainda não tem correspondência exata cadastrada para o benchmark. Não usaremos outro modelo para estimar seu desempenho."};
   return {cpu:processador,gpu:video};
+}
+
+export function hardwareBlender(cpu,gpu) {
+  const amd = cpu?.fabricante === "AMD" && /^Ryzen [3579] \d{4}[A-Z0-9]*$/.test(cpu.modelo || "") && Number.isInteger(cpu.nucleo);
+  const intel = cpu?.fabricante === "Intel" && /^Core i[3579]-1[234]\d{3}[A-Z]*$/.test(cpu.modelo || "");
+  const nomeCpu = amd ? "AMD " + cpu.modelo + " " + cpu.nucleo + "-Core Processor" : intel ? "Intel " + cpu.modelo : null;
+  const slug = gpus.get(String(gpu?.modelo || "").trim().toLowerCase() + ":" + Number(gpu?.memoria_gb));
+  const nomeGpu = slug?.startsWith("rtx-") || slug?.startsWith("gtx-") ? "NVIDIA GeForce " + slug.replaceAll("-"," ").toUpperCase().replace(" TI"," Ti").replace(" SUPER"," SUPER")
+    : slug?.startsWith("rx-") ? "AMD Radeon " + slug.replaceAll("-"," ").toUpperCase() : null;
+  return {cpu:nomeCpu,gpu:nomeGpu};
 }

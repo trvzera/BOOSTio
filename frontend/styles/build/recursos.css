@@ -56,7 +56,10 @@ body:has(.build-action-dialog[open]), body:has(.compare-dialog[open]) { overflow
 .build-menu { max-height: min(70svh,560px); overflow-y: auto; overscroll-behavior: contain; }
 .build-card-current { display: inline-flex; margin-left: 8px; color: var(--cor-p1); font: 500 .7rem/1.4 var(--font-body); }
 .planning-consent { display: flex; align-items: flex-start; gap: 12px; margin: 18px 0; color: var(--cor-6); font: 400 .85rem/1.6 var(--font-body); }
-.planning-consent input { flex: 0 0 auto; width: 20px; height: 20px; margin-top: 2px; accent-color: var(--cor-p1); }
+.planning-consent:not(.ui-check) input { flex: 0 0 auto; width: 20px; height: 20px; margin-top: 2px; accent-color: var(--cor-p1); }
+.planning-consent.ui-check > input { margin: 0; }
+.build-create-option-primary { border-color: var(--cor-p1); background: rgba(0,123,255,.12); }
+.build-create-option-primary > strong { color: var(--cor-p1); }
 .import-preview { margin: 18px 0; padding: 18px; border: 1px solid var(--cor-2); border-radius: 14px; overflow-wrap: anywhere; }
 .build-action-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
 .build-summary textarea { min-height: 110px; resize: vertical; }

@@ -6,14 +6,19 @@ import { API_URL } from "../../config.js";
 export async function fetchComErro(caminho, opcoes = {}) {
   const { headers, ...restoDasOpcoes } = opcoes;
 
-  const resposta = await fetch(`${API_URL}${caminho}`, {
+  let resposta;
+  try { resposta = await fetch(`${API_URL}${caminho}`, {
     credentials: "include",
     ...restoDasOpcoes,
     headers: {
       "Content-Type": "application/json",
       ...headers,
     },
-  });
+  }); } catch (causa) {
+    if (causa.name === "AbortError") throw causa;
+    const offline = typeof navigator !== "undefined" && navigator.onLine === false;
+    throw Object.assign(new Error(offline ? "Você está sem internet. Reconecte-se e tente novamente; suas alterações não foram enviadas." : "Não foi possível conectar à BOOSTio. Confira sua conexão e se o servidor está disponível e tente novamente."),{codigo:offline ? "offline" : "conexao",cause:causa});
+  }
 
   if (resposta.status === 204) {
     if (!resposta.ok) {

@@ -25,6 +25,8 @@
 }
 .skip-link:focus-visible { transform: none; }
 main:focus { outline: none; }
+/* O HTML estático não revela a área interna antes da confirmação da sessão. */
+body[data-private-page]:not([data-session-state="authorized"]) main { visibility: hidden; }
 .checkbox-wrapper:has(input:focus-visible) {
   outline: 2px solid var(--cor-p1);
   outline-offset: 4px;

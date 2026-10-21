@@ -105,3 +105,37 @@
   .upgrade-real-totals > div { grid-template-columns: minmax(0,1fr); gap: 4px; }
   .upgrade-real-totals dd { text-align: left; }
 }
+.upgrade-dialog[open] { height: min(92svh,58rem); max-height: 92svh; display: flex; flex-direction: column; overflow: hidden; }
+.upgrade-dialog > .build-action-heading { flex-shrink: 0; }
+.upgrade-dialog .upgrade-real-panel { min-height: 0; display: flex; flex-direction: column; gap: .65rem; overflow: hidden; flex: 1; }
+.upgrade-dialog .upgrade-real-panel > * { flex-shrink: 0; margin-block: 0; }
+.upgrade-dialog .upgrade-real-categories { display: flex; flex-wrap: wrap; gap: .5rem 1rem; max-height: 5rem; overflow-y: auto; }
+.upgrade-dialog .upgrade-real-categories legend { float: left; width: 100%; }
+.upgrade-dialog .upgrade-real-workspace { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; min-height: 0; flex: 1; flex-shrink: 1; }
+.upgrade-dialog .upgrade-real-results, .upgrade-dialog .upgrade-real-preview { min-height: 0; overflow-y: auto; padding-right: .5rem; margin: 0; scrollbar-width: thin; }
+.upgrade-dialog .upgrade-real-preview { border-top: 0; }
+.upgrade-dialog .upgrade-real-panel > .build-action-actions { padding-top: .5rem; }
+.upgrade-real-help { font: 400 .75rem/1.5 var(--font-body); color: var(--text-secondary); }
+.upgrade-real-help summary { cursor: pointer; }
+.upgrade-real-help[open] { max-height: 5rem; overflow-y: auto; }
+@media(max-width:600px) {
+  .upgrade-dialog .upgrade-real-workspace { grid-template-columns: 1fr; grid-template-rows: 3fr 2fr; }
+  .upgrade-dialog .planning-grid { gap: .5rem; grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+  .upgrade-dialog .planning-field { font-size: .72rem; }
+  .upgrade-dialog .planning-field :is(input,select) { padding-inline: .5rem; font-size: .8rem; }
+  .upgrade-dialog .upgrade-real-categories { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); max-height: 7.5rem; padding-inline: .65rem; gap: .25rem .5rem; }
+  .upgrade-dialog .upgrade-real-categories legend { grid-column: 1 / -1; }
+  .upgrade-dialog .upgrade-real-categories label { gap: .4rem; font-size: .72rem; }
+  .upgrade-dialog .planning-help { font-size: .75rem; }
+  .upgrade-dialog .build-action-actions > * { flex: 1; width: auto; }
+  .upgrade-dialog .build-action-actions button { padding-inline: .7rem; }
+}
+@media(max-height:500px) {
+  .upgrade-dialog[open] { max-height: 98svh; height: 98svh; padding: .75rem; }
+  .upgrade-dialog .build-action-heading { margin-bottom: .5rem; }
+  .upgrade-dialog .build-action-heading h2 { font-size: 1.1rem; }
+  .upgrade-dialog .upgrade-real-panel { gap: .4rem; }
+  .upgrade-dialog .planning-help:not(#upgrade-real-feedback), .upgrade-dialog .upgrade-real-help { display: none; }
+  .upgrade-dialog .planning-grid { grid-template-columns: 1fr 1fr; }
+  .upgrade-dialog .upgrade-real-categories { max-height: 3rem; padding-block: .25rem; }
+}

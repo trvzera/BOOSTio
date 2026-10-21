@@ -49,7 +49,7 @@ def test_normaliza_e_preserva_ausencias_sem_aprovar_requisitos():
     assert api.buscar.call_args.kwargs["timeout"] == (4, 10)
 
 
-@pytest.mark.parametrize("alteracao", [{"cpu": {"slug": "outra"}}, {"gpu": None}, {"game": {"slug": "outro"}}, {"res": "4K"}, {"preset": "low"}])
+@pytest.mark.parametrize("alteracao", [{"cpu": {"slug": "outra"}}, {"cpu": None}, {"gpu": None}, {"game": {"slug": "outro"}}, {"res": "4K"}, {"preset": "low"}])
 def test_rejeita_resposta_que_nao_confirma_a_combinacao(alteracao):
     api = cliente(Mock(return_value=resposta(**alteracao)))
     with pytest.raises(ErroBenchmark, match="confirmou|ajustes"):
@@ -70,6 +70,12 @@ def test_zero_e_intervalos_validos_sao_preservados():
     resultado = ConsultarBenchmarkService(cliente(Mock(return_value=resposta(fps=0, fps_range=[0, 15])))).executar(CONSULTA, 1)
     assert resultado["fps"] == 0
     assert resultado["intervalo"] == [0, 15]
+
+
+def test_matriz_aceita_rotulo_4k_sem_inventar_presets_ausentes():
+    resultado = ConsultarBenchmarkService(cliente(Mock(return_value=resposta(matrix={"4k": {"high": 42}})))).executar(CONSULTA, 1)
+    assert resultado["matriz"]["4K"]["high"] == 42
+    assert resultado["matriz"]["4K"]["ultra"] is None
 
 
 def test_cache_compartilhado_ttl_e_copia_defensiva():

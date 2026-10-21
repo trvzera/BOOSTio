@@ -18,7 +18,7 @@ test("tooltip não gera novas mutações ao repetir o mesmo motivo", () => {
 test("visitante não entra em loop no login e só recebe Entrar/Criar conta no menu", () => {
   assert.equal(redirecionamentoSessao("login.html",false),null);
   assert.equal(redirecionamentoSessao("signin.html",false),null);
-  assert.equal(redirecionamentoSessao("formulario.html",false),null);
+  assert.equal(redirecionamentoSessao("formulario.html",false),"login.html");
   assert.equal(redirecionamentoSessao("configuracoes.html",false),"login.html");
   assert.equal(redirecionamentoSessao("login.html",true),"index.html");
   assert.deepEqual(linksVisitante.map(link => link.pagina),["login.html","signin.html"]);

@@ -26,7 +26,7 @@ def autenticar(cliente):
         sessao["_fresh"] = True
 
 
-@pytest.mark.parametrize("rota", ["/benchmark/fps", "/benchmark/jogos?q=Valorant"])
+@pytest.mark.parametrize("rota", ["/benchmark/fps", "/benchmark/jogos?q=Valorant", "/benchmark/blender"])
 def test_exige_sessao_e_responde_json(cliente_benchmark, rota):
     resposta = cliente_benchmark.get(rota)
     assert resposta.status_code == 401
@@ -41,6 +41,17 @@ def test_rota_delega_ao_service_com_usuario_da_sessao(cliente_benchmark, mocker)
     assert resposta.json == {"resultado": {"fps": 288}}
     assert executar.call_args.args[1] == 42
     assert resposta.headers["Cache-Control"] == "no-store"
+
+
+def test_rota_blender_autenticada_e_parametros_restritos(cliente_benchmark, mocker):
+    executar = mocker.patch("controllers.benchmark_controller.cliente_blender.executar", return_value={"score": 150})
+    autenticar(cliente_benchmark)
+    resposta = cliente_benchmark.get("/benchmark/blender?dispositivo=CPU&tipo=cpu")
+    assert resposta.status_code == 200 and resposta.json == {"resultado": {"score": 150}}
+    assert executar.call_args.args[1] == 42
+    assert resposta.headers["Cache-Control"] == "no-store"
+    assert cliente_benchmark.get("/benchmark/blender?url=https://interno").status_code == 400
+    assert cliente_benchmark.get("/benchmark/blender?tipo=cpu&tipo=gpu").status_code == 400
 
 
 @pytest.mark.parametrize("query", ["?game=valorant&game=cs2", "?url=https://externo.test", "?usuario_id=10"])

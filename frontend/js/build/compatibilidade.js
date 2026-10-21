@@ -74,7 +74,9 @@ export function avaliarBuild(build,catalogo) {
     : cat === "refrigeracao" ? tem("air_cooler") || tem("water_cooler") || cpu?.cooler
     : cat === "placa_video" ? tem(cat) || cpu?.videointegrado
     : tem(cat)).length;
-  return {erros:[...new Set(erros)],avisos:[...new Set(avisos)],dicas:[...new Set(dicas)],faltam,preco,watts:Math.round(watts),
+  const compatibilidade = build.compatibilidade || {status:"nao_verificado",rotulo:"Dados ainda não totalmente verificados",naoVerificado:[],aviso:"As verificações locais não confirmam medidas ou especificações ausentes. Uma build preenchida não é garantia de compatibilidade."};
+  for (const erro of build.compatibilidade?.erros || []) if (typeof erro.mensagem === "string") erros.push(erro.mensagem);
+  return {erros:[...new Set(erros)],avisos:[...new Set(avisos)],dicas:[...new Set(dicas)],faltam,preco,watts:Math.round(watts),compatibilidade,
     preenchidos,total:grupos.length,status:erros.length ? "erro" : faltam.length ? "incompleta" : avisos.length ? "atencao" : "completa"};
 }
 export function selecionarPecaCompativel(build,peca,catalogo) {

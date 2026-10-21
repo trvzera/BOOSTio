@@ -11,6 +11,7 @@ import { exportarCsv, exportarJson, importarBuild } from "../build/arquivos.js";
 import { planejamentoLocal, salvarPlanejamento } from "../build/planejamento.js";
 import { formatarDataHora } from "../utils/formatarData.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
+import { indicadorBuild, iniciarIndicadores } from "../build/indicador.js";
 import { navegarPara } from "../components/page-loading.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -63,7 +64,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const opcao = (acao, texto, desabilitada = false, motivo = "") => `<button type="button" class="build-menu-item${acao === "deletar" ? " danger-menu-item" : ""}" data-acao="${acao}" aria-label="${h(texto)}: ${h(build.titulo)}" ${desabilitada ? `disabled data-disabled-reason="${h(motivo || (trancada ? "Destranque a build para usar esta opção." : "Torne a build pública para compartilhar o link."))}"` : ""}>${iconeAnimado(icones[acao],"internal",{invertido:acao === "setup-atual" && setup})}<span>${h(texto)}</span></button>`;
     const menuId = "build-options-" + encodeURIComponent(build.id);
     return `<article class="build-card build-account-card ${classe} ${trancada ? "locked" : ""}" data-id="${h(build.id)}">
-      <div class="build-card-top"><div class="build-title-line"><span class="compatibility-marker" role="img" aria-label="${progresso}% completo"></span><h2 class="build-card-title font-1-m-b"><a href="${url(build)}" aria-label="Abrir configuração de ${h(build.titulo)}">${h(build.titulo)}</a></h2>${trancada ? '<i class="fa-solid fa-lock build-card-lock" aria-hidden="true"></i>' : ""}${setup ? '<span class="build-card-current">Setup atual</span>' : ""}</div>
+      <div class="build-card-top"><div class="build-title-line">${indicadorBuild(avaliacao,"compatibility-" + encodeURIComponent(build.id))}<h2 class="build-card-title font-1-m-b"><a href="${url(build)}" aria-label="Abrir configuração de ${h(build.titulo)}">${h(build.titulo)}</a></h2>${trancada ? '<i class="fa-solid fa-lock build-card-lock" aria-hidden="true"></i>' : ""}${setup ? '<span class="build-card-current">Setup atual</span>' : ""}</div>
       <div class="build-menu-wrap"><button type="button" class="build-menu-trigger" aria-label="Abrir menu da build ${h(build.titulo)}" aria-expanded="false" aria-controls="${menuId}">${iconeAnimado("dots")}</button><div class="build-menu" id="${menuId}" role="group" aria-label="Opções da build ${h(build.titulo)}" aria-hidden="true" inert>
         ${opcao("benchmark","Testar build",Boolean(motivoBenchmark(build,catalogo)),motivoBenchmark(build,catalogo))}
         ${opcao("melhorias","Buscar melhorias",trancada)}
@@ -95,6 +96,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     document.querySelector("#btn-compare-builds").disabled = salvas.length < 2;
     iniciarIcones(lista);
+    iniciarIndicadores(lista);
   }
   async function atualizar(id, estado) { await atualizarBuild(id, estado); await carregar(); }
 
@@ -126,7 +128,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     const botao = evento.target.closest("[data-acao]");
     if (!botao || botao.disabled) {
-      if (!evento.target.closest("a,.build-menu-wrap")) {
+      if (!evento.target.closest("a,.build-menu-wrap,.build-indicator")) {
         const artigo = evento.target.closest(".build-account-card");
         if (artigo) navegarPara(url(encontrar(artigo.dataset.id)));
       }
@@ -139,8 +141,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     alternarMenu(wrap,false); wrap.querySelector(".build-menu-trigger").focus({preventScroll:true});
     try {
       if (acao === "benchmark") abrirBenchmark(build,catalogo);
-      else if (acao === "melhorias") abrirMelhorias(build,catalogo,proxima => {
-        atualizar(build.id,estadoParaConta(proxima)).then(() => avisar("Melhorias salvas na conta.")).catch(erro => avisar(erro.message));
+      else if (acao === "melhorias") abrirMelhorias(build,catalogo,async proxima => {
+        await atualizar(build.id,estadoParaConta(proxima));
+        avisar("Melhorias salvas na conta.");
       });
       else if (acao === "setup-atual") {
         const remover = Boolean(dados.estado?.setupAtual);
@@ -182,15 +185,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
-  document.querySelector("#btn-create-build").onclick = () => {
+  document.querySelector("#btn-create-build").onclick = async () => {
     if (!carregadas || lotado() || criando) return;
-    const dialogo = abrirDialogoBuild("Como você quer criar sua build?",'<div class="build-create-options"><button type="button" class="build-create-option" data-criar="manual" aria-label="Criar build manualmente"><strong>Montagem manual</strong><span>Escolha peça por peça do catálogo.</span></button><a class="build-create-option" href="./formulario.html" aria-label="Criar build pelo formulário inteligente"><strong>Formulário inteligente</strong><span>Informe objetivo e orçamento para gerar a build.</span></a></div>');
+    try { await verificarEspacoBuild(); } catch (erro) { avisar(erro.message); return; }
+    const dialogo = abrirDialogoBuild("Como você quer criar sua build?",'<div class="build-create-options"><a class="build-create-option build-create-option-primary" href="./formulario.html" aria-label="Criar build pelo formulário inteligente"><strong>Formulário inteligente</strong><span>Informe objetivo e orçamento para gerar a build.</span></a><button type="button" class="build-create-option" data-criar="manual" aria-label="Criar build manualmente"><strong>Montagem manual</strong><span>Escolha peça por peça do catálogo.</span></button></div>');
     dialogo.querySelector('[data-criar="manual"]').onclick = async evento => {
       if (criando) return;
       criando = true; evento.currentTarget.disabled = true;
       try {
         await verificarEspacoBuild();
-        const {build} = await criarBuildManual(estadoParaConta({titulo:"Minha build",descricao:"",visibilidade:"privado",travada:false,orcamento:null,incluirPerifericos:false,incluirRede:false,rede:{},componentes:{}}));
+        const {build} = await criarBuildManual(estadoParaConta({titulo:"Minha build",descricao:"",visibilidade:"privado",travada:false,incluirPerifericos:false,incluirRede:false,rede:{},componentes:{}}));
         navegarPara(url(build));
       } catch (erro) { avisar(erro.message); criando = false; dialogo.close(); await carregar(); }
     };
@@ -238,4 +242,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   for (const modal of [modalEditar,modalExcluir]) modal.addEventListener("click",evento => { if (evento.target === modal) modal.classList.remove("open"); });
   iniciarIcones();
   await carregar();
+  const parametros = new URLSearchParams(location.search);
+  if (parametros.has("aviso")) avisar(parametros.get("aviso"));
+  if (parametros.has("criar") && carregadas) {
+    if (lotado()) avisar("Você atingiu o limite de três builds. Exclua uma para liberar espaço.");
+    else document.querySelector("#btn-create-build").click();
+  }
 });
