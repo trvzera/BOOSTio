@@ -155,7 +155,7 @@ Ao integrar, o servidor deve revalidar estoque, compatibilidade, medidas, quanti
 tranca, visibilidade, propriedade da build e quota. O modelo atual também só armazena
 um ID por categoria; vários modelos de RAM/SSD/HD/fan precisam de um contrato adequado.
 
-KaBuM usa os links já existentes. Pichau e Mercado Livre abrem buscas, claramente rotuladas,
+KaBuM usa os links já existentes. Pichau abre buscas, claramente rotuladas,
 até haver ofertas diretas cadastradas. Não são inventados preços de cada loja.
 Ofertas reais são independentes do preço demonstrativo da seed:
 
@@ -163,15 +163,14 @@ Ofertas reais são independentes do preço demonstrativo da seed:
 {
   "ofertas": [
     {"loja": "kabum", "preco": 1200, "url": "https://www.kabum.com.br/produto/ID", "atualizadoEm": "2026-09-28T12:00:00Z"},
-    {"loja": "pichau", "preco": 1190, "url": "https://www.pichau.com.br/produto"},
-    {"loja": "mercadolivre", "preco": 1220, "url": "https://produto.mercadolivre.com.br/MLB-ID"}
+    {"loja": "pichau", "preco": 1190, "url": "https://www.pichau.com.br/produto"}
   ]
 }
 ```
 
 Esses valores são apenas exemplos do contrato, não cotações. Sem o campo `ofertas`,
 cada loja exibe “Preço ainda não cadastrado”. Os arquivos locais em `frontend/svgs` são:
-`kabum-logo.svg`, `pichau.png`, `mercado-livre-87.svg`. As marcas ficam em escala de cinza;
+`kabum-logo.svg` e `pichau.png`. As marcas ficam em escala de cinza;
 se uma imagem falhar, o nome da loja continua visível.
 
 ## Sistema visual e transições

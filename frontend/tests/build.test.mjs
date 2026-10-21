@@ -167,10 +167,9 @@ test("perfil local limita três builds, permitindo atualizar uma existente", () 
 
 test("ofertas distinguem link de produto das buscas e texto é escapado", () => {
   const ofertas = ofertasPeca(peca("SEED-CPU-02"));
-  assert.equal(ofertas.length,3);
+  assert.equal(ofertas.length,2);
   assert.equal(ofertas[0].direta,true);
   assert.equal(ofertas[1].direta,false);
-  assert.equal(ofertas[2].direta,false);
   assert.equal(htmlSeguro('<script>"x"</script>'),"&lt;script&gt;&quot;x&quot;&lt;/script&gt;");
 });
 
@@ -262,10 +261,9 @@ test("cada loja recebe seu próprio preço, sem usar o preço da seed como cota�
   const produto = {...peca("SEED-CPU-02"),ofertas:[
     {loja:"kabum",preco:1200,url:"https://www.kabum.com.br/produto/1"},
     {loja:"pichau",preco:1100,url:"https://www.pichau.com.br/produto-exemplo"},
-    {loja:"mercadolivre",preco:1250,url:"https://produto.mercadolivre.com.br/MLB-exemplo"},
   ]};
-  assert.deepEqual(ofertasPeca(produto).map(o => o.preco),[1200,1100,1250]);
-  assert.deepEqual(ofertasPeca(peca("SEED-CPU-02")).map(o => o.preco),[null,null,null]);
+  assert.deepEqual(ofertasPeca(produto).map(o => o.preco),[1200,1100]);
+  assert.deepEqual(ofertasPeca(peca("SEED-CPU-02")).map(o => o.preco),[null,null]);
   produto.ofertas[1].url = "javascript:alert(1)";
   assert.equal(ofertasPeca(produto)[1].direta,false);
 });

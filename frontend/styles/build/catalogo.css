@@ -55,11 +55,8 @@
 .store-logo { width: 116px; height: 40px; object-fit: contain; object-position: left center; filter: saturate(0); }
 /* O SVG KaBuM tem uma prancheta quadrada com margens; o recorte é só visual. */
 .store-logo[src$="/kabum-logo.svg"] { object-fit: cover; object-position: center; }
-/* A marca do Mercado Livre é vertical; preserve símbolo e nome sem achatá-los. */
-.store-logo[src$="/mercado-livre-87.svg"] { height: 64px; }
 /* As versões escuras precisam de contraste no fundo glass, mantendo saturação zero. */
 .store-logo[src$="/pichau.png"] { filter: saturate(0) brightness(2.8); }
-.store-logo[src$="/mercado-livre-87.svg"] { filter: saturate(0) brightness(1.8); }
 .store-price { font: 600 1.25rem/1.4 var(--font-heading); color: var(--cor-6); }
 .store-price-unavailable { color: var(--text-secondary); font-size: var(--text-small); }
 .store-price-note { color: var(--text-secondary); font-size: var(--text-caption); }

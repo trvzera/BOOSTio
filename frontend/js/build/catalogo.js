@@ -75,16 +75,15 @@ export function ofertasPeca(peca) {
     { codigo: "kabum", loja: "KaBuM!", url: linkKabum || "https://www.kabum.com.br/busca/" + busca,
       direta: Boolean(linkKabum?.includes("/produto/")) },
     { codigo: "pichau", loja: "Pichau", url: "https://www.pichau.com.br/search?q=" + busca, direta: false },
-    { codigo: "mercadolivre", loja: "Mercado Livre", url: "https://lista.mercadolivre.com.br/" + encodeURIComponent(nome.replaceAll(" ", "-")), direta: false },
   ];
-  const logos = {kabum:"kabum-logo.svg",pichau:"pichau.png",mercadolivre:"mercado-livre-87.svg"};
+  const logos = {kabum:"kabum-logo.svg",pichau:"pichau.png"};
   return lojas.map(loja => {
     const oferta = Array.isArray(peca.ofertas) ? peca.ofertas.find(o => o.loja === loja.codigo) : null;
     let url = loja.url, direta = loja.direta;
     if (oferta?.url) {
       try {
         const endereco = new URL(oferta.url);
-        const dominio = loja.codigo === "mercadolivre" ? "mercadolivre.com.br" : loja.codigo + ".com.br";
+        const dominio = loja.codigo + ".com.br";
         if (endereco.protocol === "https:" && (endereco.hostname === dominio || endereco.hostname.endsWith("." + dominio))) {
           url = endereco.href; direta = true;
         }
