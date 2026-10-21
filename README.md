@@ -102,6 +102,18 @@ e não representam um tempo garantido de renderização.
 Fontes: [FPSHQ](https://fpshq.com/pt/api/) e
 [Blender Open Data](https://opendata.blender.org/about/).
 
+No laboratório (`testes.html`), é possível comparar uma consulta FPS pelo Python
+com uma consulta direta pelo JavaScript, sem cache local neste último caminho.
+O diagnóstico informa tempo, HTTP recebido e falhas de transporte/validação;
+não troca automaticamente de caminho nem altera a montagem real.
+
+O laboratório também possui uma **prévia de requisitos dos cinco jogos padrão**,
+com fontes oficiais revisadas em 21/10/2026 e consulta autenticada pelo Python.
+Compara somente a capacidade de RAM informada, sem aprovar o PC completo,
+inventar requisitos recomendados ausentes ou ajustar FPS por uma fórmula.
+Equivalência de CPU/GPU, VRAM, sistema, espaço livre e demais exigências ainda
+precisam ser validados e vinculados aos componentes reais da build.
+
 ## Estado do projeto
 
 Autenticação, budget, catálogo e gerenciamento de builds estão implementados no

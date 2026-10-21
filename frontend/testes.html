@@ -89,6 +89,12 @@
                 <label class="test-field font-1-s" for="fpshq-resolution">Resolução<select id="fpshq-resolution"><option value="1080p">1080p</option><option value="1440p">1440p</option><option value="4k">4K</option></select></label>
                 <label class="test-field font-1-s" for="fpshq-preset">Qualidade gráfica<select id="fpshq-preset"><option value="low">Baixa</option><option value="medium">Média</option><option value="high" selected>Alta</option><option value="ultra">Ultra</option></select></label>
               </div>
+              <fieldset class="fpshq-layouts fpshq-route" aria-describedby="fpshq-route-help">
+                <legend class="font-1-xs">Caminho da consulta · diagnóstico</legend>
+                <label><input type="radio" name="fpshq-route" value="backend" checked><span>Pelo Python</span></label>
+                <label><input type="radio" name="fpshq-route" value="direto"><span>Direto pelo JS</span></label>
+              </fieldset>
+              <p class="test-muted font-2-xs" id="fpshq-route-help">Mesmo jogo e peças nos dois caminhos. JS direto não usa o cache local e tem prazo de 20 s; o Python atual espera até 10 s pela resposta e pode usar cache. Trocar esta opção não faz consultas.</p>
               <div class="test-actions"><button type="submit" class="btn-primary" aria-label="Ver desempenho esperado na FPSHQ" data-disabled-reason="Aguarde a consulta atual ou o intervalo solicitado pelo provedor.">Ver desempenho</button></div>
             </form>
             <details class="fpshq-search-details fpshq-disclosure" data-animated-details>
@@ -97,6 +103,10 @@
               <p class="sr-only" id="fpshq-search-help">Digite ao menos dois caracteres. A busca retorna até dez jogos. Selecione o jogo desejado nos resultados.</p>
               <p class="test-feedback font-2-xs" id="fpshq-search-status" role="status" aria-live="polite" aria-atomic="true" hidden></p>
               <ul id="fpshq-search-results" class="fpshq-search-results" aria-label="Jogos encontrados" hidden></ul>
+            </details>
+            <details class="fpshq-disclosure fpshq-diagnostic" data-animated-details>
+              <summary>Diagnóstico da última consulta</summary>
+              <pre id="fpshq-diagnostic-log" class="font-2-xs" role="status" aria-live="polite">Nenhuma consulta feita. Este diagnóstico existe somente no laboratório.</pre>
             </details>
           </div>
           <div class="fpshq-output">
@@ -108,6 +118,17 @@
           </div>
         </div>
       </section>
+      <details class="fpshq-disclosure test-requirements" data-animated-details>
+        <summary>Requisitos do jogo · prévia</summary>
+        <p class="test-muted font-2-xs">Fontes oficiais dos cinco jogos padrão, revisadas em 21/10/2026. Não depende da FPSHQ. A comparação automática inicial verifica somente a capacidade de RAM informada.</p>
+        <div class="test-field-row">
+          <label class="test-field font-1-s" for="requirements-ram">RAM da referência (GB)<input type="number" id="requirements-ram" min="1" max="4096" step="1" inputmode="numeric" placeholder="Opcional · ex.: 16" aria-describedby="requirements-help"></label>
+          <button type="button" class="btn-secondary" id="requirements-check" aria-label="Consultar requisitos do jogo selecionado">Ver requisitos do jogo selecionado</button>
+        </div>
+        <p id="requirements-help" class="test-muted font-2-xs">Use o jogo selecionado acima. Não lemos a memória do seu computador nem alteramos suas builds. O servidor da BOOSTio precisa estar ativo.</p>
+        <p id="requirements-feedback" class="test-feedback font-2-xs" role="status" aria-live="polite" hidden></p>
+        <div id="requirements-result" aria-live="polite" hidden></div>
+      </details>
     </section>
 
     <section class="test-feature" id="teste-comparacao" aria-labelledby="comparison-title">

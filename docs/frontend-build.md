@@ -101,6 +101,20 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
   Erro preserva respostas e permite repetir/revisar. A altura do formulário acompanha
   o conteúdo. Somente as listas longas de peças próprias/periféricos possuem rolagem
   interna; orçamento e rede continuam sem recorte interno.
+- Diagnóstico de FPS no laboratório: `experimentos/benchmark-diagnostico.js` permite
+  escolher o cliente direto JS ou o cliente Python, sem requisição ao trocar o modo.
+  O direto omite cookies, não reutiliza cache local e registra HTTP, tempo, redirecionamento
+  e falha de validação; `pagehide` cancela a consulta. Produção permanece no backend.
+  Na verificação real de 21/10/2026, ambos deram timeout sem resposta HTTP: Chrome
+  após 20 s e Python atual após cerca de 10 s. O 504 é o mapeamento da BOOSTio,
+  não um status recebido do provedor; esse resultado não identifica uma causa global.
+- `GET /benchmark/requisitos?game=...&ram_gb=...` segue Blueprint → service e exige
+  sessão. Curadoria JSON dos cinco jogos com links oficiais e data de revisão, sem
+  scraping em cada consulta nem dependência da FPSHQ. A prévia fica em `testes.html`.
+  Verifica só capacidade de RAM informada; sempre retorna `escopo: parcial`,
+  `requisitosVerificados: false` e `fpsValidado: false`. Recomendado ausente fica null;
+  CPU/GPU, VRAM, sistema e espaço livre não são inferidos por nomes ou pontuações.
+  Ainda falta vincular a avaliação ao hardware real da build e à interface de produção.
 - `components/number-stepper.js` mantém inputs nativos com botões explícitos de
   aumentar/diminuir: orçamento de R$ 100 em R$ 100 sem perder centavos; porcentagem e
   rede seguem seus passos e limites. Os controles preservam Tab/Enter e não recriam

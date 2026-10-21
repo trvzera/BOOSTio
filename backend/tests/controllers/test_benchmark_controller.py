@@ -26,7 +26,7 @@ def autenticar(cliente):
         sessao["_fresh"] = True
 
 
-@pytest.mark.parametrize("rota", ["/benchmark/fps", "/benchmark/jogos?q=Valorant", "/benchmark/blender"])
+@pytest.mark.parametrize("rota", ["/benchmark/fps", "/benchmark/jogos?q=Valorant", "/benchmark/blender", "/benchmark/requisitos?game=valorant"])
 def test_exige_sessao_e_responde_json(cliente_benchmark, rota):
     resposta = cliente_benchmark.get(rota)
     assert resposta.status_code == 401
@@ -86,3 +86,18 @@ def test_falhas_do_provedor_preservam_codigo_http_e_espera(cliente_benchmark, mo
     assert resposta.headers.get("Retry-After") == (str(espera) if espera else None)
     assert resposta.headers["Cache-Control"] == "no-store"
     executar.assert_called_once()
+
+
+def test_requisitos_autenticados_nao_dependem_de_fpshq(cliente_benchmark, mocker):
+    fps = mocker.patch("services.benchmark_service.fpshq_service.FpshqService.executar", side_effect=AssertionError("Não deve consultar FPSHQ"))
+    autenticar(cliente_benchmark)
+    resposta = cliente_benchmark.get("/benchmark/requisitos?game=fortnite&ram_gb=8")
+    assert resposta.status_code == 200
+    assert resposta.headers["Cache-Control"] == "no-store"
+    assert resposta.json["resultado"]["ram"]["atendeMinimo"] is True
+    assert resposta.json["resultado"]["ram"]["atendeRecomendado"] is False
+    assert resposta.json["resultado"]["requisitosVerificados"] is False
+    assert cliente_benchmark.get("/benchmark/requisitos?game=sem-ficha").status_code == 404
+    assert cliente_benchmark.get("/benchmark/requisitos?game=valorant&ram_gb=8&ram_gb=16").status_code == 400
+    assert cliente_benchmark.get("/benchmark/requisitos?game=valorant&cpu=cpu").status_code == 400
+    fps.assert_not_called()
