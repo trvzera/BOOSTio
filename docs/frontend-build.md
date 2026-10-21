@@ -361,6 +361,15 @@ O mesmo módulo adiciona logos sociais e tooltips a botões desabilitados, inclu
 em conteúdo dinâmico. Defina `data-disabled-reason` para informar um motivo contextual;
 uma âncora focável permite ler a explicação pelo teclado sem habilitar a ação.
 
+`componentes/feedback.css` padroniza a família Poppins nas mensagens de erro,
+avisos, retornos de importação, perfil, catálogo, geração e benchmarks. Mantém a
+escala de tamanhos das páginas e Lexend nos títulos, sem aplicar fontes a ícones.
+As mensagens quebram IDs/textos longos; importação e falhas na lista de builds
+identificam o estado por `data-tone`. IDs desconhecidos continuam bloqueados pela
+validação local de arquivos: formatar o aviso não substitui peças nem altera o catálogo.
+As fontes locais declaradas em `tipografia.css` são verificadas por testes de caminho
+e cabeçalho WOFF2, além de carregamento e fonte efetivamente renderizada no Chrome.
+
 `js/pages/loading.js` usa `sessionStorage["boostio:visita-iniciada"]`, não a conta.
 Primeira visita da aba/sessão e toda entrada na home usam vídeo. A home sempre mantém 1×.
 As demais páginas mostram um loading curto (linha animada sobre preto), espera mínima

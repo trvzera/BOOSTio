@@ -45,6 +45,7 @@
 @import "./build/comparacao.css";
 @import "./build/prontas.css";
 @import "./build/melhorias.css";
+@import "./componentes/feedback.css";
 
 /* Ajustes por largura de tela */
 @import "./responsividades/r-site.css";

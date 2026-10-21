@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const [resposta, pecas] = await Promise.all([listarBuilds(), carregarCatalogoConta()]);
       salvas = resposta.builds || []; catalogo = pecas; carregadas = true;
       renderizar();
-    } catch (erro) { status.hidden = false; status.textContent = erro.message; }
+    } catch (erro) { status.hidden = false; status.textContent = erro.message; status.dataset.tone = "error"; }
   }
 
   function card(dados) {
@@ -83,6 +83,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function renderizar() {
     status.hidden = salvas.length > 0;
+    status.dataset.tone = "info";
     status.textContent = salvas.length ? "" : "Você ainda não tem builds salvas na conta.";
     lista.innerHTML = salvas.map(card).join("");
     document.querySelector("#quota-count").textContent = `${salvas.length} / ${LIMITE_BUILDS}`;
@@ -204,18 +205,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     const dialogo = abrirDialogoBuild("Importar build",'<div class="build-import-fields"><p class="planning-help" id="build-import-help">Selecione um JSON ou CSV de build (até 1 MB).</p><label class="planning-field" for="build-import-file">Arquivo da build<input type="file" id="build-import-file" accept=".json,.csv" aria-label="Arquivo da build" aria-describedby="build-import-help build-import-status"></label><p class="planning-help" id="build-import-status" role="status"></p></div><div class="build-action-actions"><button type="button" class="btn-primary" id="build-import-confirm" aria-label="Importar build selecionada" disabled>Importar build</button></div>');
     let candidata;
     const feedback = dialogo.querySelector("#build-import-status"), confirmar = dialogo.querySelector("#build-import-confirm");
+    const informarImportacao = (texto,tom) => { feedback.textContent = texto; feedback.dataset.tone = tom; };
     dialogo.querySelector("#build-import-file").onchange = async evento => {
       try {
         const arquivo = evento.target.files[0];
         candidata = importarBuild(await arquivo.text(),arquivo.name.split(".").at(-1),catalogo);
-        feedback.textContent = candidata.titulo + " · arquivo validado"; confirmar.disabled = false;
-      } catch (erro) { candidata = null; confirmar.disabled = true; feedback.textContent = erro.message; }
+        informarImportacao(candidata.titulo + " · arquivo validado","success"); confirmar.disabled = false;
+      } catch (erro) { candidata = null; confirmar.disabled = true; informarImportacao(erro.message,"error"); }
     };
     confirmar.onclick = async () => {
       if (criando || !candidata) return;
       criando = true; confirmar.disabled = true;
       try { await verificarEspacoBuild(); await criarBuildManual(estadoParaConta(candidata)); dialogo.close(); await carregar(); avisar("Build importada na conta."); }
-      catch (erro) { feedback.textContent = erro.message; }
+      catch (erro) { informarImportacao(erro.message,"error"); }
       finally { criando = false; confirmar.disabled = !candidata; }
     };
   };
