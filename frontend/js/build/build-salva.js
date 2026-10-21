@@ -1,6 +1,6 @@
 import { buscarBuild } from "../api/build/builds.js";
 import { fetchComErro } from "../api/_shared/fetchComErro.js";
-import { categorias, htmlSeguro, moeda, ofertasPeca } from "./catalogo.js";
+import { categorias, htmlSeguro, imagemPeca, moeda, ofertasPeca } from "./catalogo.js";
 import { formatarDataHora } from "../utils/formatarData.js";
 import { abrirCompraBuild, avisoCompraHtml } from "./acoes-build.js";
 import { avisar } from "./interface.js";
@@ -9,7 +9,6 @@ import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 function linhaPeca(peca) {
   const categoria = categorias.find(item => item.id === peca.tipo);
   const titulo = categoria?.nome || peca.tipo;
-  const sigla = categoria?.sigla || "PC";
   const quantidade = Number(peca.quantidade) || 1;
   const oferta = ofertasPeca(peca)[0];
 
@@ -17,7 +16,7 @@ function linhaPeca(peca) {
     <div class="component-group-heading"><h2>${htmlSeguro(titulo)}</h2><span class="component-count">${quantidade} ${quantidade === 1 ? "unidade" : "unidades"}</span></div>
     <article class="component-row component-selected glass-card build-saved-piece">
       <div class="component-selected-main">
-        <div class="component-image"><span class="component-placeholder" aria-hidden="true">${htmlSeguro(sigla)}</span></div>
+        <div class="component-image">${imagemPeca({...peca, categoria:peca.tipo})}</div>
         <div class="component-copy"><h3 class="component-model font-1-m-b">${htmlSeguro(peca.nome)}</h3><p>${quantidade} × ${moeda(peca.preco)}</p></div>
         <div class="component-purchase">
           <a class="component-buy btn-primary" href="${htmlSeguro(oferta.url)}" target="_blank" rel="noopener noreferrer" aria-label="${oferta.direta ? "Comprar" : "Buscar"} ${htmlSeguro(peca.nome)} na ${htmlSeguro(oferta.loja)} em uma nova aba">${iconeAnimado("cart")}${oferta.direta ? "Comprar" : "Buscar"}</a>

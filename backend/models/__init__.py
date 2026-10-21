@@ -33,6 +33,8 @@ from .fone import Fone
 from .teclado import Teclado
 from .mouse import Mouse
 from .monitor import Monitor
+from .placa_rede import PlacaRede
+from .cabo_rede import CaboRede
 from .setup import Setup
 from .codigo import Codigo
 from .build import Build
@@ -51,5 +53,6 @@ __all__ = [
     'lm','db','Peca','Periferico','Usuario','ModeloBase','Fonte',
     'Processador','PlacaMae','PlacaVideo','MemoriaRAM','SSD','HD',
     'Gabinete','WaterCooler','AirCooler','Fan','Fone','Teclado','Mouse','Monitor',
+    'PlacaRede','CaboRede',
     'Setup','Codigo','TokenRecuperacao','Build','BuildSalva','ConsultaPreco','ControleColeta'
 ]

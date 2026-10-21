@@ -34,13 +34,15 @@ export function categoriaCatalogo(id) {
 let carregamento;
 // Trocar somente este carregamento pela API quando /pecas/ estiver pronta.
 export function carregarCatalogo() {
-  carregamento ??= acompanharCarregamento(fetch(new URL("../../data/catalogo-demo.json", import.meta.url),{cache:"force-cache"})
-    .then((resposta) => {
+  carregamento ??= acompanharCarregamento(Promise.all([
+    fetch(new URL("../../data/catalogo-demo.json", import.meta.url),{cache:"force-cache"}),
+    fetch(new URL("../../data/imagens-produtos.json", import.meta.url),{cache:"no-cache"}),
+  ]).then(async ([resposta, imagens]) => {
       if (!resposta.ok) throw new Error("Não foi possível carregar o catálogo.");
-      return resposta.json();
-    }).then(catalogo => {
+      const catalogo = await resposta.json();
+      const mapa = imagens.ok ? await imagens.json() : {};
       try { sessionStorage.setItem("boostio:catalogo-pronto","1"); } catch {}
-      return completarCatalogoDemo(catalogo);
+      return completarCatalogoDemo(catalogo.map(peca => ({...peca, imagem:mapa[peca.part_number] || peca.imagem})));
     }).catch(erro => { carregamento = null; throw erro; }));
   return carregamento;
 }
@@ -73,16 +75,15 @@ export function ofertasPeca(peca) {
     { codigo: "kabum", loja: "KaBuM!", url: linkKabum || "https://www.kabum.com.br/busca/" + busca,
       direta: Boolean(linkKabum?.includes("/produto/")) },
     { codigo: "pichau", loja: "Pichau", url: "https://www.pichau.com.br/search?q=" + busca, direta: false },
-    { codigo: "mercadolivre", loja: "Mercado Livre", url: "https://lista.mercadolivre.com.br/" + encodeURIComponent(nome.replaceAll(" ", "-")), direta: false },
   ];
-  const logos = {kabum:"kabum-logo.svg",pichau:"pichau.png",mercadolivre:"mercado-livre-87.svg"};
+  const logos = {kabum:"kabum-logo.svg",pichau:"pichau.png"};
   return lojas.map(loja => {
     const oferta = Array.isArray(peca.ofertas) ? peca.ofertas.find(o => o.loja === loja.codigo) : null;
     let url = loja.url, direta = loja.direta;
     if (oferta?.url) {
       try {
         const endereco = new URL(oferta.url);
-        const dominio = loja.codigo === "mercadolivre" ? "mercadolivre.com.br" : loja.codigo + ".com.br";
+        const dominio = loja.codigo + ".com.br";
         if (endereco.protocol === "https:" && (endereco.hostname === dominio || endereco.hostname.endsWith("." + dominio))) {
           url = endereco.href; direta = true;
         }

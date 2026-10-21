@@ -1,10 +1,10 @@
 from models import (
     Processador, PlacaMae, PlacaVideo, MemoriaRAM, SSD, HD, Fonte, Gabinete,
-    WaterCooler, AirCooler, Fan, Fone, Teclado, Mouse, Monitor,
+    WaterCooler, AirCooler, Fan, Fone, Teclado, Mouse, Monitor, PlacaRede, CaboRede,
 )
 
 
 MODELOS_PECAS = (
     Processador, PlacaMae, PlacaVideo, MemoriaRAM, SSD, HD, Fonte, Gabinete,
-    WaterCooler, AirCooler, Fan, Fone, Teclado, Mouse, Monitor,
+    WaterCooler, AirCooler, Fan, Fone, Teclado, Mouse, Monitor, PlacaRede, CaboRede,
 )
