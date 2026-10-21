@@ -4,11 +4,12 @@ from . import db, ModeloBase
 from .build import Build
 from . import Processador, PlacaMae, PlacaVideo, MemoriaRAM, SSD, HD, Fonte, Gabinete
 from . import WaterCooler, AirCooler, Fan, Fone, Teclado, Mouse, Monitor
+from . import PlacaRede, CaboRede
 
 
 MODELOS = {modelo.__tablename__: modelo for modelo in (
     Processador, PlacaMae, PlacaVideo, MemoriaRAM, SSD, HD, Fonte, Gabinete,
-    WaterCooler, AirCooler, Fan, Fone, Teclado, Mouse, Monitor,
+    WaterCooler, AirCooler, Fan, Fone, Teclado, Mouse, Monitor, PlacaRede, CaboRede,
 )}
 MULTIPLAS = {"memoria_ram", "ssd", "hd", "fan"}
 

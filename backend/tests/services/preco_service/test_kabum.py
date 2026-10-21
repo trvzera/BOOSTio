@@ -72,13 +72,15 @@ class ColetaKabumTest(unittest.TestCase):
         with patch("services.peca_service.popular_pecas_service.AtualizarPrecosService.executar",
                    return_value=resumo) as atualizar, patch("builtins.print"):
             self.assertEqual(PopularPecasService().executar(intervalo=0), resumo)
-            self.assertEqual(sum(classe.query.count() for classe in MODELOS_PECAS), 750)
+            self.assertEqual(sum(classe.query.count() for classe in MODELOS_PECAS), 1535)
+            self.assertEqual([classe.query.count() for classe in MODELOS_PECAS[:15]], [100] * 15)
+            self.assertEqual([classe.query.count() for classe in MODELOS_PECAS[15:]], [30, 5])
             peca = PlacaVideo.query.first()
             SalvarPecaService().executar(PlacaVideo, {"kabum_external": URL_1}, peca.id)
             peca.preco = 500
             db.session.commit()
             PopularPecasService().executar(intervalo=0)
-            self.assertEqual(sum(classe.query.count() for classe in MODELOS_PECAS), 750)
+            self.assertEqual(sum(classe.query.count() for classe in MODELOS_PECAS), 1535)
             self.assertEqual(peca.kabum_external, URL_1)
             self.assertEqual(peca.preco, 500)
         self.assertEqual(atualizar.call_count, 2)
@@ -88,7 +90,7 @@ class ColetaKabumTest(unittest.TestCase):
         with patch("services.peca_service.popular_pecas_service.AtualizarPrecosService.executar") as atualizar, \
              patch("builtins.print"):
             PopularPecasService().executar(atualizar_precos=False)
-        self.assertEqual(sum(classe.query.count() for classe in MODELOS_PECAS), 750)
+        self.assertEqual(sum(classe.query.count() for classe in MODELOS_PECAS), 1535)
         atualizar.assert_not_called()
 
     def test_popular_depois_atualiza_pecas_uma_a_uma(self):

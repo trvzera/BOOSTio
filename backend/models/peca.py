@@ -5,7 +5,7 @@ class Peca(ModeloBase):
   __abstract__ = True
   
   fabricante = db.Column(db.String(30),nullable = False)
-  modelo = db.Column(db.String(30),nullable = False)
+  modelo = db.Column(db.String(120),nullable = False)
   consumo_energia = db.Column(db.Float(),nullable = False)
   preco = db.Column(db.Float(),nullable = False)
   part_number = db.Column(db.String(100), nullable=True)

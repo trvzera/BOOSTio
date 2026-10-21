@@ -13,6 +13,7 @@ from controllers.build_controller import build_bp
 from services.peca_service.popular_pecas_service import PopularPecasService
 from migrations.budget_usuario import registrar_migracao_budget
 from migrations.imagens_pecas import migrar_imagens_pecas
+from migrations.rede_build import migrar_rede_build
 
 load_dotenv()
 
@@ -44,6 +45,7 @@ registrar_migracao_budget(app, db)
 with app.app_context():
     db.create_all()
     migrar_imagens_pecas()
+    migrar_rede_build()
 
 from commands.precos import registrar_comandos_precos
 registrar_comandos_precos(app)

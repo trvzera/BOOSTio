@@ -18,6 +18,8 @@ class CriarBuildService:
     "videointegrado", "cooler", "quantidade_pentes", "conexao",
     "tamanho_polegadas", "resolucao", "taxa_atualizacao_hz",
     "tipo_painel", "layout", "switch", "mecanico", "dpi_max", "microfone",
+    "interface", "padrao_wifi", "velocidade_mbps", "bluetooth",
+    "categoria", "comprimento_m", "conector",
   )
 
   def executar(self, usuario_id, dados, modelo="gemini-3.5-flash-lite"):
@@ -43,19 +45,23 @@ class CriarBuildService:
       excluidas.update(("ssd", "hd"))
     if {"air_cooler", "water_cooler"} & excluidas:
       excluidas.update(("air_cooler", "water_cooler"))
+    acessorio_rede = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
+    excluidas.update({"adaptador_wifi", "cabo_rede"} - ({acessorio_rede} if rede.get("possuiAcessorio") is False else set()))
     catalogo = self._gerar_catalogo(orcamento - margem, excluidas)
 
     obrigatorias = ("processador", "placa_mae", "memoria_ram", "fonte", "gabinete", *self.PERIFERICOS)
 
     if any(tipo not in catalogo and tipo not in proprias for tipo in obrigatorias) or not ({"ssd", "hd"} & (set(catalogo) | set(proprias))):
       raise ValueError("Não há peças suficientes para montar um setup completo nesse orçamento")
+    if acessorio_rede and rede.get("possuiAcessorio") is False and acessorio_rede not in catalogo and acessorio_rede not in proprias:
+      raise ValueError("Não há acessório de rede com preço e disponibilidade confirmados")
 
     resposta = LLMService().executar(self._criar_prompt(dados, orcamento, margem, catalogo,
                                                        self._detalhes_proprias(proprias)), modelo)
 
     build = json.loads(resposta) if isinstance(resposta, str) else resposta
 
-    dados_build = self._validar_build(build, catalogo, orcamento, proprias)
+    dados_build = self._validar_build(build, catalogo, orcamento, proprias, rede)
 
     if proprias:
       return BuildSalva.criar_gerada_com_pecas_proprias(usuario_id, dados_build, proprias, rede).to_dict()
@@ -108,6 +114,7 @@ class CriarBuildService:
   @staticmethod
   def _criar_prompt(dados, orcamento, margem, catalogo, proprias=None):
     pedido = {campo: dados[campo] for campo in ("nome", "descricao", "utilidade")}
+    pedido["rede"] = dados.get("rede") or {}
     proprias = proprias or {}
     teto_peca = orcamento - margem
 
@@ -223,6 +230,12 @@ class CriarBuildService:
         "- Se faltar uma dessas categorias no catálogo e o usuário não a possuir, "
         "retorne o JSON de erro; nunca invente um produto.\n\n"
 
+        "# REDE\n"
+        "Se rede.possuiAcessorio for false, inclua exatamente um cabo_rede para tipo cabo "
+        "ou um adaptador_wifi para tipo wifi, respeitando o comprimento solicitado quando houver. "
+        "Adaptadores USB servem quando não há slot PCIe livre. Se o usuário já possui o "
+        "acessório ou ainda vai confirmar, não acrescente nenhum. Nunca inclua ambos.\n\n"
+
         "# COMPATIBILIDADE (confira cada item)\n"
         "- Socket: o do processador deve ser igual ao da placa_mae.\n"
         "- Memória: tipo (ex.: DDR4/DDR5), quantidade de módulos e capacidade "
@@ -262,7 +275,7 @@ class CriarBuildService:
     )
 
   @staticmethod
-  def _validar_build(build, catalogo, orcamento, proprias=None):
+  def _validar_build(build, catalogo, orcamento, proprias=None, rede=None):
     if not isinstance(build, dict) or not isinstance(build.get("componentes"), list):
       raise ValueError("A IA não retornou uma build válida")
     validacao_campos(build, ["nome", "descricao", "utilidade", "componentes"])
@@ -273,6 +286,12 @@ class CriarBuildService:
     if any(not isinstance(tipo, str) for tipo in tipos) or len(tipos) != len(set(tipos)) or set(tipos) & set(proprias):
       raise ValueError("A IA repetiu uma categoria de peça")
     finais = set(tipos) | set(proprias)
+    rede = rede or {}
+    acessorio = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
+    escolhidos_rede = set(tipos) & {"adaptador_wifi", "cabo_rede"}
+    esperado_rede = {acessorio} if acessorio and rede.get("possuiAcessorio") is False and acessorio not in proprias else set()
+    if escolhidos_rede != esperado_rede:
+      raise ValueError("A IA não respeitou a escolha de conexão da build")
     if not {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete", *CriarBuildService.PERIFERICOS} <= finais or not {"ssd", "hd"} & finais:
       raise ValueError("A IA não completou as peças obrigatórias da build")
 
