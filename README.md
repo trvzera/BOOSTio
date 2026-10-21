@@ -40,33 +40,38 @@ gaming/rendering performance from public benchmark sources.
 
 ## Funcionalidades
 
-Os **20 requisitos do produto**, com o escopo disponível e os pontos em evolução.
+Os **20 requisitos do produto**, com o status de cada funcionalidade e seu escopo atual.
 
-**Disponível** indica um fluxo implementado. **Parcial** indica que ainda há partes
-do recurso a concluir. Nenhum dos estados substitui a homologação em produção.
+**Resumo: 16 implementadas · 4 parciais.**
 
-| Nº | Requisito | Situação | Escopo atual |
+- ✅ **Implementado:** fluxo disponível no código do projeto.
+- 🟡 **Parcial:** já possui partes implementadas, mas ainda há pontos a concluir.
+
+Os status descrevem a implementação atual, não a homologação em produção.
+As limitações de cada funcionalidade estão indicadas na última coluna.
+
+| Nº | Requisito | Status | Escopo atual |
 | --- | --- | --- | --- |
-| 01 | Criar conta e fazer login | Disponível | Cadastro, autenticação, logout e sessão. |
-| 02 | Cadastrar o setup atual | Disponível | Definir ou remover uma build como computador atual. |
-| 03 | Pesquisar peças e compatibilidade | Disponível | Catálogo por categoria e diagnóstico durante a montagem, com as limitações do requisito 13. |
-| 04 | Montar por formulário | Disponível | Geração por LLM conforme uso, orçamento e peças próprias; conflitos técnicos conhecidos são rejeitados antes de salvar. |
-| 05 | Salvar configurações | Disponível | Builds persistidas na conta, inclusive incompletas, com salvamento automático. |
-| 06 | Excluir configurações salvas | Disponível | Exclusão com verificação de proprietário e tranca. |
-| 07 | Comparar configurações salvas | Parcial | Comparação de duas ou três builds; comparação de desempenho ainda em evolução. |
-| 08 | Compartilhar configurações por link | Disponível | Links de builds públicas e controle de visibilidade; páginas internas exigem sessão. |
-| 09 | Buscar melhorias do setup | Parcial | Prévia e aplicação de trocas em todas as categorias; ganhos de desempenho e ofertas atualizadas a consolidar. |
-| 10 | Ver configurações prontas | Disponível | Dez modelos para diferentes públicos e orçamentos, sem periféricos. |
-| 11 | Editar configurações salvas | Disponível | Alteração de componentes, nome, descrição e orçamento. |
-| 12 | Consultar preços das peças pelo site | Parcial | Preços cadastrados, data de atualização quando disponível e links das lojas; monitoramento contínuo em evolução. |
-| 13 | Ver compatibilidade e consumo de energia | Parcial | Diagnóstico Python de conflitos e dados não verificados; validação técnica e física completa a concluir. |
-| 14 | Incluir periféricos no orçamento | Disponível | Inclusão e reaproveitamento com tetos separados para PC e periféricos. |
-| 15 | Registrar budget no perfil | Disponível | Valor e autorização usados no formulário e em novas montagens manuais, sem alterar builds existentes. |
-| 16 | Baixar builds em JSON e CSV | Disponível | Exportação para guardar a configuração localmente. |
-| 17 | Alterar a visibilidade da build | Disponível | Alternância entre pública e privada. |
-| 18 | Duplicar builds | Disponível | Cópia independente, respeitando o limite da conta. |
-| 19 | Definir nome e descrição | Disponível | Identificação e edição dos detalhes da build. |
-| 20 | Importar builds em JSON e CSV | Disponível | Validação do arquivo e criação de uma configuração na conta. |
+| 01 | Criar conta e fazer login | ✅ **Implementado** | Cadastro, autenticação, logout e sessão. |
+| 02 | Cadastrar o setup atual | ✅ **Implementado** | Definir ou remover uma build como computador atual. |
+| 03 | Pesquisar peças e compatibilidade | ✅ **Implementado** | Catálogo por categoria e diagnóstico durante a montagem, com as limitações do requisito 13. |
+| 04 | Montar por formulário | ✅ **Implementado** | Geração por LLM conforme uso, orçamento e peças próprias; conflitos técnicos conhecidos são rejeitados antes de salvar. |
+| 05 | Salvar configurações | ✅ **Implementado** | Builds persistidas na conta, inclusive incompletas, com salvamento automático. |
+| 06 | Excluir configurações salvas | ✅ **Implementado** | Exclusão com verificação de proprietário e tranca. |
+| 07 | Comparar configurações salvas | 🟡 **Parcial** | Comparação de duas ou três builds; comparação de desempenho ainda em evolução. |
+| 08 | Compartilhar configurações por link | ✅ **Implementado** | Links de builds públicas e controle de visibilidade; páginas internas exigem sessão. |
+| 09 | Buscar melhorias do setup | 🟡 **Parcial** | Prévia e aplicação de trocas em todas as categorias; ganhos de desempenho e ofertas atualizadas a consolidar. |
+| 10 | Ver configurações prontas | ✅ **Implementado** | Dez modelos para diferentes públicos e orçamentos, sem periféricos. |
+| 11 | Editar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento. |
+| 12 | Consultar preços das peças pelo site | 🟡 **Parcial** | Preços cadastrados, data de atualização quando disponível e links das lojas; monitoramento contínuo em evolução. |
+| 13 | Ver compatibilidade e consumo de energia | 🟡 **Parcial** | Diagnóstico Python de conflitos e dados não verificados; validação técnica e física completa a concluir. |
+| 14 | Incluir periféricos no orçamento | ✅ **Implementado** | Inclusão e reaproveitamento com tetos separados para PC e periféricos. |
+| 15 | Registrar budget no perfil | ✅ **Implementado** | Valor e autorização usados no formulário e em novas montagens manuais, sem alterar builds existentes. |
+| 16 | Baixar builds em JSON e CSV | ✅ **Implementado** | Exportação para guardar a configuração localmente. |
+| 17 | Alterar a visibilidade da build | ✅ **Implementado** | Alternância entre pública e privada. |
+| 18 | Duplicar builds | ✅ **Implementado** | Cópia independente, respeitando o limite da conta. |
+| 19 | Definir nome e descrição | ✅ **Implementado** | Identificação e edição dos detalhes da build. |
+| 20 | Importar builds em JSON e CSV | ✅ **Implementado** | Validação do arquivo e criação de uma configuração na conta. |
 
 ### Regras da plataforma
 
