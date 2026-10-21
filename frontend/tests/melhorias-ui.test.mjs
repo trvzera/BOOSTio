@@ -48,6 +48,33 @@ test("laboratório de melhorias reutiliza o mesmo Lottie sem duplicar o input",a
   assert.match(codigo,/iniciarIcones\(document\.querySelector\("\.test-upgrade-categories"\)\)/);
 });
 
+test("peças são agrupadas em dropdowns nativos animados com resumo da seleção",() => {
+  assert.match(js,/class="upgrade-real-group" data-upgrade-group="/);
+  assert.match(js,/data-selected="' \+ Boolean\(selecionada\) \+ '" data-animated-details/);
+  assert.match(js,/<summary class="upgrade-real-group-heading" aria-controls="upgrade-parts-/);
+  assert.match(js,/class="upgrade-real-group-price"/);
+  assert.match(js,/iconeAnimado\("chevron"\)/);
+  assert.match(css,/\.upgrade-real-group-heading \{[^}]*grid-template-columns: minmax\(0,1fr\) auto;[^}]*cursor: pointer/);
+});
+
+test("seleção válida fecha só seu dropdown e devolve o foco ao summary",() => {
+  const trecho = js.slice(js.indexOf('if (botao.dataset.upgradePick) {'),js.indexOf('} else if (botao.dataset.upgradeRemove)'));
+  assert.ok(trecho.indexOf("simular(propostas);") < trecho.indexOf("definirDetalheAberto(grupo,false)"));
+  assert.match(trecho,/trocas = propostas;\s*renderizar\(\)/);
+  assert.match(trecho,/data-upgrade-group="' \+ categoria/);
+  assert.match(trecho,/gruposAbertos\.delete\(categoria\)/);
+  assert.match(trecho,/resumo\.focus\(\{preventScroll:true\}\)/);
+  assert.match(trecho,/resumo\.scrollIntoView\(\{block:"nearest",inline:"nearest",behavior:"instant"\}\)/);
+});
+
+test("atualizações preservam dropdowns abertos sem reabrir uma categoria em fechamento",() => {
+  assert.match(js,/const gruposAbertos = new Set\(\)/);
+  assert.match(js,/grupo\.hasAttribute\("data-animating"\)[\s\S]*getAttribute\("aria-expanded"\) === "true" : grupo\.open/);
+  assert.match(js,/gruposAbertos\.has\(categoria\.id\) \? ' open' : ''/);
+  assert.match(js,/gruposAbertos\.delete\(caixa\.value\)/);
+  assert.match(js,/trocas\.clear\(\); gruposAbertos\.clear\(\)/);
+});
+
 test("prévia considera todas as peças antigas e distingue dicas, avisos e erros",() => {
   assert.match(js,/itens\.map\(item =>/);
   assert.match(js,/item\.quantidade > 1 \? item\.quantidade \+ " × "/);

@@ -8,6 +8,17 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
 
 ### Busca de melhorias e responsividade — 21/10/2026
 
+- **Dropdowns de peças:** cada categoria do modal usa `details/summary` animado,
+  inicialmente recolhido, com contagem de opções e chevron Lottie. Uma seleção
+  validada fecha somente seu dropdown e mantém modelo/preço no resumo. Reabrir
+  permite substituir a escolha; confirmação final da build continua separada.
+  Alterar orçamento ou outra categoria preserva os dropdowns abertos/fechados.
+  Desmarcar uma categoria limpa sua seleção e estado; falhas não fecham o grupo.
+  O fechamento devolve foco ao summary, mantendo teclado e área visível acessíveis.
+  Validação: 292 testes Node e 161 verificações Chrome com API simulada em
+  320×900, 768×1024, 1440×900 e 844×390, com/sem animações. Inclui substituição,
+  remoção, orçamento insuficiente, rejeição de downgrade e salvamento confirmado.
+
 - **Checkboxes:** o modal e o laboratório usam `iconeAnimado("checkbox")` e o
   controlador compartilhado. O input nativo continua acessível e ocupa todo o label;
   o Lottie fica com 1,5 rem. Ao marcar, traço em `--cor-p1` e preenchimento em

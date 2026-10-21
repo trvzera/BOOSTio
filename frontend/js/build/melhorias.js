@@ -4,7 +4,7 @@ import { avaliarBuild, selecionarPecaCompativel } from "./compatibilidade.js";
 import { planejamentoLocal } from "./planejamento.js";
 import { abrirDialogoBuild } from "./acoes-build.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
-import { iniciarDetalhesAnimados } from "../components/animated-details.js";
+import { iniciarDetalhesAnimados, definirDetalheAberto } from "../components/animated-details.js";
 import { avaliarTrocaMelhoria, exigirTrocaMelhoria } from "./validar-melhoria.js";
 
 const CATEGORIAS = categoriasCatalogo;
@@ -22,6 +22,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
 
   const original = structuredClone(build);
   const categorias = new Set(["processador","placa_video"]);
+  const gruposAbertos = new Set();
   let trocas = new Map(), aplicando = false, aplicada = false, totalExibido;
   const budgetInicial = planejamentoLocal().budget ?? build.orcamento;
   const dialogo = abrirDialogoBuild("Buscar melhorias",'<div class="upgrade-real-panel">'
@@ -165,6 +166,14 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
   }
 
   function renderizarResultados() {
+    // Durante uma animação de fechamento, open ainda é true; ARIA indica o destino.
+    resultados.querySelectorAll("[data-upgrade-group]").forEach(grupo => {
+      const categoria = grupo.dataset.upgradeGroup;
+      const aberto = grupo.hasAttribute("data-animating")
+        ? grupo.querySelector(":scope > summary").getAttribute("aria-expanded") === "true" : grupo.open;
+      if (categorias.has(categoria) && aberto) gruposAbertos.add(categoria);
+      else gruposAbertos.delete(categoria);
+    });
     if (build.travada) { resultados.innerHTML = '<p class="planning-help">' + MOTIVO_TRAVA + '</p>'; return; }
     if (budget() == null) { resultados.innerHTML = '<p class="planning-help">' + MOTIVO_BUDGET + '</p>'; return; }
     if (!categorias.size) { resultados.innerHTML = '<p class="planning-help">Selecione uma ou mais categorias para consultar as peças.</p>'; return; }
@@ -195,7 +204,14 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
         indisponiveis ? indisponiveis + " opções indisponíveis ou sem preço válido." : "",
         inferiores ? inferiores + " opções inferiores nos dados comparados foram ocultadas." : "",
         semComparacao ? semComparacao + " opções sem comparação segura não são sugeridas." : ""].filter(Boolean).join(" ");
-      return '<section class="upgrade-real-group"><div class="upgrade-real-group-heading"><h3>' + categoria.nome + '</h3><span>' + candidatas.length + (candidatas.length === 1 ? ' opção' : ' opções') + '</span></div><p class="upgrade-real-current"><span>Na build</span> '
+      const selecionada = pecaPorId(categoria.id,trocas.get(categoria.id));
+      const precoSelecionado = centavos(selecionada?.preco);
+      return '<details class="upgrade-real-group" data-upgrade-group="' + categoria.id + '" data-selected="' + Boolean(selecionada) + '" data-animated-details' + (gruposAbertos.has(categoria.id) ? ' open' : '') + '>'
+        + '<summary class="upgrade-real-group-heading" aria-controls="upgrade-parts-' + categoria.id + '"><h3>' + categoria.nome + '</h3><span class="upgrade-real-group-value">'
+        + (selecionada ? h(nome(selecionada)) + '<span class="upgrade-real-group-price">' + h(precoSelecionado != null ? valorMonetario(precoSelecionado) : "Preço indisponível") + '</span>'
+          : candidatas.length ? 'Escolha uma peça' : 'Sem opções disponíveis')
+        + '</span><span class="upgrade-real-group-meta"><span>' + candidatas.length + (candidatas.length === 1 ? ' opção' : ' opções') + '</span>' + iconeAnimado("chevron") + '</span></summary>'
+        + '<div class="upgrade-real-group-body" id="upgrade-parts-' + categoria.id + '"><p class="upgrade-real-current"><span>Na build</span> '
         + h(nomeAtual(original,categoria.id)) + '</p>'
         + (candidatas.length ? '<div class="upgrade-real-candidates">' + candidatas.map(peca => {
           const selecionada = trocas.get(categoria.id) === peca.id;
@@ -207,7 +223,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
         }).join("") + '</div>' : '<p class="planning-help">' + h(comparacoesPendentes.size ? [...comparacoesPendentes][0] : "Nenhuma troca sem regressão verificável e compatível disponível dentro do budget combinado.") + '</p>')
         + (exclusoes ? '<p class="planning-help">' + h(exclusoes) + '</p>' : '')
         + (conflitos.size ? '<details class="upgrade-real-conflicts"><summary>Por que algumas opções não aparecem?</summary><ul>'
-          + [...conflitos].map(motivo => '<li>' + h(motivo) + '</li>').join("") + '</ul></details>' : '') + '</section>';
+          + [...conflitos].map(motivo => '<li>' + h(motivo) + '</li>').join("") + '</ul></details>' : '') + '</div></details>';
     }).join("");
   }
 
@@ -263,6 +279,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     const restaurar = resultados.contains(foco) || focoNaPrevia;
     const idFoco = foco?.dataset?.upgradePick, categoriaFoco = foco?.dataset?.upgradeCategory;
     const removerFoco = foco?.dataset?.upgradeRemove;
+    const grupoFoco = foco?.closest("[data-upgrade-group]")?.dataset.upgradeGroup;
     renderizarResultados();
     renderizarPrevia();
     dialogo.querySelectorAll("button,input,select").forEach(controle => {
@@ -275,6 +292,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
       const controles = [...dialogo.querySelectorAll("button")];
       const proximoFoco = controles.find(controle => idFoco && controle.dataset.upgradePick === idFoco && controle.dataset.upgradeCategory === categoriaFoco)
         || controles.find(controle => removerFoco && controle.dataset.upgradeRemove === removerFoco)
+        || (grupoFoco && resultados.querySelector('[data-upgrade-group="' + grupoFoco + '"] > summary'))
         || (focoNaPrevia ? dialogo.querySelector(".upgrade-real-preview-scroll") : dialogo.querySelector(".upgrade-real-browser-scroll"));
       proximoFoco.focus({preventScroll:true});
     }
@@ -292,7 +310,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     const caixa = evento.target;
     if (caixa.name === "upgrade-real-category") {
       if (caixa.checked) categorias.add(caixa.value);
-      else { categorias.delete(caixa.value); trocas.delete(caixa.value); }
+      else { categorias.delete(caixa.value); trocas.delete(caixa.value); gruposAbertos.delete(caixa.value); }
       informar("Categorias atualizadas. Desmarcar uma categoria descarta a troca dela.");
     } else if (caixa !== campoBudget) return;
     renderizar();
@@ -312,6 +330,14 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
         simular(propostas);
         trocas = propostas;
         renderizar();
+        const grupo = resultados.querySelector('[data-upgrade-group="' + categoria + '"]');
+        if (grupo) {
+          gruposAbertos.delete(categoria);
+          definirDetalheAberto(grupo,false);
+          const resumo = grupo.querySelector(":scope > summary");
+          resumo.focus({preventScroll:true});
+          resumo.scrollIntoView({block:"nearest",inline:"nearest",behavior:"instant"});
+        }
         informar("Peça adicionada à prévia. Revise as trocas antes de aplicar.");
       } else if (botao.dataset.upgradeRemove) {
         trocas.delete(botao.dataset.upgradeRemove);
@@ -343,7 +369,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
   });
   dialogo.addEventListener("click",evento => { if (aplicando && evento.target === dialogo) evento.stopImmediatePropagation(); },true);
   dialogo.addEventListener("close",() => {
-    trocas.clear(); observarViewport?.disconnect(); cancelAnimationFrame(frameViewport);
+    trocas.clear(); gruposAbertos.clear(); observarViewport?.disconnect(); cancelAnimationFrame(frameViewport);
     compacta.removeEventListener("change",ajustarCompacta); window.removeEventListener("resize",programarViewport);
     window.visualViewport?.removeEventListener("resize",programarViewport); window.visualViewport?.removeEventListener("scroll",programarViewport);
   },{once:true});

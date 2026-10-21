@@ -58,10 +58,19 @@ details[open] > summary > .upgrade-real-chevron { transform: rotate(225deg); mar
 .upgrade-real-help summary { padding-inline: .25rem; }
 .upgrade-real-help .planning-help { margin: 0; padding: .25rem .25rem .75rem; }
 .upgrade-real-filters[data-animating], .upgrade-real-help[data-animating] { overflow: hidden; }
-.upgrade-real-results { display: grid; gap: 1.5rem; min-width: 0; }
-.upgrade-real-group { min-width: 0; }
-.upgrade-real-group-heading { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; }
-.upgrade-real-group-heading > span { flex-shrink: 0; color: var(--cor-4); font: 400 .6875rem/1.5 var(--font-body); }
+.upgrade-real-results { display: grid; gap: .75rem; min-width: 0; }
+.upgrade-real-group { min-width: 0; border: 1px solid var(--glass-border); border-radius: 1rem; background: rgba(255,255,255,.01); }
+.upgrade-real-group[data-animating] { overflow: hidden; }
+.upgrade-real-group[data-selected="true"] { border-color: rgba(0,123,255,.3); }
+.upgrade-real-group-heading { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: .375rem .75rem; min-height: 2.75rem; padding: .875rem; border-radius: 1rem; list-style: none; cursor: pointer; }
+.upgrade-real-group-heading h3 { grid-column: 1; grid-row: 1; }
+.upgrade-real-group-heading:hover { background: rgba(255,255,255,.025); }
+.upgrade-real-group-value { grid-column: 1; grid-row: 2; min-width: 0; color: var(--cor-4); font: 400 .6875rem/1.6 var(--font-body); overflow-wrap: anywhere; }
+.upgrade-real-group[data-selected="true"] .upgrade-real-group-value { color: var(--cor-6); }
+.upgrade-real-group-price { display: block; margin-top: .25rem; color: var(--cor-p1); font-weight: 500; }
+.upgrade-real-group-meta { grid-column: 2; grid-row: 1 / span 2; display: flex; align-items: center; gap: .5rem; color: var(--cor-4); font: 400 .6875rem/1.5 var(--font-body); white-space: nowrap; }
+.upgrade-real-group-meta > .ui-lottie { color: var(--cor-p1); }
+.upgrade-real-group-body { min-width: 0; padding: 0 .875rem .875rem; }
 .upgrade-real-current { margin: .5rem 0 .875rem; color: var(--cor-4); font: 400 .6875rem/1.65 var(--font-body); overflow-wrap: anywhere; }
 .upgrade-real-current > span { display: inline-block; color: var(--cor-6); margin-right: .25rem; }
 .upgrade-real-candidates { display: grid; gap: .75rem; min-width: 0; }
