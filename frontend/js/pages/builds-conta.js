@@ -188,7 +188,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.querySelector("#btn-create-build").onclick = async () => {
     if (!carregadas || lotado() || criando) return;
     try { await verificarEspacoBuild(); } catch (erro) { avisar(erro.message); return; }
-    const dialogo = abrirDialogoBuild("Como você quer criar sua build?",'<div class="build-create-options"><a class="build-create-option build-create-option-primary" href="./formulario.html" aria-label="Criar build pelo formulário inteligente"><strong>Formulário inteligente</strong><span>Informe objetivo e orçamento para gerar a build.</span></a><button type="button" class="build-create-option" data-criar="manual" aria-label="Criar build manualmente"><strong>Montagem manual</strong><span>Escolha peça por peça do catálogo.</span></button></div>');
+    const dialogo = abrirDialogoBuild("Como você quer criar sua build?",'<div class="build-create-options"><a class="build-create-option build-create-option-primary" href="./formulario.html" aria-label="Criar build pelo formulário inteligente">' + iconeAnimado("handsparkle") + '<strong>Formulário inteligente</strong><span>Informe objetivo e orçamento para gerar a build.</span></a><button type="button" class="build-create-option" data-criar="manual" aria-label="Criar build manualmente">' + iconeAnimado("normalhand") + '<strong>Montagem manual</strong><span>Escolha peça por peça do catálogo.</span></button></div>');
     dialogo.querySelector('[data-criar="manual"]').onclick = async evento => {
       if (criando) return;
       criando = true; evento.currentTarget.disabled = true;

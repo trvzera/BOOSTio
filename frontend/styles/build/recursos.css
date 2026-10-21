@@ -26,9 +26,10 @@ body:has(.build-action-dialog[open]), body:has(.compare-dialog[open]) { overflow
 .build-create-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; margin-top: 24px; }
 .build-create-option { display: flex; flex-direction: column; gap: 14px; padding: 24px; border: 1px solid var(--glass-border); border-radius: var(--radius-card); background: #ffffff04; color: var(--cor-6); text-decoration: none; transition: border-color var(--motion-fast) ease, background var(--motion-fast) ease; }
 .build-create-option:is(button) { text-align: left; cursor: pointer; }
-.build-create-option:hover { border-color: var(--cor-p1); background: #007bff0a; }
+.build-create-option:is(:hover,:focus-visible) { border-color: var(--cor-p1); background: #007bff0a; }
+.build-create-option > .ui-lottie { width: 44px; height: 44px; flex-basis: 44px; color: var(--cor-p1); }
 .build-create-option > strong { font: 500 1.1rem/1.4 var(--font-heading); }
-.build-create-option > span:not(.build-create-option-action) { color: var(--cor-4); font: 400 .8rem/1.7 var(--font-body); }
+.build-create-option > span:not(.build-create-option-action):not(.ui-lottie) { color: var(--cor-4); font: 400 .8rem/1.7 var(--font-body); }
 .build-create-option-action { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 12px; color: var(--cor-p1); font: 500 .8rem/1.5 var(--font-heading); }
 .benchmark-specs { display: grid; gap: 12px; margin: 16px 0; }
 .benchmark-specs div { padding: 14px; border: 1px solid var(--cor-2); border-radius: 12px; }

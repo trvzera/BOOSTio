@@ -2,7 +2,7 @@ import { htmlSeguro as h, moeda, nomePeca, ofertasPeca } from "./catalogo.js";
 import { itensSelecionados, itensCategoria, informacoesRam } from "./estado.js";
 import { avaliarBuild } from "./compatibilidade.js";
 import { normalizarRede, resumoRede } from "./rede.js";
-import { iniciarIcones } from "../components/ui.js";
+import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { hardwareBenchmark, hardwareBlender } from "../benchmark/hardware.js";
 import { painelBenchmarkHtml } from "../benchmark/painel.js";
 import { iniciarPainelBenchmark } from "../benchmark/interface.js";
@@ -49,7 +49,7 @@ export function abrirBenchmark(build,catalogo) {
   const cpu = peca("processador"), gpu = peca("placa_video"), ram = informacoesRam(build,catalogo);
   const prefixo = "build-fpshq";
   const dialogo = abrirDialogoBuild("Desempenho esperado",'<p class="planning-help">' + h(build.titulo) + '</p>' +
-    '<div class="benchmark-type-picker" role="group" aria-label="Escolha o tipo de teste"><button type="button" class="btn-secondary" data-benchmark-type="games" aria-pressed="false" aria-label="Selecionar teste de desempenho em jogos">Jogos · FPS</button><button type="button" class="btn-secondary" data-benchmark-type="blender" aria-pressed="false" aria-label="Selecionar teste de renderização no Blender">Blender · Renderização</button></div><div data-benchmark-content><p class="planning-help">Escolha qual desempenho deseja consultar. Nenhum teste é executado no seu computador.</p></div>');
+    '<div class="benchmark-type-picker" role="group" aria-label="Escolha o tipo de teste"><button type="button" class="btn-secondary" data-benchmark-type="games" aria-pressed="false" aria-label="Selecionar teste de desempenho em jogos">' + iconeAnimado("gamepad") + '<span>Jogos · FPS</span></button><button type="button" class="btn-secondary" data-benchmark-type="blender" aria-pressed="false" aria-label="Selecionar teste de renderização no Blender">' + iconeAnimado("microchip") + '<span>Blender · Renderização</span></button></div><div data-benchmark-content><p class="planning-help">Escolha qual desempenho deseja consultar. Nenhum teste é executado no seu computador.</p></div>');
   dialogo.classList.add("benchmark-dialog");
   let limpar;
   dialogo.querySelectorAll("[data-benchmark-type]").forEach(botao => botao.addEventListener("click",() => {

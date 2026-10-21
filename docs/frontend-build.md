@@ -343,6 +343,11 @@ Botões compartilham formato capsule, altura mínima, hover discreto e foco vis�
 `js/components/ui.js` inicializa ícones via o controlador Lottie existente,
 reproduz no hover/foco e reverte na saída. Plus, login rotacionado 90°, trash e cart
 têm alternativas estáticas. Checkbox, hamburger e chevron refletem o estado do controle.
+Na seleção de desempenho, `gamepad.json` identifica Jogos e `microchip.json`, Blender.
+Na escolha de montagem, `handsparkle.json` identifica o formulário inteligente e
+`normalhand.json`, a montagem manual. Os quatro usam o mesmo hover/foco com retorno,
+sem loop/autoplay, preservam os rótulos dos controles e têm SVG estático para
+movimento reduzido ou falha de carregamento. Selecionar um tipo não consulta a API.
 O `arrow.json` original aponta na diagonal: a rotação de 45° aponta para a direita,
 225° para a esquerda, 0° mantém a diagonal externa e −45° aponta para cima.
 Ícones de elementos removidos são destruídos; falhas nas animações não bloqueiam os controles.

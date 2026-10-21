@@ -41,6 +41,32 @@ test("configurações enquadra o Lottie sem escala CSS e tem fallback reconhecí
   assert.doesNotMatch(icone,/●/);
 });
 
+test("seletores de montagem e desempenho registram os quatro novos Lotties com alternativa estática",async () => {
+  const ui = await readFile(new URL("../js/components/ui.js",import.meta.url),"utf8");
+  for (const nome of ["gamepad","microchip","handsparkle","normalhand"]) {
+    assert.ok(ui.includes(nome + ':"' + nome + '.json"'));
+    const arquivo = JSON.parse(await readFile(new URL("../lottie/" + nome + ".json",import.meta.url),"utf8"));
+    assert.ok(arquivo.w > 0 && arquivo.h > 0 && arquivo.op > arquivo.ip && arquivo.fr > 0);
+    const icone = iconeAnimado(nome);
+    assert.ok(icone.includes('data-lottie="' + nome + '"'));
+    assert.match(icone,/aria-hidden="true"/);
+    assert.match(icone,/<span class="ui-icon-fallback"><svg viewBox="0 0 24 24"/);
+  }
+});
+
+test("montagem e benchmark usam os ícones correspondentes sem alterar ações e rótulos",async () => {
+  const builds = await readFile(new URL("../js/pages/builds-conta.js",import.meta.url),"utf8");
+  const acoes = await readFile(new URL("../js/build/acoes-build.js",import.meta.url),"utf8");
+  const css = await readFile(new URL("../styles/build/recursos.css",import.meta.url),"utf8");
+  for (const [nome,rotulo] of [["handsparkle","Formulário inteligente"],["normalhand","Montagem manual"]])
+    assert.ok(builds.includes('iconeAnimado("' + nome + '") + \'<strong>' + rotulo + '</strong>'));
+  for (const [nome,rotulo] of [["gamepad","Jogos · FPS"],["microchip","Blender · Renderização"]])
+    assert.ok(acoes.includes('iconeAnimado("' + nome + '") + \'<span>' + rotulo + '</span>'));
+  assert.match(css,/\.build-create-option:is\(:hover,:focus-visible\)/);
+  assert.match(css,/\.build-create-option > \.ui-lottie \{[^}]*color: var\(--cor-p1\)/);
+  assert.match(css,/span:not\(\.build-create-option-action\):not\(\.ui-lottie\)/);
+});
+
 test("tooltip não gera novas mutações ao repetir o mesmo motivo", () => {
   let texto = "", escritas = 0;
   const elemento = {get textContent() { return texto; },set textContent(valor) { texto = valor; escritas++; }};
