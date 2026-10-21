@@ -159,6 +159,17 @@ test("criar build oferece manual ou formulário, sem dois atalhos divergentes",a
   assert.match(js,/Formulário inteligente/);
   assert.match(js,/criarBuildManual/);
 });
+test("importar build separa o arquivo das ações e preserva descrição acessível e botão responsivo",async () => {
+  const js = await readFile(new URL("../js/pages/builds-conta.js",import.meta.url),"utf8");
+  const css = await readFile(new URL("../styles/build/recursos.css",import.meta.url),"utf8");
+  assert.match(js,/class="build-import-fields"/);
+  assert.match(js,/<label class="planning-field" for="build-import-file">/);
+  assert.match(js,/aria-describedby="build-import-help build-import-status"/);
+  assert.match(js,/<div class="build-action-actions"><button[^>]*id="build-import-confirm"/);
+  assert.match(css,/\.build-import-fields \{[^}]*display: grid;[^}]*gap: 16px/);
+  assert.match(css,/\.build-action-actions \{[^}]*margin-top: 22px/);
+  assert.match(css,/\.build-action-actions > \*, \.builds-toolbar > \* \{ width: 100%; \}/);
+});
 test("fechar e voltar compartilham controles visuais sem alterar a tipografia global",async () => {
   const css = await readFile(new URL("../styles/componentes/navigation-controls.css",import.meta.url),"utf8");
   const raiz = await readFile(new URL("../styles/style.css",import.meta.url),"utf8");

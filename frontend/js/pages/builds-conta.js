@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
   document.querySelector("#btn-import-build").onclick = () => {
     if (!carregadas || lotado() || criando) return;
-    const dialogo = abrirDialogoBuild("Importar build",'<p class="planning-help">Selecione um JSON ou CSV de build (até 1 MB).</p><input type="file" id="build-import-file" accept=".json,.csv" aria-label="Arquivo da build"><p id="build-import-status" role="status"></p><button type="button" class="btn-primary" id="build-import-confirm" aria-label="Importar build selecionada" disabled>Importar build</button>');
+    const dialogo = abrirDialogoBuild("Importar build",'<div class="build-import-fields"><p class="planning-help" id="build-import-help">Selecione um JSON ou CSV de build (até 1 MB).</p><label class="planning-field" for="build-import-file">Arquivo da build<input type="file" id="build-import-file" accept=".json,.csv" aria-label="Arquivo da build" aria-describedby="build-import-help build-import-status"></label><p class="planning-help" id="build-import-status" role="status"></p></div><div class="build-action-actions"><button type="button" class="btn-primary" id="build-import-confirm" aria-label="Importar build selecionada" disabled>Importar build</button></div>');
     let candidata;
     const feedback = dialogo.querySelector("#build-import-status"), confirmar = dialogo.querySelector("#build-import-confirm");
     dialogo.querySelector("#build-import-file").onchange = async evento => {
