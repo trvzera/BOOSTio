@@ -346,6 +346,12 @@ têm alternativas estáticas. Checkbox, hamburger e chevron refletem o estado do
 O `arrow.json` original aponta na diagonal: a rotação de 45° aponta para a direita,
 225° para a esquerda, 0° mantém a diagonal externa e −45° aponta para cima.
 Ícones de elementos removidos são destruídos; falhas nas animações não bloqueiam os controles.
+O ícone de Configurações (`user.json`) tem enquadramento próprio no renderer SVG
+(`viewBoxSize`), pois a composição original 1000×1000 inclui margem vazia. Isso mantém
+o tamanho visual dos demais ícones sem aumentar a linha do menu nem cortar o giro
+da engrenagem. Hover e foco usam a cor primária; movimento reduzido ou falha no
+carregamento preservam um símbolo estático de usuário com engrenagem. Não aplicar
+`scale` no SVG: o transform inline gerado pelo Lottie pode sobrescrevê-lo.
 O mesmo módulo adiciona logos sociais e tooltips a botões desabilitados, inclusive
 em conteúdo dinâmico. Defina `data-disabled-reason` para informar um motivo contextual;
 uma âncora focável permite ler a explicação pelo teclado sem habilitar a ação.

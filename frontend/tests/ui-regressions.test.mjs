@@ -27,6 +27,20 @@ test("menu lateral não inclui ícones das opções, mantendo os do perfil",asyn
   assert.match(js,/perfil && item\.icone \? iconeAnimado\(item\.icone\)/);
 });
 
+test("configurações enquadra o Lottie sem escala CSS e tem fallback reconhecível",async () => {
+  const js = await readFile(new URL("../js/components/ui.js",import.meta.url),"utf8");
+  const css = await readFile(new URL("../styles/componentes/site-menu.css",import.meta.url),"utf8");
+  const arquivo = JSON.parse(await readFile(new URL("../lottie/user.json",import.meta.url),"utf8"));
+  assert.equal(arquivo.w,1000); assert.equal(arquivo.h,1000);
+  assert.match(js,/elemento\.dataset\.lottie === "user"\s*\? \{rendererSettings:\{viewBoxSize:"175 170 750 750"/);
+  assert.match(js,/registrarAnimacao\([^;]+,opcoes\)/);
+  assert.doesNotMatch(css,/\[data-lottie="user"\] svg\s*\{\s*transform: scale/);
+  assert.match(css,/\.profile-link:focus-visible \.ui-lottie \{ color: inherit; \}/);
+  const icone = iconeAnimado("user");
+  assert.match(icone,/aria-hidden="true"/); assert.match(icone,/<svg viewBox="0 0 24 24"/);
+  assert.doesNotMatch(icone,/●/);
+});
+
 test("tooltip não gera novas mutações ao repetir o mesmo motivo", () => {
   let texto = "", escritas = 0;
   const elemento = {get textContent() { return texto; },set textContent(valor) { texto = valor; escritas++; }};

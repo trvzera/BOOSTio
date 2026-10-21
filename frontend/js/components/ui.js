@@ -11,7 +11,8 @@ const arquivos = {
 const alternativas = {plus:"+",trash:"×",cart:"↗",import:"→",arrow:"→",chevron:"⌄",checkbox:"✓",
   lock:"▣",visibility:"◉",pencil:"✎",clone:"▢",copy:"⧉",download:"↓",
   dots:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="20" cy="12" r="2"/></svg>',
-  hamburger:"☰",login:"→",signup:"+",build:"▦",user:"●",
+  hamburger:"☰",login:"→",signup:"+",build:"▦",
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="4"/><path d="M2 21v-3a7 7 0 0 1 10-6.3M16 12v2m0 6v2m-5-5h2m6 0h2m-8.5-3.5 1.4 1.4m4.2 4.2 1.4 1.4m0-7-1.4 1.4m-4.2 4.2-1.4 1.4"/><circle cx="16" cy="17" r="3"/></svg>',
   profile:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></svg>',logout:"←",
   circledot:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>',
   magnifying:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 6 6"/></svg>',
@@ -40,7 +41,13 @@ export function iniciarIcones(raiz = document) {
     const arquivo = arquivos[elemento.dataset.lottie];
     if (!arquivo) return;
     try {
-      const animacao = await registrarAnimacao(elemento.id,new URL("../../lottie/" + arquivo,import.meta.url).href);
+      // user.json usa uma composição 1000×1000 com o desenho concentrado no centro.
+      // Enquadra a área útil, incluindo o giro da engrenagem, sem escalar o SVG via CSS
+      // (o renderer aplica seu próprio transform inline) ou aumentar o espaço do menu.
+      const opcoes = elemento.dataset.lottie === "user"
+        ? {rendererSettings:{viewBoxSize:"175 170 750 750",preserveAspectRatio:"xMidYMid meet"}}
+        : {};
+      const animacao = await registrarAnimacao(elemento.id,new URL("../../lottie/" + arquivo,import.meta.url).href,opcoes);
       if (!animacao) return;
       if (!elemento.isConnected) { destruirAnimacao(elemento.id,animacao); return; }
       const controle = elemento.closest("button,a,label,summary");
