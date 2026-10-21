@@ -1,6 +1,7 @@
 import { htmlSeguro as h, moeda, nomePeca } from "../build/catalogo.js";
 import { itensCategoria } from "../build/estado.js";
 import { pecaCompativel, selecionarPecaCompativel } from "../build/compatibilidade.js";
+import { avaliarTrocaMelhoria, exigirTrocaMelhoria } from "../build/validar-melhoria.js";
 
 const CATEGORIAS = [
   { id:"processador", nome:"Processador" },
@@ -43,6 +44,7 @@ export function iniciarTesteMelhorias({builds,catalogo,valorBudget,informar}) {
     for (const {id} of CATEGORIAS) {
       const peca = escolhas.get(id);
       if (!peca) continue;
+      exigirTrocaMelhoria(original,peca,catalogo);
       const componentes = {...proxima.componentes};
       delete componentes[id];
       proxima = selecionarPecaCompativel({...proxima,componentes},peca,catalogo);
@@ -71,9 +73,10 @@ export function iniciarTesteMelhorias({builds,catalogo,valorBudget,informar}) {
       const base = {...simulada,travada:false,componentes};
       const disponivelParaCategoria = budget - gasto(trocas) + Number(trocas.get(categoria)?.preco || 0);
       const candidatas = catalogo.filter(peca => peca.categoria === categoria && peca.id !== pecaAtual(original,categoria)?.id &&
+        avaliarTrocaMelhoria(original,peca,catalogo).permitida &&
         !peca.esgotado && Number(peca.preco) <= disponivelParaCategoria && pecaCompativel(base,peca,catalogo))
         .sort((a,b) => a.preco - b.preco).slice(0,3);
-      if (!candidatas.length) return '<section class="test-candidate-group"><h3 class="font-1-m-b">' + rotulo + '</h3><p class="font-2-xs test-muted">Nenhuma candidata compatível foi encontrada no catálogo demonstrativo.</p></section>';
+      if (!candidatas.length) return '<section class="test-candidate-group"><h3 class="font-1-m-b">' + rotulo + '</h3><p class="font-2-xs test-muted">Nenhuma melhoria verificável disponível. CPU/GPU precisam de benchmarks comparáveis; preço, nome e especificações isoladas não comprovam uma melhoria.</p></section>';
       return '<section class="test-candidate-group"><h3 class="font-1-m-b">' + rotulo + '</h3><div class="test-candidate-list">' +
         candidatas.map(peca => {
           const escolhida = trocas.get(categoria)?.id === peca.id;

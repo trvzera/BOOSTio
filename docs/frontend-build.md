@@ -8,6 +8,31 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
 
 ### Busca de melhorias e responsividade — 21/10/2026
 
+- **Filtro contra trocas inferiores:** `build/validar-melhoria.js` é compartilhado
+  pelo modal real e pelo laboratório. A regra filtra as sugestões e é reexecutada
+  ao selecionar/simular e imediatamente antes de confirmar, sem inferir desempenho
+  pelo preço, nome, geração, GHz, núcleos, VRAM ou potência da fonte.
+- RAM preserva capacidade total e número total de pentes, geração DDR, frequência
+  e latência CAS relativa à frequência. SSD/HD preservam a capacidade total dos
+  itens substituídos; SSD compara leitura/gravação e HD compara RPM/cache. Para
+  modelos mistos, preserva o melhor valor informado de cada velocidade/latência,
+  além da capacidade somada. Isto é um filtro das métricas disponíveis, não uma
+  previsão de FPS, IOPS ou desempenho em qualquer carga.
+- Peça própria sem identificação, quantidade inválida, medida ausente ou categoria
+  sem critérios suficientes não é aprovada por suposição. O catálogo atual não
+  fornece benchmarks comparáveis de CPU/GPU: essas substituições ficam bloqueadas,
+  assim como as demais categorias sem critérios confiáveis. Uma GPU dedicada também
+  não é presumida superior ao vídeo integrado. Adições em categorias vazias seguem
+  as regras de orçamento/compatibilidade; repetir modelo atual não é upgrade.
+- A montagem manual continua livre para escolher peças compatíveis. A política é
+  da busca de melhorias no frontend, não uma autorização de segurança do servidor.
+  Ainda falta definir e integrar dados de desempenho/qualidade por categoria e
+  revalidá-los em um fluxo de melhorias no Python. Não são feitas consultas de
+  benchmark em massa ou criados rankings fictícios.
+- Validação do filtro: 287 testes Node, incluindo 57 casos do módulo e integração,
+  e 43 verificações Chrome com API simulada em 320/768/1440 px. Seleção forjada de
+  downgrade rejeitada, opções válidas salvas e mesma política no menu do card.
+
 - `build/melhorias.js` separa as sugestões e a prévia em duas colunas no desktop.
   Até 900 px, usa abas **Escolher peças** e **Revisar trocas**, com contador,
   navegação pelas setas/Home/End e foco preservado após selecionar/remover peças.

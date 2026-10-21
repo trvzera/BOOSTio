@@ -5,6 +5,7 @@ import { planejamentoLocal } from "./planejamento.js";
 import { abrirDialogoBuild } from "./acoes-build.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { iniciarDetalhesAnimados } from "../components/animated-details.js";
+import { avaliarTrocaMelhoria, exigirTrocaMelhoria } from "./validar-melhoria.js";
 
 const CATEGORIAS = categoriasCatalogo;
 const MOTIVO_TRAVA = "Destranque a build para buscar e aplicar melhorias.";
@@ -37,7 +38,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     + '<fieldset class="upgrade-real-categories"><legend class="sr-only">Selecione uma ou mais categorias</legend>'
     + CATEGORIAS.map(categoria => '<label><input type="checkbox" name="upgrade-real-category" value="' + categoria.id
       + '" ' + (categorias.has(categoria.id) ? 'checked' : '') + '><span>' + categoria.nome + '</span></label>').join("") + '</fieldset></details>'
-    + '<details class="upgrade-real-help" data-animated-details><summary>O que considerar antes de trocar<span class="upgrade-real-chevron" aria-hidden="true"></span></summary><p class="planning-help">As sugestões são ordenadas por preço, não por ganho de desempenho medido. RAM, discos e fans substituem a categoria por uma unidade/kit; ajuste quantidades no editor.</p></details>'
+    + '<details class="upgrade-real-help" data-animated-details><summary>O que considerar antes de trocar<span class="upgrade-real-chevron" aria-hidden="true"></span></summary><p class="planning-help">As sugestões são ordenadas por preço, não por ganho de desempenho medido. Trocas inferiores nos dados comparados ou sem dados suficientes ficam bloqueadas. RAM e discos substituem a categoria por uma unidade/kit; o total atual é considerado para não perder capacidade. CPU/GPU e outras categorias aguardam critérios de desempenho comparáveis.</p></details>'
     + '<div class="upgrade-real-results" id="upgrade-real-results"></div></div></section>'
     + '<section class="upgrade-real-preview" id="upgrade-preview" aria-labelledby="upgrade-real-preview-title"><div class="upgrade-real-pane-heading"><h3 id="upgrade-real-preview-title" tabindex="-1">Sua prévia</h3><span>Antes de salvar</span></div>'
     + '<div class="upgrade-real-preview-scroll upgrade-real-scroll" tabindex="0" role="region" aria-label="Revisão das trocas e dos valores"><div id="upgrade-real-differences"></div><p class="planning-help" id="upgrade-real-apply-reason"></p></div></section></div>'
@@ -137,6 +138,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
       const peca = pecaPorId(id,escolhas.get(id));
       if (!peca || peca.esgotado) throw new Error(rotulo + ": a peça escolhida está indisponível no catálogo.");
       if (centavos(peca.preco) == null) throw new Error(rotulo + ": a peça escolhida não tem preço válido.");
+      exigirTrocaMelhoria(original,peca,catalogo);
       return peca;
     });
   }
@@ -167,12 +169,18 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     if (budget() == null) { resultados.innerHTML = '<p class="planning-help">' + MOTIVO_BUDGET + '</p>'; return; }
     if (!categorias.size) { resultados.innerHTML = '<p class="planning-help">Selecione uma ou mais categorias para consultar as peças.</p>'; return; }
     resultados.innerHTML = CATEGORIAS.filter(({id}) => categorias.has(id)).map(categoria => {
-      const candidatas = [], conflitos = new Set();
-      let foraDoBudget = 0, indisponiveis = 0;
+      const candidatas = [], conflitos = new Set(), comparacoesPendentes = new Set();
+      let foraDoBudget = 0, indisponiveis = 0, inferiores = 0, semComparacao = 0;
       for (const peca of catalogo) {
         if (peca.categoria !== categoria.id || peca.id === atual(original,categoria.id)?.id) continue;
         const preco = centavos(peca.preco);
         if (peca.esgotado || preco == null) { indisponiveis++; continue; }
+        const comparacao = avaliarTrocaMelhoria(original,peca,catalogo);
+        if (!comparacao.permitida) {
+          if (comparacao.codigo === "regressao") inferiores++;
+          else if (comparacao.codigo !== "mesma-peca") { semComparacao++; comparacoesPendentes.add(comparacao.motivo); }
+          continue;
+        }
         const propostas = new Map(trocas);
         propostas.set(categoria.id,peca.id);
         try {
@@ -184,7 +192,9 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
       }
       candidatas.sort((a,b) => centavos(a.preco) - centavos(b.preco) || nome(a).localeCompare(nome(b),"pt-BR"));
       const exclusoes = [foraDoBudget ? foraDoBudget + " opções excedem o budget combinado." : "",
-        indisponiveis ? indisponiveis + " opções indisponíveis ou sem preço válido." : ""].filter(Boolean).join(" ");
+        indisponiveis ? indisponiveis + " opções indisponíveis ou sem preço válido." : "",
+        inferiores ? inferiores + " opções inferiores nos dados comparados foram ocultadas." : "",
+        semComparacao ? semComparacao + " opções sem comparação segura não são sugeridas." : ""].filter(Boolean).join(" ");
       return '<section class="upgrade-real-group"><div class="upgrade-real-group-heading"><h3>' + categoria.nome + '</h3><span>' + candidatas.length + (candidatas.length === 1 ? ' opção' : ' opções') + '</span></div><p class="upgrade-real-current"><span>Na build</span> '
         + h(nomeAtual(original,categoria.id)) + '</p>'
         + (candidatas.length ? '<div class="upgrade-real-candidates">' + candidatas.map(peca => {
@@ -194,7 +204,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
             + '" data-upgrade-category="' + categoria.id + '" aria-pressed="' + selecionada
             + '" aria-label="' + h(nome(peca) + " · " + preco + " · " + (selecionada ? "Na prévia" : "Adicionar à prévia")) + '"><span class="upgrade-real-candidate-image">' + imagemPeca(peca) + '</span><span class="upgrade-real-candidate-copy"><strong>' + h(nome(peca))
             + '</strong><span class="upgrade-real-candidate-price">' + h(preco) + '</span></span><span class="upgrade-real-candidate-action">' + acao + '</span></button>';
-        }).join("") + '</div>' : '<p class="planning-help">Nenhuma candidata compatível disponível dentro do budget combinado para esta combinação.</p>')
+        }).join("") + '</div>' : '<p class="planning-help">' + h(comparacoesPendentes.size ? [...comparacoesPendentes][0] : "Nenhuma troca sem regressão verificável e compatível disponível dentro do budget combinado.") + '</p>')
         + (exclusoes ? '<p class="planning-help">' + h(exclusoes) + '</p>' : '')
         + (conflitos.size ? '<details class="upgrade-real-conflicts"><summary>Por que algumas opções não aparecem?</summary><ul>'
           + [...conflitos].map(motivo => '<li>' + h(motivo) + '</li>').join("") + '</ul></details>' : '') + '</section>';

@@ -60,7 +60,7 @@ As limitações de cada funcionalidade estão indicadas na última coluna.
 | 06 | Excluir configurações salvas | ✅ **Implementado** | Exclusão com verificação de proprietário e tranca. |
 | 07 | Comparar configurações salvas | 🟡 **Parcial** | Preços, componentes, consumo e renderização no Blender de duas ou três builds; comparação de FPS ainda pendente. |
 | 08 | Compartilhar configurações por link | ✅ **Implementado** | Links de builds públicas e controle de visibilidade; páginas internas exigem sessão. |
-| 09 | Buscar melhorias do setup | 🟡 **Parcial** | Prévia e aplicação de trocas em todas as categorias; ganhos de desempenho e ofertas atualizadas a consolidar. |
+| 09 | Buscar melhorias do setup | 🟡 **Parcial** | Prévia e aplicação com bloqueio de regressões de RAM/SSD/HD. Trocas de CPU/GPU e demais categorias aguardam critérios comparáveis; sem dados, não são liberadas como melhorias. |
 | 10 | Ver configurações prontas | ✅ **Implementado** | 16 modelos sem periféricos, ordenados do menor para o maior preço cadastrado. |
 | 11 | Editar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento. |
 | 12 | Consultar preços das peças pelo site | 🟡 **Parcial** | Preços cadastrados, data de atualização quando disponível e links das lojas; monitoramento contínuo em evolução. |
