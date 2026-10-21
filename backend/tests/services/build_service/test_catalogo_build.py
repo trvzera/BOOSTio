@@ -8,11 +8,14 @@ from models import PlacaVideo
 @pytest.mark.parametrize("data", [datetime(2026, 10, 20, 15, 30),
                                  datetime(2026, 10, 20, 12, 30, tzinfo=timezone(timedelta(hours=-3)))])
 def test_catalogo_expoe_data_do_preco_com_fuso_sem_mudar_o_modelo(data):
-    peca = PlacaVideo(id=1, modelo="GPU", preco=100, preco_atualizado_em=data)
+    peca = PlacaVideo(id=1, modelo="GPU", preco=100, preco_atualizado_em=data,
+                     imagem_url="../imgs/produtos/placa_video-1.webp")
     catalogo = peca.to_catalogo()
     assert datetime.fromisoformat(catalogo["preco_atualizado_em"]).astimezone(timezone.utc) == datetime(2026, 10, 20, 15, 30, tzinfo=timezone.utc)
     assert peca.preco_atualizado_em is data
     assert catalogo["id"] == "placa_video:1"
+    assert catalogo["imagem"] == "../imgs/produtos/placa_video-1.webp"
+    assert "imagem_url" not in catalogo
 
 
 def test_nao_inventa_atualizacao_e_estoque_nao_renova_data_do_preco():

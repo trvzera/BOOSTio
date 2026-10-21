@@ -7,17 +7,22 @@ class Peca(ModeloBase):
   __abstract__ = True
   
   fabricante = db.Column(db.String(30),nullable = False)
-  modelo = db.Column(db.String(30),nullable = False)
+  modelo = db.Column(db.String(120),nullable = False)
   consumo_energia = db.Column(db.Float(),nullable = False)
   preco = db.Column(db.Float(),nullable = False)
   part_number = db.Column(db.String(100), nullable=True)
   kabum_external = db.Column(db.Text, nullable=True)
   preco_atualizado_em = db.Column(db.DateTime, nullable=True)
   esgotado = db.Column(db.Boolean(), nullable=False, default=False)
+  imagem_url = db.Column(db.Text, nullable=True)
 
   @classmethod
   def com_link_kabum(cls):
     return cls.query.filter(cls.kabum_external.isnot(None), cls.kabum_external != "").all()
+
+  @classmethod
+  def sem_imagem_com_link(cls):
+    return cls.query.filter(cls.imagem_url.is_(None), cls.kabum_external.isnot(None), cls.kabum_external != "").all()
 
   @classmethod
   def restaurar_links_ausentes(cls, links):
@@ -54,7 +59,12 @@ class Peca(ModeloBase):
     if data and data.tzinfo is None:
       data = data.replace(tzinfo=timezone.utc)
     dados["preco_atualizado_em"] = data.isoformat() if data else None
+    dados["imagem"] = dados.pop("imagem_url", None)
     return dados
+
+  def definir_imagem(self, caminho):
+    self.imagem_url = caminho
+    db.session.commit()
 
   def aplicar_cotacao(self, resultado, atualizado_em):
     if resultado["preco"] is not None:

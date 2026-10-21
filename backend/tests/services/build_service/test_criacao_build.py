@@ -258,6 +258,24 @@ def test_contas_que_ja_excederam_limite_nao_perdem_builds(app_build):
         assert len(BuildSalva.listar_por_usuario(1)) == 4
 
 
+def test_geracao_de_rede_preserva_opcao_sem_perifericos_e_criacao_limitada(app_build, mocker):
+    tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "cabo_rede"]
+    rede = {"tipo": "cabo", "possuiAcessorio": False, "comprimentoMetros": 2}
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+        llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
+            **PEDIDO, "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos],
+        })
+        resposta = CriarBuildService().executar(1, {**PEDIDO, "rede": rede})
+        assert resposta["estado"]["rede"] == rede
+        assert resposta["estado"]["incluirRede"]
+        assert not resposta["estado"]["incluirPerifericos"]
+        assert resposta["estado"]["percentualPerifericos"] == 0
+        assert resposta["estado"]["componentes"]["cabo_rede"]["id"] == 1
+        assert Build.query.count() == BuildSalva.query.count() == 1
+        assert "# REDE" in llm.call_args.args[0]
+
+
 def test_orcamento_nao_aceita_fracao_de_centavo(app_build, mocker):
     llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
     with app_build.app_context(), pytest.raises(ValueError, match="casas decimais"):

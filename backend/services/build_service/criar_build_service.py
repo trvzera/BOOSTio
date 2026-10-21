@@ -23,6 +23,7 @@ class CriarBuildService:
     "quantidade_portas_sata", "interface", "compatibilidade", "esgotado",
     "comprimento_mm", "altura_mm", "tamanho_max_gpu_mm", "tamanho_max_cooler_mm",
     "suporte_water_cooler", "tamanho_radiador_mm", "radiadores_suportados_mm",
+    "padrao_wifi", "velocidade_mbps", "bluetooth", "categoria", "comprimento_m", "conector",
   )
 
   def executar(self, usuario_id, dados, modelo="gemini-3.5-flash-lite"):
@@ -52,6 +53,8 @@ class CriarBuildService:
       excluidas.update(("ssd", "hd"))
     if {"air_cooler", "water_cooler"} & excluidas:
       excluidas.update(("air_cooler", "water_cooler"))
+    acessorio_rede = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
+    excluidas.update({"adaptador_wifi", "cabo_rede"} - ({acessorio_rede} if rede.get("possuiAcessorio") is False else set()))
     catalogo = self._gerar_catalogo(orcamento - margem, orcamento if percentual else 0, excluidas)
     disponiveis = set(catalogo) | set(proprias)
     obrigatorias = {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"}
@@ -60,11 +63,14 @@ class CriarBuildService:
     if percentual and not self.PERIFERICOS <= disponiveis:
       raise ValueError("Não foi possível gerar uma configuração dentro do orçamento informado com os periféricos disponíveis. Ajuste o orçamento ou revise as peças.")
 
+    if acessorio_rede and rede.get("possuiAcessorio") is False and acessorio_rede not in disponiveis:
+      raise ValueError("Não há acessório de rede com preço e disponibilidade confirmados")
+
     detalhes_proprias = self._detalhes_proprias(proprias)
     resposta = LLMService().executar(self._criar_prompt(
       dados, orcamento, margem, catalogo, percentual, detalhes_proprias), modelo)
     build = json.loads(resposta) if isinstance(resposta, str) else resposta
-    dados_build = self._validar_build(build, catalogo, orcamento, percentual, proprias, detalhes_proprias)
+    dados_build = self._validar_build(build, catalogo, orcamento, percentual, proprias, detalhes_proprias, rede)
     if proprias:
       return AvaliarCompatibilidadeService().para_resposta(BuildSalva.criar_gerada_com_pecas_proprias(usuario_id, dados_build, proprias, rede, percentual))
 
@@ -121,6 +127,7 @@ class CriarBuildService:
   @staticmethod
   def _criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None):
     pedido = {campo: dados[campo] for campo in ("nome", "descricao", "utilidade")}
+    pedido["rede"] = dados.get("rede") or {}
     proprias = proprias or {}
     pc, perifericos = CriarBuildService._dividir_orcamento(orcamento, percentual)
     teto_peca = orcamento - margem
@@ -243,6 +250,12 @@ class CriarBuildService:
         "- Se faltar uma dessas categorias no catálogo e o usuário não a possuir, "
         "retorne o JSON de erro; nunca invente um produto.\n\n"
 
+        "# REDE\n"
+        "Se rede.possuiAcessorio for false, inclua exatamente um cabo_rede para tipo cabo "
+        "ou um adaptador_wifi para tipo wifi, respeitando o comprimento solicitado quando houver. "
+        "Adaptadores USB servem quando não há slot PCIe livre. Se o usuário já possui o "
+        "acessório ou ainda vai confirmar, não acrescente nenhum. Nunca inclua ambos.\n\n"
+
         "# COMPATIBILIDADE (confira cada item)\n"
         "- Socket: o do processador deve ser igual ao da placa_mae.\n"
         "- Memória: tipo (ex.: DDR4/DDR5), quantidade de módulos e capacidade "
@@ -282,7 +295,7 @@ class CriarBuildService:
     )
 
   @staticmethod
-  def _validar_build(build, catalogo, orcamento, percentual=0, proprias=None, detalhes_proprias=None):
+  def _validar_build(build, catalogo, orcamento, percentual=0, proprias=None, detalhes_proprias=None, rede=None):
     if isinstance(build, dict) and build.get("erro"):
       raise ValueError("Não foi possível gerar uma configuração dentro do orçamento informado. Ajuste o valor ou revise as peças.")
     if not isinstance(build, dict) or not isinstance(build.get("componentes"), list):
@@ -320,6 +333,12 @@ class CriarBuildService:
     if total > Decimal(str(orcamento)):
       raise ValueError("Não foi possível gerar uma configuração dentro do orçamento informado. Ajuste o valor ou revise as peças.")
     finais = set(tipos) | set(proprias)
+    rede = rede or {}
+    acessorio = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
+    escolhidos_rede = set(tipos) & {"adaptador_wifi", "cabo_rede"}
+    esperado_rede = {acessorio} if acessorio and rede.get("possuiAcessorio") is False and acessorio not in proprias else set()
+    if escolhidos_rede != esperado_rede:
+      raise ValueError("A IA não respeitou a escolha de conexão da build")
     if percentual and not CriarBuildService.PERIFERICOS <= finais:
       raise ValueError("A IA não incluiu os periféricos solicitados. Tente novamente.")
     if not {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"} <= finais or not {"ssd", "hd"} & finais:

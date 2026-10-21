@@ -62,6 +62,26 @@ class CriarBuildPerifericosTest(unittest.TestCase):
             CriarBuildService._validar_build(self.build, self.catalogo, 2000, percentual=20,
                                             proprias={"monitor": "Meu monitor"})
 
+    def test_rede_exige_somente_o_acessorio_escolhido(self):
+        catalogo = {**self.catalogo,
+                    "adaptador_wifi": [{"id": 20, "fabricante": "TP-Link", "modelo": "Archer", "preco": 100}],
+                    "cabo_rede": [{"id": 21, "fabricante": "Ugreen", "modelo": "CAT6", "preco": 30}]}
+        build = {**self.build, "componentes": [*self.build["componentes"],
+            {"tipo": "adaptador_wifi", "id": 20, "quantidade": 1}]}
+        rede = {"tipo": "wifi", "possuiAcessorio": False}
+        self.assertEqual(CriarBuildService._validar_build(build, catalogo, 2000, rede=rede)["preco_total"], 1100)
+        with self.assertRaisesRegex(ValueError, "conexão"):
+            CriarBuildService._validar_build(build, catalogo, 2000, rede={"tipo": "cabo", "possuiAcessorio": False})
+
+    def test_acessorio_de_rede_proprio_nao_precisa_ser_comprado(self):
+        build = {**self.build, "componentes": [item.copy() for item in self.build["componentes"]]}
+        validada = CriarBuildService._validar_build(
+            build, self.catalogo, 2000,
+            proprias={"adaptador_wifi": "Meu adaptador"},
+            rede={"tipo": "wifi", "possuiAcessorio": True},
+        )
+        self.assertEqual(validada["preco_total"], 1000)
+
 
 if __name__ == "__main__":
     unittest.main()

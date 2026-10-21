@@ -14,9 +14,13 @@ from models import (
   Teclado,
   Mouse,
   Monitor,
+  PlacaRede,
+  CaboRede,
 )
 from .atualizar_precos_service import AtualizarPrecosService
 from .restaurar_links_kabum_service import RestaurarLinksKabumService
+from .pecas_estudo_medio import pecas_estudo_medio
+from .pecas_basicas_medias import pecas_basicas_medias
 
 
 class PopularPecasService:
@@ -25,6 +29,12 @@ class PopularPecasService:
   def executar(self, limite: int | None = None, intervalo: float = 1.0, atualizar_precos: bool = True):
     for classe, itens in self._dados_seed().items():
       self._popular_classe(classe, itens)
+    PlacaRede.atualizar_links_antigos({
+      "https://www.kabum.com.br/produto/1049525/adaptador-wi-fi-tp-link-archer-t2u-plus-ac600-dual-band-usb-2-0-600mbps-antena-externa-compativel-windows-mac":
+        "https://www.kabum.com.br/produto/173198/adaptador-wireless-tp-link-archer-t2u-plus-ac600-usb-dual-band",
+      "https://www.kabum.com.br/produto/101797/adaptador-wireless-tp-link-usb-3-0-ac1300-archer-t3u":
+        "https://www.kabum.com.br/produto/169217/adaptador-de-rede-tp-link-archer-t3u-wireless-omni-direcional-usb-mini-dual-band-mu-mimo-ac1300",
+    })
     RestaurarLinksKabumService().executar()
     if atualizar_precos:
       return AtualizarPrecosService().executar(limite=limite, intervalo=intervalo)
@@ -34,7 +44,7 @@ class PopularPecasService:
     print(f"[seed] {classe.__name__}: {novos} inseridos, {len(itens) - novos} já cadastrados")
 
   def _dados_seed(self) -> dict:
-    return {
+    dados = {
       Processador: self._processadores(),
       PlacaMae: self._placas_mae(),
       PlacaVideo: self._placas_video(),
@@ -50,7 +60,52 @@ class PopularPecasService:
       Teclado: self._teclados(),
       Mouse: self._mouses(),
       Monitor: self._monitores(),
+      PlacaRede: self._placas_rede(),
+      CaboRede: self._cabos_rede(),
     }
+    for modelo, itens in pecas_estudo_medio().items():
+      dados[modelo].extend(itens)
+    for modelo, itens in pecas_basicas_medias().items():
+      dados[modelo].extend(itens)
+    return dados
+
+  @staticmethod
+  def _placas_rede() -> list[dict]:
+    # Inclui USB para placas-mãe sem slot PCIe livre.
+    modelos = [
+      ("Archer T2U Plus", "USB 2.0", "Wi-Fi 5", 600, False,
+       "https://www.kabum.com.br/produto/173198/adaptador-wireless-tp-link-archer-t2u-plus-ac600-usb-dual-band"),
+      ("Archer T3U", "USB 3.0", "Wi-Fi 5", 1300, False,
+       "https://www.kabum.com.br/produto/169217/adaptador-de-rede-tp-link-archer-t3u-wireless-omni-direcional-usb-mini-dual-band-mu-mimo-ac1300"),
+      ("Archer TX20E", "PCIe x1", "Wi-Fi 6", 1800, True,
+       "https://www.kabum.com.br/produto/577184/adaptador-tp-link-archer-tx20e-wi-fi-6-pcie-ax1800-dual-band-bluetooth-5-2"),
+      ("Archer T2U Nano", "USB 2.0", "Wi-Fi 5", 600, False,
+       "https://www.kabum.com.br/produto/186560/adaptador-tp-link-usb-nano-archer-t2u-nano-ac600"),
+      ("Archer T3U Plus", "USB 3.0", "Wi-Fi 5", 1300, False,
+       "https://www.kabum.com.br/produto/503880/adaptador-tp-link-wifi-usb-archer-t3u-plus-ac1300"),
+    ]
+    return [{"fabricante": "TP-Link", "modelo": nome, "consumo_energia": 5.0,
+             "preco": 0, "part_number": f"REDE-{nome.upper().replace(' ', '-')}",
+             "kabum_external": link, "esgotado": True,
+             "interface": interface, "padrao_wifi": padrao,
+             "velocidade_mbps": velocidade, "bluetooth": bluetooth}
+            for nome, interface, padrao, velocidade, bluetooth, link in modelos]
+
+  @staticmethod
+  def _cabos_rede() -> list[dict]:
+    modelos = (
+      (1, "https://www.kabum.com.br/produto/674612/cabo-de-rede-rj45-ugreen-cat6-utp-macho-1-metro-preto-"),
+      (2, "https://www.kabum.com.br/produto/674611/cabo-de-rede-rj45-ugreen-cat6-utp-macho-2-metros-preto-"),
+      (3, "https://www.kabum.com.br/produto/674538/cabo-de-rede-rj45-ugreen-cat6-utp-macho-3-metros-preto-"),
+      (5, "https://www.kabum.com.br/produto/674308/cabo-de-rede-rj45-ugreen-cat6-utp-macho-5-metros-preto-"),
+      (10, "https://www.kabum.com.br/produto/674347/cabo-de-rede-lan-rj45-ugreen-10gbps-cat6-10-metros-preto"),
+    )
+    return [{"fabricante": "Ugreen", "modelo": f"Cabo CAT6 UTP {tamanho}m",
+             "consumo_energia": 0.0, "preco": 0,
+             "part_number": f"REDE-CAT6-UGREEN-{tamanho}",
+             "kabum_external": link, "esgotado": True,
+             "categoria": "CAT6", "comprimento_m": tamanho, "conector": "RJ45"}
+            for tamanho, link in modelos]
 
   def _processadores(self) -> list[dict]:
     base = [

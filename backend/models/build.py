@@ -46,6 +46,8 @@ class Build(ModeloBase):
     teclado_id = db.Column(db.Integer, db.ForeignKey("teclado.id"), nullable=True)
     mouse_id = db.Column(db.Integer, db.ForeignKey("mouse.id"), nullable=True)
     fone_id = db.Column(db.Integer, db.ForeignKey("fone.id"), nullable=True)
+    adaptador_wifi_id = db.Column(db.Integer, db.ForeignKey("adaptador_wifi.id"), nullable=True)
+    cabo_rede_id = db.Column(db.Integer, db.ForeignKey("cabo_rede.id"), nullable=True)
 
     usuario = db.relationship("Usuario", backref="builds")
     
@@ -67,6 +69,8 @@ class Build(ModeloBase):
     teclado = db.relationship("Teclado", backref="builds")
     mouse = db.relationship("Mouse", backref="builds")
     fone = db.relationship("Fone", backref="builds")
+    adaptador_wifi = db.relationship("PlacaRede", backref="builds")
+    cabo_rede = db.relationship("CaboRede", backref="builds")
  
 
     CAMPOS_PECAS = (
@@ -85,6 +89,8 @@ class Build(ModeloBase):
         "teclado",
         "mouse",
         "fone",
+        "adaptador_wifi",
+        "cabo_rede",
     )
  
     # Multiplicadores por peça — usados no preço total.
@@ -108,6 +114,8 @@ class Build(ModeloBase):
         por_tipo = {item["tipo"]: item for item in componentes}
         if len(por_tipo) != len(componentes):
             raise ValueError("A build contém categorias de peças repetidas")
+        if set(por_tipo) - set(cls.CAMPOS_PECAS):
+            raise ValueError("A build contém uma categoria inválida")
         obrigatorias = ("processador", "placa_mae", "memoria_ram", "fonte", "gabinete")
         if any(tipo not in por_tipo for tipo in obrigatorias) or not ({"ssd", "hd"} & por_tipo.keys()):
             raise ValueError("A build gerada não contém todas as peças obrigatórias")
@@ -140,6 +148,7 @@ class Build(ModeloBase):
                     "fabricante": peca.fabricante,
                     "modelo": peca.modelo,
                     "link": peca.kabum_external,
+                    "imagem": peca.imagem_url,
                     "esgotado": peca.esgotado,
                 } if incluir_links else {}),
             }
