@@ -238,6 +238,18 @@ O primeiro comando preserva links já cadastrados. O segundo pode ser executado
 diariamente; registra preço e estoque apenas quando a loja fornece uma oferta
 válida. Peças sem cotação continuam fora das sugestões de builds.
 
+Para baixar a foto principal dos anúncios cadastrados, execute uma vez (ou retome
+após uma interrupção):
+
+```bash
+python -m flask --app app pecas-imagens
+```
+
+O comando ignora peças que já têm foto, verifica o código do anúncio e salva os
+arquivos em `frontend/imgs/produtos`. Use `--limite 20` para um teste pequeno ou
+`--categoria monitor` para uma categoria. A migração da coluna `imagem_url` roda
+automaticamente na inicialização do backend.
+
 ### Frontend
 
 Sirva a raiz do projeto com o **Live Server** do VS Code, na porta `5500`:

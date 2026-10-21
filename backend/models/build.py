@@ -138,6 +138,7 @@ class Build(ModeloBase):
                     "fabricante": peca.fabricante,
                     "modelo": peca.modelo,
                     "link": peca.kabum_external,
+                    "imagem": peca.imagem_url,
                     "esgotado": peca.esgotado,
                 } if incluir_links else {}),
             }

@@ -21,12 +21,13 @@ class SalvarPecaService:
                 peca.preco_atualizado_em = None
                 peca.esgotado = True
                 peca.preco = 0
+                peca.imagem_url = None
             campos["kabum_external"] = url
         if peca_id is None:
             peca.preco = 0
             peca.esgotado = True
         for campo, valor in campos.items():
-            if campo not in classe.__table__.columns or campo in {"id", "criado_em", "atualizado_em", "preco_atualizado_em"}:
+            if campo not in classe.__table__.columns or campo in {"id", "criado_em", "atualizado_em", "preco_atualizado_em", "imagem_url"}:
                 raise ValueError(f"Campo de peça inválido: {campo}")
             setattr(peca, campo, valor)
         try:

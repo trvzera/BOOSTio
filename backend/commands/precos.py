@@ -1,6 +1,8 @@
 import json
+import time
 
 import click
+import requests
 
 from services.peca_service.migrar_links_service import MigrarLinksService
 from services.peca_service.popular_pecas_service import PopularPecasService
@@ -8,6 +10,7 @@ from services.peca_service.atualizar_precos_service import AtualizarPrecosServic
 from services.peca_service.salvar_peca_service import SalvarPecaService
 from services.peca_service.restaurar_links_kabum_service import RestaurarLinksKabumService
 from services.peca_service.modelos_pecas import MODELOS_PECAS
+from services.peca_service.atualizar_imagem_peca_service import AtualizarImagemPecaService
 
 
 def registrar_comandos_precos(app):
@@ -44,3 +47,42 @@ def registrar_comandos_precos(app):
                   help="Segundos entre requisições à KaBuM.")
     def atualizar(limite, intervalo):
         click.echo(json.dumps(AtualizarPrecosService().executar(limite, intervalo), ensure_ascii=False))
+
+    @app.cli.command("pecas-imagens")
+    @click.option("--limite", type=click.IntRange(min=1), help="Quantidade máxima de anúncios; omitido, percorre todas as peças sem foto.")
+    @click.option("--intervalo", default=0.5, type=click.FloatRange(min=0), show_default=True,
+                  help="Segundos entre anúncios da KaBuM.")
+    @click.option("--categoria", multiple=True, type=click.Choice([c.__tablename__ for c in MODELOS_PECAS]),
+                  help="Restringe a coleta a uma ou mais categorias; omitido, percorre todas.")
+    def imagens(limite, intervalo, categoria):
+        """Baixa a foto principal validada dos anúncios cadastrados."""
+        resumo = {"consultas": 0, "salvas": 0, "falhas": 0, "bloqueada": False}
+        servico = AtualizarImagemPecaService()
+        for classe in MODELOS_PECAS:
+            if categoria and classe.__tablename__ not in categoria:
+                continue
+            for peca in classe.sem_imagem_com_link():
+                if limite is not None and resumo["consultas"] >= limite:
+                    break
+                if resumo["consultas"] and intervalo:
+                    time.sleep(intervalo)
+                resumo["consultas"] += 1
+                try:
+                    servico.executar(peca)
+                    resumo["salvas"] += 1
+                except requests.HTTPError as erro:
+                    resumo["falhas"] += 1
+                    status = erro.response.status_code if erro.response is not None else 0
+                    click.echo(f"{classe.__tablename__}:{peca.id}: HTTP {status}", err=True)
+                    if status in (401, 403, 429) or status >= 500:
+                        resumo["bloqueada"] = True
+                        break
+                except (requests.RequestException, ValueError, OSError) as erro:
+                    resumo["falhas"] += 1
+                    click.echo(f"{classe.__tablename__}:{peca.id}: {erro}", err=True)
+                if resumo["consultas"] % 25 == 0:
+                    click.echo(json.dumps(resumo, ensure_ascii=False))
+            if resumo["bloqueada"] or limite is not None and resumo["consultas"] >= limite:
+                break
+        resumo["manifesto"] = servico.exportar_manifesto()
+        click.echo(json.dumps(resumo, ensure_ascii=False))

@@ -34,13 +34,15 @@ export function categoriaCatalogo(id) {
 let carregamento;
 // Trocar somente este carregamento pela API quando /pecas/ estiver pronta.
 export function carregarCatalogo() {
-  carregamento ??= acompanharCarregamento(fetch(new URL("../../data/catalogo-demo.json", import.meta.url),{cache:"force-cache"})
-    .then((resposta) => {
+  carregamento ??= acompanharCarregamento(Promise.all([
+    fetch(new URL("../../data/catalogo-demo.json", import.meta.url),{cache:"force-cache"}),
+    fetch(new URL("../../data/imagens-produtos.json", import.meta.url),{cache:"no-cache"}),
+  ]).then(async ([resposta, imagens]) => {
       if (!resposta.ok) throw new Error("Não foi possível carregar o catálogo.");
-      return resposta.json();
-    }).then(catalogo => {
+      const catalogo = await resposta.json();
+      const mapa = imagens.ok ? await imagens.json() : {};
       try { sessionStorage.setItem("boostio:catalogo-pronto","1"); } catch {}
-      return completarCatalogoDemo(catalogo);
+      return completarCatalogoDemo(catalogo.map(peca => ({...peca, imagem:mapa[peca.part_number] || peca.imagem})));
     }).catch(erro => { carregamento = null; throw erro; }));
   return carregamento;
 }

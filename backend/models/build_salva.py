@@ -186,7 +186,8 @@ class BuildSalva(ModeloBase):
                     "nome": f"{peca.fabricante} {peca.modelo}" if peca else item["proprio"],
                     "preco": peca.preco if peca else 0, "quantidade": item["quantidade"],
                     **({"fabricante": peca.fabricante if peca else "", "modelo": peca.modelo if peca else item["proprio"],
-                        "link": peca.kabum_external if peca else None, "esgotado": peca.esgotado if peca else False} if incluir_links else {}),
+                        "link": peca.kabum_external if peca else None, "imagem": peca.imagem_url if peca else None,
+                        "esgotado": peca.esgotado if peca else False} if incluir_links else {}),
                 })
         return {
             "id": f"s-{self.id}", "nome": self.estado["titulo"], "descricao": self.estado.get("descricao", ""),
