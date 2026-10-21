@@ -19,6 +19,10 @@ class CriarBuildService:
     "videointegrado", "cooler", "quantidade_pentes", "conexao",
     "tamanho_polegadas", "resolucao", "taxa_atualizacao_hz",
     "tipo_painel", "layout", "switch", "mecanico", "dpi_max", "microfone",
+    "quantidade_slots_ram", "memoria_maxima_gb", "quantidade_slots_m2",
+    "quantidade_portas_sata", "interface", "compatibilidade", "esgotado",
+    "comprimento_mm", "altura_mm", "tamanho_max_gpu_mm", "tamanho_max_cooler_mm",
+    "suporte_water_cooler", "tamanho_radiador_mm", "radiadores_suportados_mm",
   )
 
   def executar(self, usuario_id, dados, modelo="gemini-3.5-flash-lite"):
@@ -56,10 +60,11 @@ class CriarBuildService:
     if percentual and not self.PERIFERICOS <= disponiveis:
       raise ValueError("Não foi possível gerar uma configuração dentro do orçamento informado com os periféricos disponíveis. Ajuste o orçamento ou revise as peças.")
 
+    detalhes_proprias = self._detalhes_proprias(proprias)
     resposta = LLMService().executar(self._criar_prompt(
-      dados, orcamento, margem, catalogo, percentual, self._detalhes_proprias(proprias)), modelo)
+      dados, orcamento, margem, catalogo, percentual, detalhes_proprias), modelo)
     build = json.loads(resposta) if isinstance(resposta, str) else resposta
-    dados_build = self._validar_build(build, catalogo, orcamento, percentual, proprias)
+    dados_build = self._validar_build(build, catalogo, orcamento, percentual, proprias, detalhes_proprias)
     if proprias:
       return AvaliarCompatibilidadeService().para_resposta(BuildSalva.criar_gerada_com_pecas_proprias(usuario_id, dados_build, proprias, rede, percentual))
 
@@ -277,7 +282,7 @@ class CriarBuildService:
     )
 
   @staticmethod
-  def _validar_build(build, catalogo, orcamento, percentual=0, proprias=None):
+  def _validar_build(build, catalogo, orcamento, percentual=0, proprias=None, detalhes_proprias=None):
     if isinstance(build, dict) and build.get("erro"):
       raise ValueError("Não foi possível gerar uma configuração dentro do orçamento informado. Ajuste o valor ou revise as peças.")
     if not isinstance(build, dict) or not isinstance(build.get("componentes"), list):
@@ -302,6 +307,11 @@ class CriarBuildService:
       quantidade = componente.get("quantidade", 1)
       if peca is None or type(quantidade) is not int or not 1 <= quantidade <= (64 if tipo in Build.QUANTIDADES else 1):
         raise ValueError("A IA escolheu uma peça ou quantidade inválida")
+      valor = peca.get("preco")
+      if isinstance(valor, bool) or not isinstance(valor, (int, float, Decimal)) or not isfinite(valor) or valor <= 0:
+        raise ValueError("Uma peça sugerida está sem preço válido no catálogo. Revise as peças ou tente novamente.")
+      if peca.get("esgotado") is True:
+        raise ValueError("Uma peça sugerida está indisponível no catálogo. Tente novamente.")
       componente["nome"] = f'{peca["fabricante"]} {peca["modelo"]}'
       componente["quantidade"] = quantidade
       componente["preco"] = peca["preco"]
@@ -314,6 +324,25 @@ class CriarBuildService:
       raise ValueError("A IA não incluiu os periféricos solicitados. Tente novamente.")
     if not {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"} <= finais or not {"ssd", "hd"} & finais:
       raise ValueError("A IA não completou as peças obrigatórias da build")
+    # Reutiliza o diagnóstico do servidor antes de persistir a sugestão da IA.
+    # O catálogo fornecido é o do Python, nunca especificações geradas pela LLM.
+    verificacao = [{**peca, "categoria": tipo} for tipo, itens in catalogo.items() for peca in itens]
+    componentes = {item["tipo"]: {"id": item["id"], "quantidade": item["quantidade"]}
+                   for item in build["componentes"]}
+    for tipo, nome in proprias.items():
+      especificacoes = (detalhes_proprias or {}).get(tipo, {}).get("especificacoes_confirmadas", {})
+      if especificacoes:
+        identificador = "proprio-" + tipo
+        verificacao.append({**especificacoes, "id": identificador, "categoria": tipo})
+        componentes[tipo] = {"id": identificador, "quantidade": 1}
+      else:
+        componentes[tipo] = {"proprio": nome, "quantidade": 1}
+    diagnostico = AvaliarCompatibilidadeService().executar({"componentes": componentes}, catalogo=verificacao)
+    if diagnostico["erros"]:
+      motivos = "; ".join(regra["titulo"] for regra in diagnostico["erros"])
+      raise ValueError("A configuração sugerida contém incompatibilidades: " + motivos + ". Revise as peças ou tente novamente.")
+    if diagnostico["pecasPendentes"]:
+      raise ValueError("A IA não completou as peças obrigatórias da build: " + ", ".join(diagnostico["pecasPendentes"]) + ". Tente novamente.")
     build["orcamento"] = orcamento
     build["preco_total"] = float(round(total, 2))
     return build

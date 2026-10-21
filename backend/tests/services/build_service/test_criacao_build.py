@@ -48,6 +48,10 @@ def cadastrar_pecas(tipos):
         for coluna in modelo.__table__.columns:
             if coluna.name not in dados and not coluna.nullable and not coluna.primary_key and not coluna.default and not coluna.server_default:
                 dados[coluna.name] = "Teste" if coluna.type.python_type is str else 1
+        if tipo == "processador":
+            dados.update(videointegrado=True, cooler=True)
+        if tipo == "fonte":
+            dados["potencia_w"] = 500
         db.session.add(modelo(**dados))
     db.session.commit()
 
@@ -222,6 +226,26 @@ def test_geracao_persiste_original_e_estado_em_uma_transacao(app_build, mocker):
         assert Build.query.count() == BuildSalva.query.count() == 1
         assert "Meta para periféricos: R$ 1000.00" in llm.call_args.args[0]
         assert len(BuildSalva.listar_por_usuario(1)) == 1
+
+
+def test_geracao_rejeita_conflito_antes_de_gravar_build(app_build, mocker):
+    tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd"]
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+        MODELOS["processador"].buscar_por_id(1).soquete = "AM4"
+        MODELOS["placa_mae"].buscar_por_id(1).socket = "AM5"
+        db.session.commit()
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
+        **PEDIDO, "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos],
+    })
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    resposta = cliente.post("/build/", json=PEDIDO)
+    assert resposta.status_code == 400
+    assert "incompatibilidades" in resposta.json["erro"]
+    llm.assert_called_once()
+    with app_build.app_context():
+        assert Build.query.count() == BuildSalva.query.count() == 0
 
 
 def test_contas_que_ja_excederam_limite_nao_perdem_builds(app_build):

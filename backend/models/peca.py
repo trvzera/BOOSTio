@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from . import db
 from . import ModeloBase
 
@@ -47,13 +49,18 @@ class Peca(ModeloBase):
     dados["id"] = f"{self.__tablename__}:{self.id}"
     dados["categoria"] = self.__tablename__
     dados["link"] = dados.pop("kabum_external", None)
+    data = self.preco_atualizado_em
+    # As coletas gravam UTC sem tzinfo no SQLite; o contrato explicita o fuso.
+    if data and data.tzinfo is None:
+      data = data.replace(tzinfo=timezone.utc)
+    dados["preco_atualizado_em"] = data.isoformat() if data else None
     return dados
 
   def aplicar_cotacao(self, resultado, atualizado_em):
     if resultado["preco"] is not None:
       self.preco = float(resultado["preco"])
+      self.preco_atualizado_em = atualizado_em
     self.esgotado = resultado["esgotado"]
-    self.preco_atualizado_em = atualizado_em
 
   @classmethod
   def cadastrar_ausentes(cls, itens):

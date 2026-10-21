@@ -7,6 +7,26 @@ import { perfilLoading } from "../js/components/page-loading.js";
 import { ofertasPeca } from "../js/build/catalogo.js";
 import { destinoAnterior, rotuloVoltar } from "../js/components/navigation-back.js";
 
+test("sair e excluir conta mantêm perigo vermelho, sem alterar a verificação de e-mail",async () => {
+  const menu = await readFile(new URL("../styles/componentes/site-menu.css",import.meta.url),"utf8");
+  const conta = await readFile(new URL("../styles/conta/configuracoes.css",import.meta.url),"utf8");
+  assert.match(menu,/\.profile-logout:hover, \.profile-logout:focus-visible\s*\{[^}]*color: var\(--status-error\)/s);
+  assert.match(conta,/#delete-modal \.modal-icon\s*\{[^}]*color: var\(--status-error\)/s);
+});
+
+test("checkboxes compartilham fonte e cor e detalhes não desativam sticky no desktop",async () => {
+  const ui = await readFile(new URL("../styles/componentes/ui-system.css",import.meta.url),"utf8");
+  const editor = await readFile(new URL("../styles/responsividades/r-editor-build.css",import.meta.url),"utf8");
+  assert.match(ui,/\.ui-check \{[^}]*font-family: var\(--font-body\);[^}]*color: var\(--cor-6\)/s);
+  assert.doesNotMatch(editor,/\.build-sidebar:has\(\.summary-metadata\[open\]\)\s*\{[^}]*position: static/s);
+  assert.match(editor,/@media \(max-height: 760px\)/);
+});
+
+test("menu lateral não inclui ícones das opções, mantendo os do perfil",async () => {
+  const js = await readFile(new URL("../js/header.js",import.meta.url),"utf8");
+  assert.match(js,/perfil && item\.icone \? iconeAnimado\(item\.icone\)/);
+});
+
 test("tooltip não gera novas mutações ao repetir o mesmo motivo", () => {
   let texto = "", escritas = 0;
   const elemento = {get textContent() { return texto; },set textContent(valor) { texto = valor; escritas++; }};

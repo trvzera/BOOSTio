@@ -31,6 +31,7 @@
   --status-success: var(--cor-d5);
   --status-warning: var(--cor-d2);
   --status-error: var(--cor-d1);
+  --status-error-bg: #ff3b3014;
   --text-primary: var(--cor-6);
   --text-secondary: #a1a1a6;
   --brand-gradient: linear-gradient(115deg, var(--cor-p1), var(--cor-p3));

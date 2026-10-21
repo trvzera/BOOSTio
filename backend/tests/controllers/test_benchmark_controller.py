@@ -71,3 +71,18 @@ def test_erro_validacao_e_limite_tem_contrato_json(cliente_benchmark, mocker):
     assert resposta.status_code == 429
     assert resposta.headers["Retry-After"] == "90"
     assert resposta.json["espera"] == 90
+
+
+@pytest.mark.parametrize("codigo,status,espera", [("timeout", 504, 30), ("rede", 503, 30),
+                                                ("tls", 503, 60), ("provedor", 503, 60),
+                                                ("resposta", 502, 0), ("sem-dados", 422, 0)])
+def test_falhas_do_provedor_preservam_codigo_http_e_espera(cliente_benchmark, mocker, codigo, status, espera):
+    autenticar(cliente_benchmark)
+    executar = mocker.patch("controllers.benchmark_controller.ConsultarBenchmarkService.executar",
+                           side_effect=ErroBenchmark("Consulta indisponível", codigo, status, espera))
+    resposta = cliente_benchmark.get("/benchmark/fps?game=valorant&cpu=ryzen-5-5600&gpu=rtx-3060")
+    assert resposta.status_code == status
+    assert resposta.json == {"erro": "Consulta indisponível", "codigo": codigo, "espera": espera}
+    assert resposta.headers.get("Retry-After") == (str(espera) if espera else None)
+    assert resposta.headers["Cache-Control"] == "no-store"
+    executar.assert_called_once()

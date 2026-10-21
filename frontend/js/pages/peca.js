@@ -1,6 +1,6 @@
 import "../header.js";
 import "../auth/auth.js";
-import { carregarCatalogo, categorias, moeda, htmlSeguro as h, nomePeca, imagemPeca, ofertasPeca, fichaTecnica } from "../build/catalogo.js";
+import { carregarCatalogo, categorias, moeda, htmlSeguro as h, nomePeca, imagemPeca, ofertasPeca, fichaTecnica, informacoesPreco } from "../build/catalogo.js";
 import { abrirBuild, guardarRascunho } from "../build/estado.js";
 import { selecionarPecaCompativel } from "../build/compatibilidade.js";
 import { avisar, mostrarFalha } from "../build/interface.js";
@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     let build = conta ? await carregarBuildConta(parametros.get("build")) : abrirBuild(new URLSearchParams({ id: parametros.get("build") || "" }));
     if (!conta) guardarRascunho(build);
     const detalhes = fichaTecnica(peca);
+    const preco = informacoesPreco(peca,conta);
     let motivo = "";
     try { selecionarPecaCompativel(build,peca,catalogo); } catch (erro) { motivo = erro.message; }
     document.title = nomePeca(peca) + " — BOOSTio";
@@ -32,7 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       '<section class="product-detail-layout"><div class="product-detail-visual glass-card">' + imagemPeca(peca) + (peca.imagem ? "" : '<span class="font-2-xs summary-note">Imagem ainda não cadastrada</span>') + '</div>' +
       '<div class="product-detail-copy"><span class="component-category font-1-xs">' + categoria.nome + '</span><h1 class="font-1-xl">' + h(nomePeca(peca)) +
       '</h1><ul class="product-detail-highlights">' + detalhes.slice(3,7).map(([rotulo,valor]) => '<li class="font-2-xs"><span>' + h(rotulo) + '</span><strong>' + h(valor) + '</strong></li>').join("") +
-      '</ul><span class="summary-eyebrow font-1-xs">Preço demonstrativo</span><strong class="summary-total font-1-xl">' + moeda(peca.preco) + '</strong>' +
+      '</ul><span class="summary-eyebrow font-1-xs">' + h(preco.rotulo) + '</span><strong class="summary-total font-1-xl">' + h(preco.valor) + '</strong><p class="font-2-xs summary-note">' + h(preco.nota) + '</p>' +
       '<button type="button" id="add-product" class="btn-primary" aria-label="Adicionar à build: ' + h(nomePeca(peca)) + '" ' + (motivo ? 'disabled data-disabled-reason="' + h(motivo) + '"' : "") + '>' + iconeAnimado("plus") + 'Adicionar à build</button>' +
       '<p class="font-2-xs summary-note">' + h(motivo || "Sem novos conflitos detectados nas verificações disponíveis. Confirme os dados no fabricante.") + '</p></div></section>' +
       '<section class="product-stores" aria-labelledby="stores-title"><h2 class="font-1-l" id="stores-title">Onde comprar</h2><p class="font-2-xs summary-note">Confira preço, estoque e o modelo exato na loja. As buscas não representam ofertas confirmadas.</p><div class="store-grid">' +

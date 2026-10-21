@@ -49,6 +49,23 @@ export const moeda = (valor) => new Intl.NumberFormat("pt-BR", {
   style: "currency", currency: "BRL",
 }).format(valor);
 
+export function informacoesPreco(peca, conta = false) {
+  const informado = typeof peca?.preco === "number" && Number.isFinite(peca.preco) && peca.preco > 0;
+  const data = typeof peca?.preco_atualizado_em === "string" && peca.preco_atualizado_em
+    ? new Date(peca.preco_atualizado_em) : null;
+  const atualizadoEm = data && Number.isFinite(data.getTime()) ? data : null;
+  const atualizacao = atualizadoEm
+    ? "Última atualização do preço: " + atualizadoEm.toLocaleString("pt-BR") + "."
+    : "Data de atualização não informada.";
+  return {
+    rotulo: conta ? "Preço cadastrado" : "Preço demonstrativo",
+    valor: informado ? moeda(peca.preco) : "Preço não informado",
+    nota: conta ? "Valor sem frete, não é cotação em tempo real. " + atualizacao
+      + (peca?.esgotado ? " Produto marcado como indisponível." : "")
+      : "Valor de referência do catálogo demonstrativo, sem atualização em tempo real.",
+  };
+}
+
 export const htmlSeguro = (valor = "") => String(valor)
   .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
   .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
@@ -129,7 +146,7 @@ export const rotulosTecnicos = {
 };
 
 export function fichaTecnica(peca) {
-  const ignorados = new Set(["id", "categoria", "imagem", "preco", "link", "part_number", "esgotado", "ofertas"]);
+  const ignorados = new Set(["id", "categoria", "imagem", "preco", "preco_atualizado_em", "link", "part_number", "esgotado", "ofertas"]);
   return Object.entries(peca).filter(([chave, valor]) => !ignorados.has(chave) && valor != null)
     .map(([chave, valor]) => [
       rotulosTecnicos[chave] || chave.replaceAll("_", " "),

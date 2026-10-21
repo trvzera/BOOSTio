@@ -58,11 +58,11 @@ body:has(.build-action-dialog[open]), body:has(.compare-dialog[open]) { overflow
 .planning-consent { display: flex; align-items: flex-start; gap: 12px; margin: 18px 0; color: var(--cor-6); font: 400 .85rem/1.6 var(--font-body); }
 .planning-consent:not(.ui-check) input { flex: 0 0 auto; width: 20px; height: 20px; margin-top: 2px; accent-color: var(--cor-p1); }
 .planning-consent.ui-check > input { margin: 0; }
-.build-create-option-primary { border-color: var(--cor-p1); background: rgba(0,123,255,.12); }
+.build-create-option-primary { border-color: rgba(0,123,255,.45); background: #ffffff04; }
 .build-create-option-primary > strong { color: var(--cor-p1); }
 .import-preview { margin: 18px 0; padding: 18px; border: 1px solid var(--cor-2); border-radius: 14px; overflow-wrap: anywhere; }
 .build-action-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
-.build-summary textarea { min-height: 110px; resize: vertical; }
+.build-summary textarea { min-height: 110px; resize: vertical; font: 400 .85rem/1.6 var(--font-body); }
 .summary-metadata { margin: 16px 0; padding: 12px 0; border-block: 1px solid var(--cor-2); }
 .summary-metadata summary { color: var(--cor-6); cursor: pointer; }
 .summary-metadata[data-animating] { overflow: hidden; }

@@ -34,7 +34,7 @@ Os **20 requisitos do produto**:
 1. **Criar conta e fazer login** — cadastro, autenticação, logout e sessão.
 2. **Cadastrar o setup atual** — definir ou remover uma build como seu computador atual.
 3. **Pesquisar peças e compatibilidade** — catálogo por categoria e avisos durante a montagem.
-4. **Montar por formulário** — geração assistida por LLM considerando uso, orçamento e peças próprias.
+4. **Montar por formulário** — geração assistida por LLM considerando uso, orçamento e peças próprias; sugestões com conflitos técnicos conhecidos são rejeitadas antes de salvar.
 5. **Salvar configurações** — montagens persistidas na conta, inclusive incompletas.
 6. **Excluir configurações** — exclusão respeitando o proprietário e a tranca da build.
 7. **Comparar configurações salvas** — comparação de duas ou três builds; comparação de desempenho ainda parcial.
@@ -42,7 +42,7 @@ Os **20 requisitos do produto**:
 9. **Buscar melhorias do setup** — sugestões para todas as categorias, com prévia e aplicação das trocas; ganhos de desempenho e ofertas atualizadas ainda precisam de consolidação.
 10. **Ver configurações prontas** — dez modelos para públicos e necessidades diferentes, sem periféricos.
 11. **Editar configurações** — alterar componentes, nome, descrição e orçamento da build.
-12. **Consultar preços pelo site** — preços cadastrados e acesso às lojas; monitoramento contínuo ainda em evolução.
+12. **Consultar preços pelo site** — preços cadastrados, data de atualização quando disponível e acesso às lojas; monitoramento contínuo ainda em evolução.
 13. **Ver compatibilidade e consumo** — diagnóstico Python diferencia conflito, dados não verificados e ausência de conflitos nas regras disponíveis; validação técnica completa ainda parcial.
 14. **Incluir periféricos no orçamento** — etapa própria para inclusão, reaproveitamento e meta percentual flexível, respeitando o orçamento total.
 15. **Registrar budget no perfil** — valor e autorização aplicados ao formulário e à nova montagem manual, sem modificar builds existentes.
@@ -79,7 +79,8 @@ anúncio, o link leva ao produto exato. **Pichau e Mercado Livre** são alternat
 de busca pelo modelo, sem garantia de oferta equivalente ou de preço confirmado.
 
 Preço cadastrado não significa cotação em tempo real. Estoque, frete e condições
-de compra devem ser conferidos na loja.
+de compra devem ser conferidos na loja. A ficha da peça distingue dados da conta
+de exemplos demonstrativos e informa a última atualização do preço quando cadastrada.
 
 A BOOSTio **não vende, entrega ou processa pagamentos** dos produtos. Os links
 direcionam a lojas de terceiros, responsáveis pela venda e pelo atendimento.
@@ -111,7 +112,13 @@ Ainda estão em evolução a validação completa de compatibilidade física no
 servidor, identificação de peças próprias, requisitos mínimos dos jogos,
 monitoramento agendado de preços e comparação de desempenho nas mesmas condições.
 A disponibilidade de cada consulta depende de sua fonte externa. A FPSHQ apresentou
-respostas HTTP 200 e timeouts nesta revisão; isso não comprova estabilidade da integração.
+timeouts nas consultas de FPS e jogos em 21/10/2026; o Blender respondeu e teve seu
+resultado validado pelo serviço Python. Isso não comprova indisponibilidade global
+da FPSHQ nem estabilidade permanente das fontes.
+
+A geração pela LLM já revalida conflitos conhecidos no catálogo, incluindo socket,
+DDR, slots, potência e medidas explícitas. Especificações ausentes continuam não
+verificadas; a configuração não recebe garantia de compatibilidade completa.
 
 **Projeto acadêmico em desenvolvimento — funcionalidades implementadas não
 equivalem a homologação em produção.**

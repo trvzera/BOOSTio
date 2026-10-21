@@ -171,12 +171,19 @@ class AvaliarCompatibilidadeService:
                           "Falta confirmar desativação de portas, padrões/comprimentos M.2 e baias necessárias no gabinete.")
 
         if tem("fonte"):
-            internos = [peca for tipo, _, peca in itens if tipo not in ("fonte", "monitor", "teclado", "mouse", "fone", "cabo_rede", "adaptador_wifi")]
-            consumos = [numero((p or {}).get("consumo_energia")) for p in internos]
+            internos = [(item, peca) for tipo, item, peca in itens if tipo not in ("fonte", "monitor", "teclado", "mouse", "fone", "cabo_rede", "adaptador_wifi")]
+            consumos = [numero((p or {}).get("consumo_energia")) for _, p in internos]
             potencia = numero(fonte.get("potencia_w")) or None
-            consumo = sum(numero((p or {}).get("consumo_energia")) * item.get("quantidade", 1)
-                          for tipo, item, p in itens if tipo not in ("fonte", "monitor", "teclado", "mouse", "fone", "cabo_rede", "adaptador_wifi")) if internos and all(v is not None for v in consumos) else None
-            registrar("fonte-potencia", "Consumo estimado e fonte", consumo <= potencia if consumo is not None and potencia is not None and consumo != potencia else None,
+            minimo_conhecido = sum((consumo or 0) * item.get("quantidade", 1)
+                                  for (item, _), consumo in zip(internos, consumos))
+            consumo = minimo_conhecido if internos and all(v is not None for v in consumos) else None
+            condicao = None
+            if potencia is not None:
+                if minimo_conhecido > potencia:
+                    condicao = False
+                elif consumo is not None and consumo < potencia:
+                    condicao = True
+            registrar("fonte-potencia", "Consumo estimado e fonte", condicao,
                       "A potência deve superar o consumo estimado cadastrado; essa soma não mede picos reais de carga.")
             registrar("fonte-conectores", "Conectores e encaixe da fonte", None,
                       "Conectores, padrão e espaço para a fonte ainda precisam de confirmação no catálogo.")

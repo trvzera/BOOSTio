@@ -326,6 +326,11 @@
   margin-bottom: var(--espacamento-16);
 }
 
+#delete-modal .modal-icon {
+  color: var(--status-error);
+  background: var(--status-error-bg);
+}
+
 .modal-box h3 {
   font-family: "Lexend";
   font-size: 1.15rem;

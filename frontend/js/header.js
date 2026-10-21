@@ -21,7 +21,7 @@ export function iniciarNavegacao() {
   const links = (itens, perfil = false) => itens.map(item =>
     '<a class="' + (perfil ? 'profile-link font-1-s' : 'site-menu-link') + '" href="' + pagina(item.pagina) + '" aria-label="Ir para ' + item.rotulo + '"' +
     (location.pathname.endsWith("/" + item.pagina) ? ' aria-current="page"' : "") + '>' +
-    '<span class="site-menu-link-label">' + (item.icone ? iconeAnimado(item.icone) : "") +
+    '<span class="site-menu-link-label">' + (perfil && item.icone ? iconeAnimado(item.icone) : "") +
     '<span>' + item.rotulo + '</span></span></a>'
   ).join("");
   const conta = [
