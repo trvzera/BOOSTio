@@ -194,7 +194,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       criando = true; evento.currentTarget.disabled = true;
       try {
         await verificarEspacoBuild();
-        const {build} = await criarBuildManual(estadoParaConta({titulo:"Minha build",descricao:"",visibilidade:"privado",travada:false,orcamento:null,incluirPerifericos:false,incluirRede:false,rede:{},componentes:{}}));
+        const {build} = await criarBuildManual(estadoParaConta({titulo:"Minha build",descricao:"",visibilidade:"privado",travada:false,incluirPerifericos:false,incluirRede:false,rede:{},componentes:{}}));
         navegarPara(url(build));
       } catch (erro) { avisar(erro.message); criando = false; dialogo.close(); await carregar(); }
     };

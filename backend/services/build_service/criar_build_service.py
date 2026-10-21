@@ -7,6 +7,7 @@ from models.build_salva import MODELOS
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from utils.validacoes import validacao_campos
 from services.llm_service.llm_service import LLMService
+from .avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
 class CriarBuildService:
   EXTRAS_PROPRIOS = ("webcam", "microfone")
@@ -60,7 +61,7 @@ class CriarBuildService:
     build = json.loads(resposta) if isinstance(resposta, str) else resposta
     dados_build = self._validar_build(build, catalogo, orcamento, percentual, proprias)
     if proprias:
-      return BuildSalva.criar_gerada_com_pecas_proprias(usuario_id, dados_build, proprias, rede, percentual).to_dict()
+      return AvaliarCompatibilidadeService().para_resposta(BuildSalva.criar_gerada_com_pecas_proprias(usuario_id, dados_build, proprias, rede, percentual))
 
     componentes = {}
     for item in dados_build["componentes"]:
@@ -72,7 +73,7 @@ class CriarBuildService:
       "incluirRede": rede.get("tipo") in ("cabo", "wifi"),
       "incluirPerifericos": percentual > 0, "percentualPerifericos": percentual,
     })
-    return BuildSalva.criar_limitada(usuario_id, estado, gerada=dados_build).to_dict()
+    return AvaliarCompatibilidadeService().para_resposta(BuildSalva.criar_limitada(usuario_id, estado, gerada=dados_build))
 
   @classmethod
   def _pecas_proprias(cls, valor):

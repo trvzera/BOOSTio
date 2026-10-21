@@ -11,6 +11,8 @@ import { pecasPropriasFormulario } from "../js/build/pecas-proprias.js";
 import { linksAutenticado } from "../js/components/navigation-config.js";
 import { verificarEspacoBuild } from "../js/api/build/builds.js";
 import { fetchComErro } from "../js/api/_shared/fetchComErro.js";
+import { buildDaConta, estadoParaConta } from "../js/build/conta.js";
+import { indicadorBuild } from "../js/build/indicador.js";
 
 const catalogo = completarCatalogoDemo(JSON.parse(await readFile(new URL("../data/catalogo-demo.json",import.meta.url),"utf8")));
 
@@ -95,6 +97,24 @@ test("mensagem offline não mascara aborto nem erro HTTP do provedor",async t =>
   await assert.rejects(fetchComErro("/build/"),{name:"AbortError"});
   buscar.mock.mockImplementation(async () => new Response(JSON.stringify({erro:"Fonte indisponível",codigo:"provedor"}),{status:503}));
   await assert.rejects(fetchComErro("/benchmark/fps"),{status:503,codigo:"provedor",message:"Fonte indisponível"});
+});
+
+test("diagnóstico Python acompanha a leitura mas não vira dado editável/exportável",() => {
+  const compatibilidade = {status:"nao_verificado",rotulo:"Compatibilidade não totalmente verificada",naoVerificado:[]};
+  const build = buildDaConta({id:"s-1",nome:"Teste",estado:{componentes:{}},compatibilidade});
+  assert.equal(build.compatibilidade.status,"nao_verificado");
+  assert.equal(estadoParaConta(build).compatibilidade,undefined);
+  const resultado = avaliarBuild(build,[]);
+  assert.equal(resultado.compatibilidade.status,"nao_verificado");
+  assert.match(indicadorBuild(resultado,"teste"),/Compatibilidade não totalmente verificada/);
+});
+
+test("dados ausentes não geram aprovação; motivos do servidor são escapados no popover",() => {
+  const resultado = avaliarBuild({componentes:{}},[]);
+  assert.equal(resultado.compatibilidade.status,"nao_verificado");
+  const html = indicadorBuild({...resultado,compatibilidade:{status:"nao_verificado",rotulo:"Não verificada",naoVerificado:[{mensagem:"<script>teste</script>"}]}},"teste");
+  assert.ok(!html.includes("<script>"));
+  assert.ok(html.includes("&lt;script&gt;"));
 });
 
 test("cliente consulta Blender somente pelo backend e rejeita pontuação inventada ou link externo",async () => {

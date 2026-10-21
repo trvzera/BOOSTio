@@ -87,7 +87,11 @@ test("home mantém um único h1, navegação do carrossel por botões e vídeos 
   const html = await ler(new URL("index.html",paginas));
   assert.equal([...html.matchAll(/<h1\b/g)].length,1);
   assert.equal([...html.matchAll(/<button[^>]*class="dot/g)].length,3);
-  assert.match(html,/class="video-motion-toggle/);
+  assert.doesNotMatch(html,/video-motion-toggle/);
+  assert.doesNotMatch(html,/<video[^>]*\bloop\b/);
+  const homeJs = await ler(new URL("../js/pages/index.js",import.meta.url));
+  assert.match(homeJs,/video\.currentTime >= 5/);
+  assert.match(homeJs,/encerrados\.has\(video\)/);
   const homeCss = await ler(new URL("../styles/home/home.css",import.meta.url));
   assert.match(homeCss,/#main-page\s*\{[^}]*isolation:\s*isolate/s);
   for (const video of ["background","pc"]) {

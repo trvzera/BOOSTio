@@ -175,3 +175,4 @@
 .blender-score strong small { display: block; font: 400 .8rem/1.5 var(--font-body); color: var(--text-secondary); }
 .blender-score p, .blender-score a { font-size: .85rem; }
 .blender-score a { color: var(--cor-p1); }
+.fpshq-cache-notice { padding: .75rem 1rem; margin: 1rem 0; border-left: 2px solid var(--cor-p1); color: var(--text-secondary); font: 400 .75rem/1.6 var(--font-body); background: rgba(0,123,255,.04); }

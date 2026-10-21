@@ -29,9 +29,9 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     + '<label class="planning-field" for="upgrade-real-order"><span>Ordenar por</span><select id="upgrade-real-order" aria-describedby="upgrade-real-order-help">'
     + '<option value="preco">Menor preço</option>'
     + '<option value="desempenho" disabled title="Faltam benchmarks comparáveis.">Melhor desempenho — indisponível: faltam benchmarks comparáveis</option>'
-    + '<option value="vendas" disabled title="Faltam dados de vendas.">Mais vendida — indisponível: faltam dados de vendas</option></select></label></div>'
+    + '</select></label></div>'
     + '<details class="upgrade-real-help"><summary>Como funcionam as trocas</summary><p class="planning-help" id="upgrade-real-budget-help">Budget só para peças novas, sem descontar as antigas. RAM, discos e fans substituem a categoria por uma unidade/kit; ajuste quantidades no editor.</p></details>'
-    + '<span class="sr-only" id="upgrade-real-order-help">Somente preço está disponível; ganho de desempenho e popularidade ainda não foram medidos.</span>'
+    + '<span class="sr-only" id="upgrade-real-order-help">Somente preço está disponível; ganho de desempenho ainda não foi medido.</span>'
     + '<fieldset class="upgrade-real-categories"><legend>Categorias para buscar</legend>'
     + CATEGORIAS.map(categoria => '<label><input type="checkbox" name="upgrade-real-category" value="' + categoria.id
       + '" ' + (categorias.has(categoria.id) ? 'checked' : '') + '> ' + categoria.nome + '</label>').join("") + '</fieldset>'

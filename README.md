@@ -43,9 +43,9 @@ Os **20 requisitos do produto**:
 10. **Ver configurações prontas** — dez modelos para públicos e necessidades diferentes, sem periféricos.
 11. **Editar configurações** — alterar componentes, nome, descrição e orçamento da build.
 12. **Consultar preços pelo site** — preços cadastrados e acesso às lojas; monitoramento contínuo ainda em evolução.
-13. **Ver compatibilidade e consumo** — verificações técnicas e estimativa de energia; validação definitiva no servidor ainda parcial.
+13. **Ver compatibilidade e consumo** — diagnóstico Python diferencia conflito, dados não verificados e ausência de conflitos nas regras disponíveis; validação técnica completa ainda parcial.
 14. **Incluir periféricos no orçamento** — etapa própria para inclusão, reaproveitamento e meta percentual flexível, respeitando o orçamento total.
-15. **Registrar budget no perfil** — valor e autorização para utilizá-lo em novas configurações.
+15. **Registrar budget no perfil** — valor e autorização aplicados ao formulário e à nova montagem manual, sem modificar builds existentes.
 16. **Baixar JSON e CSV** — exportação da build para guardar localmente.
 17. **Alterar visibilidade** — tornar a build pública ou privada.
 18. **Duplicar builds** — cópia independente, respeitando o limite da conta.
@@ -110,7 +110,8 @@ fazem parte da experiência atual.
 Ainda estão em evolução a validação completa de compatibilidade física no
 servidor, identificação de peças próprias, requisitos mínimos dos jogos,
 monitoramento agendado de preços e comparação de desempenho nas mesmas condições.
-A disponibilidade de cada consulta depende de sua fonte externa.
+A disponibilidade de cada consulta depende de sua fonte externa. A FPSHQ apresentou
+respostas HTTP 200 e timeouts nesta revisão; isso não comprova estabilidade da integração.
 
 **Projeto acadêmico em desenvolvimento — funcionalidades implementadas não
 equivalem a homologação em produção.**

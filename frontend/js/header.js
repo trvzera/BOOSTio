@@ -42,12 +42,6 @@ export function iniciarNavegacao() {
     '<span class="ui-lottie hamburger-animation" data-lottie="hamburger" aria-hidden="true"><span class="ui-icon-fallback hamburger-fallback"><span></span><span></span><span></span></span></span></button></div>';
 
   const controles = [];
-  const movimento = document.querySelector(".video-motion-toggle");
-  if (movimento) {
-    movimento.classList.add("site-menu-link","menu-motion-toggle");
-    movimento.innerHTML = '<span class="site-menu-link-label">' + iconeAnimado("magic") + '<span data-motion-label>Pausar animações</span></span>';
-    host.querySelector("#site-menu-panel .site-menu-group").append(movimento);
-  }
   function configurar(container, painel, botao, rotulo, hover = false) {
     let fixado = false, fechamento;
     const controle = {container, painel, botao, alternar(aberto) {
@@ -105,7 +99,7 @@ export function atualizarNavegacao(autenticado) {
   const {host, perfil, hamburger} = iniciarNavegacao();
   host.querySelector("[data-profile-guest]").hidden = Boolean(autenticado);
   host.querySelector("[data-profile-user]").hidden = !autenticado;
-  hamburger.container.hidden = false; // Visitantes também acessam navegação pública e controle de movimento.
+  hamburger.container.hidden = false; // Visitantes também acessam a navegação pública.
   iniciarIcones(host);
   perfil.alternar(false);
   hamburger.alternar(false);

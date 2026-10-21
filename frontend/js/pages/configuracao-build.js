@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded",async () => {
     }
     if (buildId === null && !parametros.has("id") && !parametros.has("compartilhar")) {
       const formulario = parametros.get("formulario") === "1";
-      const estadoInicial = formulario ? abrirBuild(new URLSearchParams(),false) : {titulo:"Minha build",descricao:"",visibilidade:"privado",travada:false,orcamento:null,incluirPerifericos:false,incluirRede:false,rede:{},componentes:{}};
+      const estadoInicial = formulario ? abrirBuild(new URLSearchParams(),false) : {titulo:"Minha build",descricao:"",visibilidade:"privado",travada:false,incluirPerifericos:false,incluirRede:false,rede:{},componentes:{}};
       const nova = await criarBuildManual(estadoParaConta(estadoInicial));
       if (formulario) sessionStorage.removeItem("boostio:respostas-formulario");
       buildId = nova.build.id;
@@ -201,9 +201,14 @@ document.addEventListener("DOMContentLoaded",async () => {
       if (conta) {
         const atual = structuredClone(build);
         mensagemSalvamento = "Salvando na sua conta…";
-        filaSalvamento = filaSalvamento.then(() => salvarBuildConta(atual)).then(() => {
+        filaSalvamento = filaSalvamento.then(() => salvarBuildConta(atual)).then(resposta => {
           falhaSalvamento = null;
           mensagemSalvamento = "Salvo na sua conta."; tomSalvamento = "info";
+          if (resposta.build?.compatibilidade && JSON.stringify(build.componentes) === JSON.stringify(atual.componentes)) {
+            build.compatibilidade = resposta.build.compatibilidade;
+            const titulo = main.querySelector('.builder-title-line'), indicador = titulo?.querySelector('.build-indicator');
+            if (indicador) { indicador.outerHTML = indicadorBuild(avaliarBuild(build,catalogo),'compatibility-details'); iniciarIndicadores(titulo); }
+          }
           const status = main.querySelector("#build-autosave-status");
           if (status) { status.textContent = mensagemSalvamento; status.dataset.tone = tomSalvamento; }
         }).catch(erro => {

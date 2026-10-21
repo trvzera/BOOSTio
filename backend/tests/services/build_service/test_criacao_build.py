@@ -126,6 +126,58 @@ def test_divisao_exata_do_orcamento_e_prompt():
     assert "R$ 4000.00" in prompt and "R$ 1000.00 (20%)" in prompt
 
 
+@pytest.mark.parametrize("permitido,valor,esperado", [(True, "4321.75", 4321.75), (False, "4321.75", None), (True, "0", None)])
+def test_manual_usa_budget_autorizado_da_propria_conta(app_build, permitido, valor, esperado):
+    with app_build.app_context():
+        usuario = db.session.get(Usuario, 1)
+        usuario.budget, usuario.usar_budget = Decimal(valor), permitido
+        db.session.commit()
+        resultado = CriarBuildManualService().executar(1, ESTADO)
+        assert resultado["estado"]["orcamento"] == esperado
+        assert resultado["compatibilidade"]["status"] == "nao_verificado"
+        assert CriarBuildManualService().executar(2, ESTADO)["estado"]["orcamento"] is None
+
+
+def test_manual_respeita_teto_explicito_e_nao_reescreve_edicao_ou_copia(app_build):
+    with app_build.app_context():
+        usuario = db.session.get(Usuario, 1)
+        usuario.budget, usuario.usar_budget = Decimal("5000"), True
+        db.session.commit()
+        resultado = CriarBuildManualService().executar(1, {**ESTADO, "orcamento": None})
+        assert resultado["estado"]["orcamento"] is None
+        original = BuildSalva.buscar(1, resultado["id"])
+        usuario.budget = Decimal("9000")
+        db.session.commit()
+        assert DuplicarBuildService().executar(1, original.to_dict()["id"])["estado"]["orcamento"] is None
+        assert CriarBuildManualService().executar(1, {**ESTADO, "orcamento": 1234.56})["estado"]["orcamento"] == 1234.56
+
+
+def test_rotas_recalculam_diagnostico_por_id_sem_confiar_no_front_e_preservam_rascunho(app_build):
+    with app_build.app_context():
+        cadastrar_pecas(["processador", "placa_mae"])
+        cpu = MODELOS["processador"].buscar_por_id(1)
+        placa = MODELOS["placa_mae"].buscar_por_id(1)
+        cpu.soquete, placa.socket = "AM4", "AM5"
+        db.session.commit()
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    estado = {**ESTADO, "visibilidade": "publico", "componentes": {"processador": {"id": 1}, "placa_mae": {"id": 1}},
+              "compatibilidade": {"status": "sem_conflitos"}}
+    resposta = cliente.post("/build/manual", json=estado)
+    assert resposta.status_code == 201  # Rascunho com conflito continua podendo ser salvo.
+    identificador = resposta.json["build"]["id"]
+    for build in (resposta.json["build"], cliente.get(f"/build/{identificador}").json["build"],
+                  cliente.get("/build/").json["builds"][0], cliente.get(f"/build/{identificador}/publica").json["build"]):
+        assert build["compatibilidade"]["status"] == "incompativel"
+        assert "compatibilidade" not in build["estado"]
+    with app_build.app_context():
+        MODELOS["placa_mae"].buscar_por_id(1).socket = "AM4"
+        db.session.commit()
+    resposta = cliente.put(f"/build/{identificador}", json=estado)
+    assert resposta.status_code == 200
+    assert resposta.json["build"]["compatibilidade"]["status"] == "nao_verificado"  # BIOS/encaixes ainda pendentes.
+
+
 def resposta_com_perifericos():
     itens = [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in
              ("processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "monitor", "teclado", "mouse", "fone")]

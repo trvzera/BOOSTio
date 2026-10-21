@@ -6,6 +6,48 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Budget manual e informação não verificada — 20/10/2026
+
+- A criação manual omite `orcamento` quando deve usar o padrão da conta. O Python
+  lê o budget do proprietário autenticado somente com `usar_budget=true` e valor
+  positivo. `orcamento:null` explícito mantém a montagem sem teto; valores explícitos,
+  importações, duplicações e builds existentes não são sobrescritos pela preferência.
+- `AvaliarCompatibilidadeService` consulta as peças por IDs nos modelos atuais,
+  sem nova coleta ou migração. As respostas de criação, edição, listagem e leitura
+  incluem `compatibilidade`: `incompativel`, `nao_verificado` ou `sem_conflitos`.
+  Cada regra também tem seu resultado; uma regra aprovada não aprova toda a montagem.
+  O diagnóstico é calculado, não aceito do frontend nem armazenado no estado editável.
+- O serviço identifica conflitos demonstráveis com os dados disponíveis (socket,
+  DDR, pentes/slots/capacidade, formatos, conexões e potência), sem rejeitar rascunhos.
+  Medida ausente/zero, peça própria não identificada, BIOS, QVL, conectores, baias,
+  interferências e distribuição detalhada de fans/radiadores ficam não verificados.
+  `dimensoes` ambíguo não vira altura do cooler; suporte genérico a water cooler
+  não equivale a suporte a 360 mm. A validação completa e o bloqueio de geração
+  tecnicamente inválida continuam pendentes; isto não homologa a saída da LLM.
+- O editor mostra a avaliação no popover. Após salvar, atualiza somente o diagnóstico
+  se os componentes ainda forem os mesmos da requisição, sem recriar os Lotties.
+  Alterações locais sem retorno do Python não recebem aprovação automática.
+- Como obter as especificações: usar a categoria/ID para carregar o registro e
+  `Peca.to_catalogo()`. O contrato atual já fornece `soquete`, `socket`, DDR e alguns
+  limites. Conferir os dados já coletados antes de cadastrar o que falta, mantendo
+  nomes de campo, unidades (mm, W, GB) e referência técnica por modelo/part number.
+  Para completar medidas, preferir manual/ficha do fabricante. Falta de informação
+  permanece explícita; nunca inferir dimensões do nome ou do tamanho externo da caixa.
+  Não foi executada atualização de catálogo, banco ou modelo nesta rodada.
+- Controle de pausa removido da home e do menu. Vídeos decorativos não ficam em
+  loop e reproduzem no máximo cinco segundos; movimento reduzido/economia de dados
+  mantêm o poster. O loader não foi alterado.
+- “Mais vendida” removida das sugestões e do laboratório; não há fonte de vendas
+  confiável no escopo atual. Melhor preço continua disponível.
+- FPSHQ: alguns probes retornaram HTTP 200, mas consultas seguintes (inclusive pelo
+  serviço Python e por HTTP/1.1/2) expiraram sem corpo. Não foi validado nesta rodada
+  um resultado normalizado real nem demonstrada recuperação estável. Sem trocar CPU,
+  inventar FPS, relaxar TLS ou repetir automaticamente. Cache de reserva tem aviso
+  visível e data; matriz aceita rótulo `4k` ou `4K` sem preencher presets ausentes.
+  Validação: 176 testes JavaScript, 109 Python (+4 subtestes) e 91 checks de navegador
+  com API simulada. Consultas públicas reais foram somente de leitura; nenhuma LLM
+  paga, execução do `app.py` ou acesso ao banco real foi usado nesses testes.
+
 ### Atualização de criação, orçamento e menus — 20/10/2026
 
 - Visitantes acessam apenas início, termos, sobre, contato, login/cadastro,
@@ -75,8 +117,8 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
   A pausa retorna `Retry-After` (também após falha de conexão), sem repetição automática.
   Cache válido continua disponível. Não foi demonstrada recuperação do provedor.
 - O hamburger reúne Início, Criar build, Termos e Sobre, sem setas nem repetir
-  Builds/Configurações/Sair do perfil. O controle de animações da home fica dentro
-  dele, sem botão flutuante extra. A escolha de criação destaca o formulário à
+  Builds/Configurações/Sair do perfil. O controle de animações da home foi removido
+  na atualização acima. A escolha de criação destaca o formulário à
   esquerda; montagem manual fica à direita.
 - Busca de melhorias permite selecionar todas as categorias do catálogo. Os
   resultados e a prévia rolam em áreas próprias, mantendo ações do diálogo visíveis.
