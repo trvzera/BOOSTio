@@ -57,6 +57,17 @@ class CriarBuildPerifericosTest(unittest.TestCase):
                                                 if item["tipo"] not in CriarBuildService.PERIFERICOS]}
         self.assertEqual(CriarBuildService._validar_build(build, self.catalogo, 2000)["preco_total"], 600)
 
+    def test_sem_reserva_nao_permite_comprar_perifericos(self):
+        with self.assertRaisesRegex(ValueError, "limite reservado para periféricos"):
+            CriarBuildService._validar_build(self.build, self.catalogo, 2000)
+
+    def test_precos_de_perifericos_vem_do_catalogo_nao_da_resposta(self):
+        self.catalogo["monitor"][0]["preco"] = 100.01
+        for item in self.build["componentes"]:
+            item["preco"] = 0
+        with self.assertRaisesRegex(ValueError, "limite reservado para periféricos"):
+            CriarBuildService._validar_build(self.build, self.catalogo, 2000, percentual=20)
+
     def test_nao_compra_novamente_uma_categoria_propria(self):
         with self.assertRaisesRegex(ValueError, "repetiu"):
             CriarBuildService._validar_build(self.build, self.catalogo, 2000, percentual=20,
@@ -69,14 +80,14 @@ class CriarBuildPerifericosTest(unittest.TestCase):
         build = {**self.build, "componentes": [*self.build["componentes"],
             {"tipo": "adaptador_wifi", "id": 20, "quantidade": 1}]}
         rede = {"tipo": "wifi", "possuiAcessorio": False}
-        self.assertEqual(CriarBuildService._validar_build(build, catalogo, 2000, rede=rede)["preco_total"], 1100)
+        self.assertEqual(CriarBuildService._validar_build(build, catalogo, 2000, percentual=20, rede=rede)["preco_total"], 1100)
         with self.assertRaisesRegex(ValueError, "conexão"):
-            CriarBuildService._validar_build(build, catalogo, 2000, rede={"tipo": "cabo", "possuiAcessorio": False})
+            CriarBuildService._validar_build(build, catalogo, 2000, percentual=20, rede={"tipo": "cabo", "possuiAcessorio": False})
 
     def test_acessorio_de_rede_proprio_nao_precisa_ser_comprado(self):
         build = {**self.build, "componentes": [item.copy() for item in self.build["componentes"]]}
         validada = CriarBuildService._validar_build(
-            build, self.catalogo, 2000,
+            build, self.catalogo, 2000, percentual=20,
             proprias={"adaptador_wifi": "Meu adaptador"},
             rede={"tipo": "wifi", "possuiAcessorio": True},
         )

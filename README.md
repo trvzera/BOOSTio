@@ -44,7 +44,7 @@ Os **20 requisitos do produto**:
 11. **Editar configurações** — alterar componentes, nome, descrição e orçamento da build.
 12. **Consultar preços pelo site** — preços cadastrados, data de atualização quando disponível e acesso às lojas; monitoramento contínuo ainda em evolução.
 13. **Ver compatibilidade e consumo** — diagnóstico Python diferencia conflito, dados não verificados e ausência de conflitos nas regras disponíveis; validação técnica completa ainda parcial.
-14. **Incluir periféricos no orçamento** — etapa própria para inclusão, reaproveitamento e meta percentual flexível, respeitando o orçamento total.
+14. **Incluir periféricos no orçamento** — etapa própria para inclusão e reaproveitamento, com tetos separados para o PC e os periféricos; sobras não são transferidas entre eles.
 15. **Registrar budget no perfil** — valor e autorização aplicados ao formulário e à nova montagem manual, sem modificar builds existentes.
 16. **Baixar JSON e CSV** — exportação da build para guardar localmente.
 17. **Alterar visibilidade** — tornar a build pública ou privada.
@@ -119,6 +119,12 @@ da FPSHQ nem estabilidade permanente das fontes.
 A geração pela LLM já revalida conflitos conhecidos no catálogo, incluindo socket,
 DDR, slots, potência e medidas explícitas. Especificações ausentes continuam não
 verificadas; a configuração não recebe garantia de compatibilidade completa.
+
+O percentual para periféricos é um **limite máximo, não uma meta de gasto**.
+Com R$ 5.000 e 20%, o PC e os acessórios de rede têm teto de R$ 4.000 e os
+periféricos, de R$ 1.000. Se eles custarem menos, a sobra fica com o usuário;
+não aumenta o teto do PC. O Python confere os subtotais pelos preços do catálogo
+antes de salvar a sugestão.
 
 **Projeto acadêmico em desenvolvimento — funcionalidades implementadas não
 equivalem a homologação em produção.**

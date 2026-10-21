@@ -86,11 +86,13 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
   Agora tem cinco etapas: objetivo, orçamento, peças do PC, periféricos e conexão.
   A etapa de periféricos distingue não incluir, comprar todos ou reaproveitar alguns;
   os já possuídos exigem modelo e usam o checkbox Lottie compartilhado.
-  A porcentagem de 1–99% é uma **meta flexível**, não dois tetos independentes.
-  `percentual_perifericos` vai no pedido e `percentualPerifericos` no estado. O Python
-  permite redistribuir a sobra entre PC e periféricos, mas valida o teto total e a
-  presença dos itens solicitados. Não inventa produtos nem força gastar a sobra.
-- O formulário envia `pecas_proprias`, rede e meta para a geração pela LLM,
+  A porcentagem de 1–99% define um **teto separado** para os periféricos; o restante
+  é o teto do PC, incluindo acessórios de rede. `percentual_perifericos` vai no pedido
+  e `percentualPerifericos` no estado. O Python filtra o catálogo por esses limites
+  e valida os dois subtotais (preço real × quantidade) e a presença dos itens
+  solicitados antes de salvar. A sobra permanece com o usuário: não passa de um teto
+  ao outro. Não inventa produtos nem força gastar a reserva integralmente.
+- O formulário envia `pecas_proprias`, rede e teto percentual para a geração pela LLM,
   que completa apenas as categorias ainda não possuídas. O resultado abre no editor
   pelo `build_id`; mantém os Lotties, controles e feedback de erro da interface.
   Webcam/microfone próprios são preservados em `pecasExtras`. Identificação completa

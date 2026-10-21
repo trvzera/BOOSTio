@@ -128,6 +128,9 @@ def test_divisao_exata_do_orcamento_e_prompt():
     assert CriarBuildService._dividir_orcamento(1234.56, 20) == (Decimal("987.65"), Decimal("246.91"))
     prompt = CriarBuildService._criar_prompt(PEDIDO, 5000, 800, {}, 20)
     assert "R$ 4000.00" in prompt and "R$ 1000.00 (20%)" in prompt
+    assert "Teto para periféricos" in prompt
+    assert "saldo de periféricos NÃO aumenta o teto do PC" in prompt
+    assert "meta flexível" not in prompt
 
 
 @pytest.mark.parametrize("permitido,valor,esperado", [(True, "4321.75", 4321.75), (False, "4321.75", None), (True, "0", None)])
@@ -190,17 +193,66 @@ def resposta_com_perifericos():
     return {**PEDIDO, "componentes": itens}, catalogo
 
 
-def test_meta_flexivel_permite_realocar_saldo_mas_nunca_ultrapassar_total():
+def test_tetos_independentes_permitem_gastar_menos_sem_transferir_a_sobra():
     build, catalogo = resposta_com_perifericos()
     assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1100
-    catalogo["processador"][0]["preco"] = 1150
-    assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1450
+    catalogo["processador"][0]["preco"] = 1100
+    assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1400
+    catalogo["processador"][0]["preco"] = 1100.01
+    with pytest.raises(ValueError, match="limite destinado ao PC"):
+        CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)
     catalogo["processador"][0]["preco"] = 800
-    catalogo["monitor"][0]["preco"] = 200
-    assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1250
+    catalogo["monitor"][0]["preco"] = 150
+    assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1200
+    catalogo["monitor"][0]["preco"] = 150.01
+    with pytest.raises(ValueError, match="limite reservado para periféricos"):
+        CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)
     catalogo["processador"][0]["preco"] = 1500
     with pytest.raises(ValueError, match="Não foi possível gerar uma configuração dentro do orçamento"):
         CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)
+
+
+def test_teto_percentual_preserva_centavos_sem_arredondar_para_cima():
+    build, catalogo = resposta_com_perifericos()
+    catalogo["monitor"][0]["preco"] = 96.91
+    assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1234.56, 20)["preco_total"] == 1146.91
+    catalogo["monitor"][0]["preco"] = 96.92
+    with pytest.raises(ValueError, match="limite reservado para periféricos"):
+        CriarBuildService._validar_build(deepcopy(build), catalogo, 1234.56, 20)
+
+
+def test_catalogo_respeita_os_dois_tetos_antes_de_chamar_a_llm(app_build, mocker):
+    gerar_catalogo = mocker.patch("services.build_service.criar_build_service.CriarBuildService._gerar_catalogo", return_value={})
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
+    with app_build.app_context(), pytest.raises(ValueError, match="Não há peças suficientes"):
+        CriarBuildService().executar(1, {**PEDIDO, "percentual_perifericos": 90})
+    assert gerar_catalogo.call_args.args[:2] == (Decimal("500.00"), Decimal("4500.00"))
+    llm.assert_not_called()
+
+
+@pytest.mark.parametrize("excesso", ["pc", "perifericos"])
+def test_geracao_rejeita_transferencia_de_sobra_antes_de_salvar(app_build, mocker, excesso):
+    tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "monitor", "teclado", "mouse", "fone"]
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+        if excesso == "perifericos":
+            MODELOS["monitor"].buscar_por_id(1).preco = 750
+        else:
+            # Cada peça cabe no filtro individual, mas o subtotal do PC excede R$ 4.000.
+            MODELOS["processador"].buscar_por_id(1).preco = 3000
+            MODELOS["placa_mae"].buscar_por_id(1).preco = 700
+        db.session.commit()
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
+        **PEDIDO, "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos],
+    })
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    resposta = cliente.post("/build/", json={**PEDIDO, "percentual_perifericos": 20})
+    assert resposta.status_code == 400
+    assert ("limite destinado ao PC" if excesso == "pc" else "limite reservado para periféricos") in resposta.json["erro"]
+    llm.assert_called_once()
+    with app_build.app_context():
+        assert Build.query.count() == BuildSalva.query.count() == 0
 
 
 def test_faltam_perifericos_na_resposta():
@@ -224,7 +276,7 @@ def test_geracao_persiste_original_e_estado_em_uma_transacao(app_build, mocker):
         assert resposta["preco_total"] == 1000
         assert len(resposta["componentes"]) == 10
         assert Build.query.count() == BuildSalva.query.count() == 1
-        assert "Meta para periféricos: R$ 1000.00" in llm.call_args.args[0]
+        assert "Teto para periféricos: R$ 1000.00" in llm.call_args.args[0]
         assert len(BuildSalva.listar_por_usuario(1)) == 1
 
 
