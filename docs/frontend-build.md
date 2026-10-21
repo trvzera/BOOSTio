@@ -6,6 +6,150 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Busca de melhorias e responsividade — 21/10/2026
+
+- **Dropdowns de peças:** cada categoria do modal usa `details/summary` animado,
+  inicialmente recolhido, com contagem de opções e chevron Lottie. Uma seleção
+  validada fecha somente seu dropdown e mantém modelo/preço no resumo. Reabrir
+  permite substituir a escolha; confirmação final da build continua separada.
+  Alterar orçamento ou outra categoria preserva os dropdowns abertos/fechados.
+  Desmarcar uma categoria limpa sua seleção e estado; falhas não fecham o grupo.
+  O fechamento devolve foco ao summary, mantendo teclado e área visível acessíveis.
+  Validação: 292 testes Node e 161 verificações Chrome com API simulada em
+  320×900, 768×1024, 1440×900 e 844×390, com/sem animações. Inclui substituição,
+  remoção, orçamento insuficiente, rejeição de downgrade e salvamento confirmado.
+
+- **Checkboxes:** o modal e o laboratório usam `iconeAnimado("checkbox")` e o
+  controlador compartilhado. O input nativo continua acessível e ocupa todo o label;
+  o Lottie fica com 1,5 rem. Ao marcar, traço em `--cor-p1` e preenchimento em
+  `--cor-p6`, sem alterar o JSON ou as cores de outras áreas. Estado inicial,
+  animação reversa e instância preservados nas atualizações. Sem Lottie ou com
+  movimento reduzido, permanece o check estático com foco de teclado em azul primário.
+  Validação: 289 testes Node e 90 verificações Chrome em 320/768/1440 px, com
+  animação normal, movimento reduzido e CDN bloqueado; inclui o laboratório.
+
+- **Filtro contra trocas inferiores:** `build/validar-melhoria.js` é compartilhado
+  pelo modal real e pelo laboratório. A regra filtra as sugestões e é reexecutada
+  ao selecionar/simular e imediatamente antes de confirmar, sem inferir desempenho
+  pelo preço, nome, geração, GHz, núcleos, VRAM ou potência da fonte.
+- RAM preserva capacidade total e número total de pentes, geração DDR, frequência
+  e latência CAS relativa à frequência. SSD/HD preservam a capacidade total dos
+  itens substituídos; SSD compara leitura/gravação e HD compara RPM/cache. Para
+  modelos mistos, preserva o melhor valor informado de cada velocidade/latência,
+  além da capacidade somada. Isto é um filtro das métricas disponíveis, não uma
+  previsão de FPS, IOPS ou desempenho em qualquer carga.
+- Peça própria sem identificação, quantidade inválida, medida ausente ou categoria
+  sem critérios suficientes não é aprovada por suposição. O catálogo atual não
+  fornece benchmarks comparáveis de CPU/GPU: essas substituições ficam bloqueadas,
+  assim como as demais categorias sem critérios confiáveis. Uma GPU dedicada também
+  não é presumida superior ao vídeo integrado. Adições em categorias vazias seguem
+  as regras de orçamento/compatibilidade; repetir modelo atual não é upgrade.
+- A montagem manual continua livre para escolher peças compatíveis. A política é
+  da busca de melhorias no frontend, não uma autorização de segurança do servidor.
+  Ainda falta definir e integrar dados de desempenho/qualidade por categoria e
+  revalidá-los em um fluxo de melhorias no Python. Não são feitas consultas de
+  benchmark em massa ou criados rankings fictícios.
+- Validação do filtro: 287 testes Node, incluindo 57 casos do módulo e integração,
+  e 43 verificações Chrome com API simulada em 320/768/1440 px. Seleção forjada de
+  downgrade rejeitada, opções válidas salvas e mesma política no menu do card.
+
+- `build/melhorias.js` separa as sugestões e a prévia em duas colunas no desktop.
+  Até 900 px, usa abas **Escolher peças** e **Revisar trocas**, com contador,
+  navegação pelas setas/Home/End e foco preservado após selecionar/remover peças.
+- O seletor recolhível inclui todas as categorias, sem ocupar a tela inteira de
+  início. Os cards mostram foto/alternativa neutra, modelo, preço e seleção. A ordem
+  é explicitamente por preço, não uma promessa de ganho de desempenho.
+- A revisão mostra todas as peças/quantidades antigas da categoria, a nova unidade
+  ou kit, custo das compras e saldo do budget combinado. O comparativo do total
+  fica recolhido. Dicas de conferência são azuis; avisos reais e erros têm tons próprios.
+  RAM/discos/fans continuam substituindo a categoria por uma unidade/kit, como
+  informado na interface; quantidades adicionais são ajustadas no editor.
+- `build/melhorias.css` e `responsividades/r-melhorias.css` mantêm cabeçalho e
+  confirmação visíveis e a rolagem dentro da área ativa. Celulares usam tela cheia,
+  com safe areas; tablets, paisagem e monitores largos têm adaptações próprias.
+  VisualViewport acompanha teclado/área visível. Texto grande ou altura extrema
+  habilitam rolagem do diálogo, evitando conteúdo inalcançável. Observadores e
+  listeners são removidos ao fechar. A posição não recebe transições de layout.
+- O editor espera a conclusão do salvamento antes de fechar. Em caso de falha,
+  restaura a base e mantém as escolhas para tentar novamente. Escape, fundo e
+  fechamento ficam bloqueados durante o envio. Cancelar não altera a build. Após
+  aplicar, o foco retorna ao novo botão do editor ou menu do card atualizado.
+- A altura real do resumo do editor ajusta seu limite sticky, permitindo alcançar
+  **Buscar melhorias** mesmo quando o conteúdo é maior que a viewport. O observer
+  é reconectado no retorno pelo histórico com cache de página.
+- Menus dos cards são preparados como popovers já na renderização. Antes, o menu
+  invisível ainda podia ampliar a área rolável; a primeira abertura retirava essa
+  área, provocava um salto na página e o listener de scroll fechava o próprio menu.
+- Validação: 230 testes Node e 403 verificações Chrome com API simulada. Matriz:
+  320×568, 360×640, 390×844, 430×932, 540×720, 768×1024, 1024×768, 1280×800,
+  1440×900, 1920×1080, 2560×1440, 844×390 e 667×375; texto a 200%, resize,
+  teclado, orçamento insuficiente, seleção múltipla, cancelamento, falha/repetição
+  e salvamento lento. Abertura pelo menu testada em 320/768/1440 px. Sem executar
+  backend, migrar banco, consumir LLM ou alterar a API de desempenho.
+
+### Comparação, modelos e revisão da geração — 21/10/2026
+
+- Minhas builds destaca a comparação em um bloco próprio, liberado com pelo menos
+  duas builds. O estado vazio fica centralizado com borda pontilhada e atalhos para
+  criar uma montagem ou explorar modelos. Cada card mostra preço mesmo com descrição;
+  totais incompletos são parciais e falta de cotação não vira produto gratuito.
+- O editor usa o nome da build como título e oferece edição pelo lápis Lottie,
+  mantendo o campo de detalhes sincronizado, o título da aba e o salvamento da conta.
+  Nome vazio e build trancada não podem ser salvos por esse controle.
+- São 16 modelos sem periféricos. A vitrine usa ordem crescente de preços disponíveis,
+  deixando modelos totalmente sem cotação ao final. Modelos incompletos continuam
+  identificados como parciais; a ordem não transforma subtotal em cotação completa.
+- `build/comparacao-renderizacao.js` reutiliza o cliente Python de Blender. A consulta
+  é explícita, por CPU ou GPU, deduplica hardware repetido e mantém cache só no modal.
+  Trocar o tipo, mudar as builds ou fechar a comparação cancela a consulta em curso.
+  O destaque exige resultado de todas as builds e mesma versão/tipo/método; empate
+  é preservado e ausência de modelo/dados não vira zero. As pontuações de CPU/GPU
+  nunca são somadas nem apresentadas como teste do PC completo.
+- `CriarBuildService` solicita uma revisão quando o retorno da LLM é inválido:
+  JSON/formato, componentes obrigatórios (inclusive GPU quando necessária), IDs,
+  quantidades, preços, estoque, rede, orçamento e conflitos técnicos conhecidos.
+  A revisão recebe o diagnóstico e as regras originais e deve devolver a build inteira.
+  Há no máximo uma correção, com rechecagem de quota antes dela e validação completa
+  antes de persistir. O fallback de transporte já existente não abre outro ciclo de
+  correção: são no máximo três chamadas na requisição combinada, sem novos provedores.
+- `LLMService` valida a conclusão e estrutura do retorno conforme o
+  [contrato do Gemini](https://ai.google.dev/api/generate-content), concatena partes
+  textuais sem pensamentos e não transforma resposta truncada/vazia em build.
+  Falha após a revisão retorna `502 / geracao-invalida`; timeout, indisponibilidade e
+  cota têm códigos próprios. `Retry-After` só é repassado quando informado e válido.
+  Não é possível garantir uma build válida com qualquer orçamento/catálogo.
+- Ações do menu verificadas: benchmark, melhorias, definir/remover setup atual,
+  trancar/destrancar, visibilidade, detalhes, duplicar, copiar link, JSON, CSV e excluir.
+  Tranca bloqueia detalhes, visibilidade e exclusão; cópia respeita quota/e-mail.
+  O link público é copiado, mas a regra atual do frontend ainda exige login para
+  visualizá-lo. Não foi criada exceção à política de páginas privadas nesta rodada.
+- Validação: 221 testes Node, 277 testes Python (+4 subtestes) e 77 verificações
+  em Chrome, em 320/768/1440 px. LLM, transporte e consultas Blender simulados;
+  bancos SQLite temporários para as rotas. Sem executar `app.py`, migrações,
+  acessar o banco real, consumir a LLM real ou habilitar a HowManyFPS.
+
+### Imagens, navegação e resumo do perfil — 21/10/2026
+
+- O catálogo da conta preserva a imagem recebida da API. Quando ela está vazia,
+  `build/imagens-produtos.js` consulta o manifesto local por `part_number` exato,
+  sem associar fotos por semelhança de nome ou por IDs de outro banco. O catálogo
+  demonstrativo reutiliza o mesmo carregamento. Os caminhos são resolvidos pelo
+  módulo, tanto em `pages/` quanto no laboratório; fotos quebradas têm alternativa
+  neutra, sem impedir a escolha da peça. Os 750 arquivos do manifesto foram conferidos.
+- O hamburger volta a exibir setas Lottie à direita e inclui **Minhas builds** para
+  usuários autenticados. O perfil mantém seus ícones, sem setas duplicadas.
+- Configurações consulta `GET /build/` para mostrar a quantidade real de builds
+  salvas. Falha de consulta aparece como indisponibilidade, nunca como zero fictício.
+  O novo pill de budget mostra o valor salvo na conta e só muda depois da confirmação
+  do salvamento; ausência, zero e falha são estados distintos. Retorno pelo histórico
+  com cache de página revalida os dados.
+- Checkbox Lottie do budget, ícone do título Perfil e ícones/textos do menu do perfil
+  ficam centralizados verticalmente, incluindo textos quebrados no celular.
+- Validação: 215 testes Node e 90 verificações em Chrome, em 320/768/1440 px,
+  com catálogo/listagem/salvamento simulados, fotos locais reais, fotos ausentes ou
+  quebradas, falhas de API, usuário visitante e animações. Sem iniciar `app.py`,
+  consultar o banco real ou executar migrações.
+
 ### Budget manual e informação não verificada — 20/10/2026
 
 - A criação manual omite `orcamento` quando deve usar o padrão da conta. O Python
@@ -86,11 +230,13 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
   Agora tem cinco etapas: objetivo, orçamento, peças do PC, periféricos e conexão.
   A etapa de periféricos distingue não incluir, comprar todos ou reaproveitar alguns;
   os já possuídos exigem modelo e usam o checkbox Lottie compartilhado.
-  A porcentagem de 1–99% é uma **meta flexível**, não dois tetos independentes.
-  `percentual_perifericos` vai no pedido e `percentualPerifericos` no estado. O Python
-  permite redistribuir a sobra entre PC e periféricos, mas valida o teto total e a
-  presença dos itens solicitados. Não inventa produtos nem força gastar a sobra.
-- O formulário envia `pecas_proprias`, rede e meta para a geração pela LLM,
+  A porcentagem de 1–99% define um **teto separado** para os periféricos; o restante
+  é o teto do PC, incluindo acessórios de rede. `percentual_perifericos` vai no pedido
+  e `percentualPerifericos` no estado. O Python filtra o catálogo por esses limites
+  e valida os dois subtotais (preço real × quantidade) e a presença dos itens
+  solicitados antes de salvar. A sobra permanece com o usuário: não passa de um teto
+  ao outro. Não inventa produtos nem força gastar a reserva integralmente.
+- O formulário envia `pecas_proprias`, rede e teto percentual para a geração pela LLM,
   que completa apenas as categorias ainda não possuídas. O resultado abre no editor
   pelo `build_id`; mantém os Lotties, controles e feedback de erro da interface.
   Webcam/microfone próprios são preservados em `pecasExtras`. Identificação completa
@@ -99,6 +245,20 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
   Erro preserva respostas e permite repetir/revisar. A altura do formulário acompanha
   o conteúdo. Somente as listas longas de peças próprias/periféricos possuem rolagem
   interna; orçamento e rede continuam sem recorte interno.
+- Diagnóstico de FPS no laboratório: `experimentos/benchmark-diagnostico.js` permite
+  escolher o cliente direto JS ou o cliente Python, sem requisição ao trocar o modo.
+  O direto omite cookies, não reutiliza cache local e registra HTTP, tempo, redirecionamento
+  e falha de validação; `pagehide` cancela a consulta. Produção permanece no backend.
+  Na verificação real de 21/10/2026, ambos deram timeout sem resposta HTTP: Chrome
+  após 20 s e Python atual após cerca de 10 s. O 504 é o mapeamento da BOOSTio,
+  não um status recebido do provedor; esse resultado não identifica uma causa global.
+- `GET /benchmark/requisitos?game=...&ram_gb=...` segue Blueprint → service e exige
+  sessão. Curadoria JSON dos cinco jogos com links oficiais e data de revisão, sem
+  scraping em cada consulta nem dependência da FPSHQ. A prévia fica em `testes.html`.
+  Verifica só capacidade de RAM informada; sempre retorna `escopo: parcial`,
+  `requisitosVerificados: false` e `fpsValidado: false`. Recomendado ausente fica null;
+  CPU/GPU, VRAM, sistema e espaço livre não são inferidos por nomes ou pontuações.
+  Ainda falta vincular a avaliação ao hardware real da build e à interface de produção.
 - `components/number-stepper.js` mantém inputs nativos com botões explícitos de
   aumentar/diminuir: orçamento de R$ 100 em R$ 100 sem perder centavos; porcentagem e
   rede seguem seus passos e limites. Os controles preservam Tab/Enter e não recriam
@@ -327,12 +487,38 @@ Botões compartilham formato capsule, altura mínima, hover discreto e foco vis�
 `js/components/ui.js` inicializa ícones via o controlador Lottie existente,
 reproduz no hover/foco e reverte na saída. Plus, login rotacionado 90°, trash e cart
 têm alternativas estáticas. Checkbox, hamburger e chevron refletem o estado do controle.
+Na seleção de desempenho, `gamepad.json` identifica Jogos e `microchip.json`, Blender.
+Na escolha de montagem, `handsparkle.json` identifica o formulário inteligente e
+`normalhand.json`, a montagem manual. Os quatro usam o mesmo hover/foco com retorno,
+sem loop/autoplay, preservam os rótulos dos controles e têm SVG estático para
+movimento reduzido ou falha de carregamento. Selecionar um tipo não consulta a API.
 O `arrow.json` original aponta na diagonal: a rotação de 45° aponta para a direita,
 225° para a esquerda, 0° mantém a diagonal externa e −45° aponta para cima.
 Ícones de elementos removidos são destruídos; falhas nas animações não bloqueiam os controles.
+O ícone de Configurações (`user.json`) tem enquadramento próprio no renderer SVG
+(`viewBoxSize`), pois a composição original 1000×1000 inclui margem vazia. Isso mantém
+o tamanho visual dos demais ícones sem aumentar a linha do menu nem cortar o giro
+da engrenagem. Hover e foco usam a cor primária; movimento reduzido ou falha no
+carregamento preservam um símbolo estático de usuário com engrenagem. Não aplicar
+`scale` no SVG: o transform inline gerado pelo Lottie pode sobrescrevê-lo.
 O mesmo módulo adiciona logos sociais e tooltips a botões desabilitados, inclusive
 em conteúdo dinâmico. Defina `data-disabled-reason` para informar um motivo contextual;
 uma âncora focável permite ler a explicação pelo teclado sem habilitar a ação.
+
+`componentes/feedback.css` padroniza a família Poppins nas mensagens de erro,
+avisos, retornos de importação, perfil, catálogo, geração e benchmarks. Mantém a
+escala de tamanhos das páginas e Lexend nos títulos, sem aplicar fontes a ícones.
+As mensagens quebram IDs/textos longos; importação e falhas na lista de builds
+identificam o estado por `data-tone`. IDs desconhecidos continuam bloqueados pela
+validação local de arquivos: formatar o aviso não substitui peças nem altera o catálogo.
+As fontes locais declaradas em `tipografia.css` são verificadas por testes de caminho
+e cabeçalho WOFF2, além de carregamento e fonte efetivamente renderizada no Chrome.
+
+O total da montagem e da build compartilhada exibe **Frete não incluído**, com
+orientação para reservar parte do orçamento e conferir a entrega por CEP/loja.
+O aviso também aparece em Comprar build. É informativo: não altera compatibilidade,
+não inventa uma cotação, não soma frete ao preço das peças nem desconta uma reserva
+automaticamente. Cálculo real de entrega depende das lojas e do endereço de destino.
 
 `js/pages/loading.js` usa `sessionStorage["boostio:visita-iniciada"]`, não a conta.
 Primeira visita da aba/sessão e toda entrada na home usam vídeo. A home sempre mantém 1×.
@@ -447,8 +633,8 @@ quantidades e IDs, sem confiar em preços/consumo enviados no arquivo. Gera novo
 preserva planejamento e nunca reutiliza a visibilidade pública ou tranca da origem.
 
 `js/build/comparacao.js` abre o comparador da lista real de builds locais.
-`js/build/melhorias.js` monta uma prévia de trocas CPU/GPU dentro de um budget combinado
-e somente altera a build após confirmação. Rankings de desempenho e de vendas aguardam
+`js/build/melhorias.js` monta uma prévia de trocas das categorias do catálogo dentro de um
+budget combinado e somente altera a build após confirmação. Rankings de desempenho e de vendas aguardam
 dados externos. `js/build/modelos.js` mantém exemplos versionados para a vitrine.
 
 `js/build/acoes-build.js` compartilha os modais de compra e benchmark e o aviso sobre

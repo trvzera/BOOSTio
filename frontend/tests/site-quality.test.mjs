@@ -35,8 +35,16 @@ test("páginas privadas e técnicas não são publicadas nos mecanismos de busca
 
 test("atalho de acessibilidade só fica visível com foco de teclado",async () => {
   const css = await ler(new URL("../styles/utilitarios/acessibilidade.css",import.meta.url));
-  assert.match(css,/\.skip-link \{[^}]*transform: translateY\(calc\(-100% - 20px\)\)/s);
-  assert.match(css,/\.skip-link:focus-visible \{ transform: none; \}/);
+  const oculto = css.match(/\.skip-link \{([^}]+)\}/)?.[1] || "";
+  const visivel = css.match(/\.skip-link:focus-visible \{([^}]+)\}/)?.[1] || "";
+  assert.match(oculto,/transform: translateY\(calc\(-100% - 20px\)\)/);
+  // O overscroll pode expor elementos deslocados: a transparência também é necessária.
+  assert.match(oculto,/opacity: 0;/);
+  assert.match(oculto,/pointer-events: none;/);
+  assert.doesNotMatch(oculto,/display:\s*none|visibility:\s*hidden/);
+  assert.match(visivel,/opacity: 1;/);
+  assert.match(visivel,/pointer-events: auto;/);
+  assert.match(visivel,/transform: none;/);
   assert.doesNotMatch(css,/\.skip-link:focus\s*\{/);
 });
 

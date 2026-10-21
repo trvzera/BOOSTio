@@ -21,6 +21,16 @@ export function criarClienteBenchmark({requisitar = fetchComErro,timeoutMs = 250
     }
   }
   return {
+    consultarRequisitos({game,ramGb = null},opcoes) {
+      if (typeof game !== "string" || !SLUG.test(game) || ramGb != null && (!Number.isInteger(ramGb) || ramGb < 1 || ramGb > 4096))
+        return Promise.reject(new Error("Selecione um jogo e informe a RAM em GB inteiros, ou deixe o campo vazio."));
+      return enviar("requisitos",{game,...(ramGb == null ? {} : {ram_gb:ramGb})},opcoes).then(dados => {
+        if (dados.game !== game || dados.escopo !== "parcial" || dados.requisitosVerificados !== false || dados.fpsValidado !== false
+          || !dados.ram || !dados.minimos || !dados.fonte || !Number.isInteger(dados.minimos.ramGb))
+          throw new Error("Resposta de requisitos inválida. A build não foi aprovada.");
+        return dados;
+      });
+    },
     consultarBlender({dispositivo,tipo},opcoes) {
       if (typeof dispositivo !== "string" || !/^[A-Za-z0-9() +._/\-]{2,160}$/.test(dispositivo) || !["cpu","gpu"].includes(tipo))
         return Promise.reject(new Error("Selecione uma CPU ou GPU identificada para o Blender."));

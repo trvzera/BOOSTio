@@ -145,6 +145,23 @@
 .builds-local-title { color: var(--cor-6); margin-bottom: var(--espacamento-12); }
 .build-account-card { cursor: pointer; }
 .build-account-card .build-card-title a { color: inherit; }
+.builds-toolbar.builds-compare-callout { justify-content: space-between; gap: 1.25rem; padding: 1.5rem; border: 1px solid color-mix(in srgb,var(--cor-p1) 35%,var(--cor-2)); border-radius: var(--radius-card,20px); }
+.builds-compare-copy { flex: 1 1 18rem; min-width: 0; }
+.builds-compare-copy h2 { color: var(--cor-6); margin: 0 0 .5rem; }
+.builds-compare-copy p { color: var(--cor-4); margin: 0; line-height: 1.65; }
+#builds-account-status.builds-empty { display: grid; justify-items: center; gap: 1rem; padding: clamp(2rem,6vw,4rem) 1.25rem; border: 1px dashed var(--cor-3); border-radius: var(--radius-card,20px); text-align: center; }
+#builds-account-status[hidden] { display: none; }
+.builds-empty > p { max-width: 34rem; margin: 0; color: var(--cor-4); line-height: 1.7; }
+.builds-empty > strong { color: var(--cor-6); }
+.builds-empty-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: .75rem; }
+.build-card-price { display: grid; gap: .25rem; margin-top: auto; padding-top: 1rem; }
+.build-account-card .build-card-meta { margin-top: 0; }
+.build-card-price > span, .build-card-price > small { color: var(--cor-4); font: 400 .6875rem/1.5 var(--font-body); }
+.build-card-price > strong { color: var(--cor-6); font: 500 1.125rem/1.4 var(--font-heading); overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .builds-toolbar.builds-compare-callout { padding: 1.25rem; }
+  .builds-empty-actions, .builds-empty-actions > * { width: 100%; }
+}
 
 .build-card {
   position: relative;

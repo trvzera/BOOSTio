@@ -4,6 +4,7 @@ export const linksVisitante = [
 ];
 export const linksAutenticado = [
   {pagina:"index.html",rotulo:"Início",icone:"build"},
+  {pagina:"builds.html",rotulo:"Minhas builds",icone:"build",autenticado:true},
   {pagina:"builds.html?criar=1",rotulo:"Criar build",icone:"plus"},
   {pagina:"termos.html",rotulo:"Termos e condições",icone:"download"},
   {pagina:"sobre.html",rotulo:"Sobre nós",icone:"user"},

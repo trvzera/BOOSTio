@@ -2,7 +2,7 @@ import "../header.js";
 import "../auth/auth.js";
 import { carregarCatalogo, htmlSeguro as h, moeda } from "../build/catalogo.js";
 import { informacoesRam, informacoesArmazenamento } from "../build/estado.js";
-import { modelosProntos, copiarModelo } from "../build/modelos.js";
+import { modelosProntos, copiarModelo, ordenarModelosPorPreco } from "../build/modelos.js";
 import { avaliarBuild } from "../build/compatibilidade.js";
 import { navegarPara } from "../components/page-loading.js";
 import { planejamentoLocal } from "../build/planejamento.js";
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     const [catalogo,referencias] = await Promise.all([carregarCatalogoConta(),carregarCatalogo()]);
-    const modelos = modelosProntos(catalogo,{referencias}).map(build => ({build,avaliacao:avaliarBuild(build,catalogo)}));
+    const modelos = ordenarModelosPorPreco(modelosProntos(catalogo,{referencias}).map(build => ({build,avaliacao:avaliarBuild(build,catalogo)})));
     const objetivos = new Map(modelos.map(({build}) => [build.objetivo,build.metadados.objetivoRotulo]));
     objetivo.innerHTML = '<option value="">Todos os objetivos</option>' + [...objetivos].map(([valor,rotulo]) =>
       '<option value="' + h(valor) + '">' + h(rotulo) + '</option>').join("");
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         '<div class="prontas-tags"><span>' + h(build.metadados.plataforma) + '</span><span>' + h(build.metadados.objetivoRotulo) + '</span></div>' +
         '<h2 id="titulo-' + h(build.id) + '">' + h(build.titulo) + '</h2><p class="prontas-descricao">' + h(build.descricao) + '</p>' +
         '<dl class="prontas-resumo"><div><dt>Memória RAM</dt><dd>' + ram.capacidade + ' GB</dd></div><div><dt>Armazenamento</dt><dd>' + discos.capacidade + ' GB</dd></div></dl>' +
-        '<div class="prontas-total"><span>' + (build.metadados.pendentes.length ? 'Total dos preços disponíveis' : 'Total das peças') + '</span><strong>' + moeda(avaliacao.preco) + '</strong><small>Sem periféricos e sem frete.' + (build.metadados.pendentes.length ? ' Há peças sem cotação ou estoque confirmado.' : '') + '</small></div>' +
+        '<div class="prontas-total"><span>' + (build.metadados.pendentes.length ? 'Total parcial dos preços disponíveis' : 'Total das peças') + '</span><strong>' + (avaliacao.preco > 0 ? moeda(avaliacao.preco) : 'Preço a consultar') + '</strong><small>Sem periféricos e sem frete.' + (build.metadados.pendentes.length ? ' Há peças sem cotação ou estoque confirmado.' : '') + '</small></div>' +
         '<div class="prontas-acoes"><button type="button" class="btn-primary" data-usar-modelo="' + h(build.id) + '" aria-label="Abrir e personalizar ' + h(build.titulo) +
         '">Abrir build</button><small>Peças e compatibilidade aparecem no editor. Salva uma cópia na sua conta.</small></div></article>';
     }
@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       budget.removeAttribute("aria-invalid");
       const limite = budget.value === "" ? Infinity : Number(budget.value);
       const visiveis = modelos.filter(({build,avaliacao}) => (!objetivo.value || build.objetivo === objetivo.value) && avaliacao.preco <= limite);
-      contador.textContent = visiveis.length + (visiveis.length === 1 ? " configuração encontrada" : " configurações encontradas");
+      contador.textContent = visiveis.length + (visiveis.length === 1 ? " configuração encontrada" : " configurações encontradas") + " · Menor preço primeiro";
       lista.innerHTML = visiveis.length ? visiveis.map(card).join("") :
         '<p class="prontas-vazio">Nenhum modelo atende a esses filtros. Aumente o budget ou escolha outro objetivo.</p>';
       informar("");

@@ -94,7 +94,7 @@ const perguntas = [
   {
     chave:"perifericos",etapa:"Periféricos",tag:"Etapa 04",
     titulo:"Quer incluir periféricos na montagem?",
-    descricao:"Monitor, teclado, mouse e headset também entram no orçamento. Informe o que já possui e uma meta para os novos itens.",
+    descricao:"Monitor, teclado, mouse e headset também entram no orçamento. Informe o que já possui e um limite para os novos itens.",
     opcoes:[
       ["sem-perifericos","Não incluir periféricos novos","Vou montar apenas o computador."],
       ["todos-perifericos","Preciso de todos","Incluir monitor, teclado, mouse e headset."],
@@ -236,7 +236,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const proprios = respostas.perifericosProprios || [];
     alvo.innerHTML = (respostas.perifericos === "alguns-perifericos" ? '<fieldset class="peripheral-owned-list"><legend>Quais periféricos você já possui?</legend>' +
       listaPerifericos.map(([tipo,nome]) => '<div class="peripheral-owned" data-owned="' + tipo + '"><label class="ui-check"><input type="checkbox" data-owned-peripheral="' + tipo + '" ' + (proprios.includes(tipo) ? 'checked' : '') + '>' + iconeAnimado("checkbox") + '<span>' + nome + '</span></label>' + (proprios.includes(tipo) ? detalhePecaHtml(tipo,nome) : '') + '</div>').join("") + '</fieldset>' : '') +
-      '<div class="peripheral-budget" id="peripheral-allocation" ' + (respostas.incluirPerifericos ? '' : 'hidden') + '><label for="peripheral-percent">Meta do orçamento para periféricos</label><div class="peripheral-percent-field"><input type="number" id="peripheral-percent" min="1" max="99" step="1" inputmode="numeric" value="' + respostas.percentualPerifericos + '"><span aria-hidden="true">%</span></div><p id="peripheral-budget-summary" class="font-2-xs" aria-live="polite"></p><p class="font-2-xs">É uma referência, não um gasto obrigatório. O saldo pode ser usado nas peças do PC, sempre dentro do orçamento total.</p></div>';
+      '<div class="peripheral-budget" id="peripheral-allocation" ' + (respostas.incluirPerifericos ? '' : 'hidden') + '><label for="peripheral-percent">Limite do orçamento para periféricos</label><div class="peripheral-percent-field"><input type="number" id="peripheral-percent" min="1" max="99" step="1" inputmode="numeric" aria-describedby="peripheral-budget-summary peripheral-budget-help" value="' + respostas.percentualPerifericos + '"><span aria-hidden="true">%</span></div><p id="peripheral-budget-summary" class="font-2-xs" aria-live="polite"></p><p id="peripheral-budget-help" class="font-2-xs">É um teto, não um gasto obrigatório. Se gastar menos, a sobra fica com você e não aumenta o limite do PC.</p></div>';
     alvo.querySelectorAll("[data-owned-peripheral]").forEach(input => input.addEventListener("change",() => {
       const escolhidos = new Set(respostas.perifericosProprios || []), tipo = input.dataset.ownedPeripheral;
       if (input.checked) escolhidos.add(tipo); else escolhidos.delete(tipo);
@@ -264,7 +264,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const divisao = dividirOrcamento(valor,percentual);
     const resumo = conteudo.querySelector("#peripheral-budget-summary");
     if (resumo) resumo.textContent = divisao
-      ? `${moeda.format(divisao.perifericos)} de referência para periféricos · ${moeda.format(divisao.pc)} de referência para o PC; a sobra pode ser redistribuída.` : "Informe um orçamento válido e uma porcentagem inteira de 1 a 99.";
+      ? `Até ${moeda.format(divisao.perifericos)} para periféricos · até ${moeda.format(divisao.pc)} para o PC e acessórios de rede.` : "Informe um orçamento válido e uma porcentagem inteira de 1 a 99.";
     conteudo.querySelector("#next-question").disabled = !podeAvancar();
   }
 

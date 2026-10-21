@@ -112,3 +112,13 @@ def test_avaliacao_nao_muda_o_estado_recebido():
     original = deepcopy(estado)
     AvaliarCompatibilidadeService().executar(estado, catalogo=[])
     assert estado == original
+
+
+def test_consumo_desconhecido_nao_esconde_fonte_ja_insuficiente():
+    pecas = [{"id": 1, "categoria": "fonte", "potencia_w": 500},
+             {"id": 2, "categoria": "processador", "consumo_energia": 600}]
+    componentes = {"fonte": {"id": 1}, "processador": {"id": 2},
+                   "memoria_ram": [{"proprio": "Minha RAM", "quantidade": 1}]}
+    assert regra(avaliar(pecas, componentes), "fonte-potencia")["status"] == "incompativel"
+    pecas[1]["consumo_energia"] = 100
+    assert regra(avaliar(pecas, componentes), "fonte-potencia")["status"] == "nao_verificado"

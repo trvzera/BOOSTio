@@ -2,7 +2,7 @@ import { buscarBuild } from "../api/build/builds.js";
 import { fetchComErro } from "../api/_shared/fetchComErro.js";
 import { categorias, htmlSeguro, imagemPeca, moeda, ofertasPeca } from "./catalogo.js";
 import { formatarDataHora } from "../utils/formatarData.js";
-import { abrirCompraBuild, avisoCompraHtml } from "./acoes-build.js";
+import { abrirCompraBuild, avisoCompraHtml, avisoFreteHtml } from "./acoes-build.js";
 import { avisar } from "./interface.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 
@@ -41,7 +41,8 @@ export async function mostrarBuildSalva(main, buildId, publico = false) {
     <aside class="build-sidebar"><section class="build-summary glass-card">
       <span class="summary-eyebrow">Total das peças</span>
       <strong class="summary-total">${moeda(build.preco_total)}</strong>
-      <p class="summary-note">Preços atuais cadastrados no banco de dados, sem frete.</p>
+      ${avisoFreteHtml()}
+      <p class="summary-note">Preços atuais cadastrados no banco de dados.</p>
       <button class="btn-secondary" type="button" id="buy-configuration" aria-label="Comprar peças da build">${iconeAnimado("cart")}Comprar build</button>
       ${avisoCompraHtml()}
       <a class="btn-secondary build-saved-back" href="./builds.html" aria-label="Voltar às minhas builds">Voltar às minhas builds</a>

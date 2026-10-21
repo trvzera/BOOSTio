@@ -2,7 +2,7 @@ import { htmlSeguro as h, moeda, nomePeca, ofertasPeca } from "./catalogo.js";
 import { itensSelecionados, itensCategoria, informacoesRam } from "./estado.js";
 import { avaliarBuild } from "./compatibilidade.js";
 import { normalizarRede, resumoRede } from "./rede.js";
-import { iniciarIcones } from "../components/ui.js";
+import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { hardwareBenchmark, hardwareBlender } from "../benchmark/hardware.js";
 import { painelBenchmarkHtml } from "../benchmark/painel.js";
 import { iniciarPainelBenchmark } from "../benchmark/interface.js";
@@ -10,6 +10,9 @@ import { painelBlenderHtml, iniciarPainelBlender } from "../benchmark/blender.js
 
 export function avisoCompraHtml() {
   return '<p class="purchase-notice">A BOOSTio não vende, entrega ou processa pagamentos de peças e periféricos. Os links abrem lojas de terceiros, responsáveis pela venda e pelo atendimento da compra. Confira preço, estoque, frete, garantia e devolução diretamente na loja.</p>';
+}
+export function avisoFreteHtml() {
+  return '<p class="shipping-notice planning-help" role="note"><strong>Frete não incluído</strong>Reserve parte do orçamento para a entrega. O valor varia conforme seu CEP e as lojas escolhidas.</p>';
 }
 export function abrirDialogoBuild(titulo,conteudo) {
   const anterior = document.activeElement;
@@ -49,7 +52,7 @@ export function abrirBenchmark(build,catalogo) {
   const cpu = peca("processador"), gpu = peca("placa_video"), ram = informacoesRam(build,catalogo);
   const prefixo = "build-fpshq";
   const dialogo = abrirDialogoBuild("Desempenho esperado",'<p class="planning-help">' + h(build.titulo) + '</p>' +
-    '<div class="benchmark-type-picker" role="group" aria-label="Escolha o tipo de teste"><button type="button" class="btn-secondary" data-benchmark-type="games" aria-pressed="false" aria-label="Selecionar teste de desempenho em jogos">Jogos · FPS</button><button type="button" class="btn-secondary" data-benchmark-type="blender" aria-pressed="false" aria-label="Selecionar teste de renderização no Blender">Blender · Renderização</button></div><div data-benchmark-content><p class="planning-help">Escolha qual desempenho deseja consultar. Nenhum teste é executado no seu computador.</p></div>');
+    '<div class="benchmark-type-picker" role="group" aria-label="Escolha o tipo de teste"><button type="button" class="btn-secondary" data-benchmark-type="games" aria-pressed="false" aria-label="Selecionar teste de desempenho em jogos">' + iconeAnimado("gamepad") + '<span>Jogos · FPS</span></button><button type="button" class="btn-secondary" data-benchmark-type="blender" aria-pressed="false" aria-label="Selecionar teste de renderização no Blender">' + iconeAnimado("microchip") + '<span>Blender · Renderização</span></button></div><div data-benchmark-content><p class="planning-help">Escolha qual desempenho deseja consultar. Nenhum teste é executado no seu computador.</p></div>');
   dialogo.classList.add("benchmark-dialog");
   let limpar;
   dialogo.querySelectorAll("[data-benchmark-type]").forEach(botao => botao.addEventListener("click",() => {
@@ -77,5 +80,5 @@ export function abrirCompraBuild(build,catalogo) {
   const rede = normalizarRede(build.rede);
   const extra = build.incluirRede && rede.tipo !== "indefinido" && rede.possuiAcessorio === false &&
     !itens.some(({categoria}) => categoria === (rede.tipo === "cabo" ? "cabo_rede" : "adaptador_wifi")) ? '<div class="benchmark-empty"><strong>Acessório de rede a incluir</strong><p>' + h(resumoRede(rede)) + (rede.comprimentoCaboM ? ' · ' + rede.comprimentoCaboM + ' m' : '') + '. Escolha um produto com as especificações necessárias na loja. Esse acessório ainda não tem oferta cadastrada.</p></div>' : '';
-  return abrirDialogoBuild("Comprar build",'<p class="planning-help">' + h(build.titulo) + ' · escolha onde comprar cada peça. As quantidades não são enviadas automaticamente ao carrinho da loja. Os preços podem mudar na loja.</p>' + avisoCompraHtml() + '<div class="build-purchase-list">' + linhas + '</div>' + extra);
+  return abrirDialogoBuild("Comprar build",'<p class="planning-help">' + h(build.titulo) + ' · escolha onde comprar cada peça. As quantidades não são enviadas automaticamente ao carrinho da loja. Os preços podem mudar na loja.</p>' + avisoFreteHtml() + avisoCompraHtml() + '<div class="build-purchase-list">' + linhas + '</div>' + extra);
 }

@@ -21,9 +21,16 @@
   background: var(--cor-p4);
   color: var(--cor-6);
   font: 500 1rem/1.4 "Lexend", sans-serif;
+  /* O deslocamento sozinho pode ser revelado pela rolagem elástica do macOS. */
+  opacity: 0;
+  pointer-events: none;
   transform: translateY(calc(-100% - 20px));
 }
-.skip-link:focus-visible { transform: none; }
+.skip-link:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
 main:focus { outline: none; }
 /* O HTML estático não revela a área interna antes da confirmação da sessão. */
 body[data-private-page]:not([data-session-state="authorized"]) main { visibility: hidden; }
