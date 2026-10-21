@@ -248,9 +248,10 @@ def test_geracao_rejeita_transferencia_de_sobra_antes_de_salvar(app_build, mocke
     cliente = app_build.test_client()
     autenticar(cliente)
     resposta = cliente.post("/build/", json={**PEDIDO, "percentual_perifericos": 20})
-    assert resposta.status_code == 400
-    assert ("limite destinado ao PC" if excesso == "pc" else "limite reservado para periféricos") in resposta.json["erro"]
-    llm.assert_called_once()
+    assert resposta.status_code == 502
+    assert resposta.json["codigo"] == "geracao-invalida"
+    assert ("limite destinado ao PC" if excesso == "pc" else "limite reservado para periféricos") in llm.call_args.args[0]
+    assert llm.call_count == 2
     with app_build.app_context():
         assert Build.query.count() == BuildSalva.query.count() == 0
 
@@ -293,9 +294,10 @@ def test_geracao_rejeita_conflito_antes_de_gravar_build(app_build, mocker):
     cliente = app_build.test_client()
     autenticar(cliente)
     resposta = cliente.post("/build/", json=PEDIDO)
-    assert resposta.status_code == 400
-    assert "incompatibilidades" in resposta.json["erro"]
-    llm.assert_called_once()
+    assert resposta.status_code == 502
+    assert resposta.json["codigo"] == "geracao-invalida"
+    assert "incompatibilidades" in llm.call_args.args[0]
+    assert llm.call_count == 2
     with app_build.app_context():
         assert Build.query.count() == BuildSalva.query.count() == 0
 
@@ -401,3 +403,166 @@ def test_email_nao_verificado_bloqueia_todas_as_criacoes_sem_chamar_llm(app_buil
     llm.assert_not_called()
     with app_build.app_context():
         assert BuildSalva.query.count() == 1
+
+
+@pytest.mark.parametrize("falha", ["gpu", "json", "id", "quantidade", "texto", "duplicada", "orcamento", "rede"])
+def test_ia_corrige_saida_invalida_antes_de_persistir(app_build, mocker, falha):
+    tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "placa_video"]
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+        MODELOS["processador"].buscar_por_id(1).videointegrado = False
+        db.session.commit()
+    correta = {**PEDIDO, "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos]}
+    invalida = deepcopy(correta)
+    if falha == "gpu":
+        invalida["componentes"].pop()
+    elif falha == "json":
+        invalida = '{"componentes":'
+    elif falha == "id":
+        invalida["componentes"][0]["id"] = 999
+    elif falha == "quantidade":
+        invalida["componentes"][0]["quantidade"] = 0
+    elif falha == "texto":
+        invalida["nome"] = []
+    elif falha == "duplicada":
+        invalida["componentes"].append(deepcopy(invalida["componentes"][0]))
+    elif falha == "orcamento":
+        invalida["componentes"][5]["quantidade"] = 60
+    else:
+        invalida["componentes"].append({"tipo": "cabo_rede", "id": 1})
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=[invalida, correta])
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    resposta = cliente.post("/build/", json=PEDIDO)
+    assert resposta.status_code == 201, resposta.json
+    assert llm.call_count == 2
+    assert "REVISÃO OBRIGATÓRIA" in llm.call_args.args[0]
+    assert "NOVO JSON COMPLETO" in llm.call_args.args[0]
+    assert resposta.json["build"]["estado"]["componentes"]["placa_video"]["id"] == 1
+    with app_build.app_context():
+        assert Build.query.count() == BuildSalva.query.count() == 1
+
+
+def test_ia_invalida_duas_vezes_nao_persiste_nem_repete_sem_limite(app_build, mocker):
+    with app_build.app_context():
+        cadastrar_pecas(["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd"])
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value="JSON inválido")
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    resposta = cliente.post("/build/", json=PEDIDO)
+    assert resposta.status_code == 502 and resposta.json["codigo"] == "geracao-invalida"
+    assert "Nenhuma build foi salva" in resposta.json["erro"]
+    assert llm.call_count == 2
+    with app_build.app_context():
+        assert Build.query.count() == BuildSalva.query.count() == 0
+
+
+def test_revisao_reverifica_vaga_antes_de_gastar_outra_consulta(app_build, mocker):
+    with app_build.app_context():
+        cadastrar_pecas(["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd"])
+        for _ in range(2):
+            CriarBuildManualService().executar(1, ESTADO)
+    def ocupar(*_args):
+        CriarBuildManualService().executar(1, ESTADO)
+        return "JSON inválido"
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=ocupar)
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    resposta = cliente.post("/build/", json=PEDIDO)
+    assert resposta.status_code == 409
+    llm.assert_called_once()
+    with app_build.app_context():
+        assert BuildSalva.query.count() == 3 and Build.query.count() == 0
+
+
+def test_fallback_de_transporte_nao_inicia_outro_ciclo_de_correcao(app_build, mocker):
+    from requests.exceptions import Timeout
+    with app_build.app_context():
+        cadastrar_pecas(["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd"])
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=["JSON inválido", Timeout(), "JSON inválido"])
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    resposta = cliente.post("/build/", json=PEDIDO)
+    assert resposta.status_code == 502 and resposta.json["codigo"] == "geracao-invalida"
+    assert llm.call_count == 3
+    with app_build.app_context():
+        assert BuildSalva.query.count() == Build.query.count() == 0
+
+
+@pytest.mark.parametrize("falha,status,codigo", [("timeout",504,"ia-timeout"),("conexao",503,"ia-indisponivel"),("limite",503,"ia-limite"),("http",502,"ia-provedor")])
+def test_falha_do_provedor_nao_e_tratada_como_erro_do_usuario(app_build, mocker, falha, status, codigo):
+    from requests import Response
+    from requests.exceptions import Timeout, ConnectionError, HTTPError
+    with app_build.app_context():
+        cadastrar_pecas(["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd"])
+    resposta_provedor = Response()
+    resposta_provedor.status_code = 429 if falha == "limite" else 503
+    resposta_provedor.headers["Retry-After"] = "45"
+    erro = Timeout() if falha == "timeout" else ConnectionError() if falha == "conexao" else HTTPError(response=resposta_provedor)
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=erro)
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    resposta = cliente.post("/build/", json=PEDIDO)
+    assert resposta.status_code == status and resposta.json["codigo"] == codigo
+    assert llm.call_count == 2
+    if falha == "limite":
+        assert resposta.headers["Retry-After"] == "45"
+    with app_build.app_context():
+        assert BuildSalva.query.count() == Build.query.count() == 0
+
+
+@pytest.mark.parametrize("valor", [{"valor": 5000}, [], "sem valor", 10**400])
+def test_orcamento_malformado_nao_gasta_consulta(app_build, mocker, valor):
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    resposta = cliente.post("/build/", json={**PEDIDO,"orcamento":valor})
+    assert resposta.status_code == 400
+    llm.assert_not_called()
+
+
+def test_menu_tranca_visibilidade_edicao_copia_e_exclusao_na_conta(app_build):
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    criada = cliente.post("/build/manual",json=ESTADO).json["build"]
+    rota = "/build/" + criada["id"]
+    assert cliente.get(rota + "/publica").status_code == 404
+    estado = {**criada["estado"],"titulo":"PC editado","visibilidade":"publico"}
+    assert cliente.put(rota,json=estado).status_code == 200
+    assert cliente.get(rota + "/publica").json["build"]["nome"] == "PC editado"
+    estado["travada"] = True
+    assert cliente.put(rota,json=estado).status_code == 200
+    for alteracao in [{**estado,"titulo":"Não salvar"},{**estado,"visibilidade":"privado"}]:
+        assert cliente.put(rota,json=alteracao).status_code == 400
+    assert cliente.delete(rota).status_code == 400
+    assert cliente.get(rota).json["build"]["nome"] == "PC editado"
+    copia = cliente.post(rota + "/duplicar").json["build"]
+    assert copia["id"] != criada["id"]
+    assert copia["estado"]["visibilidade"] == "privado" and not copia["estado"]["travada"]
+    assert cliente.put(rota,json={"travada":False}).status_code == 200
+    assert cliente.delete(rota).status_code == 204
+    assert cliente.get(rota).status_code == 404
+    assert cliente.get("/build/" + copia["id"]).status_code == 200
+
+
+def test_menu_setup_atual_alterna_e_operacoes_respeitam_proprietario(app_build):
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    primeira = cliente.post("/build/manual",json=ESTADO).json["build"]
+    segunda = cliente.post("/build/manual",json={**ESTADO,"titulo":"Segunda"}).json["build"]
+    assert cliente.post("/build/" + primeira["id"] + "/setup-atual").status_code == 200
+    assert cliente.post("/build/" + segunda["id"] + "/setup-atual").status_code == 200
+    salvas = cliente.get("/build/").json["builds"]
+    assert [b["id"] for b in salvas if b["estado"].get("setupAtual")] == [segunda["id"]]
+    cliente.post("/build/" + segunda["id"] + "/setup-atual")
+    assert not any(b["estado"].get("setupAtual") for b in cliente.get("/build/").json["builds"])
+    with cliente.session_transaction() as sessao:
+        sessao["_user_id"] = "2"
+    rota = "/build/" + primeira["id"]
+    assert cliente.get(rota).status_code == 404
+    assert cliente.put(rota,json=ESTADO).status_code == 400
+    assert cliente.delete(rota).status_code == 400
+    assert cliente.post(rota + "/setup-atual").status_code == 404
+    assert cliente.post(rota + "/duplicar").status_code == 400
+    with app_build.app_context():
+        assert BuildSalva.query.count() == 2

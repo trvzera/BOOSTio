@@ -55,13 +55,14 @@
         </div>
       </div>
 
-      <div class="builds-toolbar">
-        <button type="button" class="btn-secondary" id="btn-compare-builds" aria-label="Comparar builds" data-disabled-reason="Salve pelo menos duas builds para comparar." disabled>Comparar builds</button>
-      </div>
+      <section class="builds-toolbar builds-compare-callout glass-card" aria-labelledby="builds-compare-title">
+        <div class="builds-compare-copy"><h2 id="builds-compare-title" class="font-1-m-b">Qual build combina mais com você?</h2><p class="font-2-xs">Compare preços, componentes, consumo e renderização lado a lado.</p></div>
+        <button type="button" class="btn-primary" id="btn-compare-builds" aria-label="Comparar minhas builds" data-disabled-reason="Salve pelo menos duas builds para comparar." disabled>Comparar builds</button>
+      </section>
 
       <section class="builds-account-section" aria-labelledby="builds-account-title">
         <h2 id="builds-account-title" class="font-1-m">Builds salvas na conta</h2>
-        <p id="builds-account-status" class="font-2-s" role="status">Carregando suas builds…</p>
+        <div id="builds-account-status" class="font-2-s" role="status" aria-live="polite">Carregando suas builds…</div>
         <div id="builds-account-list"></div>
       </section>
 

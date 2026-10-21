@@ -55,13 +55,13 @@ As limitações de cada funcionalidade estão indicadas na última coluna.
 | 01 | Criar conta e fazer login | ✅ **Implementado** | Cadastro, autenticação, logout e sessão. |
 | 02 | Cadastrar o setup atual | ✅ **Implementado** | Definir ou remover uma build como computador atual. |
 | 03 | Pesquisar peças e compatibilidade | ✅ **Implementado** | Catálogo por categoria e diagnóstico durante a montagem, com as limitações do requisito 13. |
-| 04 | Montar por formulário | ✅ **Implementado** | Geração por LLM conforme uso, orçamento e peças próprias; conflitos técnicos conhecidos são rejeitados antes de salvar. |
+| 04 | Montar por formulário | ✅ **Implementado** | Geração por LLM com validação e uma revisão automática de saídas inválidas antes de salvar. |
 | 05 | Salvar configurações | ✅ **Implementado** | Builds persistidas na conta, inclusive incompletas, com salvamento automático. |
 | 06 | Excluir configurações salvas | ✅ **Implementado** | Exclusão com verificação de proprietário e tranca. |
-| 07 | Comparar configurações salvas | 🟡 **Parcial** | Comparação de duas ou três builds; comparação de desempenho ainda em evolução. |
+| 07 | Comparar configurações salvas | 🟡 **Parcial** | Preços, componentes, consumo e renderização no Blender de duas ou três builds; comparação de FPS ainda pendente. |
 | 08 | Compartilhar configurações por link | ✅ **Implementado** | Links de builds públicas e controle de visibilidade; páginas internas exigem sessão. |
 | 09 | Buscar melhorias do setup | 🟡 **Parcial** | Prévia e aplicação de trocas em todas as categorias; ganhos de desempenho e ofertas atualizadas a consolidar. |
-| 10 | Ver configurações prontas | ✅ **Implementado** | Dez modelos para diferentes públicos e orçamentos, sem periféricos. |
+| 10 | Ver configurações prontas | ✅ **Implementado** | 16 modelos sem periféricos, ordenados do menor para o maior preço cadastrado. |
 | 11 | Editar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento. |
 | 12 | Consultar preços das peças pelo site | 🟡 **Parcial** | Preços cadastrados, data de atualização quando disponível e links das lojas; monitoramento contínuo em evolução. |
 | 13 | Ver compatibilidade e consumo de energia | 🟡 **Parcial** | Diagnóstico Python de conflitos e dados não verificados; validação técnica e física completa a concluir. |
@@ -96,7 +96,7 @@ orçamento para a entrega.
 
 ## Builds prontas
 
-Dez pontos de partida para **estudos, home office, programação, jogos,
+16 pontos de partida para **estudos, home office, programação, jogos,
 criação de conteúdo, modelagem no Blender e máquinas virtuais**, com plataformas
 AM4, AM5 e Intel e diferentes níveis de investimento.
 
@@ -138,6 +138,10 @@ Dados públicos de CPU ou GPU, com **mediana em amostras por minuto**, versão d
 Blender, método de renderização e quantidade de resultados. O retorno foi validado
 pelo serviço Python em **21/10/2026**, sem garantia de disponibilidade permanente.
 
+A comparação de builds consulta esses dados ao clicar em **Comparar renderização**.
+CPU e GPU são analisadas separadamente; só há classificação quando todas as builds
+exibidas têm resultados da mesma versão do Blender e do mesmo método de renderização.
+
 ### Limites da estimativa
 
 Essas consultas **não executam um benchmark no computador do usuário**. RAM,
@@ -175,11 +179,17 @@ servidor e a consolidação dos dados usados pelas sugestões e consultas:
 - **Peças próprias:** identificar modelos para avaliar suas especificações reais.
 - **Jogos:** vincular requisitos mínimos e recomendados ao hardware da build.
 - **Preços:** consolidar o monitoramento agendado e a atualização do catálogo.
-- **Desempenho:** comparar configurações nas mesmas condições e tratar a instabilidade das fontes externas.
+- **Desempenho:** concluir a comparação de FPS e tratar a instabilidade das fontes externas.
 
 A geração pela LLM já revalida conflitos conhecidos no catálogo, incluindo socket,
 DDR, slots, potência e medidas explícitas. Especificações ausentes continuam não
 verificadas; a configuração não recebe garantia de compatibilidade completa.
+
+Saídas inválidas da IA recebem **uma tentativa automática de correção**, com o erro
+da validação e as regras originais. A nova resposta é validada por completo antes
+de persistir. Isso cobre falhas como GPU obrigatória ausente, JSON inválido, IDs,
+quantidades, orçamento e conflitos conhecidos; não garante solução quando o catálogo
+ou o orçamento não permitem a montagem. Falhas de transporte e cotas recebem mensagens próprias.
 
 ---
 

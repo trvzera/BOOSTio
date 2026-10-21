@@ -28,10 +28,10 @@ test("visitante só acessa páginas públicas e recuperação de conta",async ()
   }
 });
 
-test("dez modelos sem periféricos estão completos nos dados disponíveis e cobrem usos e valores distintos",() => {
+test("dezesseis modelos sem periféricos estão completos nos dados disponíveis e cobrem usos e valores distintos",() => {
   const modelos = modelosProntos(catalogo);
-  assert.equal(modelos.length,10);
-  assert.equal(new Set(modelos.map(b=>b.id)).size,10);
+  assert.equal(modelos.length,16);
+  assert.equal(new Set(modelos.map(b=>b.id)).size,16);
   assert.ok(new Set(modelos.map(b=>b.objetivo)).size>=5);
   for (const build of modelos) {
     const avaliacao = avaliarBuild(build,catalogo);

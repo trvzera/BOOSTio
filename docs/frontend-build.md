@@ -6,6 +6,47 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Comparação, modelos e revisão da geração — 21/10/2026
+
+- Minhas builds destaca a comparação em um bloco próprio, liberado com pelo menos
+  duas builds. O estado vazio fica centralizado com borda pontilhada e atalhos para
+  criar uma montagem ou explorar modelos. Cada card mostra preço mesmo com descrição;
+  totais incompletos são parciais e falta de cotação não vira produto gratuito.
+- O editor usa o nome da build como título e oferece edição pelo lápis Lottie,
+  mantendo o campo de detalhes sincronizado, o título da aba e o salvamento da conta.
+  Nome vazio e build trancada não podem ser salvos por esse controle.
+- São 16 modelos sem periféricos. A vitrine usa ordem crescente de preços disponíveis,
+  deixando modelos totalmente sem cotação ao final. Modelos incompletos continuam
+  identificados como parciais; a ordem não transforma subtotal em cotação completa.
+- `build/comparacao-renderizacao.js` reutiliza o cliente Python de Blender. A consulta
+  é explícita, por CPU ou GPU, deduplica hardware repetido e mantém cache só no modal.
+  Trocar o tipo, mudar as builds ou fechar a comparação cancela a consulta em curso.
+  O destaque exige resultado de todas as builds e mesma versão/tipo/método; empate
+  é preservado e ausência de modelo/dados não vira zero. As pontuações de CPU/GPU
+  nunca são somadas nem apresentadas como teste do PC completo.
+- `CriarBuildService` solicita uma revisão quando o retorno da LLM é inválido:
+  JSON/formato, componentes obrigatórios (inclusive GPU quando necessária), IDs,
+  quantidades, preços, estoque, rede, orçamento e conflitos técnicos conhecidos.
+  A revisão recebe o diagnóstico e as regras originais e deve devolver a build inteira.
+  Há no máximo uma correção, com rechecagem de quota antes dela e validação completa
+  antes de persistir. O fallback de transporte já existente não abre outro ciclo de
+  correção: são no máximo três chamadas na requisição combinada, sem novos provedores.
+- `LLMService` valida a conclusão e estrutura do retorno conforme o
+  [contrato do Gemini](https://ai.google.dev/api/generate-content), concatena partes
+  textuais sem pensamentos e não transforma resposta truncada/vazia em build.
+  Falha após a revisão retorna `502 / geracao-invalida`; timeout, indisponibilidade e
+  cota têm códigos próprios. `Retry-After` só é repassado quando informado e válido.
+  Não é possível garantir uma build válida com qualquer orçamento/catálogo.
+- Ações do menu verificadas: benchmark, melhorias, definir/remover setup atual,
+  trancar/destrancar, visibilidade, detalhes, duplicar, copiar link, JSON, CSV e excluir.
+  Tranca bloqueia detalhes, visibilidade e exclusão; cópia respeita quota/e-mail.
+  O link público é copiado, mas a regra atual do frontend ainda exige login para
+  visualizá-lo. Não foi criada exceção à política de páginas privadas nesta rodada.
+- Validação: 221 testes Node, 277 testes Python (+4 subtestes) e 77 verificações
+  em Chrome, em 320/768/1440 px. LLM, transporte e consultas Blender simulados;
+  bancos SQLite temporários para as rotas. Sem executar `app.py`, migrações,
+  acessar o banco real, consumir a LLM real ou habilitar a HowManyFPS.
+
 ### Imagens, navegação e resumo do perfil — 21/10/2026
 
 - O catálogo da conta preserva a imagem recebida da API. Quando ela está vazia,

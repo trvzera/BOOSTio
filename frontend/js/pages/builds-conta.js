@@ -3,6 +3,7 @@ import "../auth/auth.js";
 import { listarBuilds, criarBuildManual, atualizarBuild, duplicarBuild, excluirBuild, definirSetupAtual, LIMITE_BUILDS, verificarEspacoBuild } from "../api/build/builds.js";
 import { carregarCatalogoConta, buildDaConta, estadoParaConta, linkBuildConta } from "../build/conta.js";
 import { htmlSeguro as h, moeda } from "../build/catalogo.js";
+import { itensSelecionados } from "../build/estado.js";
 import { avaliarBuild } from "../build/compatibilidade.js";
 import { abrirBenchmark, abrirDialogoBuild, motivoBenchmark } from "../build/acoes-build.js";
 import { abrirComparacao } from "../build/comparacao.js";
@@ -52,12 +53,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       const [resposta, pecas] = await Promise.all([listarBuilds(), carregarCatalogoConta()]);
       salvas = resposta.builds || []; catalogo = pecas; carregadas = true;
       renderizar();
-    } catch (erro) { status.hidden = false; status.textContent = erro.message; status.dataset.tone = "error"; }
+    } catch (erro) { status.hidden = false; status.classList.remove("builds-empty"); status.textContent = erro.message; status.dataset.tone = "error"; }
   }
 
   function card(dados) {
     const build = local(dados), avaliacao = avaliarBuild(build, catalogo);
     const progresso = Math.round(avaliacao.preenchidos / avaliacao.total * 100);
+    const itens = itensSelecionados(build,catalogo);
+    const precoParcial = avaliacao.faltam.length > 0 || itens.some(({peca}) => !peca || !Number.isFinite(peca.preco) || peca.preco <= 0);
     const trancada = build.travada, setup = Boolean(dados.estado?.setupAtual);
     const classe = avaliacao.erros.length ? "error" : avaliacao.avisos.length ? "warning" : progresso === 100 ? "complete" : "incomplete";
     const icones = {benchmark:"magic",melhorias:"magnifying","setup-atual":"circledot",trancar:"lock",visibilidade:"visibility",editar:"pencil",duplicar:"clone","copiar-link":"copy","baixar-csv":"download","baixar-json":"download",deletar:"trash"};
@@ -76,7 +79,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         <span class="build-menu-divider"></span>${opcao("baixar-csv","Baixar build (CSV)")}${opcao("baixar-json","Baixar build (JSON)")}
         <span class="build-menu-divider"></span>${opcao("deletar","Deletar build",trancada)}
       </div></div></div>
-      <p class="build-card-desc font-2-xs">${h(build.descricao || `${dados.componentes.length} peças · ${moeda(dados.preco_total)}`)}</p>
+      <p class="build-card-desc font-2-xs">${h(build.descricao || "")}</p>
+      <div class="build-card-price"><span>${precoParcial ? "Total parcial" : "Total cadastrado"}</span><strong>${Number.isFinite(avaliacao.preco) && avaliacao.preco > 0 ? moeda(avaliacao.preco) : "Preço a consultar"}</strong><small>Sem frete</small></div>
       <div class="build-card-meta"><p class="build-card-percent font-1-l">${progresso}%</p><div class="build-progress" role="progressbar" aria-label="Preenchimento de ${h(build.titulo)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progresso}"><div class="build-progress-fill" style="width:${progresso}%"></div></div>
       <div class="build-card-bottom"><span class="build-visibility ${build.visibilidade}">${build.visibilidade === "publico" ? "Pública" : "Privada"}</span><time class="build-card-date font-2-xs" datetime="${h(dados.criado_em)}">${h(formatarDataHora(dados.criado_em))}</time></div></div></article>`;
   }
@@ -84,7 +88,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   function renderizar() {
     status.hidden = salvas.length > 0;
     status.dataset.tone = "info";
-    status.textContent = salvas.length ? "" : "Você ainda não tem builds salvas na conta.";
+    status.classList.toggle("builds-empty",salvas.length === 0);
+    status.innerHTML = salvas.length ? "" : '<strong class="font-1-m-b">Suas próximas ideias começam aqui</strong><p class="font-2-xs">Você ainda não tem builds salvas. Crie uma montagem ou escolha uma build pronta para personalizar.</p><div class="builds-empty-actions"><button type="button" class="btn-primary" data-empty-create aria-label="Criar minha primeira build">Criar minha primeira build</button><a class="btn-secondary" href="./configuracoes-prontas.html" aria-label="Explorar builds prontas">Explorar builds prontas</a></div>';
     lista.innerHTML = salvas.map(card).join("");
     document.querySelector("#quota-count").textContent = `${salvas.length} / ${LIMITE_BUILDS}`;
     document.querySelector("#quota-progress").setAttribute("aria-valuenow",String(Math.min(LIMITE_BUILDS,salvas.length)));
@@ -224,6 +229,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.querySelector("#btn-compare-builds").onclick = () => {
     try { abrirComparacao(salvas.map(local),catalogo); } catch (erro) { avisar(erro.message); }
   };
+  status.addEventListener("click",evento => { if (evento.target.closest("[data-empty-create]")) document.querySelector("#btn-create-build").click(); });
   document.querySelector("#cancel-build-edit").onclick = () => { idEdicao = null; modalEditar.classList.remove("open"); };
   document.querySelector("#save-build-edit").onclick = async () => {
     const dados = encontrar(idEdicao);
