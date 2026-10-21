@@ -6,6 +6,27 @@ import { redirecionamentoSessao, linksVisitante, linksAutenticado } from "../js/
 import { perfilLoading } from "../js/components/page-loading.js";
 import { ofertasPeca } from "../js/build/catalogo.js";
 import { destinoAnterior, rotuloVoltar } from "../js/components/navigation-back.js";
+import { avisoFreteHtml } from "../js/build/acoes-build.js";
+
+test("montagem lembra de reservar orçamento para frete sem inventar uma cotação",() => {
+  const aviso = avisoFreteHtml();
+  assert.match(aviso,/Frete não incluído/);
+  assert.match(aviso,/Reserve parte do orçamento para a entrega/);
+  assert.match(aviso,/CEP e as lojas escolhidas/);
+  assert.match(aviso,/class="shipping-notice planning-help" role="note"/);
+  assert.doesNotMatch(aviso,/R\$|\d+%|role="alert"/);
+});
+
+test("aviso de frete fica junto ao total e também acompanha a compra da build",async () => {
+  const editor = await readFile(new URL("../js/pages/configuracao-build.js",import.meta.url),"utf8");
+  const salva = await readFile(new URL("../js/build/build-salva.js",import.meta.url),"utf8");
+  const acoes = await readFile(new URL("../js/build/acoes-build.js",import.meta.url),"utf8");
+  const css = await readFile(new URL("../styles/build/recursos.css",import.meta.url),"utf8");
+  assert.match(editor,/'<\/strong>' \+ avisoFreteHtml\(\) \+ '<div class="summary-power"/);
+  assert.match(salva,/class="summary-total">[^\n]+\n\s*\$\{avisoFreteHtml\(\)\}/);
+  assert.match(acoes,/avisoFreteHtml\(\) \+ avisoCompraHtml\(\) \+ '<div class="build-purchase-list"/);
+  assert.match(css,/\.shipping-notice strong \{[^}]*color: var\(--cor-p1\)/);
+});
 
 test("sair e excluir conta mantêm perigo vermelho, sem alterar a verificação de e-mail",async () => {
   const menu = await readFile(new URL("../styles/componentes/site-menu.css",import.meta.url),"utf8");

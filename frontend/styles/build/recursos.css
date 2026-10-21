@@ -7,6 +7,8 @@
 .planning-help[data-tone="error"] { color: var(--status-error); }
 .planning-help[data-tone="success"] { color: var(--status-success); }
 .purchase-notice { margin: 16px 0; padding: 14px 16px; border-left: 2px solid var(--cor-p1); border-radius: 0 12px 12px 0; background: rgba(0,123,255,.04); }
+.shipping-notice { margin: 12px 0 16px; padding: 12px 14px; border: 1px solid rgba(0,123,255,.2); border-radius: 12px; background: rgba(0,123,255,.04); }
+.shipping-notice strong { display: block; margin-bottom: 4px; color: var(--cor-p1); font-weight: 500; }
 .planning-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; margin: 18px 0; }
 .network-fields { display: grid; gap: 16px; }
 .network-fields > .planning-help { margin: -6px 0 0; }

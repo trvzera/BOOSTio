@@ -370,6 +370,12 @@ validação local de arquivos: formatar o aviso não substitui peças nem altera
 As fontes locais declaradas em `tipografia.css` são verificadas por testes de caminho
 e cabeçalho WOFF2, além de carregamento e fonte efetivamente renderizada no Chrome.
 
+O total da montagem e da build compartilhada exibe **Frete não incluído**, com
+orientação para reservar parte do orçamento e conferir a entrega por CEP/loja.
+O aviso também aparece em Comprar build. É informativo: não altera compatibilidade,
+não inventa uma cotação, não soma frete ao preço das peças nem desconta uma reserva
+automaticamente. Cálculo real de entrega depende das lojas e do endereço de destino.
+
 `js/pages/loading.js` usa `sessionStorage["boostio:visita-iniciada"]`, não a conta.
 Primeira visita da aba/sessão e toda entrada na home usam vídeo. A home sempre mantém 1×.
 As demais páginas mostram um loading curto (linha animada sobre preto), espera mínima
