@@ -32,6 +32,22 @@ test("sugestões mostram imagem, preço e seleção sem prometer ganho de desemp
   assert.match(css,/\.upgrade-real-candidate-image img \{[^}]*object-fit: contain/);
 });
 
+test("categorias de melhorias usam o checkbox Lottie compartilhado e a cor primária",() => {
+  assert.match(js,/CATEGORIAS\.map\(categoria => '<label class="ui-check"><input type="checkbox"/);
+  assert.match(js,/iconeAnimado\("checkbox"\) \+ '<span>' \+ categoria\.nome/);
+  assert.match(css,/\.ui-check > input \{ width: 100%; height: 100%;[^}]*accent-color: var\(--cor-p1\)/);
+  assert.match(css,/input:checked \+ \.ui-lottie svg path\[stroke\][^{]+\{ stroke: var\(--cor-p1\); \}/);
+  assert.match(css,/input:checked \+ \.ui-lottie svg path\[fill\][^{]+\{ fill: var\(--cor-p6\); \}/);
+  assert.doesNotMatch(css,/var\(--cor-s\d/);
+});
+
+test("laboratório de melhorias reutiliza o mesmo Lottie sem duplicar o input",async () => {
+  const codigo = await ler("js/pages/test-upgrades.js");
+  assert.match(codigo,/caixa\.closest\("label"\)\.classList\.add\("ui-check"\)/);
+  assert.match(codigo,/caixa\.insertAdjacentHTML\("afterend",iconeAnimado\("checkbox"\)\)/);
+  assert.match(codigo,/iniciarIcones\(document\.querySelector\("\.test-upgrade-categories"\)\)/);
+});
+
 test("prévia considera todas as peças antigas e distingue dicas, avisos e erros",() => {
   assert.match(js,/itens\.map\(item =>/);
   assert.match(js,/item\.quantidade > 1 \? item\.quantidade \+ " × "/);

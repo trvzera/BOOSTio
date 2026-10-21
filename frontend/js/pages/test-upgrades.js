@@ -2,6 +2,7 @@ import { htmlSeguro as h, moeda, nomePeca } from "../build/catalogo.js";
 import { itensCategoria } from "../build/estado.js";
 import { pecaCompativel, selecionarPecaCompativel } from "../build/compatibilidade.js";
 import { avaliarTrocaMelhoria, exigirTrocaMelhoria } from "../build/validar-melhoria.js";
+import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 
 const CATEGORIAS = [
   { id:"processador", nome:"Processador" },
@@ -15,6 +16,11 @@ export function iniciarTesteMelhorias({builds,catalogo,valorBudget,informar}) {
   const previa = document.querySelector("#upgrade-preview");
   const feedback = document.querySelector("#upgrade-feedback");
   const checkboxes = [...document.querySelectorAll('input[name="upgrade-category"]')];
+  checkboxes.forEach(caixa => {
+    caixa.closest("label").classList.add("ui-check");
+    if (!caixa.nextElementSibling?.matches('[data-lottie="checkbox"]')) caixa.insertAdjacentHTML("afterend",iconeAnimado("checkbox"));
+  });
+  iniciarIcones(document.querySelector(".test-upgrade-categories"));
   const porId = new Map(builds.map(build => [build.id,build]));
   let original = builds[0];
   let simulada = structuredClone(original);

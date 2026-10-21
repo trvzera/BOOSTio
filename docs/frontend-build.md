@@ -8,6 +8,15 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
 
 ### Busca de melhorias e responsividade — 21/10/2026
 
+- **Checkboxes:** o modal e o laboratório usam `iconeAnimado("checkbox")` e o
+  controlador compartilhado. O input nativo continua acessível e ocupa todo o label;
+  o Lottie fica com 1,5 rem. Ao marcar, traço em `--cor-p1` e preenchimento em
+  `--cor-p6`, sem alterar o JSON ou as cores de outras áreas. Estado inicial,
+  animação reversa e instância preservados nas atualizações. Sem Lottie ou com
+  movimento reduzido, permanece o check estático com foco de teclado em azul primário.
+  Validação: 289 testes Node e 90 verificações Chrome em 320/768/1440 px, com
+  animação normal, movimento reduzido e CDN bloqueado; inclui o laboratório.
+
 - **Filtro contra trocas inferiores:** `build/validar-melhoria.js` é compartilhado
   pelo modal real e pelo laboratório. A regra filtra as sugestões e é reexecutada
   ao selecionar/simular e imediatamente antes de confirmar, sem inferir desempenho
