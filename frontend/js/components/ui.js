@@ -1,5 +1,6 @@
 import { registrarAnimacao, destruirAnimacao } from "./lottie-controller.js";
 import { iniciarVoltar, atualizarBotoesVoltar } from "./navigation-back.js";
+import { iniciarImagens } from "../build/imagens-produtos.js";
 
 const arquivos = {
   plus:"plus.json", trash:"buildTrash.json", cart:"cartshopping.json", import:"login.json",
@@ -33,6 +34,7 @@ export function iconeAnimado(nome, direcao = "internal", {invertido = false} = {
     ' aria-hidden="true"><span class="ui-icon-fallback">' + (alternativas[nome] || "") + '</span></span>';
 }
 export function iniciarIcones(raiz = document) {
+  iniciarImagens(raiz);
   for (const [elemento, estado] of ativos) {
     if (!elemento.isConnected) {
       estado.limpar(); destruirAnimacao(elemento.id,estado.animacao); ativos.delete(elemento);

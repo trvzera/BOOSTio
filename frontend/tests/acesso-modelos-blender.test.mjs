@@ -72,8 +72,9 @@ test("periféricos próprios viajam separados do hardware e não vazam ao mudar 
   assert.deepEqual(pecasPropriasFormulario({...respostas,pecas:["processador"],pecasDetalhes:{...respostas.pecasDetalhes,processador:"Ryzen 5 5600"}}),{processador:"Ryzen 5 5600",monitor:"Meu monitor",fone:"Meu headset"});
 });
 
-test("hamburger tem criação e navegação pública sem repetir páginas do perfil",() => {
-  assert.deepEqual(linksAutenticado.map(l=>l.pagina),["index.html","builds.html?criar=1","termos.html","sobre.html"]);
+test("hamburger tem criação, minhas builds autenticadas e navegação pública",() => {
+  assert.deepEqual(linksAutenticado.map(l=>l.pagina),["index.html","builds.html","builds.html?criar=1","termos.html","sobre.html"]);
+  assert.equal(linksAutenticado.find(l=>l.pagina==="builds.html").autenticado,true);
   assert.ok(linksAutenticado.every(l=>l.icone));
 });
 

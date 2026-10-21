@@ -95,6 +95,7 @@
 .component-image-link { flex: 0 0 64px; border-radius: 14px; }
 .component-image { flex: 0 0 44px; }
 .component-image img { width: 44px; height: 44px; object-fit: contain; }
+[data-product-image][hidden], [data-product-placeholder][hidden] { display: none; }
 .component-image-link img { width: 64px; height: 64px; object-fit: contain; border-radius: 14px; }
 .component-image-link:hover .component-placeholder { color: var(--cor-p1); border-color: var(--cor-p1); }
 .component-copy { flex: 1; min-width: 0; }

@@ -6,6 +6,28 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Imagens, navegação e resumo do perfil — 21/10/2026
+
+- O catálogo da conta preserva a imagem recebida da API. Quando ela está vazia,
+  `build/imagens-produtos.js` consulta o manifesto local por `part_number` exato,
+  sem associar fotos por semelhança de nome ou por IDs de outro banco. O catálogo
+  demonstrativo reutiliza o mesmo carregamento. Os caminhos são resolvidos pelo
+  módulo, tanto em `pages/` quanto no laboratório; fotos quebradas têm alternativa
+  neutra, sem impedir a escolha da peça. Os 750 arquivos do manifesto foram conferidos.
+- O hamburger volta a exibir setas Lottie à direita e inclui **Minhas builds** para
+  usuários autenticados. O perfil mantém seus ícones, sem setas duplicadas.
+- Configurações consulta `GET /build/` para mostrar a quantidade real de builds
+  salvas. Falha de consulta aparece como indisponibilidade, nunca como zero fictício.
+  O novo pill de budget mostra o valor salvo na conta e só muda depois da confirmação
+  do salvamento; ausência, zero e falha são estados distintos. Retorno pelo histórico
+  com cache de página revalida os dados.
+- Checkbox Lottie do budget, ícone do título Perfil e ícones/textos do menu do perfil
+  ficam centralizados verticalmente, incluindo textos quebrados no celular.
+- Validação: 215 testes Node e 90 verificações em Chrome, em 320/768/1440 px,
+  com catálogo/listagem/salvamento simulados, fotos locais reais, fotos ausentes ou
+  quebradas, falhas de API, usuário visitante e animações. Sem iniciar `app.py`,
+  consultar o banco real ou executar migrações.
+
 ### Budget manual e informação não verificada — 20/10/2026
 
 - A criação manual omite `orcamento` quando deve usar o padrão da conta. O Python

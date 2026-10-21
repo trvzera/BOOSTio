@@ -20,12 +20,13 @@ export function iniciarNavegacao() {
   }
   const links = (itens, perfil = false) => itens.map(item =>
     '<a class="' + (perfil ? 'profile-link font-1-s' : 'site-menu-link') + '" href="' + pagina(item.pagina) + '" aria-label="Ir para ' + item.rotulo + '"' +
+    (item.autenticado ? ' data-menu-auth hidden' : '') +
     (location.pathname.endsWith("/" + item.pagina) ? ' aria-current="page"' : "") + '>' +
     '<span class="site-menu-link-label">' + (perfil && item.icone ? iconeAnimado(item.icone) : "") +
-    '<span>' + item.rotulo + '</span></span></a>'
+    '<span>' + item.rotulo + '</span></span>' + (perfil ? '' : iconeAnimado("arrow")) + '</a>'
   ).join("");
   const conta = [
-    {pagina:"builds.html", rotulo:"Builds", icone:"build"},
+    {pagina:"builds.html", rotulo:"Minhas builds", icone:"build"},
     {pagina:"configuracoes.html", rotulo:"Configurações", icone:"user"},
   ];
   const linksMenu = linksAutenticado;
@@ -99,6 +100,7 @@ export function atualizarNavegacao(autenticado) {
   const {host, perfil, hamburger} = iniciarNavegacao();
   host.querySelector("[data-profile-guest]").hidden = Boolean(autenticado);
   host.querySelector("[data-profile-user]").hidden = !autenticado;
+  host.querySelectorAll("[data-menu-auth]").forEach(link => { link.hidden = !autenticado; });
   hamburger.container.hidden = false; // Visitantes também acessam a navegação pública.
   iniciarIcones(host);
   perfil.alternar(false);

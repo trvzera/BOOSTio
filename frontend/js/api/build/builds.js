@@ -18,8 +18,8 @@ export function criarBuild(dados) {
   return fetchComErro("/build/", { method: "POST", body: JSON.stringify(dados) });
 }
 
-export function listarBuilds() {
-  return fetchComErro("/build/", { method: "GET" });
+export function listarBuilds(opcoes = {}) {
+  return fetchComErro("/build/", { ...opcoes, method: "GET" });
 }
 
 export function buscarBuild(id) {
