@@ -87,16 +87,18 @@ def excluir_usuario(usuario_id):
         print(e)
         return jsonify({"erro":"Erro ao excluir o usuario do banco de dados"}),500
 
-@usuario_bp.get("/")
-@login_required
-def listar_usuarios():
-    service = ListarUsuariosService()
-    usuarios = service.executar()
 
-    return jsonify({
-        "mensagem": "usuarios listados com sucesso",
-        "usuarios": usuarios
-        }),200
+#Fazer uma verificação de ADM para essa rota
+# @usuario_bp.get("/")
+# @login_required
+# def listar_usuarios():
+#     service = ListarUsuariosService()
+#     usuarios = service.executar()
+
+#     return jsonify({
+#         "mensagem": "usuarios listados com sucesso",
+#         "usuarios": usuarios
+#         }),200
 
 @usuario_bp.get("/<int:usuario_id>")
 @login_required

@@ -53,5 +53,5 @@ registrar_comandos_precos(app)
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        PopularPecasService().executar(atualizar_precos=False)
+        PopularPecasService().executar(atualizar_precos=True)
     app.run(debug=True)
