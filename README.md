@@ -191,6 +191,19 @@ de persistir. Isso cobre falhas como GPU obrigatória ausente, JSON inválido, I
 quantidades, orçamento e conflitos conhecidos; não garante solução quando o catálogo
 ou o orçamento não permitem a montagem. Falhas de transporte e cotas recebem mensagens próprias.
 
+## Limites de requisições
+
+O Flask-Limiter limita login, cadastro, recuperação de senha, verificação de e-mail
+e geração de builds por IA por IP e, conforme a rota, por e-mail ou usuário.
+Localmente usa armazenamento em memória. Em produção, configure
+`RATELIMIT_STORAGE_URI` com uma URL `redis://` ou `rediss://` antes de iniciar o
+backend; sem Redis configurado, a aplicação não inicia em modo `producao`.
+
+Se houver um proxy reverso confiável, defina `TRUSTED_PROXY_HOPS` com o número
+exato de proxies que enviam `X-Forwarded-For`. O padrão é `0`: a aplicação usa
+o IP da conexão e ignora esse cabeçalho. Não habilite a opção para acesso direto
+à aplicação, pois clientes poderiam falsificar o próprio IP.
+
 ---
 
 <div align="center">

@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from configs import ambientes,configurar_oauth #Antes por esta com secret_key(IMPORTANTE)
 from flask import Flask
 from flask_cors import CORS
+from werkzeug.middleware.proxy_fix import ProxyFix
 from models import db,lm,mail 
 import os
 
@@ -16,6 +17,7 @@ from migrations.imagens_pecas import migrar_imagens_pecas
 from migrations.rede_build import migrar_rede_build
 from migrations.codigos_email import migrar_codigos_email
 from utils.csrf import configurar_csrf
+from utils.limite_requisicoes import configurar_limites
 
 load_dotenv()
 
@@ -24,8 +26,17 @@ load_dotenv()
 #O instance_path é fixado ao lado do app.py: sem isso o flask usa a pasta atual (cwd) e o caminho relativo do sqlite (URL_DATABASE) quebra dependendo de onde o app é executado.
 app = Flask(__name__, instance_path=os.path.join(os.path.dirname(os.path.abspath(__file__))))
 
-app.config.from_object(ambientes[os.getenv('APP_ENV', 'desenvolvimento')])
+ambiente = os.getenv('APP_ENV', 'desenvolvimento')
+app.config.from_object(ambientes[ambiente])
+
+if app.config['TRUSTED_PROXY_HOPS'] < 0:
+    raise ValueError('TRUSTED_PROXY_HOPS não pode ser negativo')
+
+if app.config['TRUSTED_PROXY_HOPS']:
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=app.config['TRUSTED_PROXY_HOPS'])
+
 configurar_csrf(app)
+configurar_limites(app, producao=ambiente == 'producao')
 #Iniciar o login manager e passar o app como parametro
 lm.init_app(app)
 db.init_app(app)

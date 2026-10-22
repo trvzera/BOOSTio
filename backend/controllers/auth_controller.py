@@ -8,6 +8,7 @@ from configs import oauth
 from services.usuario_service.entrar_usuario_service import EntrarUsuarioService
 from services.usuario_service.entrar_google_usuario_service import EntrarGoogleService
 from utils.csrf import token_csrf
+from utils.limite_requisicoes import limiter, chave_email
 
 auth_bp = Blueprint("auth",__name__,url_prefix='/auth')
 
@@ -23,6 +24,8 @@ def nao_armazenar_sessao(resposta):
 
 #Rota de login
 @auth_bp.post("/entrar")
+@limiter.limit("20 per minute")
+@limiter.limit("10 per 15 minutes", key_func=chave_email)
 def entrar_usuario():
     try:
         dados = request.get_json()
@@ -65,6 +68,7 @@ def teste_logado():
 
 
 @auth_bp.get("/google/redirecionar")
+@limiter.limit("20 per hour")
 def redirecionar_google():
     redirect_uri = url_for('auth.callback_google', _external=True)
     return oauth.google.authorize_redirect(redirect_uri)

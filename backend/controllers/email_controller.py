@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from smtplib import SMTPException, SMTPAuthenticationError, SMTPRecipientsRefused
 from email_validator import EmailNotValidError
 from utils.decorators import apenas_proprio_usuario
+from utils.limite_requisicoes import limiter, chave_usuario
 
 from services.email_service.enviar_codigo_email_service import EnviarEmailService
 from services.email_service.verificar_codigo_email_service import VerificarCodigoEmail
@@ -13,6 +14,8 @@ email_bp = Blueprint("email",__name__,url_prefix='/email')
 
 
 @email_bp.post("/verificar/enviar/<int:usuario_id>")
+@limiter.limit("20 per hour")
+@limiter.limit("5 per hour", key_func=chave_usuario)
 @login_required
 @apenas_proprio_usuario
 def enviar_email(usuario_id):
@@ -49,6 +52,8 @@ def enviar_email(usuario_id):
 
 
 @email_bp.post("/verificar/conferir/<int:usuario_id>")
+@limiter.limit("60 per hour")
+@limiter.limit("25 per hour", key_func=chave_usuario)
 @login_required
 @apenas_proprio_usuario
 def conferir_email(usuario_id):

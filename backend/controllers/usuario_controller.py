@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from smtplib import SMTPException, SMTPAuthenticationError, SMTPRecipientsRefused
 from email_validator import EmailNotValidError
 from utils.decorators import apenas_proprio_usuario
+from utils.limite_requisicoes import limiter, chave_email
 
 
 from services.usuario_service.criar_usuario_service import CriarUsuarioService
@@ -44,6 +45,8 @@ def atualizar_budget(usuario_id):
 #Faltando buscar por Email e finalizar criar usuario na service.
 
 @usuario_bp.post("/")
+@limiter.limit("5 per hour")
+@limiter.limit("3 per hour", key_func=chave_email)
 def criar_usuario():
     try:
         dados = request.get_json() or {}
@@ -140,6 +143,8 @@ def atualizar_usuario(usuario_id):
         return jsonify({"erro":"Erro ao atualizar o usuario no banco de dados"})
 
 @usuario_bp.post("/esqueci-senha")
+@limiter.limit("10 per hour")
+@limiter.limit("3 per hour", key_func=chave_email)
 def esqueci_senha():
     try:
         dados = request.get_json() or {}
@@ -169,6 +174,7 @@ def esqueci_senha():
         return jsonify({"erro": "Erro ao processar a solicitação."}), 500
 
 @usuario_bp.post("/redefinir-senha")
+@limiter.limit("20 per hour")
 def redefinir_senha():
     try:
         dados = request.get_json() or {}
