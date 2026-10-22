@@ -4,6 +4,7 @@ from flask_login import current_user, login_required
 from services.benchmark_service.consultar_benchmark_service import ConsultarBenchmarkService
 from services.benchmark_service.buscar_jogos_benchmark_service import BuscarJogosBenchmarkService
 from services.benchmark_service.consultar_requisitos_service import ConsultarRequisitosService
+from services.benchmark_service.consultar_requisitos_build_service import ConsultarRequisitosBuildService
 from services.benchmark_service.fpshq_service import ErroBenchmark
 from services.benchmark_service.blender_service import cliente_blender
 
@@ -59,3 +60,9 @@ def consultar_blender():
 @login_required
 def consultar_requisitos():
     return executar_consulta(ConsultarRequisitosService(), ("game", "ram_gb"), "resultado")
+
+
+@benchmark_bp.get("/requisitos-build")
+@login_required
+def consultar_requisitos_build():
+    return executar_consulta(ConsultarRequisitosBuildService(), ("game", "build_id"), "resultado")

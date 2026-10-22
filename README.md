@@ -129,8 +129,15 @@ Ao selecionar **Testar build**, o usuário escolhe o tipo de consulta:
 Escolha de jogo, resolução e qualidade gráfica, com **FPS médio** e **1% low**
 quando disponíveis. Falhas e ausência de dados não geram FPS inventados.
 
-A FPSHQ apresentou timeouts nas consultas de FPS e jogos em **21/10/2026**.
+A FPSHQ apresentou timeouts nas consultas de FPS e jogos em **21 e 22/10/2026**.
 Isso não comprova indisponibilidade global; a consulta depende da resposta do provedor.
+
+Nas builds salvas, **Verificar requisitos** consulta as fichas oficiais revisadas e
+compara a capacidade de RAM da própria configuração, pelo Python, mesmo com a FPSHQ
+indisponível. A consulta de FPS é interrompida na interface se a RAM confirmada fica
+abaixo do mínimo. Memória própria sem identificação permanece não verificada.
+CPU, GPU, VRAM, sistema e demais requisitos ainda precisam de validação; RAM suficiente
+não aprova o computador completo e nenhum FPS é calculado por essa verificação.
 
 ### Blender · Renderização
 
@@ -159,9 +166,10 @@ com uma consulta direta pelo JavaScript, sem cache local neste último caminho.
 O diagnóstico informa tempo, HTTP recebido e falhas de transporte/validação;
 não troca automaticamente de caminho nem altera a montagem real.
 
-O laboratório também possui uma **prévia de requisitos dos cinco jogos padrão**,
-com fontes oficiais revisadas em 21/10/2026 e consulta autenticada pelo Python.
-Compara somente a capacidade de RAM informada, sem aprovar o PC completo,
+Os **requisitos dos cinco jogos padrão** usam fontes oficiais revisadas em 21/10/2026
+e consulta autenticada pelo Python. O modal usa a RAM da build salva e do catálogo;
+o laboratório mantém uma prévia com capacidade informada manualmente.
+Comparam somente a capacidade de RAM, sem aprovar o PC completo,
 inventar requisitos recomendados ausentes ou ajustar FPS por uma fórmula.
 Equivalência de CPU/GPU, VRAM, sistema, espaço livre e demais exigências ainda
 precisam ser validados e vinculados aos componentes reais da build.

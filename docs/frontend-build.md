@@ -6,6 +6,55 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Requisitos na build e integração da main — 22/10/2026
+
+- Main integrada por fast-forward até `4d4f51d`: CSRF, limites, confirmação de
+  identidade e revogação de sessões preservados. A inicialização atual prepara o
+  banco explicitamente; iniciar o servidor não cria tabelas nem coleta preços.
+- `GET /benchmark/requisitos-build?game=...&build_id=...` segue Blueprint → service,
+  exige sessão e procura a configuração somente na própria conta. IDs inválidos,
+  parâmetros repetidos e tentativas de enviar outra RAM/usuário são rejeitados.
+  Ausência e build de outra conta recebem o mesmo 404.
+- A RAM vem do estado salvo e do catálogo Python: capacidade por produto/kit ×
+  quantidade. Quantidade de pentes é contada separadamente, sem dobrar novamente
+  a capacidade dos kits. Memórias próprias, modelos removidos e quantidades
+  inválidas deixam a capacidade total não verificada; o subtotal conhecido aparece
+  sem reprovar ou aprovar a memória ainda não identificada.
+- O modal oferece Verificar requisitos independentemente da FPSHQ e dos IDs de
+  CPU/GPU aceitos pelo benchmark. Ver desempenho verifica primeiro a RAM salva;
+  abaixo do mínimo, a interface não envia a consulta de FPS. Jogo sem curadoria
+  informa ausência de ficha; uma estimativa continua identificada como parcial.
+  Nenhum FPS é inventado, penalizado ou corrigido por capacidade de RAM.
+- O botão Testar build do editor aguarda o salvamento pendente antes de abrir os testes.
+  Trocar jogo limpa/cancela a verificação anterior; fechar/trocar tipo de teste
+  aborta a consulta. Erro na FPSHQ preserva os requisitos já apresentados.
+- Os resultados mantêm `escopo: parcial`, `requisitosVerificados: false` e
+  `fpsValidado: false`. CPU/GPU, VRAM, recursos, SO e armazenamento não foram
+  aprovados. A antiga rota `/benchmark/requisitos` permanece para o laboratório.
+- Integração dos testes com a main: considerar token CSRF nas alterações de budget,
+  remoção do GET global de usuários e manifesto de imagens inicialmente vazio;
+  restaurados os rótulos acessíveis dos novos botões de confirmar identidade.
+- Validação: 301 testes Node, 396 testes Python (+4 subtestes) e 53 verificações
+  Chrome com API simulada em 320×800, 768×1024 e 1440×900. Inclui RAM abaixo do mínimo,
+  kits/múltiplos modelos, propriedade, cancelamento, ausência de requisitos e
+  indisponibilidade de FPS. Os testes usam SQLite temporário, sem LLM nem scraping.
+
+#### Próxima etapa de compatibilidade física
+
+A inspeção dos modelos Python confirma: `Gabinete` já possui limites de comprimento
+da GPU e altura do cooler, formatos de placa-mãe, slots, baias e fans inclusas.
+`PlacaVideo` ainda não possui `comprimento_mm`, `altura_mm` ou `espessura_mm`;
+`AirCooler` possui somente `dimensoes` em texto, sem `altura_mm` explícita.
+`WaterCooler` informa o tamanho nominal do radiador, mas não sua espessura real;
+faltam posições/encaixes compartilhados no gabinete. `Fonte` só informa formato
+e potência; `PlacaMae` não possui quantidade de portas SATA no modelo atual.
+
+Começar pelo comprimento real da GPU e altura real do air cooler, com unidades em mm,
+fonte oficial e modelo/revisão exatos. Depois cadastrar GPU/PSU/baias, espaço de
+conectores e posições/tamanhos de fans e radiadores, incluindo interferências.
+As regras básicas já existem, mas dados ausentes permanecem não verificados.
+Três fans de 120 mm não confirmam, sozinhas, espaço para um radiador de 360 mm.
+
 ### Busca de melhorias e responsividade — 21/10/2026
 
 - **Dropdowns de peças:** cada categoria do modal usa `details/summary` animado,

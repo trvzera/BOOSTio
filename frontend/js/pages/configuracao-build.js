@@ -190,7 +190,15 @@ document.addEventListener("DOMContentLoaded",async () => {
         build.orcamento = e.target.value === "" ? null : Number(e.target.value); persistir(); atualizarCustos();
       };
       main.querySelector("#build-description").oninput = e => { if (!build.travada) { build.descricao = e.target.value; persistir(); } };
-      main.querySelector("#benchmark-build").onclick = () => { try { abrirBenchmark(build,catalogo); } catch (erro) { avisar(erro.message); } };
+      main.querySelector("#benchmark-build").onclick = async evento => {
+        const botao = evento.currentTarget;
+        botao.disabled = true;
+        try {
+          if (conta) { await filaSalvamento; if (falhaSalvamento) throw falhaSalvamento; }
+          abrirBenchmark(build,catalogo);
+        } catch (erro) { avisar(erro.message); }
+        finally { if (botao.isConnected) botao.disabled = Boolean(motivoBenchmark(build,catalogo)); }
+      };
       main.querySelector("#buy-configuration").onclick = () => { try { abrirCompraBuild(build,catalogo); } catch (erro) { avisar(erro.message); } };
       main.querySelector("#improve-configuration").onclick = () => {
         try {

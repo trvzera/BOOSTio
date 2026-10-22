@@ -3,8 +3,9 @@ import { criarClienteBenchmark } from "../api/benchmark/consultarBenchmark.js";
 import { htmlSeguro as h } from "../build/catalogo.js";
 import { resultadoDesempenhoHtml,resolucoesHtml } from "./view.js";
 import { definirDetalheAberto,iniciarDetalhesAnimados } from "../components/animated-details.js";
+import { iniciarRequisitosBuild } from "./requisitos.js";
 
-export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERENCIA_FPS,cliente = criarClienteBenchmark()} = {}) {
+export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERENCIA_FPS,buildId = null,cliente = criarClienteBenchmark()} = {}) {
   const localizar = seletor => raiz.querySelector(seletor.replaceAll("#fpshq-","#" + prefixo + "-"));
   const form = localizar("#fpshq-test-form");
   if (!form || form.dataset.benchmarkReady) return;
@@ -20,6 +21,7 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
   const painel = localizar(".fpshq-panel"), vazio = localizar("#fpshq-empty");
   const interfaces = localizar("#fpshq-layouts");
   const consulta = form.querySelector('button[type="submit"]');
+  const requisitos = iniciarRequisitosBuild(raiz,{prefixo,buildId,cliente});
   iniciarDetalhesAnimados(raiz);
   // Uma só interface de dados: trocar o layout não recria o DOM nem consulta a API.
   const aplicarInterface = opcao => {
@@ -96,11 +98,19 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
     ocupado = true; acaoAtual = "consulta"; controles(); resultado.hidden = true; resultado.setAttribute("aria-busy","true");
     informar("Consultando desempenho…");
     try {
+      if (requisitos) {
+        const ficha = await requisitos.verificar(jogo.value);
+        if (!ativo || atual !== versao) return;
+        if (ficha?.ram.atendeMinimo === false) {
+          informar("A RAM da build está abaixo do mínimo deste jogo. Nenhum FPS foi consultado.","error");
+          return;
+        }
+      }
       const dados = await cliente.consultar({...hardware,game:jogo.value,res:res.value,preset:preset.value},{signal:controle.signal});
       if (ativo && atual === versao) { renderizar(dados); informar(""); }
       ocupado = false; acaoAtual = "";
     } catch (erro) { ocupado = false; acaoAtual = ""; if (ativo && atual === versao) tratarErro(erro); }
-    finally { resultado.setAttribute("aria-busy","false"); controles(); }
+    finally { ocupado = false; if (acaoAtual === "consulta") acaoAtual = ""; if (acaoAtual === "espera") ocupado = true; resultado.setAttribute("aria-busy","false"); controles(); }
   });
   buscar.addEventListener("click",async () => {
     if (ocupado) return;
@@ -136,5 +146,5 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
   textoBusca.addEventListener("keydown",evento => { if (evento.key === "Enter") { evento.preventDefault(); buscar.click(); } });
   controles();
   if (hardware.motivo) informar(hardware.motivo);
-  return () => { ativo = false; versao++; versaoBusca++; clearInterval(cooldown); controle.abort(); };
+  return () => { ativo = false; versao++; versaoBusca++; clearInterval(cooldown); controle.abort(); requisitos?.destruir(); };
 }
