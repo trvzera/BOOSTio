@@ -11,6 +11,7 @@ class Usuario(ModeloBase,UserMixin):
   verificado = db.Column(db.Boolean, default=False ,nullable= False)
   ativo = db.Column(db.Boolean, default=True ,nullable= False)
   login_google = db.Column(db.Boolean,default=False,nullable = False)
+  google_sub = db.Column(db.String(255), nullable=True, unique=True)
   budget = db.Column(db.Numeric(12, 2), nullable=True)
   usar_budget = db.Column(db.Boolean, default=False, server_default=db.false(), nullable=False)
 
@@ -52,6 +53,20 @@ class Usuario(ModeloBase,UserMixin):
     self.email = f"usuario_deletado_{self.id}@removido.local"
     self.senha = ""
     self.ativo = False
+    db.session.commit()
+
+  @staticmethod
+  def buscar_por_google_sub(google_sub: str) -> "Usuario | None":
+    return Usuario.query.filter_by(google_sub=google_sub).first()
+
+  def vincular_google_legado(self, google_sub: str) -> None:
+    atualizados = Usuario.query.filter_by(
+      id=self.id, email=self.email, google_sub=None, login_google=True,
+      verificado=True, ativo=True, senha=None,
+    ).update({Usuario.google_sub: google_sub}, synchronize_session=False)
+    if atualizados != 1:
+      db.session.rollback()
+      raise ValueError("Não foi possível vincular esta conta ao Google")
     db.session.commit()
 
   @staticmethod

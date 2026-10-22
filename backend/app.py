@@ -16,6 +16,7 @@ from migrations.budget_usuario import registrar_migracao_budget
 from migrations.imagens_pecas import migrar_imagens_pecas
 from migrations.rede_build import migrar_rede_build
 from migrations.codigos_email import migrar_codigos_email
+from migrations.google_usuario import migrar_google_usuario
 from utils.csrf import configurar_csrf
 from utils.limite_requisicoes import configurar_limites
 
@@ -58,6 +59,7 @@ registrar_migracao_budget(app, db)
 
 with app.app_context():
     db.create_all()
+    migrar_google_usuario()
     migrar_imagens_pecas()
     migrar_rede_build()
     migrar_codigos_email()
