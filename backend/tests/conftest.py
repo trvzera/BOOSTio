@@ -33,7 +33,6 @@ def mock_atualizar_dados_sem_commit(mocker):
     # deixa atualizar_dados rodar de verdade, só mocka o commit interno dele
     mocker.patch("models.usuario.db.session.commit")
 
-# tests/conftest.py (adicionar essas, junto com as que você já tem)
 
 @pytest.fixture
 def mock_usuario_nao_encontrado(mocker):

@@ -37,7 +37,7 @@ def app_build(tmp_path):
 
 def autenticar(cliente):
     with cliente.session_transaction() as sessao:
-        sessao["_user_id"] = "1"
+        sessao["_user_id"] = "1:1"
         sessao["_fresh"] = True
 
 
@@ -557,7 +557,7 @@ def test_menu_setup_atual_alterna_e_operacoes_respeitam_proprietario(app_build):
     cliente.post("/build/" + segunda["id"] + "/setup-atual")
     assert not any(b["estado"].get("setupAtual") for b in cliente.get("/build/").json["builds"])
     with cliente.session_transaction() as sessao:
-        sessao["_user_id"] = "2"
+        sessao["_user_id"] = "2:1"
     rota = "/build/" + primeira["id"]
     assert cliente.get(rota).status_code == 404
     assert cliente.put(rota,json=ESTADO).status_code == 400

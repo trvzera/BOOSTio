@@ -1,5 +1,6 @@
 from flask import Blueprint,request,jsonify
 from flask_login import login_required,current_user
+from utils.limite_requisicoes import limiter, chave_usuario
 from models import db
 from models.build_salva import LimiteBuildsError, EmailNaoVerificadoError
 from sqlalchemy.exc import SQLAlchemyError
@@ -39,6 +40,9 @@ def mostrar_builds():
     return jsonify({"erro": str(e)}),404
 
 @build_bp.post("/")
+@limiter.limit("10 per minute")
+@limiter.limit("60 per day")
+@limiter.limit("10 per day", key_func=chave_usuario)
 @login_required
 def criar_build():
   try:

@@ -1,7 +1,8 @@
 from models import Usuario,Codigo,db
+from .confirmar_identidade_service import ConfirmarIdentidadeService
 
 class DeletarUsuarioService:
-  def executar(self, usuario_id: int) -> bool:   
+  def executar(self, usuario_id: int, dados=None) -> bool:
     if not usuario_id:
       return False
 
@@ -10,6 +11,7 @@ class DeletarUsuarioService:
     if not usuario:
       return False
     
+    ConfirmarIdentidadeService().executar(usuario, dados)
     Codigo.deletar_codigos_usuario(usuario.id)
 
     usuario.desativar()

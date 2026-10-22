@@ -1,13 +1,12 @@
 from flask import current_app
 from flask_mail import Message
 from models import TokenRecuperacao,mail,Usuario
-from werkzeug.security import generate_password_hash
 import secrets
 
 
 class EnviarEmailRecuperarService:
   def executar(self,usuario:Usuario):
-    if not usuario:
+    if not usuario or not usuario.ativo:
       raise ValueError("Nenhum usuario encontrado")
 
     token = self._gerar_token()
@@ -30,15 +29,7 @@ class EnviarEmailRecuperarService:
     return secrets.token_urlsafe(32)
 
   def _salvar_token(self,usuario:Usuario,token:str) -> None:
-    #Invalida qualquer link de recuperação anterior ainda não usado.
-    TokenRecuperacao.deletar_tokens_usuario(usuario.id)
-
-    token_recuperacao = TokenRecuperacao(
-      usuario_id = usuario.id,
-      token_hash = generate_password_hash(token)
-    )
-
-    token_recuperacao.salvar()
+    TokenRecuperacao.emitir(usuario, token)
 
   @staticmethod
   def _montar_link(token:str) -> str:

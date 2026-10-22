@@ -1,7 +1,7 @@
 from models import Usuario
 
 class ListarUsuarioIdService:
-  def executar(usuario_id: int) -> dict:
+  def executar(self, usuario_id: int) -> dict:
     if not usuario_id:
       raise ValueError("Esse usuario não existe")
       

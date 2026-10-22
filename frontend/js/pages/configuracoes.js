@@ -7,6 +7,7 @@ import { caminhoLogin } from "../auth/auth.js";
 import { carregarPerfil as buscarUsuarioLogado } from "../conta/perfil.js";
 import { atualizarUsuario } from "../api/usuario/atualizarUsuario.js";
 import { deletarUsuario } from "../api/usuario/deletarUsuario.js";
+import { fetchComErro } from "../api/_shared/fetchComErro.js";
 import { formatarMesAno } from "../utils/formatarData.js";
 import { enviarEmailVerificar } from "../api/email/enviarEmailVerificar.js";
 import { conferirEmailVerificar } from "../api/email/conferirEmailVerificar.js";
@@ -117,6 +118,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const deleteModal = document.getElementById("delete-modal");
+    document.querySelectorAll("[data-confirmar-google]").forEach(botao => {
+      botao.addEventListener("click", async () => {
+        botao.disabled = true;
+        try {
+          const resposta = await fetchComErro("/auth/google/confirmar", {method: "POST"});
+          window.location.assign(resposta.url);
+        } catch (erro) {
+          showToast(erro.message, false);
+          botao.disabled = false;
+        }
+      });
+    });
     const openDeleteModalBtn = document.getElementById("open-delete-modal");
     const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
     const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
@@ -130,6 +143,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       setTimeout(() => deleteConfirmInput.focus(), 250);
     }
     function closeModal() {
+      document.getElementById("delete-current-password").value = "";
       deleteModal.classList.remove("open");
     }
     if (document.body.classList.contains("settings-page-body")) {
@@ -148,7 +162,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       confirmDeleteBtn.addEventListener("click", async () => {
         try {
           const dadosExclusao = await buscarUsuarioLogado();
-          await deletarUsuario(dadosExclusao.usuario.id);
+          await deletarUsuario(dadosExclusao.usuario.id, document.getElementById("delete-current-password").value);
           closeModal();
           showToast("Conta excluída. Redirecionando...", true);
           window.location.href = "./index.html";
@@ -241,7 +255,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function validarCodigoCompleto() {
       const codigo = inputsCodigo.map((input) => input.value).join("");
-      botaoConfirmarCodigo.disabled = codigo.length !== 4;
+      botaoConfirmarCodigo.disabled = codigo.length !== inputsCodigo.length;
     }
 
     function iniciarContagemReenvio() {
@@ -331,12 +345,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (e.target === modalVerificacao) fecharModalVerificacao();
     });
 
-    btnSalvar.addEventListener("click", () => {
-      atualizaDados();
-      setTimeout(() => {
-        location.reload();
-      }, 500);
-    });
+    btnSalvar.addEventListener("click", atualizaDados);
 
     async function atualizaDados() {
       const valorNome = inputNome.value.trim();
@@ -369,12 +378,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                 valorNome,
                 valorEmail,
                 undefined,
+                document.getElementById("profile-current-password").value,
               );
 
         nomeConfigs.textContent = valorNome;
         emailConfigs.textContent = valorEmail;
         confirmUsernameTarget.textContent = valorNome;
         showToast(resposta.mensagem || "Perfil atualizado com sucesso.", true);
+        document.getElementById("profile-current-password").value = "";
+        location.reload();
       } catch (erro) {
         console.error("Falha ao atualizar dados:", erro);
         showToast(

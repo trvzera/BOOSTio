@@ -48,7 +48,7 @@ def app_budget(tmp_path):
 
 def autenticar(cliente, usuario_id):
     with cliente.session_transaction() as sessao:
-        sessao["_user_id"] = str(usuario_id)
+        sessao["_user_id"] = f"{usuario_id}:1"
         sessao["_fresh"] = True
 
 

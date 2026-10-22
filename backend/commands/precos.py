@@ -25,11 +25,12 @@ def registrar_comandos_precos(app):
         click.echo("Migração dos links e controle de consultas concluída.")
 
     @app.cli.command("pecas-popular")
+    @click.option("--atualizar-precos", is_flag=True, help="Consulta preços após cadastrar; por padrão, apenas cadastra.")
     @click.option("--limite", type=click.IntRange(min=1), help="Quantidade máxima de preços; omitido, percorre todas as peças elegíveis.")
     @click.option("--intervalo", default=1.0, type=click.FloatRange(min=0), show_default=True,
                   help="Segundos entre requisições à KaBuM.")
-    def popular(limite, intervalo):
-        resumo = PopularPecasService().executar(limite=limite, intervalo=intervalo)
+    def popular(limite, intervalo, atualizar_precos):
+        resumo = PopularPecasService().executar(limite=limite, intervalo=intervalo, atualizar_precos=atualizar_precos)
         click.echo(json.dumps(resumo, ensure_ascii=False))
 
     @app.cli.command("peca-links")

@@ -8,6 +8,9 @@ class EntrarUsuarioService:
 
     usuario = Usuario.buscar_por_email(dados["email"].lower())
 
+    if usuario and not usuario.ativo:
+      raise ValueError("Senha ou email inválidos")
+
     if usuario and usuario.senha is None:
       raise ValueError(f"Experimente fazer login com o Google")
     
