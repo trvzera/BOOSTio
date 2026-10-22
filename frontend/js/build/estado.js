@@ -2,6 +2,7 @@ import { categorias, perifericos, acessoriosRede } from "./catalogo.js";
 import { conexaoDisco, limitesArmazenamento, numeroConhecido } from "./hardware.js";
 import { normalizarRede } from "./rede.js";
 import { planejamentoLocal } from "./planejamento.js";
+import { posicoesFans } from "./fans.js";
 
 const CHAVE_RASCUNHOS = "boostio:rascunhos-build";
 export const CHAVE_PERFIL_LOCAL = "boostio:builds-locais";
@@ -188,7 +189,7 @@ export function motivoSelecao(build,peca,catalogo) {
     if (itensCategoria(build,"fan").length) {
       const gabinete = catalogo.find(p => p.id === build.componentes.gabinete?.id);
       if (!gabinete) return "Selecione o gabinete antes de adicionar mais fans.";
-      if (numeroConhecido(gabinete.quantidade_max_fans) == null || gabinete.tamanhos_fan_suportados_mm == null)
+      if (!posicoesFans(gabinete) && (numeroConhecido(gabinete.quantidade_max_fans) == null || gabinete.tamanhos_fan_suportados_mm == null))
         return "Faltam a quantidade e os tamanhos dos encaixes do gabinete para adicionar mais fans.";
     }
     return ""; // Encaixes e quantidade são avaliados com o gabinete.

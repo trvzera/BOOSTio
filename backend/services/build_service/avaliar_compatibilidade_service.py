@@ -2,6 +2,7 @@ import math
 import re
 
 from models.build_salva import MODELOS
+from .encaixe_fisico import avaliar_medidas
 
 
 def numero(valor):
@@ -105,32 +106,7 @@ class AvaliarCompatibilidadeService:
             registrar("formato-placa", "Formato da placa-mãe", formato in formatos if formato and formatos else None,
                       "Usa os formatos declarados no catálogo, sem inferir suporte pelo tamanho externo do gabinete.")
 
-        if tem("gabinete"):
-            for tipo, campo, limite, rotulo in (
-                ("placa_video", "comprimento_mm", "tamanho_max_gpu_mm", "Comprimento da GPU"),
-                ("air_cooler", "altura_mm", "tamanho_max_cooler_mm", "Altura do air cooler"),
-            ):
-                if not tem(tipo):
-                    continue
-                medida, maximo = numero(get(tipo).get(campo)) or None, numero(gabinete.get(limite)) or None
-                registrar(tipo + "-medida", rotulo, medida <= maximo if medida is not None and maximo is not None else None,
-                          f"Precisa de {campo} da peça e {limite} do gabinete. Não interpreta dimensões ambíguas como altura/comprimento.")
-            if tem("placa_video"):
-                registrar("gpu-interferencias", "Espaço completo da GPU", None,
-                          "Altura, espessura, conectores e interferência de radiador/fans frontais ainda precisam de dados específicos.")
-            if tem("water_cooler"):
-                radiadores = gabinete.get("radiadores_suportados_mm")
-                radiadores = [numero(v) for v in radiadores] if isinstance(radiadores, list) else None
-                tamanho = numero(get("water_cooler").get("tamanho_radiador_mm"))
-                suporta = gabinete.get("suporte_water_cooler")
-                condicao = False if suporta is False else tamanho in radiadores if tamanho is not None and radiadores and all(v is not None for v in radiadores) else None
-                registrar("radiador", "Tamanho do radiador", condicao,
-                          "Suporte genérico a water cooler não confirma quais tamanhos de radiador cabem.")
-                registrar("radiador-posicao", "Posição e espessura do radiador", None,
-                          "Conferir posição, espessura do conjunto e interferências com GPU, RAM e placa-mãe; o tamanho nominal não confirma o encaixe completo.")
-            if tem("fan") or tem("water_cooler"):
-                registrar("fans-posicoes", "Posições das fans e do radiador", None,
-                          "Faltam posições/tamanhos compartilhados no catálogo para confirmar a distribuição de fans inclusas, kits e radiador.")
+        fans = avaliar_medidas(itens, registrar)
 
         if tem("processador"):
             for tipo in ("air_cooler", "water_cooler"):
@@ -194,7 +170,7 @@ class AvaliarCompatibilidadeService:
         rotulos = {"incompativel": "Incompatibilidade identificada", "nao_verificado": "Compatibilidade não totalmente verificada",
                    "sem_conflitos": "Sem conflitos nas verificações disponíveis"}
         return {"status": status, "rotulo": rotulos[status], "escopo": "parcial", "pecasPendentes": faltam,
-                "verificacoes": regras, "erros": erros, "naoVerificado": desconhecidas,
+                "verificacoes": regras, "erros": erros, "naoVerificado": desconhecidas, "fans": fans,
                 "aviso": "Peças preenchidas não significam compatibilidade completa. BIOS, conectores e interferências não são aprovados sem dados."}
 
     def para_resposta(self, build, incluir_links=False):

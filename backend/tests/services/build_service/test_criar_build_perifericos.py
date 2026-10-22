@@ -42,7 +42,8 @@ class CriarBuildPerifericosTest(unittest.TestCase):
         self.assertEqual(validada["preco_total"], 900)
 
     def test_catalogo_envia_dados_do_monitor_em_json(self):
-        monitor = SimpleNamespace(
+        from models import Monitor
+        monitor = Monitor(
             id=1, fabricante="Marca", modelo="Monitor", preco=500.0,
             tamanho_polegadas=Decimal("23.8"), resolucao="1920x1080",
             taxa_atualizacao_hz=144,

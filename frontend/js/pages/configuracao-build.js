@@ -3,6 +3,7 @@ import "../auth/auth.js";
 import { carregarCatalogo,categoriasEditor,perifericos,acessoriosRede,moeda,htmlSeguro as h,nomePeca,imagemPeca,ofertasPeca } from "../build/catalogo.js";
 import { abrirBuild,guardarRascunho,buildsLocais,itensCategoria,categoriasMultiplas,informacoesRam,informacoesArmazenamento,motivoSelecao,removerPeca,reduzirQuantidade,linkCompartilhado } from "../build/estado.js";
 import { avaliarBuild,selecionarPecaCompativel } from "../build/compatibilidade.js";
+import { informacoesFans } from "../build/fans.js";
 import { avisar,copiarTexto,mostrarFalha } from "../build/interface.js";
 import { iconeAnimado,iniciarIcones } from "../components/ui.js";
 import { indicadorBuild,iniciarIndicadores } from "../build/indicador.js";
@@ -104,12 +105,13 @@ document.addEventListener("DOMContentLoaded",async () => {
         peca.quantidade_portas_sata != null && peca.quantidade_portas_sata + " portas SATA",
       ].filter(Boolean).join(" · ") : "";
       const resumo = ram && peca ? item.quantidade + " kit(s) · " + item.quantidade * (peca.quantidade_pentes || 1) + " pentes · " + peca.ddr + " · " + peca.frequencia_mhz + " MHz"
+        : categoria === "fan" && peca ? (peca.tamanho_mm ? peca.tamanho_mm + " mm · " : "") + (peca.quantidade || "?") + " fan(s) por kit"
         : slotsPlaca || (peca ? "Selecionado" : "Peça própria · identifique o modelo para validar.");
       const cotacao = peca && Number(peca.preco) > 0;
       const disponibilidade = peca?.esgotado ? "Sem estoque confirmado no catálogo. Consulte a loja ou substitua a peça." : peca && !cotacao ? "Preço ainda não disponível no catálogo." : "";
       let razaoDuplicar = "";
       if (multipla && peca) { try { selecionarPecaCompativel(build,peca,catalogo); } catch (erro) { razaoDuplicar = erro.message; } }
-      const unidades = ram ? item.quantidade * (peca?.quantidade_pentes || 1) : categoria === "fan" ? item.quantidade * (peca?.quantidade || 1) : item.quantidade;
+      const unidades = ram ? item.quantidade * (peca?.quantidade_pentes || 1) : categoria === "fan" ? (Number.isInteger(peca?.quantidade) && peca.quantidade > 0 ? item.quantidade * peca.quantidade : "?") : item.quantidade;
       const nomeUnidades = ram ? "pentes" : categoria === "fan" ? "fans" : "unidades";
       return '<article class="component-row component-selected glass-card"><div class="component-selected-main"><div class="component-image">' +
         imagemPeca(peca || {categoria}) + '</div><div class="component-copy">' +
@@ -134,10 +136,15 @@ document.addEventListener("DOMContentLoaded",async () => {
       const razaoAdicionar = build.travada ? trancada : !info.placa ? "Selecione a placa-mãe antes de adicionar mais RAM."
         : info.usados >= info.slots ? "Todos os slots de RAM da placa-mãe estão ocupados." : "";
       const discos = informacoesArmazenamento(build,catalogo);
+      const fans = categoria.id === "fan" ? informacoesFans(get("gabinete"),itensCategoria(build,"fan").map(item => ({item,peca:catalogo.find(p => p.id === item.id)})),get("water_cooler") || (itensCategoria(build,"water_cooler").length ? {} : null)) : null;
+      const vagasFans = fans ? 'Fans: ' + (fans.total ?? "?") + ' / ' + (fans.capacidade ?? "?") + ' posições' : '';
       const disponivel = categoria.armazenamento && catalogo.some(p => tipos.includes(p.categoria) && (() => { try { selecionarPecaCompativel(build,p,catalogo); return true; } catch { return false; } })());
       const cabecalho = '<div class="component-group-heading"><h2>' + categoria.nome + ' ' + badge(obrigatoria) + '</h2>' +
         (categoria.id === "memoria_ram" ? '<span class="component-count">' + info.usados + ' / ' + (info.slots || "—") + ' pentes · ' + info.capacidade + ' GB</span>'
-          : categoria.armazenamento ? '<span class="component-count">' + discos.ssd + ' SSD · ' + discos.hd + ' HD</span>' : "") + '</div>' +
+          : categoria.armazenamento ? '<span class="component-count">' + discos.ssd + ' SSD · ' + discos.hd + ' HD</span>'
+          : fans ? '<span class="component-count">' + vagasFans + '</span>' : "") + '</div>' +
+        (fans ? '<p class="component-connections">' + (fans.selecionadas ?? "?") + ' selecionadas · ' + (fans.inclusas ?? "?") + ' inclusas · ' + (fans.radiador ?? "?") + ' do radiador' +
+          (fans.livres != null ? ' · até ' + fans.livres + ' posições livres, conforme o tamanho' : ' · selecione um gabinete com medidas para verificar a capacidade') + '</p>' : '') +
         (categoria.armazenamento && itens.length ? '<p class="component-connections">M.2: ' + discos.m2 + ' / ' + (discos.limites.m2 ?? "não informado") + ' · SATA: ' + discos.sata + ' / ' + (discos.limites.sata ?? "não informado") + '</p>' : "");
       if (itens.length) return '<section class="component-group">' + cabecalho + itens.map(({categoria,item}) => selecionada(categoria,item)).join("") +
         (temRam ? '<button type="button" class="btn-ghost ram-add-model" data-category="memoria_ram" aria-label="Adicionar outro modelo de RAM" ' + bloqueado(Boolean(razaoAdicionar),razaoAdicionar) + '>' + iconeAnimado("plus") + 'Adicionar outro modelo de RAM</button>' : "") +

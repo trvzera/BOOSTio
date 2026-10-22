@@ -1,0 +1,42 @@
+{
+  "versao": 1,
+  "pecas": [
+    {
+      "categoria": "gabinete",
+      "fabricante": "Cooler Master",
+      "modelo": "MasterBox Q300L",
+      "part_numbers": ["MCB-Q300L-KANN-S00", "SEED-CASE-01"],
+      "fonte": "https://www.coolermaster.com/en-global/products/masterbox-q300l.html",
+      "medidas": {
+        "formatos_placa_mae": "mATX, ITX",
+        "slots_expansao": 4,
+        "tamanho_max_gpu_mm": 360,
+        "tamanho_max_cooler_mm": 159,
+        "tamanho_max_fonte_mm": 160,
+        "formatos_fonte": ["ATX", "ATX PS2"],
+        "baias_25": 2,
+        "baias_35": 1,
+        "fans_inclusos": 1,
+        "quantidade_max_fans": 6,
+        "tamanhos_fan_suportados_mm": [120, 140],
+        "posicoes_fans_completas": false,
+        "radiadores_suportados_mm": [120, 240],
+        "suporte_water_cooler": true,
+        "posicoes_fans": [
+          {"nome": "Frente", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}, {"tamanho_mm": 140, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": [120, 240]},
+          {"nome": "Topo", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": []},
+          {"nome": "Traseira", "opcoes": [{"tamanho_mm": 120, "quantidade": 1}], "fans_inclusas": [{"tamanho_mm": 120, "quantidade": 1}], "radiadores_mm": [120]},
+          {"nome": "Base", "opcoes": [{"tamanho_mm": 120, "quantidade": 1}], "fans_inclusas": [], "radiadores_mm": []}
+        ]
+      }
+    },
+    {
+      "categoria": "air_cooler",
+      "fabricante": "Deepcool",
+      "modelo": "AK400",
+      "part_numbers": ["R-AK400-BKNNMN-G-1", "SEED-ACOOL-02"],
+      "fonte": "https://www.deepcool.com/products/Cooling/cpuaircoolers/AK400-Performance-CPU-Cooler/2021/15222.shtml",
+      "medidas": {"altura_mm": 155}
+    }
+  ]
+}

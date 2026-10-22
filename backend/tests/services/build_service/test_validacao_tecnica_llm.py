@@ -117,14 +117,13 @@ def test_nao_aceita_peca_esgotada_ou_especificacoes_inventadas_pela_ia(sugestao)
 
 
 def test_prompt_recebe_os_dados_tecnicos_que_a_validacao_usa():
-    from types import SimpleNamespace
+    from models import PlacaMae, AirCooler, Gabinete
 
-    dados = CriarBuildService._campos_pecas(SimpleNamespace(
-        id=1, quantidade_slots_ram=4, quantidade_slots_m2=2, compatibilidade="AM4, AM5",
-        tamanho_max_gpu_mm=320, tamanho_max_cooler_mm=160,
-    ))
+    dados = CriarBuildService._campos_pecas(PlacaMae(id=1, quantidade_slots_ram=4, quantidade_slots_m2=2))
     assert dados["quantidade_slots_ram"] == 4
     assert dados["quantidade_slots_m2"] == 2
+    dados = CriarBuildService._campos_pecas(AirCooler(id=2, compatibilidade="AM4, AM5"))
     assert dados["compatibilidade"] == "AM4, AM5"
+    dados = CriarBuildService._campos_pecas(Gabinete(id=3, tamanho_max_gpu_mm=320, tamanho_max_cooler_mm=160))
     assert dados["tamanho_max_gpu_mm"] == 320
     assert dados["tamanho_max_cooler_mm"] == 160

@@ -38,11 +38,12 @@ export function carregarCatalogo() {
   carregamento ??= acompanharCarregamento(Promise.all([
     fetch(new URL("../../data/catalogo-demo.json", import.meta.url),{cache:"force-cache"}),
     carregarManifestoImagens(),
-  ]).then(async ([resposta, imagens]) => {
+    fetch(new URL("../../data/medidas-fisicas.json", import.meta.url),{cache:"force-cache"}).then(r => r.ok ? r.json() : {pecas:[]}).catch(() => ({pecas:[]})),
+  ]).then(async ([resposta, imagens, medidas]) => {
       if (!resposta.ok) throw new Error("Não foi possível carregar o catálogo.");
       const catalogo = await resposta.json();
       try { sessionStorage.setItem("boostio:catalogo-pronto","1"); } catch {}
-      return completarCatalogoDemo(completarImagens(catalogo,imagens));
+      return completarCatalogoDemo(completarImagens(catalogo,imagens),medidas);
     }).catch(erro => { carregamento = null; throw erro; }));
   return carregamento;
 }

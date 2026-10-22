@@ -18,7 +18,8 @@ export function avaliarBuild(build,catalogo) {
     preco += Number(peca.preco || 0) * item.quantidade;
     if (![...perifericos,...acessoriosRede,"fonte"].includes(categoria)) watts += Number(peca.consumo_energia || 0) * item.quantidade;
   }
-  const faltam = categorias.filter(c => c.obrigatoria && !tem(c.id)).map(c => c.nome);
+  const fansInclusas = Number.isInteger(gabinete?.fans_inclusos) && gabinete.fans_inclusos > 0;
+  const faltam = categorias.filter(c => c.obrigatoria && !tem(c.id) && !(c.id === "fan" && fansInclusas)).map(c => c.nome);
   if (!tem("ssd") && !tem("hd")) faltam.push("Armazenamento");
   if (cpu && !cpu.videointegrado && !tem("placa_video")) faltam.push("Placa de vídeo");
   if (cpu && !cpu.cooler && !tem("air_cooler") && !tem("water_cooler")) faltam.push("Cooler para o processador");
@@ -53,8 +54,9 @@ export function avaliarBuild(build,catalogo) {
     }
   }
   if (tem("air_cooler") && tem("water_cooler")) erros.push("Escolha apenas um cooler para o processador.");
-  const formatos = String(gabinete?.formatos_placa_mae || "").toUpperCase().split(/[,;/]+/).map(v => v.trim());
-  if (placa && gabinete?.formatos_placa_mae && !formatos.includes(String(placa.formato).toUpperCase()))
+  const formatoNormalizado = valor => String(valor || "").toUpperCase().replace(/\s/g,"").replace(/^(MICRO-?ATX|M-ATX)$/, "MATX").replace(/^MINI-?ITX$/, "ITX");
+  const formatos = String(gabinete?.formatos_placa_mae || "").split(/[,;/]+/).map(formatoNormalizado);
+  if (placa?.formato && gabinete?.formatos_placa_mae && !formatos.includes(formatoNormalizado(placa.formato)))
     erros.push("O gabinete não lista o formato da placa-mãe.");
   const discos = informacoesArmazenamento(build,catalogo);
   erros.push(...conflitosArmazenamento(discos));
@@ -66,13 +68,15 @@ export function avaliarBuild(build,catalogo) {
     if (placa && discos.m2Sata && discos.limites.m2Sata == null) dicas.push("Confirme quais slots M.2 da placa-mãe aceitam SSD SATA.");
     if (placa && discos.limites.compartilhamentoDesconhecido) dicas.push("Confirme se o SSD M.2 SATA desativa alguma porta SATA da placa-mãe.");
   }
-  const encaixe = validarEncaixe({gpu:get("placa_video"),air:get("air_cooler"),water:get("water_cooler"),gabinete,
+  const encaixe = validarEncaixe({gpu:get("placa_video"),air:get("air_cooler"),water:get("water_cooler") || (tem("water_cooler") ? {} : null),gabinete,fonte:get("fonte"),
+    discos:itensSelecionados(build,catalogo).filter(p => ["ssd","hd"].includes(p.categoria)),
     fans:itensSelecionados(build,catalogo).filter(p => p.categoria === "fan")});
   erros.push(...encaixe.erros); dicas.push(...encaixe.avisos);
   const grupos = ["processador","placa_mae","memoria_ram","armazenamento","placa_video","fonte","gabinete","fan","refrigeracao"];
   const preenchidos = grupos.filter(cat => cat === "armazenamento" ? tem("ssd") || tem("hd")
     : cat === "refrigeracao" ? tem("air_cooler") || tem("water_cooler") || cpu?.cooler
     : cat === "placa_video" ? tem(cat) || cpu?.videointegrado
+    : cat === "fan" ? tem(cat) || fansInclusas
     : tem(cat)).length;
   const compatibilidade = build.compatibilidade || {status:"nao_verificado",rotulo:"Dados ainda não totalmente verificados",naoVerificado:[],aviso:"As verificações locais não confirmam medidas ou especificações ausentes. Uma build preenchida não é garantia de compatibilidade."};
   for (const erro of build.compatibilidade?.erros || []) if (typeof erro.mensagem === "string") erros.push(erro.mensagem);

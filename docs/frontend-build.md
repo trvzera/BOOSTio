@@ -6,6 +6,48 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Encaixe físico e capacidade de fans — 22/10/2026
+
+- `services/build_service/encaixe_fisico.py` complementa o diagnóstico Python:
+  comprimento/altura/espessura e slots da GPU, altura explícita do air cooler,
+  formato/comprimento da fonte, baias dedicadas 2,5/3,5, radiador e fans.
+  Somente campos explícitos e conhecidos podem aprovar ou reprovar uma regra.
+- O frontend usa `hardware.js`/`fans.js` na filtragem do catálogo e na seleção,
+  inclusive ao selecionar o gabinete depois das peças. O Python usa o catálogo
+  da conta, nunca medidas enviadas pelo navegador/LLM, e rejeita conflitos na
+  geração antes de persistir. Rascunhos manuais continuam podendo ser salvos com
+  diagnóstico de erro; não são apresentados como montagens compatíveis.
+- Quantidade física = fans por kit × kits + fans inclusas + fans do radiador.
+  `posicoes_fans` descreve grupos com `nome`, `opcoes` (tamanho/quantidade),
+  `fans_inclusas` (tamanho/quantidade) e `radiadores_mm`. As opções de um grupo
+  são alternativas. A busca testa distribuições entre os grupos, reservando as
+  fans de fábrica e o radiador, sem contar encaixes 120/140 duas vezes.
+  Se a ficha só documenta alguns arranjos, `posicoes_fans_completas: false`
+  mantém misturas não documentadas como desconhecidas, sem inventar conflito.
+  Excesso confirmado por diâmetro ou capacidade total continua sendo rejeitado.
+  O water cooler precisa de `tamanho_fan_mm` e `quantidade_fans` explícitos para
+  verificar a distribuição; não se divide o tamanho nominal do radiador para inferi-los.
+- O editor mostra total/capacidade e separa fans selecionadas, inclusas e do
+  radiador. Posições livres são um limite superior: a disponibilidade real depende
+  do tamanho e da distribuição. Não há remoção automática de fans de fábrica.
+  Gabinete com fans inclusas já atende à presença de ventilação no progresso;
+  não exige comprar fans adicionais somente para completar essa categoria.
+- `frontend/data/medidas-fisicas.json` é uma fonte compartilhada por Python e
+  catálogo demonstrativo, com categoria, fabricante, modelo, part numbers exatos e
+  URL oficial. `models/medidas_fisicas.py` complementa `to_catalogo()` sem gravar
+  na base nem exigir migração. Não aplica dados a modelos/revisões parecidos.
+  Cobertura inicial revisada: [Q300L preto](https://www.coolermaster.com/en-global/products/masterbox-q300l.html)
+  e [AK400 padrão](https://www.deepcool.com/products/Cooling/cpuaircoolers/AK400-Performance-CPU-Cooler/2021/15222.shtml).
+  Os aliases SEED representam somente os modelos exatos identificados na seed local.
+- Limites: faltam medidas de muitas GPUs/fontes/gabinetes, espessura/posição real
+  do conjunto radiador+fans, folgas dos cabos, interferência frontal com GPU e
+  RAM, baias compartilhadas, revisão/BIOS e conectores. `escopo: parcial` continua
+  obrigatório. Não declarar encaixe completo com dimensões externas do gabinete.
+- Fixtures comuns Python/JS cobrem limites exatos, kits, tamanhos misturados,
+  posições alternativas, radiador, dados ausentes/numéricos e conflitos parciais.
+  Validação: 324 testes Node, 419 Python (+4 subtestes) e 25 verificações Chrome
+  com API simulada em 320/390/768/1440 px, sem transbordamento horizontal.
+
 ### Requisitos na build e integração da main — 22/10/2026
 
 - Main integrada por fast-forward até `4d4f51d`: CSRF, limites, confirmação de
@@ -44,7 +86,9 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
 A inspeção dos modelos Python confirma: `Gabinete` já possui limites de comprimento
 da GPU e altura do cooler, formatos de placa-mãe, slots, baias e fans inclusas.
 `PlacaVideo` ainda não possui `comprimento_mm`, `altura_mm` ou `espessura_mm`;
-`AirCooler` possui somente `dimensoes` em texto, sem `altura_mm` explícita.
+`AirCooler` possui somente `dimensoes` numérico legado, sem eixo explícito;
+não é uma altura confiável para todos os modelos. O complemento técnico acima
+fornece `altura_mm` apenas quando o modelo exato foi revisado.
 `WaterCooler` informa o tamanho nominal do radiador, mas não sua espessura real;
 faltam posições/encaixes compartilhados no gabinete. `Fonte` só informa formato
 e potência; `PlacaMae` não possui quantidade de portas SATA no modelo atual.
@@ -451,11 +495,12 @@ Em `js/build/hardware.js`, campos numéricos nulos são desconhecidos, não zero
 
 - Placa-mãe: `quantidade_slots_m2`, `quantidade_portas_sata`,
   `quantidade_slots_m2_sata` e `portas_sata_desativadas_por_m2_sata`.
-- GPU: `comprimento_mm`; air cooler: `altura_mm` (o antigo `dimensoes` só serve se numérico).
+- GPU: `comprimento_mm`, `altura_mm`, `espessura_mm`, `slots_ocupados`;
+  air cooler: `altura_mm`. O campo legado `dimensoes` não vira altura automaticamente.
 - Gabinete: `tamanho_max_gpu_mm`, `tamanho_max_cooler_mm`,
   `radiadores_suportados_mm: [120, 240, 360]`, `tamanhos_fan_suportados_mm: [120, 140]`,
   `quantidade_max_fans` e `fans_inclusos`.
-- Water cooler: `tamanho_radiador_mm`, `quantidade_fans`; fan: `tamanho_mm`, `quantidade`
+- Water cooler: `tamanho_radiador_mm`, `quantidade_fans`, `tamanho_fan_mm`; fan: `tamanho_mm`, `quantidade`
   (unidades físicas por kit, multiplicadas pela quantidade de kits na build).
 
 Esses arrays são exemplos de contrato, não medidas de um gabinete real. Radiador de
@@ -463,15 +508,16 @@ Esses arrays são exemplos de contrato, não medidas de um gabinete real. Radiad
 três unidades de 120 mm, não uma fan de 360 mm. A contagem considera as fans inclusas
 e as do radiador como instaladas; modelos com distribuição não informada precisam
 de conferência para encaixes compartilhados. Não existe um seletor de posição física ainda.
-As medidas de GPU e os encaixes de radiador/fans ainda faltam na seed atual.
+Muitos modelos ainda não possuem essas medidas. O complemento versionado acima
+adiciona encaixes apenas aos modelos revisados, sem generalizar os limites.
 
 #### Pendência: encaixe físico completo do gabinete
 
 `validarEncaixe()` já compara no frontend comprimento da GPU, altura do air cooler,
 tamanho nominal de radiador e tamanho/quantidade de fans, e a avaliação confere o
 formato da placa-mãe. Isso não equivale à confirmação de uma montagem física completa.
-A próxima integração deve preservar os dados do JSON e completar os campos ausentes,
-revalidando no Python com medidas do modelo/revisão corretos.
+A integração atual também revalida no Python. Falta ampliar dados confiáveis e
+interferências com medidas do modelo/revisão corretos.
 
 O gabinete precisa informar limites internos por configuração e posição: GPU com e
 sem radiador frontal; altura/espessura da GPU e espaço dos conectores; radiador +

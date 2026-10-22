@@ -28,6 +28,11 @@ class CriarBuildService:
     "quantidade_portas_sata", "interface", "compatibilidade", "esgotado",
     "comprimento_mm", "altura_mm", "tamanho_max_gpu_mm", "tamanho_max_cooler_mm",
     "suporte_water_cooler", "tamanho_radiador_mm", "radiadores_suportados_mm",
+    "quantidade", "tamanho_mm", "quantidade_fans", "tamanho_fan_mm", "fans_inclusos",
+    "quantidade_max_fans", "tamanhos_fan_suportados_mm", "posicoes_fans", "posicoes_fans_completas",
+    "slots_ocupados", "slots_expansao", "tamanho_max_altura_gpu_mm",
+    "espessura_mm", "tamanho_max_espessura_gpu_mm",
+    "tamanho_max_fonte_mm", "formatos_fonte", "baias_25", "baias_35",
     "padrao_wifi", "velocidade_mbps", "bluetooth", "categoria", "comprimento_m", "conector",
   )
 
@@ -145,9 +150,12 @@ class CriarBuildService:
 
   @classmethod
   def _campos_pecas(cls, peca):
+    # Usa o mesmo complemento técnico do catálogo exibido no editor. O LLM
+    # continua recebendo o ID numérico exigido pelo contrato de geração.
+    dados = {**peca.to_catalogo(), "id": peca.id}
     return {
       campo: float(valor) if isinstance(valor, Decimal) else valor for campo in cls.CAMPOS_PECAS
-      if (valor := getattr(peca, campo, None)) is not None
+      if (valor := dados.get(campo)) is not None
     }
 
   @classmethod

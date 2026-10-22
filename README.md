@@ -64,7 +64,7 @@ As limitações de cada funcionalidade estão indicadas na última coluna.
 | 10 | Ver configurações prontas | ✅ **Implementado** | 16 modelos sem periféricos, ordenados do menor para o maior preço cadastrado. |
 | 11 | Editar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento. |
 | 12 | Consultar preços das peças pelo site | 🟡 **Parcial** | Preços cadastrados, data de atualização quando disponível e links das lojas; monitoramento contínuo em evolução. |
-| 13 | Ver compatibilidade e consumo de energia | 🟡 **Parcial** | Diagnóstico Python de conflitos e dados não verificados; validação técnica e física completa a concluir. |
+| 13 | Ver compatibilidade e consumo de energia | 🟡 **Parcial** | Python e frontend verificam medidas disponíveis, formatos, baias e tamanho/quantidade/distribuição de fans e radiador. Completar dimensões por modelo e interferências físicas. |
 | 14 | Incluir periféricos no orçamento | ✅ **Implementado** | Inclusão e reaproveitamento com tetos separados para PC e periféricos. |
 | 15 | Registrar budget no perfil | ✅ **Implementado** | Valor e autorização usados no formulário e em novas montagens manuais, sem alterar builds existentes. |
 | 16 | Baixar builds em JSON e CSV | ✅ **Implementado** | Exportação para guardar a configuração localmente. |
@@ -183,7 +183,7 @@ fazem parte da experiência atual.
 Ainda estão em evolução a validação completa de compatibilidade física no
 servidor e a consolidação dos dados usados pelas sugestões e consultas:
 
-- **Compatibilidade:** completar dimensões, posições, conectores e demais regras físicas.
+- **Compatibilidade:** regras de encaixe e capacidade de fans implementadas no Python e no frontend; ampliar medidas confiáveis por modelo, conectores e interferências. Dados ausentes permanecem não verificados.
 - **Peças próprias:** identificar modelos para avaliar suas especificações reais.
 - **Jogos:** vincular requisitos mínimos e recomendados ao hardware da build.
 - **Preços:** consolidar o monitoramento agendado e a atualização do catálogo.
