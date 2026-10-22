@@ -1,6 +1,7 @@
-from flask_mail import Message
+import re
+import secrets
+
 from models import Codigo,Usuario
-from datetime import datetime
 from utils.validacoes import validacao_campos
 
 class VerificarCodigoEmail:
@@ -11,21 +12,22 @@ class VerificarCodigoEmail:
       raise ValueError("Nenhum usuario encontrado")
     
     codigo_informado = dados["codigo"]
-      
+    if not isinstance(codigo_informado, str) or not re.fullmatch(r"[0-9]{6}", codigo_informado):
+      raise ValueError("Informe o código de seis dígitos")
+
     codigo_recente = Codigo.buscar_codigo_recente(usuario.id)
 
-    if codigo_recente.codigo != codigo_informado:
-      raise ValueError("O codigo digitado está errado")
-    
-    if codigo_recente.esta_expirado():
-      raise ValueError("Esse codigo expirou")
+    if not codigo_recente or codigo_recente.esta_expirado():
+      raise ValueError("Código inválido ou expirado. Solicite outro código")
+
+    if not codigo_recente.registrar_tentativa():
+      raise ValueError("Limite de tentativas atingido. Solicite outro código")
+
+    if not secrets.compare_digest(codigo_recente.codigo, codigo_informado):
+      raise ValueError("O código digitado está errado")
 
     codigo_recente.marcar_como_usado()
     usuario.verificado = True
     usuario.salvar()
 
     return usuario.to_dict()
-
-    
-    
-      

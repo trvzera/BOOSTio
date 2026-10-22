@@ -14,7 +14,6 @@ from services.usuario_service.listar_usuario_id_service import ListarUsuarioIdSe
 from services.usuario_service.atualizar_usuario_service import AtualizarUsuarioService
 from services.usuario_service.atualizar_budget_usuario_service import AtualizarBudgetUsuarioService
 from services.usuario_service.redefinir_senha_service import RedefinirSenhaService
-from services.email_service.enviar_codigo_email_service import EnviarEmailService
 from services.email_service.enviar_email_recuperar_service import EnviarEmailRecuperarService
 
 

@@ -241,7 +241,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function validarCodigoCompleto() {
       const codigo = inputsCodigo.map((input) => input.value).join("");
-      botaoConfirmarCodigo.disabled = codigo.length !== 4;
+      botaoConfirmarCodigo.disabled = codigo.length !== inputsCodigo.length;
     }
 
     function iniciarContagemReenvio() {

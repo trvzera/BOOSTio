@@ -1,13 +1,16 @@
 from flask_mail import Message
 from models import Codigo,mail,Usuario
-from utils.validacoes import validacao_campos
-import random
+import secrets
 
 
 class EnviarEmailService:
   def executar(self,usuario:Usuario):
     if not usuario:
       raise ValueError("Nenhum usuario encontrado")
+    if usuario.verificado:
+      raise ValueError("Email já verificado")
+
+    Codigo.verificar_limite_envio(usuario.id)
     
     msg = Message(
         subject='Confirme seu email - BOOSTio',
@@ -30,7 +33,7 @@ class EnviarEmailService:
 
   @staticmethod
   def _gerar_codigo():
-    return str(random.randint(1000,9999))
+    return f"{secrets.randbelow(1_000_000):06d}"
 
   @staticmethod
   def _monta_mensagem(msg:Message,codigo:str):
