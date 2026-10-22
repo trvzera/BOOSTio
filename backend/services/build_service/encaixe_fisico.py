@@ -104,7 +104,7 @@ def distribuir_fans(grupos, demanda, water, inclusas, completas=True):
     return resultado if resultado or completas else None
 
 
-def avaliar_fans(gabinete, fans, water=None):
+def avaliar_fans(gabinete, fans, water=None, substituir=False):
     """fans: pares (item selecionado, peça). Quantidade do produto = fans por kit."""
     grupos = posicoes(gabinete)
     maximo = inteiro(gabinete.get("quantidade_max_fans"))
@@ -138,16 +138,30 @@ def avaliar_fans(gabinete, fans, water=None):
             tamanho_ok = False
     if tamanho_ok is not False and not medidas_conhecidas:
         tamanho_ok = None
-    minimo = quantidade + (inclusas or 0) + (radiador or 0)
+    substituidas = min(quantidade, radiador or 0) if substituir and completos else 0
+    substituicao_ok = True
+    tamanho_water = n((water or {}).get("tamanho_fan_mm")) or None
+    if substituir and water is not None:
+        substituicao_ok = None
+        if radiador is not None and completos and tamanho_water is not None:
+            substituicao_ok = demanda.get(tamanho_water, 0) >= radiador
+        if radiador is not None and completos and quantidade < radiador:
+            substituicao_ok = False
+        if substituicao_ok is True:
+            demanda[tamanho_water] -= radiador
+        elif substituicao_ok is False:
+            substituidas = 0
+    minimo = quantidade + (inclusas or 0) + (radiador or 0) - substituidas
     total = minimo if completos and inclusas is not None and radiador is not None else None
     quantidade_ok = False if maximo is not None and minimo > maximo else total <= maximo if total is not None and maximo is not None else None
-    distribuicao = False if quantidade_ok is False else distribuir_fans(grupos, demanda, water, inclusas, gabinete.get("posicoes_fans_completas") is not False) if completos and medidas_conhecidas else None
+    distribuicao = False if quantidade_ok is False or substituicao_ok is False else distribuir_fans(grupos, demanda, water, inclusas, gabinete.get("posicoes_fans_completas") is not False) if completos and medidas_conhecidas and substituicao_ok is True else None
     return {"selecionadas": quantidade if completos else None, "inclusas": inclusas, "radiador": radiador,
             "total": total, "capacidade": maximo, "livres": max(0, maximo - total) if maximo is not None and total is not None else None,
-            "tamanhos": tamanho_ok, "quantidade": quantidade_ok, "distribuicao": distribuicao}
+            "tamanhos": tamanho_ok, "quantidade": quantidade_ok, "distribuicao": distribuicao,
+            "substituidas": substituidas, "substituicao": substituicao_ok}
 
 
-def avaliar_medidas(itens, registrar):
+def avaliar_medidas(itens, registrar, substituir=False):
     def get(tipo):
         return next((p for t, _, p in itens if t == tipo), None) or {}
     def tem(tipo):
@@ -181,6 +195,8 @@ def avaliar_medidas(itens, registrar):
         registrar("radiador", "Tamanho do radiador", condicao, "Suporte genérico a water cooler não garante espaço para qualquer radiador.")
         registrar("radiador-posicao", "Espessura e interferências do radiador", None,
                   "O tamanho nominal não confirma espessura, folga sobre a RAM ou interferência com a GPU.")
+        registrar("radiador-dimensoes", "Dimensões reais do radiador e das fans", encaixe_radiador(gabinete, water),
+                  "Compare comprimento/largura externos e espessura radiador + fans com os limites por posição. Não há margem universal de 3–5 cm; tanques, conexões e tubos precisam de medidas reais.")
     if tem("placa_video"):
         registrar("gpu-interferencias", "Espaço completo da GPU", None,
                   "Conferir cabos e folgas com radiador/fans frontais; comprimento isolado não confirma o conjunto.")
@@ -192,13 +208,42 @@ def avaliar_medidas(itens, registrar):
             registrar("baias-" + campo, "Baias de " + formato + '"', quantidade <= limite if limite is not None else None,
                       "Baias dedicadas informadas no gabinete; baias compartilhadas ainda exigem verificação.")
     if not tem("fan") and not tem("water_cooler"):
-        return None
+        return avaliar_fans(gabinete, [])
     fans = [(item, p) for tipo, item, p in itens if tipo == "fan"]
-    info = avaliar_fans(gabinete, fans, get("water_cooler") if tem("water_cooler") else None)
+    info = avaliar_fans(gabinete, fans, get("water_cooler") if tem("water_cooler") else None, substituir)
     registrar("fans-tamanho", "Tamanho das fans", info["tamanhos"], "O diâmetro de cada fan deve constar nos encaixes do gabinete.")
     registrar("fans-quantidade", "Quantidade total de fans", info["quantidade"],
-              "Fans selecionadas: {}; inclusas: {}; radiador: {}; capacidade: {}. Fans inclusas são mantidas.".format(
+              "Fans selecionadas: {}; inclusas: {}; radiador: {}; capacidade: {}. Fans do water cooler já ocupam posições; não some outro kit nessas posições sem configurar a substituição.".format(
                   *(info[campo] if info[campo] is not None else "não informada" for campo in ("selecionadas", "inclusas", "radiador", "capacidade"))))
     registrar("fans-posicoes", "Posições das fans e do radiador", info["distribuicao"],
               "Verifica distribuição entre posições compartilhadas e mantém as fans de fábrica. Dados ausentes não confirmam a instalação.")
+    if substituir and tem("water_cooler"):
+        registrar("fans-substituicao", "Substituição das fans do water cooler", info["substituicao"],
+                  "É necessário selecionar fans suficientes do mesmo tamanho das fans originais do radiador. Verifique furação, espessura, pressão estática, conectores e parafusos corretos; parafusos longos podem danificar o radiador.")
     return info
+
+
+def encaixe_radiador(gabinete, water):
+    limites = gabinete.get("limites_radiador_mm")
+    if not isinstance(limites, list) or not limites:
+        return None
+    nominal = n(water.get("tamanho_radiador_mm")) or None
+    medidas = [n(water.get(c)) or None for c in ("comprimento_radiador_mm", "largura_radiador_mm")]
+    espessuras = [n(water.get(c)) or None for c in ("espessura_radiador_mm", "espessura_fan_mm")]
+    medidas.append(sum(espessuras) if all(v is not None for v in espessuras) else None)
+    resultados = []
+    for limite in limites:
+        if not isinstance(limite, dict):
+            resultados.append(None)
+            continue
+        tamanhos_posicao = tamanhos(limite.get("tamanhos_mm"))
+        if nominal and tamanhos_posicao is not None and nominal not in tamanhos_posicao:
+            continue
+        maximos = [n(limite.get(c)) or None for c in ("comprimento_mm", "largura_mm", "espessura_conjunto_mm")]
+        if any(m is not None and l is not None and m > l for m, l in zip(medidas, maximos)):
+            resultados.append(False)
+        elif all(v is not None for v in medidas + maximos) and nominal and tamanhos_posicao is not None:
+            resultados.append(True)
+        else:
+            resultados.append(None)
+    return True if True in resultados else None if None in resultados else False

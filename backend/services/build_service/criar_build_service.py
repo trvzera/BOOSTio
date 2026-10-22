@@ -32,6 +32,8 @@ class CriarBuildService:
     "quantidade_max_fans", "tamanhos_fan_suportados_mm", "posicoes_fans", "posicoes_fans_completas",
     "slots_ocupados", "slots_expansao", "tamanho_max_altura_gpu_mm",
     "espessura_mm", "tamanho_max_espessura_gpu_mm",
+    "comprimento_radiador_mm", "largura_radiador_mm", "espessura_radiador_mm", "espessura_fan_mm",
+    "limites_radiador_mm", "fluxo_ar", "fonte_fluxo_ar",
     "tamanho_max_fonte_mm", "formatos_fonte", "baias_25", "baias_35",
     "padrao_wifi", "velocidade_mbps", "bluetooth", "categoria", "comprimento_m", "conector",
   )
@@ -299,6 +301,29 @@ class CriarBuildService:
         "- Se não tiver vídeo integrado, inclua uma placa_video compatível "
         "(o PC precisa ter saída de vídeo).\n\n"
 
+        "# VENTILAÇÃO E WATER COOLER\n"
+        "- Preencha todas as posições de fans cuja capacidade e distribuição estejam confirmadas "
+        "no gabinete escolhido, dentro do teto do PC. Conte fans inclusas no gabinete + fans do "
+        "water cooler + fans por kit × quantidade de kits novos. Não compre novamente as inclusas. "
+        "Exemplo: sete posições de 120 mm, nenhuma fan de fábrica, AIO com duas fans: acrescente "
+        "cinco fans compatíveis, não sete. Se houver fans de fábrica, desconte-as também.\n"
+        "- Não planeje substituir fans originais do AIO automaticamente; essa é uma escolha manual. "
+        "Escolha unidade/kit que complete exatamente o número de posições, sem sobras implícitas "
+        "e sem exceder o orçamento. Se não houver combinação possível, revise peças/gabinete "
+        "ou retorne erro objetivo. Nunca invente capacidade de um gabinete sem dados.\n"
+        "- Sete posições de fans não significam gabinete mini, nem provam/rejeitam radiador de "
+        "360 mm. Use radiadores_suportados_mm e posicoes_fans: opções 120/140 compartilhadas "
+        "não são posições somáveis. As fans do radiador ocupam essas posições.\n"
+        "- 240/360 mm é nominal. Confira comprimento/largura reais do radiador, tanques, tubos, "
+        "conexões e espessura radiador + fans contra limites explícitos por posição. Não some "
+        "uma folga genérica de 3–5 cm como garantia. Dados ausentes continuam não verificados.\n"
+        "- Quando houver fluxo_ar reverso confirmado, ele é uma preferência estética para "
+        "entrada na base/lateral, não requisito. Sugira entrada frente/base/lateral e saída "
+        "topo/traseira somente conforme o gabinete. O sentido depende da orientação da fan; "
+        "não afirme que toda reversa é entrada ou toda normal é saída. Mistura de modelos "
+        "exige conferir conectores, tensão e corrente, não regras de DDR como na RAM. "
+        "fonte_fluxo_ar nome_comercial identifica apenas o anúncio, não certifica a especificação.\n\n"
+
         "# PERIFÉRICOS\n"
         f"- {regra_perifericos}\n"
         "- Cada periférico novo entra com quantidade 1 e conta no orçamento total.\n"
@@ -435,6 +460,10 @@ class CriarBuildService:
       raise ValueError("A configuração sugerida contém incompatibilidades: " + motivos + ". Revise as peças ou tente novamente.")
     if diagnostico["pecasPendentes"]:
       raise ValueError("A IA não completou as peças obrigatórias da build: " + ", ".join(diagnostico["pecasPendentes"]) + ". Tente novamente.")
+    fans = diagnostico.get("fans")
+    if fans and fans["total"] is not None and fans["capacidade"] is not None and fans["total"] < fans["capacidade"]:
+      raise ValueError("A IA não completou a ventilação do gabinete: faltam " + str(fans["capacidade"] - fans["total"]) +
+                       " fans nas posições cadastradas. Desconte as fans de fábrica e do water cooler, use unidades/kits compatíveis e preserve o teto do PC.")
     build["orcamento"] = orcamento
     build["preco_total"] = float(round(total, 2))
     return build

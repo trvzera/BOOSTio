@@ -56,6 +56,7 @@ export function normalizarBuild(valor = {}) {
     criadoEm:Number.isFinite(data.getTime()) ? data.toISOString() : new Date().toISOString(),
     visibilidade:valor.visibilidade === "publico" ? "publico" : "privado",
     travada:Boolean(valor.travada),
+    substituirFansWaterCooler:valor.substituirFansWaterCooler === true,
     percentualPerifericos:Number.isInteger(valor.percentualPerifericos) && valor.percentualPerifericos >= 0 && valor.percentualPerifericos <= 99 ? valor.percentualPerifericos : 0,
     incluirPerifericos:typeof valor.incluirPerifericos === "boolean" ? valor.incluirPerifericos : perifericos.some(cat => componentes[cat]),
     incluirRede:typeof valor.incluirRede === "boolean" ? valor.incluirRede : acessoriosRede.some(cat => componentes[cat]) || ["cabo","wifi"].includes(valor.rede?.tipo),
@@ -239,6 +240,7 @@ export function removerPeca(build,categoria,id) {
     const itens = itensCategoria(proxima,categoria).filter(r => (r.id || r.proprio) !== id);
     if (itens.length) proxima.componentes[categoria] = itens; else delete proxima.componentes[categoria];
   } else delete proxima.componentes[categoria];
+  if (categoria === "water_cooler") proxima.substituirFansWaterCooler = false;
   return proxima;
 }
 export function reduzirQuantidade(build,categoria,id) {
@@ -251,7 +253,7 @@ export function reduzirRam(build,id) { return reduzirQuantidade(build,"memoria_r
 export function linkCompartilhado(build) {
   if (build.visibilidade !== "publico") throw new Error("Torne a build pública antes de compartilhar.");
   const url = new URL("./configuracao-build.html",location.href); url.search = "";
-  const dados = {titulo:build.titulo,descricao:build.descricao,visibilidade:"publico",componentes:build.componentes,incluirPerifericos:build.incluirPerifericos,incluirRede:build.incluirRede,rede:build.rede,orcamento:build.orcamento};
+  const dados = {titulo:build.titulo,descricao:build.descricao,visibilidade:"publico",componentes:build.componentes,incluirPerifericos:build.incluirPerifericos,incluirRede:build.incluirRede,rede:build.rede,orcamento:build.orcamento,substituirFansWaterCooler:build.substituirFansWaterCooler === true};
   url.searchParams.set("compartilhar",btoa(unescape(encodeURIComponent(JSON.stringify(dados)))));
   return url.href;
 }

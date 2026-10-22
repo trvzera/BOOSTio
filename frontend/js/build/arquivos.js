@@ -64,7 +64,7 @@ function validarMetadados(build) {
   }
   if (tem(build,"visibilidade") && !["publico","privado"].includes(build.visibilidade))
     falhar("Visibilidade inválida.");
-  for (const campo of ["travada","incluirPerifericos","incluirRede"]) {
+  for (const campo of ["travada","incluirPerifericos","incluirRede","substituirFansWaterCooler"]) {
     if (tem(build,campo) && typeof build[campo] !== "boolean") falhar("Metadado inválido: " + campo + ".");
   }
   if (tem(build,"criadoEm") && (!["string","number"].includes(typeof build.criadoEm) ||

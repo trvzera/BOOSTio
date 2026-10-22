@@ -55,7 +55,7 @@ As limitações de cada funcionalidade estão indicadas na última coluna.
 | 01 | Criar conta e fazer login | ✅ **Implementado** | Cadastro, autenticação, logout e sessão. |
 | 02 | Cadastrar o setup atual | ✅ **Implementado** | Definir ou remover uma build como computador atual. |
 | 03 | Pesquisar peças e compatibilidade | ✅ **Implementado** | Catálogo por categoria e diagnóstico durante a montagem, com as limitações do requisito 13. |
-| 04 | Montar por formulário | ✅ **Implementado** | Geração por LLM com validação e uma revisão automática de saídas inválidas antes de salvar. |
+| 04 | Montar por formulário | ✅ **Implementado** | Geração por LLM com orçamento, ventilação cadastrada e uma revisão automática de saídas inválidas antes de salvar. |
 | 05 | Salvar configurações | ✅ **Implementado** | Builds persistidas na conta, inclusive incompletas, com salvamento automático. |
 | 06 | Excluir configurações salvas | ✅ **Implementado** | Exclusão com verificação de proprietário e tranca. |
 | 07 | Comparar configurações salvas | 🟡 **Parcial** | Preços, componentes, consumo e renderização no Blender de duas ou três builds; comparação de FPS ainda pendente. |
@@ -64,7 +64,7 @@ As limitações de cada funcionalidade estão indicadas na última coluna.
 | 10 | Ver configurações prontas | ✅ **Implementado** | 16 modelos sem periféricos, ordenados do menor para o maior preço cadastrado. |
 | 11 | Editar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento. |
 | 12 | Consultar preços das peças pelo site | 🟡 **Parcial** | Preços cadastrados, data de atualização quando disponível e links das lojas; monitoramento contínuo em evolução. |
-| 13 | Ver compatibilidade e consumo de energia | 🟡 **Parcial** | Python e frontend verificam medidas disponíveis, formatos, baias e tamanho/quantidade/distribuição de fans e radiador. Completar dimensões por modelo e interferências físicas. |
+| 13 | Ver compatibilidade e consumo de energia | 🟡 **Parcial** | Medidas disponíveis, formatos, baias, fans e radiador; substituição explícita das fans do water cooler e painel de informações. Completar fichas técnicas e interferências físicas. |
 | 14 | Incluir periféricos no orçamento | ✅ **Implementado** | Inclusão e reaproveitamento com tetos separados para PC e periféricos. |
 | 15 | Registrar budget no perfil | ✅ **Implementado** | Valor e autorização usados no formulário e em novas montagens manuais, sem alterar builds existentes. |
 | 16 | Baixar builds em JSON e CSV | ✅ **Implementado** | Exportação para guardar a configuração localmente. |

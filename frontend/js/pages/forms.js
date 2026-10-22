@@ -74,7 +74,7 @@ const perguntas = [
     tag: "Etapa 03",
     titulo: "O que você já possui?",
     descricao:
-      "Marque as peças do computador que pretende reaproveitar e informe o modelo de cada item. Se estiver começando do zero, marque a primeira opção.",
+      "Marque as peças do computador que pretende reaproveitar e informe o modelo de cada item. Se estiver começando do zero, marque a primeira opção. A montagem considera as fans do gabinete e do water cooler, completando as posições com dados confirmados dentro do orçamento.",
     multipla: true,
     opcoes: [
       ["nenhuma", "Ainda não tenho peças"],

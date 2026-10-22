@@ -1,4 +1,4 @@
-import { informacoesFans } from "./fans.js";
+import { informacoesFans, orientacoesVentilacao, encaixeRadiador } from "./fans.js";
 export { informacoesFans } from "./fans.js";
 // Campos ausentes são desconhecidos, nunca zero ou uma medida inferida pelo nome.
 export function numeroConhecido(valor) {
@@ -31,9 +31,10 @@ function medidas(valor) {
     .map(v => numeroConhecido(String(v).trim().replace(/\s*mm$/i,"")))
     .reduce((valores,v) => valores == null || v == null || v <= 0 ? null : [...valores,v],[]);
 }
-export function validarEncaixe({gpu,air,water,fans = [],gabinete,fonte,discos = []}) {
-  const erros = [], avisos = [];
-  if (!gabinete) return {erros,avisos};
+export function validarEncaixe({gpu,air,water,fans = [],gabinete,fonte,discos = [],substituir = false}) {
+  const orientacoes = orientacoesVentilacao({gabinete,fans,water,substituir});
+  const erros = [], avisos = [...orientacoes.dicas], alertas = [...orientacoes.avisos];
+  if (!gabinete) return {erros,avisos,alertas};
   const checarMedida = (peca,medida,limite,nome) => {
     if (!peca) return;
     const tamanho = numeroConhecido(medida), maximo = numeroConhecido(limite);
@@ -65,6 +66,7 @@ export function validarEncaixe({gpu,air,water,fans = [],gabinete,fonte,discos = 
   const radiadores = medidas(gabinete.radiadores_suportados_mm);
   const tamanhoRadiador = numeroConhecido(water?.tamanho_radiador_mm);
   if (water) {
+    if (encaixeRadiador(gabinete,water) === false) erros.push("As dimensões reais do radiador ou a espessura radiador + fans excedem os limites por posição do gabinete.");
     if (gabinete.suporte_water_cooler === false) erros.push("O gabinete não suporta water cooler.");
     else if (tamanhoRadiador != null && radiadores != null && !radiadores.includes(tamanhoRadiador))
       erros.push("O gabinete não suporta radiador de " + tamanhoRadiador + " mm.");
@@ -72,18 +74,20 @@ export function validarEncaixe({gpu,air,water,fans = [],gabinete,fonte,discos = 
       avisos.push("Confirme os tamanhos de radiador suportados pelo gabinete; suporte a water cooler não garante encaixe de 360 mm.");
     avisos.push("Confirme a espessura do conjunto radiador + fans e as folgas com RAM e GPU.");
   }
-  const info = informacoesFans(gabinete,fans,water);
+  const info = informacoesFans(gabinete,fans,water,substituir);
   if (fans.length || water) {
     if (info.tamanhos === false) erros.push("O gabinete não suporta o tamanho das fans selecionadas.");
     if (info.tamanhos == null) avisos.push("Falta o tamanho dos encaixes de fans do gabinete para confirmar a instalação.");
     if (info.quantidade == null)
       avisos.push("Falta a capacidade de fans do gabinete para conferir a quantidade total, incluindo as fans inclusas e as do radiador.");
     else if (!info.quantidade)
-      erros.push("Há mais fans do que posições no gabinete, contando as inclusas e as do radiador. Remova um kit ou use menos fans.");
+      erros.push("Há mais fans do que posições no gabinete, contando as inclusas e as do radiador. Remova um kit ou configure a substituição das fans do water cooler, se for essa a intenção.");
+    if (info.substituicao === false) erros.push("Para substituir as fans do water cooler, selecione fans suficientes do mesmo tamanho das originais.");
+    else if (info.substituicao == null) avisos.push("Faltam especificações para verificar as fans escolhidas para substituir as do water cooler.");
     if (info.distribuicao === false) erros.push("As fans e o radiador não cabem nas posições compartilhadas do gabinete, mantendo as fans inclusas.");
     else if (info.distribuicao == null) avisos.push("Confirme a distribuição das fans e do radiador: faltam medidas por posição ou tamanho das fans do radiador.");
   }
-  return {erros,avisos};
+  return {erros,avisos,alertas};
 }
 
 // Slots/SATA: complemento somente demonstrativo. Medidas: manifesto compartilhado

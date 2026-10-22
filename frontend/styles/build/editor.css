@@ -261,5 +261,19 @@
 .compatibility-unknown ul { padding-left: 1rem; list-style: disc; }
 .compatibility-messages li { font-size: var(--text-caption); }
 .compatibility-messages li.tip { border-color: var(--cor-p1); }
+.build-indicator.information { --indicator-color: var(--cor-6); }
+.build-indicator.information.aviso { --indicator-color: var(--status-warning); }
+.build-indicator.information.erro { --indicator-color: var(--status-error); }
+.build-indicator.information .compatibility-trigger { width: 2.75rem; min-height: 2.75rem; cursor: pointer; }
+.build-indicator.information .compatibility-trigger::before { content: none; }
+.build-info-icon { display: grid; place-items: center; width: 1.2rem; height: 1.2rem; border: 1px solid currentColor; border-radius: 50%; font: 500 .8rem/1 var(--font-heading); transition: transform .2s ease, opacity .2s ease; }
+.information .compatibility-trigger:hover .build-info-icon { transform: scale(1.08); }
+.information .compatibility-trigger:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.builder-title-line > .information, .build-title-line > .information { margin-left: auto; }
+.information .compatibility-details { left: auto; right: 0; }
+.information[data-above] .compatibility-details::before { inset: auto 0 -14px; }
+.builder-heading:has(.information[data-open]) { position: relative; z-index: 30; }
+.fan-replacement { display: flex; align-items: center; gap: .65rem; color: var(--text-secondary); }
+.fan-replacement > span:last-child { min-width: 0; }
 .builder-page-main { min-height: 100svh; }
 .integrated-video-note { margin: 0 0 1.25rem; padding: .85rem 1rem; border: 1px solid rgba(0,123,255,.25); border-radius: .85rem; background: rgba(0,123,255,.06); color: var(--cor-5); font: 400 .85rem/1.6 var(--font-body); }

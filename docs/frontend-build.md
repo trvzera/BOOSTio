@@ -6,6 +6,61 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Ventilação, water cooler e informações da build — 22/10/2026
+
+- `substituirFansWaterCooler` é uma opção booleana explícita no estado JSON da
+  build, validada no Python e mantida na conta, cópia, importação/exportação JSON/CSV
+  e compartilhamento legado. Não cria coluna nem exige migração. Remover o water
+  cooler no editor limpa a opção; selecionar um novo cooler não herda a troca.
+- Sem essa opção: total = fans avulsas/por kit + inclusas do gabinete + fans do
+  radiador. Com a opção: desconta as originais substituídas, sem remover o custo
+  das fans compradas. A distribuição reserva fans selecionadas do tamanho do AIO
+  e ocupa as posições do radiador uma vez. Tamanho incorreto ou quantidade
+  insuficiente são erros; falta de especificação continua não verificada.
+  Substituir só parte das fans e remover fans de fábrica do gabinete não são
+  opções implementadas. Não pressupor push/pull ou posições extras disponíveis.
+- O editor permite duplicar e misturar modelos de fans, sem exigir marca ou
+  frequência iguais como na RAM. Orientações cobrem tamanho/furação, espessura,
+  pressão estática, conectores/tensão/corrente/hub e parafusos do radiador.
+  As instruções e comprimentos de parafusos devem seguir o fabricante, não uma
+  medida genérica ([manual EK](https://www.ekwb.com/shop/EK-IM/EK-IM-3831109860205.pdf)).
+- `encaixe_radiador()` / `encaixeRadiador()` comparam `comprimento_radiador_mm`,
+  `largura_radiador_mm` e `espessura_radiador_mm + espessura_fan_mm` com
+  `limites_radiador_mm` do gabinete: lista de posições, `tamanhos_mm`,
+  `comprimento_mm`, `largura_mm`, `espessura_conjunto_mm`. Basta uma posição com
+  medidas compatíveis para esse critério; isso não aprova a distribuição conjunta
+  com GPU/RAM/tubos. Dados ausentes nunca viram zero. Não há regra "sete fans =
+  gabinete mini" nem margem arbitrária de 3–5 cm. Tamanho nominal não é comprimento
+  externo ([exemplo oficial Corsair](https://www.corsair.com/eu/en/p/cpu-coolers/cw-9060016-ww/hydro-series-h105-240mm-extreme-performance-liquid-cpu-cooler-cw-9060016-ww)).
+- O prompt instrui preencher posições confirmadas dentro do teto do PC, descontar
+  fans do gabinete/AIO, escolher unidades/kits com número exato e não planejar troca
+  de fans originais automaticamente. O backend rejeita posições cadastradas vazias
+  ou excesso e permite a revisão limitada já existente. Orçamento não é ampliado.
+  Capacidade ausente continua parcial; não inventar fans para completar uma suposta
+  capacidade. Se a combinação não existir ou não couber no orçamento, a geração
+  pode exigir revisão/novo orçamento em vez de persistir uma saída inválida.
+- Fans Reverse estão identificadas nos nomes da seed/demo: ROUND5 Nordwind
+  Reverse Black, Rise Mode Magneto Pro Reverse e ASUS TUF Gaming TR120 Reverse.
+  `Fan.to_catalogo()` informa `fluxo_ar: reverso` com
+  `fonte_fluxo_ar: nome_comercial`; sem nome explícito, não presume fluxo normal.
+  O banco SQLite local inspecionado não tinha tabela `fan`; não se executou seed.
+  Não transformar identificação comercial em ficha certificada.
+- Sentido de fluxo depende da orientação. Entrada frente/base/lateral e saída
+  topo/traseira são sugestões quando o gabinete permitir; não são critérios de
+  incompatibilidade. Reverse pode preservar o acabamento de uma entrada, sem
+  tornar uma fan normal inadequada ([ASUS](https://press.asus.com/news/press-releases/asus-launches-tuf-gaming-tr120-argb-case-fans/),
+  [Noctua](https://www.noctua.at/en/support/faqs/how-do-i-determine-my-fans-airflow-direction)).
+- O botão `i` substitui a barra no editor e nos cards. Branco para informações sem
+  pendência conhecida, amarelo para faltas/avisos/verificações pendentes e vermelho
+  para erros. Hover, clique/toque e foco abrem; Escape/saída fecham. `aria-expanded`,
+  `aria-controls` e `inert` acompanham o estado. O popover é contido na viewport e
+  elevado sobre os cards, com rolagem própria para textos longos.
+  Validação: 341 testes Node e 443 Python (+4 subtestes), sem chamadas a LLMs ou
+  APIs pagas e sem iniciar `app.py` ou alterar o banco local.
+  No Chrome, 85 verificações em 320/390/768/1440 px com API simulada cobriram
+  persistência, duplicação, substituição, painel nos cards/editor, teclado e
+  contenção horizontal/vertical na viewport, sem exceções JavaScript.
+
 ### Encaixe físico e capacidade de fans — 22/10/2026
 
 - `services/build_service/encaixe_fisico.py` complementa o diagnóstico Python:

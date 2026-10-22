@@ -46,7 +46,7 @@ function distribuir(grupos,demanda,water,inclusas,completas) {
   const resultado = tentar(0,diametros.map(d => demanda.get(d)),Boolean(water));
   return resultado || completas ? resultado : null;
 }
-export function informacoesFans(gabinete,fans = [],water = null) {
+export function informacoesFans(gabinete,fans = [],water = null,substituir = false) {
   const grupos = posicoesFans(gabinete);
   let capacidade = inteiro(gabinete?.quantidade_max_fans);
   if (grupos) {
@@ -69,10 +69,63 @@ export function informacoesFans(gabinete,fans = [],water = null) {
     else if (suportados != null && !suportados.includes(tamanho)) tamanhoOk = false;
   }
   if (tamanhoOk !== false && !medidasConhecidas) tamanhoOk = null;
-  const minimo = selecionadas + (inclusas || 0) + (radiador || 0);
+  let substituidas = substituir && completas ? Math.min(selecionadas,radiador || 0) : 0;
+  let substituicao = true;
+  const tamanhoWater = n(water?.tamanho_fan_mm) || null;
+  if (substituir && water) {
+    substituicao = null;
+    if (radiador != null && completas && tamanhoWater != null) substituicao = (demanda.get(tamanhoWater) || 0) >= radiador;
+    if (radiador != null && completas && selecionadas < radiador) substituicao = false;
+    if (substituicao === true) demanda.set(tamanhoWater,demanda.get(tamanhoWater) - radiador);
+    else if (substituicao === false) substituidas = 0;
+  }
+  const minimo = selecionadas + (inclusas || 0) + (radiador || 0) - substituidas;
   const total = completas && inclusas != null && radiador != null ? minimo : null;
   return {selecionadas:completas ? selecionadas : null,inclusas,radiador,total,capacidade,
     livres:capacidade != null && total != null ? Math.max(0,capacidade-total) : null,
     tamanhos:tamanhoOk,quantidade:capacidade != null && minimo > capacidade ? false : total != null && capacidade != null ? total <= capacidade : null,
-    distribuicao:capacidade != null && minimo > capacidade ? false : completas && medidasConhecidas ? distribuir(grupos,demanda,water,inclusas,gabinete?.posicoes_fans_completas !== false) : null};
+    substituidas,substituicao,
+    distribuicao:(capacidade != null && minimo > capacidade) || substituicao === false ? false : completas && medidasConhecidas && substituicao === true ? distribuir(grupos,demanda,water,inclusas,gabinete?.posicoes_fans_completas !== false) : null};
+}
+
+export function fluxoFan(peca) {
+  if (peca?.fluxo_ar === "reverso" || peca?.fluxo_ar === "normal") return peca.fluxo_ar;
+  // Identificação comercial, não certificação técnica nem direção de instalação.
+  return /\b(reverse|reversa|reverso)\b/i.test(peca?.modelo || "") ? "reverso" : "nao_informado";
+}
+
+export function encaixeRadiador(gabinete,water) {
+  const limites = gabinete?.limites_radiador_mm;
+  if (!Array.isArray(limites) || !limites.length) return null;
+  const nominal = n(water?.tamanho_radiador_mm) || null;
+  const e = n(water?.espessura_radiador_mm) || null, f = n(water?.espessura_fan_mm) || null;
+  const medidas = [n(water?.comprimento_radiador_mm) || null,n(water?.largura_radiador_mm) || null,e != null && f != null ? e+f : null];
+  const resultados = [];
+  for (const limite of limites) {
+    if (!limite || typeof limite !== 'object' || Array.isArray(limite)) { resultados.push(null); continue; }
+    const opcoes = tamanhos(limite.tamanhos_mm);
+    if (nominal && opcoes != null && !opcoes.includes(nominal)) continue;
+    const maximos = [limite.comprimento_mm,limite.largura_mm,limite.espessura_conjunto_mm].map(v => n(v) || null);
+    if (medidas.some((m,i) => m != null && maximos[i] != null && m > maximos[i])) resultados.push(false);
+    else if ([...medidas,...maximos].every(v => v != null) && nominal && opcoes != null) resultados.push(true);
+    else resultados.push(null);
+  }
+  return resultados.includes(true) ? true : resultados.includes(null) ? null : false;
+}
+
+export function orientacoesVentilacao({gabinete,fans = [],water,substituir = false}) {
+  const info = informacoesFans(gabinete,fans,water,substituir), avisos = [], dicas = [];
+  if (water) {
+    dicas.push('O water cooler tem ' + (info.radiador ?? 'quantidade não informada de') + ' fans no catálogo. Elas ocupam posições do gabinete; não são posições extras.');
+    dicas.push('Fans avulsas podem substituir as do water cooler se tamanho, furação, espessura, pressão estática e conectores forem adequados. Confira rosca e comprimento dos parafusos no manual; parafusos longos podem danificar o radiador.');
+    dicas.push('240/360 mm é o tamanho nominal, não o comprimento externo do radiador. Reserve espaço real para tanques, conexões, tubos e espessura do conjunto; não adicione 3–5 cm como garantia universal.');
+    if (substituir) avisos.push('Substituição das fans do water cooler planejada: ' + info.substituidas + ' fan(s) originais deixam de contar como instaladas. A montagem e os parafusos precisam ser conferidos; as peças compradas continuam no preço.');
+    else if (info.quantidade === false) avisos.push('O water cooler já vem com fans cadastradas. Remova fans extras ou marque a opção de substituir as fans originais do water cooler; não instale todas no gabinete como fans adicionais.');
+  }
+  if (fans.length || (gabinete?.fans_inclusos > 0)) {
+    dicas.push('Fluxo sugerido, quando o gabinete permitir: entrada de ar pela frente, base ou lateral; saída pelo topo e traseira. A orientação e as setas da fan definem o sentido, não apenas ela ser normal ou reversa.');
+    if (fans.some(({peca}) => fluxoFan(peca) === 'reverso')) dicas.push('Há fan identificada como reversa. Ela pode favorecer o acabamento de entradas na base/lateral, mas isso é preferência, não incompatibilidade. Fans normais também podem ser orientadas para entrada; confirme o fluxo no manual.');
+    dicas.push('Pode misturar marcas e modelos de fans sem a restrição de DDR/frequência da RAM. Confira dimensões, tensão, conectores PWM/DC e RGB/ARGB, corrente e portas ou hub disponíveis.');
+  }
+  return {avisos,dicas};
 }

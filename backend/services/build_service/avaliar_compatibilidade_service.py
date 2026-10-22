@@ -106,7 +106,7 @@ class AvaliarCompatibilidadeService:
             registrar("formato-placa", "Formato da placa-mãe", formato in formatos if formato and formatos else None,
                       "Usa os formatos declarados no catálogo, sem inferir suporte pelo tamanho externo do gabinete.")
 
-        fans = avaliar_medidas(itens, registrar)
+        fans = avaliar_medidas(itens, registrar, estado.get("substituirFansWaterCooler") is True)
 
         if tem("processador"):
             for tipo in ("air_cooler", "water_cooler"):

@@ -6,24 +6,24 @@ export function indicadorBuild(resultado,id) {
   const faltam = resultado.faltam.map(p => "Falta adicionar: " + p + ".");
   const pendencias = [...resultado.erros,...faltam,...resultado.avisos,...dicas];
   const problemas = resultado.erros.length + faltam.length + resultado.avisos.length;
-  const tom = resultado.erros.length ? "erro" : problemas ? "aviso" : "ok";
-  const nome = tom === "erro" ? "Ver incompatibilidades" : problemas ? "Ver pendências da build" : "Ver dicas da build";
   const diagnostico = resultado.compatibilidade;
   const desconhecidas = Array.isArray(diagnostico?.naoVerificado) ? diagnostico.naoVerificado : [];
+  const tom = resultado.erros.length ? "erro" : problemas || desconhecidas.length ? "aviso" : "ok";
+  const nome = tom === "erro" ? "Informações da build: incompatibilidades" : tom === "aviso" ? "Informações da build: pendências" : "Informações e orientações da build";
   const avaliacao = diagnostico ? '<p class="compatibility-assessment" data-status="' + h(diagnostico.status) + '">' + h(diagnostico.rotulo) + '</p>' +
     (desconhecidas.length ? '<details class="compatibility-unknown"><summary>' + desconhecidas.length + (desconhecidas.length === 1 ? ' verificação sem dados suficientes' : ' verificações sem dados suficientes') + '</summary><ul>' + desconhecidas.map(v => '<li>' + h(v.mensagem) + '</li>').join('') + '</ul></details>' : '') +
     '<p class="compatibility-scope">' + h(diagnostico.aviso || 'Avaliação limitada às especificações disponíveis.') + '</p>' : '';
-  return '<div class="compatibility-popover build-indicator ' + tom + '">' +
-    (pendencias.length || diagnostico ? '<button type="button" class="compatibility-trigger" aria-label="' + nome + '" aria-controls="' + h(id) + '" aria-expanded="false"></button>' +
+  return '<div class="compatibility-popover build-indicator ' + tom + ' information">' +
+    '<button type="button" class="compatibility-trigger" aria-label="' + nome + '" aria-controls="' + h(id) + '" aria-expanded="false"><span class="build-info-icon" aria-hidden="true">i</span></button>' +
       '<div id="' + h(id) + '" class="compatibility-details glass-card" role="region" aria-label="Compatibilidade da build" aria-hidden="true" inert>' +
       '<h3>' + (problemas ? 'O que precisa de atenção' : 'Verificações e dicas') + '</h3>' + avaliacao + '<ul class="compatibility-messages">' + pendencias.map((texto,i) => '<li class="' + (i < resultado.erros.length ? 'error' : i < problemas ? 'warning' : 'tip') + '">' + h(texto) + '</li>').join("") +
-      '</ul></div>'
-      : '<span class="compatibility-marker" aria-label="Sem conflitos detectados"></span>') + '</div>';
+      '</ul>' + (!pendencias.length && !diagnostico ? '<p class="compatibility-scope">Sem conflitos nas verificações disponíveis. Isso não confirma especificações ausentes.</p>' : '') + '</div></div>';
 }
 export function iniciarIndicadores(raiz) {
   if (!fechamentoExternoIniciado) {
     fechamentoExternoIniciado = true;
     document.addEventListener("pointerdown",e => { if (aberto && !aberto.box.contains(e.target)) aberto.fechar(); });
+    window.addEventListener("resize",() => aberto?.fechar());
   }
   raiz.querySelectorAll(".build-indicator").forEach(box => {
     const botao = box.querySelector("button"), painel = box.querySelector(".compatibility-details");
@@ -33,6 +33,19 @@ export function iniciarIndicadores(raiz) {
       box.toggleAttribute("data-open",aberto);
       botao.setAttribute("aria-expanded",String(aberto));
       painel.setAttribute("aria-hidden",String(!aberto)); painel.inert = !aberto;
+      if (aberto) {
+        painel.style.marginRight = '0px';
+        const ancora = botao.getBoundingClientRect();
+        const abaixo = innerHeight - ancora.bottom - 26, acima = ancora.top - 26;
+        const inverter = abaixo < 180 && acima > abaixo;
+        box.toggleAttribute('data-above',inverter);
+        painel.style.top = inverter ? 'auto' : 'calc(100% + 10px)';
+        painel.style.bottom = inverter ? 'calc(100% + 10px)' : 'auto';
+        painel.style.maxHeight = Math.max(80,Math.min(innerHeight * .7,inverter ? acima : abaixo)) + 'px';
+        const rect = painel.getBoundingClientRect();
+        const ajuste = rect.left < 16 ? rect.left - 16 : rect.right > innerWidth - 16 ? rect.right - (innerWidth - 16) : 0;
+        painel.style.marginRight = ajuste + 'px';
+      }
     };
     const fechar = () => { fixo = false; mostrar(false); };
     const abrir = () => { if (aberto?.box !== box) aberto?.fechar(); aberto = {box,fechar}; mostrar(true); };

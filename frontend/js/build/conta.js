@@ -37,6 +37,7 @@ export function estadoParaConta(build) {
     travada:build.travada,orcamento:build.orcamento,
     incluirPerifericos:build.incluirPerifericos,incluirRede:build.incluirRede,
     percentualPerifericos:build.percentualPerifericos || 0,
+    substituirFansWaterCooler:build.substituirFansWaterCooler === true,
     rede:build.rede,pecasExtras:build.pecasExtras,componentes:build.componentes,
   };
 }

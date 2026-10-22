@@ -5,7 +5,7 @@ import pytest
 
 from models import Gabinete, AirCooler
 from models.medidas_fisicas import completar_medidas
-from services.build_service.encaixe_fisico import avaliar_fans
+from services.build_service.encaixe_fisico import avaliar_fans, encaixe_radiador
 from services.build_service.criar_build_service import CriarBuildService
 from services.build_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
@@ -21,12 +21,19 @@ def regra(resultado, codigo):
 
 
 FIXTURE = json.loads((Path(__file__).resolve().parents[4] / "frontend/tests/fixtures/encaixe-fans.json").read_text())
+RADIADORES = json.loads((Path(__file__).resolve().parents[4] / "frontend/tests/fixtures/radiadores-dimensoes.json").read_text())
+
+
+@pytest.mark.parametrize("caso", RADIADORES["casos"], ids=lambda c: c["nome"])
+def test_dimensoes_reais_do_radiador(caso):
+    assert encaixe_radiador({**RADIADORES["gabinete"], **caso.get("gabinete", {})},
+                           {**RADIADORES["water"], **caso.get("water", {})}) == caso["esperado"]
 
 
 @pytest.mark.parametrize("caso", FIXTURE["casos"], ids=lambda c: c["nome"])
 def test_mesmas_regras_do_frontend(caso):
     resultado = avaliar_fans({**FIXTURE["gabinete"], **caso.get("gabinete", {})},
-                             [(f["item"], f["peca"]) for f in caso["fans"]], caso.get("water"))
+                             [(f["item"], f["peca"]) for f in caso["fans"]], caso.get("water"), caso.get("substituir") is True)
     for campo, valor in caso["esperado"].items():
         assert resultado[campo] == valor, campo
 
@@ -97,3 +104,28 @@ def test_diagnostico_resolve_medidas_do_catalogo_persistido_em_banco_isolado():
         assert resultado["fans"]["inclusas"] == 1
         assert case.fans_inclusos == 2  # complemento não faz update silencioso na base
         db.session.remove(); db.drop_all()
+
+
+@pytest.mark.parametrize("valor", ["true", 1, None, [], {}])
+def test_flag_substituicao_exige_booleano(valor):
+    from models import BuildSalva
+    with pytest.raises(ValueError, match="substituição das fans"):
+        BuildSalva.validar_estado({"titulo": "QA", "substituirFansWaterCooler": valor})
+
+
+def test_estado_preserva_substituicao_e_normaliza_default():
+    from models import BuildSalva, Fan
+    assert BuildSalva.validar_estado({"titulo": "QA", "substituirFansWaterCooler": True})["substituirFansWaterCooler"] is True
+    assert BuildSalva.validar_estado({"titulo": "QA"})["substituirFansWaterCooler"] is False
+    dados = Fan(id=1, modelo="TR120 Reverse").to_catalogo()
+    assert dados["fluxo_ar"] == "reverso" and dados["fonte_fluxo_ar"] == "nome_comercial"
+    assert "fluxo_ar" not in Fan(id=2, modelo="Sem informação").to_catalogo()
+
+
+def test_estado_aceita_fans_de_modelos_diferentes_e_preserva_quantidade(monkeypatch):
+    from models import BuildSalva, Fan
+    monkeypatch.setattr(Fan, "buscar_por_id", lambda identificador: Fan(id=identificador, modelo="Fan"))
+    estado = BuildSalva.validar_estado({"titulo": "QA", "substituirFansWaterCooler": True,
+                                      "componentes": {"fan": [{"id": 1, "quantidade": 3}, {"id": 2, "quantidade": 2}]}})
+    assert estado["componentes"]["fan"] == [{"id": 1, "quantidade": 3}, {"id": 2, "quantidade": 2}]
+    assert estado["substituirFansWaterCooler"] is True

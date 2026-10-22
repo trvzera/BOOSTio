@@ -127,3 +127,37 @@ def test_prompt_recebe_os_dados_tecnicos_que_a_validacao_usa():
     dados = CriarBuildService._campos_pecas(Gabinete(id=3, tamanho_max_gpu_mm=320, tamanho_max_cooler_mm=160))
     assert dados["tamanho_max_gpu_mm"] == 320
     assert dados["tamanho_max_cooler_mm"] == 160
+
+
+def test_geracao_completa_sete_posicoes_descontando_duas_fans_do_water(sugestao):
+    build, catalogo = sugestao
+    catalogo["gabinete"][0].update(fans_inclusos=0, quantidade_max_fans=7,
+                                 tamanhos_fan_suportados_mm=[120], suporte_water_cooler=True,
+                                 radiadores_suportados_mm=[240])
+    adicionar(sugestao, "water_cooler", tamanho_radiador_mm=240, quantidade_fans=2, tamanho_fan_mm=120)
+    adicionar(sugestao, "fan", tamanho_mm=120, quantidade=1)
+    fan = build["componentes"][-1]
+    fan["quantidade"] = 4
+    with pytest.raises(ValueError, match="faltam 1 fans"):
+        validar(sugestao)
+    fan["quantidade"] = 5
+    assert validar(sugestao)["preco_total"] == 1200
+    fan["quantidade"] = 7
+    with pytest.raises(ValueError, match="incompatibilidades"):
+        validar(sugestao)
+
+
+def test_geracao_nao_omite_fans_quando_so_gabinete_foi_selecionado(sugestao):
+    sugestao[1]["gabinete"][0].update(fans_inclusos=0, quantidade_max_fans=2)
+    with pytest.raises(ValueError, match="faltam 2 fans"):
+        validar(sugestao)
+    sugestao[1]["gabinete"][0]["fans_inclusos"] = 2
+    assert validar(sugestao)["preco_total"] == 600
+
+
+def test_prompt_descreve_ventilacao_sem_inferir_tamanho_do_gabinete_ou_folga():
+    prompt = CriarBuildService._criar_prompt({"nome": "QA", "descricao": "QA", "utilidade": "Jogos"}, 5000, 800, {})
+    assert "sete posições" in prompt and "cinco fans" in prompt
+    assert "Não planeje substituir fans originais" in prompt
+    assert "Não some uma folga genérica" in prompt
+    assert "fonte_fluxo_ar nome_comercial" in prompt

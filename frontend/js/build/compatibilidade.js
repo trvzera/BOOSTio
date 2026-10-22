@@ -69,9 +69,10 @@ export function avaliarBuild(build,catalogo) {
     if (placa && discos.limites.compartilhamentoDesconhecido) dicas.push("Confirme se o SSD M.2 SATA desativa alguma porta SATA da placa-mãe.");
   }
   const encaixe = validarEncaixe({gpu:get("placa_video"),air:get("air_cooler"),water:get("water_cooler") || (tem("water_cooler") ? {} : null),gabinete,fonte:get("fonte"),
+    substituir:build.substituirFansWaterCooler === true,
     discos:itensSelecionados(build,catalogo).filter(p => ["ssd","hd"].includes(p.categoria)),
     fans:itensSelecionados(build,catalogo).filter(p => p.categoria === "fan")});
-  erros.push(...encaixe.erros); dicas.push(...encaixe.avisos);
+  erros.push(...encaixe.erros); dicas.push(...encaixe.avisos); avisos.push(...encaixe.alertas);
   const grupos = ["processador","placa_mae","memoria_ram","armazenamento","placa_video","fonte","gabinete","fan","refrigeracao"];
   const preenchidos = grupos.filter(cat => cat === "armazenamento" ? tem("ssd") || tem("hd")
     : cat === "refrigeracao" ? tem("air_cooler") || tem("water_cooler") || cpu?.cooler

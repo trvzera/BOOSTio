@@ -3,7 +3,7 @@ import "../auth/auth.js";
 import { carregarCatalogo,categoriasEditor,perifericos,acessoriosRede,moeda,htmlSeguro as h,nomePeca,imagemPeca,ofertasPeca } from "../build/catalogo.js";
 import { abrirBuild,guardarRascunho,buildsLocais,itensCategoria,categoriasMultiplas,informacoesRam,informacoesArmazenamento,motivoSelecao,removerPeca,reduzirQuantidade,linkCompartilhado } from "../build/estado.js";
 import { avaliarBuild,selecionarPecaCompativel } from "../build/compatibilidade.js";
-import { informacoesFans } from "../build/fans.js";
+import { informacoesFans, fluxoFan } from "../build/fans.js";
 import { avisar,copiarTexto,mostrarFalha } from "../build/interface.js";
 import { iconeAnimado,iniciarIcones } from "../components/ui.js";
 import { indicadorBuild,iniciarIndicadores } from "../build/indicador.js";
@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded",async () => {
         peca.quantidade_portas_sata != null && peca.quantidade_portas_sata + " portas SATA",
       ].filter(Boolean).join(" · ") : "";
       const resumo = ram && peca ? item.quantidade + " kit(s) · " + item.quantidade * (peca.quantidade_pentes || 1) + " pentes · " + peca.ddr + " · " + peca.frequencia_mhz + " MHz"
-        : categoria === "fan" && peca ? (peca.tamanho_mm ? peca.tamanho_mm + " mm · " : "") + (peca.quantidade || "?") + " fan(s) por kit"
+        : categoria === "fan" && peca ? (peca.tamanho_mm ? peca.tamanho_mm + " mm · " : "") + (peca.quantidade || "?") + " fan(s) por kit" + (fluxoFan(peca) === "reverso" ? " · Reverse (identificação do catálogo)" : "")
         : slotsPlaca || (peca ? "Selecionado" : "Peça própria · identifique o modelo para validar.");
       const cotacao = peca && Number(peca.preco) > 0;
       const disponibilidade = peca?.esgotado ? "Sem estoque confirmado no catálogo. Consulte a loja ou substitua a peça." : peca && !cotacao ? "Preço ainda não disponível no catálogo." : "";
@@ -136,7 +136,8 @@ document.addEventListener("DOMContentLoaded",async () => {
       const razaoAdicionar = build.travada ? trancada : !info.placa ? "Selecione a placa-mãe antes de adicionar mais RAM."
         : info.usados >= info.slots ? "Todos os slots de RAM da placa-mãe estão ocupados." : "";
       const discos = informacoesArmazenamento(build,catalogo);
-      const fans = categoria.id === "fan" ? informacoesFans(get("gabinete"),itensCategoria(build,"fan").map(item => ({item,peca:catalogo.find(p => p.id === item.id)})),get("water_cooler") || (itensCategoria(build,"water_cooler").length ? {} : null)) : null;
+      const fans = categoria.id === "fan" ? informacoesFans(get("gabinete"),itensCategoria(build,"fan").map(item => ({item,peca:catalogo.find(p => p.id === item.id)})),get("water_cooler") || (itensCategoria(build,"water_cooler").length ? {} : null),build.substituirFansWaterCooler) : null;
+      const bloquearSubstituicao = build.travada || !build.substituirFansWaterCooler && !(fans?.radiador > 0 && fans.selecionadas >= fans.radiador);
       const vagasFans = fans ? 'Fans: ' + (fans.total ?? "?") + ' / ' + (fans.capacidade ?? "?") + ' posições' : '';
       const disponivel = categoria.armazenamento && catalogo.some(p => tipos.includes(p.categoria) && (() => { try { selecionarPecaCompativel(build,p,catalogo); return true; } catch { return false; } })());
       const cabecalho = '<div class="component-group-heading"><h2>' + categoria.nome + ' ' + badge(obrigatoria) + '</h2>' +
@@ -144,7 +145,9 @@ document.addEventListener("DOMContentLoaded",async () => {
           : categoria.armazenamento ? '<span class="component-count">' + discos.ssd + ' SSD · ' + discos.hd + ' HD</span>'
           : fans ? '<span class="component-count">' + vagasFans + '</span>' : "") + '</div>' +
         (fans ? '<p class="component-connections">' + (fans.selecionadas ?? "?") + ' selecionadas · ' + (fans.inclusas ?? "?") + ' inclusas · ' + (fans.radiador ?? "?") + ' do radiador' +
-          (fans.livres != null ? ' · até ' + fans.livres + ' posições livres, conforme o tamanho' : ' · selecione um gabinete com medidas para verificar a capacidade') + '</p>' : '') +
+          (fans.substituidas ? ' · ' + fans.substituidas + ' originais substituídas (sem dupla contagem)' : '') +
+          (fans.livres != null ? ' · até ' + fans.livres + ' posições livres, conforme o tamanho' : ' · capacidade não totalmente verificada') + '</p>' : '') +
+        (fans && itensCategoria(build,"water_cooler").length ? '<label class="ui-check fan-replacement font-2-xs"><input type="checkbox" id="replace-water-fans" ' + (build.substituirFansWaterCooler ? 'checked ' : '') + bloqueado(bloquearSubstituicao,build.travada ? trancada : 'Adicione fans suficientes para substituir todas as fans cadastradas do water cooler.') + ' aria-describedby="replace-water-help">' + iconeAnimado("checkbox") + '<span>Usar fans selecionadas no lugar das fans do water cooler</span></label><p id="replace-water-help" class="component-connections">As originais substituídas não contam como instaladas. Veja medidas, fluxo e cuidados com parafusos no botão de informações da build.</p>' : '') +
         (categoria.armazenamento && itens.length ? '<p class="component-connections">M.2: ' + discos.m2 + ' / ' + (discos.limites.m2 ?? "não informado") + ' · SATA: ' + discos.sata + ' / ' + (discos.limites.sata ?? "não informado") + '</p>' : "");
       if (itens.length) return '<section class="component-group">' + cabecalho + itens.map(({categoria,item}) => selecionada(categoria,item)).join("") +
         (temRam ? '<button type="button" class="btn-ghost ram-add-model" data-category="memoria_ram" aria-label="Adicionar outro modelo de RAM" ' + bloqueado(Boolean(razaoAdicionar),razaoAdicionar) + '>' + iconeAnimado("plus") + 'Adicionar outro modelo de RAM</button>' : "") +
@@ -169,8 +172,8 @@ document.addEventListener("DOMContentLoaded",async () => {
       const cpuSelecionada = catalogo.find(p => p.categoria === "processador" && p.id === itensCategoria(build,"processador")[0]?.id);
       const avisoVideo = cpuSelecionada?.videointegrado ? '<p class="integrated-video-note">Este processador possui vídeo integrado' + (cpuSelecionada.modelo_videointegrado ? ': ' + h(cpuSelecionada.modelo_videointegrado) : '') + '. ' + (itensCategoria(build,"placa_video").length ? 'A build também inclui uma placa de vídeo dedicada.' : 'É possível usar imagem sem uma placa de vídeo dedicada. Jogos e tarefas gráficas exigentes podem precisar de uma GPU separada.') + '</p>' : '';
       const categorias = categoriasEditor.filter(c => (build.incluirPerifericos || !perifericos.includes(c.id)) && (build.incluirRede || !c.rede));
-      main.innerHTML = '<header class="builder-heading"><div><a class="builder-back font-1-xs" href="./builds.html" aria-label="Voltar para Minhas builds">' + iconeAnimado("arrow","back") + 'Voltar para Minhas builds</a><div class="builder-title-line">' + indicadorBuild(resultado,"compatibility-details") +
-        '<h1 id="builder-title">' + h(build.titulo) + '</h1><button type="button" class="builder-rename" id="rename-build" aria-label="Editar nome da build" aria-haspopup="dialog" ' + bloqueado(build.travada,"Destranque a build para alterar o nome.") + '>' + iconeAnimado("pencil") + '</button></div><p>Configure sua build: escolha os componentes da sua configuração.</p></div><button type="button" class="btn-primary benchmark-trigger" id="benchmark-build" aria-label="Testar build" ' + bloqueado(Boolean(motivoBenchmark(build,catalogo)),motivoBenchmark(build,catalogo)) + '>' + iconeAnimado("magic") + 'Testar build</button></header>' +
+      main.innerHTML = '<header class="builder-heading"><div><a class="builder-back font-1-xs" href="./builds.html" aria-label="Voltar para Minhas builds">' + iconeAnimado("arrow","back") + 'Voltar para Minhas builds</a><div class="builder-title-line">' +
+        '<h1 id="builder-title">' + h(build.titulo) + '</h1><button type="button" class="builder-rename" id="rename-build" aria-label="Editar nome da build" aria-haspopup="dialog" ' + bloqueado(build.travada,"Destranque a build para alterar o nome.") + '>' + iconeAnimado("pencil") + '</button>' + indicadorBuild(resultado,"compatibility-details") + '</div><p>Configure sua build: escolha os componentes da sua configuração.</p></div><button type="button" class="btn-primary benchmark-trigger" id="benchmark-build" aria-label="Testar build" ' + bloqueado(Boolean(motivoBenchmark(build,catalogo)),motivoBenchmark(build,catalogo)) + '>' + iconeAnimado("magic") + 'Testar build</button></header>' +
         avisoVideo + '<div class="builder-layout"><section class="component-list" aria-label="Componentes"><div class="builder-options"><label class="ui-check font-2-xs"><input type="checkbox" id="include-peripherals" ' + (build.incluirPerifericos ? "checked " : "") +
         bloqueado(build.travada,trancada) + '>' + iconeAnimado("checkbox") + '<span>Incluir periféricos</span></label><label class="ui-check font-2-xs"><input type="checkbox" id="include-network" ' + (build.incluirRede ? "checked " : "") + bloqueado(build.travada,trancada) + '>' + iconeAnimado("checkbox") + '<span>Incluir rede</span></label></div>' + categorias.map(grupo).join("") +
         '</section><aside class="build-sidebar"><section class="build-summary glass-card"><span class="summary-eyebrow">Total da configuração</span><strong class="summary-total">' + moeda(resultado.preco) +
@@ -192,6 +195,11 @@ document.addEventListener("DOMContentLoaded",async () => {
         main.querySelector("#build-budget-note").dataset.tone = build.orcamento != null && total > build.orcamento ? "warning" : "info";
       };
       atualizarCustos();
+      main.querySelector("#replace-water-fans")?.addEventListener("change",e => {
+        if (build.travada) return;
+        build.substituirFansWaterCooler = e.target.checked;
+        persistir(); renderizar();
+      });
       main.querySelector("#build-budget").oninput = e => {
         if (!e.target.checkValidity() || build.travada) return;
         build.orcamento = e.target.value === "" ? null : Number(e.target.value); persistir(); atualizarCustos();
