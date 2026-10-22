@@ -13,11 +13,16 @@ const mensagens = {
 export function resumoRequisitosBuildHtml(dados) {
   const fonte = new URL(dados.fonte.url);
   if (fonte.protocol !== "https:" || !FONTES.has(fonte.hostname)) throw new Error("Fonte de requisitos não reconhecida.");
-  const ram = dados.ram, mensagem = mensagens[ram.status];
+  const ram = dados.ram;
+  let mensagem = mensagens[ram.status];
   if (!mensagem) throw new Error("Estado de requisitos inválido.");
-  const tom = ram.status === "abaixo_minimo" ? "error" : ram.status === "abaixo_recomendado" ? "warning" : "info";
+  const impedimentos = dados.impedimentosMinimos || [];
+  if (impedimentos.length && ram.atendeMinimo !== false) mensagem = "Há requisitos mínimos não atendidos. Revise as capacidades indicadas antes de consultar FPS.";
+  const tom = ram.status === "abaixo_minimo" || impedimentos.length ? "error" : ram.status === "abaixo_recomendado" ? "warning" : "info";
   const instalada = ram.completa ? ram.informadaGb + " GB" : ram.conhecidaGb > 0 ? "Pelo menos " + ram.conhecidaGb + " GB identificados" : "A confirmar";
   const ficha = (titulo,valor) => '<div><dt>' + titulo + '</dt><dd>' + h(valor) + '</dd></div>';
+  const capacidades = (dados.vram?.dedicadaGb != null ? '<p>VRAM dedicada: ' + h(dados.vram.dedicadaGb) + ' GB. Capacidade não comprova desempenho nem recursos da GPU.</p>' : '')
+    + (dados.armazenamento ? '<p>Armazenamento: ' + (dados.armazenamento.maiorUnidadeElegivelGb ? h(dados.armazenamento.maiorUnidadeElegivelGb) + ' GB na maior unidade ' + (dados.armazenamento.exigeSsd ? 'SSD ' : '') + 'identificada.' : 'unidade elegível a confirmar.') + ' Espaço livre não verificado; não somamos discos separados para instalar o jogo.</p>' : '');
   const detalhe = (titulo,requisitos) => '<div><h4>' + titulo + '</h4><dl>' + (requisitos
     ? [["Processador",requisitos.cpu],["Placa de vídeo",requisitos.gpu],["Armazenamento",requisitos.armazenamento],["Sistema",requisitos.sistema]]
       .map(([nome,valor]) => '<dt>' + nome + '</dt><dd>' + h(valor || "Não informado") + '</dd>').join("")
@@ -25,9 +30,10 @@ export function resumoRequisitosBuildHtml(dados) {
   return '<h3>Requisitos de ' + h(dados.jogo) + '</h3><p class="fpshq-requirements-status" data-tone="' + tom + '" role="status">' + mensagem + '</p>'
     + '<dl class="fpshq-requirements-ram">' + ficha("RAM da build salva",instalada) + ficha("Mínimo",dados.minimos.ramGb + " GB")
     + ficha("Recomendado",dados.recomendados?.ramGb != null ? dados.recomendados.ramGb + " GB" : "Não publicado") + '</dl>'
-    + '<p>A verificação é parcial: CPU, GPU, VRAM, sistema e demais recursos ainda precisam ser confirmados. RAM suficiente não garante que o jogo rode.</p>'
+    + (impedimentos.length ? '<p role="status">' + impedimentos.map(h).join(' ') + '</p>' : '')
+    + '<p>A verificação é parcial: CPU, GPU, VRAM, sistema e demais recursos ainda precisam ser confirmados. Capacidades suficientes não garantem que o jogo rode.</p>'
     + (ram.pendencias.length ? '<p>' + ram.pendencias.map(h).join(" ") + '</p>' : '')
-    + '<details class="fpshq-disclosure" data-animated-details><summary>Ver requisitos oficiais</summary><p>' + h(dados.contexto) + '</p><div class="fpshq-requirements-specs">'
+    + '<details class="fpshq-disclosure" data-animated-details><summary>Ver requisitos oficiais e capacidades</summary>' + capacidades + '<p>' + h(dados.contexto) + '</p><div class="fpshq-requirements-specs">'
     + detalhe("Mínimos",dados.minimos) + detalhe("Recomendados",dados.recomendados) + '</div><p>' + h(dados.observacoes) + '</p><p><a href="' + h(fonte.href)
     + '" target="_blank" rel="noopener noreferrer" aria-label="Ver requisitos oficiais de ' + h(dados.jogo) + ' em nova aba">' + h(dados.fonte.nome)
     + '</a> · Revisado em ' + h(dados.fonte.verificadoEm) + '</p></details>';
@@ -55,7 +61,7 @@ export function iniciarRequisitosBuild(raiz,{prefixo,buildId,cliente}) {
     controle?.abort(); controle = new AbortController();
     const atual = ++versao, signal = controle.signal;
     jogoPendente = game; botao.disabled = true; saida.setAttribute("aria-busy","true");
-    informar("Verificando a RAM da build salva e os requisitos do jogo…");
+    informar("Verificando as capacidades da build salva e os requisitos do jogo…");
     pendente = (async () => {
       try {
         const dados = await cliente.consultarRequisitosBuild({game,buildId},{signal});

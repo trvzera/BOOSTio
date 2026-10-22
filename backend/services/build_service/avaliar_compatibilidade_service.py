@@ -67,6 +67,8 @@ class AvaliarCompatibilidadeService:
         if not tem("ssd") and not tem("hd"):
             faltam.append("armazenamento")
         cpu, placa, gabinete, fonte = (get(tipo) for tipo in ("processador", "placa_mae", "gabinete", "fonte"))
+        if gabinete.get("observacoes_medidas"):
+            registrar("gabinete-condicoes", "Condições da ficha do gabinete", None, gabinete["observacoes_medidas"])
         if tem("processador") and cpu.get("videointegrado") is False and not tem("placa_video"):
             faltam.append("placa_video")
         if tem("processador") and cpu.get("cooler") is False and not tem("air_cooler") and not tem("water_cooler"):

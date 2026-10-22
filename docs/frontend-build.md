@@ -6,6 +6,39 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Homologação de catálogo e capacidades — 22/10/2026
+
+- `catalogo-auditar` é um comando de leitura, registrado junto dos comandos de
+  peças existentes. Não prepara esquema, não consulta lojas e não atualiza dados.
+  O resumo distingue estoque desconhecido, preço inválido/sem data, link de produto,
+  imagem local existente, URL remota não consultada e ficha física revisada.
+- `imagens-referencia.json` recupera 750 vínculos do histórico do projeto,
+  conferidos contra o catálogo e arquivos existentes. Backend e frontend exigem
+  part number, categoria, fabricante e modelo. O manifesto gerado por coleta tem
+  prioridade no navegador; `imagem_url` tem prioridade no backend. Não sobrescrever
+  a coleta nem deduzir imagem por IDs após recriar o banco.
+- Novas fichas exatas em `medidas-fisicas.json`: [NR200](https://www.coolermaster.com/en-global/products/masterbox-nr200.html),
+  [MAG A650BN](https://www.msi.com/Power-Supply/MAG-A650BN/Specification) e
+  [RTX 5060 8G Shadow 2X OC](https://www.msi.com/Graphics-Card/GeForce-RTX-5060-8G-SHADOW-2X-OC/Specification).
+  NR200 usa ITX/Mini DTX e SFX/SFX-L, não mATX/ATX; inclui fan traseira de 92 mm
+  e uma superior de 120 mm. Limites se referem a GPU horizontal. Radiador na base
+  consta como custom loop no fabricante, não como suporte AIO nesta curadoria.
+  Observações ficam no diagnóstico e prompt. Revisões diferentes não herdam ficha.
+- O prompt recebe pares de IDs por socket e a categoria de rede obrigatória ou
+  proibida, calculados pelo servidor. A lista não certifica BIOS/DDR/encaixe.
+  Três consultas reais autorizadas, isoladas e sem persistência: uma válida e duas
+  rejeitadas. O catálogo do ensaio era ampliado; revisão automática de produção
+  e prompt novo ainda não foram homologados novamente com cota real.
+- Requisitos da build: além de RAM, `vram` e `armazenamento` usam somente modelos
+  persistidos da própria conta. Campos mínimos estruturados vêm das fontes oficiais
+  versionadas, não de extração do texto em tempo de requisição. Capacidade de VRAM
+  não mede a GPU; armazenamento usa a maior unidade elegível, sem somar volumes
+  ou supor espaço livre. Cyberpunk exige SSD. Falhas confirmadas compõem
+  `impedimentosMinimos` e evitam consulta FPS na interface. Dados ausentes permanecem
+  null; `escopo: parcial`, `fpsValidado: false` e `requisitosVerificados: false`
+  são preservados. O laboratório manual continua limitado à capacidade de RAM.
+- Não foram configurados scheduler/VPS, deploy, nova API paga ou migrações.
+
 ### Ventilação, water cooler e informações da build — 22/10/2026
 
 - `substituirFansWaterCooler` é uma opção booleana explícita no estado JSON da

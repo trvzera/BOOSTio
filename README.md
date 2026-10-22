@@ -117,6 +117,11 @@ Preço cadastrado não significa cotação em tempo real. Estoque, frete e condi
 de compra devem ser conferidos na loja. A ficha da peça distingue dados da conta
 de exemplos demonstrativos e informa a última atualização do preço quando cadastrada.
 
+As fotos da API têm prioridade. Quando faltam, há **750 vínculos locais de referência**
+por part number, categoria, fabricante e modelo exatos, sem depender do ID numérico
+do banco. Peças sem correspondência ou com foto quebrada mantêm uma alternativa neutra;
+isso não significa cobertura de imagens para todo o catálogo.
+
 > A BOOSTio **não vende, entrega ou processa pagamentos** dos produtos. Os links
 > direcionam a lojas de terceiros, responsáveis pela venda e pelo atendimento.
 
@@ -132,18 +137,19 @@ quando disponíveis. Falhas e ausência de dados não geram FPS inventados.
 A FPSHQ apresentou timeouts nas consultas de FPS e jogos em **21 e 22/10/2026**.
 Isso não comprova indisponibilidade global; a consulta depende da resposta do provedor.
 
-Nas builds salvas, **Verificar requisitos** consulta as fichas oficiais revisadas e
-compara a capacidade de RAM da própria configuração, pelo Python, mesmo com a FPSHQ
-indisponível. A consulta de FPS é interrompida na interface se a RAM confirmada fica
-abaixo do mínimo. Memória própria sem identificação permanece não verificada.
-CPU, GPU, VRAM, sistema e demais requisitos ainda precisam de validação; RAM suficiente
-não aprova o computador completo e nenhum FPS é calculado por essa verificação.
+Nas builds salvas, **Verificar requisitos** usa o catálogo Python para comparar RAM,
+VRAM dedicada e capacidade/tipo de armazenamento quando há um mínimo oficial
+estruturado. Funciona independentemente da FPSHQ e interrompe a consulta na interface
+quando identifica capacidade abaixo do mínimo. Dados próprios não identificados
+permanecem desconhecidos. Não soma VRAM de placas ou discos separados, nem afirma
+quanto espaço livre existe. Equivalência de CPU/GPU, sistema e demais recursos
+continuam pendentes: capacidades suficientes não aprovam o computador completo.
 
 ### Blender · Renderização
 
 Dados públicos de CPU ou GPU, com **mediana em amostras por minuto**, versão do
 Blender, método de renderização e quantidade de resultados. O retorno foi validado
-pelo serviço Python em **21/10/2026**, sem garantia de disponibilidade permanente.
+pelo serviço Python em **22/10/2026**, sem garantia de disponibilidade permanente.
 
 A comparação de builds consulta esses dados ao clicar em **Comparar renderização**.
 CPU e GPU são analisadas separadamente; só há classificação quando todas as builds
@@ -169,10 +175,10 @@ não troca automaticamente de caminho nem altera a montagem real.
 Os **requisitos dos cinco jogos padrão** usam fontes oficiais revisadas em 21/10/2026
 e consulta autenticada pelo Python. O modal usa a RAM da build salva e do catálogo;
 o laboratório mantém uma prévia com capacidade informada manualmente.
-Comparam somente a capacidade de RAM, sem aprovar o PC completo,
-inventar requisitos recomendados ausentes ou ajustar FPS por uma fórmula.
-Equivalência de CPU/GPU, VRAM, sistema, espaço livre e demais exigências ainda
-precisam ser validados e vinculados aos componentes reais da build.
+O laboratório compara RAM informada; a build salva também verifica as capacidades
+adicionais descritas acima. Não inventamos requisitos recomendados ausentes nem
+ajustamos FPS por uma fórmula. Equivalência de CPU/GPU, sistema, espaço livre e
+demais exigências continuam sem validação completa.
 
 ## Estado do projeto
 
@@ -185,13 +191,17 @@ servidor e a consolidação dos dados usados pelas sugestões e consultas:
 
 - **Compatibilidade:** regras de encaixe e capacidade de fans implementadas no Python e no frontend; ampliar medidas confiáveis por modelo, conectores e interferências. Dados ausentes permanecem não verificados.
 - **Peças próprias:** identificar modelos para avaliar suas especificações reais.
-- **Jogos:** vincular requisitos mínimos e recomendados ao hardware da build.
+- **Jogos:** ampliar equivalências e recursos de CPU/GPU e requisitos além das capacidades já verificadas.
 - **Preços:** consolidar o monitoramento agendado e a atualização do catálogo.
 - **Desempenho:** concluir a comparação de FPS e tratar a instabilidade das fontes externas.
 
 A geração pela LLM já revalida conflitos conhecidos no catálogo, incluindo socket,
 DDR, slots, potência e medidas explícitas. Especificações ausentes continuam não
 verificadas; a configuração não recebe garantia de compatibilidade completa.
+
+As fichas físicas revisadas incluem Q300L, NR200, AK400, MAG A650BN e a variante
+MSI RTX 5060 Shadow 2X OC de 8 GB. O complemento é aplicado somente às identidades
+exatas documentadas, sem alterar o banco. Outras variantes não herdam essas medidas.
 
 Saídas inválidas da IA recebem **uma tentativa automática de correção**, com o erro
 da validação e as regras originais. A nova resposta é validada por completo antes

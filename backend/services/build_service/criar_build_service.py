@@ -33,7 +33,7 @@ class CriarBuildService:
     "slots_ocupados", "slots_expansao", "tamanho_max_altura_gpu_mm",
     "espessura_mm", "tamanho_max_espessura_gpu_mm",
     "comprimento_radiador_mm", "largura_radiador_mm", "espessura_radiador_mm", "espessura_fan_mm",
-    "limites_radiador_mm", "fluxo_ar", "fonte_fluxo_ar",
+    "limites_radiador_mm", "fluxo_ar", "fonte_fluxo_ar", "observacoes_medidas",
     "tamanho_max_fonte_mm", "formatos_fonte", "baias_25", "baias_35",
     "padrao_wifi", "velocidade_mbps", "bluetooth", "categoria", "comprimento_m", "conector",
   )
@@ -179,6 +179,18 @@ class CriarBuildService:
     proprias = proprias or {}
     pc, perifericos = CriarBuildService._dividir_orcamento(orcamento, percentual)
     teto_peca = min(Decimal(str(orcamento - margem)), pc)
+    # Tornar explícitas decisões determinísticas ajuda a LLM a não cruzar IDs de
+    # plataformas diferentes. É apenas socket: não certifica BIOS nem o conjunto.
+    socket = lambda valor: str(valor or "").upper().replace(" ", "")
+    pares = [{"processador": cpu["id"], "placas_mae": [p["id"] for p in catalogo.get("placa_mae", [])
+              if socket(p.get("socket")) == socket(cpu.get("soquete"))]}
+             for cpu in catalogo.get("processador", []) if socket(cpu.get("soquete"))]
+    rede = dados.get("rede") or {}
+    acessorio = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
+    comprar_rede = acessorio if acessorio and rede.get("possuiAcessorio") is False and acessorio not in proprias else None
+    restricoes = {"pares_por_socket_apenas": pares,
+                  "acessorio_rede_obrigatorio": comprar_rede,
+                  "categorias_rede_proibidas": sorted({"adaptador_wifi", "cabo_rede"} - ({comprar_rede} if comprar_rede else set()))}
     regra_perifericos = (
       "Complete monitor, teclado, mouse e fone (headset), exceto os já possuídos; "
       "escolha itens adequados ao uso sem ultrapassar o teto reservado, nem tentar consumi-lo exatamente. "
@@ -208,6 +220,13 @@ class CriarBuildService:
 
         "# PEDIDO\n"
         f"{json.dumps(pedido, ensure_ascii=False)}\n\n"
+
+        "# RESTRIÇÕES CALCULADAS PELO SERVIDOR\n"
+        f"{json.dumps(restricoes, ensure_ascii=False)}\n"
+        "Para CPU/placa-mãe novas com socket conhecido, escolha um dos pares listados; "
+        "uma lista vazia não autoriza outro socket. Pares por socket NÃO aprovam BIOS, "
+        "RAM ou dimensões. Inclua acessorio_rede_obrigatorio somente quando não for null. "
+        "Nunca inclua categorias_rede_proibidas, mesmo que sobrem recursos.\n\n"
 
         "# PEÇAS QUE O USUÁRIO JÁ POSSUI\n"
         f"{json.dumps(proprias, ensure_ascii=False)}\n"
@@ -366,6 +385,7 @@ class CriarBuildService:
         "5. O vídeo integrado foi verificado antes de decidir pela placa_video?\n"
         "6. Os periféricos respeitam a escolha de inclusão, o teto percentual e as peças já possuídas?\n"
         "7. Há categorias repetidas ou quantidades fora da regra?\n"
+        "7.1. O acessório obrigatório de rede foi incluído e as categorias de rede proibidas foram omitidas?\n"
         "8. A distribuição do orçamento reflete o perfil de uso e inclui "
         "todas as peças necessárias antes dos upgrades?\n"
         "Se alguma verificação falhar, corrija a montagem antes de responder.\n\n"

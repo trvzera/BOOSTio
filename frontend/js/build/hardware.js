@@ -35,6 +35,7 @@ export function validarEncaixe({gpu,air,water,fans = [],gabinete,fonte,discos = 
   const orientacoes = orientacoesVentilacao({gabinete,fans,water,substituir});
   const erros = [], avisos = [...orientacoes.dicas], alertas = [...orientacoes.avisos];
   if (!gabinete) return {erros,avisos,alertas};
+  if (gabinete.observacoes_medidas) avisos.push(gabinete.observacoes_medidas);
   const checarMedida = (peca,medida,limite,nome) => {
     if (!peca) return;
     const tamanho = numeroConhecido(medida), maximo = numeroConhecido(limite);

@@ -54,3 +54,21 @@ test("verificação independente aparece só no painel da build e não depende d
   assert.match(html,/id="build-fpshq-requirements"/);
   assert.doesNotMatch(painelBenchmarkHtml(),/data-check-build-requirements/);
 });
+
+test("capacidades extras são parciais, visíveis e validadas sem prometer espaço livre ou FPS",async () => {
+  const dados=ficha(); dados.ram={...dados.ram,completa:true,informadaGb:16,conhecidaGb:16,status:'recomendado',atendeMinimo:true,atendeRecomendado:true};
+  dados.vram={dedicadaGb:4,minimaGb:6,atendeCapacidadeMinima:false};
+  dados.minimos={...dados.minimos,vramGb:6,armazenamentoGb:70,exigeSsd:true};
+  dados.armazenamento={maiorUnidadeElegivelGb:40,minimaGb:70,exigeSsd:true,completo:true,atendeCapacidadeMinima:false,espacoLivreVerificado:false};
+  dados.impedimentosMinimos=['A VRAM dedicada está abaixo do mínimo publicado.','Nenhuma unidade atende ao mínimo.'];
+  const cliente = d => criarClienteBenchmark({requisitar:async()=>({resultado:d})});
+  assert.deepEqual(await cliente(dados).consultarRequisitosBuild({game:'fortnite',buildId:'s-1'}),dados);
+  const html=resumoRequisitosBuildHtml(dados);
+  assert.match(html,/data-tone="error"/); assert.match(html,/VRAM dedicada: 4 GB/);
+  assert.match(html,/Espaço livre não verificado/); assert.match(html,/não somamos discos separados/);
+  for (const mudar of [d=>d.vram.atendeCapacidadeMinima=true,d=>d.armazenamento.espacoLivreVerificado=true,
+    d=>d.impedimentosMinimos=[],d=>d.armazenamento.completo='true',d=>d.vram.dedicadaGb=-1]) {
+    const invalida=structuredClone(dados);mudar(invalida);
+    await assert.rejects(cliente(invalida).consultarRequisitosBuild({game:'fortnite',buildId:'s-1'}));
+  }
+});

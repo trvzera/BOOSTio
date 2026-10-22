@@ -74,6 +74,34 @@ def test_limites_fisicos_aparecem_no_diagnostico_python_e_catalogo_llm():
     assert regra(avaliar(pecas, componentes), "baias-baias_25")["status"] == "incompativel"
 
 
+def test_nr200_nao_aceita_matx_atx_psu_ou_radiador_360():
+    case = completar_medidas({"id": 1, "categoria": "gabinete", "fabricante": "Cooler Master",
+                              "modelo": "MasterBox NR200", "part_number": "SEED-CASE-11"})
+    fonte = completar_medidas({"id": 3, "categoria": "fonte", "fabricante": "MSI", "modelo": "MAG A650BN",
+                               "part_number": "SEED-PSU-01", "formato": "ATX"})
+    pecas = [case, {"id": 2, "categoria": "placa_mae", "formato": "mATX"}, fonte,
+             {"id": 4, "categoria": "placa_video", "comprimento_mm": 331, "altura_mm": 157, "espessura_mm": 61}]
+    resultado = avaliar(pecas)
+    for codigo in ("formato-placa", "fonte-formato", "fonte-medida", "placa_video-medida", "gpu-altura", "gpu-espessura"):
+        assert regra(resultado, codigo)["status"] == "incompativel"
+    assert fonte["comprimento_mm"] == 140 and case["fans_inclusos"] == 2
+    assert case["radiadores_suportados_mm"] == [120, 140, 240, 280]
+    assert "custom loop" in regra(resultado, "gabinete-condicoes")["mensagem"]
+    assert not next(p for p in case["posicoes_fans"] if p["nome"] == "Base")["radiadores_mm"]
+    fans = avaliar_fans(case, [({"quantidade": 6}, {"quantidade": 1, "tamanho_mm": 120})], None)
+    assert fans["quantidade"] is False  # 6 novas + 2 inclusas > 7; não sete de 120 mm
+
+
+def test_medidas_gpu_somente_na_variante_exata():
+    from models import PlacaVideo
+    gpu = PlacaVideo(id=6, fabricante="MSI", modelo="RTX 5060 Shadow 2X OC GeForce", part_number="SEED-GPU-06")
+    ficha = gpu.to_catalogo()
+    assert [ficha[campo] for campo in ("comprimento_mm", "altura_mm", "espessura_mm")] == [197, 120, 40]
+    assert "comprimento_mm" not in PlacaVideo(id=1, fabricante="NVIDIA", modelo="GeForce RTX 3060", part_number="SEED-GPU-02").to_catalogo()
+    gpu.modelo = "RTX 5060 Ti Shadow 2X OC GeForce"
+    assert "comprimento_mm" not in gpu.to_catalogo()
+
+
 def test_geracao_nao_salva_configuracao_com_fans_que_nao_cabem():
     tipos = ("processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "fan")
     catalogo = {tipo: [{"id": i, "fabricante": "QA", "modelo": tipo, "preco": 100}]

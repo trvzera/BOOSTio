@@ -58,9 +58,25 @@ test("falha no manifesto não derruba catálogo e permite nova consulta",async t
   let chamadas=0;
   t.mock.method(globalThis,"fetch",async()=>{
     chamadas++;
-    return new Response(JSON.stringify(chamadas===1?{}:{A:"../imgs/produtos/processador-1.jpg"}),{status:chamadas===1?503:200});
+    return new Response(JSON.stringify({A:"../imgs/produtos/processador-1.jpg"}),{status:chamadas<=2?503:200});
   });
   assert.deepEqual(await carregarManifestoImagens(),{});
   assert.equal((await carregarManifestoImagens()).A,"../imgs/produtos/processador-1.jpg");
-  assert.equal(chamadas,2);
+  assert.equal(chamadas,4);
+});
+
+test("referências recuperadas exigem categoria, fabricante, modelo e part number; arquivos existem",async () => {
+  const mapa=JSON.parse(await readFile(new URL("../data/imagens-referencia.json",import.meta.url),"utf8"));
+  const catalogo=JSON.parse(await readFile(new URL("../data/catalogo-demo.json",import.meta.url),"utf8"));
+  assert.equal(Object.keys(mapa).length,750);
+  for (const [part_number,ficha] of Object.entries(mapa)) {
+    const peca=catalogo.find(p=>p.part_number===part_number);
+    assert.ok(peca);
+    for (const campo of ['categoria','fabricante','modelo']) assert.equal(ficha[campo],peca[campo]);
+    assert.match(ficha.imagem,/^\.\.\/imgs\/produtos\/[a-z0-9_-]+\.(jpg|webp|png)$/);
+    await access(new URL(ficha.imagem,new URL('../pages/',import.meta.url)));
+    assert.equal(completarImagens([{...peca,id:'outro-banco:999'}],mapa)[0].imagem,ficha.imagem);
+    for (const campo of ['categoria','fabricante','modelo','part_number'])
+      assert.equal(completarImagens([{...peca,imagem:null,imagem_url:null,[campo]:'outro'}],mapa)[0].imagem,null);
+  }
 });

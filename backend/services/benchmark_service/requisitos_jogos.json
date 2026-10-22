@@ -11,7 +11,7 @@
     "jogo": "Counter-Strike 2",
     "contexto": "PC Windows; a página oficial consultada publica somente requisitos mínimos",
     "fonte": {"nome": "Valve · Steam", "url": "https://store.steampowered.com/app/730/CounterStrike_2/", "verificadoEm": "2026-10-21"},
-    "minimos": {"cpu": "4 threads de hardware; referência Intel Core i5-750", "gpu": "Pelo menos 1 GB de VRAM, DirectX 11 e Shader Model 5.0", "ramGb": 8, "armazenamento": "85 GB livres", "sistema": "Windows 10"},
+    "minimos": {"cpu": "4 threads de hardware; referência Intel Core i5-750", "gpu": "Pelo menos 1 GB de VRAM, DirectX 11 e Shader Model 5.0", "ramGb": 8, "vramGb": 1, "armazenamentoGb": 85, "armazenamento": "85 GB livres", "sistema": "Windows 10"},
     "recomendados": null,
     "observacoes": "Quantidade de threads ou VRAM isolada não comprova suporte. Não inventamos requisitos recomendados ausentes na fonte."
   },
@@ -27,7 +27,7 @@
     "jogo": "Cyberpunk 2077",
     "contexto": "Atualização 2.0 e Phantom Liberty; sem ray tracing",
     "fonte": {"nome": "CD PROJEKT RED", "url": "https://support.cdprojektred.com/en/cyberpunk/pc/sp-technical/issue/1556/cyberpunk-2077-system-requirements", "verificadoEm": "2026-10-21"},
-    "minimos": {"cpu": "Intel Core i7-6700 ou AMD Ryzen 5 1600", "gpu": "NVIDIA GTX 1060 6 GB, AMD RX 580 8 GB ou Intel Arc A380", "ramGb": 12, "armazenamento": "70 GB em SSD", "sistema": "Windows 10 64-bit"},
+    "minimos": {"cpu": "Intel Core i7-6700 ou AMD Ryzen 5 1600", "gpu": "NVIDIA GTX 1060 6 GB, AMD RX 580 8 GB ou Intel Arc A380", "ramGb": 12, "vramGb": 6, "armazenamentoGb": 70, "exigeSsd": true, "armazenamento": "70 GB em SSD", "sistema": "Windows 10 64-bit"},
     "recomendados": {"cpu": "Intel Core i7-12700 ou AMD Ryzen 7 7800X3D", "gpu": "NVIDIA RTX 2060 Super, AMD RX 5700 XT ou Intel Arc A770; 8 GB de VRAM", "ramGb": 16, "armazenamento": "70 GB em SSD", "sistema": "Windows 10 64-bit"},
     "observacoes": "Exige DirectX 12. Não usar requisitos antigos da versão 1.63. Ray tracing, Ultra e Overdrive possuem outras exigências; esta ficha não os valida."
   },
@@ -35,7 +35,7 @@
     "jogo": "Red Dead Redemption 2",
     "contexto": "PC Windows; ficha oficial atualizada em 30/04/2024",
     "fonte": {"nome": "Rockstar Games", "url": "https://support.rockstargames.com/articles/1LqwiYbHeiSyo3dtcVyS1N/red-dead-redemption-2-pc-system-requirements", "verificadoEm": "2026-10-21"},
-    "minimos": {"cpu": "Intel Core i5-2500K ou AMD FX-6300", "gpu": "NVIDIA GTX 770 2 GB ou AMD Radeon R9 280 3 GB", "ramGb": 8, "armazenamento": "150 GB livres", "sistema": "Windows 10 64-bit"},
+    "minimos": {"cpu": "Intel Core i5-2500K ou AMD FX-6300", "gpu": "NVIDIA GTX 770 2 GB ou AMD Radeon R9 280 3 GB", "ramGb": 8, "armazenamentoGb": 150, "armazenamento": "150 GB livres", "sistema": "Windows 10 64-bit"},
     "recomendados": {"cpu": "Intel Core i7-4770K ou AMD Ryzen 5 1500X", "gpu": "NVIDIA GTX 1060 6 GB ou AMD Radeon RX 480 4 GB", "ramGb": 12, "armazenamento": "150 GB livres", "sistema": "Windows 10 64-bit"},
     "observacoes": "Atualizações podem mudar as exigências. A Rockstar ressalva possíveis incompatibilidades de chipsets móveis e vídeo integrado. Verificar a fonte antes da compra."
   }

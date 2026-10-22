@@ -107,3 +107,42 @@ def test_sessao_propriedade_e_parametros_nao_podem_ser_contornados(app_requisito
     for sufixo in ["s-1&ram_gb=128", "s-1&usuario_id=2", "s-1&build_id=s-2", "../build", "s-0"]:
         assert navegador.get(caminho + sufixo).status_code == 400
     assert navegador.get("/benchmark/requisitos-build?game=sem-ficha&build_id=s-1").json["codigo"] == "sem-requisitos"
+
+
+def test_vram_e_disco_usam_modelos_persistidos_e_nao_somam_capacidade_de_unidades(app_requisitos):
+    from models import PlacaVideo, SSD, HD
+    with app_requisitos.app_context():
+        db.session.add_all([
+            PlacaVideo(id=1, fabricante="Teste", modelo="4GB", memoria_gb=4, consumo_energia=50, preco=100),
+            SSD(id=1, fabricante="Teste", modelo="40GB", capacidade_gb=40, tipo="SSD", interface="SATA", consumo_energia=3, preco=100),
+            HD(id=1, fabricante="Teste", modelo="1TB", capacidade_gb=1000, interface="SATA", consumo_energia=3, preco=100),
+        ])
+        salva = db.session.get(BuildSalva, 1)
+        salva.estado = {"titulo": "QA", "componentes": {"memoria_ram": [{"id": 2}], "placa_video": {"id": "placa_video:1"},
+                       "ssd": [{"id": "ssd:1", "quantidade": 2}], "hd": [{"id": "hd:1"}]}}
+        db.session.commit()
+    resposta = cliente(app_requisitos).get("/benchmark/requisitos-build?game=cyberpunk-2077&build_id=s-1")
+    assert resposta.status_code == 200
+    dados = resposta.json["resultado"]
+    assert dados["ram"]["atendeMinimo"] is True
+    assert dados["vram"] == {"dedicadaGb": 4, "minimaGb": 6, "atendeCapacidadeMinima": False}
+    assert dados["armazenamento"]["maiorUnidadeElegivelGb"] == 40
+    assert dados["armazenamento"]["atendeCapacidadeMinima"] is False  # 2x40 não é um volume de 80
+    assert dados["armazenamento"]["espacoLivreVerificado"] is False
+    assert len(dados["impedimentosMinimos"]) == 2
+    cs2 = cliente(app_requisitos).get("/benchmark/requisitos-build?game=cs2&build_id=s-1").json["resultado"]
+    assert cs2["vram"]["atendeCapacidadeMinima"] is True
+    assert cs2["armazenamento"]["maiorUnidadeElegivelGb"] == 1000
+    assert cs2["armazenamento"]["atendeCapacidadeMinima"] is True
+    assert cs2["impedimentosMinimos"] == [] and cs2["requisitosVerificados"] is False
+
+
+def test_video_integrado_e_armazenamento_proprio_continuam_desconhecidos(app_requisitos):
+    with app_requisitos.app_context():
+        salva = db.session.get(BuildSalva, 1)
+        salva.estado = {"titulo": "QA", "componentes": {"memoria_ram": [{"id": 2}], "ssd": [{"proprio": "Meu SSD"}]}}
+        db.session.commit()
+    dados = cliente(app_requisitos).get("/benchmark/requisitos-build?game=cyberpunk-2077&build_id=s-1").json["resultado"]
+    assert dados["vram"]["dedicadaGb"] is None and dados["vram"]["atendeCapacidadeMinima"] is None
+    assert dados["armazenamento"]["completo"] is False and dados["armazenamento"]["atendeCapacidadeMinima"] is None
+    assert dados["impedimentosMinimos"] == []

@@ -2,6 +2,52 @@
   "versao": 1,
   "pecas": [
     {
+      "categoria": "placa_video",
+      "fabricante": "MSI",
+      "modelo": "RTX 5060 Shadow 2X OC GeForce",
+      "part_numbers": ["SEED-GPU-06", "G5060-8S2C"],
+      "fonte": "https://www.msi.com/Graphics-Card/GeForce-RTX-5060-8G-SHADOW-2X-OC/Specification",
+      "medidas": {"comprimento_mm": 197, "altura_mm": 120, "espessura_mm": 40}
+    },
+    {
+      "categoria": "gabinete",
+      "fabricante": "Cooler Master",
+      "modelo": "MasterBox NR200",
+      "part_numbers": ["MCB-NR200-KNNN-S00", "MCB-NR200-WNNN-S00", "SEED-CASE-11"],
+      "fonte": "https://www.coolermaster.com/en-global/products/masterbox-nr200.html",
+      "medidas": {
+        "formatos_placa_mae": "Mini DTX, ITX",
+        "slots_expansao": 3,
+        "tamanho_max_gpu_mm": 330,
+        "tamanho_max_altura_gpu_mm": 156,
+        "tamanho_max_espessura_gpu_mm": 60,
+        "tamanho_max_cooler_mm": 155,
+        "tamanho_max_fonte_mm": 130,
+        "formatos_fonte": ["SFX", "SFX-L"],
+        "fans_inclusos": 2,
+        "quantidade_max_fans": 7,
+        "tamanhos_fan_suportados_mm": [92, 120, 140],
+        "posicoes_fans_completas": false,
+        "radiadores_suportados_mm": [120, 140, 240, 280],
+        "suporte_water_cooler": true,
+        "observacoes_medidas": "Limites para GPU horizontal. AIO na lateral; radiador na base é indicado pelo fabricante apenas para custom loop. GPU acima de 2,5 slots pode exigir fans slim na base. Espessura e interferências ainda precisam de confirmação; sete posições não significam sete fans de 120 mm.",
+        "posicoes_fans": [
+          {"nome": "Topo", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}], "fans_inclusas": [{"tamanho_mm": 120, "quantidade": 1}], "radiadores_mm": []},
+          {"nome": "Traseira", "opcoes": [{"tamanho_mm": 92, "quantidade": 1}], "fans_inclusas": [{"tamanho_mm": 92, "quantidade": 1}], "radiadores_mm": []},
+          {"nome": "Lateral", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}, {"tamanho_mm": 140, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": [120, 140, 240, 280]},
+          {"nome": "Base", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": []}
+        ]
+      }
+    },
+    {
+      "categoria": "fonte",
+      "fabricante": "MSI",
+      "modelo": "MAG A650BN",
+      "part_numbers": ["SEED-PSU-01"],
+      "fonte": "https://www.msi.com/Power-Supply/MAG-A650BN/Specification",
+      "medidas": {"comprimento_mm": 140}
+    },
+    {
       "categoria": "gabinete",
       "fabricante": "Cooler Master",
       "modelo": "MasterBox Q300L",

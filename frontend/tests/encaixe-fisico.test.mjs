@@ -50,6 +50,20 @@ test("filtro impede conflito por posição na adição e na escolha posterior de
   assert.equal(pecaCompativel(semGabinete,gabinete,catalogo),false);
 });
 
+test("NR200 tem limites oficiais de fonte e GPU e ressalvas visíveis, sem somar posições compartilhadas",() => {
+  const [gabinete,fonte] = completarCatalogoDemo([
+    {categoria:'gabinete',fabricante:'Cooler Master',modelo:'MasterBox NR200',part_number:'SEED-CASE-11'},
+    {categoria:'fonte',fabricante:'MSI',modelo:'MAG A650BN',part_number:'SEED-PSU-01',formato:'ATX'},
+  ],manifesto);
+  assert.equal(gabinete.fans_inclusos,2); assert.equal(fonte.comprimento_mm,140);
+  assert.deepEqual(gabinete.formatos_fonte,['SFX','SFX-L']);
+  const resultado=validarEncaixe({gabinete,fonte,gpu:{comprimento_mm:331,altura_mm:157,espessura_mm:61}});
+  assert.equal(resultado.erros.length,5);
+  assert.ok(resultado.avisos.some(v=>v.includes('custom loop')));
+  assert.equal(gabinete.posicoes_fans.find(p=>p.nome==='Base').radiadores_mm.length,0);
+  assert.equal(informacoesFans(gabinete,[{item:{quantidade:6},peca:{quantidade:1,tamanho_mm:120}}]).quantidade,false);
+});
+
 test("fans já inclusas atendem a presença de ventilação sem exigir compra extra",() => {
   const gabinete = {id:"case",categoria:"gabinete",fans_inclusos:1};
   const build = normalizarBuild({componentes:{gabinete:{id:"case"}}});

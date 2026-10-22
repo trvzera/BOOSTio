@@ -36,6 +36,20 @@ export function criarClienteBenchmark({requisitar = fetchComErro,timeoutMs = 250
         const minimo = dados.ram.informadaGb == null ? null : dados.ram.informadaGb >= dados.minimos.ramGb;
         if (dados.ram.atendeMinimo !== minimo || (minimo === false && dados.ram.status !== "abaixo_minimo"))
           throw new Error("A resposta de requisitos contém informações inconsistentes de RAM.");
+        if (dados.vram || dados.armazenamento || dados.impedimentosMinimos) {
+          const v = dados.vram, a = dados.armazenamento;
+          const capacidade = n => n === null || Number.isInteger(n) && n > 0;
+          const conclusaoVram = v?.dedicadaGb != null && v?.minimaGb != null ? v.dedicadaGb >= v.minimaGb : null;
+          const conclusaoDisco = a?.minimaGb == null ? null : a?.maiorUnidadeElegivelGb >= a.minimaGb ? true : a?.completo === true ? false : null;
+          if (!v || !a || v.minimaGb !== (dados.minimos.vramGb ?? null) || a.minimaGb !== (dados.minimos.armazenamentoGb ?? null)
+            || a.exigeSsd !== (dados.minimos.exigeSsd === true) || !capacidade(v.dedicadaGb) || !capacidade(v.minimaGb)
+            || !capacidade(a.maiorUnidadeElegivelGb) || !capacidade(a.minimaGb) || typeof a.completo !== 'boolean'
+            || typeof a.exigeSsd !== 'boolean' || a.espacoLivreVerificado !== false
+            || v.atendeCapacidadeMinima !== conclusaoVram || a.atendeCapacidadeMinima !== conclusaoDisco
+            || !Array.isArray(dados.impedimentosMinimos) || dados.impedimentosMinimos.some(m => typeof m !== 'string' || !m.trim())
+            || Boolean(dados.impedimentosMinimos.length) !== (minimo === false || conclusaoVram === false || conclusaoDisco === false))
+            throw new Error("Não foi possível confirmar as capacidades de vídeo e armazenamento da build.");
+        }
         return dados;
       });
     },

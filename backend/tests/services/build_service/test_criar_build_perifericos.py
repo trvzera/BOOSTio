@@ -94,6 +94,21 @@ class CriarBuildPerifericosTest(unittest.TestCase):
         )
         self.assertEqual(validada["preco_total"], 1000)
 
+    def test_prompt_explicita_pares_por_socket_e_rede_sem_certificar_bios(self):
+        catalogo = {**self.catalogo,
+                    "processador": [{"id": 1, "soquete": "LGA 1700"}, {"id": 2, "soquete": "AM4"}, {"id": 3}],
+                    "placa_mae": [{"id": 10, "socket": "LGA1700"}, {"id": 20, "socket": "AM5"}, {"id": 30}]}
+        dados = {"nome": "QA", "descricao": "Teste", "utilidade": "Estudos", "rede": {}}
+        prompt = CriarBuildService._criar_prompt(dados, 5000, 1000, catalogo)
+        bloco = json.loads(prompt.split("# RESTRIÇÕES CALCULADAS PELO SERVIDOR\n")[1].split("\n")[0])
+        self.assertEqual(bloco["pares_por_socket_apenas"], [{"processador": 1, "placas_mae": [10]}, {"processador": 2, "placas_mae": []}])
+        self.assertIsNone(bloco["acessorio_rede_obrigatorio"])
+        self.assertEqual(bloco["categorias_rede_proibidas"], ["adaptador_wifi", "cabo_rede"])
+        dados["rede"] = {"tipo": "wifi", "possuiAcessorio": False}
+        prompt = CriarBuildService._criar_prompt(dados, 5000, 1000, catalogo)
+        self.assertIn('"acessorio_rede_obrigatorio": "adaptador_wifi"', prompt)
+        self.assertIn('"categorias_rede_proibidas": ["cabo_rede"]', prompt)
+
 
 if __name__ == "__main__":
     unittest.main()

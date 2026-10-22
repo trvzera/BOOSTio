@@ -101,8 +101,8 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
       if (requisitos) {
         const ficha = await requisitos.verificar(jogo.value);
         if (!ativo || atual !== versao) return;
-        if (ficha?.ram.atendeMinimo === false) {
-          informar("A RAM da build está abaixo do mínimo deste jogo. Nenhum FPS foi consultado.","error");
+        if (ficha?.ram.atendeMinimo === false || ficha?.impedimentosMinimos?.length) {
+          informar(ficha.ram.atendeMinimo === false ? "A RAM da build está abaixo do mínimo deste jogo. Nenhum FPS foi consultado." : "A build não atende a um dos requisitos mínimos verificados. Nenhum FPS foi consultado.","error");
           return;
         }
       }

@@ -1,5 +1,32 @@
 # Qualidade do frontend — 20/10/2026
 
+## Revalidação — 22/10/2026
+
+- Nova rodada móvel de Lighthouse nas 16 páginas: acessibilidade 100 e boas
+  práticas 100; SEO 100 em início/Sobre/Termos, com `noindex` preservado nas demais
+  (inclusive builds prontas, que agora exigem sessão). Performance variou de 63 a
+  78. São medidas locais com API simulada, não resultados de produção.
+- Apesar da nota 100, a auditoria também apontou rótulos que não continham
+  literalmente o texto dos botões. Corrigidos formulário, comparação, autenticação
+  Google e abertura de modelo. Não usar uma nota isolada como prova de conformidade.
+- axe WCAG 2 A/AA e 2.1 AA nas 16 páginas em 320/768/1440 px, catálogo real lido
+  sem gravação e autenticação/API simuladas. Corrigidos contraste do texto pequeno
+  de Sobre e acesso de teclado à região rolável das etapas no tablet. A segunda
+  rodada passou: 134 verificações, sem violações axe, overflow ou erros JavaScript.
+  Inclui cópia de modelo com gravação simulada, skip link/foco e falha de servidor.
+- Mais 77 verificações Chrome do painel de requisitos: RAM insuficiente, VRAM e
+  SSD/disco insuficientes mesmo com RAM suficiente, dados desconhecidos, mudança de
+  jogo, cancelamento, ausência de ficha, timeout e recuperação. Respostas simuladas,
+  nenhum FPS inventado; espaço livre não foi considerado confirmado.
+- Suítes de regressão: 345 testes Node e 461 Python (+4 subtestes), com bancos
+  isolados. Avisos legados de `Query.get()` e `utcnow()` permanecem.
+- CSS por imports e identidade preservados. Empacotamento, compressão/cache e
+  auditoria no domínio definitivo continuam pendentes; deployment/VPS fora do escopo.
+  VoiceOver/Safari e aparelhos reais ainda precisam de homologação manual.
+
+O restante deste documento registra a rodada anterior; seus números e decisões
+de indexação não substituem a atualização acima.
+
 ## Escopo e método
 
 Revisão das 15 páginas de `frontend/pages/` e do laboratório `frontend/testes.html`,
