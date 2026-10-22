@@ -14,6 +14,7 @@ from services.peca_service.popular_pecas_service import PopularPecasService
 from migrations.budget_usuario import registrar_migracao_budget
 from migrations.imagens_pecas import migrar_imagens_pecas
 from migrations.rede_build import migrar_rede_build
+from utils.csrf import configurar_csrf
 
 load_dotenv()
 
@@ -23,6 +24,7 @@ load_dotenv()
 app = Flask(__name__, instance_path=os.path.join(os.path.dirname(os.path.abspath(__file__))))
 
 app.config.from_object(ambientes[os.getenv('APP_ENV', 'desenvolvimento')])
+configurar_csrf(app)
 #Iniciar o login manager e passar o app como parametro
 lm.init_app(app)
 db.init_app(app)

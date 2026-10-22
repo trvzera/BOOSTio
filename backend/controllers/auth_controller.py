@@ -7,8 +7,14 @@ from models import lm
 from configs import oauth
 from services.usuario_service.entrar_usuario_service import EntrarUsuarioService
 from services.usuario_service.entrar_google_usuario_service import EntrarGoogleService
+from utils.csrf import token_csrf
 
 auth_bp = Blueprint("auth",__name__,url_prefix='/auth')
+
+
+@auth_bp.get("/csrf")
+def obter_csrf():
+    return jsonify({"csrf_token": token_csrf()}), 200
 
 @auth_bp.after_request
 def nao_armazenar_sessao(resposta):
