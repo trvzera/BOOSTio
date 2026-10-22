@@ -1,5 +1,6 @@
 import { acompanharCarregamento } from "../components/page-loading.js";
 import { completarCatalogoDemo } from "./hardware.js";
+import { carregarManifestoImagens, completarImagens, enderecoImagem } from "./imagens-produtos.js";
 export const perifericos = ["monitor", "teclado", "mouse", "fone"];
 export const acessoriosRede = ["cabo_rede", "adaptador_wifi"];
 export const categorias = [
@@ -36,13 +37,12 @@ let carregamento;
 export function carregarCatalogo() {
   carregamento ??= acompanharCarregamento(Promise.all([
     fetch(new URL("../../data/catalogo-demo.json", import.meta.url),{cache:"force-cache"}),
-    fetch(new URL("../../data/imagens-produtos.json", import.meta.url),{cache:"no-cache"}),
+    carregarManifestoImagens(),
   ]).then(async ([resposta, imagens]) => {
       if (!resposta.ok) throw new Error("Não foi possível carregar o catálogo.");
       const catalogo = await resposta.json();
-      const mapa = imagens.ok ? await imagens.json() : {};
       try { sessionStorage.setItem("boostio:catalogo-pronto","1"); } catch {}
-      return completarCatalogoDemo(catalogo.map(peca => ({...peca, imagem:mapa[peca.part_number] || peca.imagem})));
+      return completarCatalogoDemo(completarImagens(catalogo,imagens));
     }).catch(erro => { carregamento = null; throw erro; }));
   return carregamento;
 }
@@ -50,6 +50,23 @@ export function carregarCatalogo() {
 export const moeda = (valor) => new Intl.NumberFormat("pt-BR", {
   style: "currency", currency: "BRL",
 }).format(valor);
+
+export function informacoesPreco(peca, conta = false) {
+  const informado = typeof peca?.preco === "number" && Number.isFinite(peca.preco) && peca.preco > 0;
+  const data = typeof peca?.preco_atualizado_em === "string" && peca.preco_atualizado_em
+    ? new Date(peca.preco_atualizado_em) : null;
+  const atualizadoEm = data && Number.isFinite(data.getTime()) ? data : null;
+  const atualizacao = atualizadoEm
+    ? "Última atualização do preço: " + atualizadoEm.toLocaleString("pt-BR") + "."
+    : "Data de atualização não informada.";
+  return {
+    rotulo: conta ? "Preço cadastrado" : "Preço demonstrativo",
+    valor: informado ? moeda(peca.preco) : "Preço não informado",
+    nota: conta ? "Valor sem frete, não é cotação em tempo real. " + atualizacao
+      + (peca?.esgotado ? " Produto marcado como indisponível." : "")
+      : "Valor de referência do catálogo demonstrativo, sem atualização em tempo real.",
+  };
+}
 
 export const htmlSeguro = (valor = "") => String(valor)
   .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
@@ -61,10 +78,12 @@ export function nomePeca(peca) {
 
 export function imagemPeca(peca, classe = "") {
   const categoria = categorias.find((c) => c.id === peca?.categoria);
+  const imagem = enderecoImagem(peca?.imagem) || enderecoImagem(peca?.imagem_url);
+  const alternativa = '<span class="component-placeholder ' + htmlSeguro(classe) + '" data-product-placeholder' + (imagem ? ' hidden' : '') + ' aria-hidden="true" title="Imagem indisponível">' + (categoria?.sigla || "PC") + '</span>';
   // Foto ausente: placeholder neutro, sem fingir que é a foto do produto.
-  return peca?.imagem
-    ? '<img class="' + classe + '" src="' + htmlSeguro(peca.imagem) + '" alt="' + htmlSeguro(nomePeca(peca)) + '" loading="lazy">'
-    : '<span class="component-placeholder ' + classe + '" aria-hidden="true">' + (categoria?.sigla || "PC") + '</span>';
+  return imagem
+    ? '<img class="' + htmlSeguro(classe) + '" data-product-image src="' + htmlSeguro(imagem) + '" alt="' + htmlSeguro(nomePeca(peca) || peca?.nome || "Componente") + '" width="160" height="160" loading="lazy" decoding="async">' + alternativa
+    : alternativa;
 }
 
 export function ofertasPeca(peca) {
@@ -130,7 +149,7 @@ export const rotulosTecnicos = {
 };
 
 export function fichaTecnica(peca) {
-  const ignorados = new Set(["id", "categoria", "imagem", "preco", "link", "part_number", "esgotado", "ofertas"]);
+  const ignorados = new Set(["id", "categoria", "imagem", "preco", "preco_atualizado_em", "link", "part_number", "esgotado", "ofertas"]);
   return Object.entries(peca).filter(([chave, valor]) => !ignorados.has(chave) && valor != null)
     .map(([chave, valor]) => [
       rotulosTecnicos[chave] || chave.replaceAll("_", " "),

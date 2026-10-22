@@ -35,3 +35,11 @@ test("slider arredondado não impede digitar o orçamento exato e oferece tetos"
   assert.match(forms,/await verificarEspacoBuild\(\)/);
   assert.match(forms,/finally \{ pararMensagens\(\); \}/);
 });
+
+test("periféricos têm teto separado e a sobra não é transferida ao PC", async () => {
+  const forms = await readFile(new URL("../js/pages/forms.js",import.meta.url),"utf8");
+  assert.match(forms,/Limite do orçamento para periféricos/);
+  assert.match(forms,/a sobra fica com você e não aumenta o limite do PC/);
+  assert.match(forms,/aria-describedby="peripheral-budget-summary peripheral-budget-help"/);
+  assert.doesNotMatch(forms,/meta flexível|sobra pode ser redistribuída|saldo pode ser usado nas peças do PC/i);
+});

@@ -3,8 +3,12 @@
 .profile-meta { gap: 8px; }
 .meta-pill { max-width: 100%; flex-wrap: wrap; }
 .meta-pill i { flex-shrink: 0; }
-.card-heading { align-items: flex-start; }
-.card-heading i { flex-shrink: 0; }
+.card-heading { align-items: center; }
+.card-heading i { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 1.5rem; min-height: 1.5rem; line-height: 1; }
+.meta-pill > span { min-width: 0; overflow-wrap: anywhere; }
+#budget-profile-form .planning-consent.ui-check { display: flex; align-items: center; }
+#budget-profile-form .planning-consent.ui-check > .ui-lottie { align-self: center; }
+#budget-profile-form .planning-consent.ui-check > span:last-child { min-width: 0; }
 .form-actions { flex-wrap: wrap; }
 @media (max-width: 600px) {
   #settings-page { padding-bottom: 96px; }

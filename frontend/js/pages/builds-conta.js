@@ -3,6 +3,7 @@ import "../auth/auth.js";
 import { listarBuilds, criarBuildManual, atualizarBuild, duplicarBuild, excluirBuild, definirSetupAtual, LIMITE_BUILDS, verificarEspacoBuild } from "../api/build/builds.js";
 import { carregarCatalogoConta, buildDaConta, estadoParaConta, linkBuildConta } from "../build/conta.js";
 import { htmlSeguro as h, moeda } from "../build/catalogo.js";
+import { itensSelecionados } from "../build/estado.js";
 import { avaliarBuild } from "../build/compatibilidade.js";
 import { abrirBenchmark, abrirDialogoBuild, motivoBenchmark } from "../build/acoes-build.js";
 import { abrirComparacao } from "../build/comparacao.js";
@@ -52,12 +53,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       const [resposta, pecas] = await Promise.all([listarBuilds(), carregarCatalogoConta()]);
       salvas = resposta.builds || []; catalogo = pecas; carregadas = true;
       renderizar();
-    } catch (erro) { status.hidden = false; status.textContent = erro.message; }
+    } catch (erro) { status.hidden = false; status.classList.remove("builds-empty"); status.textContent = erro.message; status.dataset.tone = "error"; }
   }
 
   function card(dados) {
     const build = local(dados), avaliacao = avaliarBuild(build, catalogo);
     const progresso = Math.round(avaliacao.preenchidos / avaliacao.total * 100);
+    const itens = itensSelecionados(build,catalogo);
+    const precoParcial = avaliacao.faltam.length > 0 || itens.some(({peca}) => !peca || !Number.isFinite(peca.preco) || peca.preco <= 0);
     const trancada = build.travada, setup = Boolean(dados.estado?.setupAtual);
     const classe = avaliacao.erros.length ? "error" : avaliacao.avisos.length ? "warning" : progresso === 100 ? "complete" : "incomplete";
     const icones = {benchmark:"magic",melhorias:"magnifying","setup-atual":"circledot",trancar:"lock",visibilidade:"visibility",editar:"pencil",duplicar:"clone","copiar-link":"copy","baixar-csv":"download","baixar-json":"download",deletar:"trash"};
@@ -76,15 +79,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         <span class="build-menu-divider"></span>${opcao("baixar-csv","Baixar build (CSV)")}${opcao("baixar-json","Baixar build (JSON)")}
         <span class="build-menu-divider"></span>${opcao("deletar","Deletar build",trancada)}
       </div></div></div>
-      <p class="build-card-desc font-2-xs">${h(build.descricao || `${dados.componentes.length} peças · ${moeda(dados.preco_total)}`)}</p>
+      <p class="build-card-desc font-2-xs">${h(build.descricao || "")}</p>
+      <div class="build-card-price"><span>${precoParcial ? "Total parcial" : "Total cadastrado"}</span><strong>${Number.isFinite(avaliacao.preco) && avaliacao.preco > 0 ? moeda(avaliacao.preco) : "Preço a consultar"}</strong><small>Sem frete</small></div>
       <div class="build-card-meta"><p class="build-card-percent font-1-l">${progresso}%</p><div class="build-progress" role="progressbar" aria-label="Preenchimento de ${h(build.titulo)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progresso}"><div class="build-progress-fill" style="width:${progresso}%"></div></div>
       <div class="build-card-bottom"><span class="build-visibility ${build.visibilidade}">${build.visibilidade === "publico" ? "Pública" : "Privada"}</span><time class="build-card-date font-2-xs" datetime="${h(dados.criado_em)}">${h(formatarDataHora(dados.criado_em))}</time></div></div></article>`;
   }
 
   function renderizar() {
     status.hidden = salvas.length > 0;
-    status.textContent = salvas.length ? "" : "Você ainda não tem builds salvas na conta.";
+    status.dataset.tone = "info";
+    status.classList.toggle("builds-empty",salvas.length === 0);
+    status.innerHTML = salvas.length ? "" : '<strong class="font-1-m-b">Suas próximas ideias começam aqui</strong><p class="font-2-xs">Você ainda não tem builds salvas. Crie uma montagem ou escolha uma build pronta para personalizar.</p><div class="builds-empty-actions"><button type="button" class="btn-primary" data-empty-create aria-label="Criar minha primeira build">Criar minha primeira build</button><a class="btn-secondary" href="./configuracoes-prontas.html" aria-label="Explorar builds prontas">Explorar builds prontas</a></div>';
     lista.innerHTML = salvas.map(card).join("");
+    // Não deixa o menu invisível aumentar a rolagem e causar um salto ao abri-lo.
+    lista.querySelectorAll(".build-menu").forEach(menu => {
+      if (typeof menu.showPopover === "function") menu.popover = "manual";
+    });
     document.querySelector("#quota-count").textContent = `${salvas.length} / ${LIMITE_BUILDS}`;
     document.querySelector("#quota-progress").setAttribute("aria-valuenow",String(Math.min(LIMITE_BUILDS,salvas.length)));
     document.querySelector("#quota-fill").style.width = `${Math.min(100,salvas.length / LIMITE_BUILDS * 100)}%`;
@@ -141,10 +151,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     alternarMenu(wrap,false); wrap.querySelector(".build-menu-trigger").focus({preventScroll:true});
     try {
       if (acao === "benchmark") abrirBenchmark(build,catalogo);
-      else if (acao === "melhorias") abrirMelhorias(build,catalogo,async proxima => {
-        await atualizar(build.id,estadoParaConta(proxima));
-        avisar("Melhorias salvas na conta.");
-      });
+      else if (acao === "melhorias") {
+        const janela = abrirMelhorias(build,catalogo,async proxima => {
+          await atualizar(build.id,estadoParaConta(proxima));
+          avisar("Melhorias salvas na conta.");
+        });
+        janela.addEventListener("close",() => {
+          if (janela.returnValue !== "aplicar") return;
+          [...lista.querySelectorAll(".build-card")].find(card => card.dataset.id === build.id)?.querySelector(".build-menu-trigger")?.focus({preventScroll:true});
+        },{once:true});
+      }
       else if (acao === "setup-atual") {
         const remover = Boolean(dados.estado?.setupAtual);
         await definirSetupAtual(build.id);
@@ -188,7 +204,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.querySelector("#btn-create-build").onclick = async () => {
     if (!carregadas || lotado() || criando) return;
     try { await verificarEspacoBuild(); } catch (erro) { avisar(erro.message); return; }
-    const dialogo = abrirDialogoBuild("Como você quer criar sua build?",'<div class="build-create-options"><a class="build-create-option build-create-option-primary" href="./formulario.html" aria-label="Criar build pelo formulário inteligente"><strong>Formulário inteligente</strong><span>Informe objetivo e orçamento para gerar a build.</span></a><button type="button" class="build-create-option" data-criar="manual" aria-label="Criar build manualmente"><strong>Montagem manual</strong><span>Escolha peça por peça do catálogo.</span></button></div>');
+    const dialogo = abrirDialogoBuild("Como você quer criar sua build?",'<div class="build-create-options"><a class="build-create-option build-create-option-primary" href="./formulario.html" aria-label="Criar build pelo formulário inteligente">' + iconeAnimado("handsparkle") + '<strong>Formulário inteligente</strong><span>Informe objetivo e orçamento para gerar a build.</span></a><button type="button" class="build-create-option" data-criar="manual" aria-label="Criar build manualmente">' + iconeAnimado("normalhand") + '<strong>Montagem manual</strong><span>Escolha peça por peça do catálogo.</span></button></div>');
     dialogo.querySelector('[data-criar="manual"]').onclick = async evento => {
       if (criando) return;
       criando = true; evento.currentTarget.disabled = true;
@@ -201,27 +217,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
   document.querySelector("#btn-import-build").onclick = () => {
     if (!carregadas || lotado() || criando) return;
-    const dialogo = abrirDialogoBuild("Importar build",'<p class="planning-help">Selecione um JSON ou CSV de build (até 1 MB).</p><input type="file" id="build-import-file" accept=".json,.csv" aria-label="Arquivo da build"><p id="build-import-status" role="status"></p><button type="button" class="btn-primary" id="build-import-confirm" aria-label="Importar build selecionada" disabled>Importar build</button>');
+    const dialogo = abrirDialogoBuild("Importar build",'<div class="build-import-fields"><p class="planning-help" id="build-import-help">Selecione um JSON ou CSV de build (até 1 MB).</p><label class="planning-field" for="build-import-file">Arquivo da build<input type="file" id="build-import-file" accept=".json,.csv" aria-label="Arquivo da build" aria-describedby="build-import-help build-import-status"></label><p class="planning-help" id="build-import-status" role="status"></p></div><div class="build-action-actions"><button type="button" class="btn-primary" id="build-import-confirm" aria-label="Importar build selecionada" disabled>Importar build</button></div>');
     let candidata;
     const feedback = dialogo.querySelector("#build-import-status"), confirmar = dialogo.querySelector("#build-import-confirm");
+    const informarImportacao = (texto,tom) => { feedback.textContent = texto; feedback.dataset.tone = tom; };
     dialogo.querySelector("#build-import-file").onchange = async evento => {
       try {
         const arquivo = evento.target.files[0];
         candidata = importarBuild(await arquivo.text(),arquivo.name.split(".").at(-1),catalogo);
-        feedback.textContent = candidata.titulo + " · arquivo validado"; confirmar.disabled = false;
-      } catch (erro) { candidata = null; confirmar.disabled = true; feedback.textContent = erro.message; }
+        informarImportacao(candidata.titulo + " · arquivo validado","success"); confirmar.disabled = false;
+      } catch (erro) { candidata = null; confirmar.disabled = true; informarImportacao(erro.message,"error"); }
     };
     confirmar.onclick = async () => {
       if (criando || !candidata) return;
       criando = true; confirmar.disabled = true;
       try { await verificarEspacoBuild(); await criarBuildManual(estadoParaConta(candidata)); dialogo.close(); await carregar(); avisar("Build importada na conta."); }
-      catch (erro) { feedback.textContent = erro.message; }
+      catch (erro) { informarImportacao(erro.message,"error"); }
       finally { criando = false; confirmar.disabled = !candidata; }
     };
   };
   document.querySelector("#btn-compare-builds").onclick = () => {
     try { abrirComparacao(salvas.map(local),catalogo); } catch (erro) { avisar(erro.message); }
   };
+  status.addEventListener("click",evento => { if (evento.target.closest("[data-empty-create]")) document.querySelector("#btn-create-build").click(); });
   document.querySelector("#cancel-build-edit").onclick = () => { idEdicao = null; modalEditar.classList.remove("open"); };
   document.querySelector("#save-build-edit").onclick = async () => {
     const dados = encontrar(idEdicao);

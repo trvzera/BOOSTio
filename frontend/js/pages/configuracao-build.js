@@ -10,7 +10,7 @@ import { navegarPara } from "../components/page-loading.js";
 import { resumoRede } from "../build/rede.js";
 import { salvarAlteracaoLocal } from "../build/autosalvar.js";
 import { iniciarDetalhesAnimados } from "../components/animated-details.js";
-import { abrirBenchmark, abrirCompraBuild, motivoBenchmark, avisoCompraHtml } from "../build/acoes-build.js";
+import { abrirBenchmark, abrirCompraBuild, abrirDialogoBuild, motivoBenchmark, avisoCompraHtml, avisoFreteHtml } from "../build/acoes-build.js";
 import { abrirMelhorias } from "../build/melhorias.js";
 import { carregarPerfil } from "../conta/perfil.js";
 import { acompanharCarregamento } from "../components/page-loading.js";
@@ -42,6 +42,18 @@ document.addEventListener("DOMContentLoaded",async () => {
     let build = conta ? await acompanharCarregamento(carregarBuildConta(buildId)) : abrirBuild();
     let filaSalvamento = Promise.resolve();
     let falhaSalvamento = null;
+    // Um resumo mais alto que a tela precisa poder subir ao rolar até as ações.
+    const observarResumo = typeof ResizeObserver === "function" ? new ResizeObserver(entradas => {
+      for (const {target} of entradas) {
+        const altura = Math.ceil(target.getBoundingClientRect().height) + "px";
+        if (target.style.getPropertyValue("--summary-height") !== altura) target.style.setProperty("--summary-height",altura);
+      }
+    }) : null;
+    window.addEventListener("pagehide",() => observarResumo?.disconnect());
+    window.addEventListener("pageshow",evento => {
+      const resumo = main.querySelector(".build-sidebar");
+      if (evento.persisted && resumo) observarResumo?.observe(resumo);
+    });
     let mensagemSalvamento = conta ? "Alterações são salvas automaticamente na sua conta." : "Alterações são salvas automaticamente neste navegador.", tomSalvamento = "info";
     if (build.travada) mensagemSalvamento = "Build trancada. Destranque-a para alterar e salvar.";
     else if (!conta && buildsLocais().length >= 3 && !buildsLocais().some(item => item.id === build.id)) {
@@ -57,6 +69,30 @@ document.addEventListener("DOMContentLoaded",async () => {
     const bloqueado = (condicao,motivo) => condicao ? 'disabled data-disabled-reason="' + h(motivo) + '"' : "";
     const trancada = "Destranque a build para alterar os componentes.";
     const badge = obrigatoria => obrigatoria ? '<span class="component-badge">Obrigatório</span>' : "";
+    function atualizarNome() {
+      main.querySelector("#builder-title").textContent = build.titulo.trim() || "Minha build";
+      document.title = (build.titulo.trim() || "Minha build") + " — BOOSTio";
+      main.querySelector("#save-configuration").disabled = build.travada || !build.titulo.trim();
+    }
+    function editarNome() {
+      if (build.travada) return;
+      const dialogo = abrirDialogoBuild("Nome da build",'<form id="rename-build-form"><label class="planning-field" for="rename-build-name">Como você quer chamar sua build?<input class="input-text" id="rename-build-name" maxlength="100" required value="' + h(build.titulo) + '"></label><p class="planning-help" id="rename-build-feedback" role="status"></p><div class="build-action-actions"><button type="submit" class="btn-primary" aria-label="Salvar novo nome da build">Salvar nome</button></div></form>');
+      const form = dialogo.querySelector("form"), input = form.querySelector("input"), feedback = form.querySelector("[role=status]");
+      input.focus(); input.select();
+      form.onsubmit = async evento => {
+        evento.preventDefault();
+        if (!input.value.trim()) { input.setCustomValidity("Informe um nome para a build."); input.reportValidity(); return; }
+        const botao = form.querySelector("button"); botao.disabled = true;
+        try {
+          build.titulo = input.value.trim();
+          main.querySelector("#build-name").value = build.titulo; atualizarNome(); persistir();
+          if (conta) { await filaSalvamento; if (falhaSalvamento) throw falhaSalvamento; }
+          dialogo.close();
+        } catch (erro) { feedback.textContent = erro.message; feedback.dataset.tone = "error"; }
+        finally { botao.disabled = false; }
+      };
+      input.oninput = () => input.setCustomValidity("");
+    }
 
     function selecionada(categoria,item) {
       const peca = catalogo.find(p => p.id === item.id), titulo = peca ? nomePeca(peca) : item.proprio || "Modelo não identificado";
@@ -118,6 +154,7 @@ document.addEventListener("DOMContentLoaded",async () => {
         '</p></div><span class="component-add" aria-hidden="true">' + iconeAnimado("plus") + '</span></button></article></section>';
     }
     function renderizar() {
+      observarResumo?.disconnect();
       // Preserva o checkbox e sua instância Lottie durante as atualizações da build.
       const opcoes = main.querySelector(".builder-options");
       const detalhesAbertos = main.querySelector(".summary-metadata")?.open;
@@ -126,18 +163,18 @@ document.addEventListener("DOMContentLoaded",async () => {
       const avisoVideo = cpuSelecionada?.videointegrado ? '<p class="integrated-video-note">Este processador possui vídeo integrado' + (cpuSelecionada.modelo_videointegrado ? ': ' + h(cpuSelecionada.modelo_videointegrado) : '') + '. ' + (itensCategoria(build,"placa_video").length ? 'A build também inclui uma placa de vídeo dedicada.' : 'É possível usar imagem sem uma placa de vídeo dedicada. Jogos e tarefas gráficas exigentes podem precisar de uma GPU separada.') + '</p>' : '';
       const categorias = categoriasEditor.filter(c => (build.incluirPerifericos || !perifericos.includes(c.id)) && (build.incluirRede || !c.rede));
       main.innerHTML = '<header class="builder-heading"><div><a class="builder-back font-1-xs" href="./builds.html" aria-label="Voltar para Minhas builds">' + iconeAnimado("arrow","back") + 'Voltar para Minhas builds</a><div class="builder-title-line">' + indicadorBuild(resultado,"compatibility-details") +
-        '<h1>Configure sua build</h1></div><p>Escolha os componentes da sua configuração.</p></div><button type="button" class="btn-primary benchmark-trigger" id="benchmark-build" aria-label="Testar build" ' + bloqueado(Boolean(motivoBenchmark(build,catalogo)),motivoBenchmark(build,catalogo)) + '>' + iconeAnimado("magic") + 'Testar build</button></header>' +
+        '<h1 id="builder-title">' + h(build.titulo) + '</h1><button type="button" class="builder-rename" id="rename-build" aria-label="Editar nome da build" aria-haspopup="dialog" ' + bloqueado(build.travada,"Destranque a build para alterar o nome.") + '>' + iconeAnimado("pencil") + '</button></div><p>Configure sua build: escolha os componentes da sua configuração.</p></div><button type="button" class="btn-primary benchmark-trigger" id="benchmark-build" aria-label="Testar build" ' + bloqueado(Boolean(motivoBenchmark(build,catalogo)),motivoBenchmark(build,catalogo)) + '>' + iconeAnimado("magic") + 'Testar build</button></header>' +
         avisoVideo + '<div class="builder-layout"><section class="component-list" aria-label="Componentes"><div class="builder-options"><label class="ui-check font-2-xs"><input type="checkbox" id="include-peripherals" ' + (build.incluirPerifericos ? "checked " : "") +
         bloqueado(build.travada,trancada) + '>' + iconeAnimado("checkbox") + '<span>Incluir periféricos</span></label><label class="ui-check font-2-xs"><input type="checkbox" id="include-network" ' + (build.incluirRede ? "checked " : "") + bloqueado(build.travada,trancada) + '>' + iconeAnimado("checkbox") + '<span>Incluir rede</span></label></div>' + categorias.map(grupo).join("") +
         '</section><aside class="build-sidebar"><section class="build-summary glass-card"><span class="summary-eyebrow">Total da configuração</span><strong class="summary-total">' + moeda(resultado.preco) +
-        '</strong><div class="summary-power"><span>Consumo estimado do PC</span><strong>' + resultado.watts + ' W</strong></div>' +
+        '</strong>' + avisoFreteHtml() + '<div class="summary-power"><span>Consumo estimado do PC</span><strong>' + resultado.watts + ' W</strong></div>' +
         '<progress class="summary-progress" value="' + resultado.preenchidos + '" max="' + resultado.total + '" aria-label="Peças selecionadas"></progress><p class="font-2-xs summary-note">' +
         resultado.preenchidos + ' de ' + resultado.total + ' peças selecionadas</p><details class="summary-metadata" data-animated-details' + (detalhesAbertos ? ' open' : '') + '><summary class="font-1-xs"><span>Nome, descrição e orçamento</span>' + iconeAnimado("chevron") + '</summary><div class="summary-details"><label for="build-name">Nome da build</label><input class="input-text" id="build-name" maxlength="100" value="' +
         h(build.titulo) + '" ' + bloqueado(build.travada,trancada) + '><label for="build-visibility">Visibilidade</label><select id="build-visibility" class="input-text" ' + bloqueado(build.travada,trancada) +
         '><option value="privado" ' + (build.visibilidade === "privado" ? "selected" : "") + '>Privada</option><option value="publico" ' + (build.visibilidade === "publico" ? "selected" : "") +
         '>Pública</option></select><label for="build-description">Descrição</label><textarea class="input-text" id="build-description" rows="4" maxlength="300" ' + bloqueado(build.travada,trancada) + '>' + h(build.descricao) + '</textarea><label for="build-budget">Orçamento desta build (R$)</label><input class="input-text" id="build-budget" type="number" min="0" max="1000000" step="any" inputmode="decimal" value="' + h(build.orcamento ?? "") + '" placeholder="Sem limite definido" ' + bloqueado(build.travada,trancada) + '></div></details><p class="planning-help" id="build-budget-note"></p><p class="build-autosave-status" id="build-autosave-status" role="status" aria-live="polite" data-tone="' + tomSalvamento + '">' + h(mensagemSalvamento) + '</p><button class="btn-primary" type="button" id="save-configuration" aria-label="Salvar build e voltar">Salvar build e voltar</button><button class="btn-secondary" type="button" id="buy-configuration" aria-label="Comprar build" ' + bloqueado(!Object.keys(build.componentes).length,"Adicione uma peça para consultar as lojas.") + '>' + iconeAnimado("cart") + 'Comprar build</button><button class="btn-secondary" type="button" id="improve-configuration" aria-label="Buscar melhorias" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("magnifying") + 'Buscar melhorias</button><button class="btn-secondary" type="button" id="share-configuration" aria-label="Compartilhar build" ' +
         bloqueado(build.visibilidade !== "publico","Torne a build pública para compartilhar.") +
-        '>Compartilhar</button><p class="summary-note">' + (conta ? 'Soma dos preços disponíveis no catálogo, sem frete. Peças sem cotação não entram no total. Alterações salvas na conta.' : 'Preços demonstrativos, sem frete. Salvamento local neste navegador.') + '</p>' + avisoCompraHtml() +
+        '>Compartilhar</button><p class="summary-note">' + (conta ? 'Soma dos preços disponíveis no catálogo. Peças sem cotação não entram no total. Alterações salvas na conta.' : 'Preços demonstrativos. Salvamento local neste navegador.') + '</p>' + avisoCompraHtml() +
         (Object.keys(build.pecasExtras || {}).length ? '<p class="summary-note">Peças próprias adicionais: ' + Object.entries(build.pecasExtras).map(([tipo,nome]) => h(tipo === "microfone" ? "Microfone: " : "Webcam: ") + h(nome)).join(" · ") + '.</p>' : "") +
         (build.travada ? '<p class="summary-note">Build trancada. Destranque-a em Minhas builds.</p>' : "") + '</section></aside></div>';
       if (opcoes) main.querySelector(".builder-options").replaceWith(opcoes);
@@ -155,12 +192,27 @@ document.addEventListener("DOMContentLoaded",async () => {
       main.querySelector("#build-description").oninput = e => { if (!build.travada) { build.descricao = e.target.value; persistir(); } };
       main.querySelector("#benchmark-build").onclick = () => { try { abrirBenchmark(build,catalogo); } catch (erro) { avisar(erro.message); } };
       main.querySelector("#buy-configuration").onclick = () => { try { abrirCompraBuild(build,catalogo); } catch (erro) { avisar(erro.message); } };
-      main.querySelector("#improve-configuration").onclick = () => { try { abrirMelhorias(build,catalogo,proxima => { build = proxima; persistir(); renderizar(); }); } catch (erro) { avisar(erro.message); } };
+      main.querySelector("#improve-configuration").onclick = () => {
+        try {
+          const janela = abrirMelhorias(build,catalogo,async proxima => {
+            const anterior = build;
+            build = proxima; persistir();
+            if (conta) {
+              await filaSalvamento;
+              if (falhaSalvamento) { build = anterior; throw falhaSalvamento; }
+            }
+            renderizar();
+          });
+          janela.addEventListener("close",() => { if (janela.returnValue === "aplicar") main.querySelector("#improve-configuration")?.focus({preventScroll:true}); },{once:true});
+        } catch (erro) { avisar(erro.message); }
+      };
       main.querySelector("#save-configuration").dataset.disabledReason = build.travada ? trancada : "Informe o nome da build para salvar.";
       main.querySelector("#save-configuration").disabled = build.travada || !build.titulo.trim();
+      main.querySelector("#rename-build").onclick = editarNome;
+      atualizarNome();
       main.querySelector("#build-name").addEventListener("input",e => {
         if (build.travada) return;
-        build.titulo = e.target.value; main.querySelector("#save-configuration").disabled = !build.titulo.trim(); persistir();
+        build.titulo = e.target.value; atualizarNome(); if (build.titulo.trim()) persistir();
       });
       main.querySelector("#build-visibility").addEventListener("change",e => { if (build.travada) return; build.visibilidade = e.target.value; persistir(); renderizar(); });
       if (!opcoes) main.querySelector("#include-peripherals").addEventListener("change",e => {
@@ -196,6 +248,7 @@ document.addEventListener("DOMContentLoaded",async () => {
         try { if (conta) { await filaSalvamento; if (falhaSalvamento) throw falhaSalvamento; } copiarTexto(conta ? linkBuildConta(build.id) : linkCompartilhado(build)); } catch (erro) { avisar(erro.message); }
       };
       iniciarIndicadores(main); iniciarDetalhesAnimados(main); iniciarIcones(main);
+      observarResumo?.observe(main.querySelector(".build-sidebar"));
     }
     function persistir() {
       if (conta) {

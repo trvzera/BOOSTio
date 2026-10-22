@@ -38,6 +38,6 @@ export async function copiarTexto(texto) {
 }
 
 export function mostrarFalha(container, erro) {
-  container.innerHTML = '<section class="catalog-empty glass-card"><h1 class="font-1-l">Não foi possível abrir este conteúdo</h1><p class="font-2-s"></p><a class="btn-ghost" data-page-back href="./configuracao-build.html" aria-label="Voltar à build"><span data-back-label>Voltar à build</span></a></section>';
+  container.innerHTML = '<section class="catalog-empty glass-card"><h1 class="font-1-l">Não foi possível abrir este conteúdo</h1><p class="font-2-s" role="alert"></p><a class="btn-ghost" data-page-back href="./configuracao-build.html" aria-label="Voltar à build"><span data-back-label>Voltar à build</span></a></section>';
   container.querySelector("p").textContent = erro.message;
 }

@@ -133,6 +133,14 @@
 .compare-button:disabled { opacity: .5; cursor: not-allowed; }
 .compare-button-remove { justify-self: start; margin-top: .5rem; font-size: .75rem; }
 .compare-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.25rem; }
+.compare-render-controls { display: grid; gap: 1rem; margin: 1.5rem 0; padding: 1.25rem; border: 1px solid var(--cor-2); border-radius: var(--radius-card,20px); background: rgba(0,123,255,.035); }
+.compare-render-controls .compare-help { margin: .5rem 0 0; }
+.compare-render-actions { display: flex; align-items: end; flex-wrap: wrap; gap: .75rem; }
+.compare-render-actions label { display: grid; flex: 1 1 12rem; gap: .5rem; color: var(--cor-4); font-size: .75rem; }
+.compare-render-actions select { width: 100%; min-height: 2.75rem; padding: .625rem 1rem; border: 1px solid var(--cor-2); border-radius: 999px; color: var(--cor-6); background: var(--cor-0); font: inherit; }
+.compare-render-feedback { flex-basis: 100%; }
+.compare-field-detail a { color: var(--cor-p1); text-decoration: underline; text-underline-offset: .2em; }
+@media (max-width: 600px) { .compare-render-actions > * { width: 100%; } }
 
 .compare-options {
   display: grid;

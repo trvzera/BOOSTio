@@ -1,8 +1,11 @@
-import { htmlSeguro as h, moeda, nomePeca, categorias as categoriasCatalogo, perifericos, acessoriosRede } from "./catalogo.js";
+import { htmlSeguro as h, moeda, nomePeca, imagemPeca, categorias as categoriasCatalogo, perifericos, acessoriosRede } from "./catalogo.js";
 import { itensCategoria } from "./estado.js";
 import { avaliarBuild, selecionarPecaCompativel } from "./compatibilidade.js";
 import { planejamentoLocal } from "./planejamento.js";
 import { abrirDialogoBuild } from "./acoes-build.js";
+import { iconeAnimado, iniciarIcones } from "../components/ui.js";
+import { iniciarDetalhesAnimados, definirDetalheAberto } from "../components/animated-details.js";
+import { avaliarTrocaMelhoria, exigirTrocaMelhoria } from "./validar-melhoria.js";
 
 const CATEGORIAS = categoriasCatalogo;
 const MOTIVO_TRAVA = "Destranque a build para buscar e aplicar melhorias.";
@@ -19,32 +22,37 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
 
   const original = structuredClone(build);
   const categorias = new Set(["processador","placa_video"]);
+  const gruposAbertos = new Set();
   let trocas = new Map(), aplicando = false, aplicada = false, totalExibido;
   const budgetInicial = planejamentoLocal().budget ?? build.orcamento;
   const dialogo = abrirDialogoBuild("Buscar melhorias",'<div class="upgrade-real-panel">'
-    + '<p class="planning-help">' + h(build.titulo) + '</p>'
-    + '<div class="planning-grid"><label class="planning-field" for="upgrade-real-budget"><span>Budget para trocas (R$)</span>'
+    + '<div class="upgrade-real-tabs" role="tablist" aria-label="Etapas da busca de melhorias" hidden>'
+    + '<button type="button" id="upgrade-tab-search" role="tab" aria-selected="true" aria-controls="upgrade-search" data-upgrade-tab="search" aria-label="Escolher peças para trocar">Escolher peças</button>'
+    + '<button type="button" id="upgrade-tab-preview" role="tab" aria-selected="false" aria-controls="upgrade-preview" data-upgrade-tab="preview" tabindex="-1" aria-label="Revisar trocas selecionadas">Revisar trocas <span id="upgrade-real-count">0</span></button></div>'
+    + '<div class="upgrade-real-workspace"><section class="upgrade-real-browser" id="upgrade-search" aria-label="Escolher peças para trocar">'
+    + '<div class="upgrade-real-pane-heading"><h3>Peças disponíveis</h3><span>Menor preço primeiro</span></div>'
+    + '<div class="upgrade-real-browser-scroll upgrade-real-scroll" tabindex="0" role="region" aria-label="Orçamento, categorias e peças sugeridas">'
+    + '<label class="planning-field upgrade-real-budget" for="upgrade-real-budget"><span>Quanto deseja investir nas trocas?</span>'
     + '<input id="upgrade-real-budget" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" value="'
-    + h(budgetInicial ?? "") + '" aria-describedby="upgrade-real-budget-help"></label>'
-    + '<label class="planning-field" for="upgrade-real-order"><span>Ordenar por</span><select id="upgrade-real-order" aria-describedby="upgrade-real-order-help">'
-    + '<option value="preco">Menor preço</option>'
-    + '<option value="desempenho" disabled title="Faltam benchmarks comparáveis.">Melhor desempenho — indisponível: faltam benchmarks comparáveis</option>'
-    + '</select></label></div>'
-    + '<details class="upgrade-real-help"><summary>Como funcionam as trocas</summary><p class="planning-help" id="upgrade-real-budget-help">Budget só para peças novas, sem descontar as antigas. RAM, discos e fans substituem a categoria por uma unidade/kit; ajuste quantidades no editor.</p></details>'
-    + '<span class="sr-only" id="upgrade-real-order-help">Somente preço está disponível; ganho de desempenho ainda não foi medido.</span>'
-    + '<fieldset class="upgrade-real-categories"><legend>Categorias para buscar</legend>'
-    + CATEGORIAS.map(categoria => '<label><input type="checkbox" name="upgrade-real-category" value="' + categoria.id
-      + '" ' + (categorias.has(categoria.id) ? 'checked' : '') + '> ' + categoria.nome + '</label>').join("") + '</fieldset>'
-    + '<p class="planning-help" id="upgrade-real-feedback" role="status" aria-live="polite" aria-atomic="true"></p>'
-    + '<div class="upgrade-real-workspace"><div class="upgrade-real-results" id="upgrade-real-results" tabindex="0" role="region" aria-label="Peças sugeridas"></div>'
-    + '<section class="upgrade-real-preview" aria-labelledby="upgrade-real-preview-title"><h3 id="upgrade-real-preview-title" tabindex="-1">Prévia das alterações</h3>'
-    + '<div id="upgrade-real-differences"></div></section></div>'
-    + '<p class="planning-help" id="upgrade-real-apply-reason" aria-live="polite"></p>'
+    + h(budgetInicial ?? "") + '" placeholder="Ex.: 1500" aria-label="Orçamento para novas peças em reais" aria-describedby="upgrade-real-budget-help"><small id="upgrade-real-budget-help">Valor para as peças novas, sem descontar as antigas e sem frete.</small></label>'
+    + '<details class="upgrade-real-filters" data-animated-details><summary><span>Peças que deseja trocar</span><strong id="upgrade-real-category-count">2 selecionadas</strong><span class="upgrade-real-chevron" aria-hidden="true"></span></summary>'
+    + '<fieldset class="upgrade-real-categories"><legend class="sr-only">Selecione uma ou mais categorias</legend>'
+    + CATEGORIAS.map(categoria => '<label class="ui-check"><input type="checkbox" name="upgrade-real-category" value="' + categoria.id
+      + '" ' + (categorias.has(categoria.id) ? 'checked' : '') + '>' + iconeAnimado("checkbox") + '<span>' + categoria.nome + '</span></label>').join("") + '</fieldset></details>'
+    + '<details class="upgrade-real-help" data-animated-details><summary>O que considerar antes de trocar<span class="upgrade-real-chevron" aria-hidden="true"></span></summary><p class="planning-help">As sugestões são ordenadas por preço, não por ganho de desempenho medido. Trocas inferiores nos dados comparados ou sem dados suficientes ficam bloqueadas. RAM e discos substituem a categoria por uma unidade/kit; o total atual é considerado para não perder capacidade. CPU/GPU e outras categorias aguardam critérios de desempenho comparáveis.</p></details>'
+    + '<div class="upgrade-real-results" id="upgrade-real-results"></div></div></section>'
+    + '<section class="upgrade-real-preview" id="upgrade-preview" aria-labelledby="upgrade-real-preview-title"><div class="upgrade-real-pane-heading"><h3 id="upgrade-real-preview-title" tabindex="-1">Sua prévia</h3><span>Antes de salvar</span></div>'
+    + '<div class="upgrade-real-preview-scroll upgrade-real-scroll" tabindex="0" role="region" aria-label="Revisão das trocas e dos valores"><div id="upgrade-real-differences"></div><p class="planning-help" id="upgrade-real-apply-reason"></p></div></section></div>'
+    + '<div class="upgrade-real-footer" role="group" aria-label="Confirmar trocas"><div class="upgrade-real-selection"><span id="upgrade-real-selection-label">Nenhuma troca selecionada</span><strong id="upgrade-real-selection-total">Escolha uma peça para começar</strong></div>'
     + '<div class="build-action-actions"><button type="button" class="upgrade-real-button" data-upgrade-action="cancelar" aria-label="Cancelar alterações e fechar">Cancelar</button>'
-    + '<button type="button" class="upgrade-real-button upgrade-real-primary" data-upgrade-action="aplicar" aria-label="Aplicar alterações" aria-describedby="upgrade-real-apply-reason">Aplicar alterações</button></div></div>');
+    + '<button type="button" class="upgrade-real-button upgrade-real-primary" data-upgrade-action="aplicar" aria-label="Aplicar alterações" aria-describedby="upgrade-real-apply-reason">Aplicar trocas</button></div>'
+    + '<p class="planning-help" id="upgrade-real-feedback" role="status" aria-live="polite" aria-atomic="true"></p></div></div>');
   dialogo.classList.add("upgrade-dialog");
+  const cabecalho = dialogo.querySelector(".build-action-heading"), titulo = cabecalho.querySelector("h2");
+  const contexto = document.createElement("div"); contexto.className = "upgrade-real-heading-copy";
+  titulo.before(contexto); contexto.append(titulo);
+  contexto.insertAdjacentHTML("beforeend",'<p class="upgrade-real-build-name" title="' + h(build.titulo) + '">' + h(build.titulo) + '</p>');
   const campoBudget = dialogo.querySelector("#upgrade-real-budget");
-  const ordem = dialogo.querySelector("#upgrade-real-order");
   const resultados = dialogo.querySelector("#upgrade-real-results");
   const previa = dialogo.querySelector("#upgrade-real-differences");
   const feedback = dialogo.querySelector("#upgrade-real-feedback");
@@ -52,14 +60,70 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
   const aplicar = dialogo.querySelector('[data-upgrade-action="aplicar"]');
   const fechar = dialogo.querySelector(".build-action-close");
   fechar.setAttribute("aria-label","Fechar janela de melhorias");
+  const compacta = matchMedia("(max-width: 900px)");
+  let aba = "search", frameViewport = 0;
+  const abas = [...dialogo.querySelectorAll("[data-upgrade-tab]")];
+  function mostrarAba(valor,{focar = false} = {}) {
+    aba = valor;
+    dialogo.querySelector(".upgrade-real-tabs").hidden = !compacta.matches;
+    for (const controle of abas) {
+      const ativa = controle.dataset.upgradeTab === aba;
+      controle.setAttribute("aria-selected",String(ativa)); controle.tabIndex = ativa ? 0 : -1;
+      const painel = dialogo.querySelector("#" + controle.getAttribute("aria-controls"));
+      painel.hidden = compacta.matches && !ativa;
+      if (compacta.matches) { painel.setAttribute("role","tabpanel"); painel.setAttribute("aria-labelledby",controle.id); }
+      else { painel.removeAttribute("role"); if (painel.id === "upgrade-search") painel.removeAttribute("aria-labelledby"); else painel.setAttribute("aria-labelledby","upgrade-real-preview-title"); }
+      if (ativa && focar) controle.focus({preventScroll:true});
+    }
+    programarViewport();
+  }
+  const ajustarCompacta = () => {
+    const foco = document.activeElement;
+    if (dialogo.querySelector("#upgrade-preview").contains(foco)) aba = "preview";
+    else if (dialogo.querySelector("#upgrade-search").contains(foco)) aba = "search";
+    mostrarAba(aba);
+    if (foco && foco.closest("[hidden]")) abas.find(botao => botao.dataset.upgradeTab === aba)?.focus({preventScroll:true});
+  };
+  compacta.addEventListener("change",ajustarCompacta);
+  dialogo.querySelector(".upgrade-real-tabs").addEventListener("keydown",evento => {
+    if (!['ArrowLeft','ArrowRight','Home','End'].includes(evento.key) || aplicando) return;
+    evento.preventDefault(); mostrarAba(evento.key === 'Home' ? 'search' : evento.key === 'End' ? 'preview' : aba === 'search' ? 'preview' : 'search',{focar:true});
+  });
+  function ajustarViewport() {
+    if (!dialogo.open) return;
+    const altura = window.visualViewport?.scale === 1 ? window.visualViewport.height : innerHeight;
+    const topo = window.visualViewport?.scale === 1 ? window.visualViewport.offsetTop : 0;
+    const definir = (chave,valor) => { if (dialogo.style.getPropertyValue(chave) !== valor) dialogo.style.setProperty(chave,valor); };
+    definir("--upgrade-viewport-height",Math.round(altura) + "px");
+    definir("--upgrade-dialog-top",Math.max(0,topo + (altura - dialogo.getBoundingClientRect().height) / 2) + "px");
+    const estilo = getComputedStyle(dialogo), painel = dialogo.querySelector(".upgrade-real-panel");
+    const reserva = cabecalho.getBoundingClientRect().height + parseFloat(getComputedStyle(cabecalho).marginBottom || 0)
+      + parseFloat(estilo.paddingTop) + parseFloat(estilo.paddingBottom)
+      + dialogo.querySelector(".upgrade-real-footer").getBoundingClientRect().height
+      + (compacta.matches ? dialogo.querySelector(".upgrade-real-tabs").getBoundingClientRect().height : 0)
+      + (parseFloat(getComputedStyle(painel).gap) || 0) * 2;
+    dialogo.classList.toggle("upgrade-dialog-flow",dialogo.clientHeight - reserva < 96);
+    if (feedback.scrollHeight > feedback.clientHeight + 1) feedback.tabIndex = 0;
+    else feedback.removeAttribute("tabindex");
+  }
+  function programarViewport() { cancelAnimationFrame(frameViewport); frameViewport = requestAnimationFrame(ajustarViewport); }
+  const observarViewport = typeof ResizeObserver === "function" ? new ResizeObserver(programarViewport) : null;
+  [dialogo,cabecalho,dialogo.querySelector(".upgrade-real-footer")].forEach(elemento => observarViewport?.observe(elemento));
+  window.addEventListener("resize",programarViewport);
+  window.visualViewport?.addEventListener("resize",programarViewport);
+  window.visualViewport?.addEventListener("scroll",programarViewport);
+  mostrarAba(aba);
 
   const pecaPorId = (categoria,id) => catalogo.find(peca => peca.categoria === categoria && peca.id === id);
   const atual = (base,categoria) => pecaPorId(categoria,itensCategoria(base,categoria)[0]?.id);
   const nome = peca => nomePeca(peca) || "Modelo sem nome";
   function nomeAtual(base,categoria) {
-    const item = itensCategoria(base,categoria)[0], peca = atual(base,categoria);
-    if (peca) return nome(peca);
-    if (item) return item.proprio ? item.proprio + " (peça própria)" : "Modelo não encontrado no catálogo";
+    const itens = itensCategoria(base,categoria);
+    if (itens.length) return itens.map(item => {
+      const peca = pecaPorId(categoria,item.id);
+      const modelo = peca ? nome(peca) : item.proprio ? item.proprio + " (peça própria)" : "Modelo não encontrado no catálogo";
+      return (item.quantidade > 1 ? item.quantidade + " × " : "") + modelo;
+    }).join(" · ");
     const cpu = atual(base,"processador");
     return categoria === "placa_video" && cpu?.videointegrado
       ? "Vídeo integrado · " + (cpu.modelo_videointegrado || "modelo a confirmar") : "Nenhuma peça selecionada";
@@ -68,13 +132,14 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     const valor = centavos(campoBudget.value);
     return campoBudget.checkValidity() && valor > 0 && valor <= 100000000 ? valor : null;
   }
-  function informar(texto) { feedback.textContent = texto; }
+  function informar(texto,tom = "info") { feedback.textContent = texto; feedback.dataset.tone = tom; programarViewport(); }
   function escolhidas(escolhas) {
     return CATEGORIAS.filter(({id}) => escolhas.has(id)).map(({id,nome:rotulo}) => {
       if (!categorias.has(id)) throw new Error("Selecione a categoria de " + rotulo + ".");
       const peca = pecaPorId(id,escolhas.get(id));
       if (!peca || peca.esgotado) throw new Error(rotulo + ": a peça escolhida está indisponível no catálogo.");
       if (centavos(peca.preco) == null) throw new Error(rotulo + ": a peça escolhida não tem preço válido.");
+      exigirTrocaMelhoria(original,peca,catalogo);
       return peca;
     });
   }
@@ -101,16 +166,30 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
   }
 
   function renderizarResultados() {
+    // Durante uma animação de fechamento, open ainda é true; ARIA indica o destino.
+    resultados.querySelectorAll("[data-upgrade-group]").forEach(grupo => {
+      const categoria = grupo.dataset.upgradeGroup;
+      const aberto = grupo.hasAttribute("data-animating")
+        ? grupo.querySelector(":scope > summary").getAttribute("aria-expanded") === "true" : grupo.open;
+      if (categorias.has(categoria) && aberto) gruposAbertos.add(categoria);
+      else gruposAbertos.delete(categoria);
+    });
     if (build.travada) { resultados.innerHTML = '<p class="planning-help">' + MOTIVO_TRAVA + '</p>'; return; }
     if (budget() == null) { resultados.innerHTML = '<p class="planning-help">' + MOTIVO_BUDGET + '</p>'; return; }
     if (!categorias.size) { resultados.innerHTML = '<p class="planning-help">Selecione uma ou mais categorias para consultar as peças.</p>'; return; }
     resultados.innerHTML = CATEGORIAS.filter(({id}) => categorias.has(id)).map(categoria => {
-      const candidatas = [], conflitos = new Set();
-      let foraDoBudget = 0, indisponiveis = 0;
+      const candidatas = [], conflitos = new Set(), comparacoesPendentes = new Set();
+      let foraDoBudget = 0, indisponiveis = 0, inferiores = 0, semComparacao = 0;
       for (const peca of catalogo) {
         if (peca.categoria !== categoria.id || peca.id === atual(original,categoria.id)?.id) continue;
         const preco = centavos(peca.preco);
         if (peca.esgotado || preco == null) { indisponiveis++; continue; }
+        const comparacao = avaliarTrocaMelhoria(original,peca,catalogo);
+        if (!comparacao.permitida) {
+          if (comparacao.codigo === "regressao") inferiores++;
+          else if (comparacao.codigo !== "mesma-peca") { semComparacao++; comparacoesPendentes.add(comparacao.motivo); }
+          continue;
+        }
         const propostas = new Map(trocas);
         propostas.set(categoria.id,peca.id);
         try {
@@ -122,20 +201,29 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
       }
       candidatas.sort((a,b) => centavos(a.preco) - centavos(b.preco) || nome(a).localeCompare(nome(b),"pt-BR"));
       const exclusoes = [foraDoBudget ? foraDoBudget + " opções excedem o budget combinado." : "",
-        indisponiveis ? indisponiveis + " opções indisponíveis ou sem preço válido." : ""].filter(Boolean).join(" ");
-      return '<section class="upgrade-real-group"><h3>' + categoria.nome + '</h3><p class="planning-help">Atual: '
+        indisponiveis ? indisponiveis + " opções indisponíveis ou sem preço válido." : "",
+        inferiores ? inferiores + " opções inferiores nos dados comparados foram ocultadas." : "",
+        semComparacao ? semComparacao + " opções sem comparação segura não são sugeridas." : ""].filter(Boolean).join(" ");
+      const selecionada = pecaPorId(categoria.id,trocas.get(categoria.id));
+      const precoSelecionado = centavos(selecionada?.preco);
+      return '<details class="upgrade-real-group" data-upgrade-group="' + categoria.id + '" data-selected="' + Boolean(selecionada) + '" data-animated-details' + (gruposAbertos.has(categoria.id) ? ' open' : '') + '>'
+        + '<summary class="upgrade-real-group-heading" aria-controls="upgrade-parts-' + categoria.id + '"><h3>' + categoria.nome + '</h3><span class="upgrade-real-group-value">'
+        + (selecionada ? h(nome(selecionada)) + '<span class="upgrade-real-group-price">' + h(precoSelecionado != null ? valorMonetario(precoSelecionado) : "Preço indisponível") + '</span>'
+          : candidatas.length ? 'Escolha uma peça' : 'Sem opções disponíveis')
+        + '</span><span class="upgrade-real-group-meta"><span>' + candidatas.length + (candidatas.length === 1 ? ' opção' : ' opções') + '</span>' + iconeAnimado("chevron") + '</span></summary>'
+        + '<div class="upgrade-real-group-body" id="upgrade-parts-' + categoria.id + '"><p class="upgrade-real-current"><span>Na build</span> '
         + h(nomeAtual(original,categoria.id)) + '</p>'
         + (candidatas.length ? '<div class="upgrade-real-candidates">' + candidatas.map(peca => {
           const selecionada = trocas.get(categoria.id) === peca.id;
-          const acao = selecionada ? "Na prévia" : "Adicionar à prévia", preco = valorMonetario(centavos(peca.preco));
+          const acao = selecionada ? "Selecionada" : "Selecionar", preco = valorMonetario(centavos(peca.preco));
           return '<button type="button" class="upgrade-real-candidate" data-upgrade-pick="' + h(peca.id)
             + '" data-upgrade-category="' + categoria.id + '" aria-pressed="' + selecionada
-            + '" aria-label="' + h(nome(peca) + " " + preco + " " + acao) + '"><strong>' + h(nome(peca))
-            + '</strong> <span>' + h(preco) + '</span> <span>' + acao + '</span></button>';
-        }).join("") + '</div>' : '<p class="planning-help">Nenhuma candidata compatível disponível dentro do budget combinado para esta combinação.</p>')
+            + '" aria-label="' + h(nome(peca) + " · " + preco + " · " + (selecionada ? "Na prévia" : "Adicionar à prévia")) + '"><span class="upgrade-real-candidate-image">' + imagemPeca(peca) + '</span><span class="upgrade-real-candidate-copy"><strong>' + h(nome(peca))
+            + '</strong><span class="upgrade-real-candidate-price">' + h(preco) + '</span></span><span class="upgrade-real-candidate-action">' + acao + '</span></button>';
+        }).join("") + '</div>' : '<p class="planning-help">' + h(comparacoesPendentes.size ? [...comparacoesPendentes][0] : "Nenhuma troca sem regressão verificável e compatível disponível dentro do budget combinado.") + '</p>')
         + (exclusoes ? '<p class="planning-help">' + h(exclusoes) + '</p>' : '')
         + (conflitos.size ? '<details class="upgrade-real-conflicts"><summary>Por que algumas opções não aparecem?</summary><ul>'
-          + [...conflitos].map(motivo => '<li>' + h(motivo) + '</li>').join("") + '</ul></details>' : '') + '</section>';
+          + [...conflitos].map(motivo => '<li>' + h(motivo) + '</li>').join("") + '</ul></details>' : '') + '</div></details>';
     }).join("");
   }
 
@@ -147,41 +235,51 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
       const peca = pecaPorId(categoria.id,trocas.get(categoria.id)), preco = centavos(peca?.preco);
       proxima.componentes[categoria.id] = {id:trocas.get(categoria.id),quantidade:1};
       if (preco == null) precoConhecido = false; else gasto += preco;
-      const precoAntigo = centavos(atual(original,categoria.id)?.preco);
-      return '<article class="upgrade-real-difference"><h4>' + categoria.nome + '</h4><dl><div><dt>Antes</dt><dd>'
+      const itensAntigos = itensCategoria(original,categoria.id);
+      const precosAntigos = itensAntigos.map(item => { const valor = centavos(pecaPorId(categoria.id,item.id)?.preco); return valor == null ? null : valor * item.quantidade; });
+      const precoAntigo = precosAntigos.length && precosAntigos.every(valor => valor != null) ? precosAntigos.reduce((soma,valor) => soma + valor,0) : null;
+      return '<article class="upgrade-real-difference"><div class="upgrade-real-difference-heading"><h4>' + categoria.nome + '</h4><button type="button" class="upgrade-real-remove" data-upgrade-remove="' + categoria.id + '" aria-label="Remover ' + h(categoria.nome) + ' da prévia">' + iconeAnimado("trash") + '</button></div><dl><div><dt>Antes</dt><dd>'
         + h(nomeAtual(original,categoria.id)) + (precoAntigo != null ? ' · ' + h(valorMonetario(precoAntigo)) : '')
-        + '</dd></div><div><dt>Depois</dt><dd>' + h(peca ? nome(peca) : "Modelo não encontrado no catálogo")
+        + '</dd></div><div class="upgrade-real-after"><dt>Nova peça · 1 unidade/kit</dt><dd>' + h(peca ? nome(peca) : "Modelo não encontrado no catálogo")
         + ' · ' + h(preco != null ? valorMonetario(preco) : "Preço indisponível") + '</dd></div></dl>'
-        + '<button type="button" class="upgrade-real-button" data-upgrade-remove="' + categoria.id + '" aria-label="Remover '
-        + categoria.sigla + ' da prévia">Remover ' + categoria.sigla + ' da prévia</button></article>';
+        + '</article>';
     }).join("");
     const antes = avaliarBuild(base,catalogo), depois = avaliarBuild(proxima,catalogo);
     totalExibido = depois.preco;
     const delta = centavos(depois.preco) - centavos(antes.preco);
-    const pendencias = [...depois.erros,...depois.avisos,...depois.dicas,
-      ...(depois.faltam.length ? ["Ainda faltam na build: " + depois.faltam.join(", ") + "."] : [])];
-    previa.innerHTML = (linhas || '<p class="planning-help">Nenhuma alteração escolhida. Adicione candidatas para comparar antes e depois.</p>')
-      + '<dl class="upgrade-real-totals"><div><dt>Custo combinado das novas peças</dt><dd>' + h(precoConhecido ? valorMonetario(gasto) : "Preço parcial: " + valorMonetario(gasto))
-      + '</dd></div><div><dt>Budget restante para novas peças</dt><dd>' + h(limite != null && precoConhecido ? valorMonetario(limite - gasto) : "Indisponível")
-      + '</dd></div><div><dt>Total cadastrado da build antes</dt><dd>' + h(moeda(antes.preco))
+    const avisos = [...depois.avisos,...(depois.faltam.length ? ["Ainda faltam na build: " + depois.faltam.join(", ") + "."] : [])];
+    const verificacoes = (rotulo,textos,tom) => textos.length ? '<details class="upgrade-real-validation" data-tone="' + tom + '"><summary>' + h(rotulo) + ' <span>' + new Set(textos).size + '</span></summary><ul>' + [...new Set(textos)].map(texto => '<li>' + h(texto) + '</li>').join("") + '</ul></details>' : '';
+    previa.innerHTML = '<dl class="upgrade-real-totals"><div><dt>Novas peças</dt><dd>' + h(precoConhecido ? valorMonetario(gasto) : "Parcial: " + valorMonetario(gasto))
+      + '</dd></div><div data-tone="' + (limite != null && gasto > limite ? 'error' : 'info') + '"><dt>Budget restante</dt><dd>' + h(limite != null && precoConhecido ? valorMonetario(limite - gasto) : "Não definido")
+      + '</dd></div></dl>'
+      + (linhas || '<div class="upgrade-real-empty"><strong>Sua prévia aparece aqui</strong><p>Selecione peças para conferir o antes e depois. A build só muda quando você aplicar as trocas.</p></div>')
+      + '<details class="upgrade-real-cost-details"><summary>Comparar o total da build<span class="upgrade-real-chevron" aria-hidden="true"></span></summary><dl><div><dt>Total cadastrado antes</dt><dd>' + h(moeda(antes.preco))
       + '</dd></div><div><dt>Total cadastrado da build na prévia</dt><dd>' + h(moeda(depois.preco))
       + '</dd></div><div><dt>Diferença no total</dt><dd>' + h((delta > 0 ? "+" : delta < 0 ? "−" : "") + valorMonetario(Math.abs(delta)))
-      + '</dd></div></dl><p class="planning-help">Totais consideram as quantidades e o custo de rede já previsto. Peças próprias ou sem preço podem deixar o total parcial. Economia não indica aumento de desempenho.</p>'
-      + (pendencias.length ? '<div class="upgrade-real-validation"><h4>Pendências e verificações</h4><ul>'
-        + [...new Set(pendencias)].map(texto => '<li>' + h(texto) + '</li>').join("") + '</ul></div>'
-        : '<p class="planning-help">Nenhum conflito detectado nas verificações disponíveis do catálogo.</p>');
+      + '</dd></div></dl><p class="planning-help">Quantidades são consideradas nos totais. Peças próprias ou sem cotação deixam o valor parcial. Economia não significa ganho de desempenho.</p></details>'
+      + verificacoes("Conflitos encontrados",depois.erros,"error") + verificacoes("Pontos de atenção",avisos,"warning")
+      + verificacoes("Dicas e conferências",depois.dicas,"info")
+      + (!depois.erros.length && !avisos.length ? '<p class="planning-help">Sem conflitos nas regras disponíveis. Dados ausentes não confirmam compatibilidade.</p>' : '');
     let motivo = build.travada ? MOTIVO_TRAVA : aplicando ? "Aguarde a aplicação das alterações." : !trocas.size ? "Adicione pelo menos uma candidata à prévia." : "";
     if (!motivo) { try { simular(trocas); } catch (erro) { motivo = erro.message; } }
     aplicar.disabled = Boolean(motivo);
     if (motivo) aplicar.dataset.disabledReason = motivo; else delete aplicar.dataset.disabledReason;
-    motivoAplicar.textContent = motivo || "Confira as diferenças e confirme em Aplicar alterações.";
+    motivoAplicar.textContent = motivo || "Confira as diferenças antes de aplicar as trocas.";
+    dialogo.querySelector("#upgrade-real-count").textContent = trocas.size;
+    dialogo.querySelector("#upgrade-real-category-count").textContent = categorias.size + (categorias.size === 1 ? " selecionada" : " selecionadas");
+    dialogo.querySelector("#upgrade-real-selection-label").textContent = trocas.size ? trocas.size + (trocas.size === 1 ? " troca na prévia" : " trocas na prévia") : "Nenhuma troca selecionada";
+    dialogo.querySelector("#upgrade-real-selection-total").textContent = trocas.size ? valorMonetario(gasto) + " em novas peças" : "Escolha uma peça para começar";
+    aplicar.textContent = trocas.size ? "Aplicar " + trocas.size + (trocas.size === 1 ? " troca" : " trocas") : "Aplicar trocas";
+    aplicar.setAttribute("aria-label",trocas.size ? "Aplicar " + trocas.size + (trocas.size === 1 ? " troca confirmada" : " trocas confirmadas") + " na build" : "Aplicar alterações");
   }
 
   function renderizar() {
     const foco = document.activeElement;
-    const restaurar = resultados.contains(foco) || previa.contains(foco);
+    const focoNaPrevia = previa.contains(foco);
+    const restaurar = resultados.contains(foco) || focoNaPrevia;
     const idFoco = foco?.dataset?.upgradePick, categoriaFoco = foco?.dataset?.upgradeCategory;
     const removerFoco = foco?.dataset?.upgradeRemove;
+    const grupoFoco = foco?.closest("[data-upgrade-group]")?.dataset.upgradeGroup;
     renderizarResultados();
     renderizarPrevia();
     dialogo.querySelectorAll("button,input,select").forEach(controle => {
@@ -194,30 +292,33 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
       const controles = [...dialogo.querySelectorAll("button")];
       const proximoFoco = controles.find(controle => idFoco && controle.dataset.upgradePick === idFoco && controle.dataset.upgradeCategory === categoriaFoco)
         || controles.find(controle => removerFoco && controle.dataset.upgradeRemove === removerFoco)
-        || dialogo.querySelector("#upgrade-real-preview-title");
+        || (grupoFoco && resultados.querySelector('[data-upgrade-group="' + grupoFoco + '"] > summary'))
+        || (focoNaPrevia ? dialogo.querySelector(".upgrade-real-preview-scroll") : dialogo.querySelector(".upgrade-real-browser-scroll"));
       proximoFoco.focus({preventScroll:true});
     }
+    iniciarDetalhesAnimados(dialogo); iniciarIcones(dialogo); programarViewport();
   }
 
   campoBudget.addEventListener("input",() => {
     if (aplicando) return;
     renderizar();
-    informar(budget() == null ? MOTIVO_BUDGET : "Budget atualizado para esta prévia. As escolhas serão validadas juntas.");
+    campoBudget.setAttribute("aria-invalid",String(budget() == null));
+    informar(budget() == null ? MOTIVO_BUDGET : "Budget atualizado. O total das trocas será validado junto.",budget() == null ? "error" : "info");
   });
   dialogo.addEventListener("change",evento => {
     if (aplicando) return;
     const caixa = evento.target;
     if (caixa.name === "upgrade-real-category") {
       if (caixa.checked) categorias.add(caixa.value);
-      else { categorias.delete(caixa.value); trocas.delete(caixa.value); }
+      else { categorias.delete(caixa.value); trocas.delete(caixa.value); gruposAbertos.delete(caixa.value); }
       informar("Categorias atualizadas. Desmarcar uma categoria descarta a troca dela.");
-    } else if (caixa === ordem) ordem.value = "preco";
-    else if (caixa !== campoBudget) return;
+    } else if (caixa !== campoBudget) return;
     renderizar();
   });
   dialogo.addEventListener("click",async evento => {
     const botao = evento.target.closest("button");
     if (!botao || botao.disabled || aplicando || aplicada || !dialogo.open) return;
+    if (botao.dataset.upgradeTab) { mostrarAba(botao.dataset.upgradeTab,{focar:true}); return; }
     if (botao.dataset.upgradeAction === "cancelar") { dialogo.close("cancelar"); return; }
     try {
       if (build.travada) throw new Error(MOTIVO_TRAVA);
@@ -229,7 +330,15 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
         simular(propostas);
         trocas = propostas;
         renderizar();
-        informar("Candidata adicionada à prévia. Confirme em Aplicar alterações para alterar a build.");
+        const grupo = resultados.querySelector('[data-upgrade-group="' + categoria + '"]');
+        if (grupo) {
+          gruposAbertos.delete(categoria);
+          definirDetalheAberto(grupo,false);
+          const resumo = grupo.querySelector(":scope > summary");
+          resumo.focus({preventScroll:true});
+          resumo.scrollIntoView({block:"nearest",inline:"nearest",behavior:"instant"});
+        }
+        informar("Peça adicionada à prévia. Revise as trocas antes de aplicar.");
       } else if (botao.dataset.upgradeRemove) {
         trocas.delete(botao.dataset.upgradeRemove);
         renderizar();
@@ -251,14 +360,20 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     } catch (erro) {
       aplicando = false;
       renderizar();
-      informar("Não foi possível aplicar esta combinação: " + (erro?.message || "Tente novamente."));
+      informar("Não foi possível aplicar esta combinação: " + (erro?.message || "Tente novamente."),"error");
     }
   });
   dialogo.addEventListener("cancel",evento => {
     evento.preventDefault();
     if (!aplicando) dialogo.close("cancelar");
   });
-  dialogo.addEventListener("close",() => { trocas.clear(); },{once:true});
+  dialogo.addEventListener("click",evento => { if (aplicando && evento.target === dialogo) evento.stopImmediatePropagation(); },true);
+  dialogo.addEventListener("close",() => {
+    trocas.clear(); gruposAbertos.clear(); observarViewport?.disconnect(); cancelAnimationFrame(frameViewport);
+    compacta.removeEventListener("change",ajustarCompacta); window.removeEventListener("resize",programarViewport);
+    window.visualViewport?.removeEventListener("resize",programarViewport); window.visualViewport?.removeEventListener("scroll",programarViewport);
+  },{once:true});
   renderizar();
+  titulo.focus({preventScroll:true});
   return dialogo;
 }

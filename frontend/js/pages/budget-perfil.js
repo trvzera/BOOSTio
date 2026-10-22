@@ -3,6 +3,7 @@ import { atualizarBudgetUsuario } from "../api/usuario/atualizarBudgetUsuario.js
 import { acompanharCarregamento } from "../components/page-loading.js";
 import { moeda } from "../build/catalogo.js";
 import { iniciarIcones } from "../components/ui.js";
+import { textoBudgetPerfil } from "../conta/resumo-perfil.js";
 
 document.addEventListener("DOMContentLoaded",() => {
   const form = document.querySelector("#budget-profile-form");
@@ -10,6 +11,8 @@ document.addEventListener("DOMContentLoaded",() => {
   const input = form.querySelector("#profile-budget"), usar = form.querySelector("#profile-budget-use");
   const feedback = form.querySelector("#profile-budget-feedback"), botao = form.querySelector("button[type=submit]");
   let usuarioId = null, ocupado = false;
+  const resumoBudget = document.querySelector("#profile-budget-summary");
+  const atualizarResumo = usuario => { if (resumoBudget) resumoBudget.textContent = textoBudgetPerfil(usuario); };
   const aviso = (mensagem,tom) => { feedback.textContent = mensagem; feedback.dataset.tone = tom; };
   function autorizarUso() {
     const positivo = input.value !== "" && input.validity.valid && Number(input.value) > 0;
@@ -31,6 +34,7 @@ document.addEventListener("DOMContentLoaded",() => {
   }
   async function carregar() {
     usuarioId = null; input.value = ""; usar.checked = false;
+    if (resumoBudget) resumoBudget.textContent = "Carregando budget…";
     bloquear(true);
     try {
       const resposta = await carregarPerfil();
@@ -38,11 +42,13 @@ document.addEventListener("DOMContentLoaded",() => {
       usuarioId = resposta.usuario.id;
       input.value = resposta.usuario.budget ?? "";
       usar.checked = resposta.usuario.usar_budget === true;
+      atualizarResumo(resposta.usuario);
       iniciarIcones(form);
       usar.dispatchEvent(new Event("change",{bubbles:true}));
       aviso("Budget sincronizado com sua conta.","info");
     } catch (erro) {
       usuarioId = null; input.value = ""; usar.checked = false;
+      atualizarResumo(null);
       aviso(erro.message || "Não foi possível carregar o budget. Tente novamente.","error");
     } finally { bloquear(false); usar.dispatchEvent(new Event("change",{bubbles:true})); }
   }
@@ -59,11 +65,13 @@ document.addEventListener("DOMContentLoaded",() => {
       if (resposta?.usuario?.id !== usuarioId) throw new Error("Resposta inválida ao salvar o budget. Recarregue a página.");
       if (!atualizarPerfil(resposta.usuario,versao)) {
         usuarioId = null; input.value = ""; usar.checked = false;
+        atualizarResumo(null);
         throw new Error("A sessão mudou durante o salvamento. Consulte o budget novamente.");
       }
+      atualizarResumo(resposta.usuario);
       aviso(budget == null ? "Budget removido da sua conta." : moeda(budget) + " salvos na sua conta. O valor não é descontado automaticamente.","success");
     } catch (erro) {
-      if ([401,403].includes(erro.status)) { limparPerfil(); usuarioId = null; input.value = ""; usar.checked = false; }
+      if ([401,403].includes(erro.status)) { limparPerfil(); usuarioId = null; input.value = ""; usar.checked = false; atualizarResumo(null); }
       aviso(erro.message || "Não foi possível salvar o budget. Tente novamente.","error");
     } finally { bloquear(false); }
   });

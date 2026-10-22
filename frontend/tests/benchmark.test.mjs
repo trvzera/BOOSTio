@@ -85,6 +85,17 @@ test("FPSHQ cancela consultas demoradas",async () => {
   const cliente = criarClienteFPSHQ({timeoutMs:5,fetcher:(_url,{signal}) => new Promise((_resolve,reject) => signal.addEventListener("abort",() => reject(new DOMException("abort","AbortError"))))});
   await assert.rejects(cliente.consultar(consulta),{codigo:"timeout"});
 });
+test("FPSHQ direto cancela ao sair do laboratório e não inicia consulta já cancelada",async () => {
+  let chamadas=0;
+  const cliente=criarClienteFPSHQ({fetcher:(_url,{signal}) => new Promise((_resolve,reject) => {
+    chamadas++; signal.addEventListener("abort",()=>reject(new DOMException("abort","AbortError")));
+  })});
+  const controle=new AbortController();
+  const consultaAtual=cliente.consultar(consulta,{signal:controle.signal}); controle.abort();
+  await assert.rejects(consultaAtual,{codigo:"cancelado"});
+  await assert.rejects(cliente.consultar(consulta,{signal:controle.signal}),{codigo:"cancelado"});
+  assert.equal(chamadas,1);
+});
 test("FPSHQ busca jogos por nome com limite do contrato e filtra IDs inválidos",async () => {
   let chamadas = 0;
   const cliente = criarClienteFPSHQ({fetcher:async url => { chamadas++; assert.equal(new URL(url).searchParams.get("q"),"Forza"); return json({ok:true,results:[{slug:"forza-horizon-5",name:"Forza Horizon 5"},{slug:"../jogo",name:"Inválido"}]}); }});

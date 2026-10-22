@@ -2,6 +2,7 @@ import { htmlSeguro as h, moeda, nomePeca, perifericos, acessoriosRede } from ".
 import { normalizarBuild, itensSelecionados } from "./estado.js";
 import { avaliarBuild } from "./compatibilidade.js";
 import { numeroConhecido } from "./hardware.js";
+import { consultarRenderizacoes, classificarRenderizacoes } from "./comparacao-renderizacao.js";
 
 let sequencia = 0;
 const numero = valor => ["number", "string"].includes(typeof valor) && String(valor).trim()
@@ -120,6 +121,8 @@ export function abrirComparacao(builds, catalogo) {
   if (!document.body) throw new Error("Abra a comparação depois que o documento estiver pronto.");
   const dados = [...unicas.values()].map(build => resumirBuild(build, catalogo));
   const selecionadas = new Set(dados.length === 2 ? [0, 1] : []);
+  const cacheRender = new Map();
+  let consultaRender, tipoRender = "cpu";
   const origem = document.activeElement;
   const dialogo = document.createElement("dialog");
   if (typeof dialogo.showModal !== "function") throw new Error("Este navegador precisa oferecer suporte a dialog nativo.");
@@ -176,6 +179,7 @@ export function abrirComparacao(builds, catalogo) {
 
   function mostrarResultados() {
     if (selecionadas.size < 2 || selecionadas.size > 3) return;
+    consultaRender?.abort();
     const itens = [...selecionadas].map(indice => dados[indice]);
     const precos = itens.filter(item => item.totalConfiavel), consumos = itens.filter(item => item.consumoCompleto);
     const menorPreco = precos.length ? Math.min(...precos.map(item => item.preco)) : null;
@@ -192,9 +196,11 @@ export function abrirComparacao(builds, catalogo) {
         + '</div></section>' : '')
       + '<dl class="compare-summary" aria-label="Destaques da comparação">'
       + resumo("Menor preço", precos, menorPreco, "preco") + resumo("Menor consumo estimado", consumos, menorConsumo, "watts")
-      + '<div class="compare-summary-item"><dt class="compare-summary-label">Melhor desempenho</dt><dd class="compare-summary-value">Indisponível</dd>'
-      + '<dd class="compare-summary-detail">Aguardando benchmarks comparáveis da API.</dd></div></dl>'
-      + '<p class="compare-help">Destaques consideram apenas totais completos conhecidos das builds exibidas. Preços parciais ficam fora da classificação.</p>'
+      + '<div class="compare-summary-item" data-render-summary><dt class="compare-summary-label">Melhor renderização · Blender</dt><dd class="compare-summary-value">Ainda não consultado</dd>'
+      + '<dd class="compare-summary-detail">Compare a CPU ou GPU abaixo.</dd></div></dl>'
+      + '<p class="compare-help">Destaques de preço e consumo consideram apenas totais completos conhecidos. Preços parciais ficam fora dessa classificação.</p>'
+      + '<section class="compare-render-controls" aria-label="Comparar desempenho em renderização"><div><h4 class="compare-section-title">Renderização no Blender</h4><p class="compare-help">Resultados públicos por componente; não é um teste da máquina completa.</p></div><div class="compare-render-actions"><label for="' + prefixo + '-render-type">Componente<select id="' + prefixo + '-render-type" data-render-type><option value="cpu"' + (tipoRender === "cpu" ? ' selected' : '') + '>Processador · CPU</option><option value="gpu"' + (tipoRender === "gpu" ? ' selected' : '') + '>Placa de vídeo · GPU</option></select></label>'
+      + botao("Comparar renderização","compare-button-primary",'data-compare-action="render"') + '</div><p class="compare-help compare-render-feedback" data-render-feedback role="status" aria-live="polite">A consulta só é feita ao clicar. CPU e GPU são avaliadas separadamente.</p></section>'
       + '<p class="compare-scroll-hint">Deslize as colunas ou use as setas do teclado para ver todas as builds.</p>'
       + '<div class="compare-columns" role="group" tabindex="0" aria-label="Builds comparadas lado a lado. Use as setas para rolar horizontalmente.">'
       + itens.map((item, ordem) => {
@@ -213,6 +219,7 @@ export function abrirComparacao(builds, catalogo) {
           + campo(item.totalConfiavel ? "Preço total cadastrado" : "Preço parcial / indisponível", item.precoTexto,
             item.totalConfiavel ? (melhorPreco ? "Menor preço entre os totais completos exibidos." : "+" + moeda(item.preco - menorPreco) + " frente ao menor total completo.")
               + (item.detalheRede ? " " + item.detalheRede + "." : "") : item.pendenciasPreco, melhorPreco)
+          + '<div class="compare-field" data-render-build="' + h(item.build.id) + '"><dt class="compare-field-label">Renderização · Blender</dt><dd class="compare-field-value">Ainda não consultado</dd><dd class="compare-field-detail">Selecione CPU ou GPU e compare a renderização.</dd></div>'
           + campo("Consumo estimado do PC", item.wattsTexto, item.consumoCompleto
             ? (melhorConsumo ? "Menor estimativa completa exibida." : "+" + decimal(item.watts - menorConsumo) + " W frente à menor estimativa completa.")
             : "Estimativa parcial / indisponível: faltam peças, modelos ou dados de consumo.", melhorConsumo)
@@ -232,6 +239,7 @@ export function abrirComparacao(builds, catalogo) {
   }
 
   dialogo.addEventListener("change", evento => {
+    if (evento.target.matches("[data-render-type]")) { tipoRender = evento.target.value; mostrarResultados(); return; }
     const caixa = evento.target.closest(".compare-checkbox");
     if (!caixa) return;
     const indice = Number(caixa.value);
@@ -249,6 +257,7 @@ export function abrirComparacao(builds, catalogo) {
     if (!controle || controle.disabled) return;
     const acao = controle.dataset.compareAction, indice = Number(controle.dataset.compareIndex);
     if (acao === "close") dialogo.close("fechar");
+    else if (acao === "render") compararRenderizacao(controle);
     else if (acao === "confirm") mostrarResultados();
     else if (acao === "picker") {
       const painel = conteudo.querySelector(".compare-picker");
@@ -269,6 +278,7 @@ export function abrirComparacao(builds, catalogo) {
     dialogo.close("cancelar");
   });
   dialogo.addEventListener("close", () => {
+    consultaRender?.abort();
     const ativo = document.activeElement;
     const restaurar = !ativo || ativo === document.body || dialogo.contains(ativo) || ativo === origem;
     dialogo.remove();
@@ -285,4 +295,30 @@ export function abrirComparacao(builds, catalogo) {
     throw erro;
   }
   return dialogo;
+
+  async function compararRenderizacao(controle) {
+    consultaRender?.abort();
+    const atual = consultaRender = new AbortController();
+    const exibidas = [...selecionadas].map(indice => dados[indice].build);
+    controle.disabled = true;
+    controle.dataset.disabledReason = "Aguarde a consulta de renderização.";
+    const retorno = conteudo.querySelector("[data-render-feedback]");
+    retorno.textContent = "Consultando resultados públicos do Blender…";
+    try {
+      const resultados = await consultarRenderizacoes(exibidas,catalogo,{tipo:tipoRender,signal:atual.signal,cache:cacheRender});
+      if (atual.signal.aborted || !dialogo.open) return;
+      const classificacao = classificarRenderizacoes(resultados);
+      conteudo.querySelectorAll("[data-render-build]").forEach(campo => {
+        const resultado = resultados.find(item => item.id === campo.dataset.renderBuild), valor = resultado?.dados;
+        campo.classList.toggle("compare-field-best",classificacao.melhores.includes(resultado?.id));
+        campo.innerHTML = '<dt class="compare-field-label">Renderização · ' + tipoRender.toUpperCase() + '</dt><dd class="compare-field-value">' + (valor ? h(decimal(valor.score)) + ' amostras/min' : 'Indisponível') + '</dd><dd class="compare-field-detail">' + (valor
+          ? h(resultado.dispositivo + " · Blender " + valor.versao + " · " + valor.metodo + " · " + valor.quantidade + " resultado(s)") + '<br><a href="' + h(valor.url) + '" target="_blank" rel="noopener noreferrer" aria-label="Ver fonte do Blender para ' + h(resultado.dispositivo) + '">Ver fonte dos dados</a>'
+          : h(resultado?.erro || "Sem dados disponíveis.")) + '</dd>';
+      });
+      const nomes = exibidas.filter(build => classificacao.melhores.includes(build.id)).map(build => build.titulo);
+      conteudo.querySelector("[data-render-summary]").innerHTML = '<dt class="compare-summary-label">Melhor renderização · ' + tipoRender.toUpperCase() + '</dt><dd class="compare-summary-value">' + h(classificacao.comparavel ? nomes.length > 1 ? "Empate entre " + nomes.length + " builds" : nomes[0] : "Sem classificação") + '</dd><dd class="compare-summary-detail">' + h(classificacao.comparavel ? decimal(classificacao.score) + " amostras/min · mesma versão e método" : classificacao.motivo) + '</dd>';
+      retorno.textContent = "Mais amostras/min é melhor neste teste. CPU e GPU são separadas; RAM, VRAM e a cena podem mudar o desempenho real.";
+    } catch (erro) { if (!atual.signal.aborted) retorno.textContent = erro.message; }
+    finally { if (!atual.signal.aborted) { controle.disabled = false; delete controle.dataset.disabledReason; } }
+  }
 }
