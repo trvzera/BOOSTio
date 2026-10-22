@@ -59,6 +59,7 @@ Não coloque a migração no comando de cada worker.
 ```console
 python -m flask --app app pecas-popular
 python -m flask --app app precos-atualizar --limite 20
+python -m flask --app app pecas-imagens --limite 20
 ```
 
 O primeiro comando cadastra as peças ausentes sem consultar lojas. O segundo
