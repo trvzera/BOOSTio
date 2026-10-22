@@ -79,7 +79,7 @@ def teste_logado():
 @limiter.limit("20 per hour")
 def redirecionar_google():
     session.pop("confirmacao_google_pendente", None)
-    redirect_uri = url_for('auth.callback_google', _external=True)
+    redirect_uri = _url_callback_google()
     return oauth.google.authorize_redirect(redirect_uri)
 
 
@@ -91,7 +91,7 @@ def confirmar_google():
         return jsonify({"erro": "Entre pelo Google novamente para identificar sua conta."}), 400
     session.pop("confirmacao_google", None)
     resposta = oauth.google.authorize_redirect(
-        url_for('auth.callback_google', _external=True),
+        _url_callback_google(),
         prompt="select_account consent", login_hint=current_user.google_sub,
     )
     session["confirmacao_google_pendente"] = {
@@ -100,6 +100,10 @@ def confirmar_google():
         "state": parse_qs(urlsplit(resposta.location).query)["state"][0],
     }
     return jsonify({"url": resposta.location})
+
+
+def _url_callback_google():
+    return current_app.config.get("GOOGLE_REDIRECT_URI") or url_for('auth.callback_google', _external=True)
 
 
 @auth_bp.get("/google/entrar")

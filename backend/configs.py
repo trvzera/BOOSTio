@@ -20,6 +20,9 @@ def resolver_uri_banco(uri):
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY") #Sempre maiuscula, ate os nomes das variaveis se não o flask não reconhece
     TRUSTED_PROXY_HOPS = int(os.getenv("TRUSTED_PROXY_HOPS", "0"))
+    TRUSTED_PROXY_PROTO_HOPS = int(os.getenv("TRUSTED_PROXY_PROTO_HOPS", "0"))
+    API_PUBLIC_URL = os.getenv("API_PUBLIC_URL")
+    CORS_ORIGINS = os.getenv("CORS_ORIGINS")
     SQLALCHEMY_DATABASE_URI = resolver_uri_banco(os.getenv("URL_DATABASE"))
     FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:5500/frontend") #Base usada para montar links enviados por email (ex: recuperar senha)
     
@@ -41,7 +44,8 @@ class Desenvolvimento(Config):
 
 
 class Producao(Config):
-    SESSION_COOKIE_SAMESITE = 'None'
+    FRONTEND_URL = os.getenv("FRONTEND_URL")
+    SESSION_COOKIE_SAMESITE = os.getenv("SESSION_COOKIE_SAMESITE", "Lax")
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     RATELIMIT_STORAGE_URI = os.getenv("RATELIMIT_STORAGE_URI")

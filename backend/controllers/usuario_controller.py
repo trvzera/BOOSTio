@@ -111,7 +111,7 @@ def excluir_usuario(usuario_id):
 def listar_usuario_id(usuario_id):
     try:
         service = ListarUsuarioIdService()
-        usuario = service.buscar_por_id(usuario_id)
+        usuario = service.executar(usuario_id)
 
         return jsonify({
             "mensagem":"Usuario encontrado com sucesso",
