@@ -69,6 +69,12 @@
         <div class="form-actions">
           <button class="btn-primary" id="save-profile-btn" aria-label="Salvar alterações do perfil">Salvar alterações</button>
         </div>
+        <div class="field">
+          <label for="profile-current-password">Senha atual para trocar o e-mail</label>
+          <input type="password" id="profile-current-password" autocomplete="current-password">
+        </div>
+        <p>Se sua conta usa somente Google, confirme abaixo. Depois de voltar, repita a alteração desejada em até cinco minutos.</p>
+        <button type="button" class="btn-ghost" data-confirmar-google>Confirmar identidade com Google</button>
       </div>
 
       <section class="settings-card" aria-labelledby="profile-budget-title">
@@ -149,6 +155,12 @@
             <input type="text" id="delete-confirm-input" autocomplete="off" placeholder="Digite seu nome de usuário">
           </div>
 
+          <div class="field">
+            <label for="delete-current-password">Senha atual</label>
+            <input type="password" id="delete-current-password" autocomplete="current-password">
+          </div>
+          <p>Conta somente Google? Confirme sua identidade e volte para concluir a exclusão.</p>
+          <button type="button" class="btn-ghost" data-confirmar-google>Confirmar identidade com Google</button>
           <div class="modal-actions">
             <button class="btn-ghost" id="cancel-delete-btn" aria-label="Cancelar exclusão">Cancelar</button>
             <button class="btn-danger" id="confirm-delete-btn" aria-label="Excluir permanentemente minha conta" disabled>Excluir permanentemente</button>

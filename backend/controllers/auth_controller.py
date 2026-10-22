@@ -1,4 +1,8 @@
 import os
+import time
+from urllib.parse import parse_qs, urlsplit, urlencode
+from flask import session
+from authlib.integrations.base_client.errors import OAuthError
 from flask import Blueprint,request,jsonify,redirect,url_for,current_app
 from flask_login import LoginManager, UserMixin, login_user,logout_user, login_required, current_user
 from models import db,Usuario
@@ -33,6 +37,8 @@ def entrar_usuario():
         service = EntrarUsuarioService()
         usuario = service.executar(dados)
 
+        session.pop("confirmacao_google", None)
+        session.pop("confirmacao_google_pendente", None)
         login_user(usuario)
 
         return jsonify({
@@ -47,6 +53,8 @@ def entrar_usuario():
 @auth_bp.post("/sair")
 @login_required
 def sair_usuario():
+    session.pop("confirmacao_google", None)
+    session.pop("confirmacao_google_pendente", None)
     logout_user()
     return jsonify({
         "mensagem":"Usuario deslogado com sucesso"
@@ -70,8 +78,28 @@ def teste_logado():
 @auth_bp.get("/google/redirecionar")
 @limiter.limit("20 per hour")
 def redirecionar_google():
+    session.pop("confirmacao_google_pendente", None)
     redirect_uri = url_for('auth.callback_google', _external=True)
     return oauth.google.authorize_redirect(redirect_uri)
+
+
+@auth_bp.post("/google/confirmar")
+@login_required
+@limiter.limit("5 per minute")
+def confirmar_google():
+    if not current_user.google_sub:
+        return jsonify({"erro": "Entre pelo Google novamente para identificar sua conta."}), 400
+    session.pop("confirmacao_google", None)
+    resposta = oauth.google.authorize_redirect(
+        url_for('auth.callback_google', _external=True),
+        prompt="select_account consent", login_hint=current_user.google_sub,
+    )
+    session["confirmacao_google_pendente"] = {
+        "sessao": current_user.get_id(), "sub": current_user.google_sub,
+        "instante": time.time(),
+        "state": parse_qs(urlsplit(resposta.location).query)["state"][0],
+    }
+    return jsonify({"url": resposta.location})
 
 
 @auth_bp.get("/google/entrar")
@@ -80,11 +108,31 @@ def callback_google():
         token = oauth.google.authorize_access_token()
         dados_usuario = token.get('userinfo')
 
+        pendente = session.pop("confirmacao_google_pendente", None)
+        if pendente:
+            if (not current_user.is_authenticated or current_user.get_id() != pendente["sessao"]
+                or request.args.get("state") != pendente["state"]
+                or not 0 <= time.time() - pendente["instante"] <= 300
+                or not dados_usuario or dados_usuario.get("sub") != pendente["sub"]
+                or dados_usuario.get("email_verified") is not True):
+                raise ValueError("Confirme com a mesma conta Google. A solicitação pode ter expirado.")
+            session["confirmacao_google"] = {
+                "sessao": current_user.get_id(), "sub": pendente["sub"], "instante": time.time(),
+            }
+            base_url = current_app.config['FRONTEND_URL'].rstrip('/')
+            return redirect(f'{base_url}/pages/configuracoes.html')
+
         usuario = EntrarGoogleService().executar(dados_usuario)
+        session.pop("confirmacao_google", None)
         login_user(usuario)
 
         base_url = current_app.config['FRONTEND_URL'].rstrip('/')
         return redirect(f'{base_url}/pages/index.html') #Redirect obrigatorio, o google espera um retorno desse tipo
     except ValueError as erro:
         base_url = current_app.config['FRONTEND_URL'].rstrip('/')
-        return redirect(f'{base_url}/pages/login.html?erro={str(erro)}')
+        return redirect(f'{base_url}/pages/login.html?{urlencode({"erro": str(erro)})}')
+    except OAuthError:
+        session.pop("confirmacao_google_pendente", None)
+        session.pop("confirmacao_google", None)
+        base_url = current_app.config['FRONTEND_URL'].rstrip('/')
+        return redirect(f'{base_url}/pages/login.html?{urlencode({"erro": "Não foi possível confirmar com o Google. Tente novamente."})}')

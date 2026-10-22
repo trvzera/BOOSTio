@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from smtplib import SMTPException, SMTPAuthenticationError, SMTPRecipientsRefused
 from email_validator import EmailNotValidError
 from utils.decorators import apenas_proprio_usuario
-from utils.limite_requisicoes import limiter, chave_email
+from utils.limite_requisicoes import limiter, chave_email, chave_usuario
 
 
 from services.usuario_service.criar_usuario_service import CriarUsuarioService
@@ -70,12 +70,13 @@ def criar_usuario():
         return jsonify({"erro": "Erro ao salvar o usuario no banco de dados."}), 500
 
 @usuario_bp.delete("/<int:usuario_id>")
+@limiter.limit("5 per minute", key_func=chave_usuario)
 @login_required
 @apenas_proprio_usuario
 def excluir_usuario(usuario_id):
     try:
         service = DeletarUsuarioService()
-        usuario = service.executar(usuario_id)
+        usuario = service.executar(usuario_id, request.get_json(silent=True))
 
         if usuario is False:
             return jsonify({"erro": "Usuario não encontrado."}), 404
@@ -84,6 +85,8 @@ def excluir_usuario(usuario_id):
         
         return jsonify(""),204
 
+    except ValueError as erro:
+        return jsonify({"erro": str(erro)}), 400
     except SQLAlchemyError as e:
         db.session.rollback()
         print(e)
@@ -119,6 +122,7 @@ def listar_usuario_id(usuario_id):
         return jsonify({"erro":f"{str(erro)}"}),404
 
 @usuario_bp.put("/<int:usuario_id>")
+@limiter.limit("5 per minute", key_func=chave_usuario)
 @login_required
 @apenas_proprio_usuario
 def atualizar_usuario(usuario_id):

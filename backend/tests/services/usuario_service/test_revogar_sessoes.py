@@ -55,7 +55,7 @@ def test_revoga_dois_dispositivos_e_cookie_remember_sem_afetar_outro_usuario(app
     with app.app_context():
         usuario = Usuario.buscar_por_id(1)
         if operacao == "excluir":
-            DeletarUsuarioService().executar(usuario.id)
+            DeletarUsuarioService().executar(usuario.id, {"senha_atual": "Original.123"})
         elif operacao == "alterar":
             usuario.atualizar_dados(senha=generate_password_hash("NovaSenha.123"))
         else:

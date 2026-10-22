@@ -2,6 +2,7 @@ from models import Usuario
 from utils.validacoes import validar_senha_forte
 from werkzeug.security import generate_password_hash,check_password_hash
 from email_validator import validate_email, ValidatedEmail
+from .confirmar_identidade_service import ConfirmarIdentidadeService
 
 class AtualizarUsuarioService:
   def executar(self, usuario_id: int, dados: dict) -> dict | None:
@@ -23,6 +24,8 @@ class AtualizarUsuarioService:
 
       if usuario_existente and usuario_existente.id != usuario.id:
         raise ValueError("Já existe um usuario com esse email")
+      if email_tratado != usuario.email:
+        ConfirmarIdentidadeService().executar(usuario, dados)
 
       
     senha = dados.get("senha")
