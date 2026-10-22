@@ -59,7 +59,8 @@ def test_sessao_e_propriedade_sao_obrigatorias(app_budget):
     resposta = cliente.put("/usuarios/1/budget", json={"budget": 5000, "usar_budget": True})
     assert resposta.status_code == 403
     assert cliente.get("/auth/me").json["usuario"]["budget"] is None
-    assert all("budget" not in usuario and "usar_budget" not in usuario for usuario in cliente.get("/usuarios/").json["usuarios"])
+    # A listagem global foi removida da API pelas novas regras de segurança.
+    assert cliente.get("/usuarios/").status_code == 405
 
 
 def test_persiste_centavos_entre_sessoes_sem_alterar_outra_conta(app_budget):

@@ -74,7 +74,7 @@ const perguntas = [
     tag: "Etapa 03",
     titulo: "O que você já possui?",
     descricao:
-      "Marque as peças do computador que pretende reaproveitar e informe o modelo de cada item. Se estiver começando do zero, marque a primeira opção.",
+      "Marque as peças do computador que pretende reaproveitar e informe o modelo de cada item. Se estiver começando do zero, marque a primeira opção. A montagem considera as fans do gabinete e do water cooler, completando as posições com dados confirmados dentro do orçamento.",
     multipla: true,
     opcoes: [
       ["nenhuma", "Ainda não tenho peças"],
@@ -293,7 +293,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       ${pergunta.chave === "orcamento" ? `<div class="budget-fields">${campos}${rangeHtml()}</div>` : campos}
       ${pergunta.chave === "perifericos" ? '<div id="perifericos-fields"></div>' : ""}
       <div id="form-navigation">
-        <button type="button" class="btn-ghost" id="previous-question" aria-label="Etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}>${iconeAnimado("arrow","back")}<span>Voltar</span></button>
+        <button type="button" class="btn-ghost" id="previous-question" aria-label="Voltar à etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}>${iconeAnimado("arrow","back")}<span>Voltar</span></button>
         <button type="button" class="btn-primary-form" id="next-question" aria-label="${rotuloAvancar}" ${podeAvancar() ? "" : "disabled"}><span>${rotuloAvancar}</span>${iconeAnimado("arrow")}</button>
       </div>`;
     if (pergunta.chave === "rede") vincularRede(conteudo.querySelector("#form-network"),respostas.rede,{prefixo:"form-rede",aoRenderizar:iniciarControlesNumericos,aoAlterar:rede => {

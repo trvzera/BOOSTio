@@ -55,7 +55,7 @@ As limitações de cada funcionalidade estão indicadas na última coluna.
 | 01 | Criar conta e fazer login | ✅ **Implementado** | Cadastro, autenticação, logout e sessão. |
 | 02 | Cadastrar o setup atual | ✅ **Implementado** | Definir ou remover uma build como computador atual. |
 | 03 | Pesquisar peças e compatibilidade | ✅ **Implementado** | Catálogo por categoria e diagnóstico durante a montagem, com as limitações do requisito 13. |
-| 04 | Montar por formulário | ✅ **Implementado** | Geração por LLM com validação e uma revisão automática de saídas inválidas antes de salvar. |
+| 04 | Montar por formulário | ✅ **Implementado** | Geração por LLM com orçamento, ventilação cadastrada e uma revisão automática de saídas inválidas antes de salvar. |
 | 05 | Salvar configurações | ✅ **Implementado** | Builds persistidas na conta, inclusive incompletas, com salvamento automático. |
 | 06 | Excluir configurações salvas | ✅ **Implementado** | Exclusão com verificação de proprietário e tranca. |
 | 07 | Comparar configurações salvas | 🟡 **Parcial** | Preços, componentes, consumo e renderização no Blender de duas ou três builds; comparação de FPS ainda pendente. |
@@ -64,7 +64,7 @@ As limitações de cada funcionalidade estão indicadas na última coluna.
 | 10 | Ver configurações prontas | ✅ **Implementado** | 16 modelos sem periféricos, ordenados do menor para o maior preço cadastrado. |
 | 11 | Editar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento. |
 | 12 | Consultar preços das peças pelo site | 🟡 **Parcial** | Preços cadastrados, data de atualização quando disponível e links das lojas; monitoramento contínuo em evolução. |
-| 13 | Ver compatibilidade e consumo de energia | 🟡 **Parcial** | Diagnóstico Python de conflitos e dados não verificados; validação técnica e física completa a concluir. |
+| 13 | Ver compatibilidade e consumo de energia | 🟡 **Parcial** | Medidas disponíveis, formatos, baias, fans e radiador; substituição explícita das fans do water cooler e painel de informações. Completar fichas técnicas e interferências físicas. |
 | 14 | Incluir periféricos no orçamento | ✅ **Implementado** | Inclusão e reaproveitamento com tetos separados para PC e periféricos. |
 | 15 | Registrar budget no perfil | ✅ **Implementado** | Valor e autorização usados no formulário e em novas montagens manuais, sem alterar builds existentes. |
 | 16 | Baixar builds em JSON e CSV | ✅ **Implementado** | Exportação para guardar a configuração localmente. |
@@ -117,6 +117,11 @@ Preço cadastrado não significa cotação em tempo real. Estoque, frete e condi
 de compra devem ser conferidos na loja. A ficha da peça distingue dados da conta
 de exemplos demonstrativos e informa a última atualização do preço quando cadastrada.
 
+As fotos da API têm prioridade. Quando faltam, há **750 vínculos locais de referência**
+por part number, categoria, fabricante e modelo exatos, sem depender do ID numérico
+do banco. Peças sem correspondência ou com foto quebrada mantêm uma alternativa neutra;
+isso não significa cobertura de imagens para todo o catálogo.
+
 > A BOOSTio **não vende, entrega ou processa pagamentos** dos produtos. Os links
 > direcionam a lojas de terceiros, responsáveis pela venda e pelo atendimento.
 
@@ -129,14 +134,22 @@ Ao selecionar **Testar build**, o usuário escolhe o tipo de consulta:
 Escolha de jogo, resolução e qualidade gráfica, com **FPS médio** e **1% low**
 quando disponíveis. Falhas e ausência de dados não geram FPS inventados.
 
-A FPSHQ apresentou timeouts nas consultas de FPS e jogos em **21/10/2026**.
+A FPSHQ apresentou timeouts nas consultas de FPS e jogos em **21 e 22/10/2026**.
 Isso não comprova indisponibilidade global; a consulta depende da resposta do provedor.
+
+Nas builds salvas, **Verificar requisitos** usa o catálogo Python para comparar RAM,
+VRAM dedicada e capacidade/tipo de armazenamento quando há um mínimo oficial
+estruturado. Funciona independentemente da FPSHQ e interrompe a consulta na interface
+quando identifica capacidade abaixo do mínimo. Dados próprios não identificados
+permanecem desconhecidos. Não soma VRAM de placas ou discos separados, nem afirma
+quanto espaço livre existe. Equivalência de CPU/GPU, sistema e demais recursos
+continuam pendentes: capacidades suficientes não aprovam o computador completo.
 
 ### Blender · Renderização
 
 Dados públicos de CPU ou GPU, com **mediana em amostras por minuto**, versão do
 Blender, método de renderização e quantidade de resultados. O retorno foi validado
-pelo serviço Python em **21/10/2026**, sem garantia de disponibilidade permanente.
+pelo serviço Python em **22/10/2026**, sem garantia de disponibilidade permanente.
 
 A comparação de builds consulta esses dados ao clicar em **Comparar renderização**.
 CPU e GPU são analisadas separadamente; só há classificação quando todas as builds
@@ -159,12 +172,13 @@ com uma consulta direta pelo JavaScript, sem cache local neste último caminho.
 O diagnóstico informa tempo, HTTP recebido e falhas de transporte/validação;
 não troca automaticamente de caminho nem altera a montagem real.
 
-O laboratório também possui uma **prévia de requisitos dos cinco jogos padrão**,
-com fontes oficiais revisadas em 21/10/2026 e consulta autenticada pelo Python.
-Compara somente a capacidade de RAM informada, sem aprovar o PC completo,
-inventar requisitos recomendados ausentes ou ajustar FPS por uma fórmula.
-Equivalência de CPU/GPU, VRAM, sistema, espaço livre e demais exigências ainda
-precisam ser validados e vinculados aos componentes reais da build.
+Os **requisitos dos cinco jogos padrão** usam fontes oficiais revisadas em 21/10/2026
+e consulta autenticada pelo Python. O modal usa a RAM da build salva e do catálogo;
+o laboratório mantém uma prévia com capacidade informada manualmente.
+O laboratório compara RAM informada; a build salva também verifica as capacidades
+adicionais descritas acima. Não inventamos requisitos recomendados ausentes nem
+ajustamos FPS por uma fórmula. Equivalência de CPU/GPU, sistema, espaço livre e
+demais exigências continuam sem validação completa.
 
 ## Estado do projeto
 
@@ -175,15 +189,19 @@ fazem parte da experiência atual.
 Ainda estão em evolução a validação completa de compatibilidade física no
 servidor e a consolidação dos dados usados pelas sugestões e consultas:
 
-- **Compatibilidade:** completar dimensões, posições, conectores e demais regras físicas.
+- **Compatibilidade:** regras de encaixe e capacidade de fans implementadas no Python e no frontend; ampliar medidas confiáveis por modelo, conectores e interferências. Dados ausentes permanecem não verificados.
 - **Peças próprias:** identificar modelos para avaliar suas especificações reais.
-- **Jogos:** vincular requisitos mínimos e recomendados ao hardware da build.
+- **Jogos:** ampliar equivalências e recursos de CPU/GPU e requisitos além das capacidades já verificadas.
 - **Preços:** consolidar o monitoramento agendado e a atualização do catálogo.
 - **Desempenho:** concluir a comparação de FPS e tratar a instabilidade das fontes externas.
 
 A geração pela LLM já revalida conflitos conhecidos no catálogo, incluindo socket,
 DDR, slots, potência e medidas explícitas. Especificações ausentes continuam não
 verificadas; a configuração não recebe garantia de compatibilidade completa.
+
+As fichas físicas revisadas incluem Q300L, NR200, AK400, MAG A650BN e a variante
+MSI RTX 5060 Shadow 2X OC de 8 GB. O complemento é aplicado somente às identidades
+exatas documentadas, sem alterar o banco. Outras variantes não herdam essas medidas.
 
 Saídas inválidas da IA recebem **uma tentativa automática de correção**, com o erro
 da validação e as regras originais. A nova resposta é validada por completo antes

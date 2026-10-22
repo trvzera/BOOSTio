@@ -226,6 +226,23 @@
   margin-top: 6px;
 }
 
+.profile-identity-confirmation {
+  display: grid;
+  justify-items: start;
+  gap: var(--espacamento-12);
+  color: var(--cor-4);
+}
+
+.profile-identity-confirmation p {
+  margin: 0;
+}
+
+.profile-identity-confirmation .btn-ghost {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
+
 .form-actions {
   display: flex;
   justify-content: flex-end;

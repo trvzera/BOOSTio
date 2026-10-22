@@ -11,9 +11,16 @@ from services.peca_service.salvar_peca_service import SalvarPecaService
 from services.peca_service.restaurar_links_kabum_service import RestaurarLinksKabumService
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from services.peca_service.atualizar_imagem_peca_service import AtualizarImagemPecaService
+from services.peca_service.auditar_catalogo_service import AuditarCatalogoService
 
 
 def registrar_comandos_precos(app):
+    @app.cli.command("catalogo-auditar")
+    @click.option("--amostras", default=5, type=click.IntRange(0, 20), show_default=True)
+    def auditar(amostras):
+        """Valida catálogo e arquivos locais, sem alterar dados ou consultar lojas."""
+        click.echo(json.dumps(AuditarCatalogoService().executar(amostras), ensure_ascii=False))
+
     @app.cli.command("pecas-restaurar-links")
     def restaurar_links():
         """Repõe links conhecidos da seed sem sobrescrever os links atuais."""

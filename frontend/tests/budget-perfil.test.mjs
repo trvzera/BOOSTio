@@ -80,9 +80,14 @@ test("resposta de salvamento atrasada não restaura a conta anterior",async t =>
 test("salvar budget envia apenas valor e autorização à rota do dono, com cookies",async t => {
   preparar(t);
   globalThis.fetch = async (url,opcoes) => {
+    if (url.endsWith("/auth/csrf")) {
+      assert.equal(opcoes.credentials,"include");
+      return json({csrf_token:"csrf-somente-testes"});
+    }
     assert.ok(url.endsWith("/usuarios/42/budget"));
     assert.equal(opcoes.method,"PUT");
     assert.equal(opcoes.credentials,"include");
+    assert.equal(opcoes.headers["X-CSRF-Token"],"csrf-somente-testes");
     assert.deepEqual(JSON.parse(opcoes.body),{budget:1234.56,usar_budget:true});
     return json({usuario:usuario(42,1234.56)});
   };
@@ -94,12 +99,13 @@ test("salvar budget envia apenas valor e autorização à rota do dono, com cook
 test("remover budget envia nulo; falhas HTTP/JSON não viram sucesso nem alteram perfil",async t => {
   preparar(t);
   atualizarPerfil(usuario(1));
-  globalThis.fetch = async (_url,opcoes) => {
+  globalThis.fetch = async (url,opcoes) => {
+    if (url.endsWith("/auth/csrf")) return json({csrf_token:"csrf-somente-testes"});
     assert.deepEqual(JSON.parse(opcoes.body),{budget:null,usar_budget:false});
     return json({erro:"Sem autorização"},403);
   };
   await assert.rejects(atualizarBudgetUsuario(1,null,false),{status:403});
-  globalThis.fetch = async () => new Response("<html>erro</html>",{status:500});
+  globalThis.fetch = async url => url.endsWith("/auth/csrf") ? json({csrf_token:"csrf-somente-testes"}) : new Response("<html>erro</html>",{status:500});
   await assert.rejects(atualizarBudgetUsuario(1,3000,true),{status:500});
   assert.equal(planejamentoLocal().budget,5000);
 });

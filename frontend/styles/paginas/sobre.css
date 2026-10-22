@@ -4,7 +4,7 @@
 .company-back:hover:not(:disabled) { color: var(--cor-p1); border-color: var(--cor-p1); }
 .company-hero { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); align-items: center; gap: var(--espacamento-60); padding-bottom: var(--espacamento-60); }
 .company-hero > *, .company-story > * { min-width: 0; }
-.company-eyebrow { display: block; margin-bottom: var(--espacamento-16); color: var(--cor-p1); }
+.company-eyebrow { display: block; margin-bottom: var(--espacamento-16); color: var(--text-accent); }
 .company-hero h1 { margin-bottom: var(--espacamento-24); text-wrap: balance; }
 .company-hero h1 span { background: var(--brand-gradient); background-clip: text; -webkit-background-clip: text; color: transparent; }
 .company-hero-copy > p { max-width: 48ch; color: var(--cor-4); line-height: 1.7; }

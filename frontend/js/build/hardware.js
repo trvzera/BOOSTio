@@ -1,3 +1,5 @@
+import { informacoesFans, orientacoesVentilacao, encaixeRadiador } from "./fans.js";
+export { informacoesFans } from "./fans.js";
 // Campos ausentes são desconhecidos, nunca zero ou uma medida inferida pelo nome.
 export function numeroConhecido(valor) {
   if (valor == null || valor === "" || typeof valor === "boolean") return null;
@@ -26,59 +28,81 @@ export function limitesArmazenamento(placa, m2Sata = 0) {
 function medidas(valor) {
   if (valor == null) return null;
   return (Array.isArray(valor) ? valor : String(valor).split(/[,;/]/))
-    .map(v => numeroConhecido(String(v).trim().replace(/\s*mm$/i,""))).filter(v => v != null);
+    .map(v => numeroConhecido(String(v).trim().replace(/\s*mm$/i,"")))
+    .reduce((valores,v) => valores == null || v == null || v <= 0 ? null : [...valores,v],[]);
 }
-export function validarEncaixe({gpu,air,water,fans,gabinete}) {
-  const erros = [], avisos = [];
-  if (!gabinete) return {erros,avisos};
+export function validarEncaixe({gpu,air,water,fans = [],gabinete,fonte,discos = [],substituir = false}) {
+  const orientacoes = orientacoesVentilacao({gabinete,fans,water,substituir});
+  const erros = [], avisos = [...orientacoes.dicas], alertas = [...orientacoes.avisos];
+  if (!gabinete) return {erros,avisos,alertas};
+  if (gabinete.observacoes_medidas) avisos.push(gabinete.observacoes_medidas);
   const checarMedida = (peca,medida,limite,nome) => {
     if (!peca) return;
     const tamanho = numeroConhecido(medida), maximo = numeroConhecido(limite);
-    if (tamanho == null || maximo == null) avisos.push("Faltam medidas para confirmar o encaixe " + nome + " no gabinete.");
+    if (!tamanho || !maximo) avisos.push("Faltam medidas para confirmar o encaixe " + nome + " no gabinete.");
     else if (tamanho > maximo) erros.push("O tamanho " + nome + " (" + tamanho + " mm) ultrapassa o limite do gabinete (" + maximo + " mm).");
   };
   checarMedida(gpu,gpu?.comprimento_mm,gabinete.tamanho_max_gpu_mm,"da placa de vídeo");
-  // O catálogo antigo usa dimensoes como altura numérica; L×A×P não é interpretado.
-  checarMedida(air,air?.altura_mm ?? numeroConhecido(air?.dimensoes),gabinete.tamanho_max_cooler_mm,"do air cooler");
+  checarMedida(gpu,gpu?.altura_mm,gabinete.tamanho_max_altura_gpu_mm,"da altura da placa de vídeo");
+  checarMedida(gpu,gpu?.espessura_mm,gabinete.tamanho_max_espessura_gpu_mm,"da espessura da placa de vídeo");
+  checarMedida(air,air?.altura_mm,gabinete.tamanho_max_cooler_mm,"do air cooler");
+  checarMedida(fonte,fonte?.comprimento_mm,gabinete.tamanho_max_fonte_mm,"da fonte");
+  if (gpu) {
+    const slots = numeroConhecido(gpu.slots_ocupados), limite = numeroConhecido(gabinete.slots_expansao);
+    if (slots && limite && slots > limite) erros.push("A placa de vídeo ocupa mais slots do que o gabinete oferece.");
+    avisos.push("Confirme as folgas da GPU com cabos, radiador e fans frontais; comprimento isolado não confirma o conjunto.");
+  }
+  if (fonte) {
+    const normalizar = v => String(v).toUpperCase().replace(/[ -]/g,"");
+    if (fonte.formato && Array.isArray(gabinete.formatos_fonte)) {
+      if (!gabinete.formatos_fonte.map(normalizar).includes(normalizar(fonte.formato))) erros.push("O formato da fonte não é aceito pelo gabinete.");
+    } else avisos.push("Faltam os formatos de fonte aceitos pelo gabinete.");
+  }
+  for (const [formato,campo] of [["2.5","baias_25"],["3.5","baias_35"]]) {
+    const unidades = discos.filter(({peca}) => String(peca?.formato || "").replaceAll('"',"") === formato).reduce((s,{item}) => s + item.quantidade,0);
+    const limite = numeroConhecido(gabinete[campo]);
+    if (unidades && limite != null && unidades > limite) erros.push('As unidades de ' + formato + ' polegadas excedem as baias do gabinete.');
+    else if (unidades && limite == null) avisos.push('Falta a quantidade de baias de ' + formato + ' polegadas do gabinete.');
+  }
   const radiadores = medidas(gabinete.radiadores_suportados_mm);
   const tamanhoRadiador = numeroConhecido(water?.tamanho_radiador_mm);
   if (water) {
+    if (encaixeRadiador(gabinete,water) === false) erros.push("As dimensões reais do radiador ou a espessura radiador + fans excedem os limites por posição do gabinete.");
     if (gabinete.suporte_water_cooler === false) erros.push("O gabinete não suporta water cooler.");
     else if (tamanhoRadiador != null && radiadores != null && !radiadores.includes(tamanhoRadiador))
       erros.push("O gabinete não suporta radiador de " + tamanhoRadiador + " mm.");
     else if (tamanhoRadiador == null || radiadores == null)
       avisos.push("Confirme os tamanhos de radiador suportados pelo gabinete; suporte a water cooler não garante encaixe de 360 mm.");
+    avisos.push("Confirme a espessura do conjunto radiador + fans e as folgas com RAM e GPU.");
   }
-  const tamanhos = medidas(gabinete.tamanhos_fan_suportados_mm);
-  let quantidade = 0;
-  for (const {peca,item} of fans) {
-    const tamanho = numeroConhecido(peca?.tamanho_mm);
-    quantidade += Number(peca?.quantidade || 1) * item.quantidade;
-    if (!peca) continue;
-    if (tamanho != null && tamanhos != null && !tamanhos.includes(tamanho))
-      erros.push("O gabinete não suporta fans de " + tamanho + " mm.");
-    else if (tamanho == null || tamanhos == null) avisos.push("Falta o tamanho dos encaixes de fans do gabinete para confirmar a instalação.");
-  }
-  const maxFans = numeroConhecido(gabinete.quantidade_max_fans);
-  const inclusas = numeroConhecido(gabinete.fans_inclusos);
-  const fansRadiador = water ? numeroConhecido(water.quantidade_fans) : 0;
+  const info = informacoesFans(gabinete,fans,water,substituir);
   if (fans.length || water) {
-    if (maxFans == null || inclusas == null || fansRadiador == null)
+    if (info.tamanhos === false) erros.push("O gabinete não suporta o tamanho das fans selecionadas.");
+    if (info.tamanhos == null) avisos.push("Falta o tamanho dos encaixes de fans do gabinete para confirmar a instalação.");
+    if (info.quantidade == null)
       avisos.push("Falta a capacidade de fans do gabinete para conferir a quantidade total, incluindo as fans inclusas e as do radiador.");
-    else if (quantidade + inclusas + fansRadiador > maxFans)
-      erros.push("Há mais fans do que posições no gabinete, contando as inclusas e as do radiador. Remova um kit ou use menos fans.");
-    if (fans.length && water) avisos.push("Confirme a distribuição das fans e do radiador: encaixes de tamanhos diferentes podem compartilhar a mesma posição.");
+    else if (!info.quantidade)
+      erros.push("Há mais fans do que posições no gabinete, contando as inclusas e as do radiador. Remova um kit ou configure a substituição das fans do water cooler, se for essa a intenção.");
+    if (info.substituicao === false) erros.push("Para substituir as fans do water cooler, selecione fans suficientes do mesmo tamanho das originais.");
+    else if (info.substituicao == null) avisos.push("Faltam especificações para verificar as fans escolhidas para substituir as do water cooler.");
+    if (info.distribuicao === false) erros.push("As fans e o radiador não cabem nas posições compartilhadas do gabinete, mantendo as fans inclusas.");
+    else if (info.distribuicao == null) avisos.push("Confirme a distribuição das fans e do radiador: faltam medidas por posição ou tamanho das fans do radiador.");
   }
-  return {erros,avisos};
+  return {erros,avisos,alertas};
 }
 
-// Complemento SOMENTE do catálogo demonstrativo. Não altera modelos ou seed Python.
+// Slots/SATA: complemento somente demonstrativo. Medidas: manifesto compartilhado
+// com Peca.to_catalogo(), sem alterar registros ou o esquema do banco.
 // Documentação das revisões de referência: docs/frontend-build.md.
-export function completarCatalogoDemo(catalogo) {
+export function completarCatalogoDemo(catalogo,manifesto = {pecas:[]}) {
   const placas = {
     "ASUS|Prime A520M-K": {quantidade_slots_m2:1,quantidade_portas_sata:4,quantidade_slots_m2_sata:1},
     "Gigabyte|B550M DS3H": {quantidade_slots_m2:2,quantidade_portas_sata:4,quantidade_slots_m2_sata:2},
     "MSI|PRO B760M-P": {quantidade_slots_m2:2,quantidade_portas_sata:4,quantidade_slots_m2_sata:1,portas_sata_desativadas_por_m2_sata:1},
   };
-  return catalogo.map(p => p.categoria === "placa_mae" ? {...p,...placas[p.fabricante + "|" + p.modelo]} : p);
+  return catalogo.map(p => {
+    const ficha = manifesto.pecas.find(f => ["categoria","fabricante","modelo"].every(k => String(p[k] || "").toLowerCase() === f[k].toLowerCase()) && f.part_numbers.includes(p.part_number));
+    const completa = ficha ? {...p,...ficha.medidas,fonte_medidas:ficha.fonte} : p;
+    return p.categoria === "placa_mae" ? {...completa,...placas[p.fabricante + "|" + p.modelo]} : completa;
+  });
 }

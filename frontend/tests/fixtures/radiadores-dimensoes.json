@@ -1,0 +1,17 @@
+{
+  "gabinete": {"limites_radiador_mm": [
+    {"posicao": "Topo", "tamanhos_mm": [240], "comprimento_mm": 280, "largura_mm": 125, "espessura_conjunto_mm": 55},
+    {"posicao": "Frente", "tamanhos_mm": [240, 360], "comprimento_mm": 400, "largura_mm": 125, "espessura_conjunto_mm": 50}
+  ]},
+  "water": {"tamanho_radiador_mm": 240, "comprimento_radiador_mm": 277, "largura_radiador_mm": 120, "espessura_radiador_mm": 27, "espessura_fan_mm": 25},
+  "casos": [
+    {"nome": "240 nominal com corpo 277 cabe no topo", "esperado": true},
+    {"nome": "360 pode caber na frente independentemente da quantidade total de fans", "water": {"tamanho_radiador_mm": 360, "comprimento_radiador_mm": 394, "espessura_radiador_mm": 25}, "esperado": true},
+    {"nome": "corpo de radiador excede todos os limites apesar do nominal suportado", "water": {"comprimento_radiador_mm": 401}, "esperado": false},
+    {"nome": "espessura inclui fans uma vez", "water": {"espessura_radiador_mm": 31}, "esperado": false},
+    {"nome": "limite exato de espessura", "water": {"espessura_radiador_mm": 30}, "esperado": true},
+    {"nome": "não inventa 30 a 50 mm de margem", "water": {"comprimento_radiador_mm": null}, "esperado": null},
+    {"nome": "limite frontal ausente não significa zero", "gabinete": {"limites_radiador_mm": null}, "esperado": null},
+    {"nome": "fan sem espessura não confirma conjunto", "water": {"espessura_fan_mm": null}, "esperado": null}
+  ]
+}

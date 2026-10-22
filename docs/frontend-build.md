@@ -6,6 +6,187 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Homologação de catálogo e capacidades — 22/10/2026
+
+- `catalogo-auditar` é um comando de leitura, registrado junto dos comandos de
+  peças existentes. Não prepara esquema, não consulta lojas e não atualiza dados.
+  O resumo distingue estoque desconhecido, preço inválido/sem data, link de produto,
+  imagem local existente, URL remota não consultada e ficha física revisada.
+- `imagens-referencia.json` recupera 750 vínculos do histórico do projeto,
+  conferidos contra o catálogo e arquivos existentes. Backend e frontend exigem
+  part number, categoria, fabricante e modelo. O manifesto gerado por coleta tem
+  prioridade no navegador; `imagem_url` tem prioridade no backend. Não sobrescrever
+  a coleta nem deduzir imagem por IDs após recriar o banco.
+- Novas fichas exatas em `medidas-fisicas.json`: [NR200](https://www.coolermaster.com/en-global/products/masterbox-nr200.html),
+  [MAG A650BN](https://www.msi.com/Power-Supply/MAG-A650BN/Specification) e
+  [RTX 5060 8G Shadow 2X OC](https://www.msi.com/Graphics-Card/GeForce-RTX-5060-8G-SHADOW-2X-OC/Specification).
+  NR200 usa ITX/Mini DTX e SFX/SFX-L, não mATX/ATX; inclui fan traseira de 92 mm
+  e uma superior de 120 mm. Limites se referem a GPU horizontal. Radiador na base
+  consta como custom loop no fabricante, não como suporte AIO nesta curadoria.
+  Observações ficam no diagnóstico e prompt. Revisões diferentes não herdam ficha.
+- O prompt recebe pares de IDs por socket e a categoria de rede obrigatória ou
+  proibida, calculados pelo servidor. A lista não certifica BIOS/DDR/encaixe.
+  Três consultas reais autorizadas, isoladas e sem persistência: uma válida e duas
+  rejeitadas. O catálogo do ensaio era ampliado; revisão automática de produção
+  e prompt novo ainda não foram homologados novamente com cota real.
+- Requisitos da build: além de RAM, `vram` e `armazenamento` usam somente modelos
+  persistidos da própria conta. Campos mínimos estruturados vêm das fontes oficiais
+  versionadas, não de extração do texto em tempo de requisição. Capacidade de VRAM
+  não mede a GPU; armazenamento usa a maior unidade elegível, sem somar volumes
+  ou supor espaço livre. Cyberpunk exige SSD. Falhas confirmadas compõem
+  `impedimentosMinimos` e evitam consulta FPS na interface. Dados ausentes permanecem
+  null; `escopo: parcial`, `fpsValidado: false` e `requisitosVerificados: false`
+  são preservados. O laboratório manual continua limitado à capacidade de RAM.
+- Não foram configurados scheduler/VPS, deploy, nova API paga ou migrações.
+
+### Ventilação, water cooler e informações da build — 22/10/2026
+
+- `substituirFansWaterCooler` é uma opção booleana explícita no estado JSON da
+  build, validada no Python e mantida na conta, cópia, importação/exportação JSON/CSV
+  e compartilhamento legado. Não cria coluna nem exige migração. Remover o water
+  cooler no editor limpa a opção; selecionar um novo cooler não herda a troca.
+- Sem essa opção: total = fans avulsas/por kit + inclusas do gabinete + fans do
+  radiador. Com a opção: desconta as originais substituídas, sem remover o custo
+  das fans compradas. A distribuição reserva fans selecionadas do tamanho do AIO
+  e ocupa as posições do radiador uma vez. Tamanho incorreto ou quantidade
+  insuficiente são erros; falta de especificação continua não verificada.
+  Substituir só parte das fans e remover fans de fábrica do gabinete não são
+  opções implementadas. Não pressupor push/pull ou posições extras disponíveis.
+- O editor permite duplicar e misturar modelos de fans, sem exigir marca ou
+  frequência iguais como na RAM. Orientações cobrem tamanho/furação, espessura,
+  pressão estática, conectores/tensão/corrente/hub e parafusos do radiador.
+  As instruções e comprimentos de parafusos devem seguir o fabricante, não uma
+  medida genérica ([manual EK](https://www.ekwb.com/shop/EK-IM/EK-IM-3831109860205.pdf)).
+- `encaixe_radiador()` / `encaixeRadiador()` comparam `comprimento_radiador_mm`,
+  `largura_radiador_mm` e `espessura_radiador_mm + espessura_fan_mm` com
+  `limites_radiador_mm` do gabinete: lista de posições, `tamanhos_mm`,
+  `comprimento_mm`, `largura_mm`, `espessura_conjunto_mm`. Basta uma posição com
+  medidas compatíveis para esse critério; isso não aprova a distribuição conjunta
+  com GPU/RAM/tubos. Dados ausentes nunca viram zero. Não há regra "sete fans =
+  gabinete mini" nem margem arbitrária de 3–5 cm. Tamanho nominal não é comprimento
+  externo ([exemplo oficial Corsair](https://www.corsair.com/eu/en/p/cpu-coolers/cw-9060016-ww/hydro-series-h105-240mm-extreme-performance-liquid-cpu-cooler-cw-9060016-ww)).
+- O prompt instrui preencher posições confirmadas dentro do teto do PC, descontar
+  fans do gabinete/AIO, escolher unidades/kits com número exato e não planejar troca
+  de fans originais automaticamente. O backend rejeita posições cadastradas vazias
+  ou excesso e permite a revisão limitada já existente. Orçamento não é ampliado.
+  Capacidade ausente continua parcial; não inventar fans para completar uma suposta
+  capacidade. Se a combinação não existir ou não couber no orçamento, a geração
+  pode exigir revisão/novo orçamento em vez de persistir uma saída inválida.
+- Fans Reverse estão identificadas nos nomes da seed/demo: ROUND5 Nordwind
+  Reverse Black, Rise Mode Magneto Pro Reverse e ASUS TUF Gaming TR120 Reverse.
+  `Fan.to_catalogo()` informa `fluxo_ar: reverso` com
+  `fonte_fluxo_ar: nome_comercial`; sem nome explícito, não presume fluxo normal.
+  O banco SQLite local inspecionado não tinha tabela `fan`; não se executou seed.
+  Não transformar identificação comercial em ficha certificada.
+- Sentido de fluxo depende da orientação. Entrada frente/base/lateral e saída
+  topo/traseira são sugestões quando o gabinete permitir; não são critérios de
+  incompatibilidade. Reverse pode preservar o acabamento de uma entrada, sem
+  tornar uma fan normal inadequada ([ASUS](https://press.asus.com/news/press-releases/asus-launches-tuf-gaming-tr120-argb-case-fans/),
+  [Noctua](https://www.noctua.at/en/support/faqs/how-do-i-determine-my-fans-airflow-direction)).
+- O botão `i` substitui a barra no editor e nos cards. Branco para informações sem
+  pendência conhecida, amarelo para faltas/avisos/verificações pendentes e vermelho
+  para erros. Hover, clique/toque e foco abrem; Escape/saída fecham. `aria-expanded`,
+  `aria-controls` e `inert` acompanham o estado. O popover é contido na viewport e
+  elevado sobre os cards, com rolagem própria para textos longos.
+  Validação: 341 testes Node e 443 Python (+4 subtestes), sem chamadas a LLMs ou
+  APIs pagas e sem iniciar `app.py` ou alterar o banco local.
+  No Chrome, 85 verificações em 320/390/768/1440 px com API simulada cobriram
+  persistência, duplicação, substituição, painel nos cards/editor, teclado e
+  contenção horizontal/vertical na viewport, sem exceções JavaScript.
+
+### Encaixe físico e capacidade de fans — 22/10/2026
+
+- `services/build_service/encaixe_fisico.py` complementa o diagnóstico Python:
+  comprimento/altura/espessura e slots da GPU, altura explícita do air cooler,
+  formato/comprimento da fonte, baias dedicadas 2,5/3,5, radiador e fans.
+  Somente campos explícitos e conhecidos podem aprovar ou reprovar uma regra.
+- O frontend usa `hardware.js`/`fans.js` na filtragem do catálogo e na seleção,
+  inclusive ao selecionar o gabinete depois das peças. O Python usa o catálogo
+  da conta, nunca medidas enviadas pelo navegador/LLM, e rejeita conflitos na
+  geração antes de persistir. Rascunhos manuais continuam podendo ser salvos com
+  diagnóstico de erro; não são apresentados como montagens compatíveis.
+- Quantidade física = fans por kit × kits + fans inclusas + fans do radiador.
+  `posicoes_fans` descreve grupos com `nome`, `opcoes` (tamanho/quantidade),
+  `fans_inclusas` (tamanho/quantidade) e `radiadores_mm`. As opções de um grupo
+  são alternativas. A busca testa distribuições entre os grupos, reservando as
+  fans de fábrica e o radiador, sem contar encaixes 120/140 duas vezes.
+  Se a ficha só documenta alguns arranjos, `posicoes_fans_completas: false`
+  mantém misturas não documentadas como desconhecidas, sem inventar conflito.
+  Excesso confirmado por diâmetro ou capacidade total continua sendo rejeitado.
+  O water cooler precisa de `tamanho_fan_mm` e `quantidade_fans` explícitos para
+  verificar a distribuição; não se divide o tamanho nominal do radiador para inferi-los.
+- O editor mostra total/capacidade e separa fans selecionadas, inclusas e do
+  radiador. Posições livres são um limite superior: a disponibilidade real depende
+  do tamanho e da distribuição. Não há remoção automática de fans de fábrica.
+  Gabinete com fans inclusas já atende à presença de ventilação no progresso;
+  não exige comprar fans adicionais somente para completar essa categoria.
+- `frontend/data/medidas-fisicas.json` é uma fonte compartilhada por Python e
+  catálogo demonstrativo, com categoria, fabricante, modelo, part numbers exatos e
+  URL oficial. `models/medidas_fisicas.py` complementa `to_catalogo()` sem gravar
+  na base nem exigir migração. Não aplica dados a modelos/revisões parecidos.
+  Cobertura inicial revisada: [Q300L preto](https://www.coolermaster.com/en-global/products/masterbox-q300l.html)
+  e [AK400 padrão](https://www.deepcool.com/products/Cooling/cpuaircoolers/AK400-Performance-CPU-Cooler/2021/15222.shtml).
+  Os aliases SEED representam somente os modelos exatos identificados na seed local.
+- Limites: faltam medidas de muitas GPUs/fontes/gabinetes, espessura/posição real
+  do conjunto radiador+fans, folgas dos cabos, interferência frontal com GPU e
+  RAM, baias compartilhadas, revisão/BIOS e conectores. `escopo: parcial` continua
+  obrigatório. Não declarar encaixe completo com dimensões externas do gabinete.
+- Fixtures comuns Python/JS cobrem limites exatos, kits, tamanhos misturados,
+  posições alternativas, radiador, dados ausentes/numéricos e conflitos parciais.
+  Validação: 324 testes Node, 419 Python (+4 subtestes) e 25 verificações Chrome
+  com API simulada em 320/390/768/1440 px, sem transbordamento horizontal.
+
+### Requisitos na build e integração da main — 22/10/2026
+
+- Main integrada por fast-forward até `4d4f51d`: CSRF, limites, confirmação de
+  identidade e revogação de sessões preservados. A inicialização atual prepara o
+  banco explicitamente; iniciar o servidor não cria tabelas nem coleta preços.
+- `GET /benchmark/requisitos-build?game=...&build_id=...` segue Blueprint → service,
+  exige sessão e procura a configuração somente na própria conta. IDs inválidos,
+  parâmetros repetidos e tentativas de enviar outra RAM/usuário são rejeitados.
+  Ausência e build de outra conta recebem o mesmo 404.
+- A RAM vem do estado salvo e do catálogo Python: capacidade por produto/kit ×
+  quantidade. Quantidade de pentes é contada separadamente, sem dobrar novamente
+  a capacidade dos kits. Memórias próprias, modelos removidos e quantidades
+  inválidas deixam a capacidade total não verificada; o subtotal conhecido aparece
+  sem reprovar ou aprovar a memória ainda não identificada.
+- O modal oferece Verificar requisitos independentemente da FPSHQ e dos IDs de
+  CPU/GPU aceitos pelo benchmark. Ver desempenho verifica primeiro a RAM salva;
+  abaixo do mínimo, a interface não envia a consulta de FPS. Jogo sem curadoria
+  informa ausência de ficha; uma estimativa continua identificada como parcial.
+  Nenhum FPS é inventado, penalizado ou corrigido por capacidade de RAM.
+- O botão Testar build do editor aguarda o salvamento pendente antes de abrir os testes.
+  Trocar jogo limpa/cancela a verificação anterior; fechar/trocar tipo de teste
+  aborta a consulta. Erro na FPSHQ preserva os requisitos já apresentados.
+- Os resultados mantêm `escopo: parcial`, `requisitosVerificados: false` e
+  `fpsValidado: false`. CPU/GPU, VRAM, recursos, SO e armazenamento não foram
+  aprovados. A antiga rota `/benchmark/requisitos` permanece para o laboratório.
+- Integração dos testes com a main: considerar token CSRF nas alterações de budget,
+  remoção do GET global de usuários e manifesto de imagens inicialmente vazio;
+  restaurados os rótulos acessíveis dos novos botões de confirmar identidade.
+- Validação: 301 testes Node, 396 testes Python (+4 subtestes) e 53 verificações
+  Chrome com API simulada em 320×800, 768×1024 e 1440×900. Inclui RAM abaixo do mínimo,
+  kits/múltiplos modelos, propriedade, cancelamento, ausência de requisitos e
+  indisponibilidade de FPS. Os testes usam SQLite temporário, sem LLM nem scraping.
+
+#### Próxima etapa de compatibilidade física
+
+A inspeção dos modelos Python confirma: `Gabinete` já possui limites de comprimento
+da GPU e altura do cooler, formatos de placa-mãe, slots, baias e fans inclusas.
+`PlacaVideo` ainda não possui `comprimento_mm`, `altura_mm` ou `espessura_mm`;
+`AirCooler` possui somente `dimensoes` numérico legado, sem eixo explícito;
+não é uma altura confiável para todos os modelos. O complemento técnico acima
+fornece `altura_mm` apenas quando o modelo exato foi revisado.
+`WaterCooler` informa o tamanho nominal do radiador, mas não sua espessura real;
+faltam posições/encaixes compartilhados no gabinete. `Fonte` só informa formato
+e potência; `PlacaMae` não possui quantidade de portas SATA no modelo atual.
+
+Começar pelo comprimento real da GPU e altura real do air cooler, com unidades em mm,
+fonte oficial e modelo/revisão exatos. Depois cadastrar GPU/PSU/baias, espaço de
+conectores e posições/tamanhos de fans e radiadores, incluindo interferências.
+As regras básicas já existem, mas dados ausentes permanecem não verificados.
+Três fans de 120 mm não confirmam, sozinhas, espaço para um radiador de 360 mm.
+
 ### Busca de melhorias e responsividade — 21/10/2026
 
 - **Dropdowns de peças:** cada categoria do modal usa `details/summary` animado,
@@ -402,11 +583,12 @@ Em `js/build/hardware.js`, campos numéricos nulos são desconhecidos, não zero
 
 - Placa-mãe: `quantidade_slots_m2`, `quantidade_portas_sata`,
   `quantidade_slots_m2_sata` e `portas_sata_desativadas_por_m2_sata`.
-- GPU: `comprimento_mm`; air cooler: `altura_mm` (o antigo `dimensoes` só serve se numérico).
+- GPU: `comprimento_mm`, `altura_mm`, `espessura_mm`, `slots_ocupados`;
+  air cooler: `altura_mm`. O campo legado `dimensoes` não vira altura automaticamente.
 - Gabinete: `tamanho_max_gpu_mm`, `tamanho_max_cooler_mm`,
   `radiadores_suportados_mm: [120, 240, 360]`, `tamanhos_fan_suportados_mm: [120, 140]`,
   `quantidade_max_fans` e `fans_inclusos`.
-- Water cooler: `tamanho_radiador_mm`, `quantidade_fans`; fan: `tamanho_mm`, `quantidade`
+- Water cooler: `tamanho_radiador_mm`, `quantidade_fans`, `tamanho_fan_mm`; fan: `tamanho_mm`, `quantidade`
   (unidades físicas por kit, multiplicadas pela quantidade de kits na build).
 
 Esses arrays são exemplos de contrato, não medidas de um gabinete real. Radiador de
@@ -414,15 +596,16 @@ Esses arrays são exemplos de contrato, não medidas de um gabinete real. Radiad
 três unidades de 120 mm, não uma fan de 360 mm. A contagem considera as fans inclusas
 e as do radiador como instaladas; modelos com distribuição não informada precisam
 de conferência para encaixes compartilhados. Não existe um seletor de posição física ainda.
-As medidas de GPU e os encaixes de radiador/fans ainda faltam na seed atual.
+Muitos modelos ainda não possuem essas medidas. O complemento versionado acima
+adiciona encaixes apenas aos modelos revisados, sem generalizar os limites.
 
 #### Pendência: encaixe físico completo do gabinete
 
 `validarEncaixe()` já compara no frontend comprimento da GPU, altura do air cooler,
 tamanho nominal de radiador e tamanho/quantidade de fans, e a avaliação confere o
 formato da placa-mãe. Isso não equivale à confirmação de uma montagem física completa.
-A próxima integração deve preservar os dados do JSON e completar os campos ausentes,
-revalidando no Python com medidas do modelo/revisão corretos.
+A integração atual também revalida no Python. Falta ampliar dados confiáveis e
+interferências com medidas do modelo/revisão corretos.
 
 O gabinete precisa informar limites internos por configuração e posição: GPU com e
 sem radiador frontal; altura/espessura da GPU e espaço dos conectores; radiador +

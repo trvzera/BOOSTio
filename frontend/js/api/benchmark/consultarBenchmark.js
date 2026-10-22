@@ -1,6 +1,7 @@
 import { fetchComErro } from "../_shared/fetchComErro.js";
 
 const SLUG = /^[a-z0-9-]{1,190}$/;
+const BUILD_ID = /^(?:s-)?[1-9][0-9]{0,17}$/;
 export function criarClienteBenchmark({requisitar = fetchComErro,timeoutMs = 25000} = {}) {
   async function enviar(rota,parametros,{signal} = {}) {
     const controle = new AbortController();
@@ -21,6 +22,37 @@ export function criarClienteBenchmark({requisitar = fetchComErro,timeoutMs = 250
     }
   }
   return {
+    consultarRequisitosBuild({game,buildId},opcoes) {
+      if (typeof game !== "string" || !SLUG.test(game) || typeof buildId !== "string" || !BUILD_ID.test(buildId))
+        return Promise.reject(new Error("Selecione um jogo e uma build salva na sua conta."));
+      return enviar("requisitos-build",{game,build_id:buildId},opcoes).then(dados => {
+        const estados = ["nao_informada","abaixo_minimo","abaixo_recomendado","recomendado","minimo_sem_recomendacao"];
+        if (dados.game !== game || dados.buildId !== buildId || dados.escopo !== "parcial" || dados.requisitosVerificados !== false || dados.fpsValidado !== false
+          || dados.ram?.fonte !== "build_salva" || typeof dados.ram.completa !== "boolean" || !estados.includes(dados.ram.status)
+          || !Number.isInteger(dados.ram.conhecidaGb) || dados.ram.conhecidaGb < 0 || !Array.isArray(dados.ram.pendencias)
+          || !Number.isInteger(dados.minimos?.ramGb) || dados.minimos.ramGb <= 0 || !dados.fonte
+          || (dados.ram.completa ? !Number.isInteger(dados.ram.informadaGb) || dados.ram.informadaGb <= 0 || dados.ram.informadaGb !== dados.ram.conhecidaGb || dados.ram.status === "nao_informada" : dados.ram.informadaGb !== null || dados.ram.status !== "nao_informada"))
+          throw new Error("Não foi possível confirmar os requisitos da build salva.");
+        const minimo = dados.ram.informadaGb == null ? null : dados.ram.informadaGb >= dados.minimos.ramGb;
+        if (dados.ram.atendeMinimo !== minimo || (minimo === false && dados.ram.status !== "abaixo_minimo"))
+          throw new Error("A resposta de requisitos contém informações inconsistentes de RAM.");
+        if (dados.vram || dados.armazenamento || dados.impedimentosMinimos) {
+          const v = dados.vram, a = dados.armazenamento;
+          const capacidade = n => n === null || Number.isInteger(n) && n > 0;
+          const conclusaoVram = v?.dedicadaGb != null && v?.minimaGb != null ? v.dedicadaGb >= v.minimaGb : null;
+          const conclusaoDisco = a?.minimaGb == null ? null : a?.maiorUnidadeElegivelGb >= a.minimaGb ? true : a?.completo === true ? false : null;
+          if (!v || !a || v.minimaGb !== (dados.minimos.vramGb ?? null) || a.minimaGb !== (dados.minimos.armazenamentoGb ?? null)
+            || a.exigeSsd !== (dados.minimos.exigeSsd === true) || !capacidade(v.dedicadaGb) || !capacidade(v.minimaGb)
+            || !capacidade(a.maiorUnidadeElegivelGb) || !capacidade(a.minimaGb) || typeof a.completo !== 'boolean'
+            || typeof a.exigeSsd !== 'boolean' || a.espacoLivreVerificado !== false
+            || v.atendeCapacidadeMinima !== conclusaoVram || a.atendeCapacidadeMinima !== conclusaoDisco
+            || !Array.isArray(dados.impedimentosMinimos) || dados.impedimentosMinimos.some(m => typeof m !== 'string' || !m.trim())
+            || Boolean(dados.impedimentosMinimos.length) !== (minimo === false || conclusaoVram === false || conclusaoDisco === false))
+            throw new Error("Não foi possível confirmar as capacidades de vídeo e armazenamento da build.");
+        }
+        return dados;
+      });
+    },
     consultarRequisitos({game,ramGb = null},opcoes) {
       if (typeof game !== "string" || !SLUG.test(game) || ramGb != null && (!Number.isInteger(ramGb) || ramGb < 1 || ramGb > 4096))
         return Promise.reject(new Error("Selecione um jogo e informe a RAM em GB inteiros, ou deixe o campo vazio."));

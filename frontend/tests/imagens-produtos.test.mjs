@@ -35,8 +35,12 @@ test("caminhos de imagens independem de estar em pages ou no laboratório",() =>
 
 test("as imagens do manifesto existem nos caminhos publicados",async () => {
   const mapa=JSON.parse(await readFile(new URL("../data/imagens-produtos.json",import.meta.url),"utf8"));
-  assert.ok(Object.keys(mapa).length>0);
+  // O comando pecas-imagens gera o mapa; uma instalação nova pode começar vazia.
+  assert.ok(mapa && typeof mapa === "object" && !Array.isArray(mapa));
   await Promise.all(Object.values(mapa).map(caminho=>access(new URL(caminho,new URL("../pages/",import.meta.url)))));
+  const peca=completarImagens([{categoria:"processador",part_number:"SEM-FOTO"}],{} )[0];
+  assert.equal(peca.imagem,null);
+  assert.doesNotMatch(imagemPeca(peca),/<img/);
 });
 
 test("imagem sem vínculo fica neutra e uma foto quebrada exibe alternativa sem repetir listeners",() => {
@@ -54,9 +58,25 @@ test("falha no manifesto não derruba catálogo e permite nova consulta",async t
   let chamadas=0;
   t.mock.method(globalThis,"fetch",async()=>{
     chamadas++;
-    return new Response(JSON.stringify(chamadas===1?{}:{A:"../imgs/produtos/processador-1.jpg"}),{status:chamadas===1?503:200});
+    return new Response(JSON.stringify({A:"../imgs/produtos/processador-1.jpg"}),{status:chamadas<=2?503:200});
   });
   assert.deepEqual(await carregarManifestoImagens(),{});
   assert.equal((await carregarManifestoImagens()).A,"../imgs/produtos/processador-1.jpg");
-  assert.equal(chamadas,2);
+  assert.equal(chamadas,4);
+});
+
+test("referências recuperadas exigem categoria, fabricante, modelo e part number; arquivos existem",async () => {
+  const mapa=JSON.parse(await readFile(new URL("../data/imagens-referencia.json",import.meta.url),"utf8"));
+  const catalogo=JSON.parse(await readFile(new URL("../data/catalogo-demo.json",import.meta.url),"utf8"));
+  assert.equal(Object.keys(mapa).length,750);
+  for (const [part_number,ficha] of Object.entries(mapa)) {
+    const peca=catalogo.find(p=>p.part_number===part_number);
+    assert.ok(peca);
+    for (const campo of ['categoria','fabricante','modelo']) assert.equal(ficha[campo],peca[campo]);
+    assert.match(ficha.imagem,/^\.\.\/imgs\/produtos\/[a-z0-9_-]+\.(jpg|webp|png)$/);
+    await access(new URL(ficha.imagem,new URL('../pages/',import.meta.url)));
+    assert.equal(completarImagens([{...peca,id:'outro-banco:999'}],mapa)[0].imagem,ficha.imagem);
+    for (const campo of ['categoria','fabricante','modelo','part_number'])
+      assert.equal(completarImagens([{...peca,imagem:null,imagem_url:null,[campo]:'outro'}],mapa)[0].imagem,null);
+  }
 });

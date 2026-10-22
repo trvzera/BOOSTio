@@ -2,6 +2,7 @@ import { categorias, perifericos, acessoriosRede } from "./catalogo.js";
 import { conexaoDisco, limitesArmazenamento, numeroConhecido } from "./hardware.js";
 import { normalizarRede } from "./rede.js";
 import { planejamentoLocal } from "./planejamento.js";
+import { posicoesFans } from "./fans.js";
 
 const CHAVE_RASCUNHOS = "boostio:rascunhos-build";
 export const CHAVE_PERFIL_LOCAL = "boostio:builds-locais";
@@ -55,6 +56,7 @@ export function normalizarBuild(valor = {}) {
     criadoEm:Number.isFinite(data.getTime()) ? data.toISOString() : new Date().toISOString(),
     visibilidade:valor.visibilidade === "publico" ? "publico" : "privado",
     travada:Boolean(valor.travada),
+    substituirFansWaterCooler:valor.substituirFansWaterCooler === true,
     percentualPerifericos:Number.isInteger(valor.percentualPerifericos) && valor.percentualPerifericos >= 0 && valor.percentualPerifericos <= 99 ? valor.percentualPerifericos : 0,
     incluirPerifericos:typeof valor.incluirPerifericos === "boolean" ? valor.incluirPerifericos : perifericos.some(cat => componentes[cat]),
     incluirRede:typeof valor.incluirRede === "boolean" ? valor.incluirRede : acessoriosRede.some(cat => componentes[cat]) || ["cabo","wifi"].includes(valor.rede?.tipo),
@@ -188,7 +190,7 @@ export function motivoSelecao(build,peca,catalogo) {
     if (itensCategoria(build,"fan").length) {
       const gabinete = catalogo.find(p => p.id === build.componentes.gabinete?.id);
       if (!gabinete) return "Selecione o gabinete antes de adicionar mais fans.";
-      if (numeroConhecido(gabinete.quantidade_max_fans) == null || gabinete.tamanhos_fan_suportados_mm == null)
+      if (!posicoesFans(gabinete) && (numeroConhecido(gabinete.quantidade_max_fans) == null || gabinete.tamanhos_fan_suportados_mm == null))
         return "Faltam a quantidade e os tamanhos dos encaixes do gabinete para adicionar mais fans.";
     }
     return ""; // Encaixes e quantidade são avaliados com o gabinete.
@@ -238,6 +240,7 @@ export function removerPeca(build,categoria,id) {
     const itens = itensCategoria(proxima,categoria).filter(r => (r.id || r.proprio) !== id);
     if (itens.length) proxima.componentes[categoria] = itens; else delete proxima.componentes[categoria];
   } else delete proxima.componentes[categoria];
+  if (categoria === "water_cooler") proxima.substituirFansWaterCooler = false;
   return proxima;
 }
 export function reduzirQuantidade(build,categoria,id) {
@@ -250,7 +253,7 @@ export function reduzirRam(build,id) { return reduzirQuantidade(build,"memoria_r
 export function linkCompartilhado(build) {
   if (build.visibilidade !== "publico") throw new Error("Torne a build pública antes de compartilhar.");
   const url = new URL("./configuracao-build.html",location.href); url.search = "";
-  const dados = {titulo:build.titulo,descricao:build.descricao,visibilidade:"publico",componentes:build.componentes,incluirPerifericos:build.incluirPerifericos,incluirRede:build.incluirRede,rede:build.rede,orcamento:build.orcamento};
+  const dados = {titulo:build.titulo,descricao:build.descricao,visibilidade:"publico",componentes:build.componentes,incluirPerifericos:build.incluirPerifericos,incluirRede:build.incluirRede,rede:build.rede,orcamento:build.orcamento,substituirFansWaterCooler:build.substituirFansWaterCooler === true};
   url.searchParams.set("compartilhar",btoa(unescape(encodeURIComponent(JSON.stringify(dados)))));
   return url.href;
 }

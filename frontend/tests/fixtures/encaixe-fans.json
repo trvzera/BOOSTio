@@ -1,0 +1,38 @@
+{
+  "gabinete": {
+    "quantidade_max_fans": 6, "fans_inclusos": 1,
+    "tamanhos_fan_suportados_mm": [120, 140],
+    "posicoes_fans": [
+      {"nome": "Frente", "opcoes": [{"tamanho_mm": 120, "quantidade": 3}, {"tamanho_mm": 140, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": [120, 240, 360]},
+      {"nome": "Topo", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": [240]},
+      {"nome": "Traseira", "opcoes": [{"tamanho_mm": 120, "quantidade": 1}], "fans_inclusas": [{"tamanho_mm": 120, "quantidade": 1}], "radiadores_mm": [120]}
+    ]
+  },
+  "casos": [
+    {"nome": "sete fans extras mais water de duas excedem sete posições", "gabinete": {"fans_inclusos": 0, "quantidade_max_fans": 7, "posicoes_fans": null}, "water": {"tamanho_radiador_mm": 240, "tamanho_fan_mm": 120, "quantidade_fans": 2}, "fans": [{"peca": {"tamanho_mm": 120, "quantidade": 1}, "item": {"quantidade": 7}}], "esperado": {"total": 9, "quantidade": false, "substituidas": 0}},
+    {"nome": "sete fans compradas substituindo explicitamente as duas originais", "substituir": true, "gabinete": {"fans_inclusos": 0, "quantidade_max_fans": 7, "posicoes_fans": null}, "water": {"tamanho_radiador_mm": 240, "tamanho_fan_mm": 120, "quantidade_fans": 2}, "fans": [{"peca": {"tamanho_mm": 120, "quantidade": 1}, "item": {"quantidade": 7}}], "esperado": {"total": 7, "quantidade": true, "substituidas": 2, "substituicao": true}},
+    {"nome": "substituição reserva fans selecionadas no radiador uma vez", "substituir": true, "water": {"tamanho_radiador_mm": 240, "tamanho_fan_mm": 120, "quantidade_fans": 2}, "fans": [{"peca": {"tamanho_mm": 120, "quantidade": 1}, "item": {"quantidade": 5}}], "esperado": {"total": 6, "quantidade": true, "distribuicao": true, "substituidas": 2}},
+    {"nome": "não substitui fan de 120 por 140", "substituir": true, "water": {"tamanho_radiador_mm": 240, "tamanho_fan_mm": 120, "quantidade_fans": 2}, "fans": [{"peca": {"tamanho_mm": 140, "quantidade": 1}, "item": {"quantidade": 3}}], "esperado": {"substituicao": false, "distribuicao": false}},
+    {"nome": "substituição sem medida da fan original permanece parcial", "substituir": true, "water": {"tamanho_radiador_mm": 240, "quantidade_fans": 2}, "fans": [{"peca": {"tamanho_mm": 120, "quantidade": 1}, "item": {"quantidade": 5}}], "esperado": {"total": 6, "substituicao": null, "distribuicao": null}},
+    {"nome": "substituição exige unidades suficientes", "substituir": true, "water": {"tamanho_radiador_mm": 240, "tamanho_fan_mm": 120, "quantidade_fans": 2}, "fans": [{"peca": {"tamanho_mm": 120, "quantidade": 1}, "item": {"quantidade": 1}}], "esperado": {"substituicao": false, "distribuicao": false}},
+    {"nome": "limite exato com fan de fábrica", "fans": [{"peca": {"tamanho_mm": 120, "quantidade": 1}, "item": {"quantidade": 5}}], "esperado": {"selecionadas": 5, "total": 6, "capacidade": 6, "livres": 0, "quantidade": true, "tamanhos": true, "distribuicao": true}},
+    {"nome": "uma unidade além do limite", "fans": [{"peca": {"tamanho_mm": 120, "quantidade": 1}, "item": {"quantidade": 6}}], "esperado": {"total": 7, "quantidade": false, "distribuicao": false}},
+    {"nome": "kit triplo vezes duas unidades", "fans": [{"peca": {"tamanho_mm": 120, "quantidade": 3}, "item": {"quantidade": 2}}], "esperado": {"selecionadas": 6, "quantidade": false}},
+    {"nome": "tamanhos alternativos não são posições adicionais", "fans": [{"peca": {"tamanho_mm": 140, "quantidade": 2}, "item": {"quantidade": 1}}, {"peca": {"tamanho_mm": 120, "quantidade": 3}, "item": {"quantidade": 1}}], "esperado": {"total": 6, "quantidade": true, "distribuicao": false}},
+    {"nome": "mistura possível de 140 e 120", "fans": [{"peca": {"tamanho_mm": 140, "quantidade": 2}, "item": {"quantidade": 1}}, {"peca": {"tamanho_mm": 120, "quantidade": 2}, "item": {"quantidade": 1}}], "esperado": {"total": 5, "distribuicao": true}},
+    {"nome": "arranjos parciais não confirmam conflito de mistura", "gabinete": {"posicoes_fans_completas": false}, "fans": [{"peca": {"tamanho_mm": 140, "quantidade": 2}, "item": {"quantidade": 1}}, {"peca": {"tamanho_mm": 120, "quantidade": 3}, "item": {"quantidade": 1}}], "esperado": {"total": 6, "distribuicao": null}},
+    {"nome": "arranjos parciais ainda rejeitam excesso por tamanho", "gabinete": {"posicoes_fans_completas": false}, "fans": [{"peca": {"tamanho_mm": 140, "quantidade": 3}, "item": {"quantidade": 1}}], "esperado": {"total": 4, "distribuicao": false}},
+    {"nome": "radiador 360 disputa a frente com fans 140", "water": {"tamanho_radiador_mm": 360, "quantidade_fans": 3, "tamanho_fan_mm": 120}, "fans": [{"peca": {"tamanho_mm": 140, "quantidade": 2}, "item": {"quantidade": 1}}], "esperado": {"total": 6, "radiador": 3, "quantidade": true, "distribuicao": false}},
+    {"nome": "radiador 240 pode ir ao topo", "water": {"tamanho_radiador_mm": 240, "quantidade_fans": 2, "tamanho_fan_mm": 120}, "fans": [{"peca": {"tamanho_mm": 140, "quantidade": 2}, "item": {"quantidade": 1}}], "esperado": {"total": 5, "distribuicao": true}},
+    {"nome": "radiador com tamanho de fan ausente", "water": {"tamanho_radiador_mm": 240, "quantidade_fans": 2}, "fans": [], "esperado": {"total": 3, "quantidade": true, "distribuicao": null}},
+    {"nome": "water cooler próprio sem especificação", "water": {}, "fans": [], "esperado": {"radiador": null, "total": null, "quantidade": null, "distribuicao": null}},
+    {"nome": "360 mm não é uma fan de 120", "fans": [{"peca": {"tamanho_mm": 360, "quantidade": 1}, "item": {"quantidade": 1}}], "esperado": {"tamanhos": false, "distribuicao": false}},
+    {"nome": "quantidade de kit desconhecida não vira uma unidade", "fans": [{"peca": {"tamanho_mm": 120}, "item": {"quantidade": 1}}], "esperado": {"selecionadas": null, "total": null, "quantidade": null, "distribuicao": null}},
+    {"nome": "medida não finita ou inválida fica desconhecida", "fans": [{"peca": {"tamanho_mm": "NaN", "quantidade": 1}, "item": {"quantidade": 1}}], "esperado": {"tamanhos": null, "distribuicao": null}},
+    {"nome": "medidas numéricas serializadas normalizadas", "water": {"tamanho_radiador_mm": "240", "quantidade_fans": "2", "tamanho_fan_mm": "120"}, "fans": [{"peca": {"tamanho_mm": "140", "quantidade": "2"}, "item": {"quantidade": 1}}], "esperado": {"total": 5, "distribuicao": true}},
+    {"nome": "capacidade ausente e grupos ausentes não são ilimitados", "gabinete": {"quantidade_max_fans": null, "posicoes_fans": null}, "fans": [{"peca": {"tamanho_mm": 120, "quantidade": 1}, "item": {"quantidade": 1}}], "esperado": {"capacidade": null, "quantidade": null, "distribuicao": null}},
+    {"nome": "zero fans de fábrica não é dado ausente", "gabinete": {"fans_inclusos": 0, "posicoes_fans": null}, "fans": [{"peca": {"tamanho_mm": 120, "quantidade": 3}, "item": {"quantidade": 2}}], "esperado": {"total": 6, "quantidade": true, "inclusas": 0, "distribuicao": null}},
+    {"nome": "contagem de fábrica divergente não aprova posições", "gabinete": {"fans_inclusos": 2}, "fans": [], "esperado": {"total": 2, "distribuicao": null}},
+    {"nome": "conflito conhecido não é escondido por peça desconhecida", "fans": [{"peca": {"tamanho_mm": 120, "quantidade": 3}, "item": {"quantidade": 2}}, {"peca": null, "item": {"quantidade": 1}}], "esperado": {"total": null, "quantidade": false, "distribuicao": false}}
+  ]
+}

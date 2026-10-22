@@ -1,14 +1,12 @@
 let manifestoPendente;
 
 export function carregarManifestoImagens() {
-  manifestoPendente ??= fetch(new URL("../../data/imagens-produtos.json",import.meta.url),{cache:"no-cache"})
-    .then(async resposta => {
-      if (!resposta.ok) throw new Error("Mapa de imagens indisponível.");
-      const mapa = await resposta.json();
-      return mapa && typeof mapa === "object" && !Array.isArray(mapa) ? mapa : {};
-    }).catch(() => {
-      manifestoPendente = null;
-      return {}; // Ausência de fotos não deve impedir a montagem ou o catálogo.
+  const carregar = (nome,cache) => fetch(new URL("../../data/" + nome,import.meta.url),{cache})
+    .then(async r => { if (!r.ok) return null; const m = await r.json(); return m && typeof m === 'object' && !Array.isArray(m) ? m : null; }).catch(() => null);
+  manifestoPendente ??= Promise.all([carregar('imagens-referencia.json','force-cache'),carregar('imagens-produtos.json','no-cache')])
+    .then(([referencias,geradas]) => {
+      if (!referencias || !geradas) manifestoPendente = null;
+      return {...referencias,...geradas};
     });
   return manifestoPendente;
 }
@@ -29,7 +27,9 @@ export function enderecoImagem(valor) {
 
 export function completarImagens(pecas,mapa = {}) {
   return pecas.map(peca => {
-    const origem = [peca.imagem,peca.imagem_url,Object.hasOwn(mapa,peca.part_number) ? mapa[peca.part_number] : null]
+    const ficha = Object.hasOwn(mapa,peca.part_number) ? mapa[peca.part_number] : null;
+    const referencia = typeof ficha === 'string' ? ficha : ficha && ['categoria','fabricante','modelo'].every(c => ficha[c] === peca[c]) ? ficha.imagem : null;
+    const origem = [peca.imagem,peca.imagem_url,referencia]
       .find(valor => enderecoImagem(valor));
     return {...peca,imagem:origem?.trim() || null};
   });

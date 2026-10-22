@@ -6,6 +6,24 @@
 .fpshq-panel .test-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
 .fpshq-panel .test-feedback { margin: 12px 0 0; color: var(--cor-4); font: 400 .75rem/1.6 var(--font-body); }
 .fpshq-panel .test-feedback[data-tone="error"] { color: var(--status-error); }
+.fpshq-build-requirements { margin-top: 16px; padding: 16px; border: 1px solid var(--glass-border); border-radius: var(--radius-card); background: var(--glass-bg, #ffffff03); color: var(--cor-4); font: 400 .75rem/1.6 var(--font-body); }
+.fpshq-build-requirements h3 { margin: 0 0 10px; color: var(--cor-6); font: 500 .9rem/1.4 var(--font-heading); }
+.fpshq-build-requirements h4 { margin: 12px 0 8px; color: var(--cor-6); font: 500 .8rem/1.4 var(--font-heading); }
+.fpshq-build-requirements p { margin: 8px 0; overflow-wrap: anywhere; }
+.fpshq-requirements-status[data-tone="error"] { color: var(--status-error); }
+.fpshq-requirements-status[data-tone="warning"] { color: var(--status-warning); }
+.fpshq-requirements-status[data-tone="info"] { color: var(--cor-p1); }
+.fpshq-requirements-ram { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin: 16px 0; }
+.fpshq-requirements-ram > div, .fpshq-requirements-specs > div { min-width: 0; }
+.fpshq-requirements-ram dd { margin: 6px 0 0; color: var(--cor-6); font: 500 .85rem/1.5 var(--font-heading); overflow-wrap: anywhere; }
+.fpshq-requirements-specs { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.fpshq-requirements-specs dt { margin-top: 8px; color: var(--cor-6); }
+.fpshq-requirements-specs dd { margin: 2px 0 0; overflow-wrap: anywhere; }
+@media (max-width: 650px) {
+  .fpshq-requirements-ram, .fpshq-requirements-specs { grid-template-columns: minmax(0,1fr); gap: 10px; }
+  .fpshq-requirements-ram > div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .fpshq-requirements-ram dd { margin: 0; text-align: right; }
+}
 .fpshq-panel .test-muted { color: var(--cor-4); }
 .benchmark-dialog { width: min(760px,calc(100vw - 32px)); }
 .benchmark-panel { margin-top: 12px; }

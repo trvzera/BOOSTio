@@ -30,6 +30,16 @@ document.addEventListener("DOMContentLoaded", () => {
   cardsGrid.addEventListener("scroll", updateActiveDot, { passive: true });
 
   function updateActiveDot() {
+    const carrossel = isCarouselMode();
+    if (carrossel) {
+      cardsGrid.tabIndex = 0;
+      cardsGrid.setAttribute("role","region");
+      cardsGrid.setAttribute("aria-label","Etapas de montagem do computador");
+    } else {
+      cardsGrid.removeAttribute("tabindex");
+      cardsGrid.removeAttribute("role");
+      cardsGrid.removeAttribute("aria-label");
+    }
     if (!isCarouselMode() || dots.length === 0) return;
     const gridCenter = cardsGrid.scrollLeft + cardsGrid.clientWidth / 2;
     let closestIndex = 0;

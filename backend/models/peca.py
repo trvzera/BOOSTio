@@ -2,6 +2,8 @@ from datetime import timezone
 
 from . import db
 from . import ModeloBase
+from .medidas_fisicas import completar_medidas
+from .imagens_referencia import imagem_referencia
 
 class Peca(ModeloBase):
   __abstract__ = True
@@ -59,8 +61,8 @@ class Peca(ModeloBase):
     if data and data.tzinfo is None:
       data = data.replace(tzinfo=timezone.utc)
     dados["preco_atualizado_em"] = data.isoformat() if data else None
-    dados["imagem"] = dados.pop("imagem_url", None)
-    return dados
+    dados["imagem"] = dados.pop("imagem_url", None) or imagem_referencia(dados)
+    return completar_medidas(dados)
 
   def definir_imagem(self, caminho):
     self.imagem_url = caminho

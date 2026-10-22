@@ -26,7 +26,7 @@ def autenticar(cliente):
         sessao["_fresh"] = True
 
 
-@pytest.mark.parametrize("rota", ["/benchmark/fps", "/benchmark/jogos?q=Valorant", "/benchmark/blender", "/benchmark/requisitos?game=valorant"])
+@pytest.mark.parametrize("rota", ["/benchmark/fps", "/benchmark/jogos?q=Valorant", "/benchmark/blender", "/benchmark/requisitos?game=valorant", "/benchmark/requisitos-build?game=valorant&build_id=s-1"])
 def test_exige_sessao_e_responde_json(cliente_benchmark, rota):
     resposta = cliente_benchmark.get(rota)
     assert resposta.status_code == 401

@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         '<h2 id="titulo-' + h(build.id) + '">' + h(build.titulo) + '</h2><p class="prontas-descricao">' + h(build.descricao) + '</p>' +
         '<dl class="prontas-resumo"><div><dt>Memória RAM</dt><dd>' + ram.capacidade + ' GB</dd></div><div><dt>Armazenamento</dt><dd>' + discos.capacidade + ' GB</dd></div></dl>' +
         '<div class="prontas-total"><span>' + (build.metadados.pendentes.length ? 'Total parcial dos preços disponíveis' : 'Total das peças') + '</span><strong>' + (avaliacao.preco > 0 ? moeda(avaliacao.preco) : 'Preço a consultar') + '</strong><small>Sem periféricos e sem frete.' + (build.metadados.pendentes.length ? ' Há peças sem cotação ou estoque confirmado.' : '') + '</small></div>' +
-        '<div class="prontas-acoes"><button type="button" class="btn-primary" data-usar-modelo="' + h(build.id) + '" aria-label="Abrir e personalizar ' + h(build.titulo) +
+        '<div class="prontas-acoes"><button type="button" class="btn-primary" data-usar-modelo="' + h(build.id) + '" aria-label="Abrir build e personalizar: ' + h(build.titulo) +
         '">Abrir build</button><small>Peças e compatibilidade aparecem no editor. Salva uma cópia na sua conta.</small></div></article>';
     }
 

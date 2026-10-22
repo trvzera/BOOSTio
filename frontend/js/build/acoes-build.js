@@ -50,6 +50,7 @@ export function abrirBenchmark(build,catalogo) {
   if (motivo) throw new Error(motivo);
   const peca = categoria => catalogo.find(p => p.id === itensCategoria(build,categoria)[0]?.id);
   const cpu = peca("processador"), gpu = peca("placa_video"), ram = informacoesRam(build,catalogo);
+  const buildId = /^(?:s-)?[1-9][0-9]{0,17}$/.test(String(build.id)) ? String(build.id) : null;
   const prefixo = "build-fpshq";
   const dialogo = abrirDialogoBuild("Desempenho esperado",'<p class="planning-help">' + h(build.titulo) + '</p>' +
     '<div class="benchmark-type-picker" role="group" aria-label="Escolha o tipo de teste"><button type="button" class="btn-secondary" data-benchmark-type="games" aria-pressed="false" aria-label="Selecionar teste de desempenho em jogos">' + iconeAnimado("gamepad") + '<span>Jogos · FPS</span></button><button type="button" class="btn-secondary" data-benchmark-type="blender" aria-pressed="false" aria-label="Selecionar teste de renderização no Blender">' + iconeAnimado("microchip") + '<span>Blender · Renderização</span></button></div><div data-benchmark-content><p class="planning-help">Escolha qual desempenho deseja consultar. Nenhum teste é executado no seu computador.</p></div>');
@@ -61,8 +62,9 @@ export function abrirBenchmark(build,catalogo) {
     dialogo.querySelectorAll("[data-benchmark-type]").forEach(outro => outro.setAttribute("aria-pressed",String(outro === botao)));
     const conteudo = dialogo.querySelector("[data-benchmark-content]");
     if (botao.dataset.benchmarkType === "games") {
-      conteudo.innerHTML = painelBenchmarkHtml({prefixo,hardware:nomePeca(cpu) + " · " + (gpu ? nomePeca(gpu) : "Vídeo integrado"),memoria:ram.capacidade});
-      limpar = iniciarPainelBenchmark(dialogo,{prefixo,hardware:hardwareBenchmark(cpu,gpu)});
+      const memoria = ram.itens.length && ram.itens.every(({peca}) => Number.isInteger(peca?.capacidade_gb) && peca.capacidade_gb > 0) ? ram.capacidade : null;
+      conteudo.innerHTML = painelBenchmarkHtml({prefixo,hardware:nomePeca(cpu) + " · " + (gpu ? nomePeca(gpu) : "Vídeo integrado"),memoria,verificarRequisitos:Boolean(buildId)});
+      limpar = iniciarPainelBenchmark(dialogo,{prefixo,hardware:hardwareBenchmark(cpu,gpu),buildId});
     } else {
       const dispositivos = hardwareBlender(cpu,gpu);
       conteudo.innerHTML = painelBlenderHtml(dispositivos);

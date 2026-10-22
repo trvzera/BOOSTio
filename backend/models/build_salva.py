@@ -178,6 +178,8 @@ class BuildSalva(ModeloBase):
         if orcamento is not None and (type(orcamento) not in (int, float) or not 0 <= orcamento <= 1000000):
             raise ValueError("Orçamento inválido")
         percentual = dados.get("percentualPerifericos", 0)
+        if type(dados.get("substituirFansWaterCooler", False)) is not bool:
+            raise ValueError("Opção de substituição das fans inválida")
         if type(percentual) is not int or not 0 <= percentual <= 99:
             raise ValueError("A porcentagem para periféricos deve ser de 0 a 99")
         pecas_extras = dados.get("pecasExtras", {})
@@ -190,6 +192,7 @@ class BuildSalva(ModeloBase):
             "travada": bool(dados.get("travada", False)), "orcamento": orcamento,
             "incluirPerifericos": bool(dados.get("incluirPerifericos", False)),
             "percentualPerifericos": percentual,
+            "substituirFansWaterCooler": dados.get("substituirFansWaterCooler", False),
             "incluirRede": bool(dados.get("incluirRede", False)), "rede": dados.get("rede") or {},
             "pecasExtras": {tipo: nome.strip() for tipo, nome in pecas_extras.items()},
             "componentes": limpos,

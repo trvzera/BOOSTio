@@ -8,6 +8,20 @@ import { ofertasPeca } from "../js/build/catalogo.js";
 import { destinoAnterior, rotuloVoltar } from "../js/components/navigation-back.js";
 import { avisoFreteHtml } from "../js/build/acoes-build.js";
 
+test("nomes acessíveis preservam o texto visível dos botões para controle por voz",async () => {
+  const fontes = [
+    ['../js/pages/forms.js','aria-label="Voltar à etapa anterior"'],
+    ['../pages/builds.html','aria-label="Comparar builds salvas na minha conta"'],
+    ['../pages/configuracoes.html','aria-label="Confirmar identidade com Google para alterar o perfil"'],
+    ['../js/pages/configuracoes-prontas.js','aria-label="Abrir build e personalizar: '],
+  ];
+  for (const [arquivo,rotulo] of fontes) assert.ok((await readFile(new URL(arquivo,import.meta.url),'utf8')).includes(rotulo));
+  const carrossel=await readFile(new URL('../js/services-carousel.js',import.meta.url),'utf8');
+  assert.match(carrossel,/cardsGrid\.tabIndex = 0/);
+  assert.match(carrossel,/cardsGrid\.setAttribute\("role","region"\)/);
+  assert.match(carrossel,/cardsGrid\.removeAttribute\("tabindex"\)/);
+});
+
 test("montagem lembra de reservar orçamento para frete sem inventar uma cotação",() => {
   const aviso = avisoFreteHtml();
   assert.match(aviso,/Frete não incluído/);
@@ -204,6 +218,19 @@ test("ícone do setup atual usa o estado inverso sem afetar os demais", () => {
   assert.match(iconeAnimado("circledot","internal",{invertido:true}),/data-lottie-reversed="true"/);
   assert.doesNotMatch(iconeAnimado("circledot"),/data-lottie-reversed/);
 });
+test("rodapés incluem Instagram oficial com nome acessível e proteção na nova aba",async () => {
+  for (const pagina of ['index','sobre','configuracoes-prontas','configuracao-build','pecas']) {
+    const html=await readFile(new URL('../pages/'+pagina+'.html',import.meta.url),'utf8');
+    const contato=html.match(/<div id="contact-section">([\s\S]*?)<\/div>/)?.[1];
+    assert.ok(contato,pagina);
+    const link=contato.match(/<a\b[^>]*href="https:\/\/www\.instagram\.com\/boostiooficial\/"[^>]*>Instagram: @boostiooficial<\/a>/)?.[0];
+    assert.ok(link,pagina);
+    assert.match(link,/target="_blank"/);
+    assert.match(link,/rel="noopener noreferrer"/);
+    assert.match(link,/aria-label="Instagram: @boostiooficial \(abre em nova aba\)"/);
+  }
+});
+
 test("footers apresentam a BOOSTio pela página Sobre nós, sem links para a equipe removida", async () => {
   const paginas = new URL("../pages/",import.meta.url);
   await access(new URL("sobre.html",paginas));
