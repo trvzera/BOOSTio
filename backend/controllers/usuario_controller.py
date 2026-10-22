@@ -1,4 +1,4 @@
-from flask import Blueprint,request,jsonify
+from flask import Blueprint,request,jsonify,current_app
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from models import db,Usuario
 from sqlalchemy.exc import SQLAlchemyError
@@ -151,31 +151,27 @@ def atualizar_usuario(usuario_id):
 @limiter.limit("3 per hour", key_func=chave_email)
 def esqueci_senha():
     try:
-        dados = request.get_json() or {}
-        usuario = Usuario.buscar_por_email(dados.get("email"))
+        dados = request.get_json(silent=True)
+        email = dados.get("email") if isinstance(dados, dict) else None
+        usuario = Usuario.buscar_por_email(email.strip().lower()) if isinstance(email, str) and len(email) <= 150 else None
 
         #Só envia o email se o usuario existir, mas a resposta é sempre a mesma
         #pra não revelar se aquele email está cadastrado (evita enumeração de usuarios).
-        if usuario:
+        if usuario and usuario.ativo:
             service = EnviarEmailRecuperarService()
             service.executar(usuario)
 
-        return jsonify({
-            "mensagem": "Se esse email estiver cadastrado, um link de recuperação foi enviado."
-        }),200
-
-    except SMTPAuthenticationError:
-        return jsonify({"mensagem":'Falha na autenticação do servidor de email'}),400
-
-    except SMTPRecipientsRefused:
-        return jsonify({"mensagem": 'Endereço de email do destinatário foi recusado'}),400
-
-    except SMTPException as erro:
-        return jsonify({"mensagem": f'Erro ao enviar email {str(erro)}'}),400
-
+    except (SMTPException, OSError):
+        current_app.logger.warning("Falha no envio de email de recuperação de senha")
+    except ValueError:
+        db.session.rollback()
     except SQLAlchemyError:
         db.session.rollback()
-        return jsonify({"erro": "Erro ao processar a solicitação."}), 500
+        current_app.logger.error("Falha no banco durante solicitação de recuperação de senha")
+
+    return jsonify({
+        "mensagem": "Se esse email estiver cadastrado, um link de recuperação foi enviado."
+    }),200
 
 @usuario_bp.post("/redefinir-senha")
 @limiter.limit("20 per hour")

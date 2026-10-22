@@ -59,7 +59,7 @@ def test_revoga_dois_dispositivos_e_cookie_remember_sem_afetar_outro_usuario(app
         elif operacao == "alterar":
             usuario.atualizar_dados(senha=generate_password_hash("NovaSenha.123"))
         else:
-            TokenRecuperacao(usuario_id=usuario.id, token_hash=generate_password_hash("token-teste")).salvar()
+            TokenRecuperacao.emitir(usuario, "token-teste")
             RedefinirSenhaService().executar({"token": "token-teste", "senha": "NovaSenha.123"})
     assert primeiro.get("/privado").status_code == 401
     assert segundo.get("/privado").status_code == 401
@@ -79,12 +79,12 @@ def test_recusa_sessao_antiga_ou_invalida(app, identificador):
 def test_conta_inativa_nao_autentica_nem_recupera_senha(app):
     with app.app_context():
         usuario = Usuario.buscar_por_id(1)
+        TokenRecuperacao.emitir(usuario, "token-teste")
         usuario.atualizar_dados(ativo=False)
         with app.test_request_context():
             assert not login_user(usuario)
         with pytest.raises(ValueError):
             EntrarUsuarioService().executar({"email": usuario.email, "senha": "Original.123"})
-        TokenRecuperacao(usuario_id=usuario.id, token_hash=generate_password_hash("token-teste")).salvar()
         with pytest.raises(ValueError, match="inválido"):
             RedefinirSenhaService().executar({"token": "token-teste", "senha": "NovaSenha.123"})
         assert Usuario.buscar_por_sessao(usuario.get_id()) is None
