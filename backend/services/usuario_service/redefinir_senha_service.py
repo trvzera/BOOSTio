@@ -13,7 +13,7 @@ class RedefinirSenhaService:
 
     usuario = Usuario.buscar_por_id(token_recuperacao.usuario_id)
 
-    if not usuario:
+    if not usuario or not usuario.ativo:
       raise ValueError("Link inválido ou expirado")
 
     validar_senha_forte(dados["senha"])

@@ -45,7 +45,7 @@ from .consulta_preco import ConsultaPreco, ControleColeta
 #Funcão obrigatória para o login buscar informações do usuario pelo id
 @lm.user_loader
 def user_loader(id: str) -> Usuario | None:
-    usuario = Usuario.buscar_por_id(id)
+    usuario = Usuario.buscar_por_sessao(id)
     return usuario
 
 
