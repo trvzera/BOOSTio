@@ -18,6 +18,8 @@
   .avatar { width: 56px; height: 56px; font-size: 1.25rem; }
   .form-actions { flex-direction: column; align-items: stretch; }
   .form-actions > *, .form-actions > .disabled-tip-anchor > button { width: 100%; }
+  .profile-identity-confirmation { justify-items: stretch; }
+  .profile-identity-confirmation .btn-ghost { width: 100%; }
   .danger-row { flex-direction: column; align-items: stretch; }
   .danger-row .btn-danger { width: 100%; }
 }
