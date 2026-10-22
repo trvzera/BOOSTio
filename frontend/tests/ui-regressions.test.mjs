@@ -218,6 +218,19 @@ test("ícone do setup atual usa o estado inverso sem afetar os demais", () => {
   assert.match(iconeAnimado("circledot","internal",{invertido:true}),/data-lottie-reversed="true"/);
   assert.doesNotMatch(iconeAnimado("circledot"),/data-lottie-reversed/);
 });
+test("rodapés incluem Instagram oficial com nome acessível e proteção na nova aba",async () => {
+  for (const pagina of ['index','sobre','configuracoes-prontas','configuracao-build','pecas']) {
+    const html=await readFile(new URL('../pages/'+pagina+'.html',import.meta.url),'utf8');
+    const contato=html.match(/<div id="contact-section">([\s\S]*?)<\/div>/)?.[1];
+    assert.ok(contato,pagina);
+    const link=contato.match(/<a\b[^>]*href="https:\/\/www\.instagram\.com\/boostiooficial\/"[^>]*>Instagram: @boostiooficial<\/a>/)?.[0];
+    assert.ok(link,pagina);
+    assert.match(link,/target="_blank"/);
+    assert.match(link,/rel="noopener noreferrer"/);
+    assert.match(link,/aria-label="Instagram: @boostiooficial \(abre em nova aba\)"/);
+  }
+});
+
 test("footers apresentam a BOOSTio pela página Sobre nós, sem links para a equipe removida", async () => {
   const paginas = new URL("../pages/",import.meta.url);
   await access(new URL("sobre.html",paginas));
