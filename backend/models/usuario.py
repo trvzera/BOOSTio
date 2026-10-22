@@ -52,8 +52,12 @@ class Usuario(ModeloBase,UserMixin):
     if nome is not None:
       self.nome = nome
 
-    if email is not None:
+    if email is not None and email != self.email:
       self.email = email
+      self.verificado = False
+      db.session.flush()
+      from .codigo import Codigo
+      Codigo.invalidar_anteriores(self.id)
 
     if senha is not None:
       self.senha = senha

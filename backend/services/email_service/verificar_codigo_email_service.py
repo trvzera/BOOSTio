@@ -17,7 +17,8 @@ class VerificarCodigoEmail:
 
     codigo_recente = Codigo.buscar_codigo_recente(usuario.id)
 
-    if not codigo_recente or codigo_recente.esta_expirado():
+    if (not codigo_recente or codigo_recente.usado or codigo_recente.esta_expirado()
+        or not codigo_recente.email_destino or codigo_recente.email_destino != usuario.email):
       raise ValueError("Código inválido ou expirado. Solicite outro código")
 
     if not codigo_recente.registrar_tentativa():
@@ -26,8 +27,6 @@ class VerificarCodigoEmail:
     if not secrets.compare_digest(codigo_recente.codigo, codigo_informado):
       raise ValueError("O código digitado está errado")
 
-    codigo_recente.marcar_como_usado()
-    usuario.verificado = True
-    usuario.salvar()
+    codigo_recente.confirmar_email()
 
     return usuario.to_dict()

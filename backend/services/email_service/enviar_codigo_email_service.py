@@ -12,22 +12,17 @@ class EnviarEmailService:
 
     Codigo.verificar_limite_envio(usuario.id)
     
+    email_destino = usuario.email
     msg = Message(
         subject='Confirme seu email - BOOSTio',
-        recipients=[usuario.email], 
+        recipients=[email_destino],
     )
 
     codigo = self._gerar_codigo()
     self._monta_mensagem(msg,codigo)
 
+    Codigo.emitir(usuario.id, email_destino, codigo)
     mail.send(msg)
-
-    codigo = Codigo(
-      usuario_id = usuario.id,
-      codigo = codigo
-    )
-
-    codigo.salvar()
 
     return True
 

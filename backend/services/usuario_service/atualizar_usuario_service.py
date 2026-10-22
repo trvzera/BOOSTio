@@ -24,7 +24,6 @@ class AtualizarUsuarioService:
       if usuario_existente and usuario_existente.id != usuario.id:
         raise ValueError("Já existe um usuario com esse email")
 
-      usuario.verificado = False
       
     senha = dados.get("senha")
 
