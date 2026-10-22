@@ -3,6 +3,7 @@ from configs import ambientes,configurar_oauth #Antes por esta com secret_key(IM
 from flask import Flask
 from services.configuracao_service.configurar_acesso_service import ConfigurarAcessoService
 from models import db,lm,mail 
+from commands.precos import registrar_comandos_precos
 import os
 
 from controllers.usuario_controller import usuario_bp
@@ -43,8 +44,6 @@ app.register_blueprint(build_bp)
 registrar_migracao_budget(app, db)
 
 registrar_comandos_banco(app)
-
-from commands.precos import registrar_comandos_precos
 registrar_comandos_precos(app)
 
 if __name__ == '__main__':
