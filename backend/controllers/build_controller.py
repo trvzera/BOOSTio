@@ -1,12 +1,13 @@
 from flask import Blueprint,request,jsonify
 from flask_login import login_required,current_user
+from utils.limite_requisicoes import limiter, chave_usuario
 from models import db
 from models.build_salva import LimiteBuildsError, EmailNaoVerificadoError
 from sqlalchemy.exc import SQLAlchemyError
 from requests.exceptions import RequestException, HTTPError, Timeout, ConnectionError
 
 from services.build_service.listar_builds_service import ListarBuildService
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.criar_build_service import CriarBuildService, ErroGeracaoBuild
 from services.build_service.buscar_build_service import BuscarBuildService
 from services.build_service.listar_catalogo_build_service import ListarCatalogoBuildService
 from services.build_service.criar_build_manual_service import CriarBuildManualService
@@ -39,6 +40,9 @@ def mostrar_builds():
     return jsonify({"erro": str(e)}),404
 
 @build_bp.post("/")
+@limiter.limit("10 per minute")
+@limiter.limit("60 per day")
+@limiter.limit("10 per day", key_func=chave_usuario)
 @login_required
 def criar_build():
   try:
@@ -53,19 +57,33 @@ def criar_build():
     except HTTPError as erro:
       if erro.response is None or erro.response.status_code not in (429, 500, 502, 503, 504):
         raise
-      build = CriarBuildService().executar(usuario_id, dados, modelo="gemini-3.8-flash")
+      build = CriarBuildService().executar(usuario_id, dados, modelo="gemini-3.8-flash", tentativas_correcao=0)
     except (Timeout, ConnectionError):
-      build = CriarBuildService().executar(usuario_id, dados, modelo="gemini-3.8-flash")
+      build = CriarBuildService().executar(usuario_id, dados, modelo="gemini-3.8-flash", tentativas_correcao=0)
     builds = ListarBuildService().executar(usuario_id)
 
     return jsonify({"mensagem": "Build criada com sucesso", "build": build, "builds": builds}),201
   except (LimiteBuildsError, EmailNaoVerificadoError):
     raise
+  except ErroGeracaoBuild as erro:
+    return jsonify({"erro": str(erro), "codigo": "geracao-invalida"}),502
   except ValueError as e:
     return jsonify({"erro": str(e)}),400
 
+  except Timeout:
+    return jsonify({"erro": "A IA demorou demais para responder. Suas respostas foram preservadas; tente novamente em alguns instantes.", "codigo": "ia-timeout"}),504
+  except ConnectionError:
+    return jsonify({"erro": "Não foi possível acessar o serviço de montagem. Tente novamente em alguns instantes.", "codigo": "ia-indisponivel"}),503
+  except HTTPError as erro:
+    if erro.response is not None and erro.response.status_code == 429:
+      resposta = jsonify({"erro": "O serviço de montagem atingiu um limite temporário. Aguarde alguns instantes e tente novamente.", "codigo": "ia-limite"})
+      espera = erro.response.headers.get("Retry-After", "")
+      if espera.isascii() and espera.isdigit() and len(espera) <= 4 and 0 < int(espera) <= 3600:
+        resposta.headers["Retry-After"] = espera
+      return resposta,503
+    return jsonify({"erro": "O serviço de montagem está indisponível agora. Tente novamente mais tarde.", "codigo": "ia-provedor"}),502
   except RequestException:
-    return jsonify({"erro": "Não foi possível gerar a build agora"}),502
+    return jsonify({"erro": "Não foi possível consultar o serviço de montagem. Tente novamente em alguns instantes.", "codigo": "ia-provedor"}),502
 
   except SQLAlchemyError:
     db.session.rollback()

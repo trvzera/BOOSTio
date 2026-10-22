@@ -6,6 +6,87 @@ import { redirecionamentoSessao, linksVisitante, linksAutenticado } from "../js/
 import { perfilLoading } from "../js/components/page-loading.js";
 import { ofertasPeca } from "../js/build/catalogo.js";
 import { destinoAnterior, rotuloVoltar } from "../js/components/navigation-back.js";
+import { avisoFreteHtml } from "../js/build/acoes-build.js";
+
+test("montagem lembra de reservar orçamento para frete sem inventar uma cotação",() => {
+  const aviso = avisoFreteHtml();
+  assert.match(aviso,/Frete não incluído/);
+  assert.match(aviso,/Reserve parte do orçamento para a entrega/);
+  assert.match(aviso,/CEP e as lojas escolhidas/);
+  assert.match(aviso,/class="shipping-notice planning-help" role="note"/);
+  assert.doesNotMatch(aviso,/R\$|\d+%|role="alert"/);
+});
+
+test("aviso de frete fica junto ao total e também acompanha a compra da build",async () => {
+  const editor = await readFile(new URL("../js/pages/configuracao-build.js",import.meta.url),"utf8");
+  const salva = await readFile(new URL("../js/build/build-salva.js",import.meta.url),"utf8");
+  const acoes = await readFile(new URL("../js/build/acoes-build.js",import.meta.url),"utf8");
+  const css = await readFile(new URL("../styles/build/recursos.css",import.meta.url),"utf8");
+  assert.match(editor,/'<\/strong>' \+ avisoFreteHtml\(\) \+ '<div class="summary-power"/);
+  assert.match(salva,/class="summary-total">[^\n]+\n\s*\$\{avisoFreteHtml\(\)\}/);
+  assert.match(acoes,/avisoFreteHtml\(\) \+ avisoCompraHtml\(\) \+ '<div class="build-purchase-list"/);
+  assert.match(css,/\.shipping-notice strong \{[^}]*color: var\(--cor-p1\)/);
+});
+
+test("sair e excluir conta mantêm perigo vermelho, sem alterar a verificação de e-mail",async () => {
+  const menu = await readFile(new URL("../styles/componentes/site-menu.css",import.meta.url),"utf8");
+  const conta = await readFile(new URL("../styles/conta/configuracoes.css",import.meta.url),"utf8");
+  assert.match(menu,/\.profile-logout:hover, \.profile-logout:focus-visible\s*\{[^}]*color: var\(--status-error\)/s);
+  assert.match(conta,/#delete-modal \.modal-icon\s*\{[^}]*color: var\(--status-error\)/s);
+});
+
+test("checkboxes compartilham fonte e cor e detalhes não desativam sticky no desktop",async () => {
+  const ui = await readFile(new URL("../styles/componentes/ui-system.css",import.meta.url),"utf8");
+  const editor = await readFile(new URL("../styles/responsividades/r-editor-build.css",import.meta.url),"utf8");
+  assert.match(ui,/\.ui-check \{[^}]*font-family: var\(--font-body\);[^}]*color: var\(--cor-6\)/s);
+  assert.doesNotMatch(editor,/\.build-sidebar:has\(\.summary-metadata\[open\]\)\s*\{[^}]*position: static/s);
+  assert.match(editor,/@media \(max-height: 760px\)/);
+});
+
+test("menu lateral não inclui ícones das opções, mantendo os do perfil",async () => {
+  const js = await readFile(new URL("../js/header.js",import.meta.url),"utf8");
+  assert.match(js,/perfil && item\.icone \? iconeAnimado\(item\.icone\)/);
+});
+
+test("configurações enquadra o Lottie sem escala CSS e tem fallback reconhecível",async () => {
+  const js = await readFile(new URL("../js/components/ui.js",import.meta.url),"utf8");
+  const css = await readFile(new URL("../styles/componentes/site-menu.css",import.meta.url),"utf8");
+  const arquivo = JSON.parse(await readFile(new URL("../lottie/user.json",import.meta.url),"utf8"));
+  assert.equal(arquivo.w,1000); assert.equal(arquivo.h,1000);
+  assert.match(js,/elemento\.dataset\.lottie === "user"\s*\? \{rendererSettings:\{viewBoxSize:"175 170 750 750"/);
+  assert.match(js,/registrarAnimacao\([^;]+,opcoes\)/);
+  assert.doesNotMatch(css,/\[data-lottie="user"\] svg\s*\{\s*transform: scale/);
+  assert.match(css,/\.profile-link:focus-visible \.ui-lottie \{ color: inherit; \}/);
+  const icone = iconeAnimado("user");
+  assert.match(icone,/aria-hidden="true"/); assert.match(icone,/<svg viewBox="0 0 24 24"/);
+  assert.doesNotMatch(icone,/●/);
+});
+
+test("seletores de montagem e desempenho registram os quatro novos Lotties com alternativa estática",async () => {
+  const ui = await readFile(new URL("../js/components/ui.js",import.meta.url),"utf8");
+  for (const nome of ["gamepad","microchip","handsparkle","normalhand"]) {
+    assert.ok(ui.includes(nome + ':"' + nome + '.json"'));
+    const arquivo = JSON.parse(await readFile(new URL("../lottie/" + nome + ".json",import.meta.url),"utf8"));
+    assert.ok(arquivo.w > 0 && arquivo.h > 0 && arquivo.op > arquivo.ip && arquivo.fr > 0);
+    const icone = iconeAnimado(nome);
+    assert.ok(icone.includes('data-lottie="' + nome + '"'));
+    assert.match(icone,/aria-hidden="true"/);
+    assert.match(icone,/<span class="ui-icon-fallback"><svg viewBox="0 0 24 24"/);
+  }
+});
+
+test("montagem e benchmark usam os ícones correspondentes sem alterar ações e rótulos",async () => {
+  const builds = await readFile(new URL("../js/pages/builds-conta.js",import.meta.url),"utf8");
+  const acoes = await readFile(new URL("../js/build/acoes-build.js",import.meta.url),"utf8");
+  const css = await readFile(new URL("../styles/build/recursos.css",import.meta.url),"utf8");
+  for (const [nome,rotulo] of [["handsparkle","Formulário inteligente"],["normalhand","Montagem manual"]])
+    assert.ok(builds.includes('iconeAnimado("' + nome + '") + \'<strong>' + rotulo + '</strong>'));
+  for (const [nome,rotulo] of [["gamepad","Jogos · FPS"],["microchip","Blender · Renderização"]])
+    assert.ok(acoes.includes('iconeAnimado("' + nome + '") + \'<span>' + rotulo + '</span>'));
+  assert.match(css,/\.build-create-option:is\(:hover,:focus-visible\)/);
+  assert.match(css,/\.build-create-option > \.ui-lottie \{[^}]*color: var\(--cor-p1\)/);
+  assert.match(css,/span:not\(\.build-create-option-action\):not\(\.ui-lottie\)/);
+});
 
 test("tooltip não gera novas mutações ao repetir o mesmo motivo", () => {
   let texto = "", escritas = 0;
@@ -98,6 +179,17 @@ test("criar build oferece manual ou formulário, sem dois atalhos divergentes",a
   assert.match(js,/Montagem manual/);
   assert.match(js,/Formulário inteligente/);
   assert.match(js,/criarBuildManual/);
+});
+test("importar build separa o arquivo das ações e preserva descrição acessível e botão responsivo",async () => {
+  const js = await readFile(new URL("../js/pages/builds-conta.js",import.meta.url),"utf8");
+  const css = await readFile(new URL("../styles/build/recursos.css",import.meta.url),"utf8");
+  assert.match(js,/class="build-import-fields"/);
+  assert.match(js,/<label class="planning-field" for="build-import-file">/);
+  assert.match(js,/aria-describedby="build-import-help build-import-status"/);
+  assert.match(js,/<div class="build-action-actions"><button[^>]*id="build-import-confirm"/);
+  assert.match(css,/\.build-import-fields \{[^}]*display: grid;[^}]*gap: 16px/);
+  assert.match(css,/\.build-action-actions \{[^}]*margin-top: 22px/);
+  assert.match(css,/\.build-action-actions > \*, \.builds-toolbar > \* \{ width: 100%; \}/);
 });
 test("fechar e voltar compartilham controles visuais sem alterar a tipografia global",async () => {
   const css = await readFile(new URL("../styles/componentes/navigation-controls.css",import.meta.url),"utf8");

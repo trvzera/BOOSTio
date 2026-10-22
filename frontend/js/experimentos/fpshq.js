@@ -50,7 +50,8 @@ export function criarClienteFPSHQ({fetcher = (...args) => fetch(...args),agora =
     } catch { /* Armazenamento indisponível não impede uma consulta explícita. */ }
     return null;
   }
-  async function requisitar(caminho,parametros) {
+  async function requisitar(caminho,parametros,{signal} = {}) {
+    if (signal?.aborted) throw new ErroFPSHQ("Consulta cancelada.","cancelado");
     const url = new URL(caminho,FPSHQ_BASE);
     url.search = new URLSearchParams({...parametros,lang:"pt"});
     const chave = "boostio:fpshq-teste:v1:" + url.search;
@@ -61,6 +62,8 @@ export function criarClienteFPSHQ({fetcher = (...args) => fetch(...args),agora =
     bloqueadoAte = agora() + 1500;
     const promessa = (async () => {
       const controle = new AbortController();
+      const cancelar = () => controle.abort();
+      signal?.addEventListener("abort",cancelar,{once:true});
       const temporizador = setTimeout(() => controle.abort(),timeoutMs);
       try {
         const resposta = await fetcher(url.href,{signal:controle.signal,credentials:"omit",referrerPolicy:"no-referrer",headers:{Accept:"application/json"}});
@@ -82,22 +85,23 @@ export function criarClienteFPSHQ({fetcher = (...args) => fetch(...args),agora =
         return {...item,cache:false};
       } catch (erro) {
         if (erro instanceof ErroFPSHQ) throw erro;
+        if (signal?.aborted) throw new ErroFPSHQ("Consulta cancelada.","cancelado");
         throw new ErroFPSHQ(controle.signal.aborted ? "A consulta demorou demais. Tente novamente." : "Não foi possível acessar a FPSHQ. Confira a conexão e tente novamente.",controle.signal.aborted ? "timeout" : "rede");
-      } finally { clearTimeout(temporizador); }
+      } finally { clearTimeout(temporizador); signal?.removeEventListener("abort",cancelar); }
     })();
     pendentes.set(chave,promessa);
     try { return await promessa; } finally { pendentes.delete(chave); }
   }
   return {
-    async consultar(entrada) {
+    async consultar(entrada,opcoes) {
       const consulta = validarConsulta(entrada);
-      const resposta = await requisitar("fps",consulta);
+      const resposta = await requisitar("fps",consulta,opcoes);
       return {...normalizarResultado(resposta.dados,consulta),consultadoEm:resposta.data,cache:resposta.cache};
     },
-    async buscarJogos(texto) {
+    async buscarJogos(texto,opcoes) {
       const q = String(texto || "").trim();
       if (q.length < 2 || q.length > 60) throw new ErroFPSHQ("Digite entre 2 e 60 caracteres para buscar um jogo.","entrada");
-      const {dados} = await requisitar("games",{q});
+      const {dados} = await requisitar("games",{q},opcoes);
       if (!Array.isArray(dados.results)) throw new ErroFPSHQ("A busca retornou um formato inesperado.","resposta");
       return dados.results.filter(jogo => typeof jogo.slug === "string" && SLUG.test(jogo.slug) && typeof jogo.name === "string")
         .slice(0,10).map(({slug,name}) => ({slug,name:name.slice(0,180)}));

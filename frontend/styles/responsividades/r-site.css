@@ -73,7 +73,7 @@ footer { width: 100%; max-width: 1240px; padding: clamp(20px, 3vw, 32px); }
 .modal-actions { flex-wrap: wrap; }
 .modal-actions > .disabled-tip-anchor { padding: 0; }
 .modal-actions > .disabled-tip-anchor > button { width: 100%; }
-.code-inputs { display: grid; grid-template-columns: repeat(4, minmax(0, 52px)); gap: clamp(6px, 2vw, 12px); }
+.code-inputs { display: grid; grid-template-columns: repeat(6, minmax(0, 52px)); gap: clamp(6px, 2vw, 12px); }
 .code-input { width: 100%; min-width: 0; }
 .toast, #builder-feedback { width: max-content; max-width: calc(100% - 32px); bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
 .toast { border-radius: 16px; }

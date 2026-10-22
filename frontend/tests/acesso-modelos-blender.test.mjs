@@ -28,10 +28,10 @@ test("visitante só acessa páginas públicas e recuperação de conta",async ()
   }
 });
 
-test("dez modelos sem periféricos estão completos nos dados disponíveis e cobrem usos e valores distintos",() => {
+test("dezesseis modelos sem periféricos estão completos nos dados disponíveis e cobrem usos e valores distintos",() => {
   const modelos = modelosProntos(catalogo);
-  assert.equal(modelos.length,10);
-  assert.equal(new Set(modelos.map(b=>b.id)).size,10);
+  assert.equal(modelos.length,16);
+  assert.equal(new Set(modelos.map(b=>b.id)).size,16);
   assert.ok(new Set(modelos.map(b=>b.objetivo)).size>=5);
   for (const build of modelos) {
     const avaliacao = avaliarBuild(build,catalogo);
@@ -72,8 +72,9 @@ test("periféricos próprios viajam separados do hardware e não vazam ao mudar 
   assert.deepEqual(pecasPropriasFormulario({...respostas,pecas:["processador"],pecasDetalhes:{...respostas.pecasDetalhes,processador:"Ryzen 5 5600"}}),{processador:"Ryzen 5 5600",monitor:"Meu monitor",fone:"Meu headset"});
 });
 
-test("hamburger tem criação e navegação pública sem repetir páginas do perfil",() => {
-  assert.deepEqual(linksAutenticado.map(l=>l.pagina),["index.html","builds.html?criar=1","termos.html","sobre.html"]);
+test("hamburger tem criação, minhas builds autenticadas e navegação pública",() => {
+  assert.deepEqual(linksAutenticado.map(l=>l.pagina),["index.html","builds.html","builds.html?criar=1","termos.html","sobre.html"]);
+  assert.equal(linksAutenticado.find(l=>l.pagina==="builds.html").autenticado,true);
   assert.ok(linksAutenticado.every(l=>l.icone));
 });
 

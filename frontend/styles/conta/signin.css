@@ -237,7 +237,7 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  gap: var(--espacamento-12);
+  gap: var(--espacamento-8);
   margin-bottom: var(--espacamento-16);
 }
 

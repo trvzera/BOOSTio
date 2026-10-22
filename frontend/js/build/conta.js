@@ -1,9 +1,11 @@
 import { buscarBuild, catalogoBuilds, atualizarBuild } from "../api/build/builds.js";
 import { normalizarBuild, categoriasMultiplas } from "./estado.js";
+import { carregarManifestoImagens, completarImagens } from "./imagens-produtos.js";
 
 let catalogoPendente;
 export function carregarCatalogoConta() {
-  catalogoPendente ??= catalogoBuilds().then(resposta => resposta.pecas).catch(erro => {
+  catalogoPendente ??= Promise.all([catalogoBuilds(),carregarManifestoImagens()])
+    .then(([resposta,imagens]) => completarImagens(resposta.pecas,imagens)).catch(erro => {
     catalogoPendente = null;
     throw erro;
   });

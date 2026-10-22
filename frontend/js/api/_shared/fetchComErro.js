@@ -5,16 +5,27 @@ import { API_URL } from "../../config.js";
 // e devolve o JSON já parseado em caso de sucesso.
 export async function fetchComErro(caminho, opcoes = {}) {
   const { headers, ...restoDasOpcoes } = opcoes;
+  const metodo = (restoDasOpcoes.method || "GET").toUpperCase();
 
   let resposta;
-  try { resposta = await fetch(`${API_URL}${caminho}`, {
-    credentials: "include",
-    ...restoDasOpcoes,
-    headers: {
-      "Content-Type": "application/json",
-      ...headers,
-    },
-  }); } catch (causa) {
+  try {
+    let csrf = {};
+    if (!["GET", "HEAD", "OPTIONS", "TRACE"].includes(metodo)) {
+      const respostaCsrf = await fetch(`${API_URL}/auth/csrf`, { credentials: "include", cache: "no-store", signal: restoDasOpcoes.signal });
+      if (!respostaCsrf.ok) throw new Error("Não foi possível iniciar a requisição com segurança.");
+      const { csrf_token: token } = await respostaCsrf.json();
+      csrf = { "X-CSRF-Token": token };
+    }
+    resposta = await fetch(`${API_URL}${caminho}`, {
+      credentials: "include",
+      ...restoDasOpcoes,
+      headers: {
+        "Content-Type": "application/json",
+        ...headers,
+        ...csrf,
+      },
+    });
+  } catch (causa) {
     if (causa.name === "AbortError") throw causa;
     const offline = typeof navigator !== "undefined" && navigator.onLine === false;
     throw Object.assign(new Error(offline ? "Você está sem internet. Reconecte-se e tente novamente; suas alterações não foram enviadas." : "Não foi possível conectar à BOOSTio. Confira sua conexão e se o servidor está disponível e tente novamente."),{codigo:offline ? "offline" : "conexao",cause:causa});

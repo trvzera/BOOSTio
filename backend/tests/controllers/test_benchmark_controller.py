@@ -26,7 +26,7 @@ def autenticar(cliente):
         sessao["_fresh"] = True
 
 
-@pytest.mark.parametrize("rota", ["/benchmark/fps", "/benchmark/jogos?q=Valorant", "/benchmark/blender"])
+@pytest.mark.parametrize("rota", ["/benchmark/fps", "/benchmark/jogos?q=Valorant", "/benchmark/blender", "/benchmark/requisitos?game=valorant"])
 def test_exige_sessao_e_responde_json(cliente_benchmark, rota):
     resposta = cliente_benchmark.get(rota)
     assert resposta.status_code == 401
@@ -71,3 +71,33 @@ def test_erro_validacao_e_limite_tem_contrato_json(cliente_benchmark, mocker):
     assert resposta.status_code == 429
     assert resposta.headers["Retry-After"] == "90"
     assert resposta.json["espera"] == 90
+
+
+@pytest.mark.parametrize("codigo,status,espera", [("timeout", 504, 30), ("rede", 503, 30),
+                                                ("tls", 503, 60), ("provedor", 503, 60),
+                                                ("resposta", 502, 0), ("sem-dados", 422, 0)])
+def test_falhas_do_provedor_preservam_codigo_http_e_espera(cliente_benchmark, mocker, codigo, status, espera):
+    autenticar(cliente_benchmark)
+    executar = mocker.patch("controllers.benchmark_controller.ConsultarBenchmarkService.executar",
+                           side_effect=ErroBenchmark("Consulta indisponível", codigo, status, espera))
+    resposta = cliente_benchmark.get("/benchmark/fps?game=valorant&cpu=ryzen-5-5600&gpu=rtx-3060")
+    assert resposta.status_code == status
+    assert resposta.json == {"erro": "Consulta indisponível", "codigo": codigo, "espera": espera}
+    assert resposta.headers.get("Retry-After") == (str(espera) if espera else None)
+    assert resposta.headers["Cache-Control"] == "no-store"
+    executar.assert_called_once()
+
+
+def test_requisitos_autenticados_nao_dependem_de_fpshq(cliente_benchmark, mocker):
+    fps = mocker.patch("services.benchmark_service.fpshq_service.FpshqService.executar", side_effect=AssertionError("Não deve consultar FPSHQ"))
+    autenticar(cliente_benchmark)
+    resposta = cliente_benchmark.get("/benchmark/requisitos?game=fortnite&ram_gb=8")
+    assert resposta.status_code == 200
+    assert resposta.headers["Cache-Control"] == "no-store"
+    assert resposta.json["resultado"]["ram"]["atendeMinimo"] is True
+    assert resposta.json["resultado"]["ram"]["atendeRecomendado"] is False
+    assert resposta.json["resultado"]["requisitosVerificados"] is False
+    assert cliente_benchmark.get("/benchmark/requisitos?game=sem-ficha").status_code == 404
+    assert cliente_benchmark.get("/benchmark/requisitos?game=valorant&ram_gb=8&ram_gb=16").status_code == 400
+    assert cliente_benchmark.get("/benchmark/requisitos?game=valorant&cpu=cpu").status_code == 400
+    fps.assert_not_called()

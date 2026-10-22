@@ -12,6 +12,8 @@ import { enviarEmailVerificar } from "../api/email/enviarEmailVerificar.js";
 import { conferirEmailVerificar } from "../api/email/conferirEmailVerificar.js";
 import { acompanharCarregamento } from "../components/page-loading.js";
 import { iniciarCodigoVerificacao } from "../components/verification-code.js";
+import { listarBuilds } from "../api/build/builds.js";
+import { textoBuildsSalvas } from "../conta/resumo-perfil.js";
 
 const SEGUNDOS_REENVIO = 30;
 
@@ -180,6 +182,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     let usuarioAtual = null;
 
+    async function atualizarQuantidadeBuilds() {
+      const resumo = document.querySelector("#profile-build-count");
+      if (!resumo) return;
+      const usuarioId = usuarioAtual?.id, controle = new AbortController();
+      const timeout = setTimeout(() => controle.abort(),8000);
+      resumo.textContent = "Carregando builds…";
+      resumo.removeAttribute("title");
+      try {
+        const resposta = await listarBuilds({signal:controle.signal});
+        if (usuarioAtual?.id === usuarioId) resumo.textContent = textoBuildsSalvas(resposta.builds);
+      } catch {
+        if (usuarioAtual?.id === usuarioId) {
+          resumo.textContent = "Builds indisponíveis";
+          resumo.title = "Não foi possível consultar suas builds. Recarregue a página para tentar novamente.";
+        }
+      } finally { clearTimeout(timeout); }
+    }
+
     async function trocarDadosConfigs() {
       const resposta = await buscarUsuarioLogado();
       const dataFormatada = formatarMesAno(resposta.usuario.criado_em);
@@ -192,6 +212,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       inputEmail.value = resposta.usuario.email;
       criadoEm.textContent = `Membro desde ${dataFormatada}`;
       atualizarPillVerificado(resposta.usuario.verificado);
+      await atualizarQuantidadeBuilds();
     }
 
     // --- Modal de verificação de e-mail ---
@@ -220,7 +241,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function validarCodigoCompleto() {
       const codigo = inputsCodigo.map((input) => input.value).join("");
-      botaoConfirmarCodigo.disabled = codigo.length !== 4;
+      botaoConfirmarCodigo.disabled = codigo.length !== inputsCodigo.length;
     }
 
     function iniciarContagemReenvio() {
@@ -397,6 +418,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     await acompanharCarregamento(trocarDadosConfigs());
+    window.addEventListener("pageshow",evento => { if (evento.persisted) acompanharCarregamento(trocarDadosConfigs()); });
     if (new URLSearchParams(location.search).has("verificar")) abrirModalVerificacao();
   } catch (erro) {
     console.error("Erro ao iniciar a página de configurações:", erro);

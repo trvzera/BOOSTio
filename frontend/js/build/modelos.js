@@ -53,7 +53,42 @@ const MODELOS = [
     descricao:"Core i7, 64 GB de RAM e SSD de 1 TB para ambientes de desenvolvimento e virtualização. Usa vídeo integrado.",
     pecas:[["SEED-CPU-09",1],["SEED-MB-09",1],["SEED-RAM-05",2],["SEED-SSD-04",1],["SEED-PSU-03",1],["SEED-CASE-02",1],["SEED-FAN-02",2],["SEED-ACOOL-04",1]],
   },
+  {
+    id:"modelo-jogos-intel",titulo:"Jogos com plataforma Intel",objetivo:"jogos",objetivoRotulo:"Jogos",plataforma:"LGA1700",nivel:"Intermediária",
+    descricao:"Core i5, RTX 4060 e dois pentes de 16 GB DDR5. Uma alternativa Intel para personalizar conforme seus jogos.",
+    pecas:[["SEED-CPU-07",1],["SEED-MB-07",1],["SEED-RAM-03",2],["SEED-SSD-02",1],["SEED-GPU-04",1],["SEED-PSU-03",1],["SEED-CASE-02",1],["SEED-FAN-02",2],["SEED-ACOOL-04",1]],
+  },
+  {
+    id:"modelo-criacao-stream",titulo:"Jogos e criação ao vivo",objetivo:"criacao",objetivoRotulo:"Criação de conteúdo",plataforma:"AM5",nivel:"Intermediária",
+    descricao:"Ryzen 7, RTX 4060 e 32 GB para combinar jogos com gravação e criação. Confira os requisitos dos seus aplicativos.",
+    pecas:[["SEED-CPU-04",1],["SEED-MB-08",1],["SEED-RAM-05",1],["SEED-SSD-04",1],["SEED-GPU-04",1],["SEED-PSU-03",1],["SEED-CASE-02",1],["SEED-FAN-02",2],["SEED-ACOOL-02",1]],
+  },
+  {
+    id:"modelo-arquivos",titulo:"Trabalho e muitos arquivos",objetivo:"trabalho",objetivoRotulo:"Trabalho e produtividade",plataforma:"AM5",nivel:"Intermediária",
+    descricao:"32 GB de RAM, SSD para os programas e HD de 2 TB para arquivos. Usa o vídeo integrado do Ryzen 5.",
+    pecas:[["SEED-CPU-03",1],["SEED-MB-08",1],["SEED-RAM-05",1],["SEED-SSD-02",1],["SEED-HDD-02",1],["SEED-PSU-01",1],["SEED-CASE-02",1],["SEED-FAN-01",2]],
+  },
+  {
+    id:"modelo-render-cpu",titulo:"Renderização pelo processador",objetivo:"renderizacao",objetivoRotulo:"Modelagem e renderização",plataforma:"AM5",nivel:"Avançada",
+    descricao:"Ryzen 9 e 64 GB de RAM para cenas renderizadas pela CPU. Sem GPU dedicada; usa vídeo integrado para imagem.",
+    pecas:[["SEED-CPU-05",1],["SEED-MB-08",1],["SEED-RAM-05",2],["SEED-SSD-04",1],["SEED-PSU-03",1],["SEED-CASE-02",1],["SEED-FAN-02",2],["SEED-ACOOL-02",1]],
+  },
+  {
+    id:"modelo-laboratorio",titulo:"Laboratório de desenvolvimento",objetivo:"programacao",objetivoRotulo:"Programação",plataforma:"LGA1700",nivel:"Avançada",
+    descricao:"Core i7, 64 GB de RAM e dois SSDs para separar projetos e ambientes de teste. Sem GPU dedicada.",
+    pecas:[["SEED-CPU-09",1],["SEED-MB-09",1],["SEED-RAM-05",2],["SEED-SSD-04",2],["SEED-PSU-03",1],["SEED-CASE-02",1],["SEED-FAN-02",2],["SEED-ACOOL-04",1]],
+  },
+  {
+    id:"modelo-primeiro-intel",titulo:"Primeiro PC com Intel",objetivo:"jogos",objetivoRotulo:"Jogos",plataforma:"LGA1700",nivel:"Entrada",
+    descricao:"Core i3, GTX 1660 Super, 16 GB em dois pentes e SSD. Uma base sem periféricos para escolher seus próximos upgrades.",
+    pecas:[["SEED-CPU-06",1],["SEED-MB-10",1],["SEED-RAM-02",1],["SEED-SSD-01",1],["SEED-GPU-01",1],["SEED-PSU-01",1],["SEED-CASE-01",1],["SEED-FAN-01",2],["SEED-ACOOL-04",1]],
+  },
 ];
+
+export function ordenarModelosPorPreco(modelos) {
+  const preco = item => Number.isFinite(item.avaliacao.preco) && item.avaliacao.preco > 0 ? item.avaliacao.preco : Infinity;
+  return [...modelos].sort((a,b) => preco(a) - preco(b) || a.build.titulo.localeCompare(b.build.titulo,"pt-BR"));
+}
 
 export function modelosProntos(catalogo,{referencias = catalogo} = {}) {
   return MODELOS.map(modelo => {
