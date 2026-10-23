@@ -105,6 +105,12 @@ O backend recusa iniciar em produção sem `SECRET_KEY` de pelo menos 32 caracte
 também é obrigatório para o Flask-Limiter. Mantenha a mesma `SECRET_KEY` entre
 workers e implantações para preservar as sessões.
 
+A geração de builds limita cada conta a dez tentativas por dia e reserva no Redis
+até 100 chamadas diárias à IA para o projeto inteiro, contando revisões e tentativas
+com outro modelo. O dia vira à meia-noite de São Paulo. Há uma trava por usuário
+durante a geração; outra solicitação simultânea da mesma conta recebe HTTP 409.
+Se o Redis estiver indisponível, o backend não gera builds sem esse controle.
+
 Configure DNS e certificado HTTPS para `boostio.com.br` e
 `api.boostio.com.br`. Publique a pasta `frontend` como raiz do site para que
 `https://boostio.com.br/pages/index.html` exista. A API deve responder em
