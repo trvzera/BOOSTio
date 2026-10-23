@@ -27,6 +27,11 @@ def pagina(codigo, preco="999.90", disponibilidade="InStock"):
             f'"availability":"https://schema.org/{disponibilidade}"}}}}</script>')
 
 
+def resposta_html(url, html):
+    return Mock(url=url, status_code=200, headers={"Content-Type": "text/html"}, encoding="utf-8",
+                iter_content=Mock(return_value=[html.encode("utf-8")]), raise_for_status=Mock())
+
+
 class ColetaKabumTest(unittest.TestCase):
     def setUp(self):
         self.app = Flask(__name__)
@@ -54,10 +59,9 @@ class ColetaKabumTest(unittest.TestCase):
 
         def buscar(url, **kwargs):
             codigo = "123" if url == URL_1 else "456"
-            return Mock(url=url, text=pagina(codigo, "999.90" if codigo == "123" else "1200.50"),
-                        raise_for_status=Mock())
+            return resposta_html(url, pagina(codigo, "999.90" if codigo == "123" else "1200.50"))
 
-        with patch("services.preco_service.buscar_preco_kabum_service.requests.get", side_effect=buscar) as get:
+        with patch("services.preco_service.buscar_pagina_kabum_service.requests.get", side_effect=buscar) as get:
             resumo = AtualizarPrecosService().executar(intervalo=0)
             self.assertEqual(resumo["consultas"], 2)
             self.assertEqual(resumo["atualizadas"], 2)
@@ -104,10 +108,10 @@ class ColetaKabumTest(unittest.TestCase):
 
         def buscar(url, **kwargs):
             codigo = url.split("/produto/")[1].split("/")[0]
-            return Mock(url=url, text=pagina(codigo), raise_for_status=Mock())
+            return resposta_html(url, pagina(codigo))
 
         with patch.object(PopularPecasService, "_dados_seed", return_value={PlacaVideo: dados}), \
-             patch("services.preco_service.buscar_preco_kabum_service.requests.get", side_effect=buscar) as get, \
+             patch("services.preco_service.buscar_pagina_kabum_service.requests.get", side_effect=buscar) as get, \
              patch("builtins.print"):
             resumo = PopularPecasService().executar(intervalo=0)
         self.assertEqual(resumo["atualizadas"], 2)
@@ -119,8 +123,8 @@ class ColetaKabumTest(unittest.TestCase):
         peca.preco = 500
         peca.imagem_url = "../imgs/produtos/placa_video-1.jpg"
         db.session.commit()
-        resposta = Mock(url=URL_1, text=pagina("456"), raise_for_status=Mock())
-        with patch("services.preco_service.buscar_preco_kabum_service.requests.get", return_value=resposta):
+        resposta = resposta_html(URL_1, pagina("456"))
+        with patch("services.preco_service.buscar_pagina_kabum_service.requests.get", return_value=resposta):
             self.assertEqual(AtualizarPrecosService().executar()["falhas"], 1)
         self.assertEqual(peca.preco, 500)
         self.assertEqual(ConsultaPreco.query.one().status, "falha")
@@ -138,9 +142,9 @@ class ColetaKabumTest(unittest.TestCase):
 
         def buscar(url, **kwargs):
             codigo = url.split("/produto/")[1].split("/")[0]
-            return Mock(url=url, text=pagina(codigo), raise_for_status=Mock())
+            return resposta_html(url, pagina(codigo))
 
-        with patch("services.preco_service.buscar_preco_kabum_service.requests.get", side_effect=buscar) as get:
+        with patch("services.preco_service.buscar_pagina_kabum_service.requests.get", side_effect=buscar) as get:
             resumo = AtualizarPrecosService().executar(intervalo=0)
         self.assertEqual(resumo["atualizadas"], 701)
         self.assertEqual(get.call_count, 701)
@@ -155,9 +159,9 @@ class ColetaKabumTest(unittest.TestCase):
             if codigo == "456":
                 erro = requests.HTTPError(response=Mock(status_code=403))
                 return Mock(url=url, raise_for_status=Mock(side_effect=erro))
-            return Mock(url=url, text=pagina(codigo), raise_for_status=Mock())
+            return resposta_html(url, pagina(codigo))
 
-        with patch("services.preco_service.buscar_preco_kabum_service.requests.get", side_effect=buscar):
+        with patch("services.preco_service.buscar_pagina_kabum_service.requests.get", side_effect=buscar):
             self.assertEqual(AtualizarPrecosService().executar(intervalo=0)["consultas"], 2)
             self.assertEqual(AtualizarPrecosService().executar(intervalo=0)["atualizadas"], 1)
         self.assertEqual(ConsultaPreco.query.count(), 3)
@@ -193,8 +197,8 @@ class ColetaKabumTest(unittest.TestCase):
         db.session.commit()
         html = ('<script type="application/ld+json">{"@type":"Product","sku":"123",'
                 '"offers":{"availability":"https://schema.org/OutOfStock"}}</script>')
-        resposta = Mock(url=URL_1, text=html, raise_for_status=Mock())
-        with patch("services.preco_service.buscar_preco_kabum_service.requests.get", return_value=resposta):
+        resposta = resposta_html(URL_1, html)
+        with patch("services.preco_service.buscar_pagina_kabum_service.requests.get", return_value=resposta):
             self.assertEqual(AtualizarPrecosService().executar()["atualizadas"], 1)
         self.assertTrue(peca.esgotado)
         self.assertEqual(peca.preco, 500)

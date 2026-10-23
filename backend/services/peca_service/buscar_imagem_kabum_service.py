@@ -6,6 +6,7 @@ from urllib.parse import urlsplit
 import requests
 
 from services.preco_service.validar_link_service import ValidarLinkService
+from services.preco_service.buscar_pagina_kabum_service import BuscarPaginaKabumService
 
 
 class _MetadadosProduto(HTMLParser):
@@ -42,14 +43,7 @@ class BuscarImagemKabumService:
     def executar(self, url):
         ValidarLinkService().executar(url)
         codigo = self._codigo(url)
-        resposta = requests.get(url, timeout=(10, 30), allow_redirects=True,
-                                headers={"User-Agent": "Mozilla/5.0", "Accept": "text/html"})
-        resposta.raise_for_status()
-        ValidarLinkService().executar(resposta.url)
-        if self._codigo(resposta.url) != codigo:
-            raise ValueError("A KaBuM redirecionou para outro produto")
-
-        imagem = self._imagem_do_anuncio(resposta.text, codigo)
+        imagem = self._imagem_do_anuncio(BuscarPaginaKabumService().executar(url), codigo)
         resposta_imagem = requests.get(imagem, timeout=(10, 30), stream=True,
                                       allow_redirects=False,
                                       headers={"User-Agent": "Mozilla/5.0", "Referer": "https://www.kabum.com.br/"})

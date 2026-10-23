@@ -55,7 +55,8 @@ class ImagensKabumTest(unittest.TestCase):
         db.session.add(peca)
         db.session.commit()
         jpg = b"\xff\xd8\xff" + b"foto"
-        pagina_response = Mock(url=URL, text=pagina())
+        pagina_response = Mock(url=URL, status_code=200, headers={"Content-Type": "text/html"}, encoding="utf-8")
+        pagina_response.iter_content.return_value = [pagina().encode("utf-8")]
         pagina_response.raise_for_status.return_value = None
         imagem_response = Mock(headers={"Content-Type": "image/jpeg"}, is_redirect=False)
         imagem_response.iter_content.return_value = [jpg]
