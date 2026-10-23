@@ -17,7 +17,7 @@ python app.py
 Execute `banco-preparar` antes do primeiro uso e após atualizações que tragam
 migrações. Não é necessário executá-lo a cada início do servidor. Seu SQLite
 existente recebe uma cópia `.antes-migracao-*.db` antes das alterações; mantenha
-essa cópia protegida. As migrações atuais são específicas para SQLite.
+essa cópia protegida. As migrações do banco local são específicas para SQLite.
 Pare os processos que escrevem no banco ao migrar. O conjunto de migrações
 possui várias transações: em caso de falha, corrija e repita ou restaure o backup
 com o servidor parado. Não execute a migração simultaneamente em várias réplicas.
@@ -30,6 +30,12 @@ Com o ambiente de produção configurado, execute uma vez por implantação:
 python -m flask --app app banco-preparar
 python configurar_frontend.py
 ```
+
+Com `URL_DATABASE=mysql+pymysql://...`, `banco-preparar` cria o esquema somente
+em um banco MySQL vazio. Ele recusa um MySQL que já tenha tabelas, para não
+silenciar mudanças de esquema. Para implantações futuras com alterações nos
+models, faça uma migração versionada e um backup do MySQL antes de atualizar a
+aplicação. Isso não altera o SQLite local.
 
 Depois inicie o processo web:
 
