@@ -1,0 +1,38 @@
+http:
+  routers:
+    frontend:
+      rule: "Host(`boostio.com.br`)"
+      entryPoints: [websecure]
+      service: frontend
+      middlewares: [cabecalhos-seguranca]
+      tls:
+        certResolver: letsencrypt
+    api:
+      rule: "Host(`api.boostio.com.br`)"
+      entryPoints: [websecure]
+      service: api
+      middlewares: [cabecalhos-seguranca]
+      tls:
+        certResolver: letsencrypt
+
+  middlewares:
+    cabecalhos-seguranca:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        contentTypeNosniff: true
+        frameDeny: true
+        referrerPolicy: strict-origin-when-cross-origin
+        customResponseHeaders:
+          Permissions-Policy: "camera=(), microphone=(), geolocation=()"
+          Server: ""
+
+  services:
+    frontend:
+      loadBalancer:
+        servers:
+          - url: "http://web:80"
+    api:
+      loadBalancer:
+        servers:
+          - url: "http://api:8000"
