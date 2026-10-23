@@ -5,6 +5,9 @@ from utils.validacoes import validacao_campos
 class EntrarUsuarioService:
   def executar(self, dados: dict) -> Usuario:
     validacao_campos(dados,["email","senha"])
+    if (not isinstance(dados["email"], str) or len(dados["email"]) > 150
+        or not isinstance(dados["senha"], str) or len(dados["senha"]) > 1024):
+      raise ValueError("Senha ou email inválidos")
 
     usuario = Usuario.buscar_por_email(dados["email"].lower())
 

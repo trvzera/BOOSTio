@@ -40,6 +40,7 @@ class CriarBuildService:
 
   def executar(self, usuario_id, dados, modelo="gemini-3.5-flash-lite", tentativas_correcao=1):
     validacao_campos(dados, ["nome", "descricao", "utilidade", "orcamento"])
+    self._validar_textos_pedido(dados)
     if not Usuario.buscar_por_id(usuario_id):
       raise ValueError("Usuario não encontrado")
     BuildSalva.verificar_espaco(usuario_id)
@@ -100,6 +101,13 @@ class CriarBuildService:
       "incluirPerifericos": percentual > 0, "percentualPerifericos": percentual,
     })
     return AvaliarCompatibilidadeService().para_resposta(BuildSalva.criar_limitada(usuario_id, estado, gerada=dados_build))
+
+  @staticmethod
+  def _validar_textos_pedido(dados):
+    for campo, limite in (("nome", 100), ("descricao", 300), ("utilidade", 120)):
+      valor = dados[campo]
+      if not isinstance(valor, str) or not valor.strip() or len(valor) > limite:
+        raise ValueError(f"{campo} deve ser um texto de até {limite} caracteres")
 
   def _gerar_validada(self, usuario_id, prompt, modelo, catalogo, orcamento,
                      percentual, proprias, detalhes_proprias, rede, tentativas_correcao=1):

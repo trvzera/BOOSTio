@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from configs import ambientes,configurar_oauth #Antes por esta com secret_key(IMPORTANTE)
-from flask import Flask
+from flask import Flask, jsonify
+from werkzeug.exceptions import RequestEntityTooLarge
 from services.configuracao_service.configurar_acesso_service import ConfigurarAcessoService
 from services.configuracao_service.validar_producao_service import ValidarProducaoService
 from models import db,lm,mail 
@@ -23,6 +24,10 @@ load_dotenv()
 #Inicio o app e passo as configurações do app.
 #O instance_path é fixado ao lado do app.py: sem isso o flask usa a pasta atual (cwd) e o caminho relativo do sqlite (URL_DATABASE) quebra dependendo de onde o app é executado.
 app = Flask(__name__, instance_path=os.path.join(os.path.dirname(os.path.abspath(__file__))))
+
+@app.errorhandler(RequestEntityTooLarge)
+def requisicao_grande(_erro):
+    return jsonify({"erro": "Requisição muito grande", "codigo": "requisicao-grande"}), 413
 
 ambiente = os.getenv('APP_ENV', 'desenvolvimento')
 app.config.from_object(ambientes[ambiente])

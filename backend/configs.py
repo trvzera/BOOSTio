@@ -19,6 +19,9 @@ def resolver_uri_banco(uri):
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY") #Sempre maiuscula, ate os nomes das variaveis se não o flask não reconhece
+    MAX_CONTENT_LENGTH = 64 * 1024
+    MAX_FORM_MEMORY_SIZE = 16 * 1024
+    MAX_FORM_PARTS = 20
     TRUSTED_PROXY_HOPS = int(os.getenv("TRUSTED_PROXY_HOPS", "0"))
     TRUSTED_PROXY_PROTO_HOPS = int(os.getenv("TRUSTED_PROXY_PROTO_HOPS", "0"))
     API_PUBLIC_URL = os.getenv("API_PUBLIC_URL")
