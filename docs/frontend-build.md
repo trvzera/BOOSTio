@@ -6,6 +6,80 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Gabinetes: fans inclusas, capacidade e medidas — 23/10/2026
+
+Seis variantes exatas receberam fichas de fabricante no manifesto compartilhado
+`frontend/data/medidas-fisicas.json`. O complemento é aplicado na leitura por
+`Peca.to_catalogo()`, pelo prompt da montagem e pelo catálogo demonstrativo JS.
+Sem alteração do SQLite, migração, coleta de preços/imagens ou chamada LLM.
+Reiniciar um backend já aberto permite reler o manifesto em cache.
+
+- DeepCool MATREXX 55 V4 C, R-MATREXX55-BCADA4-G-4, produto 987488:
+  quatro fans inclusas (três de 140 mm frontais e uma de 120 mm traseira), oito
+  posições totais; 421 × 215 × 483 mm (C × L × A). Limites GPU/air/fonte:
+  370/165/170 mm. Não equivale ao MATREXX 55 original.
+- NZXT H5 Flow 2024 Black, CC-H52FB-01, produto 692553: duas fans de 120 mm
+  inclusas, oito posições, 430 × 225 × 465 mm (C × L × A). Radiador frontal de
+  até 360/280 mm, conforme base; 280 mm superior depende de RAM baixa e não é
+  liberado automaticamente no topo. Site/manual divergem em GPU/air (410/425 e
+  170/175 mm), por isso esses limites ficam não confirmados. Não aplicar ao H5
+  antigo, RGB ou Elite. Fans de fábrica não são remanejadas automaticamente.
+- MSI PRO SHIELD M100P, produto 1017873: uma fan traseira de 80 mm inclusa e
+  apenas uma posição para 80 **ou** 90 mm; 312 × 166 × 354 mm (C × L × A).
+  GPU/air/fonte: 275/140/160 mm. Não confundir com MAG FORGE M100R.
+- AeroCool Cylon Black, 63858, produto 203445: uma fan de 120 mm inclusa,
+  sete posições listadas (duas são do suporte de ventilação da GPU); dimensões
+  externas 413 × 198 × 459 mm (C × L × A). GPU 346 mm com fan frontal;
+  371 mm exige removê-la. Air 155 mm. Radiador frontal de 120 mm segundo o
+  fabricante; não assumir 240 mm da descrição comercial nem folga para a fonte.
+- Hayom GB1727 / GB.17.10.27, produto 938469: três fans frontais de 120 mm
+  inclusas, oito posições, GPU até 290 mm. Tamanho externo informado como
+  295 × 190 × 405 mm, sem atribuir eixos que a ficha não identifica.
+- Hayom GB1787, produto 933255: três fans de 120 mm inclusas, cinco posições,
+  GPU até 260 mm. Tamanho 265 × 280 × 285 mm, eixos não identificados. Sem
+  posição de fábrica declarada, não inventar a distribuição das três fans.
+
+Fontes e revisão de 23/10/2026 registradas em cada ficha:
+[DeepCool](https://global.deepcool.com/products/Cases/MATREXX55-V4-C-ATX-Glass-Panel-Case/2024/18145.shtml),
+[NZXT](https://support.nzxt.com/hc/en-us/articles/40225168535451-H5-Flow-2024-Specs),
+[radiadores NZXT](https://support.nzxt.com/hc/en-us/articles/47060012674203-What-radiator-sizes-does-the-H5-Flow-2024-support),
+[MSI](https://www.msi.com/PC-Case/PRO-SHIELD-M100P/Specification),
+[AeroCool](https://aerocool.io/product/cylon/),
+[Hayom GB1727](https://www.hayom.com.br/produtos/gabinete-gamer-c-3-fans-gb1727),
+[Hayom GB1787](https://www.hayom.com.br/produtos/1271).
+
+Os aliases exigem fabricante, modelo, código interno e produto KaBuM revisados;
+nome parecido ou outro anúncio não herda especificações. Contagem inclui fábrica,
+fans adicionais por kit e AIO, sem somar opções alternativas de 120/140 mm nem
+aprovar espessuras/interferências desconhecidas. Dimensão externa não determina
+quantas fans cabem: são necessárias as posições e medidas de fixação declaradas.
+O catálogo agora mostra inclusas, capacidade total e diâmetros; o editor também
+mostra inclusas/capacidade junto ao gabinete, além do contador de ventilação.
+
+Fotografia somente leitura: 100 gabinetes, 53 com contagem inclusa cadastrada
+(30 positivas, 23 zero, nem todas revisadas nesta rodada), 47 sem essa contagem,
+9 com capacidade e 8 com posições detalhadas. Antes eram 3 com capacidade/posições.
+O manifesto tem 31 variantes, aplicadas a 33 dos 1.535 cadastros. RF13 continua
+parcial: esta rodada não certifica todos os gabinetes ou o encaixe completo.
+
+Revisão pendente de variantes/anúncios, sem sobrescrita automática:
+Corsair 2000D SEED-CASE-44/433279 (SKU branco e contagem divergente), Hayom
+GB1796 SEED-CASE-24/732926 (kit do vendedor versus configuração de fábrica),
+Lian Li SEED-CASE-29/582808 (EVO RGB, não O11 Dynamic comum; suportes condicionais),
+MB520 SEED-CASE-12/171504 (gerações distintas), Rise Wave e HYTE Y70 Touch
+Infinite (fichas completas da variante ainda necessárias).
+
+Validação automatizada: 443 testes Node e 582 Python (+13 subtestes). Fixture
+compartilhada verifica identidade, dados desconhecidos, kits, fans inclusas,
+limite exato, excesso, tamanhos, AIO e propagação à API/prompt sem alterar modelos.
+Os 16 modelos prontos não ganharam conflitos técnicos; mantém-se a pendência
+anterior de estoque no modelo Intel. Validação Chrome/axe: 258 verificações de
+fichas, editor, limites e catálogo em 320/768/1440 px e paisagem 844 × 390;
+mais 57 da regressão de páginas/modelos. O seletor do roteiro de QA foi corrigido
+de `.catalog-card` para `.product-card`; a rodada final dos cards passou.
+APIs simuladas, catálogo real somente leitura; nenhum envio de e-mail ou consumo
+de cota LLM. Sem erros JS, overflow horizontal ou violações axe nas telas testadas.
+
 ### Barrinha de compatibilidade ao lado do nome — 23/10/2026
 
 O indicador circular de informação foi substituído pela barra vertical antes do

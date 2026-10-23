@@ -48,6 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const motivo = motivoSelecao(build,peca,catalogo);
         const destaques = peca.categoria === "placa_mae"
           ? [["Slots de RAM",peca.quantidade_slots_ram],["Slots M.2",peca.quantidade_slots_m2],["Portas SATA",peca.quantidade_portas_sata]].filter(([,valor]) => valor != null)
+          : peca.categoria === "gabinete" ? [["Fans inclusas",peca.fans_inclusos ?? "Não informado"],["Posições de fans (total)",peca.quantidade_max_fans ?? "Não informado"],["Diâmetros (mm)",peca.tamanhos_fan_suportados_mm?.join(" / ") || "Não informado"]]
           : fichaTecnica(peca).slice(3,6);
         return '<article class="product-card glass-card"><a class="product-visual" href="' + detalhes + '" aria-label="Ver detalhes de ' + h(nomePeca(peca)) + '">' + imagemPeca(peca) +
           '</a><div class="product-card-body"><span class="component-category font-1-xs">' + h(peca.fabricante) + '</span><h2 class="font-1-m-b"><a href="' + detalhes + '" aria-label="Ver detalhes de ' + h(nomePeca(peca)) + '">' + h(peca.modelo) +

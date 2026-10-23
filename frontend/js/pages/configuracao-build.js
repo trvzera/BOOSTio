@@ -117,6 +117,7 @@ document.addEventListener("DOMContentLoaded",async () => {
       ].filter(Boolean).join(" · ") : "";
       const resumo = ram && peca ? item.quantidade + " kit(s) · " + item.quantidade * (peca.quantidade_pentes || 1) + " pentes · " + peca.ddr + " · " + peca.frequencia_mhz + " MHz"
         : categoria === "fan" && peca ? (peca.tamanho_mm ? peca.tamanho_mm + " mm · " : "") + (peca.quantidade || "?") + " fan(s) por kit" + (fluxoFan(peca) === "reverso" ? " · Reverse (identificação do catálogo)" : "")
+        : categoria === "gabinete" && peca ? (peca.fans_inclusos == null ? "Fans inclusas não informadas" : peca.fans_inclusos + " fan(s) inclusa(s)") + " · " + (peca.quantidade_max_fans == null ? "capacidade de fans não informada" : "até " + peca.quantidade_max_fans + " posições no total")
         : slotsPlaca || (peca ? "Selecionado" : "Peça própria · identifique o modelo para validar.");
       const cotacao = peca && Number(peca.preco) > 0;
       const disponibilidade = peca?.esgotado ? "Sem estoque confirmado no catálogo. Consulte a loja ou substitua a peça." : peca && !cotacao ? "Preço ainda não disponível no catálogo." : "";

@@ -367,6 +367,110 @@
         "conectores_cpu_eps": 1, "conectores_pcie_8pinos": 2, "conectores_pcie_16pinos": 1, "conectores_sata": 6,
         "observacoes_medidas": "Contagens são de conectores, não de cabos independentes. Confirmar roteamento/curvatura e requisitos da GPU; presença de conector não certifica distribuição elétrica. A ordem de eixos não foi convertida em comprimento de encaixe sem desenho dimensional."
       }
+    },
+    {
+      "categoria": "gabinete", "fabricante": "Deepcool", "modelo": "MATREXX 55 V4 C", "part_numbers": ["R-MATREXX55-BCADA4-G-4"],
+      "aliases_catalogo": [{"fabricante": "Deepcool", "modelo": "Matrexx 55", "part_number": "SEED-CASE-40", "produto_kabum": "987488"}],
+      "fonte": "https://global.deepcool.com/products/Cases/MATREXX55-V4-C-ATX-Glass-Panel-Case/2024/18145.shtml", "verificado_em": "2026-10-23",
+      "medidas": {
+        "comprimento_mm": 421, "largura_mm": 215, "altura_mm": 483,
+        "formatos_placa_mae": "ATX, mATX, ITX", "slots_expansao": 7,
+        "tamanho_max_gpu_mm": 370, "tamanho_max_cooler_mm": 165, "tamanho_max_fonte_mm": 170, "formatos_fonte": ["ATX", "ATX PS2"],
+        "fans_inclusos": 4, "quantidade_max_fans": 8, "tamanhos_fan_suportados_mm": [120, 140], "posicoes_fans_completas": false,
+        "suporte_water_cooler": true, "radiadores_suportados_mm": [120, 140, 240, 280, 360],
+        "posicoes_fans": [
+          {"nome": "Frente", "opcoes": [{"tamanho_mm": 120, "quantidade": 3}, {"tamanho_mm": 140, "quantidade": 3}], "fans_inclusas": [{"tamanho_mm": 140, "quantidade": 3}], "radiadores_mm": [120, 140, 240, 280, 360]},
+          {"nome": "Topo", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}, {"tamanho_mm": 140, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": [120, 140, 240, 280]},
+          {"nome": "Traseira", "opcoes": [{"tamanho_mm": 120, "quantidade": 1}], "fans_inclusas": [{"tamanho_mm": 120, "quantidade": 1}], "radiadores_mm": [120]},
+          {"nome": "Cobertura da fonte", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": []}
+        ],
+        "observacoes_medidas": "Variante V4 C R-MATREXX55-BCADA4-G-4, não o MATREXX 55 original. Inclui três fans de 140 mm na frente e uma de 120 mm atrás. Oito posições no total, não oito fans adicionais. Opções de 120/140 mm na mesma posição são alternativas. A gaiola de discos e os radiadores podem interferir na fonte/GPU; não foram presumidas folgas. A configuração não prevê remover ou remanejar as fans de fábrica."
+      }
+    },
+    {
+      "categoria": "gabinete", "fabricante": "NZXT", "modelo": "H5 Flow (2024) Black", "part_numbers": ["CC-H52FB-01"],
+      "aliases_catalogo": [{"fabricante": "NZXT", "modelo": "H5 Flow", "part_number": "SEED-CASE-43", "produto_kabum": "692553"}],
+      "fonte": "https://support.nzxt.com/hc/en-us/articles/40225168535451-H5-Flow-2024-Specs", "verificado_em": "2026-10-23",
+      "medidas": {
+        "comprimento_mm": 430, "largura_mm": 225, "altura_mm": 465,
+        "formatos_placa_mae": "ATX, mATX, ITX", "slots_expansao": 7,
+        "tamanho_max_gpu_mm": null, "tamanho_max_cooler_mm": null,
+        "tamanho_max_fonte_mm": 200, "formatos_fonte": ["ATX"],
+        "fans_inclusos": 2, "quantidade_max_fans": 8, "tamanhos_fan_suportados_mm": [120, 140], "posicoes_fans_completas": false,
+        "suporte_water_cooler": true, "radiadores_suportados_mm": [120, 140, 240, 280, 360],
+        "posicoes_fans": [
+          {"nome": "Frente", "opcoes": [{"tamanho_mm": 120, "quantidade": 3}, {"tamanho_mm": 140, "quantidade": 2}], "fans_inclusas": [{"tamanho_mm": 120, "quantidade": 1}], "radiadores_mm": [120, 140, 240, 280, 360]},
+          {"nome": "Topo", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}, {"tamanho_mm": 140, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": [120, 240]},
+          {"nome": "Base", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": []},
+          {"nome": "Traseira", "opcoes": [{"tamanho_mm": 120, "quantidade": 1}], "fans_inclusas": [{"tamanho_mm": 120, "quantidade": 1}], "radiadores_mm": [120]}
+        ],
+        "observacoes_medidas": "Somente CC-H52FB-01 de 2024; não aplicar ao H5 Flow antigo, RGB ou Elite. Inclui uma fan de 120 mm na frente e outra atrás; oito posições ao todo. A NZXT condiciona radiador superior de 280 mm à memória de perfil baixo; ele não é liberado automaticamente no topo, mas 280 mm está listado para a frente. Suporte nominal por posição: https://support.nzxt.com/hc/en-us/articles/47060012674203-What-radiator-sizes-does-the-H5-Flow-2024-support . O site e o manual oficial divergem nos limites de GPU (410/425 mm) e air cooler (170/175 mm): esses dois limites ficam desconhecidos até revisão. E-ATX depende da largura de até 277 mm. Confirmar espessura, cabos e interferências reais."
+      }
+    },
+    {
+      "categoria": "gabinete", "fabricante": "MSI", "modelo": "PRO SHIELD M100P", "part_numbers": ["PRO SHIELD M100P"],
+      "aliases_catalogo": [{"fabricante": "MSI", "modelo": "M100p Pro Shield Mid Tower C/1 Fan Preto", "part_number": "KABUM-1017873", "produto_kabum": "1017873"}],
+      "fonte": "https://www.msi.com/PC-Case/PRO-SHIELD-M100P/Specification", "verificado_em": "2026-10-23",
+      "medidas": {
+        "comprimento_mm": 312, "largura_mm": 166, "altura_mm": 354,
+        "formatos_placa_mae": "mATX, ITX", "slots_expansao": 4,
+        "tamanho_max_gpu_mm": 275, "tamanho_max_cooler_mm": 140, "tamanho_max_fonte_mm": 160, "formatos_fonte": ["ATX"],
+        "fans_inclusos": 1, "quantidade_max_fans": 1, "tamanhos_fan_suportados_mm": [80, 90], "posicoes_fans_completas": false,
+        "suporte_water_cooler": null, "radiadores_suportados_mm": null,
+        "posicoes_fans": [
+          {"nome": "Traseira", "opcoes": [{"tamanho_mm": 80, "quantidade": 1}, {"tamanho_mm": 90, "quantidade": 1}], "fans_inclusas": [{"tamanho_mm": 80, "quantidade": 1}], "radiadores_mm": []}
+        ],
+        "observacoes_medidas": "Modelo PRO SHIELD M100P, não MAG FORGE M100R. A ficha MSI especifica uma fan de 80 mm inclusa na única posição traseira, que aceita 80 ou 90 mm como alternativas. Não há posição de 120 mm cadastrada. O suporte a radiadores não foi confirmado; ausência na ficha não vira suporte genérico. Baias podem exigir arranjos alternativos conforme o manual."
+      }
+    },
+    {
+      "categoria": "gabinete", "fabricante": "Aerocool", "modelo": "Cylon Black", "part_numbers": ["63858"],
+      "aliases_catalogo": [{"fabricante": "Aerocool", "modelo": "Cylon", "part_number": "SEED-CASE-23", "produto_kabum": "203445"}],
+      "fonte": "https://aerocool.io/product/cylon/", "verificado_em": "2026-10-23",
+      "medidas": {
+        "comprimento_mm": 413, "largura_mm": 198, "altura_mm": 459,
+        "formatos_placa_mae": "ATX, mATX, ITX", "slots_expansao": 7,
+        "tamanho_max_gpu_mm": 346, "tamanho_max_cooler_mm": 155, "tamanho_max_fonte_mm": null,
+        "fans_inclusos": 1, "quantidade_max_fans": 7, "tamanhos_fan_suportados_mm": [120], "posicoes_fans_completas": false,
+        "suporte_water_cooler": true, "radiadores_suportados_mm": [120],
+        "posicoes_fans": [
+          {"nome": "Frente", "opcoes": [{"tamanho_mm": 120, "quantidade": 3}], "fans_inclusas": [], "radiadores_mm": [120]},
+          {"nome": "Topo", "opcoes": [{"tamanho_mm": 120, "quantidade": 1}], "fans_inclusas": [], "radiadores_mm": []},
+          {"nome": "Traseira", "opcoes": [{"tamanho_mm": 120, "quantidade": 1}], "fans_inclusas": [{"tamanho_mm": 120, "quantidade": 1}], "radiadores_mm": []},
+          {"nome": "Suporte de ventilação da GPU", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": []}
+        ],
+        "observacoes_medidas": "A ficha AeroCool e a seção técnica do anúncio indicam uma fan traseira inclusa, não três. As sete posições incluem duas do suporte de ventilação da GPU, cujo espaço real precisa de conferência. Limite de GPU de 346 mm com fan frontal; 371 mm exige removê-la e não é aprovado automaticamente. O fabricante indica radiador frontal de 120 mm, apesar da descrição comercial mencionar 240 mm. Limite da fonte diverge entre fabricante e anúncio e permanece desconhecido."
+      }
+    },
+    {
+      "categoria": "gabinete", "fabricante": "Hayom", "modelo": "GB1727", "part_numbers": ["GB1727", "GB.17.10.27"],
+      "aliases_catalogo": [{"fabricante": "Hayom", "modelo": "Gamer HAYOM GB1727, Mid Tower, Lateral em Vidro, com 3X Fans, Preto - GB.17.10.27", "part_number": "KABUM-938469", "produto_kabum": "938469"}],
+      "fonte": "https://www.hayom.com.br/produtos/gabinete-gamer-c-3-fans-gb1727", "verificado_em": "2026-10-23",
+      "medidas": {
+        "dimensoes_fabricante": "295 × 190 × 405 mm (ordem dos eixos não declarada)",
+        "formatos_placa_mae": "mATX, ITX", "slots_expansao": 4, "tamanho_max_gpu_mm": 290, "formatos_fonte": ["ATX"],
+        "fans_inclusos": 3, "quantidade_max_fans": 8, "tamanhos_fan_suportados_mm": [120], "posicoes_fans_completas": false,
+        "suporte_water_cooler": null, "radiadores_suportados_mm": null,
+        "posicoes_fans": [
+          {"nome": "Frente", "opcoes": [{"tamanho_mm": 120, "quantidade": 3}], "fans_inclusas": [{"tamanho_mm": 120, "quantidade": 3}], "radiadores_mm": []},
+          {"nome": "Traseira", "opcoes": [{"tamanho_mm": 120, "quantidade": 1}], "fans_inclusas": [], "radiadores_mm": []},
+          {"nome": "Topo", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": []},
+          {"nome": "Base", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": []}
+        ],
+        "observacoes_medidas": "Três fans frontais de 120 mm inclusas e oito encaixes listados ao todo; somar fábrica, radiador e fans adicionais sem repetir posições. O fabricante não declara suporte a radiador, altura de air cooler ou comprimento de fonte nesta ficha; esses limites não foram inventados. Armazenamento é alternativo: um HDD de 3,5 ou um SSD de 2,5 polegadas. A ordem dos eixos externos não foi presumida."
+      }
+    },
+    {
+      "categoria": "gabinete", "fabricante": "Hayom", "modelo": "GB1787", "part_numbers": ["GB1787"],
+      "aliases_catalogo": [{"fabricante": "Hayom", "modelo": "Gamer Hayom Gb1787, Mini Tower, Vidro Temperado, M-atx, Com 3 Fans, Sem Fonte, Preto", "part_number": "KABUM-933255", "produto_kabum": "933255"}],
+      "fonte": "https://www.hayom.com.br/produtos/1271", "verificado_em": "2026-10-23",
+      "medidas": {
+        "dimensoes_fabricante": "265 × 280 × 285 mm (ordem dos eixos não declarada)",
+        "formatos_placa_mae": "mATX, ITX", "slots_expansao": 4, "tamanho_max_gpu_mm": 260, "formatos_fonte": ["ATX"],
+        "fans_inclusos": 3, "quantidade_max_fans": 5, "tamanhos_fan_suportados_mm": [120],
+        "suporte_water_cooler": null, "radiadores_suportados_mm": null,
+        "observacoes_medidas": "Três fans inclusas, mas a ficha não identifica suas posições. Os cinco encaixes informados são dois na base, dois no topo e um atrás, todos de 120 mm. A ocupação total é limitada a cinco; não foi inventada uma distribuição das fans de fábrica nem suporte a water cooler. Armazenamento: um HDD de 3,5 ou dois SSDs de 2,5 polegadas em arranjos alternativos. A ordem dos eixos externos não foi presumida."
+      }
     }
   ]
 }

@@ -1,0 +1,32 @@
+[
+  {
+    "fabricante": "Deepcool", "modelo": "Matrexx 55", "part_number": "SEED-CASE-40", "produto_kabum": "987488",
+    "esperado": {"fans_inclusos": 4, "quantidade_max_fans": 8, "tamanhos_fan_suportados_mm": [120, 140], "comprimento_mm": 421, "largura_mm": 215, "altura_mm": 483, "tamanho_max_gpu_mm": 370, "tamanho_max_cooler_mm": 165, "tamanho_max_fonte_mm": 170},
+    "extras": 4, "diametro_extras": 120, "distribuicao_sem_extras": true
+  },
+  {
+    "fabricante": "NZXT", "modelo": "H5 Flow", "part_number": "SEED-CASE-43", "produto_kabum": "692553",
+    "esperado": {"fans_inclusos": 2, "quantidade_max_fans": 8, "tamanhos_fan_suportados_mm": [120, 140], "comprimento_mm": 430, "largura_mm": 225, "altura_mm": 465, "tamanho_max_gpu_mm": null, "tamanho_max_cooler_mm": null, "tamanho_max_fonte_mm": 200},
+    "extras": 6, "diametro_extras": 120, "distribuicao_sem_extras": true
+  },
+  {
+    "fabricante": "MSI", "modelo": "M100p Pro Shield Mid Tower C/1 Fan Preto", "part_number": "KABUM-1017873", "produto_kabum": "1017873",
+    "esperado": {"fans_inclusos": 1, "quantidade_max_fans": 1, "tamanhos_fan_suportados_mm": [80, 90], "comprimento_mm": 312, "largura_mm": 166, "altura_mm": 354, "tamanho_max_gpu_mm": 275, "tamanho_max_cooler_mm": 140, "tamanho_max_fonte_mm": 160, "suporte_water_cooler": null, "radiadores_suportados_mm": null},
+    "extras": 0, "diametro_extras": 80, "distribuicao_sem_extras": true
+  },
+  {
+    "fabricante": "Aerocool", "modelo": "Cylon", "part_number": "SEED-CASE-23", "produto_kabum": "203445",
+    "esperado": {"fans_inclusos": 1, "quantidade_max_fans": 7, "tamanhos_fan_suportados_mm": [120], "comprimento_mm": 413, "largura_mm": 198, "altura_mm": 459, "tamanho_max_gpu_mm": 346, "tamanho_max_cooler_mm": 155, "tamanho_max_fonte_mm": null, "radiadores_suportados_mm": [120]},
+    "extras": 6, "diametro_extras": 120, "distribuicao_sem_extras": true
+  },
+  {
+    "fabricante": "Hayom", "modelo": "Gamer HAYOM GB1727, Mid Tower, Lateral em Vidro, com 3X Fans, Preto - GB.17.10.27", "part_number": "KABUM-938469", "produto_kabum": "938469",
+    "esperado": {"fans_inclusos": 3, "quantidade_max_fans": 8, "tamanhos_fan_suportados_mm": [120], "tamanho_max_gpu_mm": 290, "suporte_water_cooler": null, "radiadores_suportados_mm": null, "dimensoes_fabricante": "295 × 190 × 405 mm (ordem dos eixos não declarada)"},
+    "extras": 5, "diametro_extras": 120, "distribuicao_sem_extras": true
+  },
+  {
+    "fabricante": "Hayom", "modelo": "Gamer Hayom Gb1787, Mini Tower, Vidro Temperado, M-atx, Com 3 Fans, Sem Fonte, Preto", "part_number": "KABUM-933255", "produto_kabum": "933255",
+    "esperado": {"fans_inclusos": 3, "quantidade_max_fans": 5, "tamanhos_fan_suportados_mm": [120], "tamanho_max_gpu_mm": 260, "suporte_water_cooler": null, "radiadores_suportados_mm": null, "dimensoes_fabricante": "265 × 280 × 285 mm (ordem dos eixos não declarada)"},
+    "extras": 2, "diametro_extras": 120, "distribuicao_sem_extras": null
+  }
+]
