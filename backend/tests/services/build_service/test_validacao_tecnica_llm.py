@@ -62,6 +62,19 @@ def test_revalida_quantidades_slots_e_kits(sugestao, tipo):
             validar(sugestao)
 
 
+def test_geracao_sem_slots_reais_limita_dois_pentes_e_prompt_nao_inventa_especificacoes(sugestao):
+    sugestao[1]["placa_mae"][0]["quantidade_slots_ram"] = None
+    ram = next(item for item in sugestao[0]["componentes"] if item["tipo"] == "memoria_ram")
+    ram["quantidade"] = 2
+    assert validar(sugestao)["componentes"]
+    ram["quantidade"] = 3
+    with pytest.raises(ValueError, match="Limite provisório de RAM"):
+        validar(sugestao)
+    prompt = CriarBuildService._criar_prompt({"nome": "QA", "descricao": "QA", "utilidade": "Estudos"}, 5000, 800, {})
+    assert "limite provisoriamente" in prompt and "não uma especificação confirmada" in prompt
+    assert "dois pentes (próprios + novos, incluindo todos os kits)" in prompt
+
+
 @pytest.mark.parametrize("tipo,campos", [
     ("placa_video", {"comprimento_mm": 301}),
     ("air_cooler", {"altura_mm": 161, "compatibilidade": "AM4"}),

@@ -219,8 +219,8 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
       let contextoRam = '';
       if (categoria.id === 'memoria_ram') {
         try {
-          const {placa,slots,maximoGb,padrao} = contextoMelhoriaRam(original,catalogo);
-          contextoRam = '<p class="planning-help">Placa-mãe atual: ' + h(nome(placa)) + ' · ' + h(padrao) + ' · ' + slots + ' slots · até ' + maximoGb + ' GB.</p>';
+          const {placa,slots,slotsProvisorios,maximoGb,padrao} = contextoMelhoriaRam(original,catalogo);
+          contextoRam = '<p class="planning-help">Placa-mãe atual: ' + h(nome(placa)) + ' · ' + h(padrao) + ' · ' + (slotsProvisorios ? 'limite provisório de ' + slots + ' pentes (slots não confirmados)' : slots + ' slots') + ' · até ' + maximoGb + ' GB.</p>';
         } catch(erro) { contextoRam = '<p class="planning-help" data-tone="warning">' + h(erro.message) + '</p>'; }
         contextoRam += '<label class="planning-field upgrade-ram-mode" for="upgrade-ram-mode"><span>Como melhorar a RAM?</span><select id="upgrade-ram-mode"><option value="adicionar"' + (modoRam === 'adicionar' ? ' selected' : '') + '>Adicionar sem remover as atuais</option><option value="substituir"' + (modoRam === 'substituir' ? ' selected' : '') + '>Substituir todas as memórias</option></select></label><p class="planning-help">' + h(AVISO_DUAL_CHANNEL) + '</p>';
       }
@@ -276,7 +276,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     const linhasRam = memorias.size ? '<article class="upgrade-real-difference"><h4>Memória RAM · ' + (modoRam === 'adicionar' ? 'acrescentar' : 'substituir todas') + '</h4><p class="planning-help">Antes: ' + h(nomeAtual(original,'memoria_ram')) + '</p>'
       + [...memorias].map(([id,quantidade])=>'<div class="upgrade-ram-selection"><strong>' + h(nome(pecaPorId('memoria_ram',id))) + '</strong><span>' + quantidade + (quantidade === 1 ? ' unidade/kit · ' : ' unidades/kits · ') + h(valorMonetario((centavos(pecaPorId('memoria_ram',id)?.preco) || 0) * quantidade))
         + '</span><div class="upgrade-ram-quantity"><button type="button" class="upgrade-real-remove" data-upgrade-ram-quantity="' + h(id) + '" data-step="-1" aria-label="Diminuir quantidade de ' + h(nome(pecaPorId('memoria_ram',id))) + '">−</button><span aria-label="Quantidade de unidades ou kits">' + quantidade + '</span><button type="button" class="upgrade-real-remove" data-upgrade-ram-quantity="' + h(id) + '" data-step="1" aria-label="Adicionar mais uma unidade ou kit de ' + h(nome(pecaPorId('memoria_ram',id))) + '">' + iconeAnimado('plus') + '</button><button type="button" class="upgrade-real-remove" data-upgrade-ram-remove="' + h(id) + '" aria-label="Remover ' + h(nome(pecaPorId('memoria_ram',id))) + ' da prévia">' + iconeAnimado('trash') + '</button></div></div>').join('')
-      + '<p class="planning-help"' + (erroRam ? ' data-tone="error"' : '') + '>' + h(erroRam || 'Depois: ' + ram.capacidadeGb + ' GB · ' + ram.pentes + ' de ' + ram.slots + ' slots ocupados. ' + (modoRam === 'adicionar' ? 'As memórias atuais serão mantidas.' : 'As memórias atuais serão removidas da build.')) + '</p></article>' : '';
+      + '<p class="planning-help"' + (erroRam ? ' data-tone="error"' : '') + '>' + h(erroRam || 'Depois: ' + ram.capacidadeGb + ' GB · ' + ram.pentes + ' de ' + ram.slots + (ram.slotsProvisorios ? ' pentes no limite provisório. ' : ' slots ocupados. ') + (modoRam === 'adicionar' ? 'As memórias atuais serão mantidas.' : 'As memórias atuais serão removidas da build.')) + '</p></article>' : '';
     const antes = avaliarBuild(base,catalogo), depois = avaliarBuild(proxima,catalogo);
     totalExibido = depois.preco;
     const delta = centavos(depois.preco) - centavos(antes.preco);

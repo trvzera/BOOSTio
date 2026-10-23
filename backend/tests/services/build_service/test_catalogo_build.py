@@ -30,3 +30,38 @@ def test_nao_inventa_atualizacao_e_estoque_nao_renova_data_do_preco():
     peca.aplicar_cotacao({"preco": 120, "esgotado": False}, agora)
     assert peca.preco == 120 and not peca.esgotado
     assert peca.preco_atualizado_em == agora
+
+
+def test_catalogo_entrega_preco_coletado_para_a_oferta_kabum_sem_inventar_outras_lojas():
+    data = datetime(2026, 10, 23, 12)
+    peca = PlacaVideo(id=1, modelo="GPU", preco=1234.56, preco_atualizado_em=data,
+                     kabum_external="https://www.kabum.com.br/produto/123/gpu", esgotado=False)
+    catalogo = peca.to_catalogo()
+    assert catalogo["ofertas"] == [{"loja": "kabum", "url": peca.kabum_external, "preco": 1234.56,
+                                   "atualizadoEm": "2026-10-23T12:00:00+00:00", "esgotado": False}]
+    peca.aplicar_cotacao({"preco": None, "esgotado": True}, datetime(2026, 10, 23, 13))
+    oferta = peca.to_catalogo()["ofertas"][0]
+    assert oferta["esgotado"] is True
+    assert oferta["preco"] == 1234.56 and oferta["atualizadoEm"] == catalogo["preco_atualizado_em"]
+
+
+@pytest.mark.parametrize("link", [None, "", "https://www.kabum.com.br/busca/gpu",
+                                    "https://www.pichau.com.br/produto/123", "javascript:alert(1)",
+                                    "http://www.kabum.com.br/produto/123", "https://www.kabum.com.br.evil.example/produto/123",
+                                    "https://usuario@www.kabum.com.br/produto/123", "https://www.kabum.com.br:8443/produto/123",
+                                    "https://www.kabum.com.br:errada/produto/123"])
+def test_sem_link_exato_kabum_nao_atribui_preco_a_uma_busca(link):
+    peca = PlacaVideo(id=1, modelo="GPU", preco=100, preco_atualizado_em=datetime(2026, 10, 23), kabum_external=link)
+    assert peca.to_catalogo()["ofertas"] == []
+
+
+@pytest.mark.parametrize("preco", [None, 0, -1, True, "100", float("inf"), float("nan")])
+def test_preco_invalido_nao_vira_oferta(preco):
+    peca = PlacaVideo(id=1, modelo="GPU", preco=preco, preco_atualizado_em=datetime(2026, 10, 23),
+                     kabum_external="https://www.kabum.com.br/produto/123/gpu")
+    assert peca.to_catalogo()["ofertas"] == []
+
+
+def test_preco_inicial_sem_data_de_coleta_nao_vira_oferta():
+    peca = PlacaVideo(id=1, modelo="GPU", preco=100, kabum_external="https://www.kabum.com.br/produto/123/gpu")
+    assert peca.to_catalogo()["ofertas"] == []

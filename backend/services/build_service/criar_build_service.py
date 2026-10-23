@@ -333,7 +333,11 @@ class CriarBuildService:
         "- A quantidade nunca pode exceder os slots da placa_mae, e a capacidade total "
         "deve respeitar o máximo suportado por ela. Para kits, multiplique quantidade "
         "pelo campo quantidade_pentes para contar os slots; capacidade_gb é a capacidade "
-        "por item do catálogo, e quantidade é o número de itens comprados.\n\n"
+        "por item do catálogo, e quantidade é o número de itens comprados.\n"
+        "- Se quantidade_slots_ram estiver ausente ou inválida, limite provisoriamente "
+        "a configuração inteira a dois pentes (próprios + novos, incluindo todos os kits). "
+        "Esse é um limite da montagem, não uma especificação confirmada. Não invente "
+        "slots nem capacidade máxima; valores cadastrados válidos, inclusive zero ou um, prevalecem.\n\n"
 
         "# VÍDEO INTEGRADO E PLACA DE VÍDEO\n"
         "- Primeiro verifique se o processador escolhido tem vídeo integrado "

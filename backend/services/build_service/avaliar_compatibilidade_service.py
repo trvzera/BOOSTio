@@ -46,11 +46,11 @@ class AvaliarCompatibilidadeService:
                 itens.append((tipo, item, peca))
 
         regras = []
-        def registrar(codigo, titulo, condicao, motivo):
+        def registrar(codigo, titulo, condicao, motivo, fonte="catalogo_da_conta"):
             status = "nao_verificado" if condicao is None else "sem_conflitos" if condicao else "incompativel"
             mensagem = "Conflito confirmado: " + titulo + ". " + motivo if condicao is False else motivo
             regras.append({"codigo": codigo, "titulo": titulo, "status": status, "mensagem": mensagem,
-                           "fonte": "catalogo_da_conta"})
+                           "fonte": fonte})
 
         def tem(tipo):
             return tipo in componentes
@@ -91,10 +91,17 @@ class AvaliarCompatibilidadeService:
             pentes = [numero((p or {}).get("quantidade_pentes")) for _, p in rams]
             capacidades = [numero((p or {}).get("capacidade_gb")) for _, p in rams]
             slots, maximo = numero(placa.get("quantidade_slots_ram")), numero(placa.get("memoria_maxima_gb"))
+            if slots is not None and not slots.is_integer():
+                slots = None
             usados = sum(item.get("quantidade", 1) * pente for (item, _), pente in zip(rams, pentes)) if all(p is not None for p in pentes) else None
             capacidade = sum(item.get("quantidade", 1) * gb for (item, _), gb in zip(rams, capacidades)) if all(gb is not None for gb in capacidades) else None
             registrar("ram-slots", "Quantidade de pentes", usados <= slots if usados is not None and slots is not None else None,
                       "Conta pentes por kit × quantidade; falta de quantidade de slots não significa slots ilimitados.")
+            if slots is None:
+                registrar("ram-limite-provisorio", "Limite provisório de RAM", usados <= 2 if usados is not None else None,
+                          "Slots não informados: a montagem fica limitada provisoriamente a dois pentes, contando todos os kits. "
+                          "Isso não confirma os slots reais nem a capacidade máxima; confira o manual antes de comprar.",
+                          fonte="politica_de_montagem")
             registrar("ram-capacidade", "Capacidade de RAM", capacidade <= maximo if capacidade is not None and maximo is not None else None,
                       "Compara a capacidade cadastrada por produto × quantidade com o limite da placa-mãe.")
             registrar("ram-perfis", "Perfis e estabilidade da RAM", None,

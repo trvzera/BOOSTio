@@ -111,7 +111,7 @@ export function ofertasPeca(peca) {
     }
     const valor = oferta?.preco;
     const preco = valor != null && valor !== "" && Number.isFinite(Number(valor)) && Number(valor) >= 0 ? Number(valor) : null;
-    return {...loja,url,direta,preco,atualizadoEm:oferta?.atualizadoEm || null,
+    return {...loja,url,direta,preco,atualizadoEm:oferta?.atualizadoEm || null,esgotado:oferta?.esgotado === true,
       logo:new URL("../../svgs/" + logos[loja.codigo],import.meta.url).href};
   });
 }

@@ -6,6 +6,36 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Preço nas lojas e RAM com slots ausentes — 23/10/2026
+
+- O preço principal existia no catálogo, mas a API não enviava `ofertas`, que o
+  card de cada loja consome. `Peca.to_catalogo()` agora monta a oferta KaBuM a partir
+  da cotação já coletada: preço positivo/finito, data da coleta e link HTTPS do
+  produto no domínio exato, sem credenciais/porta alternativa. Nenhuma consulta de
+  preço acontece ao serializar. Não transfere esse preço para Pichau ou buscas.
+- O preço inicial da seed, sem data de coleta, não é apresentado como oferta.
+  Produto esgotado pode exibir o último preço, mas informa indisponibilidade e
+  preserva a data antiga. A página lembra que o preço cadastrado não inclui frete.
+- `slotsRam()` separa capacidade confirmada de política provisória. Ausência ou
+  valor inválido usa limite de **dois pentes**, sem modificar a ficha/banco.
+  Zero, um ou quatro slots explicitamente cadastrados continuam prevalecendo.
+  Kits e modelos diferentes dividem o limite; o terceiro pente fica bloqueado.
+- O editor informa que a contagem é provisória e orienta confirmar slots e
+  capacidade no manual. Não foi atribuída capacidade máxima desconhecida nem
+  aprovada compatibilidade completa por esse limite. Melhorias usam a mesma
+  política de slots, mas ainda exigem DDR/capacidade máxima para uma proposta segura.
+- Python mantém `ram-slots` como não verificado quando falta o dado real e avalia
+  separadamente `ram-limite-provisorio`, identificado como política de montagem.
+  A validação da geração rejeita excesso; o prompt instrui contar pentes próprios,
+  novos e por kit dentro desse teto, sem inventar especificações.
+
+Fotografia somente leitura: 35 das 100 placas-mãe sem slots; 1.435 das 1.535 peças
+com cotação datada e link de produto KaBuM agora expõem a oferta correspondente.
+Validação: 424 testes Node, 561 Python (+13 subtestes), 43 verificações Chrome de
+preço/seleção/duplicação, 51 de páginas/modelos/axe e 92 de melhorias/RAM, incluindo
+320/768/1440 px e paisagem 844 × 390. Banco real somente leitura; salvamentos de
+interface simulados, sem migração, coleta externa, envio de e-mail ou chamadas LLM.
+
 ### Transição de valores e retorno à build — 23/10/2026
 
 - `components/value-transition.js` anima apenas números alterados: entrada vertical

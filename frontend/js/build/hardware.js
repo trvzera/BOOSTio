@@ -7,6 +7,14 @@ export function numeroConhecido(valor) {
   const n = Number(valor);
   return Number.isFinite(n) && n >= 0 ? n : null;
 }
+export const AVISO_SLOTS_RAM_PROVISORIOS = "Slots de RAM não informados: limite provisório de dois pentes no editor. Confirme a quantidade real de slots e a capacidade máxima no manual da placa-mãe antes de comprar.";
+export function slotsRam(placa) {
+  if (!placa) return {slots:0,provisorio:false};
+  const valor = placa.quantidade_slots_ram;
+  const numero = ["number","string"].includes(typeof valor) && String(valor).trim() ? numeroConhecido(valor) : null;
+  // Zero ou um slot explicitamente cadastrado não vira dois. Não altera a ficha.
+  return numero != null && Number.isInteger(numero) ? {slots:numero,provisorio:false} : {slots:2,provisorio:true};
+}
 export function conexaoDisco(peca) {
   if (!peca) return null;
   const formato = String(peca.formato || "").toUpperCase();

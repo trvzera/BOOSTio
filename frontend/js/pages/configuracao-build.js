@@ -4,6 +4,7 @@ import { carregarCatalogo,categoriasEditor,perifericos,acessoriosRede,moeda,html
 import { abrirBuild,guardarRascunho,buildsLocais,itensCategoria,categoriasMultiplas,informacoesRam,informacoesArmazenamento,motivoSelecao,removerPeca,reduzirQuantidade,linkCompartilhado } from "../build/estado.js";
 import { avaliarBuild,selecionarPecaCompativel } from "../build/compatibilidade.js";
 import { informacoesFans, fluxoFan } from "../build/fans.js";
+import { slotsRam, AVISO_SLOTS_RAM_PROVISORIOS } from "../build/hardware.js";
 import { avisar,copiarTexto,mostrarFalha } from "../build/interface.js";
 import { iconeAnimado,iniciarIcones } from "../components/ui.js";
 import { indicadorBuild,iniciarIndicadores } from "../build/indicador.js";
@@ -110,7 +111,7 @@ document.addEventListener("DOMContentLoaded",async () => {
       const detalhe = peca ? "./peca.html?" + new URLSearchParams({id:peca.id,build:build.id}) : "";
       const oferta = peca ? ofertasPeca(peca)[0] : null, ram = categoria === "memoria_ram", multipla = categoriasMultiplas.has(categoria);
       const slotsPlaca = categoria === "placa_mae" && peca ? [
-        peca.quantidade_slots_ram != null && peca.quantidade_slots_ram + " slots de RAM",
+        slotsRam(peca).provisorio ? "Até 2 pentes de RAM (limite provisório)" : slotsRam(peca).slots + " slots de RAM",
         peca.quantidade_slots_m2 != null && peca.quantidade_slots_m2 + " slots M.2",
         peca.quantidade_portas_sata != null && peca.quantidade_portas_sata + " portas SATA",
       ].filter(Boolean).join(" · ") : "";
@@ -152,9 +153,10 @@ document.addEventListener("DOMContentLoaded",async () => {
       const vagasFans = fans ? 'Fans: ' + (fans.total ?? "?") + ' / ' + (fans.capacidade ?? "?") + ' posições' : '';
       const disponivel = categoria.armazenamento && catalogo.some(p => tipos.includes(p.categoria) && (() => { try { selecionarPecaCompativel(build,p,catalogo); return true; } catch { return false; } })());
       const cabecalho = '<div class="component-group-heading"><h2>' + categoria.nome + ' ' + badge(obrigatoria) + '</h2>' +
-        (categoria.id === "memoria_ram" ? '<span class="component-count">' + info.usados + ' / ' + (info.slots || "—") + ' pentes · ' + info.capacidade + ' GB</span>'
+        (categoria.id === "memoria_ram" ? '<span class="component-count">' + info.usados + ' / ' + (info.placa ? info.slots : "—") + ' pentes · ' + info.capacidade + ' GB' + (info.slotsProvisorios ? ' · limite provisório' : '') + '</span>'
           : categoria.armazenamento ? '<span class="component-count">' + discos.ssd + ' SSD · ' + discos.hd + ' HD</span>'
           : fans ? '<span class="component-count">' + vagasFans + '</span>' : "") + '</div>' +
+        (categoria.id === "memoria_ram" && info.slotsProvisorios ? '<p class="component-connections">' + AVISO_SLOTS_RAM_PROVISORIOS + '</p>' : '') +
         (fans ? '<p class="component-connections">' + (fans.selecionadas ?? "?") + ' selecionadas · ' + (fans.inclusas ?? "?") + ' inclusas · ' + (fans.radiador ?? "?") + ' do radiador' +
           (fans.substituidas ? ' · ' + fans.substituidas + ' originais substituídas (sem dupla contagem)' : '') +
           (fans.livres != null ? ' · até ' + fans.livres + ' posições livres, conforme o tamanho' : ' · capacidade não totalmente verificada') + '</p>' : '') +

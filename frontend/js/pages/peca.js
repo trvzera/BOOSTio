@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       '" alt="' + oferta.loja + '"><span class="store-name font-1-m-b" hidden>' + oferta.loja + '</span></a>' +
       (oferta.preco != null ? '<strong class="store-price">' + moeda(oferta.preco) + '</strong>' : '<span class="store-price-unavailable">Preço ainda não cadastrado</span>') +
       '<p class="font-2-xs">' +
-      (oferta.direta ? "Página do produto cadastrada" : "Busca pelo modelo · anúncio não cadastrado") + '</p><a class="btn-ghost" href="' + h(oferta.url) +
+      (oferta.esgotado ? "Último preço cadastrado · produto indisponível" : oferta.preco != null ? "Preço cadastrado, sem frete · confirme na loja" : oferta.direta ? "Página do produto cadastrada" : "Busca pelo modelo · anúncio não cadastrado") + '</p><a class="btn-ghost" href="' + h(oferta.url) +
       '" target="_blank" rel="noopener noreferrer" aria-label="' + (oferta.direta ? "Comprar na loja" : "Buscar na loja") + ' ' + h(oferta.loja) + ' em uma nova aba">' + iconeAnimado("cart") + (oferta.direta ? "Comprar na loja" : "Buscar na loja") + '</a></article>').join("") + '</div></section>' +
       '<section class="product-specifications glass-card" aria-labelledby="spec-title"><h2 class="font-1-l" id="spec-title">Informações técnicas</h2><dl>' +
       detalhes.map(([rotulo,valor]) => '<div><dt class="font-2-xs">' + h(rotulo) + '</dt><dd class="font-1-xs">' + h(valor) + '</dd></div>').join("") +

@@ -44,10 +44,21 @@ test('limites são os da placa-mãe atual, incluindo capacidade máxima',()=>{
   assert.throws(()=>propor([{id:ram.id,quantidade:4}]),/slots/);
   const pequena={...placa,memoria_maxima_gb:16};
   assert.throws(()=>propor([{id:outra.id,quantidade:1}],'adicionar',base(),[pequena,ram,outra]),/máximo/);
-  for(const campo of ['quantidade_slots_ram','memoria_maxima_gb','tipo_memoria']){
+  for(const campo of ['memoria_maxima_gb','tipo_memoria']){
     assert.throws(()=>contextoMelhoriaRam(base(),[{...placa,[campo]:null},ram]),/Faltam/);
   }
   assert.throws(()=>propor([{id:ram.id,quantidade:1}],'adicionar',{componentes:{memoria_ram:base().componentes.memoria_ram}}),/placa-mãe atual/);
+});
+
+test('slots desconhecidos permitem dois pentes provisórios sem inventar capacidade máxima',()=>{
+  const cat=[{...placa,quantidade_slots_ram:null},ram];
+  const contexto=contextoMelhoriaRam(base(),cat);
+  assert.equal(contexto.slots,2);assert.equal(contexto.slotsProvisorios,true);
+  const resultado=propor([{id:ram.id,quantidade:1}],'adicionar',base(),cat);
+  assert.equal(resultado.pentes,2);assert.equal(resultado.slotsProvisorios,true);
+  assert.throws(()=>propor([{id:ram.id,quantidade:2}],'adicionar',base(),cat),/slots/);
+  assert.equal(cat[0].quantidade_slots_ram,null);
+  assert.throws(()=>contextoMelhoriaRam(base(),[{...cat[0],memoria_maxima_gb:null},ram]),/capacidade máxima/);
 });
 
 for(const [mudanca,mensagem] of [[{ddr:'DDR5'},/DDR/],[{frequencia_mhz:2666},/frequência/],

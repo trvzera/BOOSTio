@@ -1,4 +1,5 @@
 import { itensCategoria } from './estado.js';
+import { slotsRam } from './hardware.js';
 
 const positivo = valor => typeof valor !== 'boolean' && ['number','string'].includes(typeof valor)
   && String(valor).trim() && Number.isFinite(Number(valor)) && Number(valor) > 0 ? Number(valor) : null;
@@ -18,9 +19,10 @@ export function contextoMelhoriaRam(build,catalogo) {
   const id = itensCategoria(build,'placa_mae')[0]?.id;
   const placa = catalogo.find(p=>p.categoria === 'placa_mae' && p.id === id);
   if (!placa) throw new Error('Identifique a placa-mãe atual no catálogo antes de melhorar a RAM.');
-  const slots = inteiro(placa.quantidade_slots_ram), maximoGb = inteiro(placa.memoria_maxima_gb), padrao = ddr(placa.tipo_memoria);
-  if (!slots || !maximoGb || !padrao) throw new Error('Faltam DDR, quantidade de slots ou capacidade máxima da placa-mãe para conferir a melhoria de RAM.');
-  return {placa,slots,maximoGb,padrao};
+  const {slots,provisorio:slotsProvisorios} = slotsRam(placa), maximoGb = inteiro(placa.memoria_maxima_gb), padrao = ddr(placa.tipo_memoria);
+  if (!slots) throw new Error('A placa-mãe está cadastrada sem slots de RAM disponíveis. Confira esse dado antes de melhorar a memória.');
+  if (!maximoGb || !padrao) throw new Error('Faltam DDR ou capacidade máxima da placa-mãe para conferir a melhoria de RAM.');
+  return {placa,slots,slotsProvisorios,maximoGb,padrao};
 }
 
 // Uma proposta contém somente as unidades/kit que serão compradas. Não grava a build.

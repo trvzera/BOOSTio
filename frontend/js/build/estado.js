@@ -1,5 +1,5 @@
 import { categorias, perifericos, acessoriosRede } from "./catalogo.js";
-import { conexaoDisco, limitesArmazenamento, numeroConhecido } from "./hardware.js";
+import { conexaoDisco, limitesArmazenamento, numeroConhecido, slotsRam } from "./hardware.js";
 import { normalizarRede } from "./rede.js";
 import { planejamentoLocal } from "./planejamento.js";
 import { posicoesFans } from "./fans.js";
@@ -131,9 +131,10 @@ export function salvarNoPerfilLocal(build) {
 }
 export function informacoesRam(build,catalogo) {
   const placa = catalogo.find(p => p.id === build.componentes.placa_mae?.id);
+  const {slots,provisorio} = slotsRam(placa);
   const itens = itensRam(build).map(item => ({item,peca:catalogo.find(p => p.id === item.id)}));
   return {
-    slots:Number(placa?.quantidade_slots_ram || 0),
+    slots,slotsProvisorios:provisorio,
     usados:itens.reduce((n,{item,peca}) => n + Number(peca?.quantidade_pentes || 1) * item.quantidade,0),
     capacidade:itens.reduce((n,{item,peca}) => n + Number(peca?.capacidade_gb || 0) * item.quantidade,0),
     itens,placa,
@@ -209,7 +210,7 @@ export function motivoSelecao(build,peca,catalogo) {
   if (info.itens.length && !info.placa) return "Selecione a placa-mãe para adicionar mais memória RAM.";
   const quantidade = (itensRam(build).find(r => r.id === peca.id)?.quantidade || 0) + 1;
   if (info.placa && quantidade > limiteRam(build,catalogo,peca.id))
-    return "Os pentes de RAM excedem os slots da placa-mãe.";
+    return info.slotsProvisorios ? "A seleção excede o limite provisório de dois pentes: falta confirmar os slots da placa-mãe." : "Os pentes de RAM excedem os slots da placa-mãe.";
   if (info.placa?.memoria_maxima_gb &&
       info.capacidade + Number(peca.capacidade_gb) > Number(info.placa.memoria_maxima_gb))
     return "A capacidade de RAM supera o máximo da placa-mãe.";
@@ -226,7 +227,7 @@ export function selecionarPeca(build,peca,catalogo) {
     proxima.componentes[peca.categoria] = itens;
   } else proxima.componentes[peca.categoria] = {id:peca.id,quantidade:1};
   const info = informacoesRam(proxima,catalogo);
-  if (info.placa && info.usados > info.slots) throw new Error("Os pentes de RAM excedem os slots desta placa-mãe.");
+  if (info.placa && info.usados > info.slots) throw new Error(info.slotsProvisorios ? "Os pentes excedem o limite provisório de dois; confirme os slots da placa-mãe." : "Os pentes de RAM excedem os slots desta placa-mãe.");
   const conflitos = conflitosArmazenamento(informacoesArmazenamento(proxima,catalogo));
   if (conflitos.length) throw new Error(conflitos.join(" "));
   if (perifericos.includes(peca.categoria)) proxima.incluirPerifericos = true;
