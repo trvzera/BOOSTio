@@ -149,8 +149,8 @@ test("candidata sem categoria/ID e argumentos inválidos não são liberados",()
 test("modal e laboratório filtram e revalidam as trocas, inclusive na confirmação",async () => {
   const modal = await readFile(new URL("../js/build/melhorias.js",import.meta.url),"utf8");
   const teste = await readFile(new URL("../js/pages/test-upgrades.js",import.meta.url),"utf8");
-  assert.match(modal,/avaliarTrocaMelhoria\(original,peca,catalogo\)/);
-  assert.match(modal,/exigirTrocaMelhoria\(original,peca,catalogo\)/);
+  assert.match(modal,/avaliarTrocaMelhoria\(original,peca,catalogo,\{modo:modoTroca\(categoria\.id\)\}\)/);
+  assert.match(modal,/exigirTrocaMelhoria\(original,peca,catalogo,\{modo:modoTroca\(id\)\}\)/);
   assert.match(modal,/const pecas = escolhidas\(escolhas\)/);
   assert.match(modal,/const confirmada = simular\(trocas,build\)/);
   assert.match(teste,/avaliarTrocaMelhoria\(original,peca,catalogo\)\.permitida/);

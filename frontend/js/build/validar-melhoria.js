@@ -15,13 +15,18 @@ const cl = valor => {
 
 // Política conservadora: ausência de dados não prova que a troca não é pior.
 // Não classifica CPU/GPU por nome, preço, GHz, núcleos ou quantidade de VRAM.
-// O modal substitui a categoria inteira por UMA unidade/kit, não cada item isolado.
-export function avaliarTrocaMelhoria(build,candidata,catalogo) {
+// Substituição troca a categoria inteira por UMA unidade/kit. Expansão de discos
+// mantém os itens atuais e não promete melhora nas velocidades dos novos volumes.
+export function avaliarTrocaMelhoria(build,candidata,catalogo,{modo = "substituir"} = {}) {
   if (!build?.componentes || typeof candidata?.id !== "string" || !candidata.id.trim() || !Array.isArray(catalogo)
     || !categorias.some(categoria => categoria.id === candidata.categoria))
     return desconhecida("Identifique a build e as peças no catálogo antes de comparar a troca.");
   const categoria = candidata.categoria;
   const itens = itensCategoria(build,categoria);
+  const expandirDiscos = ["ssd","hd"].includes(categoria) && modo === "adicionar";
+  if (!["adicionar","substituir"].includes(modo)) return desconhecida("Escolha se deseja adicionar ou substituir a peça.");
+  if (expandirDiscos && NUMERO(candidata.capacidade_gb) == null)
+    return desconhecida("Falta a capacidade do novo disco para confirmar a expansão de armazenamento.");
   if (!itens.length) {
     // Uma GPU dedicada antiga não é necessariamente melhor que o vídeo integrado.
     if (categoria === "placa_video") {
@@ -38,6 +43,8 @@ export function avaliarTrocaMelhoria(build,candidata,catalogo) {
   }));
   if (atuais.some(({peca,quantidade}) => !peca || !Number.isInteger(quantidade) || quantidade > 64))
     return desconhecida("Identifique todos os modelos e quantidades atuais desta categoria para evitar uma troca inferior.");
+  if (expandirDiscos)
+    return {permitida:true,codigo:"expansao",motivo:"Acrescenta capacidade sem remover os discos atuais. Não implica ganho de velocidade; conexões e encaixes ainda serão verificados."};
   if (atuais.some(({peca}) => peca.id === candidata.id || peca.part_number && candidata.part_number
     && String(peca.part_number).trim().toUpperCase() === String(candidata.part_number).trim().toUpperCase()))
     return bloquear("mesma-peca","Este modelo já está na build. Ajuste sua quantidade no editor, sem substituir a categoria inteira.");
@@ -90,8 +97,8 @@ export function avaliarTrocaMelhoria(build,candidata,catalogo) {
   return desconhecida("Ainda faltam critérios comparáveis desta categoria para descartar uma piora. Esta troca não será sugerida como melhoria.");
 }
 
-export function exigirTrocaMelhoria(build,candidata,catalogo) {
-  const avaliacao = avaliarTrocaMelhoria(build,candidata,catalogo);
+export function exigirTrocaMelhoria(build,candidata,catalogo,opcoes) {
+  const avaliacao = avaliarTrocaMelhoria(build,candidata,catalogo,opcoes);
   if (!avaliacao.permitida) throw new Error(avaliacao.motivo);
   return avaliacao;
 }

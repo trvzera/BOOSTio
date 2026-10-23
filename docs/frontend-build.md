@@ -6,6 +6,41 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Buscar melhorias: opções ocultas e expansão de discos — 23/10/2026
+
+A listagem dependia de um budget válido antes de procurar peças. Além disso,
+SSD/HD só substituíam a categoria inteira por uma unidade: capacidade total e
+velocidades ausentes podiam zerar as opções. CPU/GPU e demais categorias já
+instaladas continuam sem classificação quando não há métricas comparáveis; fans
+e coolers em categorias vazias podiam aparecer apenas como adições.
+
+- Sem budget válido, agora é possível consultar e preparar a prévia, com aviso
+  de que a lista não está filtrada por preço. Aplicar permanece bloqueado até um
+  valor válido; quando informado, o teto combinado das novas compras é respeitado.
+- SSD e HD têm modos explícitos de adicionar (padrão) ou substituir. Adicionar
+  preserva os volumes/quantidades atuais e permite mais uma unidade do mesmo
+  modelo ou de outro, sem prometer aumento de velocidade. Não exige velocidades
+  comparativas para uma expansão que não remove o disco atual. A substituição
+  mantém os critérios anteriores de capacidade e velocidades sem regressão.
+- O seletor compartilhado valida M.2/SATA, portas compartilhadas e quantidades;
+  a avaliação final mantém regras físicas e demais conflitos. A compra conta
+  apenas a unidade nova; o total da build inclui também as antigas. Mudar o modo
+  descarta só a seleção daquela categoria, preservando outras trocas e o foco.
+- Erros antigos `discos-m2`/`discos-sata` só saem da prévia após revalidação das
+  respectivas conexões com dados conhecidos, ou quando a conexão deixa de ser
+  usada. Limite desconhecido não limpa erro. Diagnósticos de outras peças ou
+  regras desconhecidas permanecem; o servidor reavalia ao salvar.
+- Estados sem opções mostram o motivo diretamente. RAM cheia orienta usar o
+  modo de substituição; ausência de placa-mãe, DDR/capacidade máxima ou critérios
+  comparativos não é escondida por uma mensagem genérica. Não inferir fichas ou
+  liberar CPU/GPU por preço, nome, núcleos ou VRAM.
+
+Validação: 493 testes Node e 94 verificações Chrome/axe em 320, 375, 768, 1440 px e
+paisagem 844 × 390. Catálogo real somente leitura, builds de teste em memória e
+callback de salvamento simulado. Incluídos ausência/erro de budget, expansão e
+substituição, slots cheios, fontes, foco, cancelamento e falha ao salvar. Sem
+gravação real, API externa, banco alterado, migração, LLM ou envio de e-mail.
+
 ### Comparativo: último campo sobreposto — 23/10/2026
 
 O subgrid reservava nove linhas por card, mas havia dez itens: cabeçalho e nove
