@@ -233,6 +233,12 @@ export function abrirComparacao(builds, catalogo) {
       }).join("") + '</div><p class="compare-footnote">Valores cadastrados no catálogo podem ser demonstrativos; não são cotações em tempo real. '
       + 'Orçamento não entra no preço. Acessório de rede a confirmar ou sem cotação deixa o total parcial. '
       + 'O consumo é uma estimativa dos componentes do PC, sem fonte, periféricos e acessórios de rede; não é uma medição na tomada.</p></section>';
+    // Cada card ocupa uma linha para o cabeçalho e uma para cada especificação.
+    // Sem essa contagem, campos novos podem se sobrepor na última linha do subgrid.
+    const colunas = conteudo.querySelector(".compare-columns");
+    const linhas = Math.max(...[...colunas.querySelectorAll(".compare-card")].map(cartao =>
+      1 + cartao.querySelectorAll(".compare-field").length));
+    colunas.style.setProperty("--compare-row-count", String(linhas));
     anunciar("Comparando " + selecionadas.size + " builds.");
     atualizarPausaRender();
     dialogo.scrollTop = 0;

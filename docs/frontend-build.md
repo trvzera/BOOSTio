@@ -6,6 +6,23 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Comparativo: último campo sobreposto — 23/10/2026
+
+O subgrid reservava nove linhas por card, mas havia dez itens: cabeçalho e nove
+especificações. Por isso, “Compatibilidade” e “Desempenho em jogos” ocupavam a
+mesma linha. O editor agora conta os campos ao renderizar os resultados e passa
+`--compare-row-count` ao CSS, usado tanto nas linhas da grade quanto no espaço
+ocupado por cada card. A contagem é refeita ao adicionar/remover uma build ou
+trocar CPU/GPU. O fallback de layout sem subgrid foi preservado.
+
+Validação: 474 testes Node e 194 verificações Chrome/axe (141 de layout e 53 da
+comparação Blender). Layout testado com duas/três builds, descrições de tamanhos
+diferentes e pendências abertas/fechadas em 320, 375, 768, 1024, 1440, 1920 px e
+paisagem 844 × 390. Sem sobreposição, conteúdo fora dos cards, overflow horizontal
+da página ou exceções JS. APIs simuladas; nenhuma gravação na conta/banco ou LLM.
+O campo de jogos continua indicando indisponibilidade quando faltam benchmarks;
+a correção é visual e não cria estimativas de FPS.
+
 ### Comparação Blender: identificação e erros de GPU — 23/10/2026
 
 A identificação Blender estava dependente do pequeno registro de slugs de jogos

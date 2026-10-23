@@ -277,8 +277,8 @@
 .compare-message { padding-left: .625rem; border-left: 2px solid var(--cor-3, #696969); list-style: none; }
 
 @supports (grid-template-rows: subgrid) {
-  .compare-columns { grid-template-rows: repeat(9, auto); }
-  .compare-card { display: grid; grid-template-rows: subgrid; grid-row: span 9; row-gap: 0; }
+  .compare-columns { grid-template-rows: repeat(var(--compare-row-count, 1), auto); }
+  .compare-card { display: grid; grid-template-rows: subgrid; grid-row: span var(--compare-row-count, 1); row-gap: 0; }
   .compare-specs { display: contents; }
 }
 
