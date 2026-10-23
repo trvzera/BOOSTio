@@ -6,6 +6,48 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Comparação Blender: identificação e erros de GPU — 23/10/2026
+
+A identificação Blender estava dependente do pequeno registro de slugs de jogos
+e de títulos abreviados. Na leitura real, apenas 44/100 CPUs e 12/100 GPUs eram
+reconhecidas antes de consultar o Python. A RTX 5070 EAGLE OC SFF 12G, por exemplo,
+era recusada pelo frontend mesmo com resultados públicos no Blender Open Data.
+
+- `benchmark/hardware.js` agora identifica o modelo explícito em títulos
+  comerciais completos, independentemente do registro FPS, sem remover sufixos
+  Ti/SUPER/XT/XTX/GRE/F/KF/X3D. Repetição do mesmo identificador no título é
+  permitida; múltiplos modelos diferentes, mobile/Max-Q, RX 580 2048SP e peças não
+  reconhecidas não são convertidos para outro componente. Mantida a restrição
+  anterior da referência RTX 3060 de 12 GB: não usar para 8 GB/capacidade ausente.
+- A cobertura de identificação chegou a 99/100 CPUs e 93/100 GPUs nesta fotografia.
+  Isso **não** significa que todos esses modelos têm resultados públicos. O
+  backend ainda exige correspondência do nome devolvido pelo provedor; um 422
+  não aciona fallback para outra peça. Nada é estimado ou salvo na build.
+- A comparação preserva código/status/espera dos erros por build. O aviso geral
+  diferencia falha total, parcial, sessão e versões/métodos incompatíveis, em vez
+  de exibir sempre uma mensagem de pontuação como se a consulta tivesse funcionado.
+- Uma resposta de pausa bloqueia novas consultas pelo intervalo informado,
+  inclusive ao mudar CPU/GPU dentro do modal. Fechar limpa o timer e cancela a
+  consulta. `aria-busy` identifica a atualização dos resultados. Cache do modal
+  guarda apenas consultas bem-sucedidas; consulta cancelada não sobrescreve a nova.
+- CPU e GPU continuam separadas. Classificação só com resultados de todas as
+  builds na mesma versão/método. Resultados de métodos diferentes continuam
+  visíveis, sem vencedora. A fonte pode agrupar fabricantes/capacidades de VRAM;
+  são referências por componente, não medição do PC completo nem tempo garantido.
+
+Validação: 472 testes Node, 582 Python (+13 subtestes) e 53 verificações Chrome/axe
+do comparativo em 320/768/1440 px e paisagem 844 × 390, com APIs simuladas e
+catálogo real somente leitura. Incluídos GPU 5070/5060 Ti de nomes comerciais,
+erro 422, sessão 401, pausa 429, cache, resultado parcial, versões diferentes,
+cancelamento/troca de tipo e fechamento. Sem exceções JS, overflow da página ou
+gravações reais. As cinco consultas públicas reais pelo BlenderService responderam
+com sucesso para Ryzen 5 5600, Core i3-12100F, Core Ultra 5 245KF, RTX 5070 e
+RX 6750 XT. Não houve consumo de LLM, mudança no banco ou arquitetura Python.
+
+Ainda pendentes: outros identificadores de hardware, ausência de dados no provedor
+e seleção de uma versão/método comum quando os agregados mais recentes divergem.
+Não classificar resultados incompatíveis apenas para preencher o destaque.
+
 ### Gabinetes: fans inclusas, capacidade e medidas — 23/10/2026
 
 Seis variantes exatas receberam fichas de fabricante no manifesto compartilhado

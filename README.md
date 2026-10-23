@@ -155,11 +155,16 @@ continuam pendentes: capacidades suficientes não aprovam o computador completo.
 
 Dados públicos de CPU ou GPU, com **mediana em amostras por minuto**, versão do
 Blender, método de renderização e quantidade de resultados. O retorno foi validado
-pelo serviço Python em **22/10/2026**, sem garantia de disponibilidade permanente.
+pelo serviço Python e revalidado com consultas reais em **23/10/2026**, sem garantia
+de disponibilidade permanente.
 
 A comparação de builds consulta esses dados ao clicar em **Comparar renderização**.
 CPU e GPU são analisadas separadamente; só há classificação quando todas as builds
 exibidas têm resultados da mesma versão do Blender e do mesmo método de renderização.
+O reconhecimento do Blender é independente dos slugs da API de FPS: nomes
+comerciais como EAGLE, DUAL e SHADOW não impedem identificar o chip explícito.
+Sufixos e variantes são preservados; modelos não identificados ou sem resultados
+públicos são informados por build, sem substituir a peça nem inventar pontuação.
 
 ### Limites da estimativa
 

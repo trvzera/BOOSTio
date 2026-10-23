@@ -8,15 +8,31 @@ export async function consultarRenderizacoes(builds,catalogo,{tipo = "cpu",signa
   return Promise.all(builds.map(async build => {
     const peca = categoria => catalogo.find(p => p.id === itensCategoria(build,categoria)[0]?.id);
     const dispositivo = hardwareBlender(peca("processador"),peca("placa_video"))[tipo];
-    if (!dispositivo) return {id:build.id,erro:"Modelo não identificado para este teste. Não será usado outro componente."};
+    if (!dispositivo) return {id:build.id,codigo:"modelo-nao-identificado",erro:tipo === "gpu" && !peca("placa_video")
+      ? "Esta build não tem uma GPU dedicada identificada. Vídeo integrado não será substituído por outra placa para este teste."
+      : "Modelo de " + tipo.toUpperCase() + " não identificado para o Blender. Não será usado outro componente."};
     const chave = tipo + ":" + dispositivo;
     try {
       if (!consultas.has(chave)) consultas.set(chave,cache.has(chave) ? Promise.resolve(cache.get(chave))
         : cliente.consultarBlender({dispositivo,tipo},{signal}).then(dados => { if (!signal?.aborted) cache.set(chave,dados); return dados; }));
       const dados = await consultas.get(chave);
       return {id:build.id,dispositivo,dados};
-    } catch (erro) { return {id:build.id,dispositivo,erro:erro.message || "Resultado indisponível. Tente novamente."}; }
+    } catch (erro) { return {id:build.id,dispositivo,erro:erro.message || "Resultado indisponível. Tente novamente.",
+      codigo:erro.codigo,status:erro.status,espera:Number.isFinite(erro.espera) && erro.espera > 0 ? Math.min(erro.espera,3600) : 0}; }
   }));
+}
+
+export function resumirConsultaRenderizacoes(resultados) {
+  const sucesso = resultados.filter(r => r.dados && Number.isFinite(r.dados.score)).length;
+  const espera = Math.max(0,...resultados.map(r => Number.isFinite(r.espera) ? r.espera : 0));
+  if (!sucesso) return {tom:"error",espera,mensagem:"Não foi possível comparar a renderização. "
+    + [...new Set(resultados.map(r => r.erro || "Sem resultado disponível."))].join(" ")};
+  if (sucesso !== resultados.length) return {tom:"warning",espera,mensagem:"Resultados disponíveis para " + sucesso + " de " + resultados.length
+    + " builds. Confira o motivo em cada card; não há vencedora enquanto faltarem resultados."};
+  const classificacao = classificarRenderizacoes(resultados);
+  return {tom:classificacao.comparavel ? "info" : "warning",espera,mensagem:classificacao.comparavel
+    ? "Mais amostras/min é melhor neste teste. CPU e GPU são separadas; RAM, VRAM, drivers e a cena podem mudar o desempenho real. A fonte pode agrupar variantes de fabricante e memória."
+    : classificacao.motivo + " As pontuações continuam visíveis, sem indicar uma vencedora."};
 }
 
 export function classificarRenderizacoes(resultados) {
