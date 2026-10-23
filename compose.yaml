@@ -44,6 +44,9 @@ services:
       GUNICORN_BIND: 0.0.0.0:8000
       TRUSTED_PROXY_HOPS: "1"
       TRUSTED_PROXY_PROTO_HOPS: "1"
+      IMAGENS_COLETADAS_DIR: /dados/coletados
+    volumes:
+      - imagens_coletadas:/dados/coletados
     depends_on:
       db:
         condition: service_healthy
@@ -79,6 +82,8 @@ services:
       args:
         API_PUBLIC_URL: https://api.boostio.com.br
     restart: unless-stopped
+    volumes:
+      - imagens_coletadas:/usr/share/nginx/html/coletados:ro
     depends_on:
       api:
         condition: service_healthy
@@ -103,6 +108,7 @@ services:
 volumes:
   mysql_data:
   redis_data:
+  imagens_coletadas:
 
 networks:
   backend:

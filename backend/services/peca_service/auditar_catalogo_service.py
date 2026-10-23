@@ -5,6 +5,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from .modelos_pecas import MODELOS_PECAS
+from .atualizar_imagem_peca_service import PASTA_COLETADOS
 from services.preco_service.validar_link_service import ValidarLinkService
 
 
@@ -54,7 +55,11 @@ class AuditarCatalogoService:
                     elif not destino.scheme:
                         frontend = Path(__file__).resolve().parents[3] / "frontend"
                         arquivo = (frontend / "pages" / imagem).resolve()
-                        if arquivo.is_relative_to(frontend / "imgs") and arquivo.is_file():
+                        raiz = frontend / "imgs"
+                        if imagem.startswith("../coletados/"):
+                            raiz = PASTA_COLETADOS.resolve()
+                            arquivo = (raiz / imagem.removeprefix("../coletados/")).resolve()
+                        if arquivo.is_relative_to(raiz) and arquivo.is_file():
                             imagens += 1
                             locais += 1
                         else:

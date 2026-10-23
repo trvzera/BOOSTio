@@ -37,6 +37,20 @@ def test_amostras_validacao(valor):
         AuditarCatalogoService().executar(valor)
 
 
+def test_auditoria_reconhece_volume_e_rejeita_caminho_fora_dele(monkeypatch, tmp_path):
+    volume = tmp_path / "coletados"
+    (volume / "imagens").mkdir(parents=True)
+    (volume / "imagens" / "peca.jpg").write_bytes(b"foto")
+    (tmp_path / "fora.jpg").write_bytes(b"fora")
+    pecas = [{"id": "ssd:1", "imagem": "../coletados/imagens/peca.jpg"},
+             {"id": "ssd:2", "imagem": "../coletados/../fora.jpg"}]
+    monkeypatch.setattr("services.peca_service.auditar_catalogo_service.PASTA_COLETADOS", volume)
+    monkeypatch.setattr("services.peca_service.auditar_catalogo_service.MODELOS_PECAS", [modelo("ssd", pecas)])
+    resumo = AuditarCatalogoService().executar()["categorias"]["ssd"]
+    assert resumo["imagensLocais"] == 1
+    assert resumo["pendencias"]["imagem_local_ausente"] == 1
+
+
 def test_comando_registrado_e_limita_amostras(monkeypatch):
     app = Flask(__name__)
     registrar_comandos_precos(app)

@@ -8,8 +8,9 @@ from .modelos_pecas import MODELOS_PECAS
 
 
 PROJETO = Path(__file__).resolve().parents[3]
-PASTA_IMAGENS = PROJETO / "frontend" / "imgs" / "produtos"
-MANIFESTO = PROJETO / "frontend" / "data" / "imagens-produtos.json"
+PASTA_COLETADOS = Path(os.getenv("IMAGENS_COLETADAS_DIR") or PROJETO / "frontend" / "coletados")
+PASTA_IMAGENS = PASTA_COLETADOS / "imagens"
+MANIFESTO = PASTA_COLETADOS / "imagens-produtos.json"
 
 
 class AtualizarImagemPecaService:
@@ -18,11 +19,11 @@ class AtualizarImagemPecaService:
         PASTA_IMAGENS.mkdir(parents=True, exist_ok=True)
         nome = f"{peca.__tablename__}-{peca.id}.{extensao}"
         destino = PASTA_IMAGENS / nome
-        with NamedTemporaryFile(dir=PASTA_IMAGENS, delete=False) as temporario:
+        with NamedTemporaryFile(dir=PASTA_IMAGENS, prefix=".tmp-", delete=False) as temporario:
             temporario.write(conteudo)
+        Path(temporario.name).chmod(0o644)
         os.replace(temporario.name, destino)
-        destino.chmod(0o644)
-        peca.definir_imagem(f"../imgs/produtos/{nome}")
+        peca.definir_imagem(f"../coletados/imagens/{nome}")
         return destino
 
     @staticmethod
@@ -30,8 +31,9 @@ class AtualizarImagemPecaService:
         imagens = {peca.part_number: peca.imagem_url
                    for classe in MODELOS_PECAS for peca in classe.mostrar_pecas()
                    if peca.part_number and peca.imagem_url}
-        with NamedTemporaryFile(mode="w", encoding="utf-8", dir=MANIFESTO.parent, delete=False) as temporario:
+        MANIFESTO.parent.mkdir(parents=True, exist_ok=True)
+        with NamedTemporaryFile(mode="w", encoding="utf-8", dir=MANIFESTO.parent, prefix=".tmp-", delete=False) as temporario:
             temporario.write(json.dumps(imagens, ensure_ascii=False, indent=2) + "\n")
+        Path(temporario.name).chmod(0o644)
         os.replace(temporario.name, MANIFESTO)
-        MANIFESTO.chmod(0o644)
         return len(imagens)

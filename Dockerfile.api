@@ -7,6 +7,8 @@ COPY requirements.txt .
 RUN python -m pip install --no-cache-dir -r requirements.txt
 
 COPY backend/ ./backend/
+# Manifestos compartilhados usados pelo catálogo do backend.
+COPY frontend/data/imagens-referencia.json frontend/data/medidas-fisicas.json ./frontend/data/
 WORKDIR /app/backend
 
 CMD ["gunicorn", "-c", "gunicorn.conf.py", "wsgi:app"]

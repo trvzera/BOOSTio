@@ -12,6 +12,7 @@ venv/
 .env
 .env.local
 .env.production
+frontend/coletados/
 instance/
 *.db
 .DS_Store
