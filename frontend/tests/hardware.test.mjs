@@ -129,9 +129,9 @@ test("catálogo demonstrativo complementa somente modelos de placa identificados
   const dados = completarCatalogoDemo([{id:"x",categoria:"placa_mae",fabricante:"ASUS",modelo:"Prime A520M-K"},{id:"y",categoria:"placa_mae",fabricante:"Outra",modelo:"Desconhecida"}]);
   assert.equal(dados[0].quantidade_portas_sata,4); assert.equal(dados[1].quantidade_portas_sata,undefined);
 });
-test("indicador mostra informação acessível sem pill e pendências escapadas nos avisos",() => {
+test("barrinha mostra informação acessível sem ícone de i ou pill e escapa pendências",() => {
   const ok = indicadorBuild({erros:[],avisos:[],faltam:[]},"ok");
-  assert.match(ok,/build-indicator ok/); assert.match(ok,/build-info-icon/); assert.match(ok,/aria-expanded="false"/); assert.doesNotMatch(ok,/pill/);
+  assert.match(ok,/build-indicator ok/); assert.match(ok,/class="compatibility-trigger"/); assert.match(ok,/aria-expanded="false"/); assert.doesNotMatch(ok,/pill|build-info-icon|>i<|information/);
   const aviso = indicadorBuild({erros:[],avisos:["<script>"],faltam:["RAM"]},"aviso");
   assert.match(aviso,/&lt;script&gt;/); assert.match(aviso,/Falta adicionar: RAM/);
   assert.match(indicadorBuild({erros:["erro"],avisos:[],faltam:[]},"erro"),/build-indicator erro/);

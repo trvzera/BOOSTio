@@ -6,6 +6,24 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Barrinha de compatibilidade ao lado do nome — 23/10/2026
+
+O indicador circular de informação foi substituído pela barra vertical antes do
+nome, nos cards de Minhas builds, no editor e na visualização pública. Usa azul
+primário sem problemas, amarelo para pendências e vermelho para erros, mantendo
+o diagnóstico existente. Não altera as regras nem o percentual de preenchimento.
+
+A barra tem 3 px de largura visual e botão transparente de pelo menos 24 px de
+largura, com nome acessível, foco visível, `aria-expanded` e `aria-controls`.
+Hover, clique/toque e teclado continuam abrindo os detalhes; Escape fecha.
+O painel se ajusta às bordas da tela, e o editor centraliza a barra no título.
+Removidos os estilos antigos do círculo e o posicionamento à direita do nome.
+
+Validação: 427 testes Node, 45 verificações de páginas/axe, 85 de interação e
+36 de compartilhamento. Mais 47 verificações finais de alinhamento, área clicável,
+hover, Escape e limites do painel em 320/1440 px; a rodada geral também cobriu
+390/768 px. APIs simuladas, sem alteração do banco ou regras de compatibilidade.
+
 ### Preço nas lojas e RAM com slots ausentes — 23/10/2026
 
 - O preço principal existia no catálogo, mas a API não enviava `ofertas`, que o
