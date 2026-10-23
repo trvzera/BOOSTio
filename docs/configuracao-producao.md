@@ -123,6 +123,16 @@ após subir os serviços. Configure backup periódico do MySQL fora da VPS.
 O contêiner da API consulta `/health` internamente. A rota responde 200 quando
 MySQL e Redis estão acessíveis e 503 em caso de falha, sem divulgar detalhes.
 
+Para a coleta diária, agende `deploy/atualizar_precos.sh` no cron da VPS, uma
+vez por dia, no horário de menor tráfego. O script impede execuções sobrepostas
+e usa o comando de coleta já existente. O tempo total depende da quantidade de
+links e da resposta da loja; acompanhe o resultado nos logs do cron.
+
+Agende também `deploy/backup_mysql.sh` diariamente, definindo
+`BOOSTIO_BACKUP_DIR` como um diretório privado fora do projeto. O script grava
+um dump comprimido com permissões restritas. Envie cópias para outro local,
+defina retenção e teste a restauração antes de depender desse backup.
+
 Para publicar o conteúdo da pasta `frontend` na raiz do site, use:
 
 ```dotenv
