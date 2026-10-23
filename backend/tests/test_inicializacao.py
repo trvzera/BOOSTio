@@ -17,10 +17,13 @@ def test_importar_app_e_wsgi_nao_cria_banco_nem_coleta(tmp_path):
     for ambiente, modulo in [("desenvolvimento", "app"), ("producao", "wsgi")]:
         banco = tmp_path / f"{ambiente}.db"
         env = dict(os.environ, PYTHON_DOTENV_DISABLED="1", APP_ENV=ambiente,
-                   URL_DATABASE=f"sqlite:///{banco.as_posix()}", SECRET_KEY="apenas-testes",
+                   URL_DATABASE=f"sqlite:///{banco.as_posix()}", SECRET_KEY="chave-de-testes-com-mais-de-trinta-e-dois-caracteres",
                    FRONTEND_URL="https://www.example.com", API_PUBLIC_URL="https://api.example.com",
                    RATELIMIT_STORAGE_URI="redis://127.0.0.1:6379/0", TRUSTED_PROXY_HOPS="0",
-                   TRUSTED_PROXY_PROTO_HOPS="0", SESSION_COOKIE_SAMESITE="Lax")
+                   TRUSTED_PROXY_PROTO_HOPS="0", SESSION_COOKIE_SAMESITE="Lax",
+                   GOOGLE_CLIENT_ID="cliente-teste", GOOGLE_CLIENT_SECRET="segredo-teste",
+                   GEMINI_API_KEY="gemini-teste", MAIL_USERNAME="teste@example.com",
+                   MAIL_PASSWORD="senha-teste")
         codigo = f'''
 from unittest.mock import patch
 # Redis é externo a este teste de importação; não inicializar seu cliente.

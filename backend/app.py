@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from configs import ambientes,configurar_oauth #Antes por esta com secret_key(IMPORTANTE)
 from flask import Flask
 from services.configuracao_service.configurar_acesso_service import ConfigurarAcessoService
+from services.configuracao_service.validar_producao_service import ValidarProducaoService
 from models import db,lm,mail 
 from commands.precos import registrar_comandos_precos
 import os
@@ -26,6 +27,8 @@ app = Flask(__name__, instance_path=os.path.join(os.path.dirname(os.path.abspath
 ambiente = os.getenv('APP_ENV', 'desenvolvimento')
 app.config.from_object(ambientes[ambiente])
 
+if ambiente == 'producao':
+    ValidarProducaoService().executar(app)
 ConfigurarAcessoService().executar(app, producao=ambiente == 'producao')
 
 configurar_csrf(app)

@@ -86,20 +86,29 @@ cadastrar o callback: localhost e 127.0.0.1 não compartilham os mesmos cookies.
 
 ## Produção
 
-Exemplo ilustrativo; substitua pelos domínios escolhidos:
+Para publicar o conteúdo da pasta `frontend` na raiz do site, use:
 
 ```dotenv
 APP_ENV=producao
-FRONTEND_URL=https://www.seu-dominio.com
-API_PUBLIC_URL=https://api.seu-dominio.com
+FRONTEND_URL=https://boostio.com.br
+API_PUBLIC_URL=https://api.boostio.com.br
+CORS_ORIGINS=https://boostio.com.br
 SESSION_COOKIE_SAMESITE=Lax
 TRUSTED_PROXY_HOPS=0
 TRUSTED_PROXY_PROTO_HOPS=0
 ```
 
-Mantenha também as configurações existentes de banco, Redis, chave de sessão,
-e-mail e credenciais Google. Este guia cobre endereços; não substitui a configuração
-do servidor de produção.
+O arquivo `backend/.env.producao.example` lista as variáveis necessárias. Preencha
+os segredos nas variáveis da hospedagem, sem publicá-los no frontend ou no Git.
+O backend recusa iniciar em produção sem `SECRET_KEY` de pelo menos 32 caracteres,
+`URL_DATABASE`, credenciais Google, chave Gemini e credenciais de e-mail. O Redis
+também é obrigatório para o Flask-Limiter. Mantenha a mesma `SECRET_KEY` entre
+workers e implantações para preservar as sessões.
+
+Configure DNS e certificado HTTPS para `boostio.com.br` e
+`api.boostio.com.br`. Publique a pasta `frontend` como raiz do site para que
+`https://boostio.com.br/pages/index.html` exista. A API deve responder em
+`https://api.boostio.com.br`, sem prefixo `/api` nessa configuração.
 
 `FRONTEND_URL` é a base que contém `/pages`, usada nos retornos do login e links de
 recuperação. Se o frontend estiver em `/frontend`, inclua esse caminho.
@@ -122,7 +131,7 @@ O backend exige URLs HTTPS em produção. CORS aceita por padrão apenas a orige
 de `FRONTEND_URL`. Se houver outras origens legítimas, configure explicitamente:
 
 ```dotenv
-CORS_ORIGINS=https://www.seu-dominio.com,https://seu-dominio.com
+CORS_ORIGINS=https://boostio.com.br
 ```
 
 Não inclua caminhos nem `*`. Cookies continuam HttpOnly e Secure em produção.
@@ -156,7 +165,7 @@ suposição. `X-Forwarded-Host` não é aceito; o Host deve ser o domínio da AP
 Cadastre em **URIs de redirecionamento autorizados** do cliente OAuth web:
 
 ```text
-https://api.seu-dominio.com/auth/google/entrar
+https://api.boostio.com.br/auth/google/entrar
 ```
 
 O endereço é exatamente `API_PUBLIC_URL` + `/auth/google/entrar`, incluindo eventual
