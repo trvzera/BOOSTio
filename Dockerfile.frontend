@@ -1,0 +1,6 @@
+FROM caddy:2-alpine
+
+ARG API_PUBLIC_URL=https://api.boostio.com.br
+COPY frontend/ /srv/frontend/
+COPY deploy/Caddyfile /etc/caddy/Caddyfile
+RUN printf '// Endereço público da API.\nexport const API_PUBLICA = "%s";\n' "$API_PUBLIC_URL" > /srv/frontend/js/config-publica.js

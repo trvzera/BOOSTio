@@ -92,6 +92,35 @@ cadastrar o callback: localhost e 127.0.0.1 não compartilham os mesmos cookies.
 
 ## Produção
 
+### VPS Hostinger com Docker
+
+O `compose.yaml` inicia MySQL, Redis, API e Caddy. Na VPS, aponte os registros
+DNS de `boostio.com.br` e `api.boostio.com.br` para o IP da máquina e libere as
+portas 80 e 443. O Caddy obtém os certificados HTTPS e serve a pasta `frontend`;
+os contêineres de banco, Redis e API não publicam portas externas.
+
+Copie `.env.production.example` para `.env.production` na raiz do projeto e
+preencha as credenciais. Use a mesma senha em `MYSQL_PASSWORD` e na
+`URL_DATABASE`, codificando caracteres especiais da senha na URL. Restrinja o
+arquivo a quem administra a VPS (`chmod 600 .env.production`). Não copie o
+`.env` local para a VPS. O SQLite local continua disponível fora do Docker.
+
+Na primeira instalação, com o MySQL vazio:
+
+```console
+docker compose --env-file .env.production up -d --build db redis
+docker compose --env-file .env.production run --rm api python -m flask --app app banco-preparar
+docker compose --env-file .env.production run --rm api python -m flask --app app pecas-popular
+docker compose --env-file .env.production up -d --build api web
+```
+
+O comando de preparação do MySQL só aceita um banco vazio. Em novas versões que
+mudem o esquema, faça backup e uma migração específica antes de atualizar a API.
+Não apague o volume `mysql_data`, que contém os dados. Os volumes `caddy_data` e
+`caddy_config` guardam os certificados; `redis_data` guarda os contadores e
+reservas de geração. Verifique `docker compose ps` e os logs da API e do Caddy
+após subir os serviços. Configure backup periódico do MySQL fora da VPS.
+
 Para publicar o conteúdo da pasta `frontend` na raiz do site, use:
 
 ```dotenv
