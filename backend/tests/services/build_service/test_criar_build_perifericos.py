@@ -17,6 +17,7 @@ class CriarBuildPerifericosTest(unittest.TestCase):
             tipo: [{"id": indice, "fabricante": "Marca", "modelo": tipo, "preco": 100}]
             for indice, tipo in enumerate(self.tipos, start=1)
         }
+        self.catalogo["gabinete"][0]["fans_inclusos"] = 1
         self.build = {
             "nome": "Setup", "descricao": "Completo", "utilidade": "jogos",
             "componentes": [

@@ -1,5 +1,21 @@
 # Qualidade do frontend — 20/10/2026
 
+## Melhorias de RAM e e-mail — 23/10/2026
+
+- 365 testes Node e 492 Python (+13 subtestes), sem chamadas reais a LLMs ou envios
+  SMTP. Banco real não foi alterado. Avisos legados de SQLAlchemy/Flask-Login permanecem.
+- 92 verificações Chrome do fluxo real do editor com API/gravações simuladas:
+  adição do mesmo pente, modelos misturados, kits, quantidades, bloqueio do quinto
+  pente, budget, substituição explícita, confirmação/persistência única e foco.
+  Telas 320/768/1440 e paisagem 844×390, com/sem redução de movimento. Sem exceções,
+  overflow ou violações axe A/AA nas telas auditadas; corrigido contraste do botão.
+- Também testado com as 1.535 peças reais lidas sem escrita. Abertura do modal nessa
+  execução levou cerca de 28 ms; é uma medição local, não uma garantia de produção.
+- E-mail renderizado em 320/600 px e inspecionado visualmente, sem enviar mensagens.
+  MIME contém alternativas texto/HTML, mesmo código/expiração, nome escapado e
+  cabeçalhos de mensagem automática. Compatibilidade real em Outlook/Gmail e entrega
+  ainda precisam de homologação; HTML não substitui SPF/DKIM/DMARC/reputação.
+
 ## Revalidação — 23/10/2026
 
 - `main` atualizada até `d20fc97` sem conflitos. As proteções de cotas e geração

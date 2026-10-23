@@ -15,7 +15,7 @@ def sugestao():
         "ssd": {"interface": "NVMe", "formato": "M.2"},
         "fonte": {"potencia_w": 500},
         "gabinete": {"formatos_placa_mae": "mATX, ITX", "tamanho_max_gpu_mm": 300,
-                     "tamanho_max_cooler_mm": 160, "suporte_water_cooler": False},
+                     "tamanho_max_cooler_mm": 160, "suporte_water_cooler": False, "fans_inclusos": 1},
     }
     catalogo = {tipo: [{"id": 1, "fabricante": "Teste", "modelo": tipo, "preco": 100,
                         "consumo_energia": 5, **campos}] for tipo, campos in especificacoes.items()}
@@ -84,6 +84,8 @@ def test_exige_gpu_ou_cooler_quando_cpu_precisa(sugestao, campo, pendente):
 def test_nao_bloqueia_sugestao_so_por_especificacoes_ausentes(sugestao):
     for itens in sugestao[1].values():
         itens[0] = {k: v for k, v in itens[0].items() if k in ("id", "fabricante", "modelo", "preco")}
+    # A presença obrigatória de ventilação é independente das medidas incompletas.
+    sugestao[1]["gabinete"][0]["fans_inclusos"] = 1
     assert validar(sugestao)["preco_total"] == 600
 
 
@@ -161,3 +163,25 @@ def test_prompt_descreve_ventilacao_sem_inferir_tamanho_do_gabinete_ou_folga():
     assert "Não planeje substituir fans originais" in prompt
     assert "Não some uma folga genérica" in prompt
     assert "fonte_fluxo_ar nome_comercial" in prompt
+    assert "VENTILAÇÃO É OBRIGATÓRIA" in prompt
+
+
+def test_geracao_exige_fans_mesmo_com_capacidade_desconhecida(sugestao):
+    sugestao[1]["gabinete"][0].pop("fans_inclusos")
+    with pytest.raises(ValueError, match="não incluiu fans"):
+        validar(sugestao)
+    adicionar(sugestao, "fan", tamanho_mm=120, quantidade=1)
+    assert validar(sugestao)["preco_total"] == 700
+
+
+def test_fans_do_aio_confirmadas_nao_sao_compradas_novamente(sugestao):
+    sugestao[1]["gabinete"][0].update(fans_inclusos=0, suporte_water_cooler=True)
+    adicionar(sugestao, "water_cooler", tamanho_radiador_mm=240, tamanho_fan_mm=120, quantidade_fans=2)
+    assert validar(sugestao)["preco_total"] == 700
+
+
+@pytest.mark.parametrize("quantidade", [None, 0, True, 1.5])
+def test_fans_sem_quantidade_real_nao_satisfazem_ventilacao(sugestao, quantidade):
+    adicionar(sugestao, "fan", tamanho_mm=120, quantidade=quantidade)
+    with pytest.raises(ValueError, match="fans por unidade/kit"):
+        validar(sugestao)

@@ -6,6 +6,58 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Expansão de RAM, verificação de e-mail e fans — 23/10/2026
+
+- O modal de melhorias começa com RAM/SSD/HD, categorias com critérios comparáveis.
+  CPU/GPU continuam disponíveis nos filtros, mas sem ranqueamento inventado.
+  Preço zero não é tratado como uma melhoria gratuita.
+- `build/melhorias-ram.js` planeja uma cópia sem gravar: acrescentar é o padrão e
+  mantém as memórias atuais; substituir é uma escolha explícita que aceita vários
+  modelos/quantidades. O modal oferece o mesmo modelo atual, controles de quantidade
+  e preço apenas das novas compras. A aplicação continua exigindo confirmação.
+- Placa-mãe atual identificada, DDR, slots e capacidade máxima são obrigatórios
+  para a sugestão de RAM. Kits contam pentes × quantidade e GB por item × quantidade.
+  Adição mantém frequência/DDR; outros modelos precisam de CAS comparável, sem piora
+  relativa. Troca não pode reduzir capacidade/frequência ou sair de vários pentes
+  para apenas um; quatro pentes podem virar dois com capacidade preservada.
+- Dois pentes do mesmo modelo/capacidade são uma preferência, não certificação de
+  dual channel: instalar conforme manual, considerar suporte CPU/placa-mãe e kits
+  testados juntos. Misturas mantêm o aviso de estabilidade/XMP/EXPO. Referência:
+  [orientação Intel](https://www.intel.com/content/www/us/en/gaming/resources/how-much-ram-gaming.html).
+- Modelos/quantidades/preços são revalidados contra o catálogo em memória antes de confirmar; o callback
+  existente salva uma única configuração. Erros de outras peças vindos do servidor
+  não são descartados por uma expansão de RAM. O diagnóstico da seleção nova é parcial.
+- E-mail de verificação: HTML responsivo e alternativa em texto, código de seis
+  dígitos, nome escapado, prazo de cinco minutos, instruções para reenvio/segurança e
+  identificação de mensagem automática. Sem imagens/fontes remotas, rastreamento ou
+  anexos. Preservados limites, uso único, vínculo com o destinatário e SMTP/TLS.
+- Não há garantia de caixa de entrada por mudar HTML. Em domínio próprio, configurar
+  autenticação SPF/DKIM/DMARC e alinhamento no provedor/DNS, verificar reputação e os
+  cabeçalhos de mensagens de teste. Não falsificar From nem adicionar autenticação
+  inventada pelo Python. [Diretrizes oficiais Gmail](https://support.google.com/mail/answer/81126?hl=pt-BR).
+- Geração: prompt e Python exigem ventilação, mesmo sem a capacidade documentada do
+  gabinete. Fans incluídas no gabinete ou AIO contam quando confirmadas; fan própria
+  é preservada sem recompra. Onde a capacidade é conhecida, continua sendo obrigatório
+  completar as posições, sem excesso e sem transferir sobras de periféricos. A omissão
+  usa a revisão automática limitada; não salva uma resposta inválida.
+
+#### Como enriquecer os dados técnicos sem migrar o banco
+
+1. Usar a ficha/manual oficial da variante exata e part number real, quando existir.
+   Identificadores `SEED-*` são internos, não códigos oficiais para procurar no fabricante.
+   Preços/imagens das coletas não provam que medidas e listas de suporte estão completas.
+2. Normalizar unidade/eixo e guardar referência da fonte. Alimentar as fichas em
+   `frontend/data/medidas-fisicas.json`, que o backend lê em
+   `models/medidas_fisicas.py::completar_medidas`. `Peca.to_catalogo()` já inclui esse
+   complemento na API. A seleção exige categoria, fabricante, modelo e part number;
+   variantes parecidas não herdam a ficha. Não houve coleta nova nem alteração do banco.
+3. Ampliar primeiro gabinetes/GPU/coolers mais usados: dimensões, posições alternativas
+   de fans/radiadores, espessura do conjunto e interferências. Não deduzir eixos pelo
+   nome comercial nem usar uma folga universal para AIO.
+4. BIOS/lista de CPUs, QVL/perfis de RAM, conectores e compartilhamento de portas exigem
+   dados de suporte próprios do fabricante, além das medidas. Automatização futura deve
+   validar extração, fonte/data e revisão antes de publicar, sem usar LLM como prova.
+
 ### Formulário, modelos e compartilhamento — 23/10/2026
 
 - `main` integrada por fast-forward até `d20fc97`, mantendo CSRF, limitação global

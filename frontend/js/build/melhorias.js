@@ -6,6 +6,7 @@ import { abrirDialogoBuild } from "./acoes-build.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { iniciarDetalhesAnimados, definirDetalheAberto } from "../components/animated-details.js";
 import { avaliarTrocaMelhoria, exigirTrocaMelhoria } from "./validar-melhoria.js";
+import { AVISO_DUAL_CHANNEL, contextoMelhoriaRam, planejarMelhoriaRam } from './melhorias-ram.js';
 
 const CATEGORIAS = categoriasCatalogo;
 const MOTIVO_TRAVA = "Destranque a build para buscar e aplicar melhorias.";
@@ -21,9 +22,12 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     throw new Error("Informe uma build, o catálogo e o callback para aplicar as alterações.");
 
   const original = structuredClone(build);
-  const categorias = new Set(["processador","placa_video"]);
+  const categorias = new Set(["memoria_ram","ssd","hd"]);
   const gruposAbertos = new Set();
   let trocas = new Map(), aplicando = false, aplicada = false, totalExibido;
+  let memorias = new Map(), modoRam = 'adicionar';
+  const selecoes = () => trocas.size + memorias.size;
+  const propostaRam = (itens = memorias) => ({modo:modoRam,itens:[...itens].map(([id,quantidade])=>({id,quantidade}))});
   const budgetInicial = planejamentoLocal().budget ?? build.orcamento;
   const dialogo = abrirDialogoBuild("Buscar melhorias",'<div class="upgrade-real-panel">'
     + '<div class="upgrade-real-tabs" role="tablist" aria-label="Etapas da busca de melhorias" hidden>'
@@ -35,11 +39,11 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     + '<label class="planning-field upgrade-real-budget" for="upgrade-real-budget"><span>Quanto deseja investir nas trocas?</span>'
     + '<input id="upgrade-real-budget" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" value="'
     + h(budgetInicial ?? "") + '" placeholder="Ex.: 1500" aria-label="Orçamento para novas peças em reais" aria-describedby="upgrade-real-budget-help"><small id="upgrade-real-budget-help">Valor para as peças novas, sem descontar as antigas e sem frete.</small></label>'
-    + '<details class="upgrade-real-filters" data-animated-details><summary><span>Peças que deseja trocar</span><strong id="upgrade-real-category-count">2 selecionadas</strong><span class="upgrade-real-chevron" aria-hidden="true"></span></summary>'
+    + '<details class="upgrade-real-filters" data-animated-details><summary><span>Peças que deseja melhorar</span><strong id="upgrade-real-category-count">3 selecionadas</strong><span class="upgrade-real-chevron" aria-hidden="true"></span></summary>'
     + '<fieldset class="upgrade-real-categories"><legend class="sr-only">Selecione uma ou mais categorias</legend>'
     + CATEGORIAS.map(categoria => '<label class="ui-check"><input type="checkbox" name="upgrade-real-category" value="' + categoria.id
       + '" ' + (categorias.has(categoria.id) ? 'checked' : '') + '>' + iconeAnimado("checkbox") + '<span>' + categoria.nome + '</span></label>').join("") + '</fieldset></details>'
-    + '<details class="upgrade-real-help" data-animated-details><summary>O que considerar antes de trocar<span class="upgrade-real-chevron" aria-hidden="true"></span></summary><p class="planning-help">As sugestões são ordenadas por preço, não por ganho de desempenho medido. Trocas inferiores nos dados comparados ou sem dados suficientes ficam bloqueadas. RAM e discos substituem a categoria por uma unidade/kit; o total atual é considerado para não perder capacidade. CPU/GPU e outras categorias aguardam critérios de desempenho comparáveis.</p></details>'
+    + '<details class="upgrade-real-help" data-animated-details><summary>O que considerar antes de trocar<span class="upgrade-real-chevron" aria-hidden="true"></span></summary><p class="planning-help">As sugestões são ordenadas por preço, não por ganho de desempenho medido. Trocas inferiores nos dados comparados ou sem dados suficientes ficam bloqueadas. Na RAM, você pode acrescentar pentes ou substituir as memórias; os discos substituem a categoria por uma unidade. CPU/GPU e outras categorias aguardam critérios de desempenho comparáveis.</p></details>'
     + '<div class="upgrade-real-results" id="upgrade-real-results"></div></div></section>'
     + '<section class="upgrade-real-preview" id="upgrade-preview" aria-labelledby="upgrade-real-preview-title"><div class="upgrade-real-pane-heading"><h3 id="upgrade-real-preview-title" tabindex="-1">Sua prévia</h3><span>Antes de salvar</span></div>'
     + '<div class="upgrade-real-preview-scroll upgrade-real-scroll" tabindex="0" role="region" aria-label="Revisão das trocas e dos valores"><div id="upgrade-real-differences"></div><p class="planning-help" id="upgrade-real-apply-reason"></p></div></section></div>'
@@ -138,19 +142,21 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
       if (!categorias.has(id)) throw new Error("Selecione a categoria de " + rotulo + ".");
       const peca = pecaPorId(id,escolhas.get(id));
       if (!peca || peca.esgotado) throw new Error(rotulo + ": a peça escolhida está indisponível no catálogo.");
-      if (centavos(peca.preco) == null) throw new Error(rotulo + ": a peça escolhida não tem preço válido.");
+      if (centavos(peca.preco) == null || centavos(peca.preco) <= 0) throw new Error(rotulo + ": a peça escolhida não tem preço válido.");
       exigirTrocaMelhoria(original,peca,catalogo);
       return peca;
     });
   }
-  function simular(escolhas,base = {...build,componentes:original.componentes}) {
+  function simular(escolhas,base = {...build,componentes:original.componentes},rams = memorias) {
     if (build.travada || base.travada) throw new Error(MOTIVO_TRAVA);
     const limite = budget();
     if (limite == null) throw new Error(MOTIVO_BUDGET);
     const pecas = escolhidas(escolhas);
-    const gasto = pecas.reduce((total,peca) => total + centavos(peca.preco),0);
+    if (rams.size && !categorias.has('memoria_ram')) throw new Error('Selecione a categoria de Memória RAM.');
+    const ram = planejarMelhoriaRam(base,catalogo,propostaRam(rams));
+    const gasto = pecas.reduce((total,peca) => total + centavos(peca.preco),ram.gastoCentavos);
     if (gasto > limite) throw new Error("As peças escolhidas juntas ultrapassam o budget em " + valorMonetario(gasto - limite) + ". Remova uma troca, escolha outra peça ou ajuste o budget.");
-    const proxima = structuredClone(base);
+    const proxima = ram.build;
     // Retira todas as substituídas antes de validar: o consumo intermediário não é a combinação final.
     for (const peca of pecas) delete proxima.componentes[peca.categoria];
     for (const peca of pecas) {
@@ -181,21 +187,24 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
       const candidatas = [], conflitos = new Set(), comparacoesPendentes = new Set();
       let foraDoBudget = 0, indisponiveis = 0, inferiores = 0, semComparacao = 0;
       for (const peca of catalogo) {
-        if (peca.categoria !== categoria.id || peca.id === atual(original,categoria.id)?.id) continue;
+        if (peca.categoria !== categoria.id || categoria.id !== 'memoria_ram' && peca.id === atual(original,categoria.id)?.id) continue;
         const preco = centavos(peca.preco);
-        if (peca.esgotado || preco == null) { indisponiveis++; continue; }
-        const comparacao = avaliarTrocaMelhoria(original,peca,catalogo);
+        if (peca.esgotado || preco == null || preco <= 0) { indisponiveis++; continue; }
+        const comparacao = categoria.id === 'memoria_ram' ? {permitida:true} : avaliarTrocaMelhoria(original,peca,catalogo);
         if (!comparacao.permitida) {
           if (comparacao.codigo === "regressao") inferiores++;
           else if (comparacao.codigo !== "mesma-peca") { semComparacao++; comparacoesPendentes.add(comparacao.motivo); }
           continue;
         }
         const propostas = new Map(trocas);
-        propostas.set(categoria.id,peca.id);
+        const rams = new Map(memorias);
+        if (categoria.id === 'memoria_ram') rams.set(peca.id,rams.get(peca.id) || 1);
+        else propostas.set(categoria.id,peca.id);
         try {
-          const outras = escolhidas(propostas).filter(outra => outra.categoria !== categoria.id);
-          if (preco + outras.reduce((total,outra) => total + centavos(outra.preco),0) > budget()) { foraDoBudget++; continue; }
-          simular(propostas);
+          const outras = escolhidas(propostas);
+          const ram = planejarMelhoriaRam(original,catalogo,propostaRam(rams));
+          if (outras.reduce((total,outra) => total + centavos(outra.preco),ram.gastoCentavos) > budget()) { foraDoBudget++; continue; }
+          simular(propostas,undefined,rams);
           candidatas.push(peca);
         } catch (erro) { conflitos.add(erro.message); }
       }
@@ -204,22 +213,30 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
         indisponiveis ? indisponiveis + " opções indisponíveis ou sem preço válido." : "",
         inferiores ? inferiores + " opções inferiores nos dados comparados foram ocultadas." : "",
         semComparacao ? semComparacao + " opções sem comparação segura não são sugeridas." : ""].filter(Boolean).join(" ");
-      const selecionada = pecaPorId(categoria.id,trocas.get(categoria.id));
+      const selecionada = categoria.id === 'memoria_ram' ? memorias.size > 0 : pecaPorId(categoria.id,trocas.get(categoria.id));
       const precoSelecionado = centavos(selecionada?.preco);
+      let contextoRam = '';
+      if (categoria.id === 'memoria_ram') {
+        try {
+          const {placa,slots,maximoGb,padrao} = contextoMelhoriaRam(original,catalogo);
+          contextoRam = '<p class="planning-help">Placa-mãe atual: ' + h(nome(placa)) + ' · ' + h(padrao) + ' · ' + slots + ' slots · até ' + maximoGb + ' GB.</p>';
+        } catch(erro) { contextoRam = '<p class="planning-help" data-tone="warning">' + h(erro.message) + '</p>'; }
+        contextoRam += '<label class="planning-field upgrade-ram-mode" for="upgrade-ram-mode"><span>Como melhorar a RAM?</span><select id="upgrade-ram-mode"><option value="adicionar"' + (modoRam === 'adicionar' ? ' selected' : '') + '>Adicionar sem remover as atuais</option><option value="substituir"' + (modoRam === 'substituir' ? ' selected' : '') + '>Substituir todas as memórias</option></select></label><p class="planning-help">' + h(AVISO_DUAL_CHANNEL) + '</p>';
+      }
       return '<details class="upgrade-real-group" data-upgrade-group="' + categoria.id + '" data-selected="' + Boolean(selecionada) + '" data-animated-details' + (gruposAbertos.has(categoria.id) ? ' open' : '') + '>'
         + '<summary class="upgrade-real-group-heading" aria-controls="upgrade-parts-' + categoria.id + '"><h3>' + categoria.nome + '</h3><span class="upgrade-real-group-value">'
-        + (selecionada ? h(nome(selecionada)) + '<span class="upgrade-real-group-price">' + h(precoSelecionado != null ? valorMonetario(precoSelecionado) : "Preço indisponível") + '</span>'
+        + (selecionada ? categoria.id === 'memoria_ram' ? memorias.size + (memorias.size === 1 ? ' modelo na prévia' : ' modelos na prévia') : h(nome(selecionada)) + '<span class="upgrade-real-group-price">' + h(precoSelecionado != null ? valorMonetario(precoSelecionado) : "Preço indisponível") + '</span>'
           : candidatas.length ? 'Escolha uma peça' : 'Sem opções disponíveis')
         + '</span><span class="upgrade-real-group-meta"><span>' + candidatas.length + (candidatas.length === 1 ? ' opção' : ' opções') + '</span>' + iconeAnimado("chevron") + '</span></summary>'
         + '<div class="upgrade-real-group-body" id="upgrade-parts-' + categoria.id + '"><p class="upgrade-real-current"><span>Na build</span> '
-        + h(nomeAtual(original,categoria.id)) + '</p>'
+        + h(nomeAtual(original,categoria.id)) + '</p>' + contextoRam
         + (candidatas.length ? '<div class="upgrade-real-candidates">' + candidatas.map(peca => {
-          const selecionada = trocas.get(categoria.id) === peca.id;
+          const selecionada = categoria.id === 'memoria_ram' ? memorias.has(peca.id) : trocas.get(categoria.id) === peca.id;
           const acao = selecionada ? "Selecionada" : "Selecionar", preco = valorMonetario(centavos(peca.preco));
           return '<button type="button" class="upgrade-real-candidate" data-upgrade-pick="' + h(peca.id)
             + '" data-upgrade-category="' + categoria.id + '" aria-pressed="' + selecionada
             + '" aria-label="' + h(nome(peca) + " · " + preco + " · " + (selecionada ? "Na prévia" : "Adicionar à prévia")) + '"><span class="upgrade-real-candidate-image">' + imagemPeca(peca) + '</span><span class="upgrade-real-candidate-copy"><strong>' + h(nome(peca))
-            + '</strong><span class="upgrade-real-candidate-price">' + h(preco) + '</span></span><span class="upgrade-real-candidate-action">' + acao + '</span></button>';
+            + '</strong>' + (categoria.id === 'memoria_ram' ? '<span class="planning-help">' + h(peca.capacidade_gb) + ' GB · ' + h(peca.quantidade_pentes) + (Number(peca.quantidade_pentes) === 1 ? ' pente' : ' pentes') + ' · ' + h(peca.ddr) + ' · ' + h(peca.frequencia_mhz) + ' MHz</span>' : '') + '<span class="upgrade-real-candidate-price">' + h(preco) + '</span></span><span class="upgrade-real-candidate-action">' + acao + '</span></button>';
         }).join("") + '</div>' : '<p class="planning-help">' + h(comparacoesPendentes.size ? [...comparacoesPendentes][0] : "Nenhuma troca sem regressão verificável e compatível disponível dentro do budget combinado.") + '</p>')
         + (exclusoes ? '<p class="planning-help">' + h(exclusoes) + '</p>' : '')
         + (conflitos.size ? '<details class="upgrade-real-conflicts"><summary>Por que algumas opções não aparecem?</summary><ul>'
@@ -229,8 +246,17 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
 
   function renderizarPrevia() {
     const base = {...build,componentes:original.componentes};
-    const proxima = structuredClone(base), limite = budget();
+    let proxima = structuredClone(base), ram, erroRam = '';
+    const limite = budget();
     let gasto = 0, precoConhecido = true;
+    if (memorias.size) {
+      try { ram = planejarMelhoriaRam(base,catalogo,propostaRam()); proxima = ram.build; }
+      catch(erro) { erroRam = erro.message; }
+      for (const [id,quantidade] of memorias) {
+        const preco = centavos(pecaPorId('memoria_ram',id)?.preco);
+        if (preco == null) precoConhecido = false; else gasto += preco * quantidade;
+      }
+    }
     const linhas = CATEGORIAS.filter(({id}) => trocas.has(id)).map(categoria => {
       const peca = pecaPorId(categoria.id,trocas.get(categoria.id)), preco = centavos(peca?.preco);
       proxima.componentes[categoria.id] = {id:trocas.get(categoria.id),quantidade:1};
@@ -244,6 +270,10 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
         + ' · ' + h(preco != null ? valorMonetario(preco) : "Preço indisponível") + '</dd></div></dl>'
         + '</article>';
     }).join("");
+    const linhasRam = memorias.size ? '<article class="upgrade-real-difference"><h4>Memória RAM · ' + (modoRam === 'adicionar' ? 'acrescentar' : 'substituir todas') + '</h4><p class="planning-help">Antes: ' + h(nomeAtual(original,'memoria_ram')) + '</p>'
+      + [...memorias].map(([id,quantidade])=>'<div class="upgrade-ram-selection"><strong>' + h(nome(pecaPorId('memoria_ram',id))) + '</strong><span>' + quantidade + (quantidade === 1 ? ' unidade/kit · ' : ' unidades/kits · ') + h(valorMonetario((centavos(pecaPorId('memoria_ram',id)?.preco) || 0) * quantidade))
+        + '</span><div class="upgrade-ram-quantity"><button type="button" class="upgrade-real-remove" data-upgrade-ram-quantity="' + h(id) + '" data-step="-1" aria-label="Diminuir quantidade de ' + h(nome(pecaPorId('memoria_ram',id))) + '">−</button><span aria-label="Quantidade de unidades ou kits">' + quantidade + '</span><button type="button" class="upgrade-real-remove" data-upgrade-ram-quantity="' + h(id) + '" data-step="1" aria-label="Adicionar mais uma unidade ou kit de ' + h(nome(pecaPorId('memoria_ram',id))) + '">' + iconeAnimado('plus') + '</button><button type="button" class="upgrade-real-remove" data-upgrade-ram-remove="' + h(id) + '" aria-label="Remover ' + h(nome(pecaPorId('memoria_ram',id))) + ' da prévia">' + iconeAnimado('trash') + '</button></div></div>').join('')
+      + '<p class="planning-help"' + (erroRam ? ' data-tone="error"' : '') + '>' + h(erroRam || 'Depois: ' + ram.capacidadeGb + ' GB · ' + ram.pentes + ' de ' + ram.slots + ' slots ocupados. ' + (modoRam === 'adicionar' ? 'As memórias atuais serão mantidas.' : 'As memórias atuais serão removidas da build.')) + '</p></article>' : '';
     const antes = avaliarBuild(base,catalogo), depois = avaliarBuild(proxima,catalogo);
     totalExibido = depois.preco;
     const delta = centavos(depois.preco) - centavos(antes.preco);
@@ -252,7 +282,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     previa.innerHTML = '<dl class="upgrade-real-totals"><div><dt>Novas peças</dt><dd>' + h(precoConhecido ? valorMonetario(gasto) : "Parcial: " + valorMonetario(gasto))
       + '</dd></div><div data-tone="' + (limite != null && gasto > limite ? 'error' : 'info') + '"><dt>Budget restante</dt><dd>' + h(limite != null && precoConhecido ? valorMonetario(limite - gasto) : "Não definido")
       + '</dd></div></dl>'
-      + (linhas || '<div class="upgrade-real-empty"><strong>Sua prévia aparece aqui</strong><p>Selecione peças para conferir o antes e depois. A build só muda quando você aplicar as trocas.</p></div>')
+      + (linhas + linhasRam || '<div class="upgrade-real-empty"><strong>Sua prévia aparece aqui</strong><p>Selecione peças para conferir o antes e depois. A build só muda quando você aplicar as trocas.</p></div>')
       + '<details class="upgrade-real-cost-details"><summary>Comparar o total da build<span class="upgrade-real-chevron" aria-hidden="true"></span></summary><dl><div><dt>Total cadastrado antes</dt><dd>' + h(moeda(antes.preco))
       + '</dd></div><div><dt>Total cadastrado da build na prévia</dt><dd>' + h(moeda(depois.preco))
       + '</dd></div><div><dt>Diferença no total</dt><dd>' + h((delta > 0 ? "+" : delta < 0 ? "−" : "") + valorMonetario(Math.abs(delta)))
@@ -260,17 +290,18 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
       + verificacoes("Conflitos encontrados",depois.erros,"error") + verificacoes("Pontos de atenção",avisos,"warning")
       + verificacoes("Dicas e conferências",depois.dicas,"info")
       + (!depois.erros.length && !avisos.length ? '<p class="planning-help">Sem conflitos nas regras disponíveis. Dados ausentes não confirmam compatibilidade.</p>' : '');
-    let motivo = build.travada ? MOTIVO_TRAVA : aplicando ? "Aguarde a aplicação das alterações." : !trocas.size ? "Adicione pelo menos uma candidata à prévia." : "";
+    let motivo = build.travada ? MOTIVO_TRAVA : aplicando ? "Aguarde a aplicação das alterações." : !selecoes() ? "Adicione pelo menos uma candidata à prévia." : "";
     if (!motivo) { try { simular(trocas); } catch (erro) { motivo = erro.message; } }
     aplicar.disabled = Boolean(motivo);
     if (motivo) aplicar.dataset.disabledReason = motivo; else delete aplicar.dataset.disabledReason;
     motivoAplicar.textContent = motivo || "Confira as diferenças antes de aplicar as trocas.";
-    dialogo.querySelector("#upgrade-real-count").textContent = trocas.size;
+    const quantidade = selecoes();
+    dialogo.querySelector("#upgrade-real-count").textContent = quantidade;
     dialogo.querySelector("#upgrade-real-category-count").textContent = categorias.size + (categorias.size === 1 ? " selecionada" : " selecionadas");
-    dialogo.querySelector("#upgrade-real-selection-label").textContent = trocas.size ? trocas.size + (trocas.size === 1 ? " troca na prévia" : " trocas na prévia") : "Nenhuma troca selecionada";
-    dialogo.querySelector("#upgrade-real-selection-total").textContent = trocas.size ? valorMonetario(gasto) + " em novas peças" : "Escolha uma peça para começar";
-    aplicar.textContent = trocas.size ? "Aplicar " + trocas.size + (trocas.size === 1 ? " troca" : " trocas") : "Aplicar trocas";
-    aplicar.setAttribute("aria-label",trocas.size ? "Aplicar " + trocas.size + (trocas.size === 1 ? " troca confirmada" : " trocas confirmadas") + " na build" : "Aplicar alterações");
+    dialogo.querySelector("#upgrade-real-selection-label").textContent = quantidade ? quantidade + (quantidade === 1 ? " seleção na prévia" : " seleções na prévia") : "Nenhuma alteração selecionada";
+    dialogo.querySelector("#upgrade-real-selection-total").textContent = quantidade ? valorMonetario(gasto) + " em novas peças" : "Escolha uma peça para começar";
+    aplicar.textContent = quantidade ? "Aplicar " + quantidade + (quantidade === 1 ? " alteração" : " alterações") : "Aplicar alterações";
+    aplicar.setAttribute("aria-label",aplicar.textContent + " na build");
   }
 
   function renderizar() {
@@ -279,6 +310,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     const restaurar = resultados.contains(foco) || focoNaPrevia;
     const idFoco = foco?.dataset?.upgradePick, categoriaFoco = foco?.dataset?.upgradeCategory;
     const removerFoco = foco?.dataset?.upgradeRemove;
+    const quantidadeRamFoco = foco?.dataset?.upgradeRamQuantity, passoRamFoco = foco?.dataset?.step;
     const grupoFoco = foco?.closest("[data-upgrade-group]")?.dataset.upgradeGroup;
     renderizarResultados();
     renderizarPrevia();
@@ -290,7 +322,9 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     });
     if (restaurar && dialogo.open) {
       const controles = [...dialogo.querySelectorAll("button")];
-      const proximoFoco = controles.find(controle => idFoco && controle.dataset.upgradePick === idFoco && controle.dataset.upgradeCategory === categoriaFoco)
+      const proximoFoco = (foco?.id === 'upgrade-ram-mode' && dialogo.querySelector('#upgrade-ram-mode'))
+        || controles.find(controle => quantidadeRamFoco && controle.dataset.upgradeRamQuantity === quantidadeRamFoco && controle.dataset.step === passoRamFoco)
+        || controles.find(controle => idFoco && controle.dataset.upgradePick === idFoco && controle.dataset.upgradeCategory === categoriaFoco)
         || controles.find(controle => removerFoco && controle.dataset.upgradeRemove === removerFoco)
         || (grupoFoco && resultados.querySelector('[data-upgrade-group="' + grupoFoco + '"] > summary'))
         || (focoNaPrevia ? dialogo.querySelector(".upgrade-real-preview-scroll") : dialogo.querySelector(".upgrade-real-browser-scroll"));
@@ -310,8 +344,11 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     const caixa = evento.target;
     if (caixa.name === "upgrade-real-category") {
       if (caixa.checked) categorias.add(caixa.value);
-      else { categorias.delete(caixa.value); trocas.delete(caixa.value); gruposAbertos.delete(caixa.value); }
+      else { categorias.delete(caixa.value); trocas.delete(caixa.value); gruposAbertos.delete(caixa.value); if (caixa.value === 'memoria_ram') memorias.clear(); }
       informar("Categorias atualizadas. Desmarcar uma categoria descarta a troca dela.");
+    } else if (caixa.id === 'upgrade-ram-mode') {
+      modoRam = caixa.value; memorias.clear();
+      informar('Modo de RAM atualizado. Selecione novamente as memórias; as demais alterações foram preservadas.');
     } else if (caixa !== campoBudget) return;
     renderizar();
   });
@@ -326,8 +363,11 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
         const categoria = botao.dataset.upgradeCategory;
         if (!categorias.has(categoria)) throw new Error("Selecione a categoria antes de escolher uma candidata.");
         const propostas = new Map(trocas);
-        propostas.set(categoria,botao.dataset.upgradePick);
-        simular(propostas);
+        const rams = new Map(memorias);
+        if (categoria === 'memoria_ram') rams.set(botao.dataset.upgradePick,rams.get(botao.dataset.upgradePick) || 1);
+        else propostas.set(categoria,botao.dataset.upgradePick);
+        simular(propostas,undefined,rams);
+        memorias = rams;
         trocas = propostas;
         renderizar();
         const grupo = resultados.querySelector('[data-upgrade-group="' + categoria + '"]');
@@ -339,12 +379,20 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
           resumo.scrollIntoView({block:"nearest",inline:"nearest",behavior:"instant"});
         }
         informar("Peça adicionada à prévia. Revise as trocas antes de aplicar.");
+      } else if (botao.dataset.upgradeRamQuantity || botao.dataset.upgradeRamRemove) {
+        const id = botao.dataset.upgradeRamQuantity || botao.dataset.upgradeRamRemove;
+        const rams = new Map(memorias), quantidade = (rams.get(id) || 0) + Number(botao.dataset.step || 0);
+        if (botao.dataset.upgradeRamRemove || quantidade < 1) rams.delete(id);
+        else rams.set(id,quantidade);
+        if (Number(botao.dataset.step) > 0) simular(trocas,undefined,rams);
+        memorias = rams;
+        renderizar(); informar('Quantidade de RAM atualizada na prévia. A build ainda não foi alterada.');
       } else if (botao.dataset.upgradeRemove) {
         trocas.delete(botao.dataset.upgradeRemove);
         renderizar();
         informar("Troca removida da prévia.");
       } else if (botao.dataset.upgradeAction === "aplicar") {
-        if (!trocas.size) throw new Error("Adicione pelo menos uma candidata à prévia.");
+        if (!selecoes()) throw new Error("Adicione pelo menos uma candidata à prévia.");
         if (JSON.stringify(build.componentes) !== JSON.stringify(original.componentes))
           throw new Error("Os componentes da build mudaram enquanto o diálogo estava aberto. Cancele e abra as melhorias novamente para revisar a base atual.");
         const confirmada = simular(trocas,build);
@@ -369,7 +417,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
   });
   dialogo.addEventListener("click",evento => { if (aplicando && evento.target === dialogo) evento.stopImmediatePropagation(); },true);
   dialogo.addEventListener("close",() => {
-    trocas.clear(); gruposAbertos.clear(); observarViewport?.disconnect(); cancelAnimationFrame(frameViewport);
+    trocas.clear(); gruposAbertos.clear(); memorias.clear(); observarViewport?.disconnect(); cancelAnimationFrame(frameViewport);
     compacta.removeEventListener("change",ajustarCompacta); window.removeEventListener("resize",programarViewport);
     window.visualViewport?.removeEventListener("resize",programarViewport); window.visualViewport?.removeEventListener("scroll",programarViewport);
   },{once:true});

@@ -341,6 +341,12 @@ class CriarBuildService:
         "(o PC precisa ter saída de vídeo).\n\n"
 
         "# VENTILAÇÃO E WATER COOLER\n"
+        "- VENTILAÇÃO É OBRIGATÓRIA: nunca entregue uma build sem fans de gabinete. "
+        "Inclua a categoria fan nas peças novas quando não houver fans já possuídas ou "
+        "quantidade positiva confirmada de fans inclusas no gabinete ou no water cooler. "
+        "O cooler do processador não substitui fans de gabinete. Dados ausentes não "
+        "autorizam omitir ventilação: prefira um gabinete com encaixes documentados e "
+        "inclua fans compatíveis. Se não couber no teto, revise a combinação.\n"
         "- Preencha todas as posições de fans cuja capacidade e distribuição estejam confirmadas "
         "no gabinete escolhido, dentro do teto do PC. Conte fans inclusas no gabinete + fans do "
         "water cooler + fans por kit × quantidade de kits novos. Não compre novamente as inclusas. "
@@ -406,6 +412,8 @@ class CriarBuildService:
         "6. Os periféricos respeitam a escolha de inclusão, o teto percentual e as peças já possuídas?\n"
         "7. Há categorias repetidas ou quantidades fora da regra?\n"
         "7.1. O acessório obrigatório de rede foi incluído e as categorias de rede proibidas foram omitidas?\n"
+        "7.2. Há fans na configuração final? Foram contadas as inclusas/fábrica/AIO e "
+        "compradas apenas as faltantes, completando a capacidade cadastrada sem excedê-la?\n"
         "8. A distribuição do orçamento reflete o perfil de uso e inclui "
         "todas as peças necessárias antes dos upgrades?\n"
         "Se alguma verificação falhar, corrija a montagem antes de responder.\n\n"
@@ -456,6 +464,8 @@ class CriarBuildService:
         raise ValueError("Uma peça sugerida está sem preço válido no catálogo. Revise as peças ou tente novamente.")
       if peca.get("esgotado") is True:
         raise ValueError("Uma peça sugerida está indisponível no catálogo. Tente novamente.")
+      if tipo == "fan" and (type(peca.get("quantidade")) is not int or not 1 <= peca["quantidade"] <= 64):
+        raise ValueError("Falta uma quantidade válida de fans por unidade/kit no catálogo. Escolha outro modelo cadastrado.")
       componente["nome"] = f'{peca["fabricante"]} {peca["modelo"]}'
       componente["quantidade"] = quantidade
       componente["preco"] = peca["preco"]
@@ -509,6 +519,11 @@ class CriarBuildService:
     if fans and fans["total"] is not None and fans["capacidade"] is not None and fans["total"] < fans["capacidade"]:
       raise ValueError("A IA não completou a ventilação do gabinete: faltam " + str(fans["capacidade"] - fans["total"]) +
                        " fans nas posições cadastradas. Desconte as fans de fábrica e do water cooler, use unidades/kits compatíveis e preserve o teto do PC.")
+    if "fan" not in finais and not any(
+        type((fans or {}).get(campo)) in (int, float) and (fans or {})[campo] > 0
+        for campo in ("inclusas", "radiador")
+    ):
+      raise ValueError("A IA não incluiu fans para a ventilação do gabinete. Inclua fans compatíveis e dentro do teto do PC, sem repetir as inclusas no gabinete ou no water cooler.")
     build["orcamento"] = orcamento
     build["preco_total"] = float(round(total, 2))
     return build

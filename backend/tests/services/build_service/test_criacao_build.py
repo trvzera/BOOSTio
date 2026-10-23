@@ -52,6 +52,8 @@ def cadastrar_pecas(tipos):
             dados.update(videointegrado=True, cooler=True)
         if tipo == "fonte":
             dados["potencia_w"] = 500
+        if tipo == "gabinete":
+            dados["fans_inclusos"] = 1
         db.session.add(modelo(**dados))
     db.session.commit()
 
@@ -190,6 +192,7 @@ def resposta_com_perifericos():
              ("processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "monitor", "teclado", "mouse", "fone")]
     catalogo = {item["tipo"]: [{"id": 1, "fabricante": "Teste", "modelo": item["tipo"],
                 "preco": 800 if item["tipo"] == "processador" else 50 if item["tipo"] in CriarBuildService.PERIFERICOS else 20}] for item in itens}
+    catalogo["gabinete"][0]["fans_inclusos"] = 1
     return {**PEDIDO, "componentes": itens}, catalogo
 
 
@@ -441,6 +444,23 @@ def test_ia_corrige_saida_invalida_antes_de_persistir(app_build, mocker, falha):
     assert resposta.json["build"]["estado"]["componentes"]["placa_video"]["id"] == 1
     with app_build.app_context():
         assert Build.query.count() == BuildSalva.query.count() == 1
+
+
+def test_ia_revisa_omissao_de_fans_antes_de_salvar(app_build, mocker):
+    tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "fan"]
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+        MODELOS["gabinete"].buscar_por_id(1).fans_inclusos = 0
+        db.session.commit()
+    sem_fans = {**PEDIDO, "componentes": [{"tipo": t, "id": 1, "quantidade": 1} for t in tipos if t != "fan"]}
+    com_fans = {**PEDIDO, "componentes": [{"tipo": t, "id": 1, "quantidade": 1} for t in tipos]}
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=[sem_fans, com_fans])
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    resposta = cliente.post("/build/", json=PEDIDO)
+    assert resposta.status_code == 201, resposta.json
+    assert llm.call_count == 2 and "não incluiu fans" in llm.call_args.args[0]
+    assert resposta.json["build"]["estado"]["componentes"]["fan"] == [{"id": 1, "quantidade": 1}]
 
 
 def test_ia_invalida_duas_vezes_nao_persiste_nem_repete_sem_limite(app_build, mocker):
