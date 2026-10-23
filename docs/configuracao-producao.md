@@ -148,8 +148,10 @@ TRUSTED_PROXY_HOPS=0
 TRUSTED_PROXY_PROTO_HOPS=0
 ```
 
-O arquivo `backend/.env.producao.example` lista as variáveis necessárias. Preencha
-os segredos nas variáveis da hospedagem, sem publicá-los no frontend ou no Git.
+Para Docker, use o arquivo `.env.production.example` da raiz como modelo para
+`.env.production`. O `compose.yaml` complementa essas configurações com
+`APP_ENV=producao` e os valores de proxy. Preencha os segredos sem publicá-los
+no frontend ou no Git.
 O backend recusa iniciar em produção sem `SECRET_KEY` de pelo menos 32 caracteres,
 `URL_DATABASE`, credenciais Google, chave Gemini e credenciais de e-mail. O Redis
 também é obrigatório para o Flask-Limiter. Mantenha a mesma `SECRET_KEY` entre
