@@ -50,13 +50,21 @@ test("a validação mantém IDs desconhecidos bloqueados independentemente da ap
   });
 });
 
-test("falhas do backend são apresentadas como texto e preservam a fonte do título",() => {
+test("falhas do backend são apresentadas como texto e preservam a fonte do título",t => {
   const mensagem = 'Não foi possível carregar <img src=x onerror="alert(1)">';
   const paragrafo = {textContent:""};
-  const container = {innerHTML:"",querySelector:() => paragrafo};
+  const span = {textContent:""}, attrs = {};
+  const voltar = {setAttribute(k,v){attrs[k]=v;},querySelector:()=>span};
+  const container = {innerHTML:"",querySelector:seletor => seletor === "a" ? voltar : paragrafo};
+  const locationAnterior=globalThis.location;
+  globalThis.location={href:"https://boostio.example/pages/pecas.html?build=s-1"};
+  t.after(()=>{if(locationAnterior)globalThis.location=locationAnterior;else delete globalThis.location;});
   mostrarFalha(container,new Error(mensagem));
   assert.equal(paragrafo.textContent,mensagem);
   assert.doesNotMatch(container.innerHTML,/<img/);
   assert.match(container.innerHTML,/<h1 class="font-1-l">/);
   assert.match(container.innerHTML,/<p class="font-2-s" role="alert">/);
+  assert.equal(attrs.href,"./configuracao-build.html?build_id=s-1");
+  assert.equal(attrs["aria-label"],"Voltar à build");
+  assert.equal(span.textContent,"Voltar à build");
 });

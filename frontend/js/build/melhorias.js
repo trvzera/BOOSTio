@@ -7,6 +7,7 @@ import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { iniciarDetalhesAnimados, definirDetalheAberto } from "../components/animated-details.js";
 import { avaliarTrocaMelhoria, exigirTrocaMelhoria } from "./validar-melhoria.js";
 import { AVISO_DUAL_CHANNEL, contextoMelhoriaRam, planejarMelhoriaRam } from './melhorias-ram.js';
+import { atualizarValor, capturarValores, transicionarValores } from "../components/value-transition.js";
 
 const CATEGORIAS = categoriasCatalogo;
 const MOTIVO_TRAVA = "Destranque a build para buscar e aplicar melhorias.";
@@ -245,6 +246,8 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
   }
 
   function renderizarPrevia() {
+    const valoresAnteriores = capturarValores(previa);
+    const valorHtml = (chave,texto,numero) => '<span data-value-key="' + chave + '"' + (Number.isFinite(numero) ? ' data-value-number="' + numero + '"' : '') + '>' + h(texto) + '</span>';
     const base = {...build,componentes:original.componentes};
     let proxima = structuredClone(base), ram, erroRam = '';
     const limite = budget();
@@ -279,13 +282,13 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     const delta = centavos(depois.preco) - centavos(antes.preco);
     const avisos = [...depois.avisos,...(depois.faltam.length ? ["Ainda faltam na build: " + depois.faltam.join(", ") + "."] : [])];
     const verificacoes = (rotulo,textos,tom) => textos.length ? '<details class="upgrade-real-validation" data-tone="' + tom + '"><summary>' + h(rotulo) + ' <span>' + new Set(textos).size + '</span></summary><ul>' + [...new Set(textos)].map(texto => '<li>' + h(texto) + '</li>').join("") + '</ul></details>' : '';
-    previa.innerHTML = '<dl class="upgrade-real-totals"><div><dt>Novas peças</dt><dd>' + h(precoConhecido ? valorMonetario(gasto) : "Parcial: " + valorMonetario(gasto))
-      + '</dd></div><div data-tone="' + (limite != null && gasto > limite ? 'error' : 'info') + '"><dt>Budget restante</dt><dd>' + h(limite != null && precoConhecido ? valorMonetario(limite - gasto) : "Não definido")
+    previa.innerHTML = '<dl class="upgrade-real-totals"><div><dt>Novas peças</dt><dd>' + valorHtml("novas-pecas",precoConhecido ? valorMonetario(gasto) : "Parcial: " + valorMonetario(gasto),gasto)
+      + '</dd></div><div data-tone="' + (limite != null && gasto > limite ? 'error' : 'info') + '"><dt>Budget restante</dt><dd>' + valorHtml("saldo",limite != null && precoConhecido ? valorMonetario(limite - gasto) : "Não definido",limite != null && precoConhecido ? limite - gasto : null)
       + '</dd></div></dl>'
       + (linhas + linhasRam || '<div class="upgrade-real-empty"><strong>Sua prévia aparece aqui</strong><p>Selecione peças para conferir o antes e depois. A build só muda quando você aplicar as trocas.</p></div>')
       + '<details class="upgrade-real-cost-details"><summary>Comparar o total da build<span class="upgrade-real-chevron" aria-hidden="true"></span></summary><dl><div><dt>Total cadastrado antes</dt><dd>' + h(moeda(antes.preco))
-      + '</dd></div><div><dt>Total cadastrado da build na prévia</dt><dd>' + h(moeda(depois.preco))
-      + '</dd></div><div><dt>Diferença no total</dt><dd>' + h((delta > 0 ? "+" : delta < 0 ? "−" : "") + valorMonetario(Math.abs(delta)))
+      + '</dd></div><div><dt>Total cadastrado da build na prévia</dt><dd>' + valorHtml("total",moeda(depois.preco),depois.preco)
+      + '</dd></div><div><dt>Diferença no total</dt><dd>' + valorHtml("diferenca",(delta > 0 ? "+" : delta < 0 ? "−" : "") + valorMonetario(Math.abs(delta)),delta)
       + '</dd></div></dl><p class="planning-help">Quantidades são consideradas nos totais. Peças próprias ou sem cotação deixam o valor parcial. Economia não significa ganho de desempenho.</p></details>'
       + verificacoes("Conflitos encontrados",depois.erros,"error") + verificacoes("Pontos de atenção",avisos,"warning")
       + verificacoes("Dicas e conferências",depois.dicas,"info")
@@ -296,12 +299,13 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     if (motivo) aplicar.dataset.disabledReason = motivo; else delete aplicar.dataset.disabledReason;
     motivoAplicar.textContent = motivo || "Confira as diferenças antes de aplicar as trocas.";
     const quantidade = selecoes();
-    dialogo.querySelector("#upgrade-real-count").textContent = quantidade;
+    atualizarValor(dialogo.querySelector("#upgrade-real-count"),quantidade,quantidade);
     dialogo.querySelector("#upgrade-real-category-count").textContent = categorias.size + (categorias.size === 1 ? " selecionada" : " selecionadas");
     dialogo.querySelector("#upgrade-real-selection-label").textContent = quantidade ? quantidade + (quantidade === 1 ? " seleção na prévia" : " seleções na prévia") : "Nenhuma alteração selecionada";
     dialogo.querySelector("#upgrade-real-selection-total").textContent = quantidade ? valorMonetario(gasto) + " em novas peças" : "Escolha uma peça para começar";
     aplicar.textContent = quantidade ? "Aplicar " + quantidade + (quantidade === 1 ? " alteração" : " alterações") : "Aplicar alterações";
     aplicar.setAttribute("aria-label",aplicar.textContent + " na build");
+    transicionarValores(previa,valoresAnteriores);
   }
 
   function renderizar() {

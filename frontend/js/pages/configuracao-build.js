@@ -18,6 +18,7 @@ import { acompanharCarregamento } from "../components/page-loading.js";
 import { mostrarBuildPublica } from "../build/publica.js";
 import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta, linkBuildConta, estadoParaConta } from "../build/conta.js";
 import { criarBuildManual } from "../api/build/builds.js";
+import { atualizarValor, capturarValores, transicionarValores } from "../components/value-transition.js";
 
 document.addEventListener("DOMContentLoaded",async () => {
   const main = document.querySelector("#builder-main");
@@ -122,16 +123,17 @@ document.addEventListener("DOMContentLoaded",async () => {
       if (multipla && peca) { try { selecionarPecaCompativel(build,peca,catalogo); } catch (erro) { razaoDuplicar = erro.message; } }
       const unidades = ram ? item.quantidade * (peca?.quantidade_pentes || 1) : categoria === "fan" ? (Number.isInteger(peca?.quantidade) && peca.quantidade > 0 ? item.quantidade * peca.quantidade : "?") : item.quantidade;
       const nomeUnidades = ram ? "pentes" : categoria === "fan" ? "fans" : "unidades";
+      const chave = h(categoria + ":" + (item.id || item.proprio));
       return '<article class="component-row component-selected glass-card"><div class="component-selected-main"><div class="component-image">' +
         imagemPeca(peca || {categoria}) + '</div><div class="component-copy">' +
         (peca ? '<a class="component-model font-1-m-b" href="' + detalhe + '" aria-label="Ver detalhes de ' + h(titulo) + '">' + h(titulo) + '</a>' : '<h3 class="component-model font-1-m-b">' + h(titulo) + '</h3>') +
         '<p>' + h(resumo) + '</p>' + (disponibilidade ? '<p class="component-availability">' + h(disponibilidade) + '</p>' : '') + '</div><div class="component-purchase">' +
         (peca ? '<a class="component-buy btn-primary" href="' + h(oferta.url) + '" target="_blank" rel="noopener noreferrer" aria-label="' + (oferta.direta ? "Comprar" : "Buscar") + ' ' + h(titulo) + ' na ' + h(oferta.loja) + ' em uma nova aba">' +
-          iconeAnimado("cart") + (oferta.direta ? "Comprar" : "Buscar") + '</a><strong>' + (cotacao ? moeda(peca.preco * item.quantidade) : 'Preço a consultar') + '</strong>' : '<span class="font-2-xs">Já possuo</span>') +
+          iconeAnimado("cart") + (oferta.direta ? "Comprar" : "Buscar") + '</a><strong data-value-key="preco:' + chave + '"' + (cotacao ? ' data-value-number="' + peca.preco * item.quantidade + '"' : '') + '>' + (cotacao ? moeda(peca.preco * item.quantidade) : 'Preço a consultar') + '</strong>' : '<span class="font-2-xs">Já possuo</span>') +
         '</div><button class="component-remove" type="button" data-remove="' + categoria + '" data-item="' + h(item.id || item.proprio) +
         '" aria-label="Remover ' + h(titulo) + '" title="Remover peça" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("trash") + '</button></div>' +
-        (multipla && peca ? '<div class="ram-controls"><span class="component-quantity"><strong>' + unidades + '</strong> ' + nomeUnidades +
-          (peca.capacidade_gb ? '<span>· ' + (peca.capacidade_gb * item.quantidade) + ' GB</span>' : '') + '</span><div><button type="button" class="btn-ghost" data-quantity-reduce="' + h(peca.id) + '" data-quantity-category="' + categoria +
+        (multipla && peca ? '<div class="ram-controls"><span class="component-quantity"><strong data-value-key="quantidade:' + chave + '"' + (Number.isFinite(unidades) ? ' data-value-number="' + unidades + '"' : '') + '>' + unidades + '</strong> ' + nomeUnidades +
+          (peca.capacidade_gb ? '<span>· <span data-value-key="capacidade:' + chave + '" data-value-number="' + peca.capacidade_gb * item.quantidade + '">' + peca.capacidade_gb * item.quantidade + '</span> GB</span>' : '') + '</span><div><button type="button" class="btn-ghost" data-quantity-reduce="' + h(peca.id) + '" data-quantity-category="' + categoria +
           '" aria-label="Diminuir quantidade de ' + h(titulo) + '" ' + bloqueado(build.travada || item.quantidade <= 1,build.travada ? trancada : "Use remover para excluir a última unidade ou kit.") + '>−</button><button type="button" class="btn-ghost" data-quantity-add="' + h(peca.id) +
           '" aria-label="Duplicar ' + h(titulo) + '" ' + bloqueado(Boolean(razaoDuplicar),razaoDuplicar) + '>' + iconeAnimado("plus") + 'Duplicar</button></div></div>' : "") + '</article>';
     }
@@ -174,6 +176,7 @@ document.addEventListener("DOMContentLoaded",async () => {
     }
     function renderizar() {
       observarResumo?.disconnect();
+      const valoresAnteriores = capturarValores(main);
       // Preserva o checkbox e sua instância Lottie durante as atualizações da build.
       const opcoes = main.querySelector(".builder-options");
       const detalhesAbertos = main.querySelector(".summary-metadata")?.open;
@@ -185,10 +188,10 @@ document.addEventListener("DOMContentLoaded",async () => {
         '<h1 id="builder-title">' + h(build.titulo) + '</h1><button type="button" class="builder-rename" id="rename-build" aria-label="Editar nome da build" aria-haspopup="dialog" ' + bloqueado(build.travada,"Destranque a build para alterar o nome.") + '>' + iconeAnimado("pencil") + '</button>' + indicadorBuild(resultado,"compatibility-details") + '</div><p>Configure sua build: escolha os componentes da sua configuração.</p></div><button type="button" class="btn-primary benchmark-trigger" id="benchmark-build" aria-label="Testar build" ' + bloqueado(Boolean(motivoBenchmark(build,catalogo)),motivoBenchmark(build,catalogo)) + '>' + iconeAnimado("magic") + 'Testar build</button></header>' +
         avisoVideo + '<div class="builder-layout"><section class="component-list" aria-label="Componentes"><div class="builder-options"><label class="ui-check font-2-xs"><input type="checkbox" id="include-peripherals" ' + (build.incluirPerifericos ? "checked " : "") +
         bloqueado(build.travada,trancada) + '>' + iconeAnimado("checkbox") + '<span>Incluir periféricos</span></label><label class="ui-check font-2-xs"><input type="checkbox" id="include-network" ' + (build.incluirRede ? "checked " : "") + bloqueado(build.travada,trancada) + '>' + iconeAnimado("checkbox") + '<span>Incluir rede</span></label></div>' + categorias.map(grupo).join("") +
-        '</section><aside class="build-sidebar"><section class="build-summary glass-card"><span class="summary-eyebrow">Total da configuração</span><strong class="summary-total">' + moeda(resultado.preco) +
-        '</strong>' + avisoFreteHtml() + '<div class="summary-power"><span>Consumo estimado do PC</span><strong>' + resultado.watts + ' W</strong></div>' +
+        '</section><aside class="build-sidebar"><section class="build-summary glass-card"><span class="summary-eyebrow">Total da configuração</span><strong class="summary-total" data-value-key="total" data-value-number="' + resultado.preco + '">' + moeda(resultado.preco) +
+        '</strong>' + avisoFreteHtml() + '<div class="summary-power"><span>Consumo estimado do PC</span><strong data-value-key="consumo" data-value-number="' + resultado.watts + '">' + resultado.watts + ' W</strong></div>' +
         '<progress class="summary-progress" value="' + resultado.preenchidos + '" max="' + resultado.total + '" aria-label="Peças selecionadas"></progress><p class="font-2-xs summary-note">' +
-        resultado.preenchidos + ' de ' + resultado.total + ' peças selecionadas</p><details class="summary-metadata" data-animated-details' + (detalhesAbertos ? ' open' : '') + '><summary class="font-1-xs"><span>Nome, descrição e orçamento</span>' + iconeAnimado("chevron") + '</summary><div class="summary-details"><label for="build-name">Nome da build</label><input class="input-text" id="build-name" maxlength="100" value="' +
+        '<span data-value-key="selecionadas" data-value-number="' + resultado.preenchidos + '">' + resultado.preenchidos + '</span> de ' + resultado.total + ' peças selecionadas</p><details class="summary-metadata" data-animated-details' + (detalhesAbertos ? ' open' : '') + '><summary class="font-1-xs"><span>Nome, descrição e orçamento</span>' + iconeAnimado("chevron") + '</summary><div class="summary-details"><label for="build-name">Nome da build</label><input class="input-text" id="build-name" maxlength="100" value="' +
         h(build.titulo) + '" ' + bloqueado(build.travada,trancada) + '><label for="build-visibility">Visibilidade</label><select id="build-visibility" class="input-text" ' + bloqueado(build.travada,trancada) +
         '><option value="privado" ' + (build.visibilidade === "privado" ? "selected" : "") + '>Privada</option><option value="publico" ' + (build.visibilidade === "publico" ? "selected" : "") +
         '>Pública</option></select><label for="build-description">Descrição</label><textarea class="input-text" id="build-description" rows="4" maxlength="300" ' + bloqueado(build.travada,trancada) + '>' + h(build.descricao) + '</textarea><label for="build-budget">Orçamento desta build (R$)</label><input class="input-text" id="build-budget" type="number" min="0" max="1000000" step="any" inputmode="decimal" value="' + h(build.orcamento ?? "") + '" placeholder="Sem limite definido" ' + bloqueado(build.travada,trancada) + '></div></details><p class="planning-help" id="build-budget-note"></p><p class="build-autosave-status" id="build-autosave-status" role="status" aria-live="polite" data-tone="' + tomSalvamento + '">' + h(mensagemSalvamento) + '</p><button class="btn-primary" type="button" id="save-configuration" aria-label="Salvar build e voltar">Salvar build e voltar</button><button class="btn-secondary" type="button" id="buy-configuration" aria-label="Comprar build" ' + bloqueado(!Object.keys(build.componentes).length,"Adicione uma peça para consultar as lojas.") + '>' + iconeAnimado("cart") + 'Comprar build</button><button class="btn-secondary" type="button" id="improve-configuration" aria-label="Buscar melhorias" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("magnifying") + 'Buscar melhorias</button><button class="btn-secondary" type="button" id="share-configuration" aria-label="Compartilhar build" ' +
@@ -199,9 +202,17 @@ document.addEventListener("DOMContentLoaded",async () => {
       if (opcoes) main.querySelector(".builder-options").replaceWith(opcoes);
       const atualizarCustos = () => {
         const total = avaliarBuild(build,catalogo).preco;
-        main.querySelector(".summary-total").textContent = moeda(total);
-        main.querySelector("#build-budget-note").textContent = build.orcamento == null ? "Defina um orçamento para acompanhar o total." : total > build.orcamento ? "Total acima do orçamento em " + moeda(total - build.orcamento) + "." : "Disponível no orçamento: " + moeda(build.orcamento - total) + ".";
-        main.querySelector("#build-budget-note").dataset.tone = build.orcamento != null && total > build.orcamento ? "warning" : "info";
+        atualizarValor(main.querySelector(".summary-total"),moeda(total),total);
+        const nota = main.querySelector("#build-budget-note");
+        const excedeu = build.orcamento != null && total > build.orcamento;
+        const diferenca = build.orcamento == null ? null : build.orcamento - total;
+        if (diferenca == null) nota.textContent = "Defina um orçamento para acompanhar o total.";
+        else {
+          if (!nota.querySelector("[data-value-key]")) nota.innerHTML = '<span data-budget-label></span><span data-value-key="saldo"></span>.';
+          nota.querySelector("[data-budget-label]").textContent = excedeu ? "Total acima do orçamento em " : "Disponível no orçamento: ";
+          atualizarValor(nota.querySelector('[data-value-key="saldo"]'),moeda(Math.abs(diferenca)),diferenca);
+        }
+        nota.dataset.tone = excedeu ? "warning" : "info";
       };
       atualizarCustos();
       main.querySelector("#replace-water-fans")?.addEventListener("change",e => {
@@ -284,6 +295,7 @@ document.addEventListener("DOMContentLoaded",async () => {
         try { if (conta) { await filaSalvamento; if (falhaSalvamento) throw falhaSalvamento; } copiarTexto(conta ? linkBuildConta(build.id) : linkCompartilhado(build)); } catch (erro) { avisar(erro.message); }
       };
       iniciarIndicadores(main); iniciarDetalhesAnimados(main); iniciarIcones(main);
+      transicionarValores(main,valoresAnteriores);
       observarResumo?.observe(main.querySelector(".build-sidebar"));
     }
     function persistir(salvarTitulo = false) {

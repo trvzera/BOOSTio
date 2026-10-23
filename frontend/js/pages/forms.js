@@ -10,6 +10,7 @@ import { pecasPropriasFormulario } from "../build/pecas-proprias.js";
 import { buscarUsuarioLogado } from "../api/usuario/buscarUsuarioLogado.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { iniciarControlesNumericos } from "../components/number-stepper.js";
+import { atualizarValor } from "../components/value-transition.js";
 import {
   registrarAnimacao,
   destruirAnimacao,
@@ -217,7 +218,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const valor = Number.isFinite(recebido) ? recebido : "";
     const maximo = Math.max(20000,valor);
     const isActive = respostas.orcamento === "personalizado" ? "active" : "";
-    return `<div class="budget-range ${isActive}"><div><label class="font-1-m-b" for="budget-input">Orçamento personalizado (R$)</label><strong class="font-2-xs" id="budget-value">${valor === "" ? "Informe um valor" : moeda.format(valor)}</strong></div><input id="budget-input" type="number" inputmode="decimal" min="0.01" max="1000000" step="0.01" data-number-step="100" value="${valor}" aria-describedby="budget-help"><input type="range" id="budget-range" min="0" max="${Math.ceil(maximo / 100) * 100}" step="100" value="${Math.round(valor / 100) * 100}" style="--range-progress: ${progressoRange(valor)}%" aria-label="Ajustar orçamento de cem em cem reais"><p id="budget-help" class="font-2-xs">Controle e setas de R$ 100 em R$ 100. Digite para usar outro valor.</p></div>
+    return `<div class="budget-range ${isActive}"><div><label class="font-1-m-b" for="budget-input">Orçamento personalizado (R$)</label><strong class="font-2-xs value-transition" id="budget-value"${valor === "" ? "" : ` data-value-number="${valor}"`}>${valor === "" ? "Informe um valor" : moeda.format(valor)}</strong></div><input id="budget-input" type="number" inputmode="decimal" min="0.01" max="1000000" step="0.01" data-number-step="100" value="${valor}" aria-describedby="budget-help"><input type="range" id="budget-range" min="0" max="${Math.ceil(maximo / 100) * 100}" step="100" value="${Math.round(valor / 100) * 100}" style="--range-progress: ${progressoRange(valor)}%" aria-label="Ajustar orçamento de cem em cem reais"><p id="budget-help" class="font-2-xs">Controle e setas de R$ 100 em R$ 100. Digite para usar outro valor.</p></div>
       `;
   }
 
@@ -478,7 +479,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       conteudo.querySelector("#budget-input").value = valor;
       conteudo.querySelector("#budget-input").dispatchEvent(new Event("change",{bubbles:true}));
       conteudo.querySelector("#budget-range").value = valor;
-      conteudo.querySelector("#budget-value").textContent = moeda.format(valor);
+      atualizarValor(conteudo.querySelector("#budget-value"),moeda.format(valor),valor);
       const budgetRange = conteudo.querySelector(".budget-range");
       if (budgetRange) budgetRange.classList.remove("active");
       atualizarReserva();
@@ -490,7 +491,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function atualizarRange(evento) {
     respostas.orcamentoPersonalizado = evento.target.valueAsNumber;
     respostas.orcamento = "personalizado";
-    conteudo.querySelector("#budget-value").textContent = Number.isFinite(respostas.orcamentoPersonalizado) ? moeda.format(respostas.orcamentoPersonalizado) : "Informe um valor";
+    atualizarValor(conteudo.querySelector("#budget-value"),Number.isFinite(respostas.orcamentoPersonalizado) ? moeda.format(respostas.orcamentoPersonalizado) : "Informe um valor",respostas.orcamentoPersonalizado);
     evento.target.setAttribute("aria-invalid",String(!orcamentoValido(respostas.orcamentoPersonalizado)));
     const slider = conteudo.querySelector("#budget-range"), numero = conteudo.querySelector("#budget-input");
     if (evento.target === slider) {

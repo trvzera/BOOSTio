@@ -14,6 +14,7 @@ import { formatarDataHora } from "../utils/formatarData.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { indicadorBuild, iniciarIndicadores } from "../build/indicador.js";
 import { navegarPara } from "../components/page-loading.js";
+import { atualizarValor, capturarValores, transicionarValores } from "../components/value-transition.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const lista = document.querySelector("#builds-account-list");
@@ -80,12 +81,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         <span class="build-menu-divider"></span>${opcao("deletar","Deletar build",trancada)}
       </div></div></div>
       <p class="build-card-desc font-2-xs">${h(build.descricao || "")}</p>
-      <div class="build-card-price"><span>${precoParcial ? "Total parcial" : "Total cadastrado"}</span><strong>${Number.isFinite(avaliacao.preco) && avaliacao.preco > 0 ? moeda(avaliacao.preco) : "Preço a consultar"}</strong><small>Sem frete</small></div>
-      <div class="build-card-meta"><p class="build-card-percent font-1-l">${progresso}%</p><div class="build-progress" role="progressbar" aria-label="Preenchimento de ${h(build.titulo)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progresso}"><div class="build-progress-fill" style="width:${progresso}%"></div></div>
+      <div class="build-card-price"><span>${precoParcial ? "Total parcial" : "Total cadastrado"}</span><strong data-value-key="preco:${h(build.id)}" data-value-number="${avaliacao.preco}">${Number.isFinite(avaliacao.preco) && avaliacao.preco > 0 ? moeda(avaliacao.preco) : "Preço a consultar"}</strong><small>Sem frete</small></div>
+      <div class="build-card-meta"><p class="build-card-percent font-1-l"><span data-value-key="progresso:${h(build.id)}" data-value-number="${progresso}">${progresso}%</span></p><div class="build-progress" role="progressbar" aria-label="Preenchimento de ${h(build.titulo)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progresso}"><div class="build-progress-fill" style="width:${progresso}%"></div></div>
       <div class="build-card-bottom"><span class="build-visibility ${build.visibilidade}">${build.visibilidade === "publico" ? "Pública" : "Privada"}</span><time class="build-card-date font-2-xs" datetime="${h(dados.criado_em)}">${h(formatarDataHora(dados.criado_em))}</time></div></div></article>`;
   }
 
   function renderizar() {
+    const valoresAnteriores = capturarValores(lista);
     status.hidden = salvas.length > 0;
     status.dataset.tone = "info";
     status.classList.toggle("builds-empty",salvas.length === 0);
@@ -95,7 +97,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     lista.querySelectorAll(".build-menu").forEach(menu => {
       if (typeof menu.showPopover === "function") menu.popover = "manual";
     });
-    document.querySelector("#quota-count").textContent = `${salvas.length} / ${LIMITE_BUILDS}`;
+    atualizarValor(document.querySelector("#quota-count"),`${salvas.length} / ${LIMITE_BUILDS}`,salvas.length);
     document.querySelector("#quota-progress").setAttribute("aria-valuenow",String(Math.min(LIMITE_BUILDS,salvas.length)));
     document.querySelector("#quota-fill").style.width = `${Math.min(100,salvas.length / LIMITE_BUILDS * 100)}%`;
     document.querySelector("#quota-help").textContent = lotado() ? "Limite atingido. Exclua uma build para liberar espaço." : "Até três builds salvas na sua conta";
@@ -107,6 +109,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.querySelector("#btn-compare-builds").disabled = salvas.length < 2;
     iniciarIcones(lista);
     iniciarIndicadores(lista);
+    transicionarValores(lista,valoresAnteriores);
   }
   async function atualizar(id, estado) { await atualizarBuild(id, estado); await carregar(); }
 

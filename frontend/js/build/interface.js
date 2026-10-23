@@ -1,3 +1,5 @@
+import { destinoBuild, rotuloVoltar } from "../components/navigation-back.js";
+
 export function avisar(mensagem) {
   let toast = document.querySelector("#builder-feedback");
   if (!toast) {
@@ -38,6 +40,11 @@ export async function copiarTexto(texto) {
 }
 
 export function mostrarFalha(container, erro) {
-  container.innerHTML = '<section class="catalog-empty glass-card"><h1 class="font-1-l">Não foi possível abrir este conteúdo</h1><p class="font-2-s" role="alert"></p><a class="btn-ghost" data-page-back href="./configuracao-build.html" aria-label="Voltar à build"><span data-back-label>Voltar à build</span></a></section>';
+  const destino = destinoBuild(location.href), rotulo = rotuloVoltar(new URL(destino,location.href));
+  container.innerHTML = '<section class="catalog-empty glass-card"><h1 class="font-1-l">Não foi possível abrir este conteúdo</h1><p class="font-2-s" role="alert"></p><a class="btn-ghost" data-page-back data-back-destination href="./builds.html" aria-label="Voltar para Minhas builds"><span data-back-label></span></a></section>';
+  const voltar = container.querySelector("a");
+  voltar.setAttribute("href",destino);
+  voltar.setAttribute("aria-label",rotulo);
+  voltar.querySelector("span").textContent = rotulo;
   container.querySelector("p").textContent = erro.message;
 }

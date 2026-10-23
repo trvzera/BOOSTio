@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.title = nomePeca(peca) + " — BOOSTio";
     const categoriaVoltar = ["air_cooler","water_cooler"].includes(peca.categoria) ? "cooler"
       : ["ssd","hd"].includes(peca.categoria) ? "armazenamento" : ["cabo_rede","adaptador_wifi"].includes(peca.categoria) ? "rede" : peca.categoria;
-    main.innerHTML = '<header class="builder-heading"><a class="builder-back icon-back btn-ghost" data-page-back href="./pecas.html?' + new URLSearchParams({ categoria: categoriaVoltar, build: build.id }) +
+    main.innerHTML = '<header class="builder-heading"><a class="builder-back icon-back btn-ghost" data-page-back data-back-destination href="./pecas.html?' + new URLSearchParams({ categoria: categoriaVoltar, build: build.id }) +
       '" aria-label="Voltar ao catálogo de ' + categoria.nome + '" title="Voltar à categoria">' + iconeAnimado("arrow","back") + '</a></header>' +
       '<section class="product-detail-layout"><div class="product-detail-visual glass-card">' + imagemPeca(peca) + (peca.imagem ? "" : '<span class="font-2-xs summary-note">Imagem ainda não cadastrada</span>') + '</div>' +
       '<div class="product-detail-copy"><span class="component-category font-1-xs">' + categoria.nome + '</span><h1 class="font-1-xl">' + h(nomePeca(peca)) +

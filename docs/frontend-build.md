@@ -6,6 +6,35 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Transição de valores e retorno à build — 23/10/2026
+
+- `components/value-transition.js` anima apenas números alterados: entrada vertical
+  de `0.45em`, blur de `4px` e duração de `360ms`. Aumento entra de baixo;
+  diminuição inverte o sentido. Para ajustar o efeito, altere esses valores e a
+  curva de easing nesse módulo. A aparência não interpola preços: o texto já
+  contém o valor final correto, sem cópias para leitores de tela.
+- Aplicado aos totais/consumo/quantidades do editor, saldo do orçamento, orçamento
+  do formulário, preços/progresso/cota em Minhas builds e totais da prévia de
+  melhorias. Não anima o primeiro carregamento nem valores iguais. Chaves
+  `data-value-key` permitem comparar os números quando os cards são recriados.
+- `atualizarValor` preserva o elemento ao digitar/arrastar, sem empilhar animações.
+  `prefers-reduced-motion` desativa o efeito e cancela animações em andamento;
+  navegadores sem Web Animations mostram a atualização diretamente. CSS compartilhado
+  usa algarismos tabulares e não sobrescreve o layout próprio dos componentes.
+- Links explícitos do catálogo/editor usam `data-back-destination`: o histórico
+  só prevalece quando identifica a mesma página, build e categoria. Filtros e hash
+  são preservados nesse contexto; início/outra build não substituem o destino.
+  Retornos genéricos à página anterior mantêm o comportamento existente.
+- Falhas no catálogo/peça mantêm o ID da build. Sem contexto, ou numa falha do
+  próprio editor, o retorno é Minhas builds, nunca o editor sem ID que criaria
+  outra configuração. Nenhuma mudança no backend, banco ou cálculos.
+
+Validação: 418 testes Node aprovados, 77 verificações de interação no Chrome em
+320/768/1440 px e paisagem 844 × 390, com movimento normal/reduzido; mais 63
+verificações de páginas afetadas/axe e 92 de melhorias/RAM. APIs e gravações
+simuladas; catálogo real somente leitura. Sem criações involuntárias ou erros JS.
+As medições de contraste aguardam o fim dos efeitos de scroll já existentes.
+
 ### Navegação, verificação de e-mail e expansão técnica — 23/10/2026
 
 - Footer: hover com cor primária e sublinhado suave apenas sobre o link, incluindo

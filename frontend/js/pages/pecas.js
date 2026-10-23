@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const tamanhoPagina = 12;
     const temPecas = Object.keys(build.componentes).length > 0;
     const produtos = catalogo.filter((p) => (categoria.tipos || [categoria.id]).includes(p.categoria));
-    main.innerHTML = '<header class="builder-heading"><div><a class="builder-back font-1-xs" data-page-back href="./configuracao-build.html?' + new URLSearchParams({[conta ? "build_id" : "id"]:build.id}) + '" aria-label="Voltar à build">' + iconeAnimado("arrow","back") + '<span data-back-label>Voltar à build</span></a><h1 class="font-1-xl">' + categoria.nome +
+    main.innerHTML = '<header class="builder-heading"><div><a class="builder-back font-1-xs" data-page-back data-back-destination href="./configuracao-build.html?' + new URLSearchParams({[conta ? "build_id" : "id"]:build.id}) + '" aria-label="Voltar à build">' + iconeAnimado("arrow","back") + '<span data-back-label>Voltar à build</span></a><h1 class="font-1-xl">' + categoria.nome +
       '</h1><p class="font-2-s">Compare os modelos e selecione a peça para sua configuração.</p></div><span class="builder-demo font-1-xs">' + (conta ? "Catálogo da conta" : "Catálogo demonstrativo") + '</span></header>' +
       '<div class="catalog-toolbar glass-card"><label class="catalog-search font-1-xs">Buscar modelo<input class="input-text" id="component-search" type="search" placeholder="Marca ou modelo"></label>' +
       '<label class="font-1-xs">Marca<select id="brand-filter" class="input-text"><option value="">Todas</option>' + [...new Set(produtos.map((p) => p.fabricante))].sort().map((marca) => '<option>' + h(marca) + '</option>').join("") + '</select></label>' +
