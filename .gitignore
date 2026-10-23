@@ -11,6 +11,7 @@ venv/
 .mypy_cache/
 .env
 .env.local
+.env.production
 instance/
 *.db
 .DS_Store

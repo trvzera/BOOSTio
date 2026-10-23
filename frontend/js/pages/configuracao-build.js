@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded",async () => {
     const conta = buildId !== null;
     const catalogo = await acompanharCarregamento(conta ? carregarCatalogoConta() : carregarCatalogo());
     let build = conta ? await acompanharCarregamento(carregarBuildConta(buildId)) : abrirBuild();
+    let tituloSalvo = build.titulo.trim();
     let filaSalvamento = Promise.resolve();
     let falhaSalvamento = null;
     // Um resumo mais alto que a tela precisa poder subir ao rolar até as ações.
@@ -55,7 +56,7 @@ document.addEventListener("DOMContentLoaded",async () => {
       const resumo = main.querySelector(".build-sidebar");
       if (evento.persisted && resumo) observarResumo?.observe(resumo);
     });
-    let mensagemSalvamento = conta ? "Alterações são salvas automaticamente na sua conta." : "Alterações são salvas automaticamente neste navegador.", tomSalvamento = "info";
+    let mensagemSalvamento = conta ? "Alterações são salvas automaticamente na sua conta. O nome é salvo ao clicar em Salvar." : "Alterações são salvas automaticamente neste navegador.", tomSalvamento = "info";
     if (build.travada) mensagemSalvamento = "Build trancada. Destranque-a para alterar e salvar.";
     else if (!conta && buildsLocais().length >= 3 && !buildsLocais().some(item => item.id === build.id)) {
       mensagemSalvamento = "Limite de três builds atingido. Apenas o rascunho será guardado até liberar espaço.";
@@ -70,10 +71,18 @@ document.addEventListener("DOMContentLoaded",async () => {
     const bloqueado = (condicao,motivo) => condicao ? 'disabled data-disabled-reason="' + h(motivo) + '"' : "";
     const trancada = "Destranque a build para alterar os componentes.";
     const badge = obrigatoria => obrigatoria ? '<span class="component-badge">Obrigatório</span>' : "";
+    function atualizarStatusSalvamento() {
+      const status = main.querySelector("#build-autosave-status");
+      if (!status) return;
+      const pendente = conta && build.titulo.trim() !== tituloSalvo && tomSalvamento !== "error";
+      status.textContent = pendente ? "Nome pendente. Clique em Salvar build e voltar." : mensagemSalvamento;
+      status.dataset.tone = pendente ? "warning" : tomSalvamento;
+    }
     function atualizarNome() {
       main.querySelector("#builder-title").textContent = build.titulo.trim() || "Minha build";
       document.title = (build.titulo.trim() || "Minha build") + " — BOOSTio";
       main.querySelector("#save-configuration").disabled = build.travada || !build.titulo.trim();
+      atualizarStatusSalvamento();
     }
     function editarNome() {
       if (build.travada) return;
@@ -86,7 +95,7 @@ document.addEventListener("DOMContentLoaded",async () => {
         const botao = form.querySelector("button"); botao.disabled = true;
         try {
           build.titulo = input.value.trim();
-          main.querySelector("#build-name").value = build.titulo; atualizarNome(); persistir();
+          main.querySelector("#build-name").value = build.titulo; atualizarNome(); persistir(true);
           if (conta) { await filaSalvamento; if (falhaSalvamento) throw falhaSalvamento; }
           dialogo.close();
         } catch (erro) { feedback.textContent = erro.message; feedback.dataset.tone = "error"; }
@@ -184,7 +193,7 @@ document.addEventListener("DOMContentLoaded",async () => {
         '><option value="privado" ' + (build.visibilidade === "privado" ? "selected" : "") + '>Privada</option><option value="publico" ' + (build.visibilidade === "publico" ? "selected" : "") +
         '>Pública</option></select><label for="build-description">Descrição</label><textarea class="input-text" id="build-description" rows="4" maxlength="300" ' + bloqueado(build.travada,trancada) + '>' + h(build.descricao) + '</textarea><label for="build-budget">Orçamento desta build (R$)</label><input class="input-text" id="build-budget" type="number" min="0" max="1000000" step="any" inputmode="decimal" value="' + h(build.orcamento ?? "") + '" placeholder="Sem limite definido" ' + bloqueado(build.travada,trancada) + '></div></details><p class="planning-help" id="build-budget-note"></p><p class="build-autosave-status" id="build-autosave-status" role="status" aria-live="polite" data-tone="' + tomSalvamento + '">' + h(mensagemSalvamento) + '</p><button class="btn-primary" type="button" id="save-configuration" aria-label="Salvar build e voltar">Salvar build e voltar</button><button class="btn-secondary" type="button" id="buy-configuration" aria-label="Comprar build" ' + bloqueado(!Object.keys(build.componentes).length,"Adicione uma peça para consultar as lojas.") + '>' + iconeAnimado("cart") + 'Comprar build</button><button class="btn-secondary" type="button" id="improve-configuration" aria-label="Buscar melhorias" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("magnifying") + 'Buscar melhorias</button><button class="btn-secondary" type="button" id="share-configuration" aria-label="Compartilhar build" ' +
         bloqueado(build.visibilidade !== "publico","Torne a build pública para compartilhar.") +
-        '>Compartilhar</button><p class="summary-note">' + (conta ? 'Soma dos preços disponíveis no catálogo. Peças sem cotação não entram no total. Alterações salvas na conta.' : 'Preços demonstrativos. Salvamento local neste navegador.') + '</p>' + avisoCompraHtml() +
+        '>Compartilhar</button><p class="summary-note">' + (conta ? 'Soma dos preços disponíveis no catálogo. Peças sem cotação não entram no total. O nome é salvo ao clicar em Salvar.' : 'Preços demonstrativos. Salvamento local neste navegador.') + '</p>' + avisoCompraHtml() +
         (Object.keys(build.pecasExtras || {}).length ? '<p class="summary-note">Peças próprias adicionais: ' + Object.entries(build.pecasExtras).map(([tipo,nome]) => h(tipo === "microfone" ? "Microfone: " : "Webcam: ") + h(nome)).join(" · ") + '.</p>' : "") +
         (build.travada ? '<p class="summary-note">Build trancada. Destranque-a em Minhas builds.</p>' : "") + '</section></aside></div>';
       if (opcoes) main.querySelector(".builder-options").replaceWith(opcoes);
@@ -235,7 +244,7 @@ document.addEventListener("DOMContentLoaded",async () => {
       atualizarNome();
       main.querySelector("#build-name").addEventListener("input",e => {
         if (build.travada) return;
-        build.titulo = e.target.value; atualizarNome(); if (build.titulo.trim()) persistir();
+        build.titulo = e.target.value; atualizarNome();
       });
       main.querySelector("#build-visibility").addEventListener("change",e => { if (build.travada) return; build.visibilidade = e.target.value; persistir(); renderizar(); });
       if (!opcoes) main.querySelector("#include-peripherals").addEventListener("change",e => {
@@ -259,7 +268,11 @@ document.addEventListener("DOMContentLoaded",async () => {
           const invalido = [...main.querySelectorAll("#build-budget")].find(input => !input.checkValidity());
           if (invalido) { main.querySelector(".summary-metadata").open = true; invalido.reportValidity(); return; }
           if (!build.titulo.trim()) throw new Error("Informe um nome para a build.");
-          if (conta) { await filaSalvamento; if (falhaSalvamento) throw falhaSalvamento; }
+          if (conta) {
+            if (build.titulo.trim() !== tituloSalvo) persistir(true);
+            await filaSalvamento;
+            if (falhaSalvamento) throw falhaSalvamento;
+          }
           else {
             const salvo = salvarAlteracaoLocal(build,catalogo);
             if (!salvo.salvo) throw new Error(salvo.motivo);
@@ -273,24 +286,29 @@ document.addEventListener("DOMContentLoaded",async () => {
       iniciarIndicadores(main); iniciarDetalhesAnimados(main); iniciarIcones(main);
       observarResumo?.observe(main.querySelector(".build-sidebar"));
     }
-    function persistir() {
+    function persistir(salvarTitulo = false) {
       if (conta) {
         const atual = structuredClone(build);
+        if (salvarTitulo) atual.titulo = atual.titulo.trim();
         mensagemSalvamento = "Salvando na sua conta…";
-        filaSalvamento = filaSalvamento.then(() => salvarBuildConta(atual)).then(resposta => {
+        filaSalvamento = filaSalvamento.then(() => {
+          if (!salvarTitulo) atual.titulo = tituloSalvo;
+          return salvarBuildConta(atual);
+        }).then(resposta => {
           falhaSalvamento = null;
+          if (salvarTitulo) tituloSalvo = atual.titulo;
           mensagemSalvamento = "Salvo na sua conta."; tomSalvamento = "info";
           if (resposta.build?.compatibilidade && JSON.stringify(build.componentes) === JSON.stringify(atual.componentes)) {
             build.compatibilidade = resposta.build.compatibilidade;
             const titulo = main.querySelector('.builder-title-line'), indicador = titulo?.querySelector('.build-indicator');
             if (indicador) { indicador.outerHTML = indicadorBuild(avaliarBuild(build,catalogo),'compatibility-details'); iniciarIndicadores(titulo); }
           }
-          const status = main.querySelector("#build-autosave-status");
-          if (status) { status.textContent = mensagemSalvamento; status.dataset.tone = tomSalvamento; }
+          atualizarStatusSalvamento();
         }).catch(erro => {
           falhaSalvamento = erro;
           mensagemSalvamento = "Não foi possível salvar: " + erro.message; tomSalvamento = "error";
           avisar(mensagemSalvamento);
+          atualizarStatusSalvamento();
         });
       } else {
       try {
@@ -298,8 +316,7 @@ document.addEventListener("DOMContentLoaded",async () => {
         mensagemSalvamento = estado.motivo; tomSalvamento = estado.salvo ? "info" : "warning";
       } catch (erro) { mensagemSalvamento = "Não foi possível salvar: " + erro.message; tomSalvamento = "error"; }
       }
-      const status = main.querySelector("#build-autosave-status");
-      if (status) { status.textContent = mensagemSalvamento; status.dataset.tone = tomSalvamento; }
+      atualizarStatusSalvamento();
     }
     main.addEventListener("click",async e => {
       const botao = e.target.closest("button");

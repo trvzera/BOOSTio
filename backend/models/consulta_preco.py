@@ -1,4 +1,5 @@
-from sqlalchemy import func, text, update
+from sqlalchemy import func, update
+from sqlalchemy.exc import IntegrityError
 
 from . import db, ModeloBase
 
@@ -65,8 +66,13 @@ class ControleColeta(db.Model):
 
     @classmethod
     def inicializar(cls):
-        db.session.execute(text("INSERT OR IGNORE INTO controle_coleta (id, versao) VALUES (1, 0)"))
-        db.session.commit()
+        if db.session.get(cls, 1) is not None:
+            return
+        db.session.add(cls(id=1, versao=0))
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
 
     @classmethod
     def bloquear(cls):

@@ -7,6 +7,12 @@ class CriarUsuarioService:
   def executar(self, dados: dict) -> Usuario:
 
     validacao_campos(dados,campos_obrigatorios = ["nome","email","senha"])
+    if not isinstance(dados["nome"], str) or not 0 < len(dados["nome"].strip()) <= 30:
+      raise ValueError("Informe um nome de até 30 caracteres")
+    if not isinstance(dados["email"], str) or len(dados["email"]) > 150:
+      raise ValueError("Informe um email válido")
+    if not isinstance(dados["senha"], str) or len(dados["senha"]) > 1024:
+      raise ValueError("Senha inválida")
 
     email_tratado = self._validar_email(dados['email']).lower()
 

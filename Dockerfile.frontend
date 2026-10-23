@@ -1,0 +1,6 @@
+FROM nginx:stable-alpine
+
+ARG API_PUBLIC_URL=https://api.boostio.com.br
+COPY frontend/ /usr/share/nginx/html/
+COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf
+RUN printf '// Endereço público da API.\nexport const API_PUBLICA = "%s";\n' "$API_PUBLIC_URL" > /usr/share/nginx/html/js/config-publica.js

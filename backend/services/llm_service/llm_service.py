@@ -2,6 +2,8 @@ import os
 
 import requests
 
+from .reservar_chamada_service import ReservarChamadaService
+
 class RespostaLLMInvalida(ValueError):
   """O provedor respondeu, mas não entregou uma saída completa para validar."""
 
@@ -11,12 +13,14 @@ class LLMService:
     if not chave:
       raise RuntimeError("GEMINI_API_KEY não configurada")
 
+    ReservarChamadaService().executar()
+
     resposta = requests.post(
       f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent",
       headers={"x-goog-api-key": chave},
       json={
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"responseMimeType": "application/json"},
+        "generationConfig": {"responseMimeType": "application/json", "maxOutputTokens": 8192},
       },
       timeout=90,
     )

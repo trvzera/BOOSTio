@@ -8,6 +8,13 @@ class AtualizarUsuarioService:
   def executar(self, usuario_id: int, dados: dict) -> dict | None:
     if not usuario_id:
       return None
+    if not isinstance(dados, dict):
+      raise ValueError("Envie um objeto JSON válido")
+    nome = dados.get("nome")
+    if nome is not None and (not isinstance(nome, str) or not 0 < len(nome.strip()) <= 30):
+      raise ValueError("Informe um nome de até 30 caracteres")
+    if dados.get("senha") is not None and (not isinstance(dados["senha"], str) or len(dados["senha"]) > 1024):
+      raise ValueError("Senha inválida")
 
     usuario = Usuario.buscar_por_id(usuario_id)
     
@@ -19,6 +26,8 @@ class AtualizarUsuarioService:
     email_tratado: str | None = None
 
     if novo_email:
+      if not isinstance(novo_email, str) or len(novo_email) > 150:
+        raise ValueError("Informe um email válido")
       email_tratado = self._validar_email(novo_email).normalized.lower()
       usuario_existente = Usuario.buscar_por_email(email_tratado)
 

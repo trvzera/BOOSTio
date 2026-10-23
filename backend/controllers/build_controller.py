@@ -16,6 +16,8 @@ from services.build_service.duplicar_build_service import DuplicarBuildService
 from services.build_service.definir_setup_atual_service import DefinirSetupAtualService
 from services.build_service.excluir_build_service import ExcluirBuildService
 from services.build_service.buscar_build_publica_service import BuscarBuildPublicaService
+from services.llm_service.bloquear_geracao_service import BloquearGeracaoService, GeracaoEmAndamentoError
+from services.llm_service.reservar_chamada_service import CotaGlobalIAError, ControleIAIndisponivelError
 
 build_bp = Blueprint("build",__name__,url_prefix='/build')
 
@@ -52,19 +54,28 @@ def criar_build():
       return jsonify({"erro": "Envie um objeto JSON válido"}),400
 
     usuario_id = current_user.id
-    try:
-      build = CriarBuildService().executar(usuario_id, dados)
-    except HTTPError as erro:
-      if erro.response is None or erro.response.status_code not in (429, 500, 502, 503, 504):
-        raise
-      build = CriarBuildService().executar(usuario_id, dados, modelo="gemini-3.8-flash", tentativas_correcao=0)
-    except (Timeout, ConnectionError):
-      build = CriarBuildService().executar(usuario_id, dados, modelo="gemini-3.8-flash", tentativas_correcao=0)
+    with BloquearGeracaoService().executar(usuario_id):
+      try:
+        build = CriarBuildService().executar(usuario_id, dados)
+      except HTTPError as erro:
+        if erro.response is None or erro.response.status_code not in (429, 500, 502, 503, 504):
+          raise
+        build = CriarBuildService().executar(usuario_id, dados, modelo="gemini-3.8-flash", tentativas_correcao=0)
+      except (Timeout, ConnectionError):
+        build = CriarBuildService().executar(usuario_id, dados, modelo="gemini-3.8-flash", tentativas_correcao=0)
     builds = ListarBuildService().executar(usuario_id)
 
     return jsonify({"mensagem": "Build criada com sucesso", "build": build, "builds": builds}),201
   except (LimiteBuildsError, EmailNaoVerificadoError):
     raise
+  except GeracaoEmAndamentoError as erro:
+    return jsonify({"erro": str(erro), "codigo": "geracao-em-andamento"}),409
+  except CotaGlobalIAError as erro:
+    resposta = jsonify({"erro": str(erro), "codigo": "ia-cota-global"})
+    resposta.headers["Retry-After"] = str(erro.espera)
+    return resposta,429
+  except ControleIAIndisponivelError:
+    return jsonify({"erro": "A geração está temporariamente indisponível. Tente novamente mais tarde.", "codigo": "ia-controle-indisponivel"}),503
   except ErroGeracaoBuild as erro:
     return jsonify({"erro": str(erro), "codigo": "geracao-invalida"}),502
   except ValueError as e:

@@ -2,6 +2,7 @@ import sqlite3
 from contextlib import closing
 from pathlib import Path
 from uuid import uuid4
+from sqlalchemy import inspect
 
 from models import db
 from migrations.budget_usuario import migrar_budget
@@ -16,8 +17,13 @@ from services.peca_service.migrar_links_service import MigrarLinksService
 
 class PrepararBancoService:
   def executar(self):
+    if db.engine.dialect.name == "mysql":
+      if inspect(db.engine).get_table_names():
+        raise ValueError("MySQL já contém tabelas; aplique migrações versionadas antes de alterar o esquema")
+      db.create_all()
+      return {"backup": None, "mensagem": "Banco MySQL novo preparado"}
     if db.engine.dialect.name != "sqlite":
-      raise ValueError("As migrações atuais atendem SQLite. Adapte-as antes de usar outro banco.")
+      raise ValueError("Banco não suportado pelo comando banco-preparar")
     caminho = db.engine.url.database
     backup = self._backup(caminho)
     db.create_all()

@@ -1,5 +1,7 @@
 
 def validacao_campos(dados: dict, campos_obrigatorios: list[str]):
+  if not isinstance(dados, dict):
+    raise ValueError("Envie um objeto JSON válido")
   campos_obrigatorios_resp = []
 
   for campo in campos_obrigatorios:
