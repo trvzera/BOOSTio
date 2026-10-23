@@ -6,6 +6,49 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Formulário, modelos e compartilhamento — 23/10/2026
+
+- `main` integrada por fast-forward até `d20fc97`, mantendo CSRF, limitação global
+  de chamadas e bloqueio de geração por usuário. Sem migrações nem alterações no
+  banco real. As alterações de imagens e animações locais foram preservadas.
+- Homologação real do formulário pela rota `POST /build/` em SQLite temporário,
+  com catálogo disponível e filtros de produção: estudos, R$ 6.000, gerada após
+  uma revisão automática, HTTP 201 e total de R$ 2.956,80. Foram consumidas as três
+  chamadas gratuitas autorizadas: duas no primeiro cenário e uma no segundo.
+  O segundo cenário foi interrompido antes de uma quarta chamada pelo limite local
+  do ensaio; não é evidência de limite ou erro do Gemini. Sem fallback pago ou builds
+  nas contas reais. A validação adicional de rede foi testada offline depois disso.
+- Rede do formulário valida objeto, tipo, booleano de posse e medidas positivas
+  finitas. Cabo com comprimento confirmado menor que o solicitado provoca revisão,
+  sem ampliar o orçamento. Especificação ausente não equivale a medida suficiente.
+- Os 16 modelos foram revisados contra estoque/preços atuais, preservando
+  plataformas, capacidades e ausência de periféricos. A página reconsulta vagas
+  no foco/retorno, bloqueia cópia sem e-mail verificado ou com três builds e
+  confirma novamente antes do POST. O servidor continua sendo a autoridade do limite.
+- `GET /build/<s-id>/publica` é a exceção pública: consulta apenas build com
+  visibilidade pública, envia `Cache-Control: no-store`, as peças selecionadas e
+  diagnóstico parcial. Não expõe `usuario_id`, budget, setup atual, anotações de
+  rede nem extras particulares. O JSON original não é modificado pela leitura.
+- `build/publica.js` usa essa resposta em uma tela separada, sem inputs, ações de
+  edição ou acesso ao catálogo privado completo. Descrição/nome são escapados;
+  preços parciais e frete permanecem explícitos. O editor normal continua privado.
+- `POST /build/<s-id>/copiar-publica` exige sessão, CSRF, e-mail verificado e vaga
+  transacional. Revalida a visibilidade no momento da cópia e usa o serviço manual
+  existente. A nova build é privada, destrancada, sem marca de setup atual nem
+  dados pessoais da origem; o budget autorizado é o do destinatário.
+- Retorno do login: `components/sessao-publica.js` aceita somente ID público e
+  ação `testar`/`salvar`, guarda por até 15 minutos na sessão do navegador e consome
+  uma única vez. Não aceita URLs externas. `auth.js` retoma no login/cadastro ou
+  início (callback Google). Salvar ainda exige confirmação explícita; testar abre
+  somente a escolha do teste, sem consultar um provedor automaticamente.
+- Requisitos autenticados de uma build pública usam
+  `/benchmark/requisitos-build?game=...&build_id=s-...&origem_publica=1`.
+  A rota confere a visibilidade novamente; sem a flag continua exigindo proprietário.
+  O cliente valida `ram.fonte: build_publica`; não é uma aprovação de CPU/GPU/FPS.
+- RF07, RF09 e RF12 são concluídos no escopo acordado. Comparação de FPS, novos
+  critérios de upgrade e confirmação do agendamento em produção continuam extensões.
+  RF13 segue parcial: dados ausentes/BIOS/interferências não são certificados.
+
 ### Homologação de catálogo e capacidades — 22/10/2026
 
 - `catalogo-auditar` é um comando de leitura, registrado junto dos comandos de

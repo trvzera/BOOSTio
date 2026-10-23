@@ -58,9 +58,10 @@ class CriarBuildService:
     percentual = dados.get("percentual_perifericos", 0)
     if type(percentual) is not int or not 0 <= percentual <= 99:
       raise ValueError("A porcentagem para periféricos deve ser de 0 a 99")
-    rede = dados.get("rede") or {}
-    if not isinstance(rede, dict):
-      raise ValueError("Dados de rede inválidos")
+    rede = dados.get("rede")
+    if rede is None:
+      rede = {}
+    self._validar_rede(rede)
     proprias = self._pecas_proprias(dados.get("pecas_proprias", {}))
     margem = min(orcamento / 2, max(800, orcamento * 0.25))
 
@@ -101,6 +102,17 @@ class CriarBuildService:
       "incluirPerifericos": percentual > 0, "percentualPerifericos": percentual,
     })
     return AvaliarCompatibilidadeService().para_resposta(BuildSalva.criar_limitada(usuario_id, estado, gerada=dados_build))
+
+  @staticmethod
+  def _validar_rede(rede):
+    if not isinstance(rede, dict) or rede.get("tipo", "indefinido") not in ("wifi", "cabo", "indefinido"):
+      raise ValueError("Dados de rede inválidos")
+    if rede.get("possuiAcessorio") is not None and type(rede["possuiAcessorio"]) is not bool:
+      raise ValueError("Informe se já possui o acessório de rede")
+    for campo, maximo in (("velocidadeMbps", 100000), ("comprimentoCaboM", 1000)):
+      valor = rede.get(campo)
+      if valor is not None and (type(valor) not in (int, float) or not isfinite(valor) or not 0 < valor <= maximo):
+        raise ValueError("Medida de rede inválida: " + campo)
 
   @staticmethod
   def _validar_textos_pedido(dados):
@@ -465,6 +477,11 @@ class CriarBuildService:
     esperado_rede = {acessorio} if acessorio and rede.get("possuiAcessorio") is False and acessorio not in proprias else set()
     if escolhidos_rede != esperado_rede:
       raise ValueError("A IA não respeitou a escolha de conexão da build")
+    if "cabo_rede" in escolhidos_rede and rede.get("comprimentoCaboM"):
+      item = next(c for c in build["componentes"] if c["tipo"] == "cabo_rede")
+      comprimento = pecas[("cabo_rede", item["id"])].get("comprimento_m")
+      if type(comprimento) in (int, float, Decimal) and isfinite(comprimento) and comprimento < rede["comprimentoCaboM"]:
+        raise ValueError("O cabo de rede sugerido é menor que o comprimento solicitado. Escolha outro cabo cadastrado, respeitando o teto do PC.")
     if percentual and not CriarBuildService.PERIFERICOS <= finais:
       raise ValueError("A IA não incluiu os periféricos solicitados. Tente novamente.")
     if not {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"} <= finais or not {"ssd", "hd"} & finais:

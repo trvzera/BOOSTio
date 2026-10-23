@@ -45,7 +45,7 @@ export function motivoBenchmark(build,catalogo) {
   if (avaliacao.erros.length) return "Resolva os erros de compatibilidade antes de testar o desempenho.";
   return "";
 }
-export function abrirBenchmark(build,catalogo) {
+export function abrirBenchmark(build,catalogo,{publica = false} = {}) {
   const motivo = motivoBenchmark(build,catalogo);
   if (motivo) throw new Error(motivo);
   const peca = categoria => catalogo.find(p => p.id === itensCategoria(build,categoria)[0]?.id);
@@ -64,7 +64,7 @@ export function abrirBenchmark(build,catalogo) {
     if (botao.dataset.benchmarkType === "games") {
       const memoria = ram.itens.length && ram.itens.every(({peca}) => Number.isInteger(peca?.capacidade_gb) && peca.capacidade_gb > 0) ? ram.capacidade : null;
       conteudo.innerHTML = painelBenchmarkHtml({prefixo,hardware:nomePeca(cpu) + " · " + (gpu ? nomePeca(gpu) : "Vídeo integrado"),memoria,verificarRequisitos:Boolean(buildId)});
-      limpar = iniciarPainelBenchmark(dialogo,{prefixo,hardware:hardwareBenchmark(cpu,gpu),buildId});
+      limpar = iniciarPainelBenchmark(dialogo,{prefixo,hardware:hardwareBenchmark(cpu,gpu),buildId,publica});
     } else {
       const dispositivos = hardwareBlender(cpu,gpu);
       conteudo.innerHTML = painelBlenderHtml(dispositivos);

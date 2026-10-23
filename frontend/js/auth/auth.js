@@ -4,8 +4,12 @@ import { atualizarMenu } from "../components/menu.js";
 import { paginaPrivada, redirecionamentoSessao } from "../components/navigation-config.js";
 import { acompanharCarregamento } from "../components/page-loading.js";
 import { verificarEspacoBuild } from "../api/build/builds.js";
+import { idCompartilhamentoPublico, consumirRetornoPublico } from '../components/sessao-publica.js';
 
-const privada = paginaPrivada(location.pathname.split("/").pop());
+const paginaAtual = location.pathname.split("/").pop();
+const publica = paginaAtual === 'configuracao-build.html' && idCompartilhamentoPublico(location.search);
+const privada = paginaPrivada(paginaAtual,location.search);
+if (publica) document.body.removeAttribute('data-private-page');
 function bloquearConteudo() {
   if (!privada) return;
   document.body.dataset.sessionState = "checking";
@@ -18,7 +22,11 @@ export async function confirmaUsuario() {
   const resposta = await carregarPerfil();
   const autenticado = Boolean(resposta?.auth);
   atualizarMenu(autenticado);
-  const destino = redirecionamentoSessao(location.pathname.split("/").pop(),autenticado);
+  if (autenticado && ['login.html','signin.html','index.html'].includes(paginaAtual)) {
+    const retorno = consumirRetornoPublico();
+    if (retorno) { location.replace(new URL(retorno,location.href).href); return resposta; }
+  }
+  const destino = redirecionamentoSessao(paginaAtual,autenticado,location.search);
   if (destino) location.replace(new URL("../../pages/" + destino,import.meta.url).href);
   else {
     if (location.pathname.endsWith("/formulario.html")) {

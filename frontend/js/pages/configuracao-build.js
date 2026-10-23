@@ -15,7 +15,7 @@ import { abrirBenchmark, abrirCompraBuild, abrirDialogoBuild, motivoBenchmark, a
 import { abrirMelhorias } from "../build/melhorias.js";
 import { carregarPerfil } from "../conta/perfil.js";
 import { acompanharCarregamento } from "../components/page-loading.js";
-import { mostrarBuildSalva } from "../build/build-salva.js";
+import { mostrarBuildPublica } from "../build/publica.js";
 import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta, linkBuildConta, estadoParaConta } from "../build/conta.js";
 import { criarBuildManual } from "../api/build/builds.js";
 
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded",async () => {
     let buildId = parametros.get("build_id");
     const compartilhada = parametros.get("compartilhar_id");
     if (compartilhada !== null) {
-      await mostrarBuildSalva(main, compartilhada, true);
+      await mostrarBuildPublica(main, compartilhada);
       return;
     }
     if (buildId === null && !parametros.has("id") && !parametros.has("compartilhar")) {

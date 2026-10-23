@@ -42,7 +42,7 @@ gaming/rendering performance from public benchmark sources.
 
 Os **20 requisitos do produto**, com o status de cada funcionalidade e seu escopo atual.
 
-**Resumo: 16 implementadas · 4 parciais.**
+**Resumo: 19 implementadas · 1 parcial.**
 
 - ✅ **Implementado:** fluxo disponível no código do projeto.
 - 🟡 **Parcial:** já possui partes implementadas, mas ainda há pontos a concluir.
@@ -58,12 +58,12 @@ As limitações de cada funcionalidade estão indicadas na última coluna.
 | 04 | Montar por formulário | ✅ **Implementado** | Geração por LLM com orçamento, ventilação cadastrada e uma revisão automática de saídas inválidas antes de salvar. |
 | 05 | Salvar configurações | ✅ **Implementado** | Builds persistidas na conta, inclusive incompletas, com salvamento automático. |
 | 06 | Excluir configurações salvas | ✅ **Implementado** | Exclusão com verificação de proprietário e tranca. |
-| 07 | Comparar configurações salvas | 🟡 **Parcial** | Preços, componentes, consumo e renderização no Blender de duas ou três builds; comparação de FPS ainda pendente. |
-| 08 | Compartilhar configurações por link | ✅ **Implementado** | Links de builds públicas e controle de visibilidade; páginas internas exigem sessão. |
-| 09 | Buscar melhorias do setup | 🟡 **Parcial** | Prévia e aplicação com bloqueio de regressões de RAM/SSD/HD. Trocas de CPU/GPU e demais categorias aguardam critérios comparáveis; sem dados, não são liberadas como melhorias. |
-| 10 | Ver configurações prontas | ✅ **Implementado** | 16 modelos sem periféricos, ordenados do menor para o maior preço cadastrado. |
+| 07 | Comparar configurações salvas | ✅ **Implementado** | Duas ou três builds: preços, componentes, consumo e renderização no Blender. FPS é uma ampliação pendente, não uma condição da comparação atual. |
+| 08 | Compartilhar configurações por link | ✅ **Implementado** | Builds públicas podem ser vistas sem login, somente leitura. Testar exige sessão; salvar uma cópia privada exige também e-mail verificado e vaga na conta. |
+| 09 | Buscar melhorias do setup | ✅ **Implementado** | Prévia e aplicação de melhorias de RAM/SSD/HD com bloqueio de regressões. Ampliar para CPU/GPU e outras categorias depende de métricas confiáveis. |
+| 10 | Ver configurações prontas | ✅ **Implementado** | 16 modelos sem periféricos, referências revisadas no catálogo, filtro de budget e preço crescente. A cópia respeita e-mail verificado e limite da conta. |
 | 11 | Editar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento. |
-| 12 | Consultar preços das peças pelo site | 🟡 **Parcial** | Preços cadastrados, data de atualização quando disponível e links das lojas; monitoramento contínuo em evolução. |
+| 12 | Consultar preços das peças pelo site | ✅ **Implementado** | Preços cadastrados, data de atualização quando disponível e links das lojas. Não inclui frete nem garante o valor no checkout. |
 | 13 | Ver compatibilidade e consumo de energia | 🟡 **Parcial** | Medidas disponíveis, formatos, baias, fans e radiador; substituição explícita das fans do water cooler e painel de informações. Completar fichas técnicas e interferências físicas. |
 | 14 | Incluir periféricos no orçamento | ✅ **Implementado** | Inclusão e reaproveitamento com tetos separados para PC e periféricos. |
 | 15 | Registrar budget no perfil | ✅ **Implementado** | Valor e autorização usados no formulário e em novas montagens manuais, sem alterar builds existentes. |
@@ -76,10 +76,14 @@ As limitações de cada funcionalidade estão indicadas na última coluna.
 ### Regras da plataforma
 
 - **Acesso:** início, termos, contato, sobre, cadastro, login e recuperação de senha
-  são públicos. Formulário, montagem, catálogo, perfil, builds prontas e laboratório exigem login.
+  são públicos. Links de builds públicas também abrem sem login, em uma tela somente
+  leitura. Formulário, editor, catálogo, perfil, builds prontas e laboratório exigem login.
 - **Criação:** e-mail verificado e limite de **três builds por conta**, incluindo
   montagem manual, formulário, importação, cópia de modelo e duplicação.
 - **Tranca:** uma build trancada não pode ser editada nem excluída antes de ser destrancada.
+- **Compartilhamento:** o visitante não altera a build original nem acessa o budget
+  ou os dados do proprietário. Testar exige login; uma cópia é privada e independente.
+  Tornar a original privada interrompe novas consultas e cópias pelo link público.
 
 ### Como o orçamento é respeitado
 
@@ -102,6 +106,8 @@ AM4, AM5 e Intel e diferentes níveis de investimento.
 
 Os modelos não incluem monitor, teclado, mouse, headset ou outros periféricos.
 Os totais e o filtro de orçamento usam os preços disponíveis no catálogo da conta.
+Modelos sem todas as cotações ou com peças indisponíveis não aparecem como opções
+dentro de um budget informado. A disponibilidade pode mudar após a revisão.
 
 A cópia é uma base editável: peças ausentes ou indisponíveis são sinalizadas no
 editor; não são substituídas por produtos parecidos nem registradas como peças
@@ -208,6 +214,10 @@ da validação e as regras originais. A nova resposta é validada por completo a
 de persistir. Isso cobre falhas como GPU obrigatória ausente, JSON inválido, IDs,
 quantidades, orçamento e conflitos conhecidos; não garante solução quando o catálogo
 ou o orçamento não permitem a montagem. Falhas de transporte e cotas recebem mensagens próprias.
+
+Em 23/10/2026, um teste isolado pelo fluxo completo do formulário gerou, revisou,
+validou e persistiu uma configuração de estudos em banco temporário. Isso não
+comprova todos os cenários de uso nem garante respostas válidas de um provedor externo.
 
 ## Limites de requisições
 

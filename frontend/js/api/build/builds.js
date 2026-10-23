@@ -42,6 +42,10 @@ export function duplicarBuild(id) {
   return fetchComErro(`/build/${encodeURIComponent(id)}/duplicar`, { method: "POST" });
 }
 
+export function copiarBuildPublica(id) {
+  return fetchComErro(`/build/${encodeURIComponent(id)}/copiar-publica`, {method:'POST'});
+}
+
 export function excluirBuild(id) {
   return fetchComErro(`/build/${encodeURIComponent(id)}`, { method: "DELETE" });
 }

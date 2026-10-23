@@ -22,13 +22,13 @@ export function criarClienteBenchmark({requisitar = fetchComErro,timeoutMs = 250
     }
   }
   return {
-    consultarRequisitosBuild({game,buildId},opcoes) {
+    consultarRequisitosBuild({game,buildId,publica = false},opcoes) {
       if (typeof game !== "string" || !SLUG.test(game) || typeof buildId !== "string" || !BUILD_ID.test(buildId))
         return Promise.reject(new Error("Selecione um jogo e uma build salva na sua conta."));
-      return enviar("requisitos-build",{game,build_id:buildId},opcoes).then(dados => {
+      return enviar("requisitos-build",{game,build_id:buildId,...(publica ? {origem_publica:'1'} : {})},opcoes).then(dados => {
         const estados = ["nao_informada","abaixo_minimo","abaixo_recomendado","recomendado","minimo_sem_recomendacao"];
         if (dados.game !== game || dados.buildId !== buildId || dados.escopo !== "parcial" || dados.requisitosVerificados !== false || dados.fpsValidado !== false
-          || dados.ram?.fonte !== "build_salva" || typeof dados.ram.completa !== "boolean" || !estados.includes(dados.ram.status)
+          || dados.ram?.fonte !== (publica ? "build_publica" : "build_salva") || typeof dados.ram.completa !== "boolean" || !estados.includes(dados.ram.status)
           || !Number.isInteger(dados.ram.conhecidaGb) || dados.ram.conhecidaGb < 0 || !Array.isArray(dados.ram.pendencias)
           || !Number.isInteger(dados.minimos?.ramGb) || dados.minimos.ramGb <= 0 || !dados.fonte
           || (dados.ram.completa ? !Number.isInteger(dados.ram.informadaGb) || dados.ram.informadaGb <= 0 || dados.ram.informadaGb !== dados.ram.conhecidaGb || dados.ram.status === "nao_informada" : dados.ram.informadaGb !== null || dados.ram.status !== "nao_informada"))

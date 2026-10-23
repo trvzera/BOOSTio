@@ -39,7 +39,7 @@ export function resumoRequisitosBuildHtml(dados) {
     + '</a> · Revisado em ' + h(dados.fonte.verificadoEm) + '</p></details>';
 }
 
-export function iniciarRequisitosBuild(raiz,{prefixo,buildId,cliente}) {
+export function iniciarRequisitosBuild(raiz,{prefixo,buildId,cliente,publica = false}) {
   const saida = raiz.querySelector('#' + prefixo + '-requirements');
   const botao = raiz.querySelector('[data-check-build-requirements]');
   const jogo = raiz.querySelector('#' + prefixo + '-game');
@@ -64,7 +64,7 @@ export function iniciarRequisitosBuild(raiz,{prefixo,buildId,cliente}) {
     informar("Verificando as capacidades da build salva e os requisitos do jogo…");
     pendente = (async () => {
       try {
-        const dados = await cliente.consultarRequisitosBuild({game,buildId},{signal});
+        const dados = await cliente.consultarRequisitosBuild({game,buildId,publica},{signal});
         if (!ativo || atual !== versao) throw Object.assign(new Error("Consulta cancelada."),{codigo:"cancelado"});
         saida.innerHTML = resumoRequisitosBuildHtml(dados); saida.hidden = false;
         iniciarDetalhesAnimados(saida);

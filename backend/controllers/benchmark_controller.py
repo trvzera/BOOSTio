@@ -65,4 +65,4 @@ def consultar_requisitos():
 @benchmark_bp.get("/requisitos-build")
 @login_required
 def consultar_requisitos_build():
-    return executar_consulta(ConsultarRequisitosBuildService(), ("game", "build_id"), "resultado")
+    return executar_consulta(ConsultarRequisitosBuildService(), ("game", "build_id", "origem_publica"), "resultado")

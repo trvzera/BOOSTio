@@ -16,6 +16,7 @@ from services.build_service.duplicar_build_service import DuplicarBuildService
 from services.build_service.definir_setup_atual_service import DefinirSetupAtualService
 from services.build_service.excluir_build_service import ExcluirBuildService
 from services.build_service.buscar_build_publica_service import BuscarBuildPublicaService
+from services.build_service.copiar_build_publica_service import CopiarBuildPublicaService
 from services.llm_service.bloquear_geracao_service import BloquearGeracaoService, GeracaoEmAndamentoError
 from services.llm_service.reservar_chamada_service import CotaGlobalIAError, ControleIAIndisponivelError
 
@@ -189,6 +190,24 @@ def excluir_build(build_id):
 @build_bp.get("/<build_id>/publica")
 def buscar_build_publica(build_id):
   try:
-    return jsonify({"build": BuscarBuildPublicaService().executar(build_id)}),200
+    resposta = jsonify({"build": BuscarBuildPublicaService().executar(build_id)})
+    resposta.headers["Cache-Control"] = "no-store"
+    return resposta,200
+  except ValueError as erro:
+    resposta = jsonify({"erro": str(erro)})
+    resposta.headers["Cache-Control"] = "no-store"
+    return resposta,404
+
+
+@build_bp.post("/<build_id>/copiar-publica")
+@login_required
+def copiar_build_publica(build_id):
+  try:
+    return jsonify({"build": CopiarBuildPublicaService().executar(current_user.id, build_id)}),201
+  except (LimiteBuildsError, EmailNaoVerificadoError):
+    raise
   except ValueError as erro:
     return jsonify({"erro": str(erro)}),404
+  except SQLAlchemyError:
+    db.session.rollback()
+    return jsonify({"erro": "Não foi possível salvar a cópia. Tente novamente."}),500

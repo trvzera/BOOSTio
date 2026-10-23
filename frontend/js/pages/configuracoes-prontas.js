@@ -7,7 +7,8 @@ import { avaliarBuild } from "../build/compatibilidade.js";
 import { navegarPara } from "../components/page-loading.js";
 import { planejamentoLocal } from "../build/planejamento.js";
 import { carregarCatalogoConta, estadoParaConta } from "../build/conta.js";
-import { criarBuildManual, verificarEspacoBuild } from "../api/build/builds.js";
+import { criarBuildManual, verificarEspacoBuild, listarBuilds, LIMITE_BUILDS } from "../api/build/builds.js";
+import { carregarPerfil } from '../conta/perfil.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
   const formulario = document.querySelector("#prontas-filtros");
@@ -18,18 +19,37 @@ document.addEventListener("DOMContentLoaded", async () => {
   const feedback = document.querySelector("#prontas-feedback");
   const cota = document.querySelector("#prontas-cota");
   let abrindo = false;
+  let motivoBloqueio = 'Verificando as vagas da sua conta…', revisaoCota = 0;
 
   function informar(texto, erro = false) {
     feedback.textContent = texto;
     feedback.dataset.tone = erro ? "error" : "info";
   }
 
-  function atualizarCota() {
-    cota.textContent = "As cópias são salvas na sua conta";
+  function aplicarCota() {
     lista.querySelectorAll("[data-usar-modelo]").forEach(botao => {
-      botao.disabled = abrindo;
+      botao.disabled = abrindo || Boolean(motivoBloqueio);
+      if (motivoBloqueio) botao.dataset.disabledReason = motivoBloqueio;
+      else delete botao.dataset.disabledReason;
     });
-    return false;
+  }
+  async function atualizarCota() {
+    const atual = ++revisaoCota;
+    motivoBloqueio = 'Verificando as vagas da sua conta…'; aplicarCota();
+    try {
+      const perfil = await carregarPerfil();
+      if (!perfil.auth) throw new Error('Entre na sua conta para salvar uma configuração pronta.');
+      if (!perfil.usuario?.verificado) throw new Error('Verifique seu e-mail nas configurações para salvar uma configuração pronta.');
+      const resposta = await listarBuilds();
+      if (atual !== revisaoCota) return;
+      const usados = resposta.builds.length;
+      motivoBloqueio = usados >= LIMITE_BUILDS ? 'Você atingiu o limite de três builds. Exclua uma para liberar espaço.' : '';
+      cota.textContent = motivoBloqueio || usados + ' de ' + LIMITE_BUILDS + ' builds salvas · Abrir cria uma cópia privada';
+    } catch(erro) {
+      if (atual !== revisaoCota) return;
+      motivoBloqueio = erro.message; cota.textContent = motivoBloqueio;
+    }
+    aplicarCota();
   }
 
   formulario.addEventListener("submit",evento => evento.preventDefault());
@@ -65,12 +85,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       budget.removeAttribute("aria-invalid");
       const limite = budget.value === "" ? Infinity : Number(budget.value);
-      const visiveis = modelos.filter(({build,avaliacao}) => (!objetivo.value || build.objetivo === objetivo.value) && avaliacao.preco <= limite);
+      const visiveis = modelos.filter(({build,avaliacao}) => (!objetivo.value || build.objetivo === objetivo.value)
+        && (!Number.isFinite(limite) || !build.metadados.pendentes.length && avaliacao.preco <= limite));
       contador.textContent = visiveis.length + (visiveis.length === 1 ? " configuração encontrada" : " configurações encontradas") + " · Menor preço primeiro";
       lista.innerHTML = visiveis.length ? visiveis.map(card).join("") :
         '<p class="prontas-vazio">Nenhum modelo atende a esses filtros. Aumente o budget ou escolha outro objetivo.</p>';
       informar("");
-      atualizarCota();
+      aplicarCota();
     }
 
     objetivo.addEventListener("change",renderizar);
@@ -87,7 +108,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!modelo) return;
       try {
         abrindo = true;
-        atualizarCota();
+        aplicarCota();
         await verificarEspacoBuild();
         const copia = copiarModelo(modelo.build);
         const planejamento = planejamentoLocal();

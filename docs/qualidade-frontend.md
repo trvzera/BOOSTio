@@ -1,5 +1,24 @@
 # Qualidade do frontend — 20/10/2026
 
+## Revalidação — 23/10/2026
+
+- `main` atualizada até `d20fc97` sem conflitos. As proteções de cotas e geração
+  recebidas do backend foram preservadas, assim como imagens/animações do usuário.
+- Compartilhamento público em tela somente leitura, sem budget ou dados do dono;
+  testes de sessão, CSRF, verificação de e-mail, limite transacional e revogação
+  de visibilidade em banco temporário. Retorno seguro após login/Google, sem
+  criar cópias nem consultar benchmark automaticamente.
+- Chrome com APIs e gravações simuladas: 134 verificações nas 16 páginas e mais
+  36 do compartilhamento/cópias/cotas. Tamanhos 320/768/1440 px,
+  sem overflow, erros JavaScript ou violações axe WCAG A/AA nas telas auditadas.
+  Isso não substitui testes manuais em Safari/VoiceOver ou homologação em produção.
+- Um cenário real do formulário persistiu uma configuração válida no banco
+  temporário após uma correção da IA. Três chamadas gratuitas autorizadas usadas;
+  o segundo cenário parou no teto local do ensaio, antes de outra consulta.
+- Suítes de regressão desta rodada: 350 testes Node e 482 Python (+13 subtestes).
+  Avisos legados de `Query.get()`/`utcnow()` permanecem. Sem alterações no banco real,
+  coleta de preços, imagens ou configuração de deploy.
+
 ## Revalidação — 22/10/2026
 
 - Nova rodada móvel de Lighthouse nas 16 páginas: acessibilidade 100 e boas
