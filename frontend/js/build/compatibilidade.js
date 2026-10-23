@@ -68,7 +68,7 @@ export function avaliarBuild(build,catalogo) {
     if (placa && discos.m2Sata && discos.limites.m2Sata == null) dicas.push("Confirme quais slots M.2 da placa-mãe aceitam SSD SATA.");
     if (placa && discos.limites.compartilhamentoDesconhecido) dicas.push("Confirme se o SSD M.2 SATA desativa alguma porta SATA da placa-mãe.");
   }
-  const encaixe = validarEncaixe({gpu:get("placa_video"),air:get("air_cooler"),water:get("water_cooler") || (tem("water_cooler") ? {} : null),gabinete,fonte:get("fonte"),
+  const encaixe = validarEncaixe({gpu:get("placa_video"),air:get("air_cooler"),water:get("water_cooler") || (tem("water_cooler") ? {} : null),gabinete,placa,fonte:get("fonte"),
     substituir:build.substituirFansWaterCooler === true,
     discos:itensSelecionados(build,catalogo).filter(p => ["ssd","hd"].includes(p.categoria)),
     fans:itensSelecionados(build,catalogo).filter(p => p.categoria === "fan")});

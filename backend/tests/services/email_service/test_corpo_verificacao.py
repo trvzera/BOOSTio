@@ -40,3 +40,16 @@ def test_nome_e_escapado_e_codigo_nunca_aceita_html(app_email):
         for codigo in ("<script>", "12345", "1234567", "١٢٣٤٥٦", 123456, None):
             with pytest.raises(ValueError, match="Código"):
                 EnviarEmailService._monta_mensagem(msg, codigo)
+
+
+def test_html_usa_paleta_da_boostio_e_codigo_sem_fonte_monoespacada(app_email):
+    with app_email.app_context():
+        msg = Message()
+        EnviarEmailService._monta_mensagem(msg, "001234", "QA")
+    for cor in ("#000000", "#1c1c1e", "#3a3a3c", "#007bff", "#e5e5ea"):
+        assert cor in msg.html
+    assert "font-family:Lexend,Arial,Helvetica,sans-serif" in msg.html
+    assert "font-family:Poppins,Arial,Helvetica,sans-serif" in msg.html
+    assert "monospace" not in msg.html and "Consolas" not in msg.html
+    assert "data-verification-code" in msg.html
+    assert "font-variant-numeric:tabular-nums" in msg.html

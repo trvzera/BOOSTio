@@ -205,9 +205,16 @@ A geração pela LLM já revalida conflitos conhecidos no catálogo, incluindo s
 DDR, slots, potência e medidas explícitas. Especificações ausentes continuam não
 verificadas; a configuração não recebe garantia de compatibilidade completa.
 
-As fichas físicas revisadas incluem Q300L, NR200, AK400, MAG A650BN e a variante
-MSI RTX 5060 Shadow 2X OC de 8 GB. O complemento é aplicado somente às identidades
-exatas documentadas, sem alterar o banco. Outras variantes não herdam essas medidas.
+As fichas revisadas cobrem 25 variantes, incluindo gabinetes, GPUs, fontes,
+air/water coolers, placas-mãe, processador, RAM, SSDs e fan. Há limites físicos,
+slots, perfis JEDEC/XMP, dimensões por capacidade de SSD, conexões RGB/PWM e
+exceções físicas declaradas pelo fabricante do cooler. Na fotografia atual,
+essas fichas complementam 27 cadastros; não representam todo o catálogo.
+As fichas novas guardam fonte oficial/data da consulta e só são aplicadas às identidades
+exatas documentadas; apelidos internos também exigem o anúncio revisado. Sem alterar
+o banco ou inferir dados de outra revisão. Modelos/links com variantes divergentes
+continuam pendentes de revisão. Isso não certifica BIOS, QVL ou todas as
+interferências físicas.
 
 Saídas inválidas da IA recebem **uma tentativa automática de correção**, com o erro
 da validação e as regras originais. A nova resposta é validada por completo antes

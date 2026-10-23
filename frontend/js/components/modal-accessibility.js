@@ -15,6 +15,8 @@ export function iniciarModaisAcessiveis() {
       const titulo = caixa.querySelector("h1,h2,h3");
       if (titulo) { titulo.id ||= "modal-title-" + (++sequencia); caixa.setAttribute("aria-labelledby",titulo.id); }
       else caixa.setAttribute("aria-label","Janela de confirmação");
+      const descricao = caixa.querySelector("#verify-email-description");
+      if (descricao) caixa.setAttribute("aria-describedby",descricao.id);
       modal.addEventListener("keydown",evento => {
         if (!estado.aberto) return;
         if (evento.key === "Escape") {

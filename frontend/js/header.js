@@ -1,5 +1,6 @@
 import { iconeAnimado, iniciarIcones } from "./components/ui.js";
 import { linksVisitante, linksAutenticado } from "./components/navigation-config.js";
+import { marcarPaginaAtual } from "./components/navigation-current.js";
 
 let navegacao;
 const pagina = nome => new URL("../pages/" + nome, import.meta.url).href;
@@ -91,6 +92,10 @@ export function iniciarNavegacao() {
     controles.forEach(c => { if (c.container.hasAttribute("data-open")) { c.botao.focus(); c.alternar(false); } });
   });
   hamburger.painel.querySelectorAll(".site-menu-link").forEach((link, indice) => link.style.setProperty("--menu-item-index", indice));
+  marcarPaginaAtual();
+  host.addEventListener("click",evento => {
+    if (evento.target.closest('a[aria-current="page"]') && !evento.ctrlKey && !evento.metaKey && !evento.shiftKey && !evento.altKey) evento.preventDefault();
+  });
   navegacao = {host, perfil, hamburger, preview};
   iniciarIcones(host);
   return navegacao;
@@ -108,3 +113,9 @@ export function atualizarNavegacao(autenticado) {
 }
 if (document.body) iniciarNavegacao();
 else document.addEventListener("DOMContentLoaded", iniciarNavegacao, {once:true});
+document.addEventListener("DOMContentLoaded",() => {
+  marcarPaginaAtual();
+  document.querySelectorAll("footer").forEach(footer => footer.addEventListener("click",evento => {
+    if (evento.target.closest('a[aria-current="page"]') && !evento.ctrlKey && !evento.metaKey && !evento.shiftKey && !evento.altKey) evento.preventDefault();
+  }));
+},{once:true});

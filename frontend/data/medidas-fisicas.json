@@ -1,5 +1,5 @@
 {
-  "versao": 1,
+  "versao": 2,
   "pecas": [
     {
       "categoria": "placa_video",
@@ -83,6 +83,290 @@
       "part_numbers": ["R-AK400-BKNNMN-G-1", "SEED-ACOOL-02"],
       "fonte": "https://www.deepcool.com/products/Cooling/cpuaircoolers/AK400-Performance-CPU-Cooler/2021/15222.shtml",
       "medidas": {"altura_mm": 155}
+    },
+    {
+      "categoria": "placa_video",
+      "fabricante": "Gigabyte",
+      "modelo": "GeForce RTX 5070 EAGLE OC SFF 12G",
+      "part_numbers": ["GV-N5070EAGLE OC-12GD"],
+      "aliases_catalogo": [
+        {"fabricante": "Gigabyte", "modelo": "RTX 5070 EAGLE OC SFF 12G", "part_number": "SEED-GPU-16", "produto_kabum": "714573"}
+      ],
+      "fonte": "https://www.gigabyte.com/Graphics-Card/GV-N5070EAGLE-OC-12GD/sp",
+      "verificado_em": "2026-10-23",
+      "medidas": {
+        "comprimento_mm": 290,
+        "altura_mm": 120,
+        "espessura_mm": 50,
+        "interface_memoria": "192-bit",
+        "conectores_energia": "1 x 16-pin",
+        "observacoes_medidas": "Medidas da variante GV-N5070EAGLE OC-12GD: comprimento 290 mm, altura 120 mm e espessura 50 mm. A folga do cabo de energia e interferências com outras peças não estão incluídas nessas medidas."
+      }
+    },
+    {
+      "categoria": "gabinete",
+      "fabricante": "Cooler Master",
+      "modelo": "MasterBox TD500 Mesh V2 White",
+      "part_numbers": ["TD500V2-WGNN-S00"],
+      "aliases_catalogo": [
+        {"fabricante": "Cooler Master", "modelo": "MasterBox TD500", "part_number": "SEED-CASE-02", "produto_kabum": "509115"}
+      ],
+      "fonte": "https://www.coolermaster.com/en-global/products/masterbox-td500-mesh-v2.html",
+      "verificado_em": "2026-10-23",
+      "medidas": {
+        "formatos_placa_mae": "ATX, mATX, ITX",
+        "slots_expansao": 7,
+        "tamanho_max_gpu_mm": 410,
+        "tamanho_max_cooler_mm": 165,
+        "tamanho_max_fonte_mm": 200,
+        "formatos_fonte": ["ATX", "ATX PS2"],
+        "baias_25": 3,
+        "baias_35": 2,
+        "fans_inclusos": 3,
+        "quantidade_max_fans": 7,
+        "tamanhos_fan_suportados_mm": [120, 140],
+        "posicoes_fans_completas": false,
+        "suporte_water_cooler": true,
+        "radiadores_suportados_mm": [120, 140, 240, 280, 360],
+        "posicoes_fans": [
+          {"nome": "Frente", "opcoes": [{"tamanho_mm": 120, "quantidade": 3}, {"tamanho_mm": 140, "quantidade": 2}], "fans_inclusas": [{"tamanho_mm": 120, "quantidade": 3}], "radiadores_mm": [120, 140, 240, 280, 360]},
+          {"nome": "Topo", "opcoes": [{"tamanho_mm": 120, "quantidade": 3}, {"tamanho_mm": 140, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": [120, 140, 240, 280, 360]},
+          {"nome": "Traseira", "opcoes": [{"tamanho_mm": 120, "quantidade": 1}], "fans_inclusas": [], "radiadores_mm": [120]}
+        ],
+        "observacoes_medidas": "Ficha do TD500 Mesh V2 White TD500V2-WGNN-S00, não do TD500 original. Fans de 120/140 mm na mesma posição são alternativas. Fonte: máximo 200 mm; fabricante recomenda até 170 mm. E-ATX/SSI-CEB têm suporte condicionado a até 12 x 10,7 polegadas, não aprovado automaticamente. Radiador no topo: espessura máxima recomendada de 55 mm; confirmar conjunto com fans e folgas com RAM/GPU. A ficha não informa todos os limites de interferência."
+      }
+    },
+    {
+      "categoria": "air_cooler",
+      "fabricante": "Cooler Master",
+      "modelo": "Hyper 212 3DHP Black ARGB",
+      "part_numbers": ["MAY-T2HP-217PA-R1"],
+      "aliases_catalogo": [
+        {"fabricante": "Cooler Master", "modelo": "Hyper 212 Black", "part_number": "SEED-ACOOL-01", "produto_kabum": "1002623"}
+      ],
+      "fonte": "https://www.coolermaster.com/en-global/products/hyper-212-3dhp-black-argb.html",
+      "verificado_em": "2026-10-23",
+      "medidas": {
+        "comprimento_mm": 133,
+        "largura_mm": 86,
+        "altura_mm": 158,
+        "compatibilidade": "LGA1851, LGA1700, LGA1200, LGA1151, LGA1150, LGA1155, LGA1156, AM5, AM4",
+        "quantidade_fans": 1,
+        "tamanho_fan_mm": 120,
+        "espessura_fan_mm": 25,
+        "observacoes_medidas": "Dados exclusivos do Hyper 212 3DHP Black ARGB MAY-T2HP-217PA-R1. Confirmar interferências com dissipadores da placa-mãe e pentes de RAM."
+      }
+    },
+    {
+      "categoria": "fonte",
+      "fabricante": "Corsair",
+      "modelo": "CX650 CP-9020278-BR",
+      "part_numbers": ["CP-9020278-BR"],
+      "aliases_catalogo": [
+        {"fabricante": "Corsair", "modelo": "CX Series CX650", "part_number": "SEED-PSU-04", "produto_kabum": "516056"}
+      ],
+      "fonte": "https://www.corsair.com/br/pt/p/psu/cp-9020278-br/cx-series-cx650-650-watt-80-plus-bronze-atx-power-supply-br-cp-9020278-br",
+      "verificado_em": "2026-10-23",
+      "medidas": {
+        "comprimento_mm": 125,
+        "formato": "ATX",
+        "observacoes_medidas": "Comprimento da revisão CP-9020278-BR. Não aplicar a outras revisões da CX650. Reservar espaço adicional para passagem e curvatura dos cabos."
+      }
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "ASRock",
+      "modelo": "A620AM Pro RS",
+      "part_numbers": ["90-MXBSV0-A0UAYZ"],
+      "aliases_catalogo": [
+        {"fabricante": "ASRock", "modelo": "A620AM Pro RS", "part_number": "SEED-MB-17", "produto_kabum": "938417"}
+      ],
+      "fonte": "https://www.asrock.com/mb/AMD/A620AM%20Pro%20RS/index.asp",
+      "verificado_em": "2026-10-23",
+      "medidas": {
+        "socket": "AM5",
+        "chipset": "AMD A620A",
+        "formato": "mATX",
+        "tipo_memoria": "DDR5",
+        "quantidade_slots_ram": 4,
+        "memoria_maxima_gb": 256,
+        "quantidade_slots_m2": 3,
+        "quantidade_slots_m2_sata": 0,
+        "quantidade_portas_sata": 2,
+        "observacoes_medidas": "Três M.2 Key M para SSD PCIe/NVMe 2260/2280; o M.2 Key E para Wi-Fi não conta como armazenamento. Dois slots de armazenamento PCIe Gen4 x4 e um Gen3 x4. Limites de RAM, frequências e suporte a cada CPU dependem também do processador, BIOS e QVL; a ficha não certifica uma combinação específica."
+      }
+    },
+    {
+      "categoria": "water_cooler",
+      "fabricante": "MSI",
+      "modelo": "MAG CORELIQUID A13 240",
+      "part_numbers": ["MAGCORELIQUIDA13-240"],
+      "aliases_catalogo": [
+        {"fabricante": "MSI", "modelo": "MAG Coreliquid A13", "part_number": "SEED-WCOOL-11", "produto_kabum": "679305"}
+      ],
+      "fonte": "https://www.msi.com/Liquid-Cooling/MAG-CORELIQUID-A13-240/Specification",
+      "verificado_em": "2026-10-23",
+      "medidas": {
+        "compatibilidade": "LGA1700, LGA1851, AM4, AM5",
+        "tamanho_radiador_mm": 240,
+        "comprimento_radiador_mm": 277,
+        "largura_radiador_mm": 119.6,
+        "espessura_radiador_mm": 27.2,
+        "quantidade_fans": 2,
+        "tamanho_fan_mm": 120,
+        "espessura_fan_mm": 25,
+        "observacoes_medidas": "Radiador de classe 240 mm com comprimento real de 277 mm; conjunto radiador + fans de 52,2 mm. Confirmar mangueiras, conexões, bomba e interferências com RAM/GPU. Suporte nominal de 240 mm no gabinete não confirma todas essas folgas."
+      }
+    },
+    {
+      "categoria": "placa_mae", "fabricante": "ASUS", "modelo": "PRIME A520M-K",
+      "part_numbers": [],
+      "aliases_catalogo": [{"fabricante": "ASUS", "modelo": "Prime A520M-K", "part_number": "SEED-MB-01", "produto_kabum": "398510"}],
+      "fonte": "https://www.asus.com/uk/motherboards-components/motherboards/prime/prime-a520m-k/techspec/",
+      "verificado_em": "2026-10-23",
+      "medidas": {
+        "socket": "AM4", "chipset": "AMD A520", "formato": "mATX", "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 2, "memoria_maxima_gb": 64,
+        "quantidade_slots_m2": 1, "quantidade_slots_m2_sata": 1, "quantidade_portas_sata": 4,
+        "observacoes_medidas": "M.2 Key M 2242/2260/2280 com PCIe 3.0 x4 ou SATA. A lista de CPUs e a QVL dependem de BIOS/processador; frequência OC não é garantida. Compartilhamento de portas não confirmado nesta ficha."
+      }
+    },
+    {
+      "categoria": "placa_mae", "fabricante": "MSI", "modelo": "A520M-A PRO", "part_numbers": [],
+      "aliases_catalogo": [{"fabricante": "MSI", "modelo": "A520M-A PRO", "part_number": "SEED-MB-02", "produto_kabum": "280890"}],
+      "fonte": "https://www.msi.com/Motherboard/A520M-A-PRO/Specification", "verificado_em": "2026-10-23",
+      "medidas": {
+        "socket": "AM4", "chipset": "AMD A520", "formato": "mATX", "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 2, "memoria_maxima_gb": 64, "quantidade_slots_m2": 1, "quantidade_portas_sata": 4,
+        "observacoes_medidas": "DDR4 UDIMM; perfis A-XMP e suporte a cada CPU exigem confirmação de BIOS/QVL. Não assumir que o limite OC é frequência garantida para qualquer combinação de pentes."
+      }
+    },
+    {
+      "categoria": "placa_mae", "fabricante": "MSI", "modelo": "B550M PRO-VDH WIFI", "part_numbers": [],
+      "aliases_catalogo": [{"fabricante": "MSI", "modelo": "B550M Pro-VDH WiFi", "part_number": "SEED-MB-06", "produto_kabum": "114338"}],
+      "fonte": "https://www.msi.com/Motherboard/B550M-PRO-VDH-WIFI/Specification", "verificado_em": "2026-10-23",
+      "medidas": {
+        "socket": "AM4", "chipset": "AMD B550", "formato": "mATX", "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 4, "memoria_maxima_gb": 128,
+        "quantidade_slots_m2": 2, "quantidade_slots_m2_sata": 1, "quantidade_portas_sata": 4,
+        "wifi_integrado": true, "padrao_wifi": "Wi-Fi 5 (802.11ac)", "versao_bluetooth": "4.2",
+        "observacoes_medidas": "M2_1 suporta SSD PCIe ou SATA 2242/2260/2280; M2_2 suporta PCIe 3.0 x4 nos mesmos comprimentos, não SATA. Geração PCIe e suporte de CPU dependem do processador/BIOS. A-XMP, ECC e frequência exigem confirmação na QVL."
+      }
+    },
+    {
+      "categoria": "air_cooler", "fabricante": "Cooler Master", "modelo": "V4 Alpha 3DHP Black", "part_numbers": ["MAZ-T2HP-217PK-R1"],
+      "aliases_catalogo": [{"fabricante": "Cooler Master", "modelo": "V4 ALPHA 3DHP", "part_number": "SEED-ACOOL-12", "produto_kabum": "1002624"}],
+      "fonte": "https://www.coolermaster.com/en-global/products/v4-alpha-3dhp-black.html", "verificado_em": "2026-10-23",
+      "medidas": {
+        "comprimento_mm": 133, "largura_mm": 114, "altura_mm": 161,
+        "compatibilidade": "LGA1851, LGA1700, LGA1200, LGA1151, LGA1150, LGA1155, LGA1156, AM5, AM4",
+        "quantidade_fans": 2, "tamanho_fan_mm": 120, "espessura_fan_mm": 25,
+        "conector_fan": "4-pin PWM", "tensao_fan_v": 12,
+        "observacoes_medidas": "Dimensões do conjunto com fans. Conferir folgas com RAM/dissipadores e kit de montagem do socket; as duas fans do air cooler não ocupam posições de fans do gabinete."
+      }
+    },
+    {
+      "categoria": "air_cooler", "fabricante": "Deepcool", "modelo": "ASSASSIN IV", "part_numbers": ["R-ASN4-BKNNMT-G"],
+      "aliases_catalogo": [{"fabricante": "Deepcool", "modelo": "Assassin Iv", "part_number": "SEED-ACOOL-04", "produto_kabum": "505785"}],
+      "fonte": "https://www.deepcool.com/products/Cooling/cpuaircoolers/Assassin-IV-Premium-CPU-Air-Cooler-1700-AM5/2023/17129.shtml", "verificado_em": "2026-10-23",
+      "medidas": {
+        "comprimento_mm": 144, "largura_mm": 147, "altura_mm": 164,
+        "compatibilidade": "LGA2066, LGA2011-v3, LGA2011, LGA1700, LGA1200, LGA1151, LGA1150, LGA1155, AM5, AM4",
+        "quantidade_fans": 2, "espessura_fan_mm": 25, "tamanhos_fans_cooler_mm": [140, 120],
+        "placas_mae_incompativeis": [
+          "ASUS ROG STRIX Z790-H GAMING WIFI", "ASUS ROG STRIX Z690-E GAMING WIFI",
+          "MSI MEG X570 GODLIKE", "MSI B650M APE WIFI", "ASUS ROG CROSSHAIR X670E GENE",
+          "MSI MEG Z790 ACE", "ASUS TUF GAMING B760M-PLUS WIFI", "ASUS ROG STRIX B760-G GAMING WIFI",
+          "ASUS ROG STRIX Z690-F GAMING WIFI", "ASUS ROG STRIX X670E-I GAMING WIFI", "ASUS ROG STRIX Z790-I GAMING WIFI"
+        ],
+        "observacoes_medidas": "Medidas do produto, não apenas do dissipador de 160 mm. Usa fans de dois diâmetros diferentes (140 e 120 mm); não assumir uma única medida de fan. Conferir acessórios e folgas se reposicionar a fan traseira."
+      }
+    },
+    {
+      "categoria": "water_cooler", "fabricante": "MSI", "modelo": "MAG CORELIQUID A12 240", "part_numbers": [],
+      "aliases_catalogo": [{"fabricante": "MSI", "modelo": "MAG Coreliquid A12", "part_number": "SEED-WCOOL-04", "produto_kabum": "716001"}],
+      "fonte": "https://storage-asset.msi.com/datasheet/liquid-cooling/us/MAG-CORELIQUID-A12-240.pdf", "verificado_em": "2026-10-23",
+      "medidas": {
+        "compatibilidade": "LGA1700, LGA1851, AM4, AM5", "tamanho_radiador_mm": 240,
+        "comprimento_radiador_mm": 277, "largura_radiador_mm": 120, "espessura_radiador_mm": 27,
+        "quantidade_fans": 2, "tamanho_fan_mm": 120, "espessura_fan_mm": 25, "comprimento_tubo_mm": 400,
+        "observacoes_medidas": "Radiador externo de 277 mm; espessura radiador + fans de 52 mm sem contar folgas de montagem/conexões. As duas fans inclusas ocupam posições compartilhadas do gabinete."
+      }
+    },
+    {
+      "categoria": "fan", "fabricante": "Deepcool", "modelo": "RF120", "part_numbers": ["DP-FRGB-RF120-1C"],
+      "aliases_catalogo": [{"fabricante": "Deepcool", "modelo": "RF120", "part_number": "SEED-FAN-02", "produto_kabum": "202502"}],
+      "fonte": "https://uk.deepcool.com/products/Cooling/fans/RF120-RGB-PWM-Fan-Single/2021/11901.shtml", "verificado_em": "2026-10-23",
+      "medidas": {
+        "quantidade": 1, "tamanho_mm": 120, "espessura_mm": 25,
+        "conector_fan": "4-pin PWM", "tensao_fan_v": 12, "corrente_fan_a": 0.11,
+        "conector_rgb": "4-pin (+12V-G-R-B)", "tensao_rgb_v": 12,
+        "fluxo_ar_cfm": 56.5, "pressao_estatica_mmh2o": 1.66,
+        "observacoes_medidas": "Unidade avulsa DP-FRGB-RF120-1C, não o kit RF120M de cinco unidades. RGB 12 V de quatro pinos: não conectar diretamente a ARGB 5 V de três pinos. Verificar limite de corrente do header/hub e orientação pelas setas da fan."
+      }
+    },
+    {
+      "categoria": "memoria_ram", "fabricante": "Kingston", "modelo": "FURY Beast KF432C16BB/8", "part_numbers": ["KF432C16BB/8"],
+      "aliases_catalogo": [{"fabricante": "Kingston", "modelo": "Fury Beast 8GB", "part_number": "SEED-RAM-01", "produto_kabum": "172365"}],
+      "fonte": "https://www.kingston.com/datasheets/KF432C16BB_8.pdf", "verificado_em": "2026-10-23",
+      "medidas": {
+        "capacidade_gb": 8, "quantidade_pentes": 1, "ddr": "DDR4", "formato": "UDIMM", "numero_pinos": 288,
+        "altura_mm": 34, "frequencia_mhz": 3200, "latencia": "CL16",
+        "perfis_memoria": "JEDEC: 2400 MT/s CL17 a 1,2 V; XMP 1: 3200 MT/s CL16 a 1,35 V; XMP 2: 3000 MT/s CL15 a 1,35 V",
+        "observacoes_medidas": "Altura com dissipador. 3200 MT/s requer o perfil correspondente e suporte da CPU/BIOS/placa-mãe; não é garantia de operação em qualquer mistura de pentes. Modelo sem sufixo SP."
+      }
+    },
+    {
+      "categoria": "ssd", "fabricante": "Kingston", "modelo": "NV2 500GB", "part_numbers": ["SNV2S/500G"],
+      "aliases_catalogo": [{"fabricante": "Kingston", "modelo": "NV2 500GB", "part_number": "SEED-SSD-01", "produto_kabum": "400945"}],
+      "fonte": "https://www.kingston.com/datasheets/SNV2S_en.pdf", "verificado_em": "2026-10-23",
+      "medidas": {"capacidade_gb": 500, "formato": "M.2 2280", "interface": "PCIe 4.0 x4 NVMe", "comprimento_mm": 80, "largura_mm": 22, "espessura_mm": 2.2, "velocidade_leitura_mbps": 3500, "velocidade_gravacao_mbps": 2100, "durabilidade_tbw": 160, "observacoes_medidas": "Velocidades sequenciais anunciadas para esta capacidade; dependem do sistema/uso. M.2 NVMe não equivale a M.2 SATA. Endurance não é previsão de vida útil restante."}
+    },
+    {
+      "categoria": "ssd", "fabricante": "Kingston", "modelo": "NV2 1TB", "part_numbers": ["SNV2S/1000G"],
+      "aliases_catalogo": [{"fabricante": "Kingston", "modelo": "NV2 1TB", "part_number": "SEED-SSD-02", "produto_kabum": "400812"}],
+      "fonte": "https://www.kingston.com/datasheets/SNV2S_en.pdf", "verificado_em": "2026-10-23",
+      "medidas": {"capacidade_gb": 1000, "formato": "M.2 2280", "interface": "PCIe 4.0 x4 NVMe", "comprimento_mm": 80, "largura_mm": 22, "espessura_mm": 2.2, "velocidade_leitura_mbps": 3500, "velocidade_gravacao_mbps": 2100, "durabilidade_tbw": 320, "observacoes_medidas": "Desempenho anunciado específico de 1 TB, não usar a velocidade de gravação do NV2 de 2/4 TB. Conferir suporte NVMe e comprimento 2280 no slot."}
+    },
+    {
+      "categoria": "ssd", "fabricante": "Kingston", "modelo": "NV3 500GB M.2 2280", "part_numbers": ["SNV3S/500G"],
+      "aliases_catalogo": [
+        {"fabricante": "Kingston", "modelo": "NV3", "part_number": "SEED-SSD-03", "produto_kabum": "621161"},
+        {"fabricante": "Kingston", "modelo": "Nv3 500 Gb Nvme M.2 2280", "part_number": "SEED-SSD-06", "produto_kabum": "632571"}
+      ],
+      "fonte": "https://www.kingston.com/datasheets/SNV3S_en.pdf", "verificado_em": "2026-10-23",
+      "medidas": {"capacidade_gb": 500, "formato": "M.2 2280", "interface": "PCIe 4.0 x4 NVMe", "comprimento_mm": 80, "largura_mm": 22, "espessura_mm": 2.3, "velocidade_leitura_mbps": 5000, "velocidade_gravacao_mbps": 3000, "durabilidade_tbw": 160, "observacoes_medidas": "Ficha da variante SNV3S M.2 2280; não aplicar ao SNV3SM3 M.2 2230. Velocidades anunciadas dependem de sistema/uso e capacidade."}
+    },
+    {
+      "categoria": "ssd", "fabricante": "Kingston", "modelo": "NV3 1TB M.2 2280", "part_numbers": ["SNV3S/1000G"],
+      "aliases_catalogo": [
+        {"fabricante": "Kingston", "modelo": "1TB Nv3 M.2 Nvme PCIe 4", "part_number": "SEED-SSD-04", "produto_kabum": "633107"},
+        {"fabricante": "Kingston", "modelo": "Nv3 1TB M.2 2280 Nvme Gen4", "part_number": "SEED-SSD-22", "produto_kabum": "1021928"}
+      ],
+      "fonte": "https://www.kingston.com/datasheets/SNV3S_en.pdf", "verificado_em": "2026-10-23",
+      "medidas": {"capacidade_gb": 1000, "formato": "M.2 2280", "interface": "PCIe 4.0 x4 NVMe", "comprimento_mm": 80, "largura_mm": 22, "espessura_mm": 2.3, "velocidade_leitura_mbps": 6000, "velocidade_gravacao_mbps": 4000, "durabilidade_tbw": 320, "observacoes_medidas": "Ficha SNV3S/1000G, não a variante compacta SNV3SM3. Conferir dissipador e fixação do slot. Velocidades anunciadas não são resultado de benchmark desta máquina."}
+    },
+    {
+      "categoria": "processador", "fabricante": "AMD", "modelo": "Ryzen 7 9800X3D", "part_numbers": ["100-100001084WOF"],
+      "aliases_catalogo": [{"fabricante": "AMD", "modelo": "Ryzen 7 9800X3D", "part_number": "SEED-CPU-01", "produto_kabum": "662405"}],
+      "fonte": "https://www.amd.com/en/products/processors/desktops/ryzen/9000-series/amd-ryzen-7-9800x3d.html", "verificado_em": "2026-10-23",
+      "medidas": {
+        "soquete": "AM5", "nucleo": 8, "thread": 16, "clockbase": 4.7, "clockmax": 5.2,
+        "videointegrado": true, "modelo_videointegrado": "AMD Radeon Graphics (2 núcleos, 2200 MHz)", "cooler": false,
+        "tdp_w": 120, "tipos_memoria_cpu": ["DDR5"], "memoria_maxima_cpu_gb": 256,
+        "observacoes_medidas": "A ficha AMD confirma vídeo integrado, apesar do texto do anúncio vinculado. Não inclui cooler. TDP não é consumo elétrico medido e não substitui o consumo estimado cadastrado. Frequência de RAM depende de número/rank dos pentes, BIOS e placa-mãe; vídeo integrado básico não equivale a uma GPU dedicada para jogos."
+      }
+    },
+    {
+      "categoria": "fonte", "fabricante": "Gigabyte", "modelo": "P650G PCIE 5.1", "part_numbers": ["GP-P650G PG5"],
+      "aliases_catalogo": [{"fabricante": "Gigabyte", "modelo": "P650G PG5", "part_number": "SEED-PSU-02", "produto_kabum": "907600"}],
+      "fonte": "https://www.gigabyte.com/Power-Supply/GP-P650G-PG5/sp", "verificado_em": "2026-10-23",
+      "medidas": {
+        "formato": "ATX", "potencia_w": 650, "versao_atx": "3.1", "certificacao_fonte": "80 PLUS Gold",
+        "dimensoes_fabricante": "150 × 140 × 86 mm (eixos não rotulados na ficha)",
+        "conectores_cpu_eps": 1, "conectores_pcie_8pinos": 2, "conectores_pcie_16pinos": 1, "conectores_sata": 6,
+        "observacoes_medidas": "Contagens são de conectores, não de cabos independentes. Confirmar roteamento/curvatura e requisitos da GPU; presença de conector não certifica distribuição elétrica. A ordem de eixos não foi convertida em comprimento de encaixe sem desenho dimensional."
+      }
     }
   ]
 }

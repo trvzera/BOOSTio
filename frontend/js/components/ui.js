@@ -63,7 +63,7 @@ export function iniciarIcones(raiz = document) {
       const aberto = () => input ? input.checked : controle?.getAttribute("aria-expanded") === "true";
       const invertido = elemento.dataset.lottieReversed === "true";
       const mover = direcao => {
-        if (controle?.disabled || input?.disabled || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        if (controle?.disabled || controle?.getAttribute("aria-current") === "page" || input?.disabled || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
         animacao.setDirection(direcao); animacao.play();
       };
       const atualizarEstado = () => {

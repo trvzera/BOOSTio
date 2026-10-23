@@ -6,6 +6,111 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Navegação, verificação de e-mail e expansão técnica — 23/10/2026
+
+- Footer: hover com cor primária e sublinhado suave apenas sobre o link, incluindo
+  foco de teclado. `navigation-current.js` marca a página atual no footer, hamburger
+  e perfil com `aria-current="page"`: azul fixo, sem fundo/underline/animação no hover
+  ou recarregamento redundante no clique normal. Href e foco são preservados;
+  ações como `?criar=1`, seções e atalhos de abrir link em outra aba continuam livres.
+- Modal de verificação: título azul de 1,5 rem, fonte de corpo Poppins, endereço
+  separado e seis dígitos (corrigido texto antigo de quatro). Fundo escuro mais
+  legível e camada acima da navegação, sem transparência que revele os textos de
+  trás. Mantidos colar código, reenvio, erros e foco/Escape; descrição associada ao diálogo.
+- E-mail: fundo preto, card `#1c1c1e`, borda `#3a3a3c`, azul `#007bff` e textos
+  branco/cinza da identidade. Código sem monoespaçada: Lexend com fallback Arial;
+  corpo Poppins/Arial. Não baixa fontes externas nem exige que o cliente de e-mail
+  suporte webfonts; aparência exata pode variar. Alternativa em texto e proteções
+  de emissão/uso único/expiração permanecem; não houve envio real ou mudança no SMTP.
+- O manifesto agora tem 25 variantes e complementa 27 dos 1.535 cadastros na
+  leitura atual. A ampliação desta rodada cobre A520M-K/A520M-A PRO/B550M PRO-VDH
+  WIFI, ASSASSIN IV/V4 Alpha/A12 240, RF120 avulsa, Fury KF432C16BB/8, NV2/NV3
+  500 GB/1 TB, Ryzen 7 9800X3D e P650G PG5. Novos campos também chegam ao prompt
+  quando relevantes. Nenhuma migração, coleta de preço/imagem ou chamada LLM.
+- A ficha AMD do 9800X3D confirma Radeon integrada, ausência de cooler e TDP 120 W.
+  TDP fica separado: não vira consumo elétrico medido nem altera silenciosamente
+  o consumo estimado cadastrado. Perfis de RAM não equivalem a OC garantido.
+- A fan RF120 desta ficha é uma unidade, com RGB 12 V de quatro pinos e PWM;
+  não confundir com kit de cinco nem conectar RGB 12 V diretamente a ARGB 5 V.
+  SSDs usam os valores da capacidade correta e distinguem M.2 2280 de 2230.
+- O ASSASSIN IV tem lista oficial de exceções de placa-mãe. Python e JS bloqueiam
+  os modelos exatos dessa lista, mesmo sem gabinete selecionado. Ausência na lista
+  não certifica as demais combinações; nenhuma equivalência aproximada foi criada.
+
+Revisão ainda necessária, sem sobrescrever dados ambíguos: SEED-RAM-03 está como
+DDR5 no cadastro, mas aponta para anúncio do DDR4 KF432C16BB/16 (402907);
+SEED-MB-07 aponta para PRO B760M-P DDR4 apesar do cadastro DDR5; SEED-MB-03 aponta
+para B550M DS3H AC R2 com nome abreviado; SEED-MB-22 aponta para a variante D5.
+Esses casos não receberam fichas de outra variante. Links não são prova de toda a
+identidade técnica. Corrigir catálogo/modelo/anúncio exige revisão própria.
+
+O usuário autorizou commit/push depois dos testes, incluindo o complemento da
+rodada anterior. As mudanças locais de imagens/home/animação ficam fora do commit.
+
+Validação desta rodada: 408 testes Node, 533 Python (+13 subtestes), 341 verificações
+das fichas no Chrome, 78 do footer/menu/modal/e-mail, 36 de compartilhamento/modelos
+e 63 de páginas afetadas/modelos em 320/768/1440 px, sem exceções/overflow/violações
+axe nas telas auditadas. E-mail só renderizado em prévia local, sem envio SMTP real.
+
+### Enriquecimento técnico reversível — 23/10/2026
+
+Registro da rodada inicial, entregue **sem commit/push** naquele momento, sem
+migração, coleta ou escrita no banco; a autorização posterior está no bloco acima.
+O complemento compartilhado passou de cinco para onze variantes, consultadas em
+fontes oficiais. Cada ficha nova registra `fonte`, `verificado_em` e o modelo oficial.
+
+- TD500 Mesh V2 White: limites de GPU/cooler/fonte, sete slots, baias e posições
+  alternativas de fans/radiadores; três fans de 120 mm de fábrica contam na ocupação.
+- RTX 5070 EAGLE OC SFF 12G: comprimento/altura/espessura, barramento de 192 bits e
+  conector de 16 pinos. Não foi inferida uma quantidade de slots a partir da espessura.
+- Hyper 212 3DHP Black ARGB: altura real de 158 mm, demais eixos e lista de sockets.
+- CX650 CP-9020278-BR: comprimento de 125 mm, sem aplicar a outras revisões da CX650.
+  A ficha oficial brasileira estava indexada, mas o acesso direto retornou 404 na
+  consulta; revalidar a disponibilidade desse endereço antes de ampliar a coleta.
+- ASRock A620AM Pro RS: AM5/DDR5, quatro slots, limite anunciado de 256 GB,
+  três M.2 para SSD PCIe/NVMe e duas portas SATA. O Key E para Wi-Fi não soma um SSD.
+  Não foi inventada frequência máxima comum, pois as seções da ficha divergem em OC.
+- MSI MAG CORELIQUID A13 240: radiador externo de 277 × 119,6 × 27,2 mm e duas
+  fans de 120 × 120 × 25 mm; conjunto de 52,2 mm sem folgas adicionais presumidas.
+
+As fontes oficiais completas ficam em `frontend/data/medidas-fisicas.json`. A
+identidade tradicional continua exigindo categoria/fabricante/modelo/part number.
+Entradas novas podem declarar `aliases_catalogo`: nomes e códigos internos exatos
+mais ID de produto KaBuM revisado. Somente HTTPS no domínio exato, sem credenciais,
+redirecionadores ou inferência pelo slug. Esse vínculo não consulta nem certifica
+o anúncio em tempo real. Sem o vínculo esperado, não aplicar o complemento.
+
+Validação: 403 testes Node e 529 Python (+13 subtestes), todos aprovados; 98
+verificações Chrome/axe das seis fichas em 320/768/1440 px, sem exceções, overflow
+ou violações nas telas verificadas. Catálogo real lido sem escrita: as seis fichas
+foram aplicadas e os 16 modelos não apresentaram novos conflitos técnicos. Durante
+a consulta, a PRO B760M-P ficou indisponível; isso é estoque, não falha de encaixe.
+Outras 36 verificações Chrome de compartilhamento/cópia/cota e modelos prontos
+também passaram, com APIs simuladas. A auditoria distingue estoque variável de
+conflito técnico; não pressupõe que todas as ofertas estejam sempre disponíveis.
+
+`Peca.to_catalogo()` expõe os campos sem atualizar o ORM. A montagem automática
+recebe os mesmos dados revisados em `_campos_pecas`; não houve nova chamada LLM.
+O demo usa a mesma identidade e medidas, copiando objetos aninhados. As telas
+mostram variante, fonte/data e posições legíveis; baias/dimensões genéricas antigas
+ficam ocultas quando há dados específicos revisados, sem apagar o registro original.
+
+Limitações preservadas: CPU/BIOS/QVL, corrente/conectores, compartilhamentos não
+documentados e folgas completas de radiador/RAM/GPU continuam não verificados.
+O TD500 Mesh V2 aceita E-ATX com limites de dimensão, não todas as E-ATX; por isso
+não recebe aprovação genérica. A recomendação de 55 mm no topo não virou limite
+certificado do conjunto com fans. A ASRock H610M-HDV/M.2 cadastrada como DDR4 aponta
+para anúncio D5: **não enriquecida**, precisa de revisão do catálogo/anúncio.
+
+Para desfazer só esta experiência, remover as seis novas fichas do manifesto já
+desativa os novos complementos após reiniciar o backend (manifesto em cache por
+processo). Os dados originais seguem no banco. Para remover também a implementação,
+reverter apenas os trechos desta rodada em `models/medidas_fisicas.py`,
+`criar_build_service.py`, `hardware.js`, `catalogo.js`, README/documentação e remover
+os novos `build/medidas-fisicas.js`, `tests/fichas-tecnicas.test.mjs`,
+`tests/fixtures/fichas-tecnicas.json` e `test_fichas_tecnicas.py`. Não restaurar
+globalmente o repositório: imagens, animação e alterações da home já eram locais.
+
 ### Expansão de RAM, verificação de e-mail e fans — 23/10/2026
 
 - O modal de melhorias começa com RAM/SSD/HD, categorias com critérios comparáveis.

@@ -126,7 +126,27 @@ export const rotulosTecnicos = {
   quantidade_slots_m2: "Slots M.2", capacidade_gb: "Capacidade (GB)", ddr: "Geração",
   quantidade_portas_sata:"Portas SATA", quantidade_slots_m2_sata:"Slots M.2 com suporte a SATA",
   portas_sata_desativadas_por_m2_sata:"Portas SATA desativadas por M.2 SATA",
-  comprimento_mm:"Comprimento (mm)", altura_mm:"Altura (mm)",
+  comprimento_mm:"Comprimento (mm)", largura_mm:"Largura (mm)", altura_mm:"Altura (mm)", espessura_mm:"Espessura (mm)",
+  comprimento_radiador_mm:"Comprimento real do radiador (mm)", largura_radiador_mm:"Largura do radiador (mm)",
+  espessura_radiador_mm:"Espessura do radiador (mm)", espessura_fan_mm:"Espessura da fan (mm)", tamanho_fan_mm:"Tamanho da fan (mm)",
+  tamanho_max_fonte_mm:"Comprimento máximo da fonte (mm)", formatos_fonte:"Formatos de fonte aceitos",
+  tamanho_max_altura_gpu_mm:"Altura máxima da GPU (mm)", tamanho_max_espessura_gpu_mm:"Espessura máxima da GPU (mm)",
+  slots_ocupados:"Slots ocupados", baias_25:"Baias de 2,5 polegadas", baias_35:"Baias de 3,5 polegadas",
+  posicoes_fans:"Posições de fans e radiadores", limites_radiador_mm:"Limites do radiador por posição",
+  posicoes_fans_completas:"Lista de arranjos de fans exaustiva", observacoes_medidas:"Condições e folgas a confirmar",
+  fonte_medidas:"Fonte das especificações", modelo_ficha_tecnica:"Variante da ficha oficial",
+  ficha_tecnica_verificada_em:"Ficha consultada em", fluxo_ar:"Fluxo de ar", fonte_fluxo_ar:"Origem da informação de fluxo",
+  numero_pinos:"Pinos", perfis_memoria:"Perfis JEDEC/XMP", durabilidade_tbw:"Endurance anunciada (TBW)",
+  conector_fan:"Conector da fan", tensao_fan_v:"Tensão da fan (V)", corrente_fan_a:"Corrente da fan (A)",
+  conector_rgb:"Conector da iluminação", tensao_rgb_v:"Tensão da iluminação (V)",
+  fluxo_ar_cfm:"Fluxo de ar anunciado (CFM)", pressao_estatica_mmh2o:"Pressão estática anunciada (mmH₂O)",
+  tamanhos_fans_cooler_mm:"Diâmetros das fans do cooler (mm)", comprimento_tubo_mm:"Comprimento dos tubos (mm)",
+  placas_mae_incompativeis:"Placas-mãe com incompatibilidade declarada pelo fabricante",
+  wifi_integrado:"Wi-Fi integrado", versao_bluetooth:"Versão do Bluetooth", tdp_w:"TDP anunciado (W)",
+  tipos_memoria_cpu:"Tipos de RAM suportados pela CPU", memoria_maxima_cpu_gb:"RAM máxima anunciada pela CPU (GB)",
+  versao_atx:"Versão ATX", certificacao_fonte:"Certificação da fonte", dimensoes_fabricante:"Dimensões informadas pelo fabricante",
+  conectores_cpu_eps:"Conectores CPU/EPS (4+4 pinos)", conectores_pcie_8pinos:"Conectores PCIe (6+2 pinos)",
+  conectores_pcie_16pinos:"Conectores PCIe de 16 pinos", conectores_sata:"Conectores de alimentação SATA",
   radiadores_suportados_mm:"Radiadores suportados (mm)", tamanhos_fan_suportados_mm:"Fans suportadas (mm)",
   quantidade_max_fans:"Posições de fans (total)",
   frequencia_mhz: "Frequência (MHz)", latencia: "Latência", quantidade_pentes: "Pentes no kit",
@@ -151,9 +171,28 @@ export const rotulosTecnicos = {
 
 export function fichaTecnica(peca) {
   const ignorados = new Set(["id", "categoria", "imagem", "preco", "preco_atualizado_em", "link", "part_number", "esgotado", "ofertas"]);
+  // Medidas genéricas antigas não devem contradizer a ficha exata revisada.
+  if (peca.modelo_ficha_tecnica && peca.baias_25 != null && peca.baias_35 != null) ignorados.add("bays_disco");
+  if (peca.modelo_ficha_tecnica && [peca.comprimento_mm,peca.largura_mm,peca.altura_mm].every(v=>v!=null)) ignorados.add("dimensoes");
   return Object.entries(peca).filter(([chave, valor]) => !ignorados.has(chave) && valor != null)
     .map(([chave, valor]) => [
       rotulosTecnicos[chave] || chave.replaceAll("_", " "),
-      typeof valor === "boolean" ? (valor ? "Sim" : "Não") : String(valor),
+      formatarEspecificacao(chave,valor),
     ]);
+}
+
+function formatarEspecificacao(chave,valor) {
+  if (chave === "ficha_tecnica_verificada_em" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) return valor.split("-").reverse().join("/");
+  if (chave === "posicoes_fans" && Array.isArray(valor)) {
+    const fans = lista => (lista || []).map(f => f.quantidade + " × " + f.tamanho_mm + " mm").join(" ou ");
+    return valor.map(p => p.nome + ": " + fans(p.opcoes)
+      + (p.fans_inclusas?.length ? "; de fábrica: " + fans(p.fans_inclusas) : "")
+      + (p.radiadores_mm?.length ? "; radiadores: " + p.radiadores_mm.join(" / ") + " mm" : "; sem radiador indicado"))
+      .join(" · ");
+  }
+  if (typeof valor === "boolean") return valor ? "Sim" : "Não";
+  if (Array.isArray(valor)) return valor.map(v => formatarEspecificacao("",v)).join(", ");
+  if (valor && typeof valor === "object") return Object.entries(valor)
+    .map(([k,v]) => (rotulosTecnicos[k] || k.replaceAll("_"," ")) + ": " + formatarEspecificacao(k,v)).join("; ");
+  return String(valor);
 }
