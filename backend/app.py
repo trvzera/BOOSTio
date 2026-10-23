@@ -13,6 +13,7 @@ from controllers.auth_controller import auth_bp
 from controllers.email_controller import email_bp
 from controllers.benchmark_controller import benchmark_bp
 from controllers.build_controller import build_bp
+from controllers.saude_controller import saude_bp
 from migrations.budget_usuario import registrar_migracao_budget
 from commands.banco import registrar_comandos_banco
 from utils.csrf import configurar_csrf
@@ -49,6 +50,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(email_bp)
 app.register_blueprint(benchmark_bp)
 app.register_blueprint(build_bp)
+app.register_blueprint(saude_bp)
 registrar_migracao_budget(app, db)
 
 registrar_comandos_banco(app)

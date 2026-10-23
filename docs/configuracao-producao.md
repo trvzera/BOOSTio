@@ -120,6 +120,8 @@ Não apague o volume `mysql_data`, que contém os dados. Os volumes `caddy_data`
 `caddy_config` guardam os certificados; `redis_data` guarda os contadores e
 reservas de geração. Verifique `docker compose ps` e os logs da API e do Caddy
 após subir os serviços. Configure backup periódico do MySQL fora da VPS.
+O contêiner da API consulta `/health` internamente. A rota responde 200 quando
+MySQL e Redis estão acessíveis e 503 em caso de falha, sem divulgar detalhes.
 
 Para publicar o conteúdo da pasta `frontend` na raiz do site, use:
 
