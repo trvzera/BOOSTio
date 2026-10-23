@@ -94,19 +94,19 @@ cadastrar o callback: localhost e 127.0.0.1 não compartilham os mesmos cookies.
 
 ### VPS Hostinger com Docker
 
-O `compose.yaml` inicia MySQL, Redis, API, frontend estático e Traefik. Na VPS, aponte os registros
-DNS de `boostio.com.br` e `api.boostio.com.br` para o IP da máquina e libere as
-portas 80 e 443. O Traefik obtém os certificados HTTPS e encaminha o frontend
-ao Nginx e as chamadas da API ao Flask;
-os contêineres de banco, Redis e API não publicam portas externas.
+O Traefik da Hostinger já roda em outra stack. O `compose.yaml` do BOOSTio
+inicia apenas MySQL, Redis, API e frontend estático; as labels de `api` e `web`
+ligam esses contêineres à rede externa `traefik-proxy`. Confirme que essa rede
+existe na VPS (`docker network inspect traefik-proxy`). Aponte os registros DNS
+de `boostio.com.br` e `api.boostio.com.br` para a VPS. O Traefik da Hostinger
+recebe as portas 80 e 443 e usa seu resolvedor `letsencrypt` para o HTTPS.
+Não publique portas da API, banco, Redis ou frontend diretamente no host.
 
 Copie `.env.production.example` para `.env.production` na raiz do projeto e
 preencha as credenciais. Use a mesma senha em `MYSQL_PASSWORD` e na
 `URL_DATABASE`, codificando caracteres especiais da senha na URL. Restrinja o
 arquivo a quem administra a VPS (`chmod 600 .env.production`). Não copie o
 `.env` local para a VPS. O SQLite local continua disponível fora do Docker.
-Preencha também `ACME_EMAIL` com o endereço que receberá avisos do emissor dos
-certificados. O Traefik usa um arquivo de rotas, sem acesso ao socket do Docker.
 
 Na primeira instalação, com o MySQL vazio:
 
@@ -114,14 +114,14 @@ Na primeira instalação, com o MySQL vazio:
 docker compose --env-file .env.production up -d --build db redis
 docker compose --env-file .env.production run --rm api python -m flask --app app banco-preparar
 docker compose --env-file .env.production run --rm api python -m flask --app app pecas-popular
-docker compose --env-file .env.production up -d --build api web traefik
+docker compose --env-file .env.production up -d --build api web
 ```
 
 O comando de preparação do MySQL só aceita um banco vazio. Em novas versões que
 mudem o esquema, faça backup e uma migração específica antes de atualizar a API.
-Não apague o volume `mysql_data`, que contém os dados. O volume `traefik_letsencrypt`
-guarda os certificados; `redis_data` guarda os contadores e
-reservas de geração. Verifique `docker compose ps` e os logs da API e do Traefik
+Não apague o volume `mysql_data`, que contém os dados. O volume `redis_data`
+guarda os contadores e reservas de geração. Os certificados ficam na stack
+Traefik da Hostinger. Verifique `docker compose ps` e os logs da API e do Traefik
 após subir os serviços. Configure backup periódico do MySQL fora da VPS.
 O contêiner da API consulta `/health` internamente. A rota responde 200 quando
 MySQL e Redis estão acessíveis e 503 em caso de falha, sem divulgar detalhes.

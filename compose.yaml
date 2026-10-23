@@ -14,6 +14,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 12
+    labels:
+      - traefik.enable=false
     networks: [backend]
 
   redis:
@@ -27,6 +29,8 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
+    labels:
+      - traefik.enable=false
     networks: [backend]
 
   api:
@@ -50,7 +54,23 @@ services:
       interval: 15s
       timeout: 7s
       retries: 4
-    networks: [backend, proxy]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-proxy
+      - traefik.http.routers.boostio-api.rule=Host(`api.boostio.com.br`)
+      - traefik.http.routers.boostio-api.entrypoints=websecure
+      - traefik.http.routers.boostio-api.tls=true
+      - traefik.http.routers.boostio-api.tls.certresolver=letsencrypt
+      - traefik.http.routers.boostio-api.service=boostio-api
+      - traefik.http.routers.boostio-api.middlewares=boostio-api-security
+      - traefik.http.services.boostio-api.loadbalancer.server.port=8000
+      - traefik.http.middlewares.boostio-api-security.headers.stsSeconds=31536000
+      - traefik.http.middlewares.boostio-api-security.headers.stsIncludeSubdomains=true
+      - traefik.http.middlewares.boostio-api-security.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.boostio-api-security.headers.frameDeny=true
+      - traefik.http.middlewares.boostio-api-security.headers.referrerPolicy=strict-origin-when-cross-origin
+      - traefik.http.middlewares.boostio-api-security.headers.customResponseHeaders.Permissions-Policy=camera=(), microphone=(), geolocation=()
+    networks: [backend, traefik-proxy]
 
   web:
     build:
@@ -62,41 +82,30 @@ services:
     depends_on:
       api:
         condition: service_healthy
-    networks: [proxy]
-
-  traefik:
-    image: traefik:v3.5
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    command:
-      - --providers.file.filename=/etc/traefik/dynamic.yml
-      - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      - --entrypoints.web.http.redirections.entrypoint.to=websecure
-      - --entrypoints.web.http.redirections.entrypoint.scheme=https
-      - --certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:?Defina ACME_EMAIL}
-      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
-      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
-    depends_on:
-      api:
-        condition: service_healthy
-      web:
-        condition: service_started
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./deploy/traefik-dynamic.yml:/etc/traefik/dynamic.yml:ro
-      - traefik_letsencrypt:/letsencrypt
-    networks: [proxy]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-proxy
+      - traefik.http.routers.boostio-web.rule=Host(`boostio.com.br`)
+      - traefik.http.routers.boostio-web.entrypoints=websecure
+      - traefik.http.routers.boostio-web.tls=true
+      - traefik.http.routers.boostio-web.tls.certresolver=letsencrypt
+      - traefik.http.routers.boostio-web.service=boostio-web
+      - traefik.http.routers.boostio-web.middlewares=boostio-web-security
+      - traefik.http.services.boostio-web.loadbalancer.server.port=80
+      - traefik.http.middlewares.boostio-web-security.headers.stsSeconds=31536000
+      - traefik.http.middlewares.boostio-web-security.headers.stsIncludeSubdomains=true
+      - traefik.http.middlewares.boostio-web-security.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.boostio-web-security.headers.frameDeny=true
+      - traefik.http.middlewares.boostio-web-security.headers.referrerPolicy=strict-origin-when-cross-origin
+      - traefik.http.middlewares.boostio-web-security.headers.customResponseHeaders.Permissions-Policy=camera=(), microphone=(), geolocation=()
+    networks: [traefik-proxy]
 
 volumes:
   mysql_data:
   redis_data:
-  traefik_letsencrypt:
 
 networks:
   backend:
     internal: true
-  proxy:
+  traefik-proxy:
+    external: true
