@@ -90,6 +90,14 @@ class FpshqService:
             if salvo:
                 return {**deepcopy(salvo[1]), "cache": True, "desatualizado": True}
             raise erro from causa
+        if 300 <= resposta.status_code < 400:
+            # A API pública chegou a redirecionar para uma página externa de
+            # hospedagem inativa. Nunca seguir destinos fornecidos pelo provedor.
+            erro = self._falhar("A FPSHQ está redirecionando a consulta em vez de fornecer dados. O serviço de jogos está indisponível; nenhum FPS foi estimado.",
+                                "redirecionamento", 503, 60)
+            if salvo:
+                return {**deepcopy(salvo[1]), "cache": True, "desatualizado": True}
+            raise erro
         if resposta.status_code == 429:
             espera = self._espera(resposta.headers.get("Retry-After"))
             with self.lock:

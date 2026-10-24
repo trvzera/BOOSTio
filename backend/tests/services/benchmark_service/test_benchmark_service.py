@@ -26,6 +26,28 @@ def cliente(buscar=None, **opcoes):
     return FpshqService(buscar=buscar or Mock(return_value=resposta()), **opcoes)
 
 
+def test_redirecionamento_externo_nao_e_seguido_e_ativa_intervalo():
+    buscar=Mock(return_value=Mock(status_code=302, headers={"Location":"https://externo.invalid/noactive/"}))
+    api=cliente(buscar)
+    for _ in range(2):
+        with pytest.raises(ErroBenchmark) as erro:
+            api.executar("games",{"q":"valorant"},1)
+        assert erro.value.status == 503
+        assert erro.value.codigo == "redirecionamento"
+        assert erro.value.espera == 60
+    assert buscar.call_count == 1
+    assert buscar.call_args.kwargs["allow_redirects"] is False
+
+
+def test_redirecionamento_preserva_resposta_validada_com_aviso_de_desatualizada():
+    tempo=[0]
+    api=cliente(Mock(return_value=Mock(status_code=302, headers={})),relogio=lambda:tempo[0])
+    api.salvar("games",{"q":"valorant"},{"jogos":[{"nome":"Valorant"}]})
+    tempo[0]=3601
+    resultado=api.executar("games",{"q":"valorant"},1)
+    assert resultado["cache"] and resultado["desatualizado"]
+
+
 @pytest.mark.parametrize("campo,valor", [("cpu", None), ("gpu", "../gpu"), ("game", "http://externo.test"), ("res", "8k"), ("preset", "extreme")])
 def test_valida_antes_da_rede(campo, valor):
     api = cliente()
@@ -188,7 +210,7 @@ def test_limites_por_usuario_globais_e_cache_limitado():
         BuscarJogosBenchmarkService(api).executar({"q": "novo"}, 2)
 
 
-@pytest.mark.parametrize("status,esperado", [(404, 404), (503, 503), (302, 502)])
+@pytest.mark.parametrize("status,esperado", [(404, 404), (503, 503), (302, 503)])
 def test_erros_http_sem_cache(status, esperado):
     api = cliente(Mock(return_value=Mock(status_code=status, headers={})))
     with pytest.raises(ErroBenchmark) as erro:
