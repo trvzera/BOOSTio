@@ -219,8 +219,8 @@ A geração pela LLM já revalida conflitos conhecidos no catálogo, incluindo s
 DDR, slots, potência e medidas explícitas. Especificações ausentes continuam não
 verificadas; a configuração não recebe garantia de compatibilidade completa.
 
-O manifesto atual possui 37 fichas revisadas, incluindo gabinetes, GPUs, fontes,
-air/water coolers, placas-mãe, processador, RAM, SSDs e fan. Há limites físicos,
+O manifesto atual possui 48 fichas técnicas, incluindo gabinetes, GPUs, fontes,
+air/water coolers, placas-mãe, processador, RAM, SSDs, fans e periféricos. Há limites físicos,
 slots, perfis JEDEC/XMP, dimensões por capacidade de SSD, conexões RGB/PWM e
 exceções físicas declaradas pelo fabricante do cooler. As fichas só complementam
 cadastros com identidade correspondente; não representam todo o catálogo.
@@ -232,6 +232,12 @@ exatas documentadas; apelidos internos também exigem o anúncio revisado. Sem a
 o banco ou inferir dados de outra revisão. Modelos/links com variantes divergentes
 continuam pendentes de revisão. Isso não certifica BIOS, QVL ou todas as
 interferências físicas.
+
+A base de cadastro inclui **1.542 produtos**, com sete novos modelos de fans,
+periféricos e gabinete identificados por part number. Isso não significa que todos
+tenham preço, estoque ou ficha completa confirmados. A auditoria aponta campos
+técnicos ausentes por categoria; novas peças só entram nas sugestões após cotação
+válida e disponibilidade. Veja as [fontes e os limites da revisão do catálogo](docs/catalogo-e-especificacoes.md).
 
 Saídas inválidas da IA recebem **uma tentativa automática de correção**, com o erro,
 os subtotais calculados pelo servidor e as regras originais. A nova resposta é validada por completo antes
@@ -269,17 +275,19 @@ Service específico, e o SQL especial fica nos Repositories.
 
 ## Diagrama de classes
 
-O diagrama de classes do domínio está sendo finalizado para esta entrega.
-O local previsto é `docs/diagrama-classes.png`; o arquivo e o link de visualização
-ainda precisam ser incluídos antes da submissão. Ele deve refletir as Models
-atuais, incluindo a diferença entre `Build` e `BuildSalva`, cujo estado é JSON.
-O [prompt baseado nas classes atuais](docs/prompt-diagrama-classes.md) está disponível
-para gerar a imagem e conferir seus relacionamentos antes de incluí-la.
+O [diagrama de classes do domínio](docs/diagrama-classes.png) apresenta as Models,
+suas heranças e relações, incluindo a diferença entre `Build` e `BuildSalva`,
+cujo estado é JSON. A [fonte editável em DOT](docs/diagrama-classes.dot) também
+está versionada. A imagem foi preservada dos arquivos de entrega já existentes;
+não representa um diagrama de todos os Services e Controllers.
+
+A [revisão de estrutura](docs/revisao-estrutura.md) explica o papel das pastas,
+os recursos necessários ao site e os arquivos locais/gerados que não entram no PR.
 
 ## Validação da versão
 
-Na revisão de **24/10/2026**, a suíte local aprovou **530 testes JavaScript** e
-**658 testes Python**, além de **13 subtestes Python**. Os testes cobrem, entre
+Na revisão de **24/10/2026**, a suíte local aprovou **538 testes JavaScript** e
+**666 testes Python**, além de **13 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
 Há testes específicos para as sete classes de Controller e para preservar o
