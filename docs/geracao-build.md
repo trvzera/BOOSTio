@@ -19,6 +19,29 @@ O formulário continua usando `POST /build/`, `GerarBuildService` e
 - Núcleos, threads, clocks e velocidades de armazenamento também chegam ao
   prompt quando cadastrados. IDs novos são inteiros; preços vêm do catálogo.
 
+### Preferências e qualidade — complemento de 24/10/2026
+
+- O formulário inclui etapa opcional de aparência com estilo, cor e referência
+  visual de gabinete. `aparencia` é validada e persistida no JSON da build, sem
+  adicionar tabelas ou colunas. Gabinete próprio não é substituído. Referência
+  nova só entra na amostra se disponível e dentro do filtro financeiro; não se
+  torna peça obrigatória. A amostra continua limitada a 12 itens por categoria.
+- A amostragem agora distingue recursos de monitor, teclado, mouse, fone e gabinete.
+  O prompt orienta avaliar adequação/qualidade técnica dos periféricos, sem escolher
+  por padrão o primeiro conjunto econômico, nem equiparar preço/DPI/RGB a qualidade.
+  As sobras continuam com o usuário. Dados ausentes não são completados pela IA.
+- Logs INFO registram duração de catálogo, prompt, LLM e validação e tamanho do
+  prompt. Erros da revisão são classificados sem registrar seu conteúdo. Não há
+  nomes/e-mails, resposta da IA, tokens ou peças próprias nesses logs. Para analisá-los,
+  o logger da aplicação precisa estar configurado para INFO.
+- O carregamento mostra tempo decorrido e informa que pode haver revisão, sem
+  prometer progresso exato. Não acrescenta chamadas, abortos de criação em andamento,
+  fallback pago ou tentativas ilimitadas.
+- Validação desta rodada: testes isolados com saídas controladas e navegação real
+  no Chrome. Não houve novas chamadas Gemini: os problemas dos cenários reais
+  abaixo ainda precisam de homologação online, não são considerados definitivamente
+  resolvidos somente por melhorar o prompt.
+
 ## Revisão e ventilação
 
 - Erros de orçamento recebem subtotais calculados no Python e valores a reduzir,

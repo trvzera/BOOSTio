@@ -6,6 +6,52 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Formulário, conta e diagnóstico — 24/10/2026 (nova rodada)
+
+- Originais da marca, esboços, anotações e termos históricos preservados em
+  `materiais/`. Exportações ficam em `materiais/exportacoes/`, ignoradas no Git;
+  materiais não são enviados na imagem Docker. Nenhum recurso de runtime foi removido.
+- `verification-flow.js` centraliza envio inicial único por destino/página,
+  reenvio manual com intervalo, colagem/autofill e confirmação ao sexto dígito.
+  Eventos repetidos não repetem a mesma tentativa automática; há botão de confirmação
+  como alternativa. Respostas antigas não alteram outro destino. Erros SMTP públicos
+  não expõem o texto da exceção. O limite de tentativas continua no Python.
+- Perfil mostra Google vinculado e existência de senha, nunca `sub`/hash/token.
+  `POST /auth/google/vincular` confirma senha, CSRF, sessão, OAuth state e tempo;
+  o callback existente associa somente uma identidade livre, sem mesclar contas
+  por e-mail. Vínculo revoga outras sessões. Google-only pode criar senha após
+  confirmação recente da mesma identidade. Senha vazia foi bloqueada no servidor.
+  Homologação real do OAuth permanece necessária; nenhum login externo foi executado.
+- Peças próprias recebem sugestões nativas por categoria. Apenas nome completo
+  ou modelo exato e único usa a ficha cadastrada; desconhecidos/ambíguos permanecem
+  a confirmar. F/Ti/DDR e outras variantes não são intercambiadas por aproximação.
+- Sexta etapa opcional de aparência: estilo, cor e até seis gabinetes disponíveis
+  como referência, usando fotos reais/placeholder. Galeria com rolagem interna,
+  navegação por teclado e preferência “nenhuma”; o gabinete próprio é preservado.
+  Preferências validadas por enum/ID no Python e persistidas no JSON da build,
+  sem migração. São flexíveis; não certificam cor, medidas ou encaixe desconhecidos.
+- A amostra para IA preserva recursos de periféricos/gabinetes e uma referência
+  disponível dentro do filtro financeiro. O prompt distingue viabilidade mínima
+  de qualidade; preço, RGB ou DPI isolados não representam desempenho. Mantidos
+  os tetos independentes e sobra dos periféricos com o usuário.
+- Geração mostra tempo decorrido, sem percentual fictício. Logs INFO medem catálogo,
+  prompt, provedor e validação; revisão usa categorias de erro, sem registrar
+  prompt, resposta, nome/e-mail ou modelo de peça própria. Nenhuma chamada LLM real
+  foi consumida nesta rodada; mudanças de qualidade ainda precisam dessa homologação.
+- SSD/HD exibe total em GB/TB, multiplicando as quantidades; 1 TB = 1.000 GB,
+  como capacidade comercial. Itens sem capacidade produzem subtotal parcial.
+- Comprar build voltou a renderizar links quando há acessório de rede pendente:
+  corrigida a variável `itens` fora do escopo. Não abre lojas automaticamente.
+- FPSHQ: chamada pública retornou 302 para hospedagem externa `noactive`; mantida
+  a proibição de redirecionamento e adicionados erro específico/pausa/cache válido.
+  Blender respondeu 200 para Ryzen 5 5600 CPU. Nenhuma das observações garante SLA.
+- Regressão: 558 testes JS e 696 Python (+17 subtestes). Chrome: 221 verificações
+  de aparência, peças próprias, erros de geração e estados Google; mais 76 de OTP
+  e 321 de estados de erro das páginas/modais,
+  em 320/375/768/1440 px e 844 px paisagem, sem falhas. APIs simuladas, catálogo
+  real somente leitura, nenhum e-mail, build ou conta real alterados. Isso não
+  certifica conformidade integral WCAG nem todos os dispositivos.
+
 ### Autoria e desativação — 24/10/2026
 
 - As respostas de build incluem `criador: {nome}` calculado no Python a partir

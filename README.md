@@ -61,10 +61,10 @@ de builds no backend para persistir a configuração na conta.
 
 | Nº | Requisito | Status | Escopo atual |
 | --- | --- | --- | --- |
-| 01 | O sistema deve permitir ao usuário criar sua conta e fazer login | ✅ **Implementado** | Cadastro, autenticação, logout e sessão. |
+| 01 | O sistema deve permitir ao usuário criar sua conta e fazer login | ✅ **Implementado** | Cadastro, autenticação, logout e sessão. Código de e-mail enviado ao iniciar a verificação e conferido ao completar seis dígitos; vínculo Google explícito no perfil, com confirmação de identidade. |
 | 02 | O sistema deve permitir ao usuário cadastrar seu setup atual | ✅ **Implementado** | Definir ou remover uma build como computador atual. |
 | 03 | O sistema deve permitir ao usuário pesquisar compatibilidade e peças | ✅ **Implementado** | Catálogo por categoria e diagnóstico durante a montagem, com as limitações do requisito 13. |
-| 04 | O sistema deve permitir ao usuário montar seu setup atual através de formulário | ✅ **Implementado** | Geração por LLM com orçamento, ventilação obrigatória (contando fans inclusas) e uma revisão automática de saídas inválidas antes de salvar. |
+| 04 | O sistema deve permitir ao usuário montar seu setup atual através de formulário | ✅ **Implementado** | Geração por LLM com orçamento, peças próprias identificadas pelo catálogo, preferências opcionais de gabinete/cor, ventilação obrigatória (contando fans inclusas) e uma revisão automática de saídas inválidas antes de salvar. |
 | 05 | O sistema deve permitir ao usuário salvar configurações de computadores feitas | ✅ **Implementado** | Builds persistidas na conta, inclusive incompletas, com salvamento automático e avisos de falha. |
 | 06 | O sistema deve permitir ao usuário excluir configurações salvas no perfil | ✅ **Implementado** | Exclusão com verificação de proprietário e tranca. |
 | 07 | O sistema deve permitir ao usuário comparar configurações salvas | ✅ **Implementado** | Duas ou três builds: preços, componentes, consumo e renderização no Blender. FPS é uma ampliação pendente, não uma condição da comparação atual. |
@@ -112,6 +112,13 @@ O Python confere os subtotais pelos preços e quantidades do catálogo antes de
 salvar a sugestão. O **frete não está incluído**: é importante reservar parte do
 orçamento para a entrega.
 
+O formulário oferece **estilo do gabinete, cor e referência visual** com fotos
+disponíveis no catálogo, incluindo “sem preferência”. São preferências flexíveis:
+não autorizam exceder o orçamento nem ignorar medidas, ventilação ou estoque.
+Cor e características ausentes não são inventadas. O editor também mostra a
+capacidade total de SSDs/HDs em GB/TB; quando faltam dados, identifica o subtotal
+como parcial.
+
 ## Builds prontas
 
 16 pontos de partida para **estudos, home office, programação, jogos,
@@ -155,7 +162,11 @@ Escolha de jogo, resolução e qualidade gráfica, com **FPS médio** e **1% low
 quando disponíveis. Falhas e ausência de dados não geram FPS inventados.
 
 A FPSHQ apresentou timeouts nas consultas de FPS e jogos em **21 e 22/10/2026**.
-Isso não comprova indisponibilidade global; a consulta depende da resposta do provedor.
+Na consulta pública de **24/10/2026**, respondeu **HTTP 302** para uma página externa
+de hospedagem inativa, em vez do JSON da API. O Python não segue esse destino:
+informa indisponibilidade e aplica uma pausa, preservando apenas cache previamente
+validado com aviso de desatualização. É uma observação deste ambiente e momento,
+não uma garantia sobre o estado permanente do provedor.
 
 Nas builds salvas, **Verificar requisitos** usa o catálogo Python para comparar RAM,
 VRAM dedicada e capacidade/tipo de armazenamento quando há um mínimo oficial
@@ -169,8 +180,8 @@ continuam pendentes: capacidades suficientes não aprovam o computador completo.
 
 Dados públicos de CPU ou GPU, com **mediana em amostras por minuto**, versão do
 Blender, método de renderização e quantidade de resultados. O retorno foi validado
-pelo serviço Python e revalidado com consultas reais em **23/10/2026**, sem garantia
-de disponibilidade permanente.
+pelo serviço Python e revalidado com consultas reais em **23 e 24/10/2026**. A última
+consulta de CPU respondeu HTTP 200, sem garantia de disponibilidade permanente.
 
 A comparação de builds consulta esses dados ao clicar em **Comparar renderização**.
 CPU e GPU são analisadas separadamente; só há classificação quando todas as builds
@@ -215,7 +226,7 @@ Ainda estão em evolução a validação completa de compatibilidade física no
 servidor e a consolidação dos dados usados pelas sugestões e consultas:
 
 - **Compatibilidade:** regras de encaixe e capacidade de fans implementadas no Python e no frontend; ampliar medidas confiáveis por modelo, conectores e interferências. Dados ausentes permanecem não verificados.
-- **Peças próprias:** identificar modelos para avaliar suas especificações reais.
+- **Peças próprias:** ampliar a identificação. O formulário já sugere modelos por categoria e reconhece correspondências exatas e únicas; nomes desconhecidos ou ambíguos continuam a confirmar, sem substituir variantes por aproximação.
 - **Jogos:** ampliar equivalências e recursos de CPU/GPU e requisitos além das capacidades já verificadas.
 - **Preços:** consolidar o monitoramento agendado e a atualização do catálogo.
 - **Desempenho:** concluir a comparação de FPS e tratar a instabilidade das fontes externas.
@@ -251,11 +262,15 @@ quantidades, orçamento e conflitos conhecidos; não garante solução quando o 
 ou o orçamento não permitem a montagem. Falhas de transporte e cotas recebem mensagens próprias.
 
 O planejamento fornece conjuntos de periféricos que cabem na reserva e preserva
-opções de socket, DDR e faixas de preço no catálogo enviado à IA. Fans omitidas
+opções de socket, DDR, recursos dos periféricos e faixas de preço no catálogo enviado
+à IA. O prompt diferencia o conjunto mínimo viável de uma recomendação de qualidade
+e considera referências visuais sem torná-las obrigatórias. Fans omitidas
 podem ser completadas pelo Python somente quando encaixe e orçamento são conhecidos.
 Pedidos exigentes com investimento alto subutilizado podem aproveitar a revisão
 já prevista, sem exigir gasto mínimo ou novas tentativas ilimitadas. Detalhes e
 resultados dos testes estão na [revisão da geração](docs/geracao-build.md).
+Esses ajustes recentes foram validados com respostas controladas; novas chamadas
+reais à LLM e o vínculo com o Google ainda precisam de homologação online.
 
 Em 23/10/2026, um teste isolado pelo fluxo completo do formulário gerou, revisou,
 validou e persistiu uma configuração de estudos em banco temporário. Isso não
@@ -292,12 +307,12 @@ Os originais da marca, esboços e anotações estão reunidos em [materiais](mat
 
 ## Validação da versão
 
-Na revisão de **24/10/2026**, a suíte local aprovou **545 testes JavaScript** e
-**668 testes Python**, além de **13 subtestes Python**. Os testes cobrem, entre
+Na revisão de **24/10/2026**, a suíte local aprovou **558 testes JavaScript** e
+**696 testes Python**, além de **17 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
 Há testes específicos para as sete classes de Controller e para preservar o
-contrato das 34 rotas declaradas, incluindo o blueprint legado de peças, que
+contrato das 35 rotas declaradas, incluindo o blueprint legado de peças, que
 continua fora do registro do aplicativo principal. O catálogo ativo permanece
 em `/build/catalogo`.
 
