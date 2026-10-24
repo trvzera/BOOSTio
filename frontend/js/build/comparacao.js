@@ -2,7 +2,7 @@ import { htmlSeguro as h, moeda, nomePeca, perifericos, acessoriosRede } from ".
 import { normalizarBuild, itensSelecionados } from "./estado.js";
 import { avaliarBuild } from "./compatibilidade.js";
 import { numeroConhecido } from "./hardware.js";
-import { consultarRenderizacoes, classificarRenderizacoes } from "./comparacao-renderizacao.js";
+import { consultarRenderizacoes, classificarRenderizacoes, resumirConsultaRenderizacoes } from "./comparacao-renderizacao.js";
 
 let sequencia = 0;
 const numero = valor => ["number", "string"].includes(typeof valor) && String(valor).trim()
@@ -122,7 +122,7 @@ export function abrirComparacao(builds, catalogo) {
   const dados = [...unicas.values()].map(build => resumirBuild(build, catalogo));
   const selecionadas = new Set(dados.length === 2 ? [0, 1] : []);
   const cacheRender = new Map();
-  let consultaRender, tipoRender = "cpu";
+  let consultaRender, tipoRender = "cpu", pausaRenderAte = 0, timerRender;
   const origem = document.activeElement;
   const dialogo = document.createElement("dialog");
   if (typeof dialogo.showModal !== "function") throw new Error("Este navegador precisa oferecer suporte a dialog nativo.");
@@ -233,7 +233,14 @@ export function abrirComparacao(builds, catalogo) {
       }).join("") + '</div><p class="compare-footnote">Valores cadastrados no catálogo podem ser demonstrativos; não são cotações em tempo real. '
       + 'Orçamento não entra no preço. Acessório de rede a confirmar ou sem cotação deixa o total parcial. '
       + 'O consumo é uma estimativa dos componentes do PC, sem fonte, periféricos e acessórios de rede; não é uma medição na tomada.</p></section>';
+    // Cada card ocupa uma linha para o cabeçalho e uma para cada especificação.
+    // Sem essa contagem, campos novos podem se sobrepor na última linha do subgrid.
+    const colunas = conteudo.querySelector(".compare-columns");
+    const linhas = Math.max(...[...colunas.querySelectorAll(".compare-card")].map(cartao =>
+      1 + cartao.querySelectorAll(".compare-field").length));
+    colunas.style.setProperty("--compare-row-count", String(linhas));
     anunciar("Comparando " + selecionadas.size + " builds.");
+    atualizarPausaRender();
     dialogo.scrollTop = 0;
     if (dialogo.open) focarTitulo();
   }
@@ -279,6 +286,7 @@ export function abrirComparacao(builds, catalogo) {
   });
   dialogo.addEventListener("close", () => {
     consultaRender?.abort();
+    clearInterval(timerRender);
     const ativo = document.activeElement;
     const restaurar = !ativo || ativo === document.body || dialogo.contains(ativo) || ativo === origem;
     dialogo.remove();
@@ -297,6 +305,7 @@ export function abrirComparacao(builds, catalogo) {
   return dialogo;
 
   async function compararRenderizacao(controle) {
+    if (Date.now() < pausaRenderAte) { atualizarPausaRender(); return; }
     consultaRender?.abort();
     const atual = consultaRender = new AbortController();
     const exibidas = [...selecionadas].map(indice => dados[indice].build);
@@ -304,6 +313,8 @@ export function abrirComparacao(builds, catalogo) {
     controle.dataset.disabledReason = "Aguarde a consulta de renderização.";
     const retorno = conteudo.querySelector("[data-render-feedback]");
     retorno.textContent = "Consultando resultados públicos do Blender…";
+    retorno.dataset.tone = "info";
+    conteudo.querySelectorAll("[data-render-build]").forEach(campo => campo.setAttribute("aria-busy","true"));
     try {
       const resultados = await consultarRenderizacoes(exibidas,catalogo,{tipo:tipoRender,signal:atual.signal,cache:cacheRender});
       if (atual.signal.aborted || !dialogo.open) return;
@@ -317,8 +328,33 @@ export function abrirComparacao(builds, catalogo) {
       });
       const nomes = exibidas.filter(build => classificacao.melhores.includes(build.id)).map(build => build.titulo);
       conteudo.querySelector("[data-render-summary]").innerHTML = '<dt class="compare-summary-label">Melhor renderização · ' + tipoRender.toUpperCase() + '</dt><dd class="compare-summary-value">' + h(classificacao.comparavel ? nomes.length > 1 ? "Empate entre " + nomes.length + " builds" : nomes[0] : "Sem classificação") + '</dd><dd class="compare-summary-detail">' + h(classificacao.comparavel ? decimal(classificacao.score) + " amostras/min · mesma versão e método" : classificacao.motivo) + '</dd>';
-      retorno.textContent = "Mais amostras/min é melhor neste teste. CPU e GPU são separadas; RAM, VRAM e a cena podem mudar o desempenho real.";
-    } catch (erro) { if (!atual.signal.aborted) retorno.textContent = erro.message; }
-    finally { if (!atual.signal.aborted) { controle.disabled = false; delete controle.dataset.disabledReason; } }
+      const resumo = resumirConsultaRenderizacoes(resultados);
+      retorno.textContent = resumo.mensagem; retorno.dataset.tone = resumo.tom;
+      if (resumo.espera > 0) {
+        pausaRenderAte = Date.now() + resumo.espera * 1000;
+        clearInterval(timerRender); timerRender = setInterval(atualizarPausaRender,1000);
+      }
+    } catch (erro) { if (!atual.signal.aborted) { retorno.textContent = erro.message; retorno.dataset.tone = "error"; } }
+    finally {
+      if (!atual.signal.aborted) {
+        conteudo.querySelectorAll("[data-render-build]").forEach(campo => campo.setAttribute("aria-busy","false"));
+        controle.disabled = false; delete controle.dataset.disabledReason;
+        atualizarPausaRender();
+      }
+    }
+  }
+
+  function atualizarPausaRender() {
+    const espera = Math.max(0,Math.ceil((pausaRenderAte-Date.now())/1000));
+    const botao = conteudo.querySelector('[data-compare-action="render"]');
+    if (espera) {
+      if (botao) {
+        botao.disabled = true;
+        botao.dataset.disabledReason = "O Blender solicitou uma pausa. Aguarde " + espera + " s.";
+      }
+    } else {
+      clearInterval(timerRender);
+      if (botao) { botao.disabled = false; delete botao.dataset.disabledReason; }
+    }
   }
 }

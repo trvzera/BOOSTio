@@ -1,6 +1,6 @@
 import { categorias, perifericos, acessoriosRede } from "./catalogo.js";
 import { itensSelecionados, itensCategoria, informacoesRam, informacoesArmazenamento, conflitosArmazenamento, selecionarPeca } from "./estado.js";
-import { validarEncaixe, conexaoDisco } from "./hardware.js";
+import { validarEncaixe, conexaoDisco, AVISO_SLOTS_RAM_PROVISORIOS } from "./hardware.js";
 
 export function avaliarBuild(build,catalogo) {
   const get = cat => catalogo.find(p => p.id === itensCategoria(build,cat)[0]?.id && p.categoria === cat);
@@ -31,7 +31,8 @@ export function avaliarBuild(build,catalogo) {
     if (rams[0] && (ram.ddr !== rams[0].peca.ddr || Number(ram.frequencia_mhz) !== Number(rams[0].peca.frequencia_mhz)))
       erros.push("As memórias precisam ter o mesmo padrão DDR e a mesma frequência.");
   }
-  if (placa && infoRam.usados > infoRam.slots) erros.push("Há mais pentes de RAM do que slots disponíveis.");
+  if (placa && infoRam.usados > infoRam.slots) erros.push(infoRam.slotsProvisorios ? "A RAM excede o limite provisório de dois pentes; confirme os slots reais da placa-mãe." : "Há mais pentes de RAM do que slots disponíveis.");
+  if (infoRam.slotsProvisorios) dicas.push(AVISO_SLOTS_RAM_PROVISORIOS);
   if (placa?.memoria_maxima_gb && infoRam.capacidade > Number(placa.memoria_maxima_gb))
     erros.push("A capacidade de RAM supera o máximo informado da placa-mãe.");
   if (new Set(rams.map(r => r.peca.id)).size > 1)
@@ -68,7 +69,7 @@ export function avaliarBuild(build,catalogo) {
     if (placa && discos.m2Sata && discos.limites.m2Sata == null) dicas.push("Confirme quais slots M.2 da placa-mãe aceitam SSD SATA.");
     if (placa && discos.limites.compartilhamentoDesconhecido) dicas.push("Confirme se o SSD M.2 SATA desativa alguma porta SATA da placa-mãe.");
   }
-  const encaixe = validarEncaixe({gpu:get("placa_video"),air:get("air_cooler"),water:get("water_cooler") || (tem("water_cooler") ? {} : null),gabinete,fonte:get("fonte"),
+  const encaixe = validarEncaixe({gpu:get("placa_video"),air:get("air_cooler"),water:get("water_cooler") || (tem("water_cooler") ? {} : null),gabinete,placa,fonte:get("fonte"),
     substituir:build.substituirFansWaterCooler === true,
     discos:itensSelecionados(build,catalogo).filter(p => ["ssd","hd"].includes(p.categoria)),
     fans:itensSelecionados(build,catalogo).filter(p => p.categoria === "fan")});

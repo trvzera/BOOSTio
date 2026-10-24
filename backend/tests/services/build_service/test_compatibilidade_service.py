@@ -56,6 +56,37 @@ def test_ram_conta_kits_e_nao_presume_slots_ou_capacidade():
     assert regra(avaliar(pecas, componentes), "ram-ddr")["status"] == "incompativel"
 
 
+@pytest.mark.parametrize("slots", [None, "", "  ", True, -1, 1.5, "desconhecido"])
+def test_ram_limita_dois_pentes_provisorios_sem_confirmar_slots_ausentes(slots):
+    pecas = [{"id": 1, "categoria": "placa_mae", "tipo_memoria": "DDR4", "quantidade_slots_ram": slots},
+             {"id": 2, "categoria": "memoria_ram", "ddr": "DDR4", "quantidade_pentes": 1, "capacidade_gb": 8}]
+    componentes = {"placa_mae": {"id": 1}, "memoria_ram": [{"id": 2, "quantidade": 2}]}
+    resultado = avaliar(pecas, componentes)
+    assert regra(resultado, "ram-slots")["status"] == "nao_verificado"
+    limite = regra(resultado, "ram-limite-provisorio")
+    assert limite["status"] == "sem_conflitos" and limite["fonte"] == "politica_de_montagem"
+    assert "não confirma" in limite["mensagem"]
+    assert regra(resultado, "ram-capacidade")["status"] == "nao_verificado"
+    componentes["memoria_ram"][0]["quantidade"] = 3
+    assert regra(avaliar(pecas, componentes), "ram-limite-provisorio")["status"] == "incompativel"
+    assert pecas[0]["quantidade_slots_ram"] == slots
+
+
+def test_ram_provisoria_conta_kits_modelos_diferentes_e_respeita_zero_um_e_quatro_confirmados():
+    pecas = [{"id": 1, "categoria": "placa_mae", "quantidade_slots_ram": None},
+             {"id": 2, "categoria": "memoria_ram", "quantidade_pentes": 2},
+             {"id": 3, "categoria": "memoria_ram", "quantidade_pentes": 1}]
+    componentes = {"placa_mae": {"id": 1}, "memoria_ram": [{"id": 2, "quantidade": 1}]}
+    assert regra(avaliar(pecas, componentes), "ram-limite-provisorio")["status"] == "sem_conflitos"
+    componentes["memoria_ram"].append({"id": 3, "quantidade": 1})
+    assert regra(avaliar(pecas, componentes), "ram-limite-provisorio")["status"] == "incompativel"
+    for slots, esperado in [(0, "incompativel"), (1, "incompativel"), (4, "sem_conflitos")]:
+        pecas[0]["quantidade_slots_ram"] = slots
+        resultado = avaliar(pecas, componentes)
+        assert regra(resultado, "ram-slots")["status"] == esperado
+        assert not any(r["codigo"] == "ram-limite-provisorio" for r in resultado["verificacoes"])
+
+
 def test_medida_ausente_ou_ambigua_nao_confirma_encaixe():
     pecas = [{"id": 1, "categoria": "gabinete", "tamanho_max_gpu_mm": 300, "tamanho_max_cooler_mm": 160},
              {"id": 2, "categoria": "placa_video", "modelo": "GPU 280 mm"},

@@ -1,8 +1,8 @@
 from flask import Blueprint,request,jsonify,current_app
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from models import db,Usuario
+from flask_login import login_user, logout_user, login_required
+from models import db
 from sqlalchemy.exc import SQLAlchemyError
-from smtplib import SMTPException, SMTPAuthenticationError, SMTPRecipientsRefused
+from smtplib import SMTPException
 from email_validator import EmailNotValidError
 from utils.decorators import apenas_proprio_usuario
 from utils.limite_requisicoes import limiter, chave_email, chave_usuario
@@ -10,185 +10,174 @@ from utils.limite_requisicoes import limiter, chave_email, chave_usuario
 
 from services.usuario_service.criar_usuario_service import CriarUsuarioService
 from services.usuario_service.deletar_usuario_service import DeletarUsuarioService
-from services.usuario_service.listar_usuarios_service import ListarUsuariosService
 from services.usuario_service.listar_usuario_id_service import ListarUsuarioIdService
 from services.usuario_service.atualizar_usuario_service import AtualizarUsuarioService
 from services.usuario_service.atualizar_budget_usuario_service import AtualizarBudgetUsuarioService
 from services.usuario_service.redefinir_senha_service import RedefinirSenhaService
-from services.email_service.enviar_email_recuperar_service import EnviarEmailRecuperarService
+from services.usuario_service.solicitar_recuperacao_senha_service import SolicitarRecuperacaoSenhaService
 
 
 usuario_bp = Blueprint("usuario", __name__, url_prefix="/usuarios")
 
-@usuario_bp.errorhandler(401)
-def sessao_necessaria(_erro):
-    return jsonify({"erro": "Entre na sua conta para continuar."}), 401
+class UsuarioController:
+    """Controller HTTP do recurso; métodos estáticos não compartilham estado de requisição."""
+
+    @staticmethod
+    @usuario_bp.errorhandler(401)
+    def sessao_necessaria(_erro):
+        return jsonify({"erro": "Entre na sua conta para continuar."}), 401
 
 
-@usuario_bp.put("/<int:usuario_id>/budget")
-@login_required
-@apenas_proprio_usuario
-def atualizar_budget(usuario_id):
-    try:
-        usuario = AtualizarBudgetUsuarioService().executar(usuario_id, request.get_json(silent=True))
-        if usuario is None:
-            return jsonify({"erro": "Usuário não encontrado."}), 404
-        resposta = jsonify({"mensagem": "Budget atualizado com sucesso", "usuario": usuario})
-        resposta.headers["Cache-Control"] = "no-store"
-        return resposta, 200
-    except ValueError as erro:
-        return jsonify({"erro": str(erro)}), 400
-    except SQLAlchemyError:
-        db.session.rollback()
-        return jsonify({"erro": "Não foi possível salvar o budget. Tente novamente."}), 500
+    @staticmethod
+    @usuario_bp.put("/<int:usuario_id>/budget")
+    @login_required
+    @apenas_proprio_usuario
+    def atualizar_budget(usuario_id):
+        try:
+            usuario = AtualizarBudgetUsuarioService().executar(usuario_id, request.get_json(silent=True))
+            if usuario is None:
+                return jsonify({"erro": "Usuário não encontrado."}), 404
+            resposta = jsonify({"mensagem": "Budget atualizado com sucesso", "usuario": usuario})
+            resposta.headers["Cache-Control"] = "no-store"
+            return resposta, 200
+        except ValueError as erro:
+            return jsonify({"erro": str(erro)}), 400
+        except SQLAlchemyError:
+            db.session.rollback()
+            return jsonify({"erro": "Não foi possível salvar o budget. Tente novamente."}), 500
 
-#Faltando buscar por Email e finalizar criar usuario na service.
 
-@usuario_bp.post("/")
-@limiter.limit("5 per hour")
-@limiter.limit("3 per hour", key_func=chave_email)
-def criar_usuario():
-    try:
-        dados = request.get_json() or {}
-        service = CriarUsuarioService()
-        usuario = service.executar(dados)
+    @staticmethod
+    @usuario_bp.post("/")
+    @limiter.limit("5 per hour")
+    @limiter.limit("3 per hour", key_func=chave_email)
+    def criar_usuario():
+        try:
+            dados = request.get_json() or {}
+            service = CriarUsuarioService()
+            usuario = service.executar(dados)
         
-        if usuario:
-            login_user(usuario)
+            if usuario:
+                login_user(usuario)
+
+            return jsonify({
+                "mensagem": "Usuario cadastrado com sucesso",
+                "usuario": usuario.to_dict()
+                }
+            ),201
+        
+        except ValueError as erro:
+            return jsonify({f"erro": f"{str(erro)}"}),400
+    
+        except SQLAlchemyError:
+            db.session.rollback()
+            return jsonify({"erro": "Erro ao salvar o usuario no banco de dados."}), 500
+
+    @staticmethod
+    @usuario_bp.delete("/<int:usuario_id>")
+    @limiter.limit("5 per minute", key_func=chave_usuario)
+    @login_required
+    @apenas_proprio_usuario
+    def excluir_usuario(usuario_id):
+        try:
+            service = DeletarUsuarioService()
+            usuario = service.executar(usuario_id, request.get_json(silent=True))
+
+            if usuario is False:
+                return jsonify({"erro": "Usuario não encontrado."}), 404
+
+            logout_user()
+        
+            return jsonify(""),204
+
+        except ValueError as erro:
+            return jsonify({"erro": str(erro)}), 400
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            print(e)
+            return jsonify({"erro":"Erro ao excluir o usuario do banco de dados"}),500
+
+
+    @staticmethod
+    @usuario_bp.get("/<int:usuario_id>")
+    @login_required
+    @apenas_proprio_usuario
+    def listar_usuario_id(usuario_id):
+        try:
+            service = ListarUsuarioIdService()
+            usuario = service.executar(usuario_id)
+
+            return jsonify({
+                "mensagem":"Usuario encontrado com sucesso",
+                "usuario": usuario,
+                }),200
+
+        except ValueError as erro:
+            return jsonify({"erro":f"{str(erro)}"}),404
+
+    @staticmethod
+    @usuario_bp.put("/<int:usuario_id>")
+    @limiter.limit("5 per minute", key_func=chave_usuario)
+    @login_required
+    @apenas_proprio_usuario
+    def atualizar_usuario(usuario_id):
+        try:
+            dados = request.get_json() or {}
+            service = AtualizarUsuarioService()
+            usuario = service.executar(usuario_id,dados)
+
+            if usuario is None:
+                return jsonify({"erro":"Usuario não encontrado"}),404
+
+            return jsonify({"mensagem":"Usuario atualizado com sucesso"}),200
+
+        except EmailNotValidError:
+            return jsonify({"erro": "Email inexistente"}), 400
+    
+        except ValueError as erro:
+            return jsonify({"erro":f"{str(erro)}"}),400
+    
+        except SQLAlchemyError:
+            db.session.rollback()
+            return jsonify({"erro":"Erro ao atualizar o usuario no banco de dados"})
+
+    @staticmethod
+    @usuario_bp.post("/esqueci-senha")
+    @limiter.limit("10 per hour")
+    @limiter.limit("3 per hour", key_func=chave_email)
+    def esqueci_senha():
+        try:
+            SolicitarRecuperacaoSenhaService().executar(request.get_json(silent=True))
+
+        except (SMTPException, OSError):
+            current_app.logger.warning("Falha no envio de email de recuperação de senha")
+        except ValueError:
+            db.session.rollback()
+        except SQLAlchemyError:
+            db.session.rollback()
+            current_app.logger.error("Falha no banco durante solicitação de recuperação de senha")
 
         return jsonify({
-            "mensagem": "Usuario cadastrado com sucesso",
-            "usuario": usuario.to_dict()
-            }
-        ),201
-        
-    except ValueError as erro:
-        return jsonify({f"erro": f"{str(erro)}"}),400
-    
-    except SQLAlchemyError:
-        db.session.rollback()
-        return jsonify({"erro": "Erro ao salvar o usuario no banco de dados."}), 500
-
-@usuario_bp.delete("/<int:usuario_id>")
-@limiter.limit("5 per minute", key_func=chave_usuario)
-@login_required
-@apenas_proprio_usuario
-def excluir_usuario(usuario_id):
-    try:
-        service = DeletarUsuarioService()
-        usuario = service.executar(usuario_id, request.get_json(silent=True))
-
-        if usuario is False:
-            return jsonify({"erro": "Usuario não encontrado."}), 404
-
-        logout_user()
-        
-        return jsonify(""),204
-
-    except ValueError as erro:
-        return jsonify({"erro": str(erro)}), 400
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        print(e)
-        return jsonify({"erro":"Erro ao excluir o usuario do banco de dados"}),500
-
-
-#Fazer uma verificação de ADM para essa rota
-# @usuario_bp.get("/")
-# @login_required
-# def listar_usuarios():
-#     service = ListarUsuariosService()
-#     usuarios = service.executar()
-
-#     return jsonify({
-#         "mensagem": "usuarios listados com sucesso",
-#         "usuarios": usuarios
-#         }),200
-
-@usuario_bp.get("/<int:usuario_id>")
-@login_required
-@apenas_proprio_usuario
-def listar_usuario_id(usuario_id):
-    try:
-        service = ListarUsuarioIdService()
-        usuario = service.executar(usuario_id)
-
-        return jsonify({
-            "mensagem":"Usuario encontrado com sucesso",
-            "usuario": usuario,
-            }),200
-
-    except ValueError as erro:
-        return jsonify({"erro":f"{str(erro)}"}),404
-
-@usuario_bp.put("/<int:usuario_id>")
-@limiter.limit("5 per minute", key_func=chave_usuario)
-@login_required
-@apenas_proprio_usuario
-def atualizar_usuario(usuario_id):
-    try:
-        dados = request.get_json() or {}
-        service = AtualizarUsuarioService()
-        usuario = service.executar(usuario_id,dados)
-
-        if usuario is None:
-            return jsonify({"erro":"Usuario não encontrado"}),404
-
-        return jsonify({"mensagem":"Usuario atualizado com sucesso"}),200
-
-    except EmailNotValidError:
-        return jsonify({"erro": "Email inexistente"}), 400
-    
-    except ValueError as erro:
-        return jsonify({"erro":f"{str(erro)}"}),400
-    
-    except SQLAlchemyError:
-        db.session.rollback()
-        return jsonify({"erro":"Erro ao atualizar o usuario no banco de dados"})
-
-@usuario_bp.post("/esqueci-senha")
-@limiter.limit("10 per hour")
-@limiter.limit("3 per hour", key_func=chave_email)
-def esqueci_senha():
-    try:
-        dados = request.get_json(silent=True)
-        email = dados.get("email") if isinstance(dados, dict) else None
-        usuario = Usuario.buscar_por_email(email.strip().lower()) if isinstance(email, str) and len(email) <= 150 else None
-
-        #Só envia o email se o usuario existir, mas a resposta é sempre a mesma
-        #pra não revelar se aquele email está cadastrado (evita enumeração de usuarios).
-        if usuario and usuario.ativo:
-            service = EnviarEmailRecuperarService()
-            service.executar(usuario)
-
-    except (SMTPException, OSError):
-        current_app.logger.warning("Falha no envio de email de recuperação de senha")
-    except ValueError:
-        db.session.rollback()
-    except SQLAlchemyError:
-        db.session.rollback()
-        current_app.logger.error("Falha no banco durante solicitação de recuperação de senha")
-
-    return jsonify({
-        "mensagem": "Se esse email estiver cadastrado, um link de recuperação foi enviado."
-    }),200
-
-@usuario_bp.post("/redefinir-senha")
-@limiter.limit("20 per hour")
-def redefinir_senha():
-    try:
-        dados = request.get_json() or {}
-        service = RedefinirSenhaService()
-        usuario = service.executar(dados)
-
-        return jsonify({
-            "mensagem": "Senha redefinida com sucesso",
-            "usuario": usuario
+            "mensagem": "Se esse email estiver cadastrado, um link de recuperação foi enviado."
         }),200
 
-    except ValueError as erro:
-        return jsonify({"erro": str(erro)}),400
+    @staticmethod
+    @usuario_bp.post("/redefinir-senha")
+    @limiter.limit("20 per hour")
+    def redefinir_senha():
+        try:
+            dados = request.get_json() or {}
+            service = RedefinirSenhaService()
+            usuario = service.executar(dados)
 
-    except SQLAlchemyError:
-        db.session.rollback()
-        return jsonify({"erro": "Erro ao redefinir a senha."}), 500
+            return jsonify({
+                "mensagem": "Senha redefinida com sucesso",
+                "usuario": usuario
+            }),200
+
+        except ValueError as erro:
+            return jsonify({"erro": str(erro)}),400
+
+        except SQLAlchemyError:
+            db.session.rollback()
+            return jsonify({"erro": "Erro ao redefinir a senha."}), 500

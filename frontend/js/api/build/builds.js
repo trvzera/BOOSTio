@@ -26,8 +26,8 @@ export function buscarBuild(id) {
   return fetchComErro(`/build/${encodeURIComponent(id)}`, { method: "GET" });
 }
 
-export function catalogoBuilds() {
-  return fetchComErro("/build/catalogo", { method: "GET" });
+export function catalogoBuilds(opcoes = {}) {
+  return fetchComErro("/build/catalogo", { ...opcoes, method: "GET", cache:"no-store" });
 }
 
 export function criarBuildManual(dados) {
@@ -40,6 +40,10 @@ export function atualizarBuild(id, dados) {
 
 export function duplicarBuild(id) {
   return fetchComErro(`/build/${encodeURIComponent(id)}/duplicar`, { method: "POST" });
+}
+
+export function copiarBuildPublica(id) {
+  return fetchComErro(`/build/${encodeURIComponent(id)}/copiar-publica`, {method:'POST'});
 }
 
 export function excluirBuild(id) {

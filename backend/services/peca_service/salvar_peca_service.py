@@ -9,7 +9,7 @@ class SalvarPecaService:
     def executar(self, classe, dados: dict, peca_id: int | None = None):
         if classe not in MODELOS_PECAS:
             raise ValueError("Tipo de peça inválido")
-        peca = db.session.get(classe, peca_id) if peca_id is not None else classe()
+        peca = classe.buscar_por_id(peca_id) if peca_id is not None else classe()
         if peca is None:
             raise ValueError("Peça não encontrada")
         campos = dict(dados)
@@ -31,8 +31,7 @@ class SalvarPecaService:
                 raise ValueError(f"Campo de peça inválido: {campo}")
             setattr(peca, campo, valor)
         try:
-            db.session.add(peca)
-            db.session.commit()
+            peca.salvar()
         except Exception:
             db.session.rollback()
             raise

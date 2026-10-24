@@ -1,3 +1,5 @@
+import { idCompartilhamentoPublico } from './sessao-publica.js';
+
 export const linksVisitante = [
   {pagina:"login.html",rotulo:"Entrar",icone:"login"},
   {pagina:"signin.html",rotulo:"Criar conta",icone:"signup"},
@@ -13,9 +15,11 @@ export const paginasPublicas = new Set([
   "", "index.html", "termos.html", "sobre.html", "contato.html",
   "login.html", "signin.html", "esqueci-senha.html", "reset-senha.html", "erro.html",
 ]);
-export function paginaPrivada(pagina) { return !paginasPublicas.has(pagina); }
-export function redirecionamentoSessao(pagina,autenticado) {
+export function paginaPrivada(pagina,busca = '') {
+  return !(pagina === 'configuracao-build.html' && idCompartilhamentoPublico(busca)) && !paginasPublicas.has(pagina);
+}
+export function redirecionamentoSessao(pagina,autenticado,busca = '') {
   if (autenticado && ["login.html","signin.html"].includes(pagina)) return "index.html";
-  if (!autenticado && paginaPrivada(pagina)) return "login.html";
+  if (!autenticado && paginaPrivada(pagina,busca)) return "login.html";
   return null;
 }

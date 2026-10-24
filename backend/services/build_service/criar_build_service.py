@@ -25,8 +25,9 @@ class CriarBuildService:
     "tamanho_polegadas", "resolucao", "taxa_atualizacao_hz",
     "tipo_painel", "layout", "switch", "mecanico", "dpi_max", "microfone",
     "quantidade_slots_ram", "memoria_maxima_gb", "quantidade_slots_m2",
-    "quantidade_portas_sata", "interface", "compatibilidade", "esgotado",
-    "comprimento_mm", "altura_mm", "tamanho_max_gpu_mm", "tamanho_max_cooler_mm",
+    "quantidade_portas_sata", "quantidade_slots_m2_sata", "portas_sata_desativadas_por_m2_sata",
+    "interface", "compatibilidade", "esgotado",
+    "comprimento_mm", "largura_mm", "altura_mm", "tamanho_max_gpu_mm", "tamanho_max_cooler_mm",
     "suporte_water_cooler", "tamanho_radiador_mm", "radiadores_suportados_mm",
     "quantidade", "tamanho_mm", "quantidade_fans", "tamanho_fan_mm", "fans_inclusos",
     "quantidade_max_fans", "tamanhos_fan_suportados_mm", "posicoes_fans", "posicoes_fans_completas",
@@ -34,6 +35,11 @@ class CriarBuildService:
     "espessura_mm", "tamanho_max_espessura_gpu_mm",
     "comprimento_radiador_mm", "largura_radiador_mm", "espessura_radiador_mm", "espessura_fan_mm",
     "limites_radiador_mm", "fluxo_ar", "fonte_fluxo_ar", "observacoes_medidas",
+    "fonte_medidas", "modelo_ficha_tecnica", "ficha_tecnica_verificada_em",
+    "tipos_memoria_cpu", "memoria_maxima_cpu_gb", "tdp_w", "perfis_memoria", "numero_pinos",
+    "placas_mae_incompativeis",
+    "conector_fan", "tensao_fan_v", "corrente_fan_a", "conector_rgb", "tensao_rgb_v",
+    "conectores_cpu_eps", "conectores_pcie_8pinos", "conectores_pcie_16pinos", "conectores_sata",
     "tamanho_max_fonte_mm", "formatos_fonte", "baias_25", "baias_35",
     "padrao_wifi", "velocidade_mbps", "bluetooth", "categoria", "comprimento_m", "conector",
   )
@@ -58,9 +64,10 @@ class CriarBuildService:
     percentual = dados.get("percentual_perifericos", 0)
     if type(percentual) is not int or not 0 <= percentual <= 99:
       raise ValueError("A porcentagem para periféricos deve ser de 0 a 99")
-    rede = dados.get("rede") or {}
-    if not isinstance(rede, dict):
-      raise ValueError("Dados de rede inválidos")
+    rede = dados.get("rede")
+    if rede is None:
+      rede = {}
+    self._validar_rede(rede)
     proprias = self._pecas_proprias(dados.get("pecas_proprias", {}))
     margem = min(orcamento / 2, max(800, orcamento * 0.25))
 
@@ -101,6 +108,17 @@ class CriarBuildService:
       "incluirPerifericos": percentual > 0, "percentualPerifericos": percentual,
     })
     return AvaliarCompatibilidadeService().para_resposta(BuildSalva.criar_limitada(usuario_id, estado, gerada=dados_build))
+
+  @staticmethod
+  def _validar_rede(rede):
+    if not isinstance(rede, dict) or rede.get("tipo", "indefinido") not in ("wifi", "cabo", "indefinido"):
+      raise ValueError("Dados de rede inválidos")
+    if rede.get("possuiAcessorio") is not None and type(rede["possuiAcessorio"]) is not bool:
+      raise ValueError("Informe se já possui o acessório de rede")
+    for campo, maximo in (("velocidadeMbps", 100000), ("comprimentoCaboM", 1000)):
+      valor = rede.get(campo)
+      if valor is not None and (type(valor) not in (int, float) or not isfinite(valor) or not 0 < valor <= maximo):
+        raise ValueError("Medida de rede inválida: " + campo)
 
   @staticmethod
   def _validar_textos_pedido(dados):
@@ -315,7 +333,11 @@ class CriarBuildService:
         "- A quantidade nunca pode exceder os slots da placa_mae, e a capacidade total "
         "deve respeitar o máximo suportado por ela. Para kits, multiplique quantidade "
         "pelo campo quantidade_pentes para contar os slots; capacidade_gb é a capacidade "
-        "por item do catálogo, e quantidade é o número de itens comprados.\n\n"
+        "por item do catálogo, e quantidade é o número de itens comprados.\n"
+        "- Se quantidade_slots_ram estiver ausente ou inválida, limite provisoriamente "
+        "a configuração inteira a dois pentes (próprios + novos, incluindo todos os kits). "
+        "Esse é um limite da montagem, não uma especificação confirmada. Não invente "
+        "slots nem capacidade máxima; valores cadastrados válidos, inclusive zero ou um, prevalecem.\n\n"
 
         "# VÍDEO INTEGRADO E PLACA DE VÍDEO\n"
         "- Primeiro verifique se o processador escolhido tem vídeo integrado "
@@ -329,6 +351,12 @@ class CriarBuildService:
         "(o PC precisa ter saída de vídeo).\n\n"
 
         "# VENTILAÇÃO E WATER COOLER\n"
+        "- VENTILAÇÃO É OBRIGATÓRIA: nunca entregue uma build sem fans de gabinete. "
+        "Inclua a categoria fan nas peças novas quando não houver fans já possuídas ou "
+        "quantidade positiva confirmada de fans inclusas no gabinete ou no water cooler. "
+        "O cooler do processador não substitui fans de gabinete. Dados ausentes não "
+        "autorizam omitir ventilação: prefira um gabinete com encaixes documentados e "
+        "inclua fans compatíveis. Se não couber no teto, revise a combinação.\n"
         "- Preencha todas as posições de fans cuja capacidade e distribuição estejam confirmadas "
         "no gabinete escolhido, dentro do teto do PC. Conte fans inclusas no gabinete + fans do "
         "water cooler + fans por kit × quantidade de kits novos. Não compre novamente as inclusas. "
@@ -394,6 +422,8 @@ class CriarBuildService:
         "6. Os periféricos respeitam a escolha de inclusão, o teto percentual e as peças já possuídas?\n"
         "7. Há categorias repetidas ou quantidades fora da regra?\n"
         "7.1. O acessório obrigatório de rede foi incluído e as categorias de rede proibidas foram omitidas?\n"
+        "7.2. Há fans na configuração final? Foram contadas as inclusas/fábrica/AIO e "
+        "compradas apenas as faltantes, completando a capacidade cadastrada sem excedê-la?\n"
         "8. A distribuição do orçamento reflete o perfil de uso e inclui "
         "todas as peças necessárias antes dos upgrades?\n"
         "Se alguma verificação falhar, corrija a montagem antes de responder.\n\n"
@@ -444,6 +474,8 @@ class CriarBuildService:
         raise ValueError("Uma peça sugerida está sem preço válido no catálogo. Revise as peças ou tente novamente.")
       if peca.get("esgotado") is True:
         raise ValueError("Uma peça sugerida está indisponível no catálogo. Tente novamente.")
+      if tipo == "fan" and (type(peca.get("quantidade")) is not int or not 1 <= peca["quantidade"] <= 64):
+        raise ValueError("Falta uma quantidade válida de fans por unidade/kit no catálogo. Escolha outro modelo cadastrado.")
       componente["nome"] = f'{peca["fabricante"]} {peca["modelo"]}'
       componente["quantidade"] = quantidade
       componente["preco"] = peca["preco"]
@@ -465,6 +497,11 @@ class CriarBuildService:
     esperado_rede = {acessorio} if acessorio and rede.get("possuiAcessorio") is False and acessorio not in proprias else set()
     if escolhidos_rede != esperado_rede:
       raise ValueError("A IA não respeitou a escolha de conexão da build")
+    if "cabo_rede" in escolhidos_rede and rede.get("comprimentoCaboM"):
+      item = next(c for c in build["componentes"] if c["tipo"] == "cabo_rede")
+      comprimento = pecas[("cabo_rede", item["id"])].get("comprimento_m")
+      if type(comprimento) in (int, float, Decimal) and isfinite(comprimento) and comprimento < rede["comprimentoCaboM"]:
+        raise ValueError("O cabo de rede sugerido é menor que o comprimento solicitado. Escolha outro cabo cadastrado, respeitando o teto do PC.")
     if percentual and not CriarBuildService.PERIFERICOS <= finais:
       raise ValueError("A IA não incluiu os periféricos solicitados. Tente novamente.")
     if not {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"} <= finais or not {"ssd", "hd"} & finais:
@@ -492,6 +529,11 @@ class CriarBuildService:
     if fans and fans["total"] is not None and fans["capacidade"] is not None and fans["total"] < fans["capacidade"]:
       raise ValueError("A IA não completou a ventilação do gabinete: faltam " + str(fans["capacidade"] - fans["total"]) +
                        " fans nas posições cadastradas. Desconte as fans de fábrica e do water cooler, use unidades/kits compatíveis e preserve o teto do PC.")
+    if "fan" not in finais and not any(
+        type((fans or {}).get(campo)) in (int, float) and (fans or {})[campo] > 0
+        for campo in ("inclusas", "radiador")
+    ):
+      raise ValueError("A IA não incluiu fans para a ventilação do gabinete. Inclua fans compatíveis e dentro do teto do PC, sem repetir as inclusas no gabinete ou no water cooler.")
     build["orcamento"] = orcamento
     build["preco_total"] = float(round(total, 2))
     return build

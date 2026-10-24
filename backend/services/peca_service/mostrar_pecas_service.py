@@ -1,22 +1,22 @@
-from models import db,Processador,PlacaMae,PlacaVideo,MemoriaRam,Armazenamento,Fonte
+from models import Processador, PlacaMae, PlacaVideo, MemoriaRAM, SSD, HD, Fonte
 
 class MostrarPecasService:
     def executar(self):
         try:
-            processadores = Processador.query.all()
-            placas_mae = PlacaMae.query.all()
-            placas_video = PlacaVideo.query.all()
-            memorias_ram = MemoriaRam.query.all()
-            armazenamentos = Armazenamento.query.all()
-            fontes = Fonte.query.all()
+            processadores = Processador.mostrar_pecas()
+            placas_mae = PlacaMae.mostrar_pecas()
+            placas_video = PlacaVideo.mostrar_pecas()
+            memorias_ram = MemoriaRAM.mostrar_pecas()
+            armazenamentos = SSD.mostrar_pecas() + HD.mostrar_pecas()
+            fontes = Fonte.mostrar_pecas()
 
             pecas = {
-                "processadores": [processador.to_dict() for processador in processadores],
-                "placas_mae": [placa_mae.to_dict() for placa_mae in placas_mae],
-                "placas_video": [placa_video.to_dict() for placa_video in placas_video],
-                "memorias_ram": [memoria_ram.to_dict() for memoria_ram in memorias_ram],
-                "armazenamentos": [armazenamento.to_dict() for armazenamento in armazenamentos],
-                "fontes": [fonte.to_dict() for fonte in fontes]
+                "processadores": [processador.to_catalogo() for processador in processadores],
+                "placas_mae": [placa_mae.to_catalogo() for placa_mae in placas_mae],
+                "placas_video": [placa_video.to_catalogo() for placa_video in placas_video],
+                "memorias_ram": [memoria_ram.to_catalogo() for memoria_ram in memorias_ram],
+                "armazenamentos": [armazenamento.to_catalogo() for armazenamento in armazenamentos],
+                "fontes": [fonte.to_catalogo() for fonte in fontes]
             }
 
             return pecas

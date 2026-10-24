@@ -38,7 +38,8 @@ test("aviso de frete fica junto ao total e também acompanha a compra da build",
   const css = await readFile(new URL("../styles/build/recursos.css",import.meta.url),"utf8");
   assert.match(editor,/'<\/strong>' \+ avisoFreteHtml\(\) \+ '<div class="summary-power"/);
   assert.match(salva,/class="summary-total">[^\n]+\n\s*\$\{avisoFreteHtml\(\)\}/);
-  assert.match(acoes,/avisoFreteHtml\(\) \+ avisoCompraHtml\(\) \+ '<div class="build-purchase-list"/);
+  assert.match(acoes,/avisoFreteHtml\(\)\+avisoCompraHtml\(\)/);
+  assert.match(acoes,/<div class="build-purchase-list">'\+linhas/);
   assert.match(css,/\.shipping-notice strong \{[^}]*color: var\(--cor-p1\)/);
 });
 

@@ -1,4 +1,5 @@
 from datetime import timezone
+import re
 
 from . import db, ModeloBase
 from .build import Build
@@ -129,7 +130,7 @@ class BuildSalva(ModeloBase):
 
     @classmethod
     def buscar_publica(cls, identificador):
-        if not identificador.startswith("s-") or not identificador[2:].isdigit():
+        if not isinstance(identificador, str) or not re.fullmatch(r"s-[1-9][0-9]{0,17}", identificador):
             return None
         build = db.session.get(cls, int(identificador[2:]))
         return build if build is not None and build.estado.get("visibilidade") == "publico" else None

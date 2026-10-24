@@ -98,13 +98,11 @@ footer {
   color: var(--cor-4);
   position: relative;
   padding-bottom: 3px;
-  transition: 0.2s var(--ease);
+  text-decoration: none;
+  transition: color .22s ease;
 }
 
-.footer-item a:hover,
-#contact-section a:hover,
-#about-section a:hover,
-#terms-link:hover {
+:is(.footer-item a, #contact-section a, #about-section a, #terms-link):not([aria-current="page"]):is(:hover,:focus-visible) {
   color: var(--cor-p1);
 }
 
@@ -113,19 +111,28 @@ footer {
 #about-section a::before,
 #terms-link::before {
   content: "";
-  width: 0%;
+  width: 100%;
   height: 2px;
-  background-color: var(--cor-4);
+  background-color: currentColor;
   position: absolute;
-  bottom: 0;
+  bottom: 6px;
+  left: 0;
   border-radius: 50px;
-  transition: 0.2s var(--ease);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .24s var(--ease), opacity .18s ease;
 }
 
-.footer-item:hover a::before,
-#contact-section a:hover::before,
-#about-section a:hover::before,
-#terms-link:hover::before {
-  width: 100%;
-  background-color: var(--cor-p1);
+:is(.footer-item a, #contact-section a, #about-section a, #terms-link):not([aria-current="page"]):is(:hover,:focus-visible)::before {
+  opacity: 1;
+  transform: scaleX(1);
+}
+:is(.footer-item a, #contact-section a, #about-section a, #terms-link)[aria-current="page"],
+footer a[aria-current="page"] { color: var(--cor-p1); cursor: default; }
+:is(.footer-item a, #contact-section a, #about-section a, #terms-link)[aria-current="page"]::before,
+footer a[aria-current="page"]::before { content: none; }
+@media (prefers-reduced-motion: reduce) {
+  :is(.footer-item a, #contact-section a, #about-section a, #terms-link),
+  :is(.footer-item a, #contact-section a, #about-section a, #terms-link)::before { transition: none; }
 }

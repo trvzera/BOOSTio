@@ -17,6 +17,7 @@ class CriarBuildPerifericosTest(unittest.TestCase):
             tipo: [{"id": indice, "fabricante": "Marca", "modelo": tipo, "preco": 100}]
             for indice, tipo in enumerate(self.tipos, start=1)
         }
+        self.catalogo["gabinete"][0]["fans_inclusos"] = 1
         self.build = {
             "nome": "Setup", "descricao": "Completo", "utilidade": "jogos",
             "componentes": [
@@ -93,6 +94,21 @@ class CriarBuildPerifericosTest(unittest.TestCase):
             rede={"tipo": "wifi", "possuiAcessorio": True},
         )
         self.assertEqual(validada["preco_total"], 1000)
+
+    def test_rede_valida_tipos_medidas_e_valores_finitos(self):
+        CriarBuildService._validar_rede({"tipo": "cabo", "possuiAcessorio": False, "comprimentoCaboM": 10, "velocidadeMbps": 1000})
+        for rede in ([], False, "", {"tipo": "outro"}, {"possuiAcessorio": "false"},
+                     {"comprimentoCaboM": True}, {"comprimentoCaboM": -1},
+                     {"velocidadeMbps": float("nan")}, {"velocidadeMbps": 100001}):
+            with self.subTest(rede=rede), self.assertRaises(ValueError):
+                CriarBuildService._validar_rede(rede)
+
+    def test_cabo_confirmadamente_curto_nao_atende_comprimento_solicitado(self):
+        catalogo = {**self.catalogo, "cabo_rede": [{"id": 21, "fabricante": "Teste", "modelo": "CAT6 1m", "preco": 30, "comprimento_m": 1}]}
+        build = {**self.build, "componentes": [*self.build["componentes"], {"tipo": "cabo_rede", "id": 21, "quantidade": 1}]}
+        with self.assertRaisesRegex(ValueError, "menor que o comprimento"):
+            CriarBuildService._validar_build(build, catalogo, 2000, percentual=20,
+                rede={"tipo": "cabo", "possuiAcessorio": False, "comprimentoCaboM": 10})
 
     def test_prompt_explicita_pares_por_socket_e_rede_sem_certificar_bios(self):
         catalogo = {**self.catalogo,

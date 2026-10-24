@@ -4,6 +4,7 @@ import { carregarCatalogo,categoriasEditor,perifericos,acessoriosRede,moeda,html
 import { abrirBuild,guardarRascunho,buildsLocais,itensCategoria,categoriasMultiplas,informacoesRam,informacoesArmazenamento,motivoSelecao,removerPeca,reduzirQuantidade,linkCompartilhado } from "../build/estado.js";
 import { avaliarBuild,selecionarPecaCompativel } from "../build/compatibilidade.js";
 import { informacoesFans, fluxoFan } from "../build/fans.js";
+import { slotsRam, AVISO_SLOTS_RAM_PROVISORIOS } from "../build/hardware.js";
 import { avisar,copiarTexto,mostrarFalha } from "../build/interface.js";
 import { iconeAnimado,iniciarIcones } from "../components/ui.js";
 import { indicadorBuild,iniciarIndicadores } from "../build/indicador.js";
@@ -15,9 +16,12 @@ import { abrirBenchmark, abrirCompraBuild, abrirDialogoBuild, motivoBenchmark, a
 import { abrirMelhorias } from "../build/melhorias.js";
 import { carregarPerfil } from "../conta/perfil.js";
 import { acompanharCarregamento } from "../components/page-loading.js";
-import { mostrarBuildSalva } from "../build/build-salva.js";
+import { mostrarBuildPublica } from "../build/publica.js";
 import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta, linkBuildConta, estadoParaConta } from "../build/conta.js";
 import { criarBuildManual } from "../api/build/builds.js";
+import { atualizarValor, capturarValores, transicionarValores } from "../components/value-transition.js";
+import { criarHistoricoBuild } from "../build/historico-build.js";
+import { anunciarStatus, cancelarAnuncioStatus } from "../components/status-messages.js";
 
 document.addEventListener("DOMContentLoaded",async () => {
   const main = document.querySelector("#builder-main");
@@ -27,7 +31,7 @@ document.addEventListener("DOMContentLoaded",async () => {
     let buildId = parametros.get("build_id");
     const compartilhada = parametros.get("compartilhar_id");
     if (compartilhada !== null) {
-      await mostrarBuildSalva(main, compartilhada, true);
+      await mostrarBuildPublica(main, compartilhada);
       return;
     }
     if (buildId === null && !parametros.has("id") && !parametros.has("compartilhar")) {
@@ -44,6 +48,14 @@ document.addEventListener("DOMContentLoaded",async () => {
     let tituloSalvo = build.titulo.trim();
     let filaSalvamento = Promise.resolve();
     let falhaSalvamento = null;
+    let revisaoSalvamento = 0;
+    const historico = criarHistoricoBuild();
+    let desfazendo = false;
+    window.addEventListener("pagehide",() => {
+      historico.limpar();
+      const desfazer = main.querySelector("#undo-configuration");
+      if (desfazer) { desfazer.disabled=true; desfazer.dataset.disabledReason=historico.motivo(build); }
+    });
     // Um resumo mais alto que a tela precisa poder subir ao rolar até as ações.
     const observarResumo = typeof ResizeObserver === "function" ? new ResizeObserver(entradas => {
       for (const {target} of entradas) {
@@ -71,6 +83,14 @@ document.addEventListener("DOMContentLoaded",async () => {
     const bloqueado = (condicao,motivo) => condicao ? 'disabled data-disabled-reason="' + h(motivo) + '"' : "";
     const trancada = "Destranque a build para alterar os componentes.";
     const badge = obrigatoria => obrigatoria ? '<span class="component-badge">Obrigatório</span>' : "";
+    function anunciarResumoSalvo() {
+      const total = avaliarBuild(build,catalogo).preco;
+      const saldo = build.orcamento == null ? "" : total > build.orcamento
+        ? " Orçamento excedido em " + moeda(total-build.orcamento) + "."
+        : " Disponível no orçamento: " + moeda(build.orcamento-total) + ".";
+      const nomePendente = conta && build.titulo.trim() !== tituloSalvo ? " Nome pendente; clique em Salvar build e voltar." : "";
+      anunciarStatus(mensagemSalvamento + " Total da build: " + moeda(total) + "." + saldo + nomePendente);
+    }
     function atualizarStatusSalvamento() {
       const status = main.querySelector("#build-autosave-status");
       if (!status) return;
@@ -109,12 +129,13 @@ document.addEventListener("DOMContentLoaded",async () => {
       const detalhe = peca ? "./peca.html?" + new URLSearchParams({id:peca.id,build:build.id}) : "";
       const oferta = peca ? ofertasPeca(peca)[0] : null, ram = categoria === "memoria_ram", multipla = categoriasMultiplas.has(categoria);
       const slotsPlaca = categoria === "placa_mae" && peca ? [
-        peca.quantidade_slots_ram != null && peca.quantidade_slots_ram + " slots de RAM",
+        slotsRam(peca).provisorio ? "Até 2 pentes de RAM (limite provisório)" : slotsRam(peca).slots + " slots de RAM",
         peca.quantidade_slots_m2 != null && peca.quantidade_slots_m2 + " slots M.2",
         peca.quantidade_portas_sata != null && peca.quantidade_portas_sata + " portas SATA",
       ].filter(Boolean).join(" · ") : "";
       const resumo = ram && peca ? item.quantidade + " kit(s) · " + item.quantidade * (peca.quantidade_pentes || 1) + " pentes · " + peca.ddr + " · " + peca.frequencia_mhz + " MHz"
         : categoria === "fan" && peca ? (peca.tamanho_mm ? peca.tamanho_mm + " mm · " : "") + (peca.quantidade || "?") + " fan(s) por kit" + (fluxoFan(peca) === "reverso" ? " · Reverse (identificação do catálogo)" : "")
+        : categoria === "gabinete" && peca ? (peca.fans_inclusos == null ? "Fans inclusas não informadas" : peca.fans_inclusos + " fan(s) inclusa(s)") + " · " + (peca.quantidade_max_fans == null ? "capacidade de fans não informada" : "até " + peca.quantidade_max_fans + " posições no total")
         : slotsPlaca || (peca ? "Selecionado" : "Peça própria · identifique o modelo para validar.");
       const cotacao = peca && Number(peca.preco) > 0;
       const disponibilidade = peca?.esgotado ? "Sem estoque confirmado no catálogo. Consulte a loja ou substitua a peça." : peca && !cotacao ? "Preço ainda não disponível no catálogo." : "";
@@ -122,16 +143,17 @@ document.addEventListener("DOMContentLoaded",async () => {
       if (multipla && peca) { try { selecionarPecaCompativel(build,peca,catalogo); } catch (erro) { razaoDuplicar = erro.message; } }
       const unidades = ram ? item.quantidade * (peca?.quantidade_pentes || 1) : categoria === "fan" ? (Number.isInteger(peca?.quantidade) && peca.quantidade > 0 ? item.quantidade * peca.quantidade : "?") : item.quantidade;
       const nomeUnidades = ram ? "pentes" : categoria === "fan" ? "fans" : "unidades";
+      const chave = h(categoria + ":" + (item.id || item.proprio));
       return '<article class="component-row component-selected glass-card"><div class="component-selected-main"><div class="component-image">' +
         imagemPeca(peca || {categoria}) + '</div><div class="component-copy">' +
         (peca ? '<a class="component-model font-1-m-b" href="' + detalhe + '" aria-label="Ver detalhes de ' + h(titulo) + '">' + h(titulo) + '</a>' : '<h3 class="component-model font-1-m-b">' + h(titulo) + '</h3>') +
         '<p>' + h(resumo) + '</p>' + (disponibilidade ? '<p class="component-availability">' + h(disponibilidade) + '</p>' : '') + '</div><div class="component-purchase">' +
         (peca ? '<a class="component-buy btn-primary" href="' + h(oferta.url) + '" target="_blank" rel="noopener noreferrer" aria-label="' + (oferta.direta ? "Comprar" : "Buscar") + ' ' + h(titulo) + ' na ' + h(oferta.loja) + ' em uma nova aba">' +
-          iconeAnimado("cart") + (oferta.direta ? "Comprar" : "Buscar") + '</a><strong>' + (cotacao ? moeda(peca.preco * item.quantidade) : 'Preço a consultar') + '</strong>' : '<span class="font-2-xs">Já possuo</span>') +
+          iconeAnimado("cart") + (oferta.direta ? "Comprar" : "Buscar") + '</a><strong data-value-key="preco:' + chave + '"' + (cotacao ? ' data-value-number="' + peca.preco * item.quantidade + '"' : '') + '>' + (cotacao ? moeda(peca.preco * item.quantidade) : 'Preço a consultar') + '</strong>' : '<span class="font-2-xs">Já possuo</span>') +
         '</div><button class="component-remove" type="button" data-remove="' + categoria + '" data-item="' + h(item.id || item.proprio) +
         '" aria-label="Remover ' + h(titulo) + '" title="Remover peça" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("trash") + '</button></div>' +
-        (multipla && peca ? '<div class="ram-controls"><span class="component-quantity"><strong>' + unidades + '</strong> ' + nomeUnidades +
-          (peca.capacidade_gb ? '<span>· ' + (peca.capacidade_gb * item.quantidade) + ' GB</span>' : '') + '</span><div><button type="button" class="btn-ghost" data-quantity-reduce="' + h(peca.id) + '" data-quantity-category="' + categoria +
+        (multipla && peca ? '<div class="ram-controls"><span class="component-quantity"><strong data-value-key="quantidade:' + chave + '"' + (Number.isFinite(unidades) ? ' data-value-number="' + unidades + '"' : '') + '>' + unidades + '</strong> ' + nomeUnidades +
+          (peca.capacidade_gb ? '<span>· <span data-value-key="capacidade:' + chave + '" data-value-number="' + peca.capacidade_gb * item.quantidade + '">' + peca.capacidade_gb * item.quantidade + '</span> GB</span>' : '') + '</span><div><button type="button" class="btn-ghost" data-quantity-reduce="' + h(peca.id) + '" data-quantity-category="' + categoria +
           '" aria-label="Diminuir quantidade de ' + h(titulo) + '" ' + bloqueado(build.travada || item.quantidade <= 1,build.travada ? trancada : "Use remover para excluir a última unidade ou kit.") + '>−</button><button type="button" class="btn-ghost" data-quantity-add="' + h(peca.id) +
           '" aria-label="Duplicar ' + h(titulo) + '" ' + bloqueado(Boolean(razaoDuplicar),razaoDuplicar) + '>' + iconeAnimado("plus") + 'Duplicar</button></div></div>' : "") + '</article>';
     }
@@ -150,9 +172,10 @@ document.addEventListener("DOMContentLoaded",async () => {
       const vagasFans = fans ? 'Fans: ' + (fans.total ?? "?") + ' / ' + (fans.capacidade ?? "?") + ' posições' : '';
       const disponivel = categoria.armazenamento && catalogo.some(p => tipos.includes(p.categoria) && (() => { try { selecionarPecaCompativel(build,p,catalogo); return true; } catch { return false; } })());
       const cabecalho = '<div class="component-group-heading"><h2>' + categoria.nome + ' ' + badge(obrigatoria) + '</h2>' +
-        (categoria.id === "memoria_ram" ? '<span class="component-count">' + info.usados + ' / ' + (info.slots || "—") + ' pentes · ' + info.capacidade + ' GB</span>'
+        (categoria.id === "memoria_ram" ? '<span class="component-count">' + info.usados + ' / ' + (info.placa ? info.slots : "—") + ' pentes · ' + info.capacidade + ' GB' + (info.slotsProvisorios ? ' · limite provisório' : '') + '</span>'
           : categoria.armazenamento ? '<span class="component-count">' + discos.ssd + ' SSD · ' + discos.hd + ' HD</span>'
           : fans ? '<span class="component-count">' + vagasFans + '</span>' : "") + '</div>' +
+        (categoria.id === "memoria_ram" && info.slotsProvisorios ? '<p class="component-connections">' + AVISO_SLOTS_RAM_PROVISORIOS + '</p>' : '') +
         (fans ? '<p class="component-connections">' + (fans.selecionadas ?? "?") + ' selecionadas · ' + (fans.inclusas ?? "?") + ' inclusas · ' + (fans.radiador ?? "?") + ' do radiador' +
           (fans.substituidas ? ' · ' + fans.substituidas + ' originais substituídas (sem dupla contagem)' : '') +
           (fans.livres != null ? ' · até ' + fans.livres + ' posições livres, conforme o tamanho' : ' · capacidade não totalmente verificada') + '</p>' : '') +
@@ -172,41 +195,69 @@ document.addEventListener("DOMContentLoaded",async () => {
         '" aria-label="' + h(acao + " " + dica + ": " + categoria.nome + " · " + total + " modelos no catálogo") + '" ' + bloqueado(build.travada,trancada) + '><div><span class="component-empty-label">' + acao + '</span> <p>' + h(dica) +
         '</p></div><span class="component-add" aria-hidden="true">' + iconeAnimado("plus") + '</span></button></article></section>';
     }
-    function renderizar() {
+    function renderizar(recriarOpcoes = false) {
       observarResumo?.disconnect();
+      const valoresAnteriores = capturarValores(main);
       // Preserva o checkbox e sua instância Lottie durante as atualizações da build.
-      const opcoes = main.querySelector(".builder-options");
+      const opcoes = recriarOpcoes ? null : main.querySelector(".builder-options");
       const detalhesAbertos = main.querySelector(".summary-metadata")?.open;
       const resultado = avaliarBuild(build,catalogo);
       const cpuSelecionada = catalogo.find(p => p.categoria === "processador" && p.id === itensCategoria(build,"processador")[0]?.id);
       const avisoVideo = cpuSelecionada?.videointegrado ? '<p class="integrated-video-note">Este processador possui vídeo integrado' + (cpuSelecionada.modelo_videointegrado ? ': ' + h(cpuSelecionada.modelo_videointegrado) : '') + '. ' + (itensCategoria(build,"placa_video").length ? 'A build também inclui uma placa de vídeo dedicada.' : 'É possível usar imagem sem uma placa de vídeo dedicada. Jogos e tarefas gráficas exigentes podem precisar de uma GPU separada.') + '</p>' : '';
       const categorias = categoriasEditor.filter(c => (build.incluirPerifericos || !perifericos.includes(c.id)) && (build.incluirRede || !c.rede));
       main.innerHTML = '<header class="builder-heading"><div><a class="builder-back font-1-xs" href="./builds.html" aria-label="Voltar para Minhas builds">' + iconeAnimado("arrow","back") + 'Voltar para Minhas builds</a><div class="builder-title-line">' +
-        '<h1 id="builder-title">' + h(build.titulo) + '</h1><button type="button" class="builder-rename" id="rename-build" aria-label="Editar nome da build" aria-haspopup="dialog" ' + bloqueado(build.travada,"Destranque a build para alterar o nome.") + '>' + iconeAnimado("pencil") + '</button>' + indicadorBuild(resultado,"compatibility-details") + '</div><p>Configure sua build: escolha os componentes da sua configuração.</p></div><button type="button" class="btn-primary benchmark-trigger" id="benchmark-build" aria-label="Testar build" ' + bloqueado(Boolean(motivoBenchmark(build,catalogo)),motivoBenchmark(build,catalogo)) + '>' + iconeAnimado("magic") + 'Testar build</button></header>' +
+        indicadorBuild(resultado,"compatibility-details") + '<h1 id="builder-title">' + h(build.titulo) + '</h1><button type="button" class="builder-rename" id="rename-build" aria-label="Editar nome da build" aria-haspopup="dialog" ' + bloqueado(build.travada,"Destranque a build para alterar o nome.") + '>' + iconeAnimado("pencil") + '</button></div><p>Configure sua build: escolha os componentes da sua configuração.</p></div><button type="button" class="btn-primary benchmark-trigger" id="benchmark-build" aria-label="Testar build" ' + bloqueado(Boolean(motivoBenchmark(build,catalogo)),motivoBenchmark(build,catalogo)) + '>' + iconeAnimado("magic") + 'Testar build</button></header>' +
         avisoVideo + '<div class="builder-layout"><section class="component-list" aria-label="Componentes"><div class="builder-options"><label class="ui-check font-2-xs"><input type="checkbox" id="include-peripherals" ' + (build.incluirPerifericos ? "checked " : "") +
         bloqueado(build.travada,trancada) + '>' + iconeAnimado("checkbox") + '<span>Incluir periféricos</span></label><label class="ui-check font-2-xs"><input type="checkbox" id="include-network" ' + (build.incluirRede ? "checked " : "") + bloqueado(build.travada,trancada) + '>' + iconeAnimado("checkbox") + '<span>Incluir rede</span></label></div>' + categorias.map(grupo).join("") +
-        '</section><aside class="build-sidebar"><section class="build-summary glass-card"><span class="summary-eyebrow">Total da configuração</span><strong class="summary-total">' + moeda(resultado.preco) +
-        '</strong>' + avisoFreteHtml() + '<div class="summary-power"><span>Consumo estimado do PC</span><strong>' + resultado.watts + ' W</strong></div>' +
+        '</section><aside class="build-sidebar"><section class="build-summary glass-card"><span class="summary-eyebrow">Total da configuração</span><strong class="summary-total" data-value-key="total" data-value-number="' + resultado.preco + '">' + moeda(resultado.preco) +
+        '</strong>' + avisoFreteHtml() + '<div class="summary-power"><span>Consumo estimado do PC</span><strong data-value-key="consumo" data-value-number="' + resultado.watts + '">' + resultado.watts + ' W</strong></div>' +
         '<progress class="summary-progress" value="' + resultado.preenchidos + '" max="' + resultado.total + '" aria-label="Peças selecionadas"></progress><p class="font-2-xs summary-note">' +
-        resultado.preenchidos + ' de ' + resultado.total + ' peças selecionadas</p><details class="summary-metadata" data-animated-details' + (detalhesAbertos ? ' open' : '') + '><summary class="font-1-xs"><span>Nome, descrição e orçamento</span>' + iconeAnimado("chevron") + '</summary><div class="summary-details"><label for="build-name">Nome da build</label><input class="input-text" id="build-name" maxlength="100" value="' +
+        '<span data-value-key="selecionadas" data-value-number="' + resultado.preenchidos + '">' + resultado.preenchidos + '</span> de ' + resultado.total + ' peças selecionadas</p><details class="summary-metadata" data-animated-details' + (detalhesAbertos ? ' open' : '') + '><summary class="font-1-xs"><span>Nome, descrição e orçamento</span>' + iconeAnimado("chevron") + '</summary><div class="summary-details"><label for="build-name">Nome da build</label><input class="input-text" id="build-name" maxlength="100" value="' +
         h(build.titulo) + '" ' + bloqueado(build.travada,trancada) + '><label for="build-visibility">Visibilidade</label><select id="build-visibility" class="input-text" ' + bloqueado(build.travada,trancada) +
         '><option value="privado" ' + (build.visibilidade === "privado" ? "selected" : "") + '>Privada</option><option value="publico" ' + (build.visibilidade === "publico" ? "selected" : "") +
-        '>Pública</option></select><label for="build-description">Descrição</label><textarea class="input-text" id="build-description" rows="4" maxlength="300" ' + bloqueado(build.travada,trancada) + '>' + h(build.descricao) + '</textarea><label for="build-budget">Orçamento desta build (R$)</label><input class="input-text" id="build-budget" type="number" min="0" max="1000000" step="any" inputmode="decimal" value="' + h(build.orcamento ?? "") + '" placeholder="Sem limite definido" ' + bloqueado(build.travada,trancada) + '></div></details><p class="planning-help" id="build-budget-note"></p><p class="build-autosave-status" id="build-autosave-status" role="status" aria-live="polite" data-tone="' + tomSalvamento + '">' + h(mensagemSalvamento) + '</p><button class="btn-primary" type="button" id="save-configuration" aria-label="Salvar build e voltar">Salvar build e voltar</button><button class="btn-secondary" type="button" id="buy-configuration" aria-label="Comprar build" ' + bloqueado(!Object.keys(build.componentes).length,"Adicione uma peça para consultar as lojas.") + '>' + iconeAnimado("cart") + 'Comprar build</button><button class="btn-secondary" type="button" id="improve-configuration" aria-label="Buscar melhorias" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("magnifying") + 'Buscar melhorias</button><button class="btn-secondary" type="button" id="share-configuration" aria-label="Compartilhar build" ' +
+        '>Pública</option></select><label for="build-description">Descrição</label><textarea class="input-text" id="build-description" rows="4" maxlength="300" ' + bloqueado(build.travada,trancada) + '>' + h(build.descricao) + '</textarea><label for="build-budget">Orçamento desta build (R$)</label><input class="input-text" id="build-budget" type="number" min="0" max="1000000" step="any" inputmode="decimal" value="' + h(build.orcamento ?? "") + '" placeholder="Sem limite definido" ' + bloqueado(build.travada,trancada) + '></div></details><p class="planning-help" id="build-budget-note"></p><p class="build-autosave-status" id="build-autosave-status" data-tone="' + tomSalvamento + '">' + h(mensagemSalvamento) + '</p><button class="btn-primary" type="button" id="save-configuration" aria-label="Salvar build e voltar">Salvar build e voltar</button><button class="btn-secondary" type="button" id="buy-configuration" aria-label="Comprar build" ' + bloqueado(!Object.keys(build.componentes).length,"Adicione uma peça para consultar as lojas.") + '>' + iconeAnimado("cart") + 'Comprar build</button><button class="btn-secondary" type="button" id="improve-configuration" aria-label="Buscar melhorias" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("magnifying") + 'Buscar melhorias</button><button class="btn-secondary" type="button" id="share-configuration" aria-label="Compartilhar build" ' +
         bloqueado(build.visibilidade !== "publico","Torne a build pública para compartilhar.") +
         '>Compartilhar</button><p class="summary-note">' + (conta ? 'Soma dos preços disponíveis no catálogo. Peças sem cotação não entram no total. O nome é salvo ao clicar em Salvar.' : 'Preços demonstrativos. Salvamento local neste navegador.') + '</p>' + avisoCompraHtml() +
         (Object.keys(build.pecasExtras || {}).length ? '<p class="summary-note">Peças próprias adicionais: ' + Object.entries(build.pecasExtras).map(([tipo,nome]) => h(tipo === "microfone" ? "Microfone: " : "Webcam: ") + h(nome)).join(" · ") + '.</p>' : "") +
         (build.travada ? '<p class="summary-note">Build trancada. Destranque-a em Minhas builds.</p>' : "") + '</section></aside></div>';
       if (opcoes) main.querySelector(".builder-options").replaceWith(opcoes);
+      main.querySelectorAll('.builder-options input').forEach(input=>input.disabled=build.travada);
+      main.querySelector('.summary-progress').insertAdjacentHTML('afterend','<button type="button" class="btn-secondary" id="undo-configuration" aria-label="Desfazer última alteração de peças" '+bloqueado(Boolean(historico.motivo(build)),historico.motivo(build))+'>Desfazer última alteração</button><p class="summary-note">Histórico desta página; recarregar ou sair do editor limpa o desfazer.</p>');
+      main.querySelector('#undo-configuration').onclick=async()=>{
+        if (desfazendo||historico.motivo(build)) return;
+        desfazendo=true;
+        main.querySelectorAll('button,input,textarea,select').forEach(controle=>controle.disabled=true);
+        try {
+          await filaSalvamento;
+          build=historico.desfazer(build);persistir();
+          if (conta) {await filaSalvamento;if(falhaSalvamento)throw falhaSalvamento;}
+          avisar('Última alteração desfeita.');
+        } catch(erro) {avisar('Não foi possível concluir o desfazer: '+erro.message);}
+        finally {
+          desfazendo=false;renderizar(true);
+          const titulo=main.querySelector('#builder-title');titulo.tabIndex=-1;titulo.focus({preventScroll:true});
+        }
+      };
       const atualizarCustos = () => {
         const total = avaliarBuild(build,catalogo).preco;
-        main.querySelector(".summary-total").textContent = moeda(total);
-        main.querySelector("#build-budget-note").textContent = build.orcamento == null ? "Defina um orçamento para acompanhar o total." : total > build.orcamento ? "Total acima do orçamento em " + moeda(total - build.orcamento) + "." : "Disponível no orçamento: " + moeda(build.orcamento - total) + ".";
-        main.querySelector("#build-budget-note").dataset.tone = build.orcamento != null && total > build.orcamento ? "warning" : "info";
+        atualizarValor(main.querySelector(".summary-total"),moeda(total),total);
+        const nota = main.querySelector("#build-budget-note");
+        const excedeu = build.orcamento != null && total > build.orcamento;
+        const diferenca = build.orcamento == null ? null : build.orcamento - total;
+        if (diferenca == null) nota.textContent = "Defina um orçamento para acompanhar o total.";
+        else {
+          if (!nota.querySelector("[data-value-key]")) nota.innerHTML = '<span data-budget-label></span><span data-value-key="saldo"></span>.';
+          nota.querySelector("[data-budget-label]").textContent = excedeu ? "Total acima do orçamento em " : "Disponível no orçamento: ";
+          atualizarValor(nota.querySelector('[data-value-key="saldo"]'),moeda(Math.abs(diferenca)),diferenca);
+        }
+        nota.dataset.tone = excedeu ? "warning" : "info";
       };
       atualizarCustos();
       main.querySelector("#replace-water-fans")?.addEventListener("change",e => {
         if (build.travada) return;
+        const anterior=structuredClone(build);
         build.substituirFansWaterCooler = e.target.checked;
+        historico.registrar(anterior,build);
         persistir(); renderizar();
       });
       main.querySelector("#build-budget").oninput = e => {
@@ -224,6 +275,13 @@ document.addEventListener("DOMContentLoaded",async () => {
         finally { if (botao.isConnected) botao.disabled = Boolean(motivoBenchmark(build,catalogo)); }
       };
       main.querySelector("#buy-configuration").onclick = () => { try { abrirCompraBuild(build,catalogo); } catch (erro) { avisar(erro.message); } };
+      main.querySelectorAll('.component-buy').forEach(link=>link.addEventListener('click',evento=>{
+        evento.preventDefault();
+        const linha=link.closest('.component-selected'),remover=linha.querySelector('[data-remove]');
+        const categoria=remover.dataset.remove,id=remover.dataset.item;
+        try { abrirCompraBuild({...build,componentes:{[categoria]:itensCategoria(build,categoria).filter(i=>i.id===id)}},catalogo); }
+        catch(erro) { avisar(erro.message); }
+      }));
       main.querySelector("#improve-configuration").onclick = () => {
         try {
           const janela = abrirMelhorias(build,catalogo,async proxima => {
@@ -233,6 +291,7 @@ document.addEventListener("DOMContentLoaded",async () => {
               await filaSalvamento;
               if (falhaSalvamento) { build = anterior; throw falhaSalvamento; }
             }
+            historico.registrar(anterior,build);
             renderizar();
           });
           janela.addEventListener("close",() => { if (janela.returnValue === "aplicar") main.querySelector("#improve-configuration")?.focus({preventScroll:true}); },{once:true});
@@ -251,17 +310,19 @@ document.addEventListener("DOMContentLoaded",async () => {
         if (build.travada) return;
         if (!e.target.checked && perifericos.some(cat => build.componentes[cat]) &&
             !confirm("Remover os periféricos selecionados desta build?")) { e.target.checked = true; return; }
+        const anterior=structuredClone(build);
         build.incluirPerifericos = e.target.checked;
         if (!build.incluirPerifericos) perifericos.forEach(cat => delete build.componentes[cat]);
-        persistir(); renderizar();
+        historico.registrar(anterior,build);persistir(); renderizar();
       });
       if (!opcoes) main.querySelector("#include-network").addEventListener("change",e => {
         if (build.travada) return;
         if (!e.target.checked && acessoriosRede.some(cat => build.componentes[cat]) &&
             !confirm("Remover os acessórios de rede selecionados desta build?")) { e.target.checked = true; return; }
+        const anterior=structuredClone(build);
         build.incluirRede = e.target.checked;
         if (!build.incluirRede) acessoriosRede.forEach(cat => delete build.componentes[cat]);
-        persistir(); renderizar();
+        historico.registrar(anterior,build);persistir(); renderizar();
       });
       main.querySelector("#save-configuration").onclick = async () => {
         try {
@@ -269,7 +330,7 @@ document.addEventListener("DOMContentLoaded",async () => {
           if (invalido) { main.querySelector(".summary-metadata").open = true; invalido.reportValidity(); return; }
           if (!build.titulo.trim()) throw new Error("Informe um nome para a build.");
           if (conta) {
-            if (build.titulo.trim() !== tituloSalvo) persistir(true);
+            if (build.titulo.trim() !== tituloSalvo || falhaSalvamento) persistir(true);
             await filaSalvamento;
             if (falhaSalvamento) throw falhaSalvamento;
           }
@@ -284,30 +345,34 @@ document.addEventListener("DOMContentLoaded",async () => {
         try { if (conta) { await filaSalvamento; if (falhaSalvamento) throw falhaSalvamento; } copiarTexto(conta ? linkBuildConta(build.id) : linkCompartilhado(build)); } catch (erro) { avisar(erro.message); }
       };
       iniciarIndicadores(main); iniciarDetalhesAnimados(main); iniciarIcones(main);
+      transicionarValores(main,valoresAnteriores);
       observarResumo?.observe(main.querySelector(".build-sidebar"));
     }
     function persistir(salvarTitulo = false) {
+      const revisao = ++revisaoSalvamento;
+      cancelarAnuncioStatus({reiniciar:true});
       if (conta) {
         const atual = structuredClone(build);
         if (salvarTitulo) atual.titulo = atual.titulo.trim();
-        mensagemSalvamento = "Salvando na sua conta…";
+        mensagemSalvamento = "Salvando na sua conta…"; tomSalvamento = "info";
         filaSalvamento = filaSalvamento.then(() => {
           if (!salvarTitulo) atual.titulo = tituloSalvo;
           return salvarBuildConta(atual);
         }).then(resposta => {
           falhaSalvamento = null;
           if (salvarTitulo) tituloSalvo = atual.titulo;
-          mensagemSalvamento = "Salvo na sua conta."; tomSalvamento = "info";
+          if (revisao === revisaoSalvamento) { mensagemSalvamento = "Salvo na sua conta."; tomSalvamento = "info"; }
           if (resposta.build?.compatibilidade && JSON.stringify(build.componentes) === JSON.stringify(atual.componentes)) {
             build.compatibilidade = resposta.build.compatibilidade;
             const titulo = main.querySelector('.builder-title-line'), indicador = titulo?.querySelector('.build-indicator');
             if (indicador) { indicador.outerHTML = indicadorBuild(avaliarBuild(build,catalogo),'compatibility-details'); iniciarIndicadores(titulo); }
           }
           atualizarStatusSalvamento();
+          if (revisao === revisaoSalvamento) anunciarResumoSalvo();
         }).catch(erro => {
           falhaSalvamento = erro;
-          mensagemSalvamento = "Não foi possível salvar: " + erro.message; tomSalvamento = "error";
-          avisar(mensagemSalvamento);
+          mensagemSalvamento = "Não foi possível salvar: " + erro.message + " Use Salvar build e voltar para tentar novamente."; tomSalvamento = "error";
+          avisar(mensagemSalvamento,{urgente:true});
           atualizarStatusSalvamento();
         });
       } else {
@@ -317,21 +382,26 @@ document.addEventListener("DOMContentLoaded",async () => {
       } catch (erro) { mensagemSalvamento = "Não foi possível salvar: " + erro.message; tomSalvamento = "error"; }
       }
       atualizarStatusSalvamento();
+      if (!conta) {
+        if (tomSalvamento === "error") avisar(mensagemSalvamento,{urgente:true});
+        else anunciarResumoSalvo();
+      }
     }
     main.addEventListener("click",async e => {
       const botao = e.target.closest("button");
-      if (!botao || botao.disabled) return;
+      if (!botao || botao.disabled || desfazendo) return;
       if (botao.dataset.category) {
         try { if (conta) { await filaSalvamento; if (falhaSalvamento) throw falhaSalvamento; } navegarPara(urlCategoria(botao.dataset.category)); }
         catch (erro) { avisar(erro.message); }
         return;
       }
       try {
+        const anterior=structuredClone(build);
         if (botao.dataset.remove) build = removerPeca(build,botao.dataset.remove,botao.dataset.item);
         else if (botao.dataset.quantityAdd) build = selecionarPecaCompativel(build,catalogo.find(p => p.id === botao.dataset.quantityAdd),catalogo);
         else if (botao.dataset.quantityReduce) build = reduzirQuantidade(build,botao.dataset.quantityCategory,botao.dataset.quantityReduce);
         else return;
-        persistir(); renderizar();
+        historico.registrar(anterior,build);persistir(); renderizar();
       } catch (erro) { avisar(erro.message); }
     });
     renderizar();

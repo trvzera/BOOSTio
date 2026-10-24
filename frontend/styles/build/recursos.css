@@ -96,3 +96,10 @@ body:has(.build-action-dialog[open]), body:has(.compare-dialog[open]) { overflow
   .build-action-actions > *, .builds-toolbar > * { width: 100%; }
   :is(.build-action-actions, .builds-toolbar) > .disabled-tip-anchor > button { width: 100%; }
 }
+.build-public-actions { display: grid; gap: var(--espacamento-12); }
+.build-public-actions > button { width: 100%; }
+.build-public-piece .component-selected-main { grid-template-columns: 44px minmax(0,1fr) auto; }
+@media (max-width: 700px) {
+  .build-public-piece .component-selected-main { grid-template-columns: 44px minmax(0,1fr); }
+  .build-public-piece .component-purchase { grid-column: 1 / -1; grid-row: auto; }
+}

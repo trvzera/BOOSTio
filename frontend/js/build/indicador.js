@@ -13,8 +13,8 @@ export function indicadorBuild(resultado,id) {
   const avaliacao = diagnostico ? '<p class="compatibility-assessment" data-status="' + h(diagnostico.status) + '">' + h(diagnostico.rotulo) + '</p>' +
     (desconhecidas.length ? '<details class="compatibility-unknown"><summary>' + desconhecidas.length + (desconhecidas.length === 1 ? ' verificação sem dados suficientes' : ' verificações sem dados suficientes') + '</summary><ul>' + desconhecidas.map(v => '<li>' + h(v.mensagem) + '</li>').join('') + '</ul></details>' : '') +
     '<p class="compatibility-scope">' + h(diagnostico.aviso || 'Avaliação limitada às especificações disponíveis.') + '</p>' : '';
-  return '<div class="compatibility-popover build-indicator ' + tom + ' information">' +
-    '<button type="button" class="compatibility-trigger" aria-label="' + nome + '" aria-controls="' + h(id) + '" aria-expanded="false"><span class="build-info-icon" aria-hidden="true">i</span></button>' +
+  return '<div class="compatibility-popover build-indicator ' + tom + '">' +
+    '<button type="button" class="compatibility-trigger" aria-label="' + nome + '" aria-controls="' + h(id) + '" aria-expanded="false"></button>' +
       '<div id="' + h(id) + '" class="compatibility-details glass-card" role="region" aria-label="Compatibilidade da build" aria-hidden="true" inert>' +
       '<h3>' + (problemas ? 'O que precisa de atenção' : 'Verificações e dicas') + '</h3>' + avaliacao + '<ul class="compatibility-messages">' + pendencias.map((texto,i) => '<li class="' + (i < resultado.erros.length ? 'error' : i < problemas ? 'warning' : 'tip') + '">' + h(texto) + '</li>').join("") +
       '</ul>' + (!pendencias.length && !diagnostico ? '<p class="compatibility-scope">Sem conflitos nas verificações disponíveis. Isso não confirma especificações ausentes.</p>' : '') + '</div></div>';
@@ -34,6 +34,7 @@ export function iniciarIndicadores(raiz) {
       botao.setAttribute("aria-expanded",String(aberto));
       painel.setAttribute("aria-hidden",String(!aberto)); painel.inert = !aberto;
       if (aberto) {
+        painel.style.left = '0px'; painel.style.right = 'auto';
         painel.style.marginRight = '0px';
         const ancora = botao.getBoundingClientRect();
         const abaixo = innerHeight - ancora.bottom - 26, acima = ancora.top - 26;
@@ -43,8 +44,8 @@ export function iniciarIndicadores(raiz) {
         painel.style.bottom = inverter ? 'calc(100% + 10px)' : 'auto';
         painel.style.maxHeight = Math.max(80,Math.min(innerHeight * .7,inverter ? acima : abaixo)) + 'px';
         const rect = painel.getBoundingClientRect();
-        const ajuste = rect.left < 16 ? rect.left - 16 : rect.right > innerWidth - 16 ? rect.right - (innerWidth - 16) : 0;
-        painel.style.marginRight = ajuste + 'px';
+        const ajuste = rect.left < 16 ? 16 - rect.left : rect.right > innerWidth - 16 ? innerWidth - 16 - rect.right : 0;
+        painel.style.left = ajuste + 'px';
       }
     };
     const fechar = () => { fixo = false; mostrar(false); };

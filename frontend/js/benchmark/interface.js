@@ -5,7 +5,7 @@ import { resultadoDesempenhoHtml,resolucoesHtml } from "./view.js";
 import { definirDetalheAberto,iniciarDetalhesAnimados } from "../components/animated-details.js";
 import { iniciarRequisitosBuild } from "./requisitos.js";
 
-export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERENCIA_FPS,buildId = null,cliente = criarClienteBenchmark()} = {}) {
+export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERENCIA_FPS,buildId = null,publica = false,cliente = criarClienteBenchmark()} = {}) {
   const localizar = seletor => raiz.querySelector(seletor.replaceAll("#fpshq-","#" + prefixo + "-"));
   const form = localizar("#fpshq-test-form");
   if (!form || form.dataset.benchmarkReady) return;
@@ -21,7 +21,7 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
   const painel = localizar(".fpshq-panel"), vazio = localizar("#fpshq-empty");
   const interfaces = localizar("#fpshq-layouts");
   const consulta = form.querySelector('button[type="submit"]');
-  const requisitos = iniciarRequisitosBuild(raiz,{prefixo,buildId,cliente});
+  const requisitos = iniciarRequisitosBuild(raiz,{prefixo,buildId,cliente,publica});
   iniciarDetalhesAnimados(raiz);
   // Uma só interface de dados: trocar o layout não recria o DOM nem consulta a API.
   const aplicarInterface = opcao => {

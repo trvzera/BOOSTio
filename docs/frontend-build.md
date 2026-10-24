@@ -6,6 +6,563 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Ficha da peça e requisito 13 — 23/10/2026
+
+- RF13 marcado como implementado no escopo de exibir o diagnóstico de compatibilidade,
+  consumo estimado e informações técnicas cadastradas. Isso não certifica combinações
+  sem dados nem significa que todas as fichas do catálogo estejam completas.
+- A página da peça destaca informações próprias de cada categoria, incluindo socket,
+  slots, memória, medidas e ventilação. Campos importantes ausentes mostram “Não informado”,
+  sem inventar capacidade ou aprovar um encaixe desconhecido.
+- Ficha organizada em identificação, desempenho/consumo, compatibilidade/instalação,
+  recursos e origem das informações, com fonte/data quando cadastradas. Valores e
+  observações são escapados; grupos vazios não aparecem. Mantidos Lexend/Poppins e
+  o layout de uma coluna da ficha em celulares. Sem mudança de banco ou backend.
+- O prompt do diagrama está em `prompt-diagrama-classes.md`. A imagem final ainda
+  precisa ser conferida e adicionada pelo usuário antes da entrega.
+- Validação: 527 testes Node aprovados e 86 verificações no Chrome, com três
+  categorias em 320, 390, 768 e 1440 px. Sem overflow, exceções JavaScript ou
+  violações axe WCAG A/AA no conteúdo testado. Sessão e API simuladas; sem
+  alterações no banco, chamadas LLM, SMTP ou consulta real a lojas.
+
+### Entrega acadêmica: Controllers em classes — 23/10/2026
+
+- Sete classes por recurso, com métodos estáticos: Auth, Usuario, Build, Email,
+  Benchmark, Saude e Peca. Blueprints, nomes de endpoint, URLs, autorização, CSRF
+  e limites foram preservados. O blueprint antigo de peças continua não registrado
+  no app; seu Service agora usa os nomes reais de Models e o contrato de catálogo.
+- `GerarBuildService` coordena trava/fallback sem mudar modelo, número de tentativas
+  ou cota. `SolicitarRecuperacaoSenhaService` localiza/valida a conta para recuperação,
+  preservando resposta genérica contra enumeração. Services de verificação resolvem
+  o usuário; Controllers não consultam as Models de usuário diretamente.
+- CRUD básico de peças usa `salvar()`/`buscar_por_id()` das Models. SQL especial
+  de saúde e migração de links fica em Repositories, sem duplicar CRUD. A migração
+  não foi executada no banco real; somente testes em bancos temporários.
+- 615 testes Python (+13 subtestes) e 521 Node aprovados. Incluem identidade das
+  sete classes, contrato de 34 rotas declaradas, recuperação, limites, fallback
+  único, OAuth, CSRF, persistência e compartilhamento. Nenhuma chamada real à LLM,
+  SMTP, coleta de preços/imagens ou mudança no banco do usuário nesta adaptação.
+
+### Revisão em seis etapas — 23/10/2026
+
+6. **Mensagens acessíveis:** regiões persistentes `status`/`alert`, com contexto
+   completo e sem foco programático. Resumos de total/saldo e salvamento esperam
+   700 ms de pausa e apenas a revisão mais recente confirma o salvamento; falhas
+   usam o canal urgente. O aviso visual não duplica a região de anúncio. Dentro
+   de modais, as regiões ficam no diálogo ativo, não atrás dele. Fechar/sair
+   cancela mensagens pendentes. Porcentagem de periféricos e budget das melhorias
+   também usam pausa; frases decorativas da geração não são lidas a cada troca.
+   Salvar permite nova tentativa após falha, sem exigir mudar o nome.
+
+   Referência: [WCAG — mensagens de status](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html).
+   Validação desta etapa: 520 testes Node, 583 Python (+13 subtestes), 83 verificações
+   Chrome/axe de formulário/editor/status/desfazer em três larguras e nova rodada
+   de 97 verificações do modal de melhorias em cinco viewports. Falhas e gravações
+   simuladas, catálogo somente leitura; sem chamadas reais a LLM, SMTP ou lojas.
+   Axe e observação do DOM não substituem homologação manual com VoiceOver/NVDA.
+
+5. **Expansão SSD/HD:** a prévia permite aumentar/diminuir as unidades novas do
+   modelo escolhido, sem remover os discos atuais. Quantidades entram no custo
+   combinado e na validação M.2/SATA/portas compartilhadas; baias de 2,5/3,5 pol.
+   conhecidas também limitam a proposta. O botão de aumentar explica o limite.
+   Dados ausentes continuam pendentes, não viram espaço garantido. Substituir é
+   explícito e mantém os critérios de não regressão. 514 testes Node e 97
+   verificações Chrome/axe em celular, tablet, desktop e paisagem, com catálogo
+   somente leitura e aplicação simulada.
+
+4. **Desfazer:** histórico de um nível em memória no editor para remoção,
+   quantidades, upgrades confirmados e opções de peças/periféricos/rede. Restaura
+   só os campos de montagem; nome/orçamento atuais são preservados. Uma configuração
+   local diferente, ID diferente ou tranca impede aplicar o snapshot. Undo aguarda
+   a fila anterior e salva a restauração pela mesma fila. Falha não é anunciada como
+   sucesso. O histórico é limpo ao sair/recarregar e não oferece redo. Não substitui
+   controle de versão concorrente no servidor. 512 Node e 51 verificações Chrome/axe,
+   incluindo duas gravações simuladas sequenciais por remoção/desfazer.
+
+   Complemento de ciclo de vida: `pagehide` limpa o histórico e desabilita Desfazer,
+   inclusive se a página for preservada pelo cache de navegação. 521 testes Node
+   e 54 verificações Chrome/axe, incluindo saída/restauração simulada e revalidação
+   da sessão em três larguras. Nenhuma gravação real em conta ou banco.
+
+3. **Compra revalidada:** abrir Comprar build ou comprar uma peça consulta de novo
+   `/build/catalogo` com `no-store`, sem reutilizar a promessa em memória. O fluxo
+   público reconsulta a rota pública e a visibilidade. Links só aparecem após
+   resposta válida; falha mostra retry sem usar cotações antigas. O resumo compara
+   centavos × quantidades, total anterior/atual e diferença, sem simular diferença
+   completa para itens sem preço. Peças sem estoque confirmado/preço não liberam
+   compra. Fechar cancela a consulta; nenhuma build é alterada. Dados são o último
+   registro do catálogo, não scraping em tempo real. Modo demo é explicitamente
+   demonstrativo. 508 testes Node e 21 verificações Chrome/axe do fluxo.
+
+2. **Motivos de exclusão:** o catálogo separa busca/marca sem resultado de peças
+   bloqueadas pelas regras da build. Um painel nativo mostra categorias de causa,
+   contagens e até três exemplos por causa (DDR, slots, estoque, conexões, espaço,
+   dados ausentes e outros conflitos). Quando não sobra opção, o painel começa
+   aberto. As mensagens reais são escapadas e os filtros continuam obrigatórios.
+   504 testes Node passaram; o filtro não aprova medidas desconhecidas.
+
+1. **Fichas técnicas:** seis fichas novas e um alias adicional, abrangendo oito
+   anúncios de placas-mãe. Corrigidas MSI 940305 (DDR4) e ASRock 587807 (DDR5).
+   Slots, máximos, conexões e dimensões foram complementados só quando confirmados.
+   MSI B760 DDR5 não herda a ficha DDR4. Na H610M-S, SATA permanece desconhecido
+   porque a própria página MSI diverge; na ASRock D5 abreviada, não foram herdadas
+   medidas de outra revisão. Builds prontas Intel usam placas coerentes com a RAM.
+   Nenhuma alteração em builds salvas, preço, estoque ou banco. 501 testes Node
+   e 41 testes Python específicos passaram. Ainda faltam fichas de outros modelos;
+   não declarar a compatibilidade física completa nem substituir ausência por palpite.
+
+   Fontes: [MSI DDR4](https://www.msi.com/Motherboard/PRO-B760M-P-DDR4/Specification),
+   [MSI DDR5](https://www.msi.com/Motherboard/PRO-B760M-P/Specification),
+   [ASRock: anúncio exato](https://www.kabum.com.br/produto/587807/placa-mae-asrock-h610m-hdv-m-2-d5-intel-chipset-h610-ddr5-lga-1700-matx),
+   [ASUS A520M-E](https://www.asus.com/motherboards-components/motherboards/prime/prime-a520m-e/techspec/),
+   [ASUS B550M-A](https://www.asus.com/motherboards-components/motherboards/prime/prime-b550m-a/techspec/),
+   [MSI H610M-S](https://www.msi.com/Motherboard/PRO-H610M-S-DDR4/Specification).
+
+### Buscar melhorias: opções ocultas e expansão de discos — 23/10/2026
+
+A listagem dependia de um budget válido antes de procurar peças. Além disso,
+SSD/HD só substituíam a categoria inteira por uma unidade: capacidade total e
+velocidades ausentes podiam zerar as opções. CPU/GPU e demais categorias já
+instaladas continuam sem classificação quando não há métricas comparáveis; fans
+e coolers em categorias vazias podiam aparecer apenas como adições.
+
+- Sem budget válido, agora é possível consultar e preparar a prévia, com aviso
+  de que a lista não está filtrada por preço. Aplicar permanece bloqueado até um
+  valor válido; quando informado, o teto combinado das novas compras é respeitado.
+- SSD e HD têm modos explícitos de adicionar (padrão) ou substituir. Adicionar
+  preserva os volumes/quantidades atuais e permite mais uma unidade do mesmo
+  modelo ou de outro, sem prometer aumento de velocidade. Não exige velocidades
+  comparativas para uma expansão que não remove o disco atual. A substituição
+  mantém os critérios anteriores de capacidade e velocidades sem regressão.
+- O seletor compartilhado valida M.2/SATA, portas compartilhadas e quantidades;
+  a avaliação final mantém regras físicas e demais conflitos. A compra conta
+  apenas a unidade nova; o total da build inclui também as antigas. Mudar o modo
+  descarta só a seleção daquela categoria, preservando outras trocas e o foco.
+- Erros antigos `discos-m2`/`discos-sata` só saem da prévia após revalidação das
+  respectivas conexões com dados conhecidos, ou quando a conexão deixa de ser
+  usada. Limite desconhecido não limpa erro. Diagnósticos de outras peças ou
+  regras desconhecidas permanecem; o servidor reavalia ao salvar.
+- Estados sem opções mostram o motivo diretamente. RAM cheia orienta usar o
+  modo de substituição; ausência de placa-mãe, DDR/capacidade máxima ou critérios
+  comparativos não é escondida por uma mensagem genérica. Não inferir fichas ou
+  liberar CPU/GPU por preço, nome, núcleos ou VRAM.
+
+Validação: 493 testes Node e 94 verificações Chrome/axe em 320, 375, 768, 1440 px e
+paisagem 844 × 390. Catálogo real somente leitura, builds de teste em memória e
+callback de salvamento simulado. Incluídos ausência/erro de budget, expansão e
+substituição, slots cheios, fontes, foco, cancelamento e falha ao salvar. Sem
+gravação real, API externa, banco alterado, migração, LLM ou envio de e-mail.
+
+### Comparativo: último campo sobreposto — 23/10/2026
+
+O subgrid reservava nove linhas por card, mas havia dez itens: cabeçalho e nove
+especificações. Por isso, “Compatibilidade” e “Desempenho em jogos” ocupavam a
+mesma linha. O editor agora conta os campos ao renderizar os resultados e passa
+`--compare-row-count` ao CSS, usado tanto nas linhas da grade quanto no espaço
+ocupado por cada card. A contagem é refeita ao adicionar/remover uma build ou
+trocar CPU/GPU. O fallback de layout sem subgrid foi preservado.
+
+Validação: 474 testes Node e 194 verificações Chrome/axe (141 de layout e 53 da
+comparação Blender). Layout testado com duas/três builds, descrições de tamanhos
+diferentes e pendências abertas/fechadas em 320, 375, 768, 1024, 1440, 1920 px e
+paisagem 844 × 390. Sem sobreposição, conteúdo fora dos cards, overflow horizontal
+da página ou exceções JS. APIs simuladas; nenhuma gravação na conta/banco ou LLM.
+O campo de jogos continua indicando indisponibilidade quando faltam benchmarks;
+a correção é visual e não cria estimativas de FPS.
+
+### Comparação Blender: identificação e erros de GPU — 23/10/2026
+
+A identificação Blender estava dependente do pequeno registro de slugs de jogos
+e de títulos abreviados. Na leitura real, apenas 44/100 CPUs e 12/100 GPUs eram
+reconhecidas antes de consultar o Python. A RTX 5070 EAGLE OC SFF 12G, por exemplo,
+era recusada pelo frontend mesmo com resultados públicos no Blender Open Data.
+
+- `benchmark/hardware.js` agora identifica o modelo explícito em títulos
+  comerciais completos, independentemente do registro FPS, sem remover sufixos
+  Ti/SUPER/XT/XTX/GRE/F/KF/X3D. Repetição do mesmo identificador no título é
+  permitida; múltiplos modelos diferentes, mobile/Max-Q, RX 580 2048SP e peças não
+  reconhecidas não são convertidos para outro componente. Mantida a restrição
+  anterior da referência RTX 3060 de 12 GB: não usar para 8 GB/capacidade ausente.
+- A cobertura de identificação chegou a 99/100 CPUs e 93/100 GPUs nesta fotografia.
+  Isso **não** significa que todos esses modelos têm resultados públicos. O
+  backend ainda exige correspondência do nome devolvido pelo provedor; um 422
+  não aciona fallback para outra peça. Nada é estimado ou salvo na build.
+- A comparação preserva código/status/espera dos erros por build. O aviso geral
+  diferencia falha total, parcial, sessão e versões/métodos incompatíveis, em vez
+  de exibir sempre uma mensagem de pontuação como se a consulta tivesse funcionado.
+- Uma resposta de pausa bloqueia novas consultas pelo intervalo informado,
+  inclusive ao mudar CPU/GPU dentro do modal. Fechar limpa o timer e cancela a
+  consulta. `aria-busy` identifica a atualização dos resultados. Cache do modal
+  guarda apenas consultas bem-sucedidas; consulta cancelada não sobrescreve a nova.
+- CPU e GPU continuam separadas. Classificação só com resultados de todas as
+  builds na mesma versão/método. Resultados de métodos diferentes continuam
+  visíveis, sem vencedora. A fonte pode agrupar fabricantes/capacidades de VRAM;
+  são referências por componente, não medição do PC completo nem tempo garantido.
+
+Validação: 472 testes Node, 582 Python (+13 subtestes) e 53 verificações Chrome/axe
+do comparativo em 320/768/1440 px e paisagem 844 × 390, com APIs simuladas e
+catálogo real somente leitura. Incluídos GPU 5070/5060 Ti de nomes comerciais,
+erro 422, sessão 401, pausa 429, cache, resultado parcial, versões diferentes,
+cancelamento/troca de tipo e fechamento. Sem exceções JS, overflow da página ou
+gravações reais. As cinco consultas públicas reais pelo BlenderService responderam
+com sucesso para Ryzen 5 5600, Core i3-12100F, Core Ultra 5 245KF, RTX 5070 e
+RX 6750 XT. Não houve consumo de LLM, mudança no banco ou arquitetura Python.
+
+Ainda pendentes: outros identificadores de hardware, ausência de dados no provedor
+e seleção de uma versão/método comum quando os agregados mais recentes divergem.
+Não classificar resultados incompatíveis apenas para preencher o destaque.
+
+### Gabinetes: fans inclusas, capacidade e medidas — 23/10/2026
+
+Seis variantes exatas receberam fichas de fabricante no manifesto compartilhado
+`frontend/data/medidas-fisicas.json`. O complemento é aplicado na leitura por
+`Peca.to_catalogo()`, pelo prompt da montagem e pelo catálogo demonstrativo JS.
+Sem alteração do SQLite, migração, coleta de preços/imagens ou chamada LLM.
+Reiniciar um backend já aberto permite reler o manifesto em cache.
+
+- DeepCool MATREXX 55 V4 C, R-MATREXX55-BCADA4-G-4, produto 987488:
+  quatro fans inclusas (três de 140 mm frontais e uma de 120 mm traseira), oito
+  posições totais; 421 × 215 × 483 mm (C × L × A). Limites GPU/air/fonte:
+  370/165/170 mm. Não equivale ao MATREXX 55 original.
+- NZXT H5 Flow 2024 Black, CC-H52FB-01, produto 692553: duas fans de 120 mm
+  inclusas, oito posições, 430 × 225 × 465 mm (C × L × A). Radiador frontal de
+  até 360/280 mm, conforme base; 280 mm superior depende de RAM baixa e não é
+  liberado automaticamente no topo. Site/manual divergem em GPU/air (410/425 e
+  170/175 mm), por isso esses limites ficam não confirmados. Não aplicar ao H5
+  antigo, RGB ou Elite. Fans de fábrica não são remanejadas automaticamente.
+- MSI PRO SHIELD M100P, produto 1017873: uma fan traseira de 80 mm inclusa e
+  apenas uma posição para 80 **ou** 90 mm; 312 × 166 × 354 mm (C × L × A).
+  GPU/air/fonte: 275/140/160 mm. Não confundir com MAG FORGE M100R.
+- AeroCool Cylon Black, 63858, produto 203445: uma fan de 120 mm inclusa,
+  sete posições listadas (duas são do suporte de ventilação da GPU); dimensões
+  externas 413 × 198 × 459 mm (C × L × A). GPU 346 mm com fan frontal;
+  371 mm exige removê-la. Air 155 mm. Radiador frontal de 120 mm segundo o
+  fabricante; não assumir 240 mm da descrição comercial nem folga para a fonte.
+- Hayom GB1727 / GB.17.10.27, produto 938469: três fans frontais de 120 mm
+  inclusas, oito posições, GPU até 290 mm. Tamanho externo informado como
+  295 × 190 × 405 mm, sem atribuir eixos que a ficha não identifica.
+- Hayom GB1787, produto 933255: três fans de 120 mm inclusas, cinco posições,
+  GPU até 260 mm. Tamanho 265 × 280 × 285 mm, eixos não identificados. Sem
+  posição de fábrica declarada, não inventar a distribuição das três fans.
+
+Fontes e revisão de 23/10/2026 registradas em cada ficha:
+[DeepCool](https://global.deepcool.com/products/Cases/MATREXX55-V4-C-ATX-Glass-Panel-Case/2024/18145.shtml),
+[NZXT](https://support.nzxt.com/hc/en-us/articles/40225168535451-H5-Flow-2024-Specs),
+[radiadores NZXT](https://support.nzxt.com/hc/en-us/articles/47060012674203-What-radiator-sizes-does-the-H5-Flow-2024-support),
+[MSI](https://www.msi.com/PC-Case/PRO-SHIELD-M100P/Specification),
+[AeroCool](https://aerocool.io/product/cylon/),
+[Hayom GB1727](https://www.hayom.com.br/produtos/gabinete-gamer-c-3-fans-gb1727),
+[Hayom GB1787](https://www.hayom.com.br/produtos/1271).
+
+Os aliases exigem fabricante, modelo, código interno e produto KaBuM revisados;
+nome parecido ou outro anúncio não herda especificações. Contagem inclui fábrica,
+fans adicionais por kit e AIO, sem somar opções alternativas de 120/140 mm nem
+aprovar espessuras/interferências desconhecidas. Dimensão externa não determina
+quantas fans cabem: são necessárias as posições e medidas de fixação declaradas.
+O catálogo agora mostra inclusas, capacidade total e diâmetros; o editor também
+mostra inclusas/capacidade junto ao gabinete, além do contador de ventilação.
+
+Fotografia somente leitura: 100 gabinetes, 53 com contagem inclusa cadastrada
+(30 positivas, 23 zero, nem todas revisadas nesta rodada), 47 sem essa contagem,
+9 com capacidade e 8 com posições detalhadas. Antes eram 3 com capacidade/posições.
+O manifesto tem 31 variantes, aplicadas a 33 dos 1.535 cadastros. RF13 continua
+parcial: esta rodada não certifica todos os gabinetes ou o encaixe completo.
+
+Revisão pendente de variantes/anúncios, sem sobrescrita automática:
+Corsair 2000D SEED-CASE-44/433279 (SKU branco e contagem divergente), Hayom
+GB1796 SEED-CASE-24/732926 (kit do vendedor versus configuração de fábrica),
+Lian Li SEED-CASE-29/582808 (EVO RGB, não O11 Dynamic comum; suportes condicionais),
+MB520 SEED-CASE-12/171504 (gerações distintas), Rise Wave e HYTE Y70 Touch
+Infinite (fichas completas da variante ainda necessárias).
+
+Validação automatizada: 443 testes Node e 582 Python (+13 subtestes). Fixture
+compartilhada verifica identidade, dados desconhecidos, kits, fans inclusas,
+limite exato, excesso, tamanhos, AIO e propagação à API/prompt sem alterar modelos.
+Os 16 modelos prontos não ganharam conflitos técnicos; mantém-se a pendência
+anterior de estoque no modelo Intel. Validação Chrome/axe: 258 verificações de
+fichas, editor, limites e catálogo em 320/768/1440 px e paisagem 844 × 390;
+mais 57 da regressão de páginas/modelos. O seletor do roteiro de QA foi corrigido
+de `.catalog-card` para `.product-card`; a rodada final dos cards passou.
+APIs simuladas, catálogo real somente leitura; nenhum envio de e-mail ou consumo
+de cota LLM. Sem erros JS, overflow horizontal ou violações axe nas telas testadas.
+
+### Barrinha de compatibilidade ao lado do nome — 23/10/2026
+
+O indicador circular de informação foi substituído pela barra vertical antes do
+nome, nos cards de Minhas builds, no editor e na visualização pública. Usa azul
+primário sem problemas, amarelo para pendências e vermelho para erros, mantendo
+o diagnóstico existente. Não altera as regras nem o percentual de preenchimento.
+
+A barra tem 3 px de largura visual e botão transparente de pelo menos 24 px de
+largura, com nome acessível, foco visível, `aria-expanded` e `aria-controls`.
+Hover, clique/toque e teclado continuam abrindo os detalhes; Escape fecha.
+O painel se ajusta às bordas da tela, e o editor centraliza a barra no título.
+Removidos os estilos antigos do círculo e o posicionamento à direita do nome.
+
+Validação: 427 testes Node, 45 verificações de páginas/axe, 85 de interação e
+36 de compartilhamento. Mais 47 verificações finais de alinhamento, área clicável,
+hover, Escape e limites do painel em 320/1440 px; a rodada geral também cobriu
+390/768 px. APIs simuladas, sem alteração do banco ou regras de compatibilidade.
+
+### Preço nas lojas e RAM com slots ausentes — 23/10/2026
+
+- O preço principal existia no catálogo, mas a API não enviava `ofertas`, que o
+  card de cada loja consome. `Peca.to_catalogo()` agora monta a oferta KaBuM a partir
+  da cotação já coletada: preço positivo/finito, data da coleta e link HTTPS do
+  produto no domínio exato, sem credenciais/porta alternativa. Nenhuma consulta de
+  preço acontece ao serializar. Não transfere esse preço para Pichau ou buscas.
+- O preço inicial da seed, sem data de coleta, não é apresentado como oferta.
+  Produto esgotado pode exibir o último preço, mas informa indisponibilidade e
+  preserva a data antiga. A página lembra que o preço cadastrado não inclui frete.
+- `slotsRam()` separa capacidade confirmada de política provisória. Ausência ou
+  valor inválido usa limite de **dois pentes**, sem modificar a ficha/banco.
+  Zero, um ou quatro slots explicitamente cadastrados continuam prevalecendo.
+  Kits e modelos diferentes dividem o limite; o terceiro pente fica bloqueado.
+- O editor informa que a contagem é provisória e orienta confirmar slots e
+  capacidade no manual. Não foi atribuída capacidade máxima desconhecida nem
+  aprovada compatibilidade completa por esse limite. Melhorias usam a mesma
+  política de slots, mas ainda exigem DDR/capacidade máxima para uma proposta segura.
+- Python mantém `ram-slots` como não verificado quando falta o dado real e avalia
+  separadamente `ram-limite-provisorio`, identificado como política de montagem.
+  A validação da geração rejeita excesso; o prompt instrui contar pentes próprios,
+  novos e por kit dentro desse teto, sem inventar especificações.
+
+Fotografia somente leitura: 35 das 100 placas-mãe sem slots; 1.435 das 1.535 peças
+com cotação datada e link de produto KaBuM agora expõem a oferta correspondente.
+Validação: 424 testes Node, 561 Python (+13 subtestes), 43 verificações Chrome de
+preço/seleção/duplicação, 51 de páginas/modelos/axe e 92 de melhorias/RAM, incluindo
+320/768/1440 px e paisagem 844 × 390. Banco real somente leitura; salvamentos de
+interface simulados, sem migração, coleta externa, envio de e-mail ou chamadas LLM.
+
+### Transição de valores e retorno à build — 23/10/2026
+
+- `components/value-transition.js` anima apenas números alterados: entrada vertical
+  de `0.45em`, blur de `4px` e duração de `360ms`. Aumento entra de baixo;
+  diminuição inverte o sentido. Para ajustar o efeito, altere esses valores e a
+  curva de easing nesse módulo. A aparência não interpola preços: o texto já
+  contém o valor final correto, sem cópias para leitores de tela.
+- Aplicado aos totais/consumo/quantidades do editor, saldo do orçamento, orçamento
+  do formulário, preços/progresso/cota em Minhas builds e totais da prévia de
+  melhorias. Não anima o primeiro carregamento nem valores iguais. Chaves
+  `data-value-key` permitem comparar os números quando os cards são recriados.
+- `atualizarValor` preserva o elemento ao digitar/arrastar, sem empilhar animações.
+  `prefers-reduced-motion` desativa o efeito e cancela animações em andamento;
+  navegadores sem Web Animations mostram a atualização diretamente. CSS compartilhado
+  usa algarismos tabulares e não sobrescreve o layout próprio dos componentes.
+- Links explícitos do catálogo/editor usam `data-back-destination`: o histórico
+  só prevalece quando identifica a mesma página, build e categoria. Filtros e hash
+  são preservados nesse contexto; início/outra build não substituem o destino.
+  Retornos genéricos à página anterior mantêm o comportamento existente.
+- Falhas no catálogo/peça mantêm o ID da build. Sem contexto, ou numa falha do
+  próprio editor, o retorno é Minhas builds, nunca o editor sem ID que criaria
+  outra configuração. Nenhuma mudança no backend, banco ou cálculos.
+
+Validação: 418 testes Node aprovados, 77 verificações de interação no Chrome em
+320/768/1440 px e paisagem 844 × 390, com movimento normal/reduzido; mais 63
+verificações de páginas afetadas/axe e 92 de melhorias/RAM. APIs e gravações
+simuladas; catálogo real somente leitura. Sem criações involuntárias ou erros JS.
+As medições de contraste aguardam o fim dos efeitos de scroll já existentes.
+
+### Navegação, verificação de e-mail e expansão técnica — 23/10/2026
+
+- Footer: hover com cor primária e sublinhado suave apenas sobre o link, incluindo
+  foco de teclado. `navigation-current.js` marca a página atual no footer, hamburger
+  e perfil com `aria-current="page"`: azul fixo, sem fundo/underline/animação no hover
+  ou recarregamento redundante no clique normal. Href e foco são preservados;
+  ações como `?criar=1`, seções e atalhos de abrir link em outra aba continuam livres.
+- Modal de verificação: título azul de 1,5 rem, fonte de corpo Poppins, endereço
+  separado e seis dígitos (corrigido texto antigo de quatro). Fundo escuro mais
+  legível e camada acima da navegação, sem transparência que revele os textos de
+  trás. Mantidos colar código, reenvio, erros e foco/Escape; descrição associada ao diálogo.
+- E-mail: fundo preto, card `#1c1c1e`, borda `#3a3a3c`, azul `#007bff` e textos
+  branco/cinza da identidade. Código sem monoespaçada: Lexend com fallback Arial;
+  corpo Poppins/Arial. Não baixa fontes externas nem exige que o cliente de e-mail
+  suporte webfonts; aparência exata pode variar. Alternativa em texto e proteções
+  de emissão/uso único/expiração permanecem; não houve envio real ou mudança no SMTP.
+- O manifesto agora tem 25 variantes e complementa 27 dos 1.535 cadastros na
+  leitura atual. A ampliação desta rodada cobre A520M-K/A520M-A PRO/B550M PRO-VDH
+  WIFI, ASSASSIN IV/V4 Alpha/A12 240, RF120 avulsa, Fury KF432C16BB/8, NV2/NV3
+  500 GB/1 TB, Ryzen 7 9800X3D e P650G PG5. Novos campos também chegam ao prompt
+  quando relevantes. Nenhuma migração, coleta de preço/imagem ou chamada LLM.
+- A ficha AMD do 9800X3D confirma Radeon integrada, ausência de cooler e TDP 120 W.
+  TDP fica separado: não vira consumo elétrico medido nem altera silenciosamente
+  o consumo estimado cadastrado. Perfis de RAM não equivalem a OC garantido.
+- A fan RF120 desta ficha é uma unidade, com RGB 12 V de quatro pinos e PWM;
+  não confundir com kit de cinco nem conectar RGB 12 V diretamente a ARGB 5 V.
+  SSDs usam os valores da capacidade correta e distinguem M.2 2280 de 2230.
+- O ASSASSIN IV tem lista oficial de exceções de placa-mãe. Python e JS bloqueiam
+  os modelos exatos dessa lista, mesmo sem gabinete selecionado. Ausência na lista
+  não certifica as demais combinações; nenhuma equivalência aproximada foi criada.
+
+Revisão ainda necessária, sem sobrescrever dados ambíguos: SEED-RAM-03 está como
+DDR5 no cadastro, mas aponta para anúncio do DDR4 KF432C16BB/16 (402907);
+SEED-MB-07 aponta para PRO B760M-P DDR4 apesar do cadastro DDR5; SEED-MB-03 aponta
+para B550M DS3H AC R2 com nome abreviado; SEED-MB-22 aponta para a variante D5.
+Esses casos não receberam fichas de outra variante. Links não são prova de toda a
+identidade técnica. Corrigir catálogo/modelo/anúncio exige revisão própria.
+
+O usuário autorizou commit/push depois dos testes, incluindo o complemento da
+rodada anterior. As mudanças locais de imagens/home/animação ficam fora do commit.
+
+Validação desta rodada: 408 testes Node, 533 Python (+13 subtestes), 341 verificações
+das fichas no Chrome, 78 do footer/menu/modal/e-mail, 36 de compartilhamento/modelos
+e 63 de páginas afetadas/modelos em 320/768/1440 px, sem exceções/overflow/violações
+axe nas telas auditadas. E-mail só renderizado em prévia local, sem envio SMTP real.
+
+### Enriquecimento técnico reversível — 23/10/2026
+
+Registro da rodada inicial, entregue **sem commit/push** naquele momento, sem
+migração, coleta ou escrita no banco; a autorização posterior está no bloco acima.
+O complemento compartilhado passou de cinco para onze variantes, consultadas em
+fontes oficiais. Cada ficha nova registra `fonte`, `verificado_em` e o modelo oficial.
+
+- TD500 Mesh V2 White: limites de GPU/cooler/fonte, sete slots, baias e posições
+  alternativas de fans/radiadores; três fans de 120 mm de fábrica contam na ocupação.
+- RTX 5070 EAGLE OC SFF 12G: comprimento/altura/espessura, barramento de 192 bits e
+  conector de 16 pinos. Não foi inferida uma quantidade de slots a partir da espessura.
+- Hyper 212 3DHP Black ARGB: altura real de 158 mm, demais eixos e lista de sockets.
+- CX650 CP-9020278-BR: comprimento de 125 mm, sem aplicar a outras revisões da CX650.
+  A ficha oficial brasileira estava indexada, mas o acesso direto retornou 404 na
+  consulta; revalidar a disponibilidade desse endereço antes de ampliar a coleta.
+- ASRock A620AM Pro RS: AM5/DDR5, quatro slots, limite anunciado de 256 GB,
+  três M.2 para SSD PCIe/NVMe e duas portas SATA. O Key E para Wi-Fi não soma um SSD.
+  Não foi inventada frequência máxima comum, pois as seções da ficha divergem em OC.
+- MSI MAG CORELIQUID A13 240: radiador externo de 277 × 119,6 × 27,2 mm e duas
+  fans de 120 × 120 × 25 mm; conjunto de 52,2 mm sem folgas adicionais presumidas.
+
+As fontes oficiais completas ficam em `frontend/data/medidas-fisicas.json`. A
+identidade tradicional continua exigindo categoria/fabricante/modelo/part number.
+Entradas novas podem declarar `aliases_catalogo`: nomes e códigos internos exatos
+mais ID de produto KaBuM revisado. Somente HTTPS no domínio exato, sem credenciais,
+redirecionadores ou inferência pelo slug. Esse vínculo não consulta nem certifica
+o anúncio em tempo real. Sem o vínculo esperado, não aplicar o complemento.
+
+Validação: 403 testes Node e 529 Python (+13 subtestes), todos aprovados; 98
+verificações Chrome/axe das seis fichas em 320/768/1440 px, sem exceções, overflow
+ou violações nas telas verificadas. Catálogo real lido sem escrita: as seis fichas
+foram aplicadas e os 16 modelos não apresentaram novos conflitos técnicos. Durante
+a consulta, a PRO B760M-P ficou indisponível; isso é estoque, não falha de encaixe.
+Outras 36 verificações Chrome de compartilhamento/cópia/cota e modelos prontos
+também passaram, com APIs simuladas. A auditoria distingue estoque variável de
+conflito técnico; não pressupõe que todas as ofertas estejam sempre disponíveis.
+
+`Peca.to_catalogo()` expõe os campos sem atualizar o ORM. A montagem automática
+recebe os mesmos dados revisados em `_campos_pecas`; não houve nova chamada LLM.
+O demo usa a mesma identidade e medidas, copiando objetos aninhados. As telas
+mostram variante, fonte/data e posições legíveis; baias/dimensões genéricas antigas
+ficam ocultas quando há dados específicos revisados, sem apagar o registro original.
+
+Limitações preservadas: CPU/BIOS/QVL, corrente/conectores, compartilhamentos não
+documentados e folgas completas de radiador/RAM/GPU continuam não verificados.
+O TD500 Mesh V2 aceita E-ATX com limites de dimensão, não todas as E-ATX; por isso
+não recebe aprovação genérica. A recomendação de 55 mm no topo não virou limite
+certificado do conjunto com fans. A ASRock H610M-HDV/M.2 cadastrada como DDR4 aponta
+para anúncio D5: **não enriquecida**, precisa de revisão do catálogo/anúncio.
+
+Para desfazer só esta experiência, remover as seis novas fichas do manifesto já
+desativa os novos complementos após reiniciar o backend (manifesto em cache por
+processo). Os dados originais seguem no banco. Para remover também a implementação,
+reverter apenas os trechos desta rodada em `models/medidas_fisicas.py`,
+`criar_build_service.py`, `hardware.js`, `catalogo.js`, README/documentação e remover
+os novos `build/medidas-fisicas.js`, `tests/fichas-tecnicas.test.mjs`,
+`tests/fixtures/fichas-tecnicas.json` e `test_fichas_tecnicas.py`. Não restaurar
+globalmente o repositório: imagens, animação e alterações da home já eram locais.
+
+### Expansão de RAM, verificação de e-mail e fans — 23/10/2026
+
+- O modal de melhorias começa com RAM/SSD/HD, categorias com critérios comparáveis.
+  CPU/GPU continuam disponíveis nos filtros, mas sem ranqueamento inventado.
+  Preço zero não é tratado como uma melhoria gratuita.
+- `build/melhorias-ram.js` planeja uma cópia sem gravar: acrescentar é o padrão e
+  mantém as memórias atuais; substituir é uma escolha explícita que aceita vários
+  modelos/quantidades. O modal oferece o mesmo modelo atual, controles de quantidade
+  e preço apenas das novas compras. A aplicação continua exigindo confirmação.
+- Placa-mãe atual identificada, DDR, slots e capacidade máxima são obrigatórios
+  para a sugestão de RAM. Kits contam pentes × quantidade e GB por item × quantidade.
+  Adição mantém frequência/DDR; outros modelos precisam de CAS comparável, sem piora
+  relativa. Troca não pode reduzir capacidade/frequência ou sair de vários pentes
+  para apenas um; quatro pentes podem virar dois com capacidade preservada.
+- Dois pentes do mesmo modelo/capacidade são uma preferência, não certificação de
+  dual channel: instalar conforme manual, considerar suporte CPU/placa-mãe e kits
+  testados juntos. Misturas mantêm o aviso de estabilidade/XMP/EXPO. Referência:
+  [orientação Intel](https://www.intel.com/content/www/us/en/gaming/resources/how-much-ram-gaming.html).
+- Modelos/quantidades/preços são revalidados contra o catálogo em memória antes de confirmar; o callback
+  existente salva uma única configuração. Erros de outras peças vindos do servidor
+  não são descartados por uma expansão de RAM. O diagnóstico da seleção nova é parcial.
+- E-mail de verificação: HTML responsivo e alternativa em texto, código de seis
+  dígitos, nome escapado, prazo de cinco minutos, instruções para reenvio/segurança e
+  identificação de mensagem automática. Sem imagens/fontes remotas, rastreamento ou
+  anexos. Preservados limites, uso único, vínculo com o destinatário e SMTP/TLS.
+- Não há garantia de caixa de entrada por mudar HTML. Em domínio próprio, configurar
+  autenticação SPF/DKIM/DMARC e alinhamento no provedor/DNS, verificar reputação e os
+  cabeçalhos de mensagens de teste. Não falsificar From nem adicionar autenticação
+  inventada pelo Python. [Diretrizes oficiais Gmail](https://support.google.com/mail/answer/81126?hl=pt-BR).
+- Geração: prompt e Python exigem ventilação, mesmo sem a capacidade documentada do
+  gabinete. Fans incluídas no gabinete ou AIO contam quando confirmadas; fan própria
+  é preservada sem recompra. Onde a capacidade é conhecida, continua sendo obrigatório
+  completar as posições, sem excesso e sem transferir sobras de periféricos. A omissão
+  usa a revisão automática limitada; não salva uma resposta inválida.
+
+#### Como enriquecer os dados técnicos sem migrar o banco
+
+1. Usar a ficha/manual oficial da variante exata e part number real, quando existir.
+   Identificadores `SEED-*` são internos, não códigos oficiais para procurar no fabricante.
+   Preços/imagens das coletas não provam que medidas e listas de suporte estão completas.
+2. Normalizar unidade/eixo e guardar referência da fonte. Alimentar as fichas em
+   `frontend/data/medidas-fisicas.json`, que o backend lê em
+   `models/medidas_fisicas.py::completar_medidas`. `Peca.to_catalogo()` já inclui esse
+   complemento na API. A seleção exige categoria, fabricante, modelo e part number;
+   variantes parecidas não herdam a ficha. Não houve coleta nova nem alteração do banco.
+3. Ampliar primeiro gabinetes/GPU/coolers mais usados: dimensões, posições alternativas
+   de fans/radiadores, espessura do conjunto e interferências. Não deduzir eixos pelo
+   nome comercial nem usar uma folga universal para AIO.
+4. BIOS/lista de CPUs, QVL/perfis de RAM, conectores e compartilhamento de portas exigem
+   dados de suporte próprios do fabricante, além das medidas. Automatização futura deve
+   validar extração, fonte/data e revisão antes de publicar, sem usar LLM como prova.
+
+### Formulário, modelos e compartilhamento — 23/10/2026
+
+- `main` integrada por fast-forward até `d20fc97`, mantendo CSRF, limitação global
+  de chamadas e bloqueio de geração por usuário. Sem migrações nem alterações no
+  banco real. As alterações de imagens e animações locais foram preservadas.
+- Homologação real do formulário pela rota `POST /build/` em SQLite temporário,
+  com catálogo disponível e filtros de produção: estudos, R$ 6.000, gerada após
+  uma revisão automática, HTTP 201 e total de R$ 2.956,80. Foram consumidas as três
+  chamadas gratuitas autorizadas: duas no primeiro cenário e uma no segundo.
+  O segundo cenário foi interrompido antes de uma quarta chamada pelo limite local
+  do ensaio; não é evidência de limite ou erro do Gemini. Sem fallback pago ou builds
+  nas contas reais. A validação adicional de rede foi testada offline depois disso.
+- Rede do formulário valida objeto, tipo, booleano de posse e medidas positivas
+  finitas. Cabo com comprimento confirmado menor que o solicitado provoca revisão,
+  sem ampliar o orçamento. Especificação ausente não equivale a medida suficiente.
+- Os 16 modelos foram revisados contra estoque/preços atuais, preservando
+  plataformas, capacidades e ausência de periféricos. A página reconsulta vagas
+  no foco/retorno, bloqueia cópia sem e-mail verificado ou com três builds e
+  confirma novamente antes do POST. O servidor continua sendo a autoridade do limite.
+- `GET /build/<s-id>/publica` é a exceção pública: consulta apenas build com
+  visibilidade pública, envia `Cache-Control: no-store`, as peças selecionadas e
+  diagnóstico parcial. Não expõe `usuario_id`, budget, setup atual, anotações de
+  rede nem extras particulares. O JSON original não é modificado pela leitura.
+- `build/publica.js` usa essa resposta em uma tela separada, sem inputs, ações de
+  edição ou acesso ao catálogo privado completo. Descrição/nome são escapados;
+  preços parciais e frete permanecem explícitos. O editor normal continua privado.
+- `POST /build/<s-id>/copiar-publica` exige sessão, CSRF, e-mail verificado e vaga
+  transacional. Revalida a visibilidade no momento da cópia e usa o serviço manual
+  existente. A nova build é privada, destrancada, sem marca de setup atual nem
+  dados pessoais da origem; o budget autorizado é o do destinatário.
+- Retorno do login: `components/sessao-publica.js` aceita somente ID público e
+  ação `testar`/`salvar`, guarda por até 15 minutos na sessão do navegador e consome
+  uma única vez. Não aceita URLs externas. `auth.js` retoma no login/cadastro ou
+  início (callback Google). Salvar ainda exige confirmação explícita; testar abre
+  somente a escolha do teste, sem consultar um provedor automaticamente.
+- Requisitos autenticados de uma build pública usam
+  `/benchmark/requisitos-build?game=...&build_id=s-...&origem_publica=1`.
+  A rota confere a visibilidade novamente; sem a flag continua exigindo proprietário.
+  O cliente valida `ram.fonte: build_publica`; não é uma aprovação de CPU/GPU/FPS.
+- RF07, RF09 e RF12 são concluídos no escopo acordado. Comparação de FPS, novos
+  critérios de upgrade e confirmação do agendamento em produção continuam extensões.
+  RF13 segue parcial: dados ausentes/BIOS/interferências não são certificados.
+
 ### Homologação de catálogo e capacidades — 22/10/2026
 
 - `catalogo-auditar` é um comando de leitura, registrado junto dos comandos de

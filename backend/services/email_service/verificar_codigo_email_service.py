@@ -5,6 +5,9 @@ from models import Codigo,Usuario
 from utils.validacoes import validacao_campos
 
 class VerificarCodigoEmail:
+  def executar_para_usuario(self, usuario_id, dados):
+    return self.executar(dados, Usuario.buscar_por_id(usuario_id))
+
   def executar(self,dados:dict,usuario:Usuario):
     validacao_campos(dados,["codigo"])
     

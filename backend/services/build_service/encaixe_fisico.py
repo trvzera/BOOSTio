@@ -161,11 +161,25 @@ def avaliar_fans(gabinete, fans, water=None, substituir=False):
             "substituidas": substituidas, "substituicao": substituicao_ok}
 
 
+def encaixe_cooler_placa(cooler, placa):
+    normalizar = lambda v: " ".join(str(v or "").split()).upper()
+    if not placa.get("fabricante") or not placa.get("modelo") or not isinstance(cooler.get("placas_mae_incompativeis"), list):
+        return None
+    fabricante, modelo = normalizar(placa["fabricante"]), normalizar(placa["modelo"])
+    nome = modelo if modelo.startswith(fabricante + " ") else fabricante + " " + modelo
+    return False if any(normalizar(p) == nome for p in cooler["placas_mae_incompativeis"]) else None
+
+
 def avaliar_medidas(itens, registrar, substituir=False):
     def get(tipo):
         return next((p for t, _, p in itens if t == tipo), None) or {}
     def tem(tipo):
         return any(t == tipo for t, _, _ in itens)
+    for tipo in ("air_cooler", "water_cooler"):
+        if tem("placa_mae") and get(tipo).get("placas_mae_incompativeis"):
+            registrar(tipo + "-placa-excecao", "Interferência física entre cooler e placa-mãe",
+                      encaixe_cooler_placa(get(tipo), get("placa_mae")),
+                      "O fabricante do cooler declara incompatibilidade com os modelos exatos da lista. Não estar na lista não certifica todas as folgas ou kits de montagem.")
     gabinete = get("gabinete")
     if not tem("gabinete"):
         return None

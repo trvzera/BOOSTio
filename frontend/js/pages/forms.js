@@ -10,6 +10,8 @@ import { pecasPropriasFormulario } from "../build/pecas-proprias.js";
 import { buscarUsuarioLogado } from "../api/usuario/buscarUsuarioLogado.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { iniciarControlesNumericos } from "../components/number-stepper.js";
+import { atualizarValor } from "../components/value-transition.js";
+import { anunciarStatus, cancelarAnuncioStatus } from "../components/status-messages.js";
 import {
   registrarAnimacao,
   destruirAnimacao,
@@ -217,7 +219,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const valor = Number.isFinite(recebido) ? recebido : "";
     const maximo = Math.max(20000,valor);
     const isActive = respostas.orcamento === "personalizado" ? "active" : "";
-    return `<div class="budget-range ${isActive}"><div><label class="font-1-m-b" for="budget-input">Orçamento personalizado (R$)</label><strong class="font-2-xs" id="budget-value">${valor === "" ? "Informe um valor" : moeda.format(valor)}</strong></div><input id="budget-input" type="number" inputmode="decimal" min="0.01" max="1000000" step="0.01" data-number-step="100" value="${valor}" aria-describedby="budget-help"><input type="range" id="budget-range" min="0" max="${Math.ceil(maximo / 100) * 100}" step="100" value="${Math.round(valor / 100) * 100}" style="--range-progress: ${progressoRange(valor)}%" aria-label="Ajustar orçamento de cem em cem reais"><p id="budget-help" class="font-2-xs">Controle e setas de R$ 100 em R$ 100. Digite para usar outro valor.</p></div>
+    return `<div class="budget-range ${isActive}"><div><label class="font-1-m-b" for="budget-input">Orçamento personalizado (R$)</label><strong class="font-2-xs value-transition" id="budget-value"${valor === "" ? "" : ` data-value-number="${valor}"`}>${valor === "" ? "Informe um valor" : moeda.format(valor)}</strong></div><input id="budget-input" type="number" inputmode="decimal" min="0.01" max="1000000" step="0.01" data-number-step="100" value="${valor}" aria-describedby="budget-help"><input type="range" id="budget-range" min="0" max="${Math.ceil(maximo / 100) * 100}" step="100" value="${Math.round(valor / 100) * 100}" style="--range-progress: ${progressoRange(valor)}%" aria-label="Ajustar orçamento de cem em cem reais"><p id="budget-help" class="font-2-xs">Controle e setas de R$ 100 em R$ 100. Digite para usar outro valor.</p></div>
       `;
   }
 
@@ -236,7 +238,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const proprios = respostas.perifericosProprios || [];
     alvo.innerHTML = (respostas.perifericos === "alguns-perifericos" ? '<fieldset class="peripheral-owned-list"><legend>Quais periféricos você já possui?</legend>' +
       listaPerifericos.map(([tipo,nome]) => '<div class="peripheral-owned" data-owned="' + tipo + '"><label class="ui-check"><input type="checkbox" data-owned-peripheral="' + tipo + '" ' + (proprios.includes(tipo) ? 'checked' : '') + '>' + iconeAnimado("checkbox") + '<span>' + nome + '</span></label>' + (proprios.includes(tipo) ? detalhePecaHtml(tipo,nome) : '') + '</div>').join("") + '</fieldset>' : '') +
-      '<div class="peripheral-budget" id="peripheral-allocation" ' + (respostas.incluirPerifericos ? '' : 'hidden') + '><label for="peripheral-percent">Limite do orçamento para periféricos</label><div class="peripheral-percent-field"><input type="number" id="peripheral-percent" min="1" max="99" step="1" inputmode="numeric" aria-describedby="peripheral-budget-summary peripheral-budget-help" value="' + respostas.percentualPerifericos + '"><span aria-hidden="true">%</span></div><p id="peripheral-budget-summary" class="font-2-xs" aria-live="polite"></p><p id="peripheral-budget-help" class="font-2-xs">É um teto, não um gasto obrigatório. Se gastar menos, a sobra fica com você e não aumenta o limite do PC.</p></div>';
+      '<div class="peripheral-budget" id="peripheral-allocation" ' + (respostas.incluirPerifericos ? '' : 'hidden') + '><label for="peripheral-percent">Limite do orçamento para periféricos</label><div class="peripheral-percent-field"><input type="number" id="peripheral-percent" min="1" max="99" step="1" inputmode="numeric" aria-describedby="peripheral-budget-summary peripheral-budget-help" value="' + respostas.percentualPerifericos + '"><span aria-hidden="true">%</span></div><p id="peripheral-budget-summary" class="font-2-xs"></p><p id="peripheral-budget-help" class="font-2-xs">É um teto, não um gasto obrigatório. Se gastar menos, a sobra fica com você e não aumenta o limite do PC.</p></div>';
     alvo.querySelectorAll("[data-owned-peripheral]").forEach(input => input.addEventListener("change",() => {
       const escolhidos = new Set(respostas.perifericosProprios || []), tipo = input.dataset.ownedPeripheral;
       if (input.checked) escolhidos.add(tipo); else escolhidos.delete(tipo);
@@ -250,7 +252,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }));
     alvo.querySelector("#peripheral-percent")?.addEventListener("input",evento => {
       respostas.percentualPerifericos = evento.target.valueAsNumber;
-      atualizarReserva(); atualizarMenu();
+      atualizarReserva(true); atualizarMenu();
     });
     vincularCamposDetalhesPecas();
     iniciarControlesNumericos(alvo); iniciarIcones(alvo); atualizarReserva();
@@ -258,13 +260,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const faixas = {"ate-3000":3000,"3000-5000":5000,"5000-8000":8000};
   const valorOrcamento = () => respostas.orcamento === "personalizado" ? respostas.orcamentoPersonalizado : faixas[respostas.orcamento];
-  function atualizarReserva() {
+  function atualizarReserva(anunciar = false) {
     const valor = valorOrcamento() || 0;
     const percentual = respostas.incluirPerifericos ? respostas.percentualPerifericos ?? 20 : 0;
     const divisao = dividirOrcamento(valor,percentual);
     const resumo = conteudo.querySelector("#peripheral-budget-summary");
     if (resumo) resumo.textContent = divisao
       ? `Até ${moeda.format(divisao.perifericos)} para periféricos · até ${moeda.format(divisao.pc)} para o PC e acessórios de rede.` : "Informe um orçamento válido e uma porcentagem inteira de 1 a 99.";
+    if (anunciar && resumo) anunciarStatus(resumo.textContent);
     conteudo.querySelector("#next-question").disabled = !podeAvancar();
   }
 
@@ -273,6 +276,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function renderizarPergunta() {
+    cancelarAnuncioStatus();
     limparCheckboxesLottie();
     const geracao = geracaoPergunta;
     const pergunta = perguntas[indiceAtual];
@@ -478,7 +482,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       conteudo.querySelector("#budget-input").value = valor;
       conteudo.querySelector("#budget-input").dispatchEvent(new Event("change",{bubbles:true}));
       conteudo.querySelector("#budget-range").value = valor;
-      conteudo.querySelector("#budget-value").textContent = moeda.format(valor);
+      atualizarValor(conteudo.querySelector("#budget-value"),moeda.format(valor),valor);
       const budgetRange = conteudo.querySelector(".budget-range");
       if (budgetRange) budgetRange.classList.remove("active");
       atualizarReserva();
@@ -490,7 +494,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function atualizarRange(evento) {
     respostas.orcamentoPersonalizado = evento.target.valueAsNumber;
     respostas.orcamento = "personalizado";
-    conteudo.querySelector("#budget-value").textContent = Number.isFinite(respostas.orcamentoPersonalizado) ? moeda.format(respostas.orcamentoPersonalizado) : "Informe um valor";
+    atualizarValor(conteudo.querySelector("#budget-value"),Number.isFinite(respostas.orcamentoPersonalizado) ? moeda.format(respostas.orcamentoPersonalizado) : "Informe um valor",respostas.orcamentoPersonalizado);
     evento.target.setAttribute("aria-invalid",String(!orcamentoValido(respostas.orcamentoPersonalizado)));
     const slider = conteudo.querySelector("#budget-range"), numero = conteudo.querySelector("#budget-input");
     if (evento.target === slider) {
@@ -548,7 +552,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!sessao.auth) throw Object.assign(new Error("Entre na sua conta para salvar a build."),{status:401});
       await verificarEspacoBuild();
       painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Gerando sua build</h1><p class="font-2-s">Vamos selecionar peças compatíveis dentro do seu orçamento.</p></div>`;
-      conteudo.innerHTML = `<div class="build-loading"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-m" role="status" id="generation-message">Analisando seu perfil</h2><p class="font-2-xs">A seleção pode levar alguns instantes. Aguarde nesta página.</p></div>`;
+      conteudo.innerHTML = `<div class="build-loading"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-m" id="generation-message">Analisando seu perfil</h2><p class="font-2-xs">A seleção pode levar alguns instantes. Aguarde nesta página.</p></div>`;
+      anunciarStatus("Gerando sua build. A seleção pode levar alguns instantes. Aguarde nesta página.",{atraso:150});
       const frases = ["Analisando seu perfil", "Buscando peças para o seu orçamento", "Pensando no equilíbrio da configuração", "Escolhendo as melhores peças para o seu uso"];
       let frase = 0;
       pararMensagens();
@@ -566,6 +571,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         pecas_proprias:pecasPropriasFormulario(respostas),rede:respostas.rede});
       window.location.href = `${paginaConfiguracaoBuild}?build_id=${encodeURIComponent(resposta.build.id)}`;
     } catch (erro) {
+      cancelarAnuncioStatus();
       gerando = false;
       document.querySelector("#questions").dataset.formState = "error";
       atualizarMenu();

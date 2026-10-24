@@ -41,7 +41,7 @@ class TestCodigosEmail(unittest.TestCase):
             sessao["csrf_token"] = "token-para-testes"
         self.cabecalhos = {"X-CSRF-Token": "token-para-testes"}
         self.mail_mock = patch("services.email_service.enviar_codigo_email_service.mail.send")
-        self.mail_mock.start()
+        self.enviados = self.mail_mock.start()
 
     def tearDown(self):
         self.mail_mock.stop()
@@ -67,6 +67,16 @@ class TestCodigosEmail(unittest.TestCase):
         self.assertRegex(codigo, r"^[0-9]{6}$")
         self.assertEqual(self.conferir(codigo).status_code, 200)
         self.assertEqual(self.conferir(codigo).status_code, 400)
+
+    def test_email_usa_codigo_emitido_e_cabecalhos_transacionais(self):
+        self.assertEqual(self.enviar().status_code, 200)
+        mensagem = self.enviados.call_args.args[0]
+        codigo = Codigo.buscar_codigo_recente(self.usuario_id).codigo
+        self.assertEqual(mensagem.recipients, ["teste@example.test"])
+        self.assertIn(codigo, mensagem.body)
+        self.assertIn(codigo, mensagem.html)
+        self.assertIn("Teste", mensagem.html)
+        self.assertEqual(mensagem.extra_headers, {"Auto-Submitted": "auto-generated", "X-Auto-Response-Suppress": "All"})
 
     def test_cinco_tentativas_por_codigo(self):
         self.assertEqual(self.enviar().status_code, 200)

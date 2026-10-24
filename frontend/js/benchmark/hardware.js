@@ -30,11 +30,51 @@ export function hardwareBenchmark(cpu,gpu) {
 }
 
 export function hardwareBlender(cpu,gpu) {
-  const amd = cpu?.fabricante === "AMD" && /^Ryzen [3579] \d{4}[A-Z0-9]*$/.test(cpu.modelo || "") && Number.isInteger(cpu.nucleo);
-  const intel = cpu?.fabricante === "Intel" && /^Core i[3579]-1[234]\d{3}[A-Z]*$/.test(cpu.modelo || "");
-  const nomeCpu = amd ? "AMD " + cpu.modelo + " " + cpu.nucleo + "-Core Processor" : intel ? "Intel " + cpu.modelo : null;
-  const slug = gpus.get(String(gpu?.modelo || "").trim().toLowerCase() + ":" + Number(gpu?.memoria_gb));
-  const nomeGpu = slug?.startsWith("rtx-") || slug?.startsWith("gtx-") ? "NVIDIA GeForce " + slug.replaceAll("-"," ").toUpperCase().replace(" TI"," Ti").replace(" SUPER"," SUPER")
-    : slug?.startsWith("rx-") ? "AMD Radeon " + slug.replaceAll("-"," ").toUpperCase() : null;
+  // Open Data identifica o chip, não o nome comercial da placa (EAGLE, DUAL,
+  // SHADOW etc.). Isso é independente do registro de slugs da API de jogos.
+  // Só extrai identificadores explícitos: a API Python ainda exige nome exato
+  // na resposta. Nunca remove Ti/SUPER/XT/F nem tenta uma peça parecida no 422.
+  const nome = p => String(p?.modelo || "").replace(/\((?:R|TM)\)|[®™]/gi,"")
+    .replace(/[‐‑–—]/g,"-").replace(/\s+/g," ").trim();
+  const identificadores = (texto,expressao) => [...new Map([...texto.matchAll(expressao)]
+    .map(m => [m.slice(1).map(v => (v || "").replace(/\s+/g,"").toUpperCase()).join(":"),m])).values()];
+  const unico = (texto,expressao) => {
+    const encontrados = identificadores(texto,expressao);
+    return encontrados.length === 1 ? encontrados[0] : null;
+  };
+  const modeloCpu = nome(cpu), marca = String(cpu?.fabricante || "").trim().toUpperCase();
+  let nomeCpu = null;
+  if (marca === "AMD" && Number.isInteger(cpu.nucleo) && cpu.nucleo > 0) {
+    const m = unico(modeloCpu,/\bRyzen\s+([3579])\s+(\d{4}[A-Z0-9]*)\b/gi);
+    if (m) nomeCpu = "AMD Ryzen " + m[1] + " " + m[2].toUpperCase() + " " + cpu.nucleo + "-Core Processor";
+  } else if (marca === "INTEL") {
+    const cores = identificadores(modeloCpu,/\bCore\s+i([3579])[-\s]+(\d{3,5}[A-Z]*)\b/gi);
+    const ultras = identificadores(modeloCpu,/\bCore\s+Ultra\s+([3579])\s+(\d{3}[A-Z]*)\b/gi);
+    if (cores.length + ultras.length === 1) {
+      const core = cores[0], m = core || ultras[0];
+      nomeCpu = "Intel Core " + (core ? "i" + m[1] + "-" : "Ultra " + m[1] + " ") + m[2].toUpperCase();
+    }
+  }
+  const modeloGpu = nome(gpu);
+  // Não tratar versões mobile, RX 580 2048SP ou títulos com vários chips como
+  // a GPU desktop padrão. Uma variante sem identificação continua indisponível.
+  if (/\b(?:laptop|notebook|mobile|max-q|2048\s*sp)\b/i.test(modeloGpu)) return {cpu:nomeCpu,gpu:null};
+  const padraoNvidia = /\b(RTX|GTX|GT)\s*(\d{3,4})(?:\s*(TI(?:\s*SUPER)?|SUPER))?\b/gi;
+  const padraoAmd = /\bRX\s*(\d{3,4})(?:\s*(XTX|XT|GRE))?\b/gi;
+  const nvidias = identificadores(modeloGpu,padraoNvidia), amds = identificadores(modeloGpu,padraoAmd);
+  let nomeGpu = null;
+  if (nvidias.length + amds.length === 1) {
+    const nvidia = nvidias[0], m = nvidia || amds[0];
+    // Mantém a restrição já existente: não usar a referência 3060 de 12 GB
+    // para a variante de 8 GB (ou capacidade ausente), nem substituir por Ti.
+    if (nvidia && m[1].toUpperCase() === "RTX" && m[2] === "3060" && !m[3] && Number(gpu.memoria_gb) !== 12)
+      return {cpu:nomeCpu,gpu:null};
+    const restante = modeloGpu.replace(nvidia ? padraoNvidia : padraoAmd,"");
+    if (!/\b(?:Ti|SUPER|XTX|XT|GRE|M)\b/i.test(restante)) {
+      nomeGpu = nvidia ? "NVIDIA GeForce " + m[1].toUpperCase() + " " + m[2]
+        + (m[3] ? " " + m[3].toUpperCase().replace(/\s+/g,"").replace("TI","Ti").replace("TiSUPER","Ti SUPER") : "")
+        : "AMD Radeon RX " + m[1] + (m[2] ? " " + m[2].toUpperCase() : "");
+    }
+  }
   return {cpu:nomeCpu,gpu:nomeGpu};
 }

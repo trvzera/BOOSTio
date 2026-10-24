@@ -1,10 +1,19 @@
 import { informacoesFans, orientacoesVentilacao, encaixeRadiador } from "./fans.js";
+import { completarMedidas } from "./medidas-fisicas.js";
 export { informacoesFans } from "./fans.js";
 // Campos ausentes são desconhecidos, nunca zero ou uma medida inferida pelo nome.
 export function numeroConhecido(valor) {
   if (valor == null || valor === "" || typeof valor === "boolean") return null;
   const n = Number(valor);
   return Number.isFinite(n) && n >= 0 ? n : null;
+}
+export const AVISO_SLOTS_RAM_PROVISORIOS = "Slots de RAM não informados: limite provisório de dois pentes no editor. Confirme a quantidade real de slots e a capacidade máxima no manual da placa-mãe antes de comprar.";
+export function slotsRam(placa) {
+  if (!placa) return {slots:0,provisorio:false};
+  const valor = placa.quantidade_slots_ram;
+  const numero = ["number","string"].includes(typeof valor) && String(valor).trim() ? numeroConhecido(valor) : null;
+  // Zero ou um slot explicitamente cadastrado não vira dois. Não altera a ficha.
+  return numero != null && Number.isInteger(numero) ? {slots:numero,provisorio:false} : {slots:2,provisorio:true};
 }
 export function conexaoDisco(peca) {
   if (!peca) return null;
@@ -31,9 +40,18 @@ function medidas(valor) {
     .map(v => numeroConhecido(String(v).trim().replace(/\s*mm$/i,"")))
     .reduce((valores,v) => valores == null || v == null || v <= 0 ? null : [...valores,v],[]);
 }
-export function validarEncaixe({gpu,air,water,fans = [],gabinete,fonte,discos = [],substituir = false}) {
+export function encaixeCoolerPlaca(cooler,placa) {
+  const normalizar = v => String(v || "").trim().replace(/\s+/g," ").toUpperCase();
+  if (!placa?.fabricante || !placa.modelo || !Array.isArray(cooler?.placas_mae_incompativeis)) return null;
+  const fabricante = normalizar(placa.fabricante), modelo = normalizar(placa.modelo);
+  const nome = modelo.startsWith(fabricante + " ") ? modelo : fabricante + " " + modelo;
+  return cooler.placas_mae_incompativeis.some(p => normalizar(p) === nome) ? false : null;
+}
+export function validarEncaixe({gpu,air,water,fans = [],gabinete,placa,fonte,discos = [],substituir = false}) {
   const orientacoes = orientacoesVentilacao({gabinete,fans,water,substituir});
   const erros = [], avisos = [...orientacoes.dicas], alertas = [...orientacoes.avisos];
+  for (const cooler of [air,water]) if (encaixeCoolerPlaca(cooler,placa) === false)
+    erros.push("O fabricante do cooler declara incompatibilidade física com este modelo exato de placa-mãe.");
   if (!gabinete) return {erros,avisos,alertas};
   if (gabinete.observacoes_medidas) avisos.push(gabinete.observacoes_medidas);
   const checarMedida = (peca,medida,limite,nome) => {
@@ -101,8 +119,7 @@ export function completarCatalogoDemo(catalogo,manifesto = {pecas:[]}) {
     "MSI|PRO B760M-P": {quantidade_slots_m2:2,quantidade_portas_sata:4,quantidade_slots_m2_sata:1,portas_sata_desativadas_por_m2_sata:1},
   };
   return catalogo.map(p => {
-    const ficha = manifesto.pecas.find(f => ["categoria","fabricante","modelo"].every(k => String(p[k] || "").toLowerCase() === f[k].toLowerCase()) && f.part_numbers.includes(p.part_number));
-    const completa = ficha ? {...p,...ficha.medidas,fonte_medidas:ficha.fonte} : p;
-    return p.categoria === "placa_mae" ? {...completa,...placas[p.fabricante + "|" + p.modelo]} : completa;
+    const base = p.categoria === "placa_mae" ? {...p,...placas[p.fabricante + "|" + p.modelo]} : p;
+    return completarMedidas(base,manifesto);
   });
 }

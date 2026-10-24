@@ -14,6 +14,7 @@
 @import "./componentes/site-menu.css";
 @import "./componentes/scroll-reveal.css";
 @import "./componentes/page-entry.css";
+@import "./componentes/value-transition.css";
 
 /* Páginas */
 @import "./home/home.css";

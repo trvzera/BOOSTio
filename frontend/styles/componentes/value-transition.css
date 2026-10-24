@@ -1,0 +1,5 @@
+/* Baixa especificidade para preservar blocos e alinhamentos de cada componente. */
+:where(.value-transition, [data-value-key]) {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+}

@@ -114,7 +114,7 @@ test("rerender mantém foco na área visível e aplicação pendente não é des
   assert.match(js,/if \(!aplicando\) dialogo\.close\("cancelar"\)/);
   assert.match(js,/if \(aplicando && evento\.target === dialogo\) evento\.stopImmediatePropagation\(\)/);
   assert.match(js,/controle\.disabled = aplicando/);
-  assert.match(js,/role="status" aria-live="polite" aria-atomic="true"/);
+  assert.match(js,/anunciarStatus\(texto \+ resumo,\{urgente:tom === "error",\.\.\.opcoes\}\)/);
 });
 
 test("editor aguarda confirmação do salvamento e mantém base original para tentar novamente",() => {
@@ -134,7 +134,7 @@ test("aplicar melhorias pelo menu devolve o foco ao novo card depois da atualiza
 test("resumo sticky permite alcançar melhorias mesmo quando é maior que a tela",() => {
   assert.match(editorCss,/top: min\(88px,calc\(100dvh - var\(--summary-height,0px\) - 16px\)\)/);
   assert.match(editor,/new ResizeObserver\(entradas =>/);
-  assert.match(editor,/function renderizar\(\) \{\s*observarResumo\?\.disconnect\(\)/);
+  assert.match(editor,/function renderizar\(recriarOpcoes = false\) \{\s*observarResumo\?\.disconnect\(\)/);
   assert.match(editor,/observarResumo\?\.observe\(main\.querySelector\("\.build-sidebar"\)\)/);
   assert.match(editor,/"pagehide",\(\) => observarResumo\?\.disconnect\(\)/);
   assert.match(editor,/evento\.persisted && resumo\) observarResumo\?\.observe\(resumo\)/);

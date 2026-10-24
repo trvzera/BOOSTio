@@ -6,15 +6,18 @@ from .fpshq_service import ErroBenchmark
 
 
 class ConsultarRequisitosBuildService:
-    """Capacidades persistidas da própria conta; não certifica CPU/GPU nem prevê FPS."""
+    """Capacidades da conta ou de uma build pública, sempre com sessão; não prevê FPS."""
 
     def executar(self, dados, usuario_id):
         identificador = dados.get("build_id")
         if not isinstance(identificador, str) or not re.fullmatch(r"(?:s-)?[1-9][0-9]{0,17}", identificador):
             raise ValueError("Selecione uma build salva para verificar os requisitos.")
-        build = BuildSalva.buscar(usuario_id, identificador)
+        if "origem_publica" in dados and dados["origem_publica"] != "1":
+            raise ValueError("Origem de requisitos inválida.")
+        publica = dados.get("origem_publica") == "1"
+        build = BuildSalva.buscar_publica(identificador) if publica else BuildSalva.buscar(usuario_id, identificador)
         if build is None:
-            raise ErroBenchmark("Build não encontrada na sua conta.", "build-nao-encontrada", 404)
+            raise ErroBenchmark("Build não encontrada.", "build-nao-encontrada", 404)
 
         selecao = build.estado.get("componentes", {}).get("memoria_ram", [])
         itens = selecao if isinstance(selecao, list) else [selecao]
@@ -45,7 +48,7 @@ class ConsultarRequisitosBuildService:
         }, usuario_id)
         resultado["buildId"] = identificador
         resultado["ram"].update({
-            "fonte": "build_salva", "completa": completa,
+            "fonte": "build_publica" if publica else "build_salva", "completa": completa,
             "conhecidaGb": capacidade, "pentesIdentificados": pentes,
             "pendencias": list(dict.fromkeys(pendencias)),
         })

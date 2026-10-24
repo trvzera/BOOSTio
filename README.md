@@ -8,7 +8,8 @@
   </p>
   <p>
     <a href="#sobre">Sobre</a> ·
-    <a href="#funcionalidades">Funcionalidades</a> ·
+    <a href="#funcionalidades-implementadas">Funcionalidades</a> ·
+    <a href="#diagrama-de-classes">Diagrama de classes</a> ·
     <a href="#builds-prontas">Builds prontas</a> ·
     <a href="#peças-e-preços">Peças e preços</a> ·
     <a href="#desempenho-esperado">Desempenho esperado</a> ·
@@ -38,48 +39,60 @@ gaming/rendering performance from public benchmark sources.
 
 </details>
 
-## Funcionalidades
+## Funcionalidades Implementadas
 
-Os **20 requisitos do produto**, com o status de cada funcionalidade e seu escopo atual.
+As **20 funcionalidades obrigatórias do projeto**, na ordem dos requisitos
+definidos para a entrega e a apresentação em vídeo, com o status e o escopo atual
+de cada uma.
 
-**Resumo: 16 implementadas · 4 parciais.**
+**Resumo do produto: 20 funcionalidades obrigatórias implementadas no escopo descrito.**
 
 - ✅ **Implementado:** fluxo disponível no código do projeto.
-- 🟡 **Parcial:** já possui partes implementadas, mas ainda há pontos a concluir.
 
 Os status descrevem a implementação atual, não a homologação em produção.
-As limitações de cada funcionalidade estão indicadas na última coluna.
+As limitações de cada funcionalidade estão indicadas na última coluna. E-mail
+depende do SMTP configurado; a geração inteligente depende da disponibilidade e
+da cota da LLM.
+Operações locais não são apresentadas como novos casos de uso de backend:
+exportação JSON/CSV gera o download no navegador; comparação e prévia de melhorias
+têm cálculos no JavaScript sobre builds carregadas da API. Aplicar melhorias,
+importar e copiar modelos prontos utilizam os fluxos de criação ou atualização
+de builds no backend para persistir a configuração na conta.
 
 | Nº | Requisito | Status | Escopo atual |
 | --- | --- | --- | --- |
-| 01 | Criar conta e fazer login | ✅ **Implementado** | Cadastro, autenticação, logout e sessão. |
-| 02 | Cadastrar o setup atual | ✅ **Implementado** | Definir ou remover uma build como computador atual. |
-| 03 | Pesquisar peças e compatibilidade | ✅ **Implementado** | Catálogo por categoria e diagnóstico durante a montagem, com as limitações do requisito 13. |
-| 04 | Montar por formulário | ✅ **Implementado** | Geração por LLM com orçamento, ventilação cadastrada e uma revisão automática de saídas inválidas antes de salvar. |
-| 05 | Salvar configurações | ✅ **Implementado** | Builds persistidas na conta, inclusive incompletas, com salvamento automático. |
-| 06 | Excluir configurações salvas | ✅ **Implementado** | Exclusão com verificação de proprietário e tranca. |
-| 07 | Comparar configurações salvas | 🟡 **Parcial** | Preços, componentes, consumo e renderização no Blender de duas ou três builds; comparação de FPS ainda pendente. |
-| 08 | Compartilhar configurações por link | ✅ **Implementado** | Links de builds públicas e controle de visibilidade; páginas internas exigem sessão. |
-| 09 | Buscar melhorias do setup | 🟡 **Parcial** | Prévia e aplicação com bloqueio de regressões de RAM/SSD/HD. Trocas de CPU/GPU e demais categorias aguardam critérios comparáveis; sem dados, não são liberadas como melhorias. |
-| 10 | Ver configurações prontas | ✅ **Implementado** | 16 modelos sem periféricos, ordenados do menor para o maior preço cadastrado. |
-| 11 | Editar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento. |
-| 12 | Consultar preços das peças pelo site | 🟡 **Parcial** | Preços cadastrados, data de atualização quando disponível e links das lojas; monitoramento contínuo em evolução. |
-| 13 | Ver compatibilidade e consumo de energia | 🟡 **Parcial** | Medidas disponíveis, formatos, baias, fans e radiador; substituição explícita das fans do water cooler e painel de informações. Completar fichas técnicas e interferências físicas. |
-| 14 | Incluir periféricos no orçamento | ✅ **Implementado** | Inclusão e reaproveitamento com tetos separados para PC e periféricos. |
-| 15 | Registrar budget no perfil | ✅ **Implementado** | Valor e autorização usados no formulário e em novas montagens manuais, sem alterar builds existentes. |
-| 16 | Baixar builds em JSON e CSV | ✅ **Implementado** | Exportação para guardar a configuração localmente. |
-| 17 | Alterar a visibilidade da build | ✅ **Implementado** | Alternância entre pública e privada. |
-| 18 | Duplicar builds | ✅ **Implementado** | Cópia independente, respeitando o limite da conta. |
-| 19 | Definir nome e descrição | ✅ **Implementado** | Identificação e edição dos detalhes da build. |
-| 20 | Importar builds em JSON e CSV | ✅ **Implementado** | Validação do arquivo e criação de uma configuração na conta. |
+| 01 | O sistema deve permitir ao usuário criar sua conta e fazer login | ✅ **Implementado** | Cadastro, autenticação, logout e sessão. |
+| 02 | O sistema deve permitir ao usuário cadastrar seu setup atual | ✅ **Implementado** | Definir ou remover uma build como computador atual. |
+| 03 | O sistema deve permitir ao usuário pesquisar compatibilidade e peças | ✅ **Implementado** | Catálogo por categoria e diagnóstico durante a montagem, com as limitações do requisito 13. |
+| 04 | O sistema deve permitir ao usuário montar seu setup atual através de formulário | ✅ **Implementado** | Geração por LLM com orçamento, ventilação obrigatória (contando fans inclusas) e uma revisão automática de saídas inválidas antes de salvar. |
+| 05 | O sistema deve permitir ao usuário salvar configurações de computadores feitas | ✅ **Implementado** | Builds persistidas na conta, inclusive incompletas, com salvamento automático e avisos de falha. |
+| 06 | O sistema deve permitir ao usuário excluir configurações salvas no perfil | ✅ **Implementado** | Exclusão com verificação de proprietário e tranca. |
+| 07 | O sistema deve permitir ao usuário comparar configurações salvas | ✅ **Implementado** | Duas ou três builds: preços, componentes, consumo e renderização no Blender. FPS é uma ampliação pendente, não uma condição da comparação atual. |
+| 08 | O sistema deve permitir ao usuário compartilhar suas configurações por link | ✅ **Implementado** | Builds públicas podem ser vistas sem login, somente leitura. Testar exige sessão; salvar uma cópia privada exige também e-mail verificado e vaga na conta. |
+| 09 | O sistema deve permitir ao usuário buscar melhorias do seu setup | ✅ **Implementado** | RAM: acrescentar ou substituir pentes conforme a placa-mãe. SSD/HD: expandir quantidades mantendo os atuais, respeitando conexões/baias conhecidas, ou substituir sem regressões verificáveis. Orçamento obrigatório para aplicar; CPU/GPU e outras categorias dependem de métricas confiáveis. |
+| 10 | O sistema deve permitir ao usuário ver configurações prontas | ✅ **Implementado** | 16 modelos sem periféricos, referências revisadas no catálogo, filtro de budget e preço crescente. A cópia respeita e-mail verificado e limite da conta. |
+| 11 | O sistema deve permitir ao usuário editar e modificar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento; desfazer a última alteração de montagem enquanto o editor estiver aberto. |
+| 12 | O sistema deve permitir ao usuário verificar o preço da peça direto pelo site, sem precisar consultar em diversas abas | ✅ **Implementado** | Preços cadastrados, data quando disponível e links das lojas. Antes da compra, o catálogo é reconsultado e diferenças/indisponibilidade são mostradas. Não inclui frete nem garante o valor no checkout. |
+| 13 | O sistema deve permitir ao usuário ver todas as informações de compatibilidade e consumo de energia do setup que está montando | ✅ **Implementado** | Diagnóstico da build, consumo estimado e fichas técnicas com socket, memória, slots, conexões, medidas, fans e radiador conforme os dados cadastrados. A página da peça organiza especificações e fontes por assunto. Dados ausentes são sinalizados, não aprovados por suposição; ampliar a cobertura de modelos permanece uma melhoria de catálogo. |
+| 14 | O sistema deve permitir ao usuário adicionar ao setup periféricos, que muitas vezes não pensado anteriormente, acaba estourando o orçamento | ✅ **Implementado** | Inclusão e reaproveitamento com tetos separados para PC e periféricos. |
+| 15 | O sistema deve permitir ao usuário registrar em seu perfil o seu budget, assim fica registrado o seu dinheiro disponível para comprar e futuras melhorias | ✅ **Implementado** | Valor e autorização usados no formulário e em novas montagens manuais, sem alterar builds existentes. |
+| 16 | O sistema deve permitir ao usuário baixar a build em JSON e CSV para ter o arquivo local | ✅ **Implementado** | Exportação para guardar a configuração localmente. |
+| 17 | O sistema deve permitir ao usuário alterar a visibilidade da build | ✅ **Implementado** | Alternância entre pública e privada. |
+| 18 | O sistema deve permitir ao usuário duplicar a sua build | ✅ **Implementado** | Cópia independente, respeitando o limite da conta. |
+| 19 | O sistema deve permitir ao usuário definir um nome e descrição para a build | ✅ **Implementado** | Identificação e edição dos detalhes da build. |
+| 20 | O sistema deve permitir ao usuário importar builds por meio de arquivos CSV ou JSON | ✅ **Implementado** | Validação do arquivo e criação de uma configuração na conta. |
 
 ### Regras da plataforma
 
 - **Acesso:** início, termos, contato, sobre, cadastro, login e recuperação de senha
-  são públicos. Formulário, montagem, catálogo, perfil, builds prontas e laboratório exigem login.
+  são públicos. Links de builds públicas também abrem sem login, em uma tela somente
+  leitura. Formulário, editor, catálogo, perfil, builds prontas e laboratório exigem login.
 - **Criação:** e-mail verificado e limite de **três builds por conta**, incluindo
   montagem manual, formulário, importação, cópia de modelo e duplicação.
 - **Tranca:** uma build trancada não pode ser editada nem excluída antes de ser destrancada.
+- **Compartilhamento:** o visitante não altera a build original nem acessa o budget
+  ou os dados do proprietário. Testar exige login; uma cópia é privada e independente.
+  Tornar a original privada interrompe novas consultas e cópias pelo link público.
 
 ### Como o orçamento é respeitado
 
@@ -102,6 +115,8 @@ AM4, AM5 e Intel e diferentes níveis de investimento.
 
 Os modelos não incluem monitor, teclado, mouse, headset ou outros periféricos.
 Os totais e o filtro de orçamento usam os preços disponíveis no catálogo da conta.
+Modelos sem todas as cotações ou com peças indisponíveis não aparecem como opções
+dentro de um budget informado. A disponibilidade pode mudar após a revisão.
 
 A cópia é uma base editável: peças ausentes ou indisponíveis são sinalizadas no
 editor; não são substituídas por produtos parecidos nem registradas como peças
@@ -149,11 +164,16 @@ continuam pendentes: capacidades suficientes não aprovam o computador completo.
 
 Dados públicos de CPU ou GPU, com **mediana em amostras por minuto**, versão do
 Blender, método de renderização e quantidade de resultados. O retorno foi validado
-pelo serviço Python em **22/10/2026**, sem garantia de disponibilidade permanente.
+pelo serviço Python e revalidado com consultas reais em **23/10/2026**, sem garantia
+de disponibilidade permanente.
 
 A comparação de builds consulta esses dados ao clicar em **Comparar renderização**.
 CPU e GPU são analisadas separadamente; só há classificação quando todas as builds
 exibidas têm resultados da mesma versão do Blender e do mesmo método de renderização.
+O reconhecimento do Blender é independente dos slugs da API de FPS: nomes
+comerciais como EAGLE, DUAL e SHADOW não impedem identificar o chip explícito.
+Sufixos e variantes são preservados; modelos não identificados ou sem resultados
+públicos são informados por build, sem substituir a peça nem inventar pontuação.
 
 ### Limites da estimativa
 
@@ -199,15 +219,71 @@ A geração pela LLM já revalida conflitos conhecidos no catálogo, incluindo s
 DDR, slots, potência e medidas explícitas. Especificações ausentes continuam não
 verificadas; a configuração não recebe garantia de compatibilidade completa.
 
-As fichas físicas revisadas incluem Q300L, NR200, AK400, MAG A650BN e a variante
-MSI RTX 5060 Shadow 2X OC de 8 GB. O complemento é aplicado somente às identidades
-exatas documentadas, sem alterar o banco. Outras variantes não herdam essas medidas.
+O manifesto atual possui 37 fichas revisadas, incluindo gabinetes, GPUs, fontes,
+air/water coolers, placas-mãe, processador, RAM, SSDs e fan. Há limites físicos,
+slots, perfis JEDEC/XMP, dimensões por capacidade de SSD, conexões RGB/PWM e
+exceções físicas declaradas pelo fabricante do cooler. As fichas só complementam
+cadastros com identidade correspondente; não representam todo o catálogo.
+Parte dos gabinetes tem capacidade de fans detalhada. Os cards mostram fans
+inclusas e posições totais separadamente; fábrica, kits adicionais e water cooler
+dividem essa capacidade. Medidas externas não substituem a ficha de fixação.
+As fichas novas guardam fonte oficial/data da consulta e só são aplicadas às identidades
+exatas documentadas; apelidos internos também exigem o anúncio revisado. Sem alterar
+o banco ou inferir dados de outra revisão. Modelos/links com variantes divergentes
+continuam pendentes de revisão. Isso não certifica BIOS, QVL ou todas as
+interferências físicas.
 
 Saídas inválidas da IA recebem **uma tentativa automática de correção**, com o erro
 da validação e as regras originais. A nova resposta é validada por completo antes
 de persistir. Isso cobre falhas como GPU obrigatória ausente, JSON inválido, IDs,
 quantidades, orçamento e conflitos conhecidos; não garante solução quando o catálogo
 ou o orçamento não permitem a montagem. Falhas de transporte e cotas recebem mensagens próprias.
+
+Em 23/10/2026, um teste isolado pelo fluxo completo do formulário gerou, revisou,
+validou e persistiu uma configuração de estudos em banco temporário. Isso não
+comprova todos os cenários de uso nem garante respostas válidas de um provedor externo.
+
+## Arquitetura
+
+- [Controllers](backend/controllers/): classes por recurso, responsáveis pela
+  entrada HTTP, sessão, chamada aos Services e respostas da API.
+- [Services](backend/services/): casos de uso, validações e integrações externas.
+- [Models](backend/models/): entidades SQLAlchemy e operações de persistência.
+- [Repositories](backend/repositories/): acesso especial ao banco na sonda de
+  saúde e na migração de links. O CRUD convencional continua nas Models.
+- [Frontend](frontend/): páginas HTML/CSS e módulos JavaScript que consomem a API.
+
+As controllers utilizam métodos estáticos registrados nos Blueprints existentes,
+sem compartilhar estado de requisição. A conversão preserva URLs, endpoints,
+permissões, CSRF, limites de requisições e respostas. O fallback da IA é coordenado
+por `GerarBuildService`; localizar a conta e solicitar recuperação ficam em
+`SolicitarRecuperacaoSenhaService`. O envio de e-mail continua encapsulado em seu
+Service específico, e o SQL especial fica nos Repositories.
+
+## Diagrama de classes
+
+O diagrama de classes do domínio está sendo finalizado para esta entrega.
+O local previsto é `docs/diagrama-classes.png`; o arquivo e o link de visualização
+ainda precisam ser incluídos antes da submissão. Ele deve refletir as Models
+atuais, incluindo a diferença entre `Build` e `BuildSalva`, cujo estado é JSON.
+O [prompt baseado nas classes atuais](docs/prompt-diagrama-classes.md) está disponível
+para gerar a imagem e conferir seus relacionamentos antes de incluí-la.
+
+## Validação da versão
+
+Na revisão de **23/10/2026**, a suíte local aprovou **527 testes JavaScript** e
+**615 testes Python**, além de **13 subtestes Python**. Os testes cobrem, entre
+outros pontos, conta, permissões, budget, limite de builds, persistência,
+compartilhamento, arquivos, compatibilidade e tratamento de falhas.
+Há testes específicos para as sete classes de Controller e para preservar o
+contrato das 34 rotas declaradas, incluindo o blueprint legado de peças, que
+continua fora do registro do aplicativo principal. O catálogo ativo permanece
+em `/build/catalogo`.
+
+Os testes utilizam isolamento, bancos temporários e mocks quando necessário.
+Não comprovam todas as combinações de hardware, a disponibilidade permanente de
+SMTP/LLM/benchmarks ou o funcionamento do ambiente de produção. A demonstração
+final deve conferir os fluxos reais com frontend e backend da versão entregue.
 
 ## Limites de requisições
 

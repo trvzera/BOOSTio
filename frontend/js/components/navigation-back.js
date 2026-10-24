@@ -10,7 +10,7 @@ const rotulos = {
 };
 
 // Mantém a URL completa (build, categoria, filtros e posição na página).
-export function destinoAnterior(atual, origem, padrao) {
+export function destinoAnterior(atual, origem, padrao, contextual = false) {
   const base = new URL(atual);
   function valido(valor) {
     if (!valor) return null;
@@ -23,7 +23,23 @@ export function destinoAnterior(atual, origem, padrao) {
       return url.href;
     } catch { return null; }
   }
-  return valido(origem) || valido(padrao) || new URL("./index.html", base).href;
+  const anterior = valido(origem), destino = valido(padrao);
+  if (contextual && destino) {
+    // Um retorno à build/categoria não pode apontar ao início ou a outra build.
+    // Preserva filtros e posição do histórico somente dentro do mesmo contexto.
+    const esperado = new URL(destino), historico = anterior && new URL(anterior);
+    const mesmoContexto = historico && esperado.pathname === historico.pathname &&
+      ["build","build_id","id","categoria"].every(chave => esperado.searchParams.get(chave) === historico.searchParams.get(chave));
+    return mesmoContexto ? anterior : destino;
+  }
+  return anterior || destino || new URL("./index.html", base).href;
+}
+
+// Nunca retorna o editor sem ID: essa URL inicia a criação de uma nova build.
+export function destinoBuild(atual) {
+  const url = new URL(atual), id = url.searchParams.get("build");
+  if (!/\/(pecas|peca)\.html$/.test(url.pathname) || !id?.trim()) return "./builds.html";
+  return "./configuracao-build.html?" + new URLSearchParams({[id.startsWith("s-") ? "build_id" : "id"]:id});
 }
 export function rotuloVoltar(destino) {
   return rotulos[new URL(destino).pathname.split("/").pop()] || "Voltar à página anterior";
@@ -35,7 +51,7 @@ function retorno(controle) {
   // A Navigation API identifica a entrada real mesmo após back/forward ou replace.
   const origem = nav ? entrada?.url : document.referrer;
   const padrao = controle.dataset.backFallback || controle.getAttribute("href") || "./index.html";
-  const destino = destinoAnterior(location.href, origem, padrao);
+  const destino = destinoAnterior(location.href, origem, padrao, controle.hasAttribute("data-back-destination"));
   return {destino, historico:Boolean(origem && destino === origem && (nav ? entrada : history.length > 1))};
 }
 export function atualizarBotoesVoltar() {

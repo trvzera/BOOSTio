@@ -254,10 +254,7 @@
 .build-account-card { --indicator-color: var(--cor-p1); }
 .build-account-card.error { --indicator-color: var(--status-error); }
 .build-account-card.warning { --indicator-color: var(--status-warning); }
-.build-account-card .build-title-line { position: relative; flex-wrap: wrap; align-items: center; gap: 6px; padding-left: 0; }
-.build-account-card .build-indicator { position: relative; left: auto; top: auto; margin-left: auto; }
-.build-account-card .build-indicator .compatibility-trigger { width: 2.75rem; }
-.build-account-card:has(.information[data-open]) { position: relative; z-index: 40; }
+.build-account-card .build-title-line { flex-wrap: wrap; align-items: center; gap: 6px; }
 .build-account-card .build-card-title { flex: 1; min-width: 0; line-height: 1.4; overflow-wrap: anywhere; }
 .build-account-card .build-card-lock { flex-shrink: 0; margin: 0; }
 .build-card-current { color: var(--cor-p1); font: 500 .6875rem/1.5 var(--font-body); flex-basis: 100%; }
