@@ -140,6 +140,11 @@ export const rotulosTecnicos = {
   conector_fan:"Conector da fan", tensao_fan_v:"Tensão da fan (V)", corrente_fan_a:"Corrente da fan (A)",
   conector_rgb:"Conector da iluminação", tensao_rgb_v:"Tensão da iluminação (V)",
   fluxo_ar_cfm:"Fluxo de ar anunciado (CFM)", pressao_estatica_mmh2o:"Pressão estática anunciada (mmH₂O)",
+  rotacao_min_rpm:"Rotação mínima (RPM)", rotacao_max_rpm:"Rotação máxima (RPM)",
+  ruido_dba:"Ruído anunciado (dBA)", ruido_sone:"Ruído anunciado (sone)", rolamento:"Rolamento",
+  comprimento_cabo_m:"Comprimento do cabo (m)", alcance_sem_fio_m:"Alcance anunciado (m)",
+  alimentacao:"Alimentação", microfone_reducao_ruido:"Redução de ruído no microfone",
+  driver_mm:"Diâmetro do driver (mm)", impedancia_ohm:"Impedância (Ω)",
   tamanhos_fans_cooler_mm:"Diâmetros das fans do cooler (mm)", comprimento_tubo_mm:"Comprimento dos tubos (mm)",
   placas_mae_incompativeis:"Placas-mãe com incompatibilidade declarada pelo fabricante",
   wifi_integrado:"Wi-Fi integrado", versao_bluetooth:"Versão do Bluetooth", tdp_w:"TDP anunciado (W)",
@@ -223,7 +228,7 @@ export function gruposFichaTecnica(peca) {
     {titulo: "Recursos e características", campos: []},
     {titulo: "Origem das informações", campos: []},
   ];
-  const desempenho = /^(consumo_|tdp_|clock|nucleo$|thread$|capacidade_gb$|memoria_gb$|frequencia_mhz$|latencia$|potencia|velocidade_|memoria_cache_|fluxo_ar_cfm$|pressao_estatica_|durabilidade_|taxa_atualizacao_|tempo_resposta_|resolucao$|dpi_max$)/;
+  const desempenho = /^(consumo_|tdp_|clock|nucleo$|thread$|capacidade_gb$|memoria_gb$|frequencia_mhz$|latencia$|potencia|velocidade_|rotacao_|ruido_|memoria_cache_|fluxo_ar_cfm$|pressao_estatica_|durabilidade_|taxa_atualizacao_|tempo_resposta_|resolucao$|dpi_max$)/;
   const encaixe = /^(soquete$|socket$|chipset$|formato|tipo_memoria$|ddr$|interface|quantidade_slots_|quantidade_portas_|portas_sata_|memoria_maxima_|tipos_memoria_cpu$|quantidade_pentes$|quantidade_max_fans$|comprimento_|largura_|altura_|espessura_|dimensoes|tamanho_|tamanhos_|slots_|baias_|bays_|posicoes_|limites_radiador_|radiadores_|compatibilidade$|placas_mae_incompativeis$|conector|numero_pinos$|versao_atx$|suporte_water_cooler$|fans_inclusos$|quantidade_fans$|cooler$|modelo_cooler$|videointegrado$|modelo_videointegrado$|observacoes_medidas$)/;
   const entradas = entradasFichaTecnica(peca);
   if (peca.part_number) entradas.push(["part_number", peca.part_number]);

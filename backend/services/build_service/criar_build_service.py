@@ -47,6 +47,7 @@ class CriarBuildService:
     "tipos_memoria_cpu", "memoria_maxima_cpu_gb", "tdp_w", "perfis_memoria", "numero_pinos",
     "placas_mae_incompativeis",
     "conector_fan", "tensao_fan_v", "corrente_fan_a", "conector_rgb", "tensao_rgb_v",
+    "rotacao_max_rpm", "fluxo_ar_cfm", "pressao_estatica_mmh2o", "ruido_dba",
     "conectores_cpu_eps", "conectores_pcie_8pinos", "conectores_pcie_16pinos", "conectores_sata",
     "tamanho_max_fonte_mm", "formatos_fonte", "certificacao_fonte", "versao_atx", "baias_25", "baias_35",
     "padrao_wifi", "velocidade_mbps", "bluetooth", "categoria", "comprimento_m", "conector",

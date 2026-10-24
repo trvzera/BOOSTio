@@ -1,6 +1,167 @@
 {
-  "versao": 2,
+  "versao": 3,
   "pecas": [
+    {
+      "categoria": "fan", "fabricante": "ARCTIC", "modelo": "P12 PWM PST Black",
+      "part_numbers": ["ACFAN00120A"],
+      "fonte": "https://www.arctic.de/media/42/84/78/1693306001/Spec_Sheet_P12_PWM_PST_EN.pdf",
+      "verificado_em": "2026-10-24",
+      "medidas": {
+        "tamanho_mm": 120, "quantidade": 1, "comprimento_mm": 120, "largura_mm": 120, "espessura_mm": 25,
+        "iluminacao": false, "conector_fan": "4 pinos PWM + tomada PST de 4 pinos",
+        "tensao_fan_v": 12, "corrente_fan_a": 0.1, "consumo_energia": 1.2,
+        "rotacao_min_rpm": 200, "rotacao_max_rpm": 1800, "fluxo_ar_cfm": 56.3,
+        "pressao_estatica_mmh2o": 2.2, "ruido_sone": 0.3, "rolamento": "Fluid Dynamic Bearing",
+        "comprimento_cabo_m": 0.4,
+        "observacoes_medidas": "Uma fan por embalagem. Potência calculada de 12 V × 0,1 A; não é medição do computador. O limite elétrico da porta/hub precisa ser conferido ao encadear fans PST. Sone não foi convertido em dBA."
+      }
+    },
+    {
+      "categoria": "fan", "fabricante": "ARCTIC", "modelo": "P12 PWM PST Black Pack of 5",
+      "part_numbers": ["ACFAN00137A"],
+      "fonte": "https://www.arctic.de/media/42/84/78/1693306001/Spec_Sheet_P12_PWM_PST_EN.pdf",
+      "verificado_em": "2026-10-24",
+      "medidas": {
+        "tamanho_mm": 120, "quantidade": 5, "comprimento_mm": 120, "largura_mm": 120, "espessura_mm": 25,
+        "iluminacao": false, "conector_fan": "4 pinos PWM + tomada PST de 4 pinos",
+        "tensao_fan_v": 12, "corrente_fan_a": 0.1, "consumo_energia": 6,
+        "rotacao_min_rpm": 200, "rotacao_max_rpm": 1800, "fluxo_ar_cfm": 56.3,
+        "pressao_estatica_mmh2o": 2.2, "ruido_sone": 0.3, "rolamento": "Fluid Dynamic Bearing",
+        "observacoes_medidas": "Kit de cinco fans; dimensões, corrente, fluxo e ruído são por ventoinha. Consumo do produto calculado para o kit inteiro: 5 × 12 V × 0,1 A. Não reutilizar o preço ou o anúncio da embalagem avulsa. Limite elétrico da porta/hub deve ser conferido."
+      }
+    },
+    {
+      "categoria": "fan", "fabricante": "be quiet!", "modelo": "Pure Wings 3 120mm PWM",
+      "part_numbers": ["BL105"], "fonte": "https://www.bequiet.com/en/casefans/4606",
+      "verificado_em": "2026-10-24",
+      "medidas": {
+        "tamanho_mm": 120, "quantidade": 1, "espessura_mm": 25, "iluminacao": false,
+        "conector_fan": "4 pinos PWM", "tensao_fan_v": 12, "corrente_fan_a": 0.1,
+        "consumo_energia": 2.4, "rotacao_max_rpm": 1600, "fluxo_ar_cfm": 49.9,
+        "pressao_estatica_mmh2o": 1.45, "ruido_dba": 25.5, "rolamento": "Rifle",
+        "comprimento_cabo_m": 0.46,
+        "observacoes_medidas": "Variante PWM BL105, não a high-speed ou a versão de 3 pinos. Potência de entrada publicada: 2,4 W; corrente nominal de 0,1 A e de segurança de 0,2 A."
+      }
+    },
+    {
+      "categoria": "fan", "fabricante": "Corsair", "modelo": "iCUE QL120 RGB Single Fan",
+      "part_numbers": ["CO-9050097-WW"],
+      "aliases_catalogo": [{"fabricante": "Corsair", "modelo": "QL120", "part_number": "SEED-FAN-14", "produto_kabum": "108137"}],
+      "fonte": "https://www.corsair.com/eu/en/p/case-fans/co-9050097-ww/icue-ql120-rgb-120mm-pwm-single-fan-co-9050097-ww",
+      "verificado_em": "2026-10-24",
+      "medidas": {
+        "tamanho_mm": 120, "quantidade": 1, "espessura_mm": 25, "iluminacao": true,
+        "rotacao_max_rpm": 1500, "fluxo_ar_cfm": 41.8, "pressao_estatica_mmh2o": 1.55,
+        "ruido_dba": 26, "corrente_fan_a": 0.3, "conector_fan": "PWM", "rolamento": "Hydraulic",
+        "observacoes_medidas": "CO-9050097-WW contém uma fan, não três. Controlador Lighting Node CORE não acompanha esta embalagem avulsa; não confundir com o kit CO-9050098-WW. Conexão de iluminação deve ser conferida no manual."
+      }
+    },
+    {
+      "categoria": "fan", "fabricante": "Lian Li", "modelo": "UNI FAN SL Wireless 120 Reverse Blade White Single",
+      "part_numbers": ["12RSL1W1W"],
+      "aliases_catalogo": [{"fabricante": "Lian Li", "modelo": "Uni Fan SL120", "part_number": "SEED-FAN-33", "produto_kabum": "931169"}],
+      "fonte": "https://lian-li.com/product/uni-fan-sl-wireless/", "verificado_em": "2026-10-24",
+      "medidas": {
+        "tamanho_mm": 120, "quantidade": 1, "comprimento_mm": 120, "largura_mm": 124.5, "espessura_mm": 28,
+        "iluminacao": true, "fluxo_ar": "reverso", "conector_fan": "4 pinos PWM",
+        "rotacao_min_rpm": 300, "rotacao_max_rpm": 2000, "fluxo_ar_cfm": 69.5,
+        "pressao_estatica_mmh2o": 2.6, "ruido_dba": 31, "rolamento": "Fluid Dynamic Bearing",
+        "observacoes_medidas": "Uma fan, sem controlador L-Wireless no pacote. A iluminação sem fio não elimina a alimentação por cabo. Variante reversa sem LCD: não herda medidas ou potência da versão LCD ou do kit de três."
+      }
+    },
+    {
+      "categoria": "mouse", "fabricante": "Logitech", "modelo": "M100 Black",
+      "part_numbers": ["910-003241"],
+      "fonte": "https://www.kabum.com.br/produto/302167/mouse-logitech-m100-usb-1000-dpi-preto-910-003241",
+      "verificado_em": "2026-10-24",
+      "medidas": {
+        "conexao": "USB com fio", "dpi_max": 1000, "botoes": 3, "sensor": "Óptico",
+        "iluminacao": false, "consumo_energia": null,
+        "observacoes_medidas": "DPI e identidade da variante brasileira confirmados no anúncio. Consumo não confirmado para este part number; não interpretá-lo como zero."
+      }
+    },
+    {
+      "categoria": "teclado", "fabricante": "Logitech", "modelo": "K270 ABNT2",
+      "part_numbers": ["920-004427"],
+      "fonte": "https://support.logi.com/hc/en-us/articles/360023462213-K270-Technical-Specifications",
+      "verificado_em": "2026-10-24",
+      "medidas": {
+        "conexao": "Sem fio 2,4 GHz com receptor USB Unifying", "layout": "ABNT2", "tamanho": "Completo",
+        "iluminacao": false, "alcance_sem_fio_m": 10, "alimentacao": "2 pilhas AAA; receptor USB",
+        "dimensoes_fabricante": "441 × 149 × 18 mm (largura × profundidade × altura)", "consumo_energia": null,
+        "observacoes_medidas": "Layout ABNT2 confirmado no anúncio brasileiro 39391/920-004427. Não é Bluetooth nem o combo MK270. Consumo do receptor USB não confirmado; autonomia de pilhas não é consumo da fonte do PC."
+      }
+    },
+    {
+      "categoria": "fone", "fabricante": "Logitech", "modelo": "H390 USB-A Black",
+      "part_numbers": ["981-000014"],
+      "fonte": "https://support.logi.com/hc/en-ch/articles/360024878073-Specifications-USB-Headset-H390",
+      "verificado_em": "2026-10-24",
+      "medidas": {
+        "conexao": "USB-A com fio", "tipo": "Headset", "microfone": true, "cancelamento_ruido": false,
+        "microfone_reducao_ruido": true, "resposta_frequencia": "20 Hz – 20 kHz", "comprimento_cabo_m": 1.9,
+        "driver_mm": 30, "impedancia_ohm": 32, "consumo_energia": null,
+        "observacoes_medidas": "Variante USB-A preta 981-000014, não USB-C. Redução de ruído é do microfone: não indica cancelamento ativo de ruído nos fones. Consumo elétrico não confirmado."
+      }
+    },
+    {
+      "categoria": "gabinete", "fabricante": "Lian Li", "modelo": "O11 DYNAMIC EVO RGB Black",
+      "part_numbers": ["O11DERGBX"],
+      "aliases_catalogo": [{"fabricante": "Lian Li", "modelo": "O11 Dynamic", "part_number": "SEED-CASE-29", "produto_kabum": "582808"}],
+      "fonte": "https://lian-li.com/product/o11d-evo-rgb/", "verificado_em": "2026-10-24",
+      "medidas": {
+        "comprimento_mm": 478, "largura_mm": 290, "altura_mm": 471,
+        "formatos_placa_mae": "ATX, mATX, ITX, E-ATX", "slots_expansao": 7,
+        "tamanho_max_gpu_mm": 455.7, "tamanho_max_cooler_mm": 167,
+        "tamanho_max_fonte_mm": 219, "formatos_fonte": ["ATX"], "fans_inclusos": 0,
+        "quantidade_max_fans": 10, "tamanhos_fan_suportados_mm": [120, 140], "suporte_water_cooler": true,
+        "baias_25": null, "baias_35": null, "bays_disco": null,
+        "posicoes_fans_completas": false, "radiadores_suportados_mm": [240, 280, 360],
+        "posicoes_fans": [
+          {"nome": "Topo (sem suporte opcional de 420 mm)", "opcoes": [{"tamanho_mm": 120, "quantidade": 3}, {"tamanho_mm": 140, "quantidade": 3}], "fans_inclusas": [], "radiadores_mm": [240, 360]},
+          {"nome": "Lateral", "opcoes": [{"tamanho_mm": 120, "quantidade": 3}, {"tamanho_mm": 140, "quantidade": 3}], "fans_inclusas": [], "radiadores_mm": [240, 280, 360]},
+          {"nome": "Base", "opcoes": [{"tamanho_mm": 120, "quantidade": 3}, {"tamanho_mm": 140, "quantidade": 3}], "fans_inclusas": [], "radiadores_mm": [240, 280, 360]},
+          {"nome": "Traseira", "opcoes": [{"tamanho_mm": 120, "quantidade": 1}], "fans_inclusas": [], "radiadores_mm": []}
+        ],
+        "observacoes_medidas": "Variante EVO RGB, não O11 original/EVO. E-ATX abaixo de 280 mm de largura; fonte abaixo de 220 mm (limite inteiro conservador de 219 mm). Radiador de 420 mm requer suporte vendido separadamente e não está aprovado nesta ficha. Baias da lateral competem com fans; armazenamento foi mantido desconhecido para não somar capacidades alternativas. Folgas com radiadores, RAM, cabos e GPU continuam por confirmar."
+      }
+    },
+    {
+      "categoria": "gabinete", "fabricante": "Corsair", "modelo": "2000D AIRFLOW White",
+      "part_numbers": ["CC-9011245-WW"],
+      "aliases_catalogo": [{"fabricante": "Corsair", "modelo": "2000D", "part_number": "SEED-CASE-44", "produto_kabum": "433279"}],
+      "fonte": "https://www.corsair.com/us/en/p/pc-cases/cc-9011245-ww/2000d-airflow-mini-itx-pc-case-white-cc-9011245-ww",
+      "verificado_em": "2026-10-24",
+      "medidas": {
+        "comprimento_mm": 271, "largura_mm": 200, "altura_mm": 458,
+        "formatos_placa_mae": "ITX", "slots_expansao": 3, "tamanho_max_gpu_mm": 365,
+        "tamanho_max_cooler_mm": 165, "tamanho_max_fonte_mm": 130, "formatos_fonte": ["SFX"],
+        "baias_25": 3, "baias_35": 0, "fans_inclusos": 0,
+        "quantidade_max_fans": null, "posicoes_fans": null, "posicoes_fans_completas": false,
+        "tamanhos_fan_suportados_mm": [120, 140], "suporte_water_cooler": true,
+        "radiadores_suportados_mm": [120, 140, 240, 280, 360],
+        "observacoes_medidas": "Versão AIRFLOW sem fans; não herda o kit da RGB AIRFLOW. Oito posições anunciadas incluem duas traseiras condicionadas a GPU de um slot; a capacidade simultânea foi mantida desconhecida para não aprovar oito fans com qualquer GPU. Fans de 140 mm apenas na lateral. Radiador traseiro de 240 mm também depende da GPU de um slot; confirmar espessuras e disposição no manual."
+      }
+    },
+    {
+      "categoria": "gabinete", "fabricante": "Cooler Master", "modelo": "MasterBox 520 Black",
+      "part_numbers": ["MB520-KGNN-S01"],
+      "fonte": "https://www.coolermaster.com/en-global/products/masterbox-520.html", "verificado_em": "2026-10-24",
+      "medidas": {
+        "comprimento_mm": 499, "largura_mm": 210, "altura_mm": 498, "slots_expansao": 7,
+        "formatos_placa_mae": "ITX, mATX, ATX, SSI CEB, E-ATX", "formatos_fonte": ["ATX"],
+        "tamanho_max_gpu_mm": 410, "tamanho_max_cooler_mm": 165, "tamanho_max_fonte_mm": 200,
+        "baias_25": 3, "baias_35": 2, "fans_inclusos": 4, "quantidade_max_fans": 7,
+        "tamanhos_fan_suportados_mm": [120, 140], "suporte_water_cooler": true,
+        "radiadores_suportados_mm": [120, 140, 240, 280, 360], "posicoes_fans_completas": false,
+        "posicoes_fans": [
+          {"nome": "Frente", "opcoes": [{"tamanho_mm": 120, "quantidade": 3}, {"tamanho_mm": 140, "quantidade": 2}], "fans_inclusas": [{"tamanho_mm": 120, "quantidade": 3}], "radiadores_mm": [120, 140, 240, 280, 360]},
+          {"nome": "Topo", "opcoes": [{"tamanho_mm": 120, "quantidade": 3}, {"tamanho_mm": 140, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": [120, 140, 240, 280, 360]},
+          {"nome": "Traseira", "opcoes": [{"tamanho_mm": 120, "quantidade": 1}], "fans_inclusas": [{"tamanho_mm": 120, "quantidade": 1}], "radiadores_mm": [120]}
+        ],
+        "observacoes_medidas": "MB520-KGNN-S01 não é o antigo MCB-B520-KGNN-RGA. Inclui três CF120 ARGB frontais e uma MasterFan Lite 120 traseira. Dimensões externas incluem saliências; não são espaço interno. E-ATX até 12 × 10,7 polegadas pode afetar cabos. Fonte de até 170 mm e radiador superior de até 55 mm são recomendações, não folgas garantidas para qualquer conjunto."
+      }
+    },
     {
       "categoria": "placa_video",
       "fabricante": "MSI",
@@ -15,7 +176,9 @@
       "modelo": "MasterBox NR200",
       "part_numbers": ["MCB-NR200-KNNN-S00", "MCB-NR200-WNNN-S00", "SEED-CASE-11"],
       "fonte": "https://www.coolermaster.com/en-global/products/masterbox-nr200.html",
+      "verificado_em": "2026-10-24",
       "medidas": {
+        "comprimento_mm": 376, "largura_mm": 185, "altura_mm": 292,
         "formatos_placa_mae": "Mini DTX, ITX",
         "slots_expansao": 3,
         "tamanho_max_gpu_mm": 330,

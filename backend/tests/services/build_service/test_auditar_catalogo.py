@@ -55,3 +55,14 @@ def test_dado_malformado_e_estoque_desconhecido_nao_aprovam_oferta(monkeypatch, 
     assert resumo["disponiveisComPreco"] == 0
     assert resumo["pendencias"]["estoque_nao_confirmado"] == 1
     assert resumo["pendencias"]["imagem_invalida"] == 1
+
+
+def test_auditoria_indica_especificacoes_ausentes_sem_tratar_zero_como_ausente(monkeypatch):
+    peca = {"id": "gabinete:1", "fans_inclusos": 0, "quantidade_max_fans": None, "posicoes_fans": []}
+    monkeypatch.setattr("services.peca_service.auditar_catalogo_service.MODELOS_PECAS", [modelo("gabinete", [peca])])
+    resumo = AuditarCatalogoService().executar(1)["categorias"]["gabinete"]
+    assert "fans_inclusos" not in resumo["camposTecnicosAusentes"]
+    assert resumo["camposTecnicosAusentes"]["quantidade_max_fans"] == 1
+    assert resumo["camposTecnicosAusentes"]["posicoes_fans"] == 1
+    assert resumo["amostrasTecnicas"][0]["id"] == "gabinete:1"
+    assert not AuditarCatalogoService().executar(0)["categorias"]["gabinete"]["amostrasTecnicas"]

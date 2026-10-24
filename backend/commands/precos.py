@@ -12,9 +12,16 @@ from services.peca_service.restaurar_links_kabum_service import RestaurarLinksKa
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from services.peca_service.atualizar_imagem_peca_service import AtualizarImagemPecaService
 from services.peca_service.auditar_catalogo_service import AuditarCatalogoService
+from services.peca_service.cadastrar_complementares_service import CadastrarComplementaresService
 
 
 def registrar_comandos_precos(app):
+    @app.cli.command("pecas-complementares")
+    @click.option("--simular", is_flag=True, help="Lista o lote sem gravar dados nem consultar lojas.")
+    def complementares(simular):
+        """Adiciona apenas fans/periféricos/gabinete revisados, sem alterar preços existentes."""
+        click.echo(json.dumps(CadastrarComplementaresService().executar(simular=simular), ensure_ascii=False))
+
     @app.cli.command("catalogo-auditar")
     @click.option("--amostras", default=5, type=click.IntRange(0, 20), show_default=True)
     def auditar(amostras):
