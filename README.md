@@ -41,42 +41,9 @@ gaming/rendering performance from public benchmark sources.
 
 ## Funcionalidades Implementadas
 
-### Casos de uso com API e persistência
-
-Os casos abaixo possuem interface, chamada HTTP, tratamento no backend, Service
-e acesso às Models. Consultas leem o banco; alterações persistem os dados.
-Os nomes identificam ações reais, não apenas telas ou rotas.
-
-| Nº | Caso de uso | API Flask | Service responsável |
-| --- | --- | --- | --- |
-| 01 | Cadastrar conta | `POST /usuarios/` | `CriarUsuarioService` |
-| 02 | Fazer login por e-mail e senha | `POST /auth/entrar` | `EntrarUsuarioService` |
-| 03 | Atualizar os dados do perfil | `PUT /usuarios/{id}` | `AtualizarUsuarioService` |
-| 04 | Excluir a conta por desativação lógica | `DELETE /usuarios/{id}` | `DeletarUsuarioService` |
-| 05 | Salvar budget e autorização de uso | `PUT /usuarios/{id}/budget` | `AtualizarBudgetUsuarioService` |
-| 06 | Solicitar código de verificação de e-mail | `POST /email/verificar/enviar/{id}` | `EnviarEmailService` |
-| 07 | Confirmar o e-mail pelo código recebido | `POST /email/verificar/conferir/{id}` | `VerificarCodigoEmail` |
-| 08 | Solicitar recuperação de senha | `POST /usuarios/esqueci-senha` | `SolicitarRecuperacaoSenhaService` e `EnviarEmailRecuperarService` |
-| 09 | Redefinir senha com token válido | `POST /usuarios/redefinir-senha` | `RedefinirSenhaService` |
-| 10 | Consultar o catálogo de peças e preços | `GET /build/catalogo` | `ListarCatalogoBuildService` |
-| 11 | Criar uma build manual | `POST /build/manual` | `CriarBuildManualService` |
-| 12 | Gerar uma build pelo formulário inteligente | `POST /build/` | `GerarBuildService`, `CriarBuildService` e `LLMService` |
-| 13 | Listar as builds da conta | `GET /build/` | `ListarBuildService` |
-| 14 | Abrir uma build salva | `GET /build/{id}` | `BuscarBuildService` |
-| 15 | Atualizar uma build e seus componentes | `PUT /build/{id}` | `AtualizarBuildService` |
-| 16 | Duplicar uma build | `POST /build/{id}/duplicar` | `DuplicarBuildService` |
-| 17 | Excluir uma build | `DELETE /build/{id}` | `ExcluirBuildService` |
-| 18 | Definir ou remover o setup atual | `POST /build/{id}/setup-atual` | `DefinirSetupAtualService` |
-| 19 | Visualizar uma build pública por link | `GET /build/{id}/publica` | `BuscarBuildPublicaService` |
-| 20 | Salvar uma cópia de build pública no perfil | `POST /build/{id}/copiar-publica` | `CopiarBuildPublicaService` |
-
-Essa lista descreve a implementação, não uma garantia de funcionamento de serviços
-externos: e-mail depende do SMTP configurado e geração depende da disponibilidade
-e cota da LLM. As ressalvas de arquitetura estão na seção [Arquitetura](#arquitetura).
-
-### Cobertura dos 20 requisitos do produto
-
-Os **20 requisitos do produto**, com o status de cada funcionalidade e seu escopo atual.
+As **20 funcionalidades obrigatórias do projeto**, na ordem dos requisitos
+definidos para a entrega e a apresentação em vídeo, com o status e o escopo atual
+de cada uma.
 
 **Resumo do produto: 19 implementadas no escopo descrito · 1 parcial.**
 
@@ -84,34 +51,37 @@ Os **20 requisitos do produto**, com o status de cada funcionalidade e seu escop
 - 🟡 **Parcial:** já possui partes implementadas, mas ainda há pontos a concluir.
 
 Os status descrevem a implementação atual, não a homologação em produção.
-As limitações de cada funcionalidade estão indicadas na última coluna.
+As limitações de cada funcionalidade estão indicadas na última coluna. E-mail
+depende do SMTP configurado; a geração inteligente depende da disponibilidade e
+da cota da LLM.
 Operações locais não são apresentadas como novos casos de uso de backend:
 exportação JSON/CSV gera o download no navegador; comparação e prévia de melhorias
 têm cálculos no JavaScript sobre builds carregadas da API. Aplicar melhorias,
-importar e copiar modelos prontos utilizam os casos de criação/atualização acima.
+importar e copiar modelos prontos utilizam os fluxos de criação ou atualização
+de builds no backend para persistir a configuração na conta.
 
 | Nº | Requisito | Status | Escopo atual |
 | --- | --- | --- | --- |
-| 01 | Criar conta e fazer login | ✅ **Implementado** | Cadastro, autenticação, logout e sessão. |
-| 02 | Cadastrar o setup atual | ✅ **Implementado** | Definir ou remover uma build como computador atual. |
-| 03 | Pesquisar peças e compatibilidade | ✅ **Implementado** | Catálogo por categoria e diagnóstico durante a montagem, com as limitações do requisito 13. |
-| 04 | Montar por formulário | ✅ **Implementado** | Geração por LLM com orçamento, ventilação obrigatória (contando fans inclusas) e uma revisão automática de saídas inválidas antes de salvar. |
-| 05 | Salvar configurações | ✅ **Implementado** | Builds persistidas na conta, inclusive incompletas, com salvamento automático e avisos de falha. |
-| 06 | Excluir configurações salvas | ✅ **Implementado** | Exclusão com verificação de proprietário e tranca. |
-| 07 | Comparar configurações salvas | ✅ **Implementado** | Duas ou três builds: preços, componentes, consumo e renderização no Blender. FPS é uma ampliação pendente, não uma condição da comparação atual. |
-| 08 | Compartilhar configurações por link | ✅ **Implementado** | Builds públicas podem ser vistas sem login, somente leitura. Testar exige sessão; salvar uma cópia privada exige também e-mail verificado e vaga na conta. |
-| 09 | Buscar melhorias do setup | ✅ **Implementado** | RAM: acrescentar ou substituir pentes conforme a placa-mãe. SSD/HD: expandir quantidades mantendo os atuais, respeitando conexões/baias conhecidas, ou substituir sem regressões verificáveis. Orçamento obrigatório para aplicar; CPU/GPU e outras categorias dependem de métricas confiáveis. |
-| 10 | Ver configurações prontas | ✅ **Implementado** | 16 modelos sem periféricos, referências revisadas no catálogo, filtro de budget e preço crescente. A cópia respeita e-mail verificado e limite da conta. |
-| 11 | Editar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento; desfazer a última alteração de montagem enquanto o editor estiver aberto. |
-| 12 | Consultar preços das peças pelo site | ✅ **Implementado** | Preços cadastrados, data quando disponível e links das lojas. Antes da compra, o catálogo é reconsultado e diferenças/indisponibilidade são mostradas. Não inclui frete nem garante o valor no checkout. |
-| 13 | Ver compatibilidade e consumo de energia | 🟡 **Parcial** | Medidas disponíveis, formatos, baias, fans e radiador; substituição explícita das fans do water cooler e painel de informações. Completar fichas técnicas e interferências físicas. |
-| 14 | Incluir periféricos no orçamento | ✅ **Implementado** | Inclusão e reaproveitamento com tetos separados para PC e periféricos. |
-| 15 | Registrar budget no perfil | ✅ **Implementado** | Valor e autorização usados no formulário e em novas montagens manuais, sem alterar builds existentes. |
-| 16 | Baixar builds em JSON e CSV | ✅ **Implementado** | Exportação para guardar a configuração localmente. |
-| 17 | Alterar a visibilidade da build | ✅ **Implementado** | Alternância entre pública e privada. |
-| 18 | Duplicar builds | ✅ **Implementado** | Cópia independente, respeitando o limite da conta. |
-| 19 | Definir nome e descrição | ✅ **Implementado** | Identificação e edição dos detalhes da build. |
-| 20 | Importar builds em JSON e CSV | ✅ **Implementado** | Validação do arquivo e criação de uma configuração na conta. |
+| 01 | O sistema deve permitir ao usuário criar sua conta e fazer login | ✅ **Implementado** | Cadastro, autenticação, logout e sessão. |
+| 02 | O sistema deve permitir ao usuário cadastrar seu setup atual | ✅ **Implementado** | Definir ou remover uma build como computador atual. |
+| 03 | O sistema deve permitir ao usuário pesquisar compatibilidade e peças | ✅ **Implementado** | Catálogo por categoria e diagnóstico durante a montagem, com as limitações do requisito 13. |
+| 04 | O sistema deve permitir ao usuário montar seu setup atual através de formulário | ✅ **Implementado** | Geração por LLM com orçamento, ventilação obrigatória (contando fans inclusas) e uma revisão automática de saídas inválidas antes de salvar. |
+| 05 | O sistema deve permitir ao usuário salvar configurações de computadores feitas | ✅ **Implementado** | Builds persistidas na conta, inclusive incompletas, com salvamento automático e avisos de falha. |
+| 06 | O sistema deve permitir ao usuário excluir configurações salvas no perfil | ✅ **Implementado** | Exclusão com verificação de proprietário e tranca. |
+| 07 | O sistema deve permitir ao usuário comparar configurações salvas | ✅ **Implementado** | Duas ou três builds: preços, componentes, consumo e renderização no Blender. FPS é uma ampliação pendente, não uma condição da comparação atual. |
+| 08 | O sistema deve permitir ao usuário compartilhar suas configurações por link | ✅ **Implementado** | Builds públicas podem ser vistas sem login, somente leitura. Testar exige sessão; salvar uma cópia privada exige também e-mail verificado e vaga na conta. |
+| 09 | O sistema deve permitir ao usuário buscar melhorias do seu setup | ✅ **Implementado** | RAM: acrescentar ou substituir pentes conforme a placa-mãe. SSD/HD: expandir quantidades mantendo os atuais, respeitando conexões/baias conhecidas, ou substituir sem regressões verificáveis. Orçamento obrigatório para aplicar; CPU/GPU e outras categorias dependem de métricas confiáveis. |
+| 10 | O sistema deve permitir ao usuário ver configurações prontas | ✅ **Implementado** | 16 modelos sem periféricos, referências revisadas no catálogo, filtro de budget e preço crescente. A cópia respeita e-mail verificado e limite da conta. |
+| 11 | O sistema deve permitir ao usuário editar e modificar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento; desfazer a última alteração de montagem enquanto o editor estiver aberto. |
+| 12 | O sistema deve permitir ao usuário verificar o preço da peça direto pelo site, sem precisar consultar em diversas abas | ✅ **Implementado** | Preços cadastrados, data quando disponível e links das lojas. Antes da compra, o catálogo é reconsultado e diferenças/indisponibilidade são mostradas. Não inclui frete nem garante o valor no checkout. |
+| 13 | O sistema deve permitir ao usuário ver todas as informações de compatibilidade e consumo de energia do setup que está montando | 🟡 **Parcial** | Medidas disponíveis, formatos, baias, fans e radiador; substituição explícita das fans do water cooler e painel de informações. Completar fichas técnicas e interferências físicas. |
+| 14 | O sistema deve permitir ao usuário adicionar ao setup periféricos, que muitas vezes não pensado anteriormente, acaba estourando o orçamento | ✅ **Implementado** | Inclusão e reaproveitamento com tetos separados para PC e periféricos. |
+| 15 | O sistema deve permitir ao usuário registrar em seu perfil o seu budget, assim fica registrado o seu dinheiro disponível para comprar e futuras melhorias | ✅ **Implementado** | Valor e autorização usados no formulário e em novas montagens manuais, sem alterar builds existentes. |
+| 16 | O sistema deve permitir ao usuário baixar a build em JSON e CSV para ter o arquivo local | ✅ **Implementado** | Exportação para guardar a configuração localmente. |
+| 17 | O sistema deve permitir ao usuário alterar a visibilidade da build | ✅ **Implementado** | Alternância entre pública e privada. |
+| 18 | O sistema deve permitir ao usuário duplicar a sua build | ✅ **Implementado** | Cópia independente, respeitando o limite da conta. |
+| 19 | O sistema deve permitir ao usuário definir um nome e descrição para a build | ✅ **Implementado** | Identificação e edição dos detalhes da build. |
+| 20 | O sistema deve permitir ao usuário importar builds por meio de arquivos CSV ou JSON | ✅ **Implementado** | Validação do arquivo e criação de uma configuração na conta. |
 
 ### Regras da plataforma
 
