@@ -26,3 +26,9 @@ test("histórico copia snapshots e restaura opções de periféricos da troca",(
   h.registrar(a,b);a.componentes.ssd[0].quantidade=9;
   const r=h.desfazer(b);assert.equal(r.componentes.ssd[0].quantidade,1);assert.equal(r.incluirPerifericos,false);
 });
+test("limpar ao sair do editor impede reaplicar histórico preservado pelo cache de navegação",()=>{
+  const h=criarHistoricoBuild(),a=base(),b={...base(),componentes:{}};
+  h.registrar(a,b);assert.equal(h.motivo(b),"");h.limpar();
+  assert.throws(()=>h.desfazer(b),/Nenhuma alteração/);
+  h.registrar(a,b);assert.deepEqual(h.desfazer(b).componentes,a.componentes);
+});

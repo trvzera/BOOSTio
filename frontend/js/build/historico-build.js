@@ -12,6 +12,7 @@ export function criarHistoricoBuild() {
       ?"A configuração mudou desde a última alteração. O histórico não será aplicado sobre outra configuração.":"";
   return {
     motivo,
+    limpar() { ultima=null; },
     registrar(antes,depois) {
       if (antes.id!==depois.id||antes.travada||depois.travada) return;
       if (chave(estado(antes))===chave(estado(depois))) return;

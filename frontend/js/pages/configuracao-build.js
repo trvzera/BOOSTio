@@ -51,6 +51,11 @@ document.addEventListener("DOMContentLoaded",async () => {
     let revisaoSalvamento = 0;
     const historico = criarHistoricoBuild();
     let desfazendo = false;
+    window.addEventListener("pagehide",() => {
+      historico.limpar();
+      const desfazer = main.querySelector("#undo-configuration");
+      if (desfazer) { desfazer.disabled=true; desfazer.dataset.disabledReason=historico.motivo(build); }
+    });
     // Um resumo mais alto que a tela precisa poder subir ao rolar até as ações.
     const observarResumo = typeof ResizeObserver === "function" ? new ResizeObserver(entradas => {
       for (const {target} of entradas) {

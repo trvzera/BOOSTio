@@ -18,7 +18,7 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
    Salvar permite nova tentativa após falha, sem exigir mudar o nome.
 
    Referência: [WCAG — mensagens de status](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html).
-   Validação final: 520 testes Node, 583 Python (+13 subtestes), 83 verificações
+   Validação desta etapa: 520 testes Node, 583 Python (+13 subtestes), 83 verificações
    Chrome/axe de formulário/editor/status/desfazer em três larguras e nova rodada
    de 97 verificações do modal de melhorias em cinco viewports. Falhas e gravações
    simuladas, catálogo somente leitura; sem chamadas reais a LLM, SMTP ou lojas.
@@ -41,6 +41,11 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
    sucesso. O histórico é limpo ao sair/recarregar e não oferece redo. Não substitui
    controle de versão concorrente no servidor. 512 Node e 51 verificações Chrome/axe,
    incluindo duas gravações simuladas sequenciais por remoção/desfazer.
+
+   Complemento de ciclo de vida: `pagehide` limpa o histórico e desabilita Desfazer,
+   inclusive se a página for preservada pelo cache de navegação. 521 testes Node
+   e 54 verificações Chrome/axe, incluindo saída/restauração simulada e revalidação
+   da sessão em três larguras. Nenhuma gravação real em conta ou banco.
 
 3. **Compra revalidada:** abrir Comprar build ou comprar uma peça consulta de novo
    `/build/catalogo` com `no-store`, sem reutilizar a promessa em memória. O fluxo
