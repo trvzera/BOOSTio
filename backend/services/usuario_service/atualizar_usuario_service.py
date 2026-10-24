@@ -13,7 +13,7 @@ class AtualizarUsuarioService:
     nome = dados.get("nome")
     if nome is not None and (not isinstance(nome, str) or not 0 < len(nome.strip()) <= 30):
       raise ValueError("Informe um nome de até 30 caracteres")
-    if dados.get("senha") is not None and (not isinstance(dados["senha"], str) or len(dados["senha"]) > 1024):
+    if dados.get("senha") is not None and (not isinstance(dados["senha"], str) or not dados["senha"] or len(dados["senha"]) > 1024):
       raise ValueError("Senha inválida")
 
     usuario = Usuario.buscar_por_id(usuario_id)
@@ -40,12 +40,9 @@ class AtualizarUsuarioService:
     senha = dados.get("senha")
 
     if senha:
-      verificacao = self._confirma_senha(dados,usuario.senha)
-      if verificacao:
-        validar_senha_forte(senha)
-        senha = generate_password_hash(senha)
-      else:
-        raise ValueError("Digite a senha atual correta")
+      ConfirmarIdentidadeService().executar(usuario, dados)
+      validar_senha_forte(senha)
+      senha = generate_password_hash(senha)
 
     usuario.atualizar_dados(
       dados.get("nome"),

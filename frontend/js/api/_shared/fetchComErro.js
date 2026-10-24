@@ -47,10 +47,12 @@ export async function fetchComErro(caminho, opcoes = {}) {
 
 
   if (!resposta.ok) {
-    const erro = new Error(dados.erro || "Erro ao comunicar com o servidor.");
+    const erro = new Error(dados.erro || dados.mensagem || "Erro ao comunicar com o servidor.");
     erro.status = resposta.status;
     erro.codigo = dados.codigo;
-    erro.espera = Number.isFinite(dados.espera) && dados.espera > 0 ? dados.espera : 0;
+    const retry=Number(resposta.headers?.get("Retry-After"));
+    erro.espera = Number.isFinite(dados.espera) && dados.espera > 0 ? dados.espera
+      : Number.isFinite(retry) && retry > 0 && retry <= 86400 ? retry : 0;
     throw erro;
   }
 

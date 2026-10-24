@@ -40,6 +40,8 @@ class Usuario(ModeloBase,UserMixin):
       "nome": self.nome,
       "email": self.email,
       "verificado": self.verificado,
+      "google_vinculado": bool(self.google_sub),
+      "possui_senha": bool(self.senha),
       "criado_em":self.criado_em
     }
     # A listagem geral de usuários não deve expor o orçamento de cada conta.

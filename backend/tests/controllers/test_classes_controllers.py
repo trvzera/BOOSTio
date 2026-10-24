@@ -41,6 +41,7 @@ def test_contrato_de_urls_metodos_e_endpoints_preservado():
         ("/auth/me", "GET", "auth.teste_logado"),
         ("/auth/google/redirecionar", "GET", "auth.redirecionar_google"),
         ("/auth/google/confirmar", "POST", "auth.confirmar_google"),
+        ("/auth/google/vincular", "POST", "auth.vincular_google"),
         ("/auth/google/entrar", "GET", "auth.callback_google"),
         ("/usuarios/<int:usuario_id>/budget", "PUT", "usuario.atualizar_budget"),
         ("/usuarios/", "POST", "usuario.criar_usuario"),

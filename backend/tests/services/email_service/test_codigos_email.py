@@ -3,6 +3,7 @@ import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
+from smtplib import SMTPAuthenticationError, SMTPRecipientsRefused, SMTPException
 
 from flask import Flask
 
@@ -67,6 +68,16 @@ class TestCodigosEmail(unittest.TestCase):
         self.assertRegex(codigo, r"^[0-9]{6}$")
         self.assertEqual(self.conferir(codigo).status_code, 200)
         self.assertEqual(self.conferir(codigo).status_code, 400)
+
+    def test_erro_smtp_nao_expoe_detalhes_do_provedor(self):
+        for erro, status in ((SMTPAuthenticationError(535,b"detalhe-interno"),503),
+                             (SMTPRecipientsRefused({"privado@test.invalid":"detalhe-interno"}),400),
+                             (SMTPException("detalhe-interno"),503), (OSError("detalhe-interno"),503)):
+            with self.subTest(erro=type(erro).__name__),patch("controllers.email_controller.EnviarEmailService.executar_para_usuario",side_effect=erro):
+                resposta=self.enviar()
+                self.assertEqual(resposta.status_code,status)
+                self.assertIn("erro",resposta.json)
+                self.assertNotIn("detalhe-interno",str(resposta.json))
 
     def test_email_usa_codigo_emitido_e_cabecalhos_transacionais(self):
         self.assertEqual(self.enviar().status_code, 200)
