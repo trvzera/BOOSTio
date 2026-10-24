@@ -73,6 +73,26 @@ def test_erro_validacao_e_limite_tem_contrato_json(cliente_benchmark, mocker):
     assert resposta.json["espera"] == 90
 
 
+def test_diagnostico_tem_apenas_metadados_publicos_permitidos(cliente_benchmark, mocker):
+    autenticar(cliente_benchmark)
+    diagnostico = {"httpProvedor": 302, "tipoResposta": "html", "redirecionamento": True,
+                   "pausa": True, "headers": {"Set-Cookie": "segredo"},
+                   "url": "https://externo.invalid/?token=segredo", "corpo": "nao-expor"}
+    mocker.patch("controllers.benchmark_controller.ConsultarBenchmarkService.executar",
+                 side_effect=ErroBenchmark("Serviço indisponível", "redirecionamento", 503, 60, diagnostico))
+    resposta = cliente_benchmark.get("/benchmark/fps")
+    assert resposta.status_code == 503
+    assert resposta.json["diagnostico"] == {
+        "httpProvedor": 302, "tipoResposta": "html", "redirecionamento": True, "pausa": True,
+    }
+    assert "segredo" not in resposta.get_data(as_text=True)
+
+
+def test_diagnostico_nao_inventa_status_nem_formato():
+    erro = ErroBenchmark("Falha", diagnostico={"httpProvedor": True, "tipoResposta": "texto livre", "pausa": "sim"})
+    assert erro.diagnostico == {}
+
+
 @pytest.mark.parametrize("codigo,status,espera", [("timeout", 504, 30), ("rede", 503, 30),
                                                 ("tls", 503, 60), ("provedor", 503, 60),
                                                 ("resposta", 502, 0), ("sem-dados", 422, 0)])

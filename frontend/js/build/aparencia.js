@@ -35,5 +35,5 @@ export function aparenciaHtml(valor,_catalogo=[],{possuiGabinete=false}={}) {
       '<div class="appearance-examples" role="region" aria-label="Exemplos de porte e visual de gabinete" tabindex="0">'
       +referencias('size','Porte do gabinete',portesGabinete,atual.porte)
       +referencias('style','Visual do gabinete',estilosGabinete,atual.estilo)+'</div>')
-    +'<p class="font-2-xs planning-help">Fotos de exemplo, não produtos selecionados. Porte e visual são independentes; medidas e orçamento vêm primeiro. Cor sem ficha fica a confirmar.</p>';
+    +'<p class="font-2-xs planning-help">As fotos mostram exemplos de tamanho e visual, não produtos que você precisa comprar. As peças devem caber e ficar dentro do seu orçamento. Só consideramos a cor quando ela está informada no cadastro.</p>';
 }

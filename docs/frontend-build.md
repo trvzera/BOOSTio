@@ -6,6 +6,28 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Linguagem e conexão — 24/10/2026
+
+- `uso-formulario.js` mantém os IDs dos cinco usos e explica prioridades em termos
+  simples. `forms.js` atualiza o texto por seleção com anúncio educado; catálogo e
+  peça explicam a função do componente, sem esconder os detalhes técnicos.
+- `erros-conexao.js` centraliza os avisos offline/transporte. `fetchComErro.js`
+  preserva HTTP conhecido, diferencia falha de leitura de JSON inválido e valida
+  CSRF antes da ação. Uma resposta perdida após envio deixa o resultado incerto;
+  a geração sugere conferir as builds antes de repetir, sem reenvio automático.
+- `session-feedback.js` usa diálogo nativo com retorno ao início baseado no
+  caminho do módulo (inclusive em `testes.html`). A sessão indisponível mantém
+  o main oculto/inert; a nova tentativa não apaga respostas do formulário.
+- FPSHQ, 24/10: teste direto real no Chrome sem cache falhou por CORS
+  (`MissingAllowOriginHeader`). Serviço Python recebeu 302/HTML e devolveu
+  503/`redirecionamento`; pausa subsequente não consultou de novo. Diagnóstico
+  separa esses status (também nos logs) e só expõe metadados permitidos, nunca corpo/headers externos.
+  Endereço do protótipo original é o mesmo; causa operacional do provedor não confirmada.
+- Regressão isolada: 583 JS e 725 Python (+20 subtestes). Chrome: 151 verificações
+  de conexão/sessão/prioridades e 261 de formulário/conta em cinco tamanhos, sem
+  exceções JS ou escrita real; mais 721 verificações das páginas/erros e 29 do
+  visual/teclado. Não certifica toda a WCAG nem disponibilidade de terceiros.
+
 ### Exemplos de gabinete e seleção por uso — 24/10/2026
 
 - Aparência sem dropdown de produto/preço: fotos de exemplo para Mini/Mid/Full

@@ -1,4 +1,5 @@
 import { fetchComErro } from "../_shared/fetchComErro.js";
+import { erroConexao } from "../_shared/erros-conexao.js";
 
 const SLUG = /^[a-z0-9-]{1,190}$/;
 const BUILD_ID = /^(?:s-)?[1-9][0-9]{0,17}$/;
@@ -15,7 +16,7 @@ export function criarClienteBenchmark({requisitar = fetchComErro,timeoutMs = 250
       return dados.resultado;
     } catch (erro) {
       if (controle.signal.aborted) throw Object.assign(new Error(signal?.aborted ? "Consulta cancelada." : "A consulta demorou demais. Tente novamente."),{codigo:signal?.aborted ? "cancelado" : "timeout"});
-      if (erro instanceof TypeError) throw new Error("Não foi possível acessar o servidor da BOOSTio. Confira a conexão e tente novamente.");
+      if (erro instanceof TypeError) throw erroConexao(erro);
       throw erro;
     } finally {
       clearTimeout(prazo); signal?.removeEventListener("abort",cancelar);

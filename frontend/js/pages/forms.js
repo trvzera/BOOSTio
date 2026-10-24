@@ -2,6 +2,7 @@ import "../header.js";
 import "../auth/auth.js";
 import { normalizarRede, vincularRede } from "../build/rede.js";
 import { normalizarAparencia, aparenciaHtml } from "../build/aparencia.js";
+import { opcoesUso, prioridadesUso } from "../build/uso-formulario.js";
 import { iniciarImagens } from "../build/imagens-produtos.js";
 import { planejamentoLocal } from "../build/planejamento.js";
 import { orcamentoValido, dividirOrcamento } from "../build/orcamento-formulario.js";
@@ -26,38 +27,16 @@ const perguntas = [
     tag: "Etapa 01",
     titulo: "Para que você vai usar o computador?",
     descricao:
-      "Escolha a utilização principal para equilibrarmos desempenho e custo-benefício.",
-    opcoes: [
-      [
-        "estudos",
-        "Estudos",
-        "Navegação, Office, faculdade e tarefas escolares.",
-      ],
-      ["jogos", "Jogos", "FPS, AAA e jogos competitivos."],
-      [
-        "trabalho-casual",
-        "Trabalho casual",
-        "Planilhas, reuniões, e-mails e videoconferências.",
-      ],
-      [
-        "trabalho-pesado",
-        "Trabalho pesado",
-        "Edição de vídeo, 3D, programação e renderização.",
-      ],
-      [
-        "todos",
-        "Um pouco de tudo",
-        "Equilíbrio entre jogos, estudos e trabalho.",
-      ],
-    ],
+      "Escolha o uso principal. Ao selecionar uma opção, você verá quais peças terão mais atenção na montagem.",
+    opcoes: opcoesUso,
   },
   {
     chave: "orcamento",
     etapa: "Orçamento",
     tag: "Etapa 02",
-    titulo: "Quanto pretende investir na sua build?",
+    titulo: "Quanto você pode gastar no computador?",
     descricao:
-      "Escolha um teto de orçamento, ajuste pelo controle ou digite o valor exato.",
+      "Informe o máximo que pode gastar. Escolha um valor, ajuste pelo controle ou digite quanto pretende investir.",
     opcoes: [
       ["ate-3000", "Até R$ 3.000", "Configuração essencial e econômica."],
       [
@@ -78,7 +57,7 @@ const perguntas = [
     tag: "Etapa 03",
     titulo: "O que você já possui?",
     descricao:
-      "Marque as peças do computador que pretende reaproveitar e informe o modelo de cada item. Se estiver começando do zero, marque a primeira opção. A montagem considera as fans do gabinete e do water cooler, completando as posições com dados confirmados dentro do orçamento.",
+      "Marque o que pretende reaproveitar e informe o modelo. Se começar do zero, escolha a primeira opção. As ventoinhas que já vêm com o gabinete ou o resfriador também serão consideradas.",
     multipla: true,
     opcoes: [
       ["nenhuma", "Ainda não tenho peças"],
@@ -92,13 +71,13 @@ const perguntas = [
       ["gabinete", "Gabinete"],
       ["cooler", "Air cooler"],
       ["water-cooler", "Water cooler"],
-      ["fans", "Fans"],
+      ["fans", "Ventoinhas (fans)"],
     ],
   },
   {
     chave:"perifericos",etapa:"Periféricos",tag:"Etapa 04",
     titulo:"Quer incluir periféricos na montagem?",
-    descricao:"Monitor, teclado, mouse e headset também entram no orçamento. Informe o que já possui e um limite para os novos itens.",
+    descricao:"Quer incluir monitor, teclado, mouse e fone? Informe o que já possui e qual parte do seu dinheiro pode ser usada nos itens que faltam.",
     opcoes:[
       ["sem-perifericos","Não incluir periféricos novos","Vou montar apenas o computador."],
       ["todos-perifericos","Preciso de todos","Incluir monitor, teclado, mouse e headset."],
@@ -108,13 +87,13 @@ const perguntas = [
   {
     chave:"rede",etapa:"Conexão",tag:"Etapa 05",
     titulo:"Como seu PC vai se conectar à internet?",
-    descricao:"Informe se usará cabo de rede ou Wi-Fi e se já possui o necessário. Você poderá adicionar o acessório pelo catálogo da build quando houver produtos cadastrados.",
+    descricao:"Escolha cabo de internet ou Wi-Fi e diga se já possui o necessário para conectar o computador.",
     opcoes:[],
   },
   {
     chave:"aparencia",etapa:"Aparência",tag:"Etapa 06",
-    titulo:"Como você imagina seu setup?",
-    descricao:"Escolha o estilo do gabinete e a cor de que gosta, ou continue sem preferência. A aparência nunca terá prioridade sobre compatibilidade, qualidade e orçamento.",
+    titulo:"Como você quer o visual do computador?",
+    descricao:"Escolha o tamanho, o visual e a cor de que gosta, ou deixe sem preferência. Primeiro, as peças precisam funcionar juntas, caber e ficar dentro do seu orçamento.",
     opcoes:[],
   },
 ];
@@ -222,7 +201,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const detalhe = respostas.pecasDetalhes?.[valor] || "";
     const placeholder = exemplosPecas[valor] || "Informe a marca e o modelo";
 
-    return `<div class="piece-detail${visivel ? " is-visible" : ""}"><label class="font-1-xs" for="detalhe-${valor}">Qual ${titulo.toLowerCase()} você possui?</label><input class="piece-model-input font-2-xs" type="text" id="detalhe-${valor}" data-piece-detail="${valor}" value="${escaparHtml(detalhe)}" placeholder="${placeholder}" maxlength="120" autocomplete="off" list="modelos-${valor}" required aria-describedby="ajuda-${valor}"><datalist id="modelos-${valor}"></datalist><span class="piece-detail-help font-2-xs" id="ajuda-${valor}" role="status" aria-live="polite">Informe marca e modelo para verificarmos a compatibilidade.</span></div>`;
+    return `<div class="piece-detail${visivel ? " is-visible" : ""}"><label class="font-1-xs" for="detalhe-${valor}">Informe o modelo: ${titulo.toLowerCase()}</label><input class="piece-model-input font-2-xs" type="text" id="detalhe-${valor}" data-piece-detail="${valor}" value="${escaparHtml(detalhe)}" placeholder="${placeholder}" maxlength="120" autocomplete="off" list="modelos-${valor}" required aria-describedby="ajuda-${valor}"><datalist id="modelos-${valor}"></datalist><span class="piece-detail-help font-2-xs" id="ajuda-${valor}" role="status" aria-live="polite">Informe marca e modelo para verificarmos se as peças funcionam juntas.</span></div>`;
   }
 
   function rangeHtml() {
@@ -249,7 +228,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const proprios = respostas.perifericosProprios || [];
     alvo.innerHTML = (respostas.perifericos === "alguns-perifericos" ? '<fieldset class="peripheral-owned-list"><legend>Quais periféricos você já possui?</legend>' +
       listaPerifericos.map(([tipo,nome]) => '<div class="peripheral-owned" data-owned="' + tipo + '"><label class="ui-check"><input type="checkbox" data-owned-peripheral="' + tipo + '" ' + (proprios.includes(tipo) ? 'checked' : '') + '>' + iconeAnimado("checkbox") + '<span>' + nome + '</span></label>' + (proprios.includes(tipo) ? detalhePecaHtml(tipo,nome) : '') + '</div>').join("") + '</fieldset>' : '') +
-      '<div class="peripheral-budget" id="peripheral-allocation" ' + (respostas.incluirPerifericos ? '' : 'hidden') + '><label for="peripheral-percent">Limite do orçamento para periféricos</label><div class="peripheral-percent-field"><input type="number" id="peripheral-percent" min="1" max="99" step="1" inputmode="numeric" aria-describedby="peripheral-budget-summary peripheral-budget-help" value="' + respostas.percentualPerifericos + '"><span aria-hidden="true">%</span></div><p id="peripheral-budget-summary" class="font-2-xs"></p><p id="peripheral-budget-help" class="font-2-xs">É um teto, não um gasto obrigatório. Se gastar menos, a sobra fica com você e não aumenta o limite do PC.</p></div>';
+      '<div class="peripheral-budget" id="peripheral-allocation" ' + (respostas.incluirPerifericos ? '' : 'hidden') + '><label for="peripheral-percent">Quanto reservar para monitor, teclado, mouse e fone?</label><div class="peripheral-percent-field"><input type="number" id="peripheral-percent" min="1" max="99" step="1" inputmode="numeric" aria-describedby="peripheral-budget-summary peripheral-budget-help" value="' + respostas.percentualPerifericos + '"><span aria-hidden="true">%</span></div><p id="peripheral-budget-summary" class="font-2-xs"></p><p id="peripheral-budget-help" class="font-2-xs">Essa é a parte máxima do seu dinheiro para esses itens. Não é preciso gastar tudo. Se sobrar, o dinheiro fica com você e não aumenta o limite das peças do computador.</p></div>';
     alvo.querySelectorAll("[data-owned-peripheral]").forEach(input => input.addEventListener("change",() => {
       const escolhidos = new Set(respostas.perifericosProprios || []), tipo = input.dataset.ownedPeripheral;
       if (input.checked) escolhidos.add(tipo); else escolhidos.delete(tipo);
@@ -277,7 +256,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const divisao = dividirOrcamento(valor,percentual);
     const resumo = conteudo.querySelector("#peripheral-budget-summary");
     if (resumo) resumo.textContent = divisao
-      ? `Até ${moeda.format(divisao.perifericos)} para periféricos · até ${moeda.format(divisao.pc)} para o PC e acessórios de rede.` : "Informe um orçamento válido e uma porcentagem inteira de 1 a 99.";
+      ? `Até ${moeda.format(divisao.perifericos)} para monitor, teclado, mouse e fone · até ${moeda.format(divisao.pc)} para as peças do computador e a conexão com a internet.` : "Informe quanto pode gastar e uma porcentagem de 1 a 99, sem casas decimais.";
     if (anunciar && resumo) anunciarStatus(resumo.textContent);
     conteudo.querySelector("#next-question").disabled = !podeAvancar();
   }
@@ -307,6 +286,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
       ${pergunta.chave === "orcamento" ? `<div class="budget-fields">${campos}${rangeHtml()}</div>` : campos}
       ${pergunta.chave === "perifericos" ? '<div id="perifericos-fields"></div>' : ""}
+      ${pergunta.chave === "objetivo" ? '<aside class="usage-priority" aria-labelledby="usage-priority-title"><h2 id="usage-priority-title" class="font-1-xs">O que vamos priorizar</h2><p id="usage-priority-copy" class="font-2-xs" aria-live="polite"></p></aside>' : ""}
       <div id="form-navigation">
         <button type="button" class="btn-ghost" id="previous-question" aria-label="Voltar à etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}>${iconeAnimado("arrow","back")}<span>Voltar</span></button>
         <button type="button" class="btn-primary-form" id="next-question" aria-label="${rotuloAvancar}" ${podeAvancar() ? "" : "disabled"}><span>${rotuloAvancar}</span>${iconeAnimado("arrow")}</button>
@@ -316,6 +296,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       conteudo.querySelector("#next-question").disabled = !podeAvancar();
     }});
     if(pergunta.chave === "aparencia") void renderizarAparencia();
+    if(pergunta.chave === "objetivo") atualizarPrioridadeUso();
     conteudo
       .querySelector("#previous-question")
       .addEventListener("click", () => navegarPara(indiceAtual - 1));
@@ -337,6 +318,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     iniciarControlesNumericos(conteudo);
     iniciarIcones(conteudo);
+  }
+
+  function atualizarPrioridadeUso() {
+    const texto=conteudo.querySelector("#usage-priority-copy");
+    if(texto)texto.textContent=prioridadesUso[respostas.objetivo]||"Selecione uma opção acima para entender como vamos escolher as peças. Todas as escolhas respeitam seu limite de gasto.";
   }
 
   function renderizarAparencia() {
@@ -374,7 +360,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             :r.estado==="vazio"?"Digite ou escolha um modelo cadastrado."
             :"Modelo não encontrado. Você pode continuar, mas as especificações e a compatibilidade ficarão a confirmar.";
           if(ajuda.textContent!==texto)ajuda.textContent=texto;
-        }catch{if(input.isConnected)ajuda.textContent="Não foi possível consultar o catálogo. Informe o modelo; as especificações ficarão a confirmar.";}
+        }catch(erro){if(input.isConnected)ajuda.textContent=["offline","conexao","timeout"].includes(erro.codigo)?erro.message:"Não conseguimos consultar a lista de peças. Informe o modelo; vamos avisar sobre as informações que ainda precisam ser confirmadas.";}
       };
       input.addEventListener("focus",ajudar,{once:true});
       input.addEventListener("input", () => {
@@ -523,6 +509,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       sincronizarCheckboxesLottie();
       sincronizarCamposDetalhesPecas();
     }
+    if (pergunta.chave === "objetivo") atualizarPrioridadeUso();
     if (pergunta.chave === "perifericos") renderizarCamposPerifericos();
     if (pergunta.chave === "orcamento") {
       const valor = faixas[input.value];
@@ -626,7 +613,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.querySelector("#questions").dataset.formState = "error";
       atualizarMenu();
       const semEspaco = erro.codigo === "limite-builds";
-      conteudo.innerHTML = `<div class="build-generation-error"><h2 class="font-1-m" tabindex="-1">${semEspaco ? "Suas três vagas estão ocupadas" : "Não foi possível gerar sua build"}</h2><p id="erro-gerar-build" class="font-2-s" role="alert"></p><div class="generation-actions">${semEspaco ? '<a href="./builds.html" class="btn-primary" aria-label="Gerenciar minhas builds">Minhas builds</a>' : '<button type="button" id="tentar-gerar-build" class="btn-primary" aria-label="Tentar gerar build novamente">Tentar novamente</button>'}<button type="button" id="revisar-orcamento" class="btn-secondary" aria-label="Revisar orçamento">Revisar orçamento</button>${erro.status === 401 ? '<a href="./login.html" class="btn-ghost" aria-label="Entrar na conta">Entrar na conta</a>' : ""}</div></div>`;
+      const incerto=erro.resultadoIncerto===true;
+      conteudo.innerHTML = `<div class="build-generation-error"><h2 class="font-1-m" tabindex="-1">${semEspaco ? "Suas três vagas estão ocupadas" : incerto ? "Não conseguimos confirmar sua montagem" : "Não foi possível gerar sua build"}</h2><p id="erro-gerar-build" class="font-2-s" role="alert"></p><div class="generation-actions">${semEspaco||incerto ? '<a href="./builds.html" class="btn-primary" aria-label="Conferir minhas builds">'+(incerto?'Conferir minhas builds':'Minhas builds')+'</a>' : '<button type="button" id="tentar-gerar-build" class="btn-primary" aria-label="Tentar gerar build novamente">Tentar novamente</button>'}<button type="button" id="revisar-orcamento" class="btn-secondary" aria-label="Revisar orçamento">Revisar orçamento</button>${erro.status === 401 ? '<a href="./login.html" class="btn-ghost" aria-label="Entrar na conta">Entrar na conta</a>' : ""}</div></div>`;
       conteudo.querySelector("#erro-gerar-build").textContent = erro.message;
       conteudo.querySelector("#tentar-gerar-build")?.addEventListener("click", mostrarGerando);
       conteudo.querySelector("#revisar-orcamento").addEventListener("click",() => navegarPara(1));

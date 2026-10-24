@@ -120,6 +120,15 @@ Cor e características ausentes não são inventadas. O editor também mostra a
 capacidade total de SSDs/HDs em GB/TB; quando faltam dados, identifica o subtotal
 como parcial.
 
+O uso escolhido no formulário explica **quais peças terão prioridade**. As páginas
+do catálogo e da peça também apresentam uma descrição simples da função de cada
+componente, mantendo as informações técnicas para quem quiser conferir os detalhes.
+
+Avisos distinguem falta de conexão, demora e erro respondido pelo servidor.
+Se a resposta de uma criação ou alteração se perder, orientamos conferir o
+resultado antes de repetir. Falhar ao verificar a sessão não significa sair da
+conta: é possível tentar novamente, mantendo o conteúdo privado bloqueado até a confirmação.
+
 ## Builds prontas
 
 16 pontos de partida para **estudos, home office, programação, jogos,
@@ -170,6 +179,11 @@ validado com aviso de desatualização. É uma observação deste ambiente e mom
 não uma garantia sobre o estado permanente do provedor.
 Busca, FPS e contrato OpenAPI apresentaram esse mesmo retorno na nova checagem.
 HTML com HTTP 200 também é tratado como resposta inválida, nunca como FPS.
+O teste direto no Chrome, sem cache da aplicação, também falhou em 24/10:
+o navegador registrou bloqueio por ausência do cabeçalho de CORS. O endereço
+consultado é o mesmo do primeiro protótipo. Isso não comprova a causa interna
+da indisponibilidade nem descarta diferenças entre redes, mas a falha atual não
+se limita à integração Python: nesta consulta, o serviço não entregou JSON.
 
 Nas builds salvas, **Verificar requisitos** usa o catálogo Python para comparar RAM,
 VRAM dedicada e capacidade/tipo de armazenamento quando há um mínimo oficial
@@ -208,7 +222,9 @@ Fontes: [FPSHQ](https://fpshq.com/pt/api/) e
 
 No laboratório (`testes.html`), é possível comparar uma consulta FPS pelo Python
 com uma consulta direta pelo JavaScript, sem cache local neste último caminho.
-O diagnóstico informa tempo, HTTP recebido e falhas de transporte/validação;
+O diagnóstico informa tempo, HTTP recebido e falhas de transporte/validação.
+Quando disponíveis, distingue o HTTP da BOOSTio do status e formato recebidos
+da FPSHQ e informa se a tentativa apenas encontrou a pausa após uma falha anterior;
 não troca automaticamente de caminho nem altera a montagem real.
 
 Os **requisitos dos cinco jogos padrão** usam fontes oficiais revisadas em 21/10/2026
@@ -318,8 +334,8 @@ Os originais da marca, esboços e anotações estão reunidos em [materiais](mat
 
 ## Validação da versão
 
-Na revisão de **24/10/2026**, a suíte local aprovou **559 testes JavaScript** e
-**720 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
+Na revisão de **24/10/2026**, a suíte local aprovou **583 testes JavaScript** e
+**725 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
 Há testes específicos para as sete classes de Controller e para preservar o

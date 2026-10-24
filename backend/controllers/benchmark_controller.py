@@ -38,7 +38,10 @@ class BenchmarkController:
         except ValueError as erro:
             return jsonify({"erro": str(erro), "codigo": "entrada"}), 400
         except ErroBenchmark as erro:
-            resposta = jsonify({"erro": str(erro), "codigo": erro.codigo, "espera": erro.espera})
+            dados = {"erro": str(erro), "codigo": erro.codigo, "espera": erro.espera}
+            if erro.diagnostico:
+                dados["diagnostico"] = erro.diagnostico
+            resposta = jsonify(dados)
             if erro.espera:
                 resposta.headers["Retry-After"] = str(erro.espera)
             return resposta, erro.status

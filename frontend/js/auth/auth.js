@@ -5,6 +5,7 @@ import { paginaPrivada, redirecionamentoSessao } from "../components/navigation-
 import { acompanharCarregamento } from "../components/page-loading.js";
 import { verificarEspacoBuild } from "../api/build/builds.js";
 import { idCompartilhamentoPublico, consumirRetornoPublico } from '../components/sessao-publica.js';
+import { mostrarFalhaSessao, limparFalhaSessao } from "../components/session-feedback.js";
 
 const paginaAtual = location.pathname.split("/").pop();
 const publica = paginaAtual === 'configuracao-build.html' && idCompartilhamentoPublico(location.search);
@@ -20,6 +21,7 @@ function bloquearConteudo() {
 export function caminhoLogin() { return new URL("../../pages/login.html",import.meta.url).href; }
 export async function confirmaUsuario() {
   const resposta = await carregarPerfil();
+  limparFalhaSessao();
   const autenticado = Boolean(resposta?.auth);
   atualizarMenu(autenticado);
   if (autenticado && ['login.html','signin.html','index.html'].includes(paginaAtual)) {
@@ -32,6 +34,7 @@ export async function confirmaUsuario() {
     if (location.pathname.endsWith("/formulario.html")) {
       try { await verificarEspacoBuild(resposta); }
       catch (erro) {
+        if(!["email-nao-verificado","limite-builds"].includes(erro.codigo))throw erro;
         const pagina = erro.codigo === "email-nao-verificado" ? "configuracoes.html?verificar=1" : "builds.html?aviso=" + encodeURIComponent(erro.message);
         location.replace(new URL("../../pages/" + pagina,import.meta.url).href);
         return resposta;
@@ -49,7 +52,9 @@ async function conferirSessao() {
   catch (erro) {
     console.warn("Não foi possível consultar a sessão do usuário:",erro);
     atualizarMenu(false);
-    if (privada) location.replace(caminhoLogin()); // Falha de sessão nunca libera páginas internas.
+    // Falha de conexão não equivale a sair da conta. Não libera o conteúdo,
+    // não apaga o formulário e permite repetir a conferência sem novo login.
+    if (privada) mostrarFalhaSessao(erro,conferirSessao);
   }
 }
 const iniciarVerificacao = () => acompanharCarregamento(conferirSessao());
