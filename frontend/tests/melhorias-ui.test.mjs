@@ -134,7 +134,7 @@ test("aplicar melhorias pelo menu devolve o foco ao novo card depois da atualiza
 test("resumo sticky permite alcançar melhorias mesmo quando é maior que a tela",() => {
   assert.match(editorCss,/top: min\(88px,calc\(100dvh - var\(--summary-height,0px\) - 16px\)\)/);
   assert.match(editor,/new ResizeObserver\(entradas =>/);
-  assert.match(editor,/function renderizar\(\) \{\s*observarResumo\?\.disconnect\(\)/);
+  assert.match(editor,/function renderizar\(recriarOpcoes = false\) \{\s*observarResumo\?\.disconnect\(\)/);
   assert.match(editor,/observarResumo\?\.observe\(main\.querySelector\("\.build-sidebar"\)\)/);
   assert.match(editor,/"pagehide",\(\) => observarResumo\?\.disconnect\(\)/);
   assert.match(editor,/evento\.persisted && resumo\) observarResumo\?\.observe\(resumo\)/);

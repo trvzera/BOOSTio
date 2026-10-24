@@ -8,6 +8,15 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
 
 ### Revisão em seis etapas — 23/10/2026
 
+4. **Desfazer:** histórico de um nível em memória no editor para remoção,
+   quantidades, upgrades confirmados e opções de peças/periféricos/rede. Restaura
+   só os campos de montagem; nome/orçamento atuais são preservados. Uma configuração
+   local diferente, ID diferente ou tranca impede aplicar o snapshot. Undo aguarda
+   a fila anterior e salva a restauração pela mesma fila. Falha não é anunciada como
+   sucesso. O histórico é limpo ao sair/recarregar e não oferece redo. Não substitui
+   controle de versão concorrente no servidor. 512 Node e 51 verificações Chrome/axe,
+   incluindo duas gravações simuladas sequenciais por remoção/desfazer.
+
 3. **Compra revalidada:** abrir Comprar build ou comprar uma peça consulta de novo
    `/build/catalogo` com `no-store`, sem reutilizar a promessa em memória. O fluxo
    público reconsulta a rota pública e a visibilidade. Links só aparecem após

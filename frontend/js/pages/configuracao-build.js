@@ -20,6 +20,7 @@ import { mostrarBuildPublica } from "../build/publica.js";
 import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta, linkBuildConta, estadoParaConta } from "../build/conta.js";
 import { criarBuildManual } from "../api/build/builds.js";
 import { atualizarValor, capturarValores, transicionarValores } from "../components/value-transition.js";
+import { criarHistoricoBuild } from "../build/historico-build.js";
 
 document.addEventListener("DOMContentLoaded",async () => {
   const main = document.querySelector("#builder-main");
@@ -46,6 +47,8 @@ document.addEventListener("DOMContentLoaded",async () => {
     let tituloSalvo = build.titulo.trim();
     let filaSalvamento = Promise.resolve();
     let falhaSalvamento = null;
+    const historico = criarHistoricoBuild();
+    let desfazendo = false;
     // Um resumo mais alto que a tela precisa poder subir ao rolar até as ações.
     const observarResumo = typeof ResizeObserver === "function" ? new ResizeObserver(entradas => {
       for (const {target} of entradas) {
@@ -177,11 +180,11 @@ document.addEventListener("DOMContentLoaded",async () => {
         '" aria-label="' + h(acao + " " + dica + ": " + categoria.nome + " · " + total + " modelos no catálogo") + '" ' + bloqueado(build.travada,trancada) + '><div><span class="component-empty-label">' + acao + '</span> <p>' + h(dica) +
         '</p></div><span class="component-add" aria-hidden="true">' + iconeAnimado("plus") + '</span></button></article></section>';
     }
-    function renderizar() {
+    function renderizar(recriarOpcoes = false) {
       observarResumo?.disconnect();
       const valoresAnteriores = capturarValores(main);
       // Preserva o checkbox e sua instância Lottie durante as atualizações da build.
-      const opcoes = main.querySelector(".builder-options");
+      const opcoes = recriarOpcoes ? null : main.querySelector(".builder-options");
       const detalhesAbertos = main.querySelector(".summary-metadata")?.open;
       const resultado = avaliarBuild(build,catalogo);
       const cpuSelecionada = catalogo.find(p => p.categoria === "processador" && p.id === itensCategoria(build,"processador")[0]?.id);
@@ -203,6 +206,23 @@ document.addEventListener("DOMContentLoaded",async () => {
         (Object.keys(build.pecasExtras || {}).length ? '<p class="summary-note">Peças próprias adicionais: ' + Object.entries(build.pecasExtras).map(([tipo,nome]) => h(tipo === "microfone" ? "Microfone: " : "Webcam: ") + h(nome)).join(" · ") + '.</p>' : "") +
         (build.travada ? '<p class="summary-note">Build trancada. Destranque-a em Minhas builds.</p>' : "") + '</section></aside></div>';
       if (opcoes) main.querySelector(".builder-options").replaceWith(opcoes);
+      main.querySelectorAll('.builder-options input').forEach(input=>input.disabled=build.travada);
+      main.querySelector('.summary-progress').insertAdjacentHTML('afterend','<button type="button" class="btn-secondary" id="undo-configuration" aria-label="Desfazer última alteração de peças" '+bloqueado(Boolean(historico.motivo(build)),historico.motivo(build))+'>Desfazer última alteração</button><p class="summary-note">Histórico desta página; recarregar ou sair do editor limpa o desfazer.</p>');
+      main.querySelector('#undo-configuration').onclick=async()=>{
+        if (desfazendo||historico.motivo(build)) return;
+        desfazendo=true;
+        main.querySelectorAll('button,input,textarea,select').forEach(controle=>controle.disabled=true);
+        try {
+          await filaSalvamento;
+          build=historico.desfazer(build);persistir();
+          if (conta) {await filaSalvamento;if(falhaSalvamento)throw falhaSalvamento;}
+          avisar('Última alteração desfeita.');
+        } catch(erro) {avisar('Não foi possível concluir o desfazer: '+erro.message);}
+        finally {
+          desfazendo=false;renderizar(true);
+          const titulo=main.querySelector('#builder-title');titulo.tabIndex=-1;titulo.focus({preventScroll:true});
+        }
+      };
       const atualizarCustos = () => {
         const total = avaliarBuild(build,catalogo).preco;
         atualizarValor(main.querySelector(".summary-total"),moeda(total),total);
@@ -220,7 +240,9 @@ document.addEventListener("DOMContentLoaded",async () => {
       atualizarCustos();
       main.querySelector("#replace-water-fans")?.addEventListener("change",e => {
         if (build.travada) return;
+        const anterior=structuredClone(build);
         build.substituirFansWaterCooler = e.target.checked;
+        historico.registrar(anterior,build);
         persistir(); renderizar();
       });
       main.querySelector("#build-budget").oninput = e => {
@@ -254,6 +276,7 @@ document.addEventListener("DOMContentLoaded",async () => {
               await filaSalvamento;
               if (falhaSalvamento) { build = anterior; throw falhaSalvamento; }
             }
+            historico.registrar(anterior,build);
             renderizar();
           });
           janela.addEventListener("close",() => { if (janela.returnValue === "aplicar") main.querySelector("#improve-configuration")?.focus({preventScroll:true}); },{once:true});
@@ -272,17 +295,19 @@ document.addEventListener("DOMContentLoaded",async () => {
         if (build.travada) return;
         if (!e.target.checked && perifericos.some(cat => build.componentes[cat]) &&
             !confirm("Remover os periféricos selecionados desta build?")) { e.target.checked = true; return; }
+        const anterior=structuredClone(build);
         build.incluirPerifericos = e.target.checked;
         if (!build.incluirPerifericos) perifericos.forEach(cat => delete build.componentes[cat]);
-        persistir(); renderizar();
+        historico.registrar(anterior,build);persistir(); renderizar();
       });
       if (!opcoes) main.querySelector("#include-network").addEventListener("change",e => {
         if (build.travada) return;
         if (!e.target.checked && acessoriosRede.some(cat => build.componentes[cat]) &&
             !confirm("Remover os acessórios de rede selecionados desta build?")) { e.target.checked = true; return; }
+        const anterior=structuredClone(build);
         build.incluirRede = e.target.checked;
         if (!build.incluirRede) acessoriosRede.forEach(cat => delete build.componentes[cat]);
-        persistir(); renderizar();
+        historico.registrar(anterior,build);persistir(); renderizar();
       });
       main.querySelector("#save-configuration").onclick = async () => {
         try {
@@ -342,18 +367,19 @@ document.addEventListener("DOMContentLoaded",async () => {
     }
     main.addEventListener("click",async e => {
       const botao = e.target.closest("button");
-      if (!botao || botao.disabled) return;
+      if (!botao || botao.disabled || desfazendo) return;
       if (botao.dataset.category) {
         try { if (conta) { await filaSalvamento; if (falhaSalvamento) throw falhaSalvamento; } navegarPara(urlCategoria(botao.dataset.category)); }
         catch (erro) { avisar(erro.message); }
         return;
       }
       try {
+        const anterior=structuredClone(build);
         if (botao.dataset.remove) build = removerPeca(build,botao.dataset.remove,botao.dataset.item);
         else if (botao.dataset.quantityAdd) build = selecionarPecaCompativel(build,catalogo.find(p => p.id === botao.dataset.quantityAdd),catalogo);
         else if (botao.dataset.quantityReduce) build = reduzirQuantidade(build,botao.dataset.quantityCategory,botao.dataset.quantityReduce);
         else return;
-        persistir(); renderizar();
+        historico.registrar(anterior,build);persistir(); renderizar();
       } catch (erro) { avisar(erro.message); }
     });
     renderizar();
