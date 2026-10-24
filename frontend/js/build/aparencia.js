@@ -53,12 +53,12 @@ function referencias(campo,titulo,opcoes,atual) {
 export function aparenciaHtml(valor,_catalogo=[],{possuiGabinete=false}={}) {
   const atual=normalizarAparencia(valor);
   if(atual.estilo==='compacto')atual.estilo='sem-preferencia';
-  return '<fieldset class="appearance-colors"><legend class="font-1-xs">Cor do setup</legend><div class="appearance-swatches">'+coresSetup.map(([v,n])=>
+  return '<fieldset class="appearance-colors"><legend class="font-1-xs">Cor das peças e periféricos</legend><div class="appearance-swatches">'+coresSetup.map(([v,n])=>
     '<label class="appearance-swatch"><input type="radio" name="appearance-color" value="'+v+'" '+(v===atual.cor?'checked':'')+'><span class="appearance-color-dot color-'+v+'" aria-hidden="true"></span><span>'+n+'</span></label>').join('')+'</div></fieldset>'
     +(possuiGabinete?'<p class="font-2-xs">O gabinete que você já possui será preservado.</p>':
       '<div class="appearance-examples" role="region" aria-label="Tamanho e estilo do gabinete" tabindex="0">'
       +referencias('size','Tamanho do gabinete',portesGabinete,atual.porte)
       +referencias('style','Estilo do gabinete',estilosGabinete,atual.estilo)
       +'<p class="font-2-xs appearance-fan-help">Uma ventoinha comum mede 120 ou 140 mm. Um water cooler de 240 mm costuma usar 2 ventoinhas de 120 mm; um de 360 mm, 3. O radiador completo, os tubos e as conexões precisam de espaço extra.</p></div>')
-    +'<p class="font-2-xs planning-help">As fotos mostram exemplos de tamanho e visual, não produtos que você precisa comprar. As peças devem caber e ficar dentro do seu orçamento. Só consideramos a cor quando ela está informada no cadastro.</p>';
+    +'<p class="font-2-xs planning-help">A cor é uma preferência para todas as peças e periféricos novos, incluindo gabinete e ventoinhas. Vamos buscar opções da cor escolhida quando ela estiver cadastrada ou indicada no nome do modelo, sem passar do orçamento ou prejudicar a montagem. As peças que você já possui serão mantidas. As fotos são apenas exemplos.</p>';
 }

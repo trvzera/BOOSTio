@@ -1,5 +1,6 @@
 from decimal import Decimal
 from .preferencias_perifericos_service import PreferenciasPerifericosService
+from .preferencias_cores_service import PreferenciasCoresService
 
 
 class AmostrarCatalogoService:
@@ -18,7 +19,7 @@ class AmostrarCatalogoService:
         "gabinete": ("formato", "painel_vidro", "fans_inclusos"),
     }
 
-    def executar(self, tipo, pecas, limite=12, utilidade=""):
+    def executar(self, tipo, pecas, limite=12, utilidade="", cor="sem-preferencia"):
         ordenadas = sorted(pecas, key=lambda p: (Decimal(str(p["preco"])), p["id"]))
         if len(ordenadas) <= limite:
             return ordenadas
@@ -38,6 +39,10 @@ class AmostrarCatalogoService:
             for peca in [*primarios.values(), *grupos.values()]:
                 if len(escolhidas) >= max(1, limite - 4):
                     break
+                escolhidas[peca["id"]] = peca
+        # Sem excluir padrões técnicos, a entrada econômica ou a faixa de investimento.
+        for peca in PreferenciasCoresService.destaques(ordenadas, cor, campos or ()):
+            if len(escolhidas) < limite:
                 escolhidas[peca["id"]] = peca
         menor, maior = Decimal(str(ordenadas[0]["preco"])), Decimal(str(ordenadas[-1]["preco"]))
         vagas = limite - len(escolhidas)

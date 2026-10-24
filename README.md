@@ -120,7 +120,16 @@ Ao escolher o tamanho, um exemplo mostra medidas externas, placas-mãe,
 ventoinhas e radiador suportados. Esses dados são do modelo de referência,
 não um padrão de todos os gabinetes daquele tamanho. São preferências flexíveis:
 não autorizam exceder o orçamento nem ignorar medidas, ventilação ou estoque.
-Cor e características ausentes não são inventadas. O editor também mostra a
+Na geração inteligente, a preferência de cor se aplica a **todas as peças e
+periféricos novos**, incluindo gabinete, ventoinhas e resfriadores. A amostra de
+produtos e os conjuntos de periféricos preservam opções da cor desejada sem
+eliminar alternativas econômicas e padrões técnicos. O complemento automático
+de fans também considera a cor, depois de verificar encaixe e orçamento.
+Cor cadastrada tem prioridade; nomes com indicação de cor são referências
+comerciais, não confirmação técnica da versão. RGB, switch, fotos e URLs não
+comprovam a cor da carcaça. Peças próprias são preservadas; ausência da cor
+preferida não impede usar uma alternativa adequada, sem exceder os tetos.
+Características ausentes não são inventadas. O editor também mostra a
 capacidade total de SSDs/HDs em GB/TB; quando faltam dados, identifica o subtotal
 como parcial.
 
@@ -339,7 +348,7 @@ Os originais da marca, esboços e anotações estão reunidos em [materiais](mat
 ## Validação da versão
 
 Na revisão de **24/10/2026**, a suíte local aprovou **586 testes JavaScript** e
-**738 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
+**781 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
 Há testes específicos para as sete classes de Controller e para preservar o

@@ -17,6 +17,7 @@ from .planejar_perifericos_service import PlanejarPerifericosService
 from .completar_ventilacao_service import CompletarVentilacaoService
 from .amostrar_catalogo_service import AmostrarCatalogoService
 from .preferencias_perifericos_service import PreferenciasPerifericosService
+from .preferencias_cores_service import PreferenciasCoresService
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ class CriarBuildService:
     "limites_radiador_mm", "fluxo_ar", "fonte_fluxo_ar", "observacoes_medidas",
     "fonte_medidas", "modelo_ficha_tecnica", "ficha_tecnica_verificada_em",
     "tipos_memoria_cpu", "memoria_maxima_cpu_gb", "tdp_w", "perfis_memoria", "numero_pinos",
-    "placas_mae_incompativeis", "cor", "painel_vidro",
+    "placas_mae_incompativeis", "cor", "cor_referencia", "fonte_cor_referencia", "painel_vidro",
     "conector_fan", "tensao_fan_v", "corrente_fan_a", "conector_rgb", "tensao_rgb_v",
     "rotacao_max_rpm", "fluxo_ar_cfm", "pressao_estatica_mmh2o", "ruido_dba",
     "conectores_cpu_eps", "conectores_pcie_8pinos", "conectores_pcie_16pinos", "conectores_sata",
@@ -98,7 +99,7 @@ class CriarBuildService:
     teto_pc, teto_perifericos = self._dividir_orcamento(orcamento, percentual)
     inicio_catalogo = perf_counter()
     catalogo = self._gerar_catalogo(min(orcamento - margem, teto_pc), teto_perifericos, excluidas,
-                                  aparencia["gabinete_id"] if "gabinete" not in proprias else None, dados["utilidade"])
+                                  aparencia["gabinete_id"] if "gabinete" not in proprias else None, dados["utilidade"], cor=aparencia["cor"])
     logger.info("Geração: etapa=catalogo duracao_ms=%d categorias=%d", (perf_counter()-inicio_catalogo)*1000, len(catalogo))
     disponiveis = set(catalogo) | set(proprias)
     obrigatorias = {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"}
@@ -112,7 +113,7 @@ class CriarBuildService:
     if acessorio_rede and rede.get("possuiAcessorio") is False and acessorio_rede not in disponiveis:
       raise ValueError("Não há acessório de rede com preço e disponibilidade confirmados")
 
-    plano_perifericos = PlanejarPerifericosService().executar(catalogo, teto_perifericos, proprias, dados["utilidade"]) if percentual else None
+    plano_perifericos = PlanejarPerifericosService().executar(catalogo, teto_perifericos, proprias, dados["utilidade"], cor=aparencia["cor"]) if percentual else None
     if plano_perifericos and not plano_perifericos["viavel"]:
       minimo = plano_perifericos.get("minimo_catalogado")
       detalhe = f" O menor conjunto disponível custa R$ {minimo:.2f}, mas a reserva é de R$ {teto_perifericos:.2f}." if minimo is not None else ""
@@ -123,7 +124,7 @@ class CriarBuildService:
     logger.info("Geração: etapa=prompt duracao_ms=%d caracteres=%d", (perf_counter()-inicio_prompt)*1000, len(prompt))
     dados_build = self._gerar_validada(usuario_id, prompt, modelo, catalogo, orcamento,
                                      percentual, proprias, detalhes_proprias, rede, tentativas_correcao,
-                                     revisar_investimento=any(termo in dados["utilidade"].casefold() for termo in ("jogo", "pesado", "render", "3d")))
+                                     revisar_investimento=any(termo in dados["utilidade"].casefold() for termo in ("jogo", "pesado", "render", "3d")), cor=aparencia["cor"])
     if proprias:
       return AvaliarCompatibilidadeService().para_resposta(BuildSalva.criar_gerada_com_pecas_proprias(usuario_id, dados_build, proprias, rede, percentual, aparencia))
 
@@ -159,7 +160,7 @@ class CriarBuildService:
         raise ValueError(f"{campo} deve ser um texto de até {limite} caracteres")
 
   def _gerar_validada(self, usuario_id, prompt, modelo, catalogo, orcamento,
-                     percentual, proprias, detalhes_proprias, rede, tentativas_correcao=1, revisar_investimento=False):
+                     percentual, proprias, detalhes_proprias, rede, tentativas_correcao=1, revisar_investimento=False, cor="sem-preferencia"):
     # No máximo uma revisão: não repetir indefinidamente nem persistir uma saída inválida.
     limite = 1 if tentativas_correcao else 0
     instrucao = prompt
@@ -176,7 +177,7 @@ class CriarBuildService:
         inicio_validacao = perf_counter()
         build = json.loads(resposta) if isinstance(resposta, str) else resposta
         teto_pc, _ = self._dividir_orcamento(orcamento, percentual)
-        build = CompletarVentilacaoService().executar(build, catalogo, teto_pc, proprias, detalhes_proprias)
+        build = CompletarVentilacaoService().executar(build, catalogo, teto_pc, proprias, detalhes_proprias, cor=cor)
         validada = self._validar_build(build, catalogo, orcamento, percentual, proprias, detalhes_proprias, rede)
         resumo = self._resumo_custos(validada, catalogo)
         # Uma revisão já permitida, não um mínimo de gasto nem novas tentativas.
@@ -253,13 +254,14 @@ class CriarBuildService:
     # Usa o mesmo complemento técnico do catálogo exibido no editor. O LLM
     # continua recebendo o ID numérico exigido pelo contrato de geração.
     dados = {**peca.to_catalogo(), "id": peca.id}
+    dados.update(PreferenciasCoresService.metadados(dados))
     return {
       campo: float(valor) if isinstance(valor, Decimal) else valor for campo in cls.CAMPOS_PECAS
       if (valor := dados.get(campo)) is not None
     }
 
   @classmethod
-  def _gerar_catalogo(cls, preco_maximo, reserva_perifericos=0, excluidas=(), referencia_gabinete=None, utilidade=""):
+  def _gerar_catalogo(cls, preco_maximo, reserva_perifericos=0, excluidas=(), referencia_gabinete=None, utilidade="", cor="sem-preferencia"):
     catalogo = {}
     for modelo in MODELOS_PECAS:
       periferico = modelo.__tablename__ in cls.PERIFERICOS
@@ -271,7 +273,7 @@ class CriarBuildService:
         if modelo.__tablename__ == "monitor":
           fichas = [p for p in fichas if PreferenciasPerifericosService.painel_permitido(p)]
         if fichas:
-          catalogo[modelo.__tablename__] = AmostrarCatalogoService().executar(modelo.__tablename__, fichas, utilidade=utilidade)
+          catalogo[modelo.__tablename__] = AmostrarCatalogoService().executar(modelo.__tablename__, fichas, utilidade=utilidade, cor=cor)
     if referencia_gabinete is not None and "gabinete" not in excluidas:
       referencia = MODELOS["gabinete"].buscar_por_id(referencia_gabinete)
       if referencia:
@@ -294,7 +296,7 @@ class CriarBuildService:
     proprias = proprias or {}
     pc, perifericos = CriarBuildService._dividir_orcamento(orcamento, percentual)
     if percentual and plano_perifericos is None:
-      plano_perifericos = PlanejarPerifericosService().executar(catalogo, perifericos, proprias, dados["utilidade"])
+      plano_perifericos = PlanejarPerifericosService().executar(catalogo, perifericos, proprias, dados["utilidade"], cor=pedido["aparencia"]["cor"])
     teto_peca = min(Decimal(str(orcamento - margem)), pc)
     # Tornar explícitas decisões determinísticas ajuda a LLM a não cruzar IDs de
     # plataformas diferentes. É apenas socket: não certifica BIOS nem o conjunto.
@@ -425,10 +427,20 @@ class CriarBuildService:
         "obrigatórios. Mouse e headset devem manter equilíbrio, conexão adequada e dados confirmados. "
         "Não inclua produtos do AliExpress ou de outra loja que não existam no catálogo validado.\n"
         "Aparência é preferência flexível. gabinete_id é uma referência visual, não uma obrigação "
-        "de compra. Use o estilo/cor somente quando houver dados confirmados; não deduza medidas "
+        "de compra. Use o estilo somente quando houver dados confirmados; não deduza medidas "
         "ou suporte de radiador pelo estilo. Preserve gabinete próprio. Nunca escolha um gabinete "
         "incompatível, de ventilação inadequada ou caro demais só para atender estética. "
         "Sem preferência, priorize encaixe, ventilação e custo-benefício.\n\n"
+        "A cor escolhida vale para TODOS os itens novos, não só para o gabinete: placa-mãe, GPU, RAM, "
+        "resfriadores, ventoinhas, fonte, armazenamento, monitor, teclado, mouse, fone e acessórios. "
+        "Entre opções adequadas ao uso, compatíveis e dentro dos tetos, prefira a cor escolhida. "
+        "Para misto, busque combinação de preto e branco, não obrigatoriamente cada peça bicolor. "
+        "cor é um dado cadastrado; cor_referencia com fonte_cor_referencia=nome_cadastrado é apenas "
+        "uma indicação comercial, não cor confirmada de toda a peça ou de uma versão diferente. "
+        "Não deduza cor por imagem, URL, RGB, cor do switch ou nome de linha. Nunca substitua peças "
+        "próprias para combinar a cor. Sem opção adequada da cor, use alternativa compatível; "
+        "não afirme que todos os itens têm cor confirmada quando houver dados ausentes. Nunca "
+        "sacrifique orçamento, segurança, ventilação ou recursos importantes do uso só pela cor.\n\n"
         "O campo porte diferencia Mini Tower, Mid Tower e Full Tower. Panorâmico/aquário e painel "
         "lateral de vidro são características visuais independentes do porte. As fotos são apenas "
         "exemplos, não itens que precisam ser comprados. Nunca deduza suporte a placa-mãe, dimensões "

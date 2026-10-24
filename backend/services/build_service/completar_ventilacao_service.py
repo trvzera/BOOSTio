@@ -3,12 +3,13 @@ from decimal import Decimal
 from math import isfinite
 
 from .encaixe_fisico import avaliar_fans
+from .preferencias_cores_service import PreferenciasCoresService
 
 
 class CompletarVentilacaoService:
     """Completa uma omissão mecânica da IA só com encaixe e orçamento conhecidos."""
 
-    def executar(self, build, catalogo, teto_pc, proprias=None, detalhes_proprias=None):
+    def executar(self, build, catalogo, teto_pc, proprias=None, detalhes_proprias=None, cor="sem-preferencia"):
         proprias = proprias or {}
         if not isinstance(build, dict) or build.get("erro") or not isinstance(build.get("componentes"), list) or "fan" in proprias:
             return build
@@ -62,10 +63,10 @@ class CompletarVentilacaoService:
             # Quando há arranjos cadastrados, eles precisam confirmar a distribuição.
             if encaixe["distribuicao"] is False or gabinete.get("posicoes_fans") and encaixe["distribuicao"] is not True:
                 continue
-            candidatas.append((custo, fan["id"], componente))
+            candidatas.append((PreferenciasCoresService.prioridade(fan, cor), custo, fan["id"], componente))
         if not candidatas:
             return build
-        candidata = min(candidatas, key=lambda item: item[:2])[2]
+        candidata = min(candidatas, key=lambda item: item[:3])[3]
         resultado = deepcopy(build)
         resultado["componentes"] = [item for item in resultado["componentes"] if item["tipo"] != "fan"] + [candidata]
         return resultado

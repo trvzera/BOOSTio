@@ -2,6 +2,7 @@ from decimal import Decimal
 from itertools import product
 from math import isfinite
 from .preferencias_perifericos_service import PreferenciasPerifericosService
+from .preferencias_cores_service import PreferenciasCoresService
 
 
 class PlanejarPerifericosService:
@@ -9,7 +10,7 @@ class PlanejarPerifericosService:
 
     TIPOS = ("monitor", "teclado", "mouse", "fone")
 
-    def executar(self, catalogo, teto, proprias=None, utilidade=""):
+    def executar(self, catalogo, teto, proprias=None, utilidade="", cor="sem-preferencia"):
         teto = Decimal(str(teto))
         tipos = [tipo for tipo in self.TIPOS if tipo not in (proprias or {})]
         opcoes = []
@@ -20,7 +21,12 @@ class PlanejarPerifericosService:
                      and isfinite(peca["preco"]) and peca["preco"] > 0]
             pecas.sort(key=lambda peca: (Decimal(str(peca["preco"])), peca["id"]))
             if len(pecas) > 8:
-                pecas = [pecas[i * (len(pecas) - 1) // 7] for i in range(8)]
+                originais = pecas
+                pecas = [originais[i * (len(originais) - 1) // 7] for i in range(8)]
+                for indice, destaque in enumerate(PreferenciasCoresService.destaques(originais, cor)):
+                    if not any(p["id"] == destaque["id"] for p in pecas):
+                        pecas[-2-indice] = destaque
+                pecas.sort(key=lambda peca: (Decimal(str(peca["preco"])), peca["id"]))
             if not pecas:
                 return {"viavel": False, "categoria_ausente": tipo, "combinacoes": []}
             opcoes.append(pecas)
@@ -44,6 +50,15 @@ class PlanejarPerifericosService:
                 mecanico = PreferenciasPerifericosService.teclado_documentado(teclado) if PreferenciasPerifericosService.jogos(utilidade) else False
                 return (-int(mecanico), *(-v for v in PreferenciasPerifericosService.monitor(monitor,utilidade)), item[0])
             prioritarias = sorted(combinacoes, key=criterio)[:3]
+        if cor in ("preto", "branco", "misto"):
+            # Oferece também conjuntos da cor desejada, sempre já dentro do teto.
+            # Isso não elimina as alternativas de melhor adequação ao uso.
+            pesos = {id(p): PreferenciasCoresService.prioridade(p, cor) for grupo in opcoes for p in grupo}
+            cores = {id(p): PreferenciasCoresService.identificar(p)[0] for grupo in opcoes for p in grupo}
+            prioritarias += sorted(combinacoes, key=lambda item: (
+                sum(pesos[id(p)] for p in item[1]),
+                int(cor == "misto" and not {"preto", "branco"} <= set().union(*(cores[id(p)] for p in item[1]))),
+                item[0], tuple(p["id"] for p in item[1])))[:3]
         if len(combinacoes) > 12:
             combinacoes = [combinacoes[i * (len(combinacoes) - 1) // 11] for i in range(12)]
             for prioridade in prioritarias:

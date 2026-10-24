@@ -69,6 +69,19 @@ def test_arranjo_fisico_conflitante_nao_e_aprovado_pela_soma_total():
     assert CompletarVentilacaoService().executar(build, catalogo, 500) is build
 
 
+def test_cor_das_fans_priorizada_apenas_depois_de_encaixe_e_teto():
+    build, catalogo = cenario()
+    catalogo["fan"] = [{"id": 1, "preco": 10, "quantidade": 1, "tamanho_mm": 120, "cor": "preto"},
+                       {"id": 2, "preco": 15, "quantidade": 1, "tamanho_mm": 120, "cor": "branco"},
+                       {"id": 3, "preco": 5, "quantidade": 1, "tamanho_mm": 140, "cor": "branco"}]
+    servico = CompletarVentilacaoService()
+    assert servico.executar(build, catalogo, 160, cor="branco")["componentes"][-1] == {"tipo": "fan", "id": 2, "quantidade": 4}
+    assert servico.executar(build, catalogo, 140, cor="branco")["componentes"][-1] == {"tipo": "fan", "id": 1, "quantidade": 4}
+    assert servico.executar(build, catalogo, 139, cor="branco") is build
+    build["componentes"].append({"tipo": "fan", "id": 1, "quantidade": 1})
+    assert servico.executar(build, catalogo, 200, cor="branco")["componentes"][-1]["id"] == 1
+
+
 @pytest.mark.parametrize("invalida", [None, {"erro": "impossível", "componentes": []}, {"componentes": [None]},
     {"componentes": [{"tipo": "gabinete", "id": True}]}, {"componentes": [{"tipo": "gabinete", "id": 1, "quantidade": False}]}])
 def test_saida_invalida_continua_para_validacao_sem_ser_disfarcada(invalida):

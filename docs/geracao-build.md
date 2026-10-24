@@ -2,6 +2,39 @@
 
 ## Porte, aparência e periféricos — atualização
 
+### Cor em toda a montagem
+
+- A cor de `aparencia` é preferência para todas as compras novas: componentes,
+  gabinete, refrigeração, periféricos e rede. Compatibilidade, limites separados
+  de orçamento e recursos adequados ao uso permanecem prioritários. Itens próprios
+  não são trocados por estética; não exigir gasto integral da reserva.
+- `PreferenciasCoresService` usa `cor` cadastrada primeiro. Se ausente, termos
+  inequívocos de cor no nome servem apenas como referência comercial, com
+  `cor_referencia`/`fonte_cor_referencia=nome_cadastrado` no catálogo da IA.
+  Não altera a cor da ficha, interpreta imagens/slug da loja ou preenche medidas.
+  Ignora exemplos conhecidos de linhas, certificação, cores de switch e iluminação;
+  casos ambíguos continuam sem confirmação. CPU sem cor cadastrada não recebe
+  cor pelo nome de linha. A cobertura comercial não equivale a revisão de todas as variantes.
+- A amostra mantém entrada econômica, padrões técnicos e faixas de investimento,
+  reservando opções da cor em cada categoria. Conjuntos de periféricos incluem
+  exemplos da cor desejada e alternativas por uso, sempre dentro da reserva;
+  “preto e branco” pode combinar itens dessas duas cores, sem exigir cada um bicolor.
+- Fans automáticas passam pela mesma validação de tamanho, quantidade e posições;
+  só depois a cor desempata opções que cabem no saldo do PC. Uma fan já escolhida
+  ou própria não é substituída para combinar a cor. Falta da cor não torna o pedido inviável.
+- Sem migração, alteração do banco ou chamadas reais à LLM. Validação: 586 JS,
+  781 Python +20 subtestes e 216 verificações Chrome em cinco formatos. A geração
+  real colorida ainda precisa de homologação com cota autorizada.
+
+### Limites da compatibilidade de ventoinhas
+
+- Regras mecânicas não dependem do rótulo Mini/Mid/Full Tower ou de vidro/aquário:
+  usam diâmetro, capacidade, arranjos por posição, fans de fábrica e do radiador.
+  Posições alternativas não são somadas; teto de vidro não cria encaixes extras.
+- Só há confirmação quando os dados necessários existem. Medidas externas,
+  estilo e soma genérica de fans não comprovam todas as posições ou interferências.
+  Conectores, corrente elétrica, parafusos e detalhes da instalação continuam a conferir.
+
 - A etapa de aparência usa fotos estáticas como exemplos, sem preço, SKU de compra
   ou seleção de produto. Há tamanho (Mini/Mid/Full Tower), estilo (sem vidro, vidro
   lateral, aquário com frente/lateral de vidro, panorâmico com frente/lateral/teto)

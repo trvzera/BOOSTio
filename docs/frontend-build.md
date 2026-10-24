@@ -8,6 +8,14 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
 
 ### Tamanho e estilo do gabinete — 24/10/2026
 
+- Complemento de cor: a orientação da etapa agora explica que a escolha vale para
+  todos os itens novos, não só o gabinete. Python preserva referências de cor na
+  amostra por categoria, exemplos de conjuntos de periféricos e complemento de
+  fans, sem mudar tetos ou encaixe. Cor do nome é indicação, não ficha confirmada;
+  peças próprias e alternativas adequadas são mantidas. Detalhes em `geracao-build.md`.
+- Regressão após essa extensão: 586 JS, 781 Python (+20 subtestes), 216 verificações
+  Chrome em cinco formatos. APIs simuladas; sem LLM real ou escrita na base.
+
 - Tamanho separado em Mini/Mid/Full Tower; estilo separado em sem vidro,
   vidro lateral, aquário (frente/lateral) e panorâmico de três faces
   (frente/lateral/teto). A imagem nova é do O11 Vision. Fontes dos exemplos e

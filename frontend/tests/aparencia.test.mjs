@@ -64,4 +64,8 @@ test('cores são escolhas rotuladas, com amostra visual e sem depender só da co
   assert.match(html,/value="misto" checked/);
   assert.match(html,/color-misto" aria-hidden="true"/);
   assert.match(html,/Preto e branco/);
+  assert.match(html,/Cor das peças e periféricos/);
+  assert.match(html,/cor é uma preferência para todas as peças e periféricos novos/);
+  assert.match(html,/incluindo gabinete e ventoinhas/);
+  assert.match(html,/peças que você já possui serão mantidas/);
 });
