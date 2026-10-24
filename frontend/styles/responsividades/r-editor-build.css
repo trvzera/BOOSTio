@@ -61,7 +61,8 @@
   .builder-page-main, .builder-footer-wrapper { padding-bottom: 96px; }
   .component-empty, .component-selected-main { padding: 16px; gap: 12px; }
   .component-empty { gap: 12px; padding: 18px 16px; }
-  .component-purchase { grid-column: 1 / -1; }
+  .component-purchase { grid-column: 1 / -1; flex-wrap: wrap; }
+  .component-purchase strong { min-width: 0; max-width: 100%; margin-inline-start: auto; white-space: normal; overflow-wrap: anywhere; }
   .component-group-heading { flex-wrap: wrap; }
   .ram-add-model, .component-group > .disabled-tip-anchor:has(> .ram-add-model) { width: 100%; justify-self: stretch; }
   .builder-options { flex-direction: column; gap: 8px; }

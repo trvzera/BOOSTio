@@ -3,7 +3,7 @@ import "../auth/auth.js";
 import { carregarCatalogo,categoriasEditor,perifericos,acessoriosRede,moeda,htmlSeguro as h,nomePeca,imagemPeca,ofertasPeca } from "../build/catalogo.js";
 import { abrirBuild,guardarRascunho,buildsLocais,itensCategoria,categoriasMultiplas,informacoesRam,informacoesArmazenamento,motivoSelecao,removerPeca,reduzirQuantidade,linkCompartilhado } from "../build/estado.js";
 import { avaliarBuild,selecionarPecaCompativel } from "../build/compatibilidade.js";
-import { informacoesFans, fluxoFan } from "../build/fans.js";
+import { informacoesFans, fluxoFan, temFansInclusas } from "../build/fans.js";
 import { slotsRam, AVISO_SLOTS_RAM_PROVISORIOS } from "../build/hardware.js";
 import { avisar,copiarTexto,mostrarFalha } from "../build/interface.js";
 import { iconeAnimado,iniciarIcones } from "../components/ui.js";
@@ -159,7 +159,8 @@ document.addEventListener("DOMContentLoaded",async () => {
     }
     function grupo(categoria) {
       const cooler = categoria.id === "cooler", cpu = get("processador");
-      const obrigatoria = categoria.obrigatoria || (cooler && cpu && !cpu.cooler) ||
+      const ventilacaoInclusa = categoria.id === "fan" && temFansInclusas(get("gabinete"),get("water_cooler"));
+      const obrigatoria = (categoria.obrigatoria && !ventilacaoInclusa) || (cooler && cpu && !cpu.cooler) ||
         (categoria.id === "placa_video" && cpu && !cpu.videointegrado);
       const tipos = categoria.tipos || [categoria.id];
       const itens = tipos.flatMap(cat => itensCategoria(build,cat).map(item => ({categoria:cat,item})));
@@ -187,8 +188,9 @@ document.addEventListener("DOMContentLoaded",async () => {
         (categoria.id === "fan" ? '<button type="button" class="btn-ghost ram-add-model" data-category="fan" aria-label="Adicionar outro modelo de fan" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("plus") + 'Adicionar outro modelo de fan</button>' : "") +
         (categoria.rede && itens.length < tipos.length ? '<button type="button" class="btn-ghost ram-add-model" data-category="rede" aria-label="Adicionar outro acessório de rede" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("plus") + 'Adicionar outro acessório de rede</button>' : "") + '</section>';
       const incluido = cooler && cpu?.cooler, total = catalogo.filter(p => tipos.includes(p.categoria)).length;
-      const acao = categoria.rede ? "Adicionar cabo ou adaptador" : "Selecionar componente";
+      const acao = categoria.rede ? "Adicionar cabo ou adaptador" : ventilacaoInclusa ? "Adicionar fans extras" : "Selecionar componente";
       const dica = categoria.rede ? resumoRede(build.rede) + (total ? " · escolha um modelo no catálogo" : " · produtos ainda não cadastrados")
+        : ventilacaoInclusa ? "Já há fans inclusas no gabinete ou water cooler. Extras dependem das posições e medidas disponíveis."
         : incluido ? "Cooler incluso no processador" + (cpu.modelo_cooler ? " · " + cpu.modelo_cooler : "") + ". Adicional opcional."
           : cooler ? "Air cooler e water cooler" : categoria.armazenamento ? "SSD ou HD · escolha ao menos um armazenamento" : "Escolha um modelo no catálogo";
       return '<section class="component-group">' + cabecalho + '<article class="component-row glass-card"><button type="button" class="component-empty' + (perifericos.includes(categoria.id) ? ' component-empty-peripheral' : '') + '" data-category="' + categoria.id +

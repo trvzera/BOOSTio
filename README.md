@@ -286,7 +286,7 @@ os recursos necessários ao site e os arquivos locais/gerados que não entram no
 
 ## Validação da versão
 
-Na revisão de **24/10/2026**, a suíte local aprovou **538 testes JavaScript** e
+Na revisão de **24/10/2026**, a suíte local aprovou **541 testes JavaScript** e
 **666 testes Python**, além de **13 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.

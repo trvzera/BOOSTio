@@ -8,6 +8,19 @@ import { ofertasPeca } from "../js/build/catalogo.js";
 import { destinoAnterior, rotuloVoltar } from "../js/components/navigation-back.js";
 import { avisoFreteHtml } from "../js/build/acoes-build.js";
 
+test("destaque dos Termos usa o azul acessível também sobre o fundo em paisagem",async()=>{
+  const css=await readFile(new URL('../styles/paginas/termos.css',import.meta.url),'utf8');
+  assert.match(css,/\.terms-intro span\s*\{\s*color:\s*var\(--text-accent\)/);
+});
+
+test("texto ampliado pode quebrar palavras nas listas dos Termos e separar preço/botão sem corte",async()=>{
+  const termos=await readFile(new URL('../styles/paginas/termos.css',import.meta.url),'utf8');
+  const editor=await readFile(new URL('../styles/responsividades/r-editor-build.css',import.meta.url),'utf8');
+  assert.match(termos,/\.terms-list li\s*\{[^}]*overflow-wrap:\s*anywhere/s);
+  assert.match(editor,/\.component-purchase\s*\{\s*grid-column:\s*1\s*\/\s*-1;\s*flex-wrap:\s*wrap/);
+  assert.match(editor,/\.component-purchase strong\s*\{[^}]*white-space:\s*normal;[^}]*overflow-wrap:\s*anywhere/s);
+});
+
 test("nomes acessíveis preservam o texto visível dos botões para controle por voz",async () => {
   const fontes = [
     ['../js/pages/forms.js','aria-label="Voltar à etapa anterior"'],

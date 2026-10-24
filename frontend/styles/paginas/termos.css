@@ -25,7 +25,7 @@
 }
 
 .terms-intro span {
-  color: var(--cor-p1);
+  color: var(--text-accent);
 }
 
 .terms-clause {
@@ -59,6 +59,7 @@
 .terms-list li {
   color: var(--text-secondary);
   line-height: 1.7;
+  overflow-wrap: anywhere;
   list-style: disc;
 }
 
