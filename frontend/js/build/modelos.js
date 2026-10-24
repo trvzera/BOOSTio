@@ -81,7 +81,7 @@ const MODELOS = [
   {
     id:"modelo-primeiro-intel",titulo:"Primeiro PC com Intel",objetivo:"jogos",objetivoRotulo:"Jogos",plataforma:"LGA1700",nivel:"Entrada",
     descricao:"Core i3, RX 7600, 16 GB em dois pentes e SSD. Uma base sem periféricos para escolher seus próximos upgrades.",
-    pecas:[["SEED-CPU-06",1],["SEED-MB-10",1],["SEED-RAM-02",1],["SEED-SSD-06",1],["SEED-GPU-05",1],["SEED-PSU-04",1],["SEED-CASE-01",1],["SEED-FAN-01",2],["SEED-ACOOL-02",1]],
+    pecas:[["SEED-CPU-06",1],["SEED-MB-31",1],["SEED-RAM-02",1],["SEED-SSD-06",1],["SEED-GPU-05",1],["SEED-PSU-04",1],["SEED-CASE-01",1],["SEED-FAN-01",2],["SEED-ACOOL-02",1]],
   },
 ];
 
