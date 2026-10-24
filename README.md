@@ -8,7 +8,8 @@
   </p>
   <p>
     <a href="#sobre">Sobre</a> ·
-    <a href="#funcionalidades">Funcionalidades</a> ·
+    <a href="#funcionalidades-implementadas">Funcionalidades</a> ·
+    <a href="#diagrama-de-classes">Diagrama de classes</a> ·
     <a href="#builds-prontas">Builds prontas</a> ·
     <a href="#peças-e-preços">Peças e preços</a> ·
     <a href="#desempenho-esperado">Desempenho esperado</a> ·
@@ -38,17 +39,56 @@ gaming/rendering performance from public benchmark sources.
 
 </details>
 
-## Funcionalidades
+## Funcionalidades Implementadas
+
+### Casos de uso com API e persistência
+
+Os casos abaixo possuem interface, chamada HTTP, tratamento no backend, Service
+e acesso às Models. Consultas leem o banco; alterações persistem os dados.
+Os nomes identificam ações reais, não apenas telas ou rotas.
+
+| Nº | Caso de uso | API Flask | Service responsável |
+| --- | --- | --- | --- |
+| 01 | Cadastrar conta | `POST /usuarios/` | `CriarUsuarioService` |
+| 02 | Fazer login por e-mail e senha | `POST /auth/entrar` | `EntrarUsuarioService` |
+| 03 | Atualizar os dados do perfil | `PUT /usuarios/{id}` | `AtualizarUsuarioService` |
+| 04 | Excluir a conta por desativação lógica | `DELETE /usuarios/{id}` | `DeletarUsuarioService` |
+| 05 | Salvar budget e autorização de uso | `PUT /usuarios/{id}/budget` | `AtualizarBudgetUsuarioService` |
+| 06 | Solicitar código de verificação de e-mail | `POST /email/verificar/enviar/{id}` | `EnviarEmailService` |
+| 07 | Confirmar o e-mail pelo código recebido | `POST /email/verificar/conferir/{id}` | `VerificarCodigoEmail` |
+| 08 | Solicitar recuperação de senha | `POST /usuarios/esqueci-senha` | `EnviarEmailRecuperarService` |
+| 09 | Redefinir senha com token válido | `POST /usuarios/redefinir-senha` | `RedefinirSenhaService` |
+| 10 | Consultar o catálogo de peças e preços | `GET /build/catalogo` | `ListarCatalogoBuildService` |
+| 11 | Criar uma build manual | `POST /build/manual` | `CriarBuildManualService` |
+| 12 | Gerar uma build pelo formulário inteligente | `POST /build/` | `CriarBuildService` e `LLMService` |
+| 13 | Listar as builds da conta | `GET /build/` | `ListarBuildService` |
+| 14 | Abrir uma build salva | `GET /build/{id}` | `BuscarBuildService` |
+| 15 | Atualizar uma build e seus componentes | `PUT /build/{id}` | `AtualizarBuildService` |
+| 16 | Duplicar uma build | `POST /build/{id}/duplicar` | `DuplicarBuildService` |
+| 17 | Excluir uma build | `DELETE /build/{id}` | `ExcluirBuildService` |
+| 18 | Definir ou remover o setup atual | `POST /build/{id}/setup-atual` | `DefinirSetupAtualService` |
+| 19 | Visualizar uma build pública por link | `GET /build/{id}/publica` | `BuscarBuildPublicaService` |
+| 20 | Salvar uma cópia de build pública no perfil | `POST /build/{id}/copiar-publica` | `CopiarBuildPublicaService` |
+
+Essa lista descreve a implementação, não uma garantia de funcionamento de serviços
+externos: e-mail depende do SMTP configurado e geração depende da disponibilidade
+e cota da LLM. As ressalvas de arquitetura estão na seção [Arquitetura](#arquitetura).
+
+### Cobertura dos 20 requisitos do produto
 
 Os **20 requisitos do produto**, com o status de cada funcionalidade e seu escopo atual.
 
-**Resumo: 19 implementadas · 1 parcial.**
+**Resumo do produto: 19 implementadas no escopo descrito · 1 parcial.**
 
 - ✅ **Implementado:** fluxo disponível no código do projeto.
 - 🟡 **Parcial:** já possui partes implementadas, mas ainda há pontos a concluir.
 
 Os status descrevem a implementação atual, não a homologação em produção.
 As limitações de cada funcionalidade estão indicadas na última coluna.
+Operações locais não são apresentadas como novos casos de uso de backend:
+exportação JSON/CSV gera o download no navegador; comparação e prévia de melhorias
+têm cálculos no JavaScript sobre builds carregadas da API. Aplicar melhorias,
+importar e copiar modelos prontos utilizam os casos de criação/atualização acima.
 
 | Nº | Requisito | Status | Escopo atual |
 | --- | --- | --- | --- |
@@ -210,12 +250,12 @@ A geração pela LLM já revalida conflitos conhecidos no catálogo, incluindo s
 DDR, slots, potência e medidas explícitas. Especificações ausentes continuam não
 verificadas; a configuração não recebe garantia de compatibilidade completa.
 
-As fichas revisadas cobrem 31 variantes, incluindo gabinetes, GPUs, fontes,
+O manifesto atual possui 37 fichas revisadas, incluindo gabinetes, GPUs, fontes,
 air/water coolers, placas-mãe, processador, RAM, SSDs e fan. Há limites físicos,
 slots, perfis JEDEC/XMP, dimensões por capacidade de SSD, conexões RGB/PWM e
-exceções físicas declaradas pelo fabricante do cooler. Na fotografia atual,
-essas fichas complementam 33 cadastros; não representam todo o catálogo.
-Nove dos 100 gabinetes têm capacidade de fans detalhada. Os cards mostram fans
+exceções físicas declaradas pelo fabricante do cooler. As fichas só complementam
+cadastros com identidade correspondente; não representam todo o catálogo.
+Parte dos gabinetes tem capacidade de fans detalhada. Os cards mostram fans
 inclusas e posições totais separadamente; fábrica, kits adicionais e water cooler
 dividem essa capacidade. Medidas externas não substituem a ficha de fixação.
 As fichas novas guardam fonte oficial/data da consulta e só são aplicadas às identidades
@@ -233,6 +273,40 @@ ou o orçamento não permitem a montagem. Falhas de transporte e cotas recebem m
 Em 23/10/2026, um teste isolado pelo fluxo completo do formulário gerou, revisou,
 validou e persistiu uma configuração de estudos em banco temporário. Isso não
 comprova todos os cenários de uso nem garante respostas válidas de um provedor externo.
+
+## Arquitetura
+
+- [Controllers](backend/controllers/): entrada HTTP, sessão e respostas da API.
+- [Services](backend/services/): casos de uso, validações e integrações externas.
+- [Models](backend/models/): entidades SQLAlchemy e operações de persistência.
+- [Repositories](backend/repositories/): diretório reservado; não há uma camada
+  implementada para duplicar CRUD das Models.
+- [Frontend](frontend/): páginas HTML/CSS e módulos JavaScript que consomem a API.
+
+**Adequação à atividade ainda pendente:** as controllers atuais são funções de
+Blueprint, não classes. A política de fallback da IA e parte da solicitação de
+recuperação de senha ainda são coordenadas nas controllers. Esses pontos precisam
+ser ajustados para atender integralmente ao padrão exigido pela disciplina;
+a organização em pastas, por si só, não significa conformidade completa.
+
+## Diagrama de classes
+
+O diagrama de classes do domínio está sendo finalizado para esta entrega.
+O local previsto é `docs/diagrama-classes.png`; o arquivo e o link de visualização
+ainda precisam ser incluídos antes da submissão. Ele deve refletir as Models
+atuais, incluindo a diferença entre `Build` e `BuildSalva`, cujo estado é JSON.
+
+## Validação da versão
+
+Na revisão de **23/10/2026**, a suíte local aprovou **521 testes JavaScript** e
+**583 testes Python**, além de **13 subtestes Python**. Os testes cobrem, entre
+outros pontos, conta, permissões, budget, limite de builds, persistência,
+compartilhamento, arquivos, compatibilidade e tratamento de falhas.
+
+Os testes utilizam isolamento, bancos temporários e mocks quando necessário.
+Não comprovam todas as combinações de hardware, a disponibilidade permanente de
+SMTP/LLM/benchmarks ou o funcionamento do ambiente de produção. A demonstração
+final deve conferir os fluxos reais com frontend e backend da versão entregue.
 
 ## Limites de requisições
 
