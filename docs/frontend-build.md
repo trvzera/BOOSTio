@@ -6,6 +6,24 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Fontes e verificação de e-mail — 24/10/2026
+
+- Corpo da página com Poppins e cor-base; títulos com Lexend. Campos e botões
+  sem regra própria herdam a fonte, mantendo tamanhos/classes já existentes.
+  Isso cobre também mensagens inseridas pelo JavaScript e retornadas pelo backend.
+- Cadastro e tooltip do botão Confirmar agora informam seis dígitos, coerentes
+  com os seis campos e a validação Python. Instruções/senha do modal de exclusão
+  receberam classes explícitas; removido um fechamento `div` excedente na página.
+- 530 testes Node aprovados. Herança de fontes inspecionada em 16 páginas HTML,
+  celular/desktop, com scripts desativados e mensagem dinâmica de teste: 97
+  verificações/1.020 textos, sem fontes padrão inesperadas. Isso não equivale a
+  testar todas as interações dessas páginas.
+- Mais 29 verificações com JavaScript ativo nos modais de excluir conta e
+  verificar e-mail, em 320/390/768/1440 px: fontes, abertura/fechamento, papel
+  acessível e largura. API/sessão simuladas, sem SMTP ou exclusão real.
+- A revisão da geração, seus testes e limitações de provedor estão em
+  [geracao-build.md](geracao-build.md).
+
 ### Ficha da peça e requisito 13 — 23/10/2026
 
 - RF13 marcado como implementado no escopo de exibir o diagnóstico de compatibilidade,

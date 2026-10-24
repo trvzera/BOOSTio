@@ -233,11 +233,18 @@ o banco ou inferir dados de outra revisão. Modelos/links com variantes divergen
 continuam pendentes de revisão. Isso não certifica BIOS, QVL ou todas as
 interferências físicas.
 
-Saídas inválidas da IA recebem **uma tentativa automática de correção**, com o erro
-da validação e as regras originais. A nova resposta é validada por completo antes
+Saídas inválidas da IA recebem **uma tentativa automática de correção**, com o erro,
+os subtotais calculados pelo servidor e as regras originais. A nova resposta é validada por completo antes
 de persistir. Isso cobre falhas como GPU obrigatória ausente, JSON inválido, IDs,
 quantidades, orçamento e conflitos conhecidos; não garante solução quando o catálogo
 ou o orçamento não permitem a montagem. Falhas de transporte e cotas recebem mensagens próprias.
+
+O planejamento fornece conjuntos de periféricos que cabem na reserva e preserva
+opções de socket, DDR e faixas de preço no catálogo enviado à IA. Fans omitidas
+podem ser completadas pelo Python somente quando encaixe e orçamento são conhecidos.
+Pedidos exigentes com investimento alto subutilizado podem aproveitar a revisão
+já prevista, sem exigir gasto mínimo ou novas tentativas ilimitadas. Detalhes e
+resultados dos testes estão na [revisão da geração](docs/geracao-build.md).
 
 Em 23/10/2026, um teste isolado pelo fluxo completo do formulário gerou, revisou,
 validou e persistiu uma configuração de estudos em banco temporário. Isso não
@@ -271,8 +278,8 @@ para gerar a imagem e conferir seus relacionamentos antes de incluí-la.
 
 ## Validação da versão
 
-Na revisão de **23/10/2026**, a suíte local aprovou **527 testes JavaScript** e
-**615 testes Python**, além de **13 subtestes Python**. Os testes cobrem, entre
+Na revisão de **24/10/2026**, a suíte local aprovou **530 testes JavaScript** e
+**658 testes Python**, além de **13 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
 Há testes específicos para as sete classes de Controller e para preservar o
