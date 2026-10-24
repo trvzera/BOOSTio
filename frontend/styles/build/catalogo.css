@@ -64,3 +64,8 @@
 .product-detail-copy > .disabled-tip-anchor { display: flex; width: 100%; margin: 16px 0; }
 .product-detail-copy > .disabled-tip-anchor > button { width: 100%; }
 .product-page #product-main { max-width: 1040px; }
+.catalog-exclusions { margin-block: 1rem; padding: 1rem; color: var(--cor-4); font: 400 .8125rem/1.7 var(--font-body); overflow-wrap: anywhere; }
+.catalog-exclusions summary { color: var(--cor-6); font-family: var(--font-heading); cursor: pointer; padding-block: .5rem; }
+.catalog-exclusions summary:focus-visible { outline: 2px solid var(--cor-p1); outline-offset: 3px; }
+.catalog-exclusions ul { padding-left: 1.25rem; margin-block: .75rem; }
+.catalog-exclusions > ul > li + li { margin-top: 1rem; }

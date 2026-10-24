@@ -2,7 +2,8 @@ import "../header.js";
 import "../auth/auth.js";
 import { carregarCatalogo, categoriaCatalogo, moeda, htmlSeguro as h, nomePeca, imagemPeca, fichaTecnica } from "../build/catalogo.js";
 import { abrirBuild, guardarRascunho, motivoSelecao, itensCategoria, categoriasMultiplas } from "../build/estado.js";
-import { pecaCompativel, selecionarPecaCompativel } from "../build/compatibilidade.js";
+import { selecionarPecaCompativel } from "../build/compatibilidade.js";
+import { filtrarPecasCatalogo, motivosCatalogoHtml } from "../build/catalogo-filtros.js";
 import { avisar, mostrarFalha } from "../build/interface.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { navegarPara } from "../components/page-loading.js";
@@ -29,14 +30,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       '<label class="font-1-xs">Marca<select id="brand-filter" class="input-text"><option value="">Todas</option>' + [...new Set(produtos.map((p) => p.fabricante))].sort().map((marca) => '<option>' + h(marca) + '</option>').join("") + '</select></label>' +
       '<label class="font-1-xs">Ordenar<select id="component-sort" class="input-text"><option value="preco-asc">Menor preço</option><option value="preco-desc">Maior preço</option><option value="nome">Nome</option></select></label>' +
       '</div><p class="catalog-context">' + (temPecas ? 'Mostrando apenas opções sem conflitos detectados com sua build. Modelos não identificados precisam de conferência.' : 'Selecione a primeira peça; as próximas categorias serão filtradas automaticamente.') + '</p>' +
-      '<p id="catalog-count" class="font-2-xs summary-note" role="status"></p><section id="catalog-results" class="catalog-grid" aria-label="Peças da categoria"></section><nav class="catalog-pagination" aria-label="Páginas do catálogo"><button type="button" id="previous-products" class="btn-ghost" aria-label="Página anterior do catálogo">Anterior</button><span id="catalog-page" class="font-2-xs"></span><button type="button" id="next-products" class="btn-ghost" aria-label="Próxima página do catálogo">Próxima</button></nav>';
+      '<p id="catalog-count" class="font-2-xs summary-note" role="status"></p><section id="catalog-results" class="catalog-grid" aria-label="Peças da categoria"></section><div id="catalog-exclusions"></div><nav class="catalog-pagination" aria-label="Páginas do catálogo"><button type="button" id="previous-products" class="btn-ghost" aria-label="Página anterior do catálogo">Anterior</button><span id="catalog-page" class="font-2-xs"></span><button type="button" id="next-products" class="btn-ghost" aria-label="Próxima página do catálogo">Próxima</button></nav>';
     const campoBusca = main.querySelector("#component-search");
     const marca = main.querySelector("#brand-filter"), ordem = main.querySelector("#component-sort");
     let filtrados = [];
-    const normal = (v) => v.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     function renderizar() {
-      filtrados = produtos.filter((p) => normal(nomePeca(p)).includes(normal(campoBusca.value)) &&
-        !p.esgotado && (!marca.value || p.fabricante === marca.value) && (!temPecas || pecaCompativel(build,p,catalogo)));
+      const consulta = filtrarPecasCatalogo(build,produtos,catalogo,{busca:campoBusca.value,marca:marca.value});
+      filtrados = consulta.incluidas;
       filtrados.sort((a,b) => ordem.value === "nome" ? nomePeca(a).localeCompare(nomePeca(b))
         : ordem.value === "preco-desc" ? b.preco-a.preco : a.preco-b.preco);
       const paginas = Math.max(1, Math.ceil(filtrados.length / tamanhoPagina));
@@ -56,7 +56,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           '</ul><strong class="product-price font-1-l">' + moeda(peca.preco) + '</strong><div class="product-actions"><a class="btn-ghost" href="' + detalhes +
           '" aria-label="Detalhes de ' + h(nomePeca(peca)) + '">Detalhes</a><button type="button" class="btn-primary" data-add="' + peca.id + '" aria-label="' + (selecionada && categoriasMultiplas.has(peca.categoria) ? "Adicionar mais" : "Adicionar") + ' ' + h(nomePeca(peca)) + ' à build" ' + (motivo ? 'disabled data-disabled-reason="' + h(motivo) + '"' : "") + '>' +
           iconeAnimado("plus") + (selecionada && categoriasMultiplas.has(peca.categoria) ? "Adicionar mais" : "Adicionar") + '</button></div></div></article>';
-      }).join("") || '<div class="catalog-empty glass-card"><p class="font-2-s">' + (build.travada ? 'Build trancada: destranque-a antes de escolher componentes.' : categoria.rede && !produtos.length ? 'Cabos de rede e adaptadores Wi-Fi ainda não foram cadastrados no catálogo. As preferências do formulário foram preservadas; nenhum produto ou preço será presumido.' : 'Nenhuma opção está disponível com estes filtros e a configuração atual. Para trocar uma peça já selecionada, remova-a primeiro no editor.') + '</p></div>';
+      }).join("") || '<div class="catalog-empty glass-card"><p class="font-2-s">' + (build.travada ? 'Build trancada: destranque-a antes de escolher componentes.' : !produtos.length ? 'Ainda não há peças cadastradas nesta categoria. Nenhum produto ou preço será presumido.' : !consulta.consideradas ? 'Nenhum modelo corresponde à busca e à marca selecionadas. Ajuste os filtros.' : 'As peças encontradas não podem ser adicionadas à configuração atual. Veja os motivos abaixo.') + '</p></div>';
+      main.querySelector("#catalog-exclusions").innerHTML = motivosCatalogoHtml(consulta.excluidas,{aberto:!filtrados.length});
       iniciarIcones(main);
       main.querySelector("#catalog-page").textContent = pagina + " / " + paginas;
       main.querySelector("#previous-products").disabled = pagina <= 1;

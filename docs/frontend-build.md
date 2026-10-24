@@ -8,6 +8,13 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
 
 ### Revisão em seis etapas — 23/10/2026
 
+2. **Motivos de exclusão:** o catálogo separa busca/marca sem resultado de peças
+   bloqueadas pelas regras da build. Um painel nativo mostra categorias de causa,
+   contagens e até três exemplos por causa (DDR, slots, estoque, conexões, espaço,
+   dados ausentes e outros conflitos). Quando não sobra opção, o painel começa
+   aberto. As mensagens reais são escapadas e os filtros continuam obrigatórios.
+   504 testes Node passaram; o filtro não aprova medidas desconhecidas.
+
 1. **Fichas técnicas:** seis fichas novas e um alias adicional, abrangendo oito
    anúncios de placas-mãe. Corrigidas MSI 940305 (DDR4) e ASRock 587807 (DDR5).
    Slots, máximos, conexões e dimensões foram complementados só quando confirmados.
