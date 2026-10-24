@@ -64,7 +64,7 @@ class TestLimitesRequisicoes(unittest.TestCase):
         self.assertEqual(executar.call_count, 10)
 
     @patch("controllers.build_controller.ListarBuildService.executar", return_value=[])
-    @patch("controllers.build_controller.CriarBuildService.executar", return_value={"id": "teste"})
+    @patch("services.build_service.criar_build_service.CriarBuildService.executar", return_value={"id": "teste"})
     def test_geracao_ia_limita_usuario(self, criar, listar):
         with self.cliente.session_transaction() as sessao:
             sessao["_user_id"] = "1"
@@ -82,7 +82,7 @@ class TestLimitesRequisicoes(unittest.TestCase):
         self.assertEqual(resposta.status_code, 429)
         self.assertEqual(criar.call_count, 10)
 
-    @patch("controllers.usuario_controller.Usuario.buscar_por_email", return_value=None)
+    @patch("models.usuario.Usuario.buscar_por_email", return_value=None)
     def test_recuperacao_limita_email_mesmo_entre_ips(self, buscar):
         for indice in range(3):
             resposta = self.cliente.post(
@@ -102,7 +102,7 @@ class TestLimitesRequisicoes(unittest.TestCase):
         self.assertEqual(buscar.call_count, 3)
 
     @patch("controllers.email_controller.EnviarEmailService.executar", return_value=True)
-    @patch("controllers.email_controller.Usuario.buscar_por_id", return_value=UsuarioTeste())
+    @patch("models.usuario.Usuario.buscar_por_id", return_value=UsuarioTeste())
     def test_envio_de_codigo_limita_conta(self, buscar, enviar):
         with self.cliente.session_transaction() as sessao:
             sessao["_user_id"] = "1"

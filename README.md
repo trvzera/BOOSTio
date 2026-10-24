@@ -56,11 +56,11 @@ Os nomes identificam ações reais, não apenas telas ou rotas.
 | 05 | Salvar budget e autorização de uso | `PUT /usuarios/{id}/budget` | `AtualizarBudgetUsuarioService` |
 | 06 | Solicitar código de verificação de e-mail | `POST /email/verificar/enviar/{id}` | `EnviarEmailService` |
 | 07 | Confirmar o e-mail pelo código recebido | `POST /email/verificar/conferir/{id}` | `VerificarCodigoEmail` |
-| 08 | Solicitar recuperação de senha | `POST /usuarios/esqueci-senha` | `EnviarEmailRecuperarService` |
+| 08 | Solicitar recuperação de senha | `POST /usuarios/esqueci-senha` | `SolicitarRecuperacaoSenhaService` e `EnviarEmailRecuperarService` |
 | 09 | Redefinir senha com token válido | `POST /usuarios/redefinir-senha` | `RedefinirSenhaService` |
 | 10 | Consultar o catálogo de peças e preços | `GET /build/catalogo` | `ListarCatalogoBuildService` |
 | 11 | Criar uma build manual | `POST /build/manual` | `CriarBuildManualService` |
-| 12 | Gerar uma build pelo formulário inteligente | `POST /build/` | `CriarBuildService` e `LLMService` |
+| 12 | Gerar uma build pelo formulário inteligente | `POST /build/` | `GerarBuildService`, `CriarBuildService` e `LLMService` |
 | 13 | Listar as builds da conta | `GET /build/` | `ListarBuildService` |
 | 14 | Abrir uma build salva | `GET /build/{id}` | `BuscarBuildService` |
 | 15 | Atualizar uma build e seus componentes | `PUT /build/{id}` | `AtualizarBuildService` |
@@ -276,18 +276,20 @@ comprova todos os cenários de uso nem garante respostas válidas de um provedor
 
 ## Arquitetura
 
-- [Controllers](backend/controllers/): entrada HTTP, sessão e respostas da API.
+- [Controllers](backend/controllers/): classes por recurso, responsáveis pela
+  entrada HTTP, sessão, chamada aos Services e respostas da API.
 - [Services](backend/services/): casos de uso, validações e integrações externas.
 - [Models](backend/models/): entidades SQLAlchemy e operações de persistência.
-- [Repositories](backend/repositories/): diretório reservado; não há uma camada
-  implementada para duplicar CRUD das Models.
+- [Repositories](backend/repositories/): acesso especial ao banco na sonda de
+  saúde e na migração de links. O CRUD convencional continua nas Models.
 - [Frontend](frontend/): páginas HTML/CSS e módulos JavaScript que consomem a API.
 
-**Adequação à atividade ainda pendente:** as controllers atuais são funções de
-Blueprint, não classes. A política de fallback da IA e parte da solicitação de
-recuperação de senha ainda são coordenadas nas controllers. Esses pontos precisam
-ser ajustados para atender integralmente ao padrão exigido pela disciplina;
-a organização em pastas, por si só, não significa conformidade completa.
+As controllers utilizam métodos estáticos registrados nos Blueprints existentes,
+sem compartilhar estado de requisição. A conversão preserva URLs, endpoints,
+permissões, CSRF, limites de requisições e respostas. O fallback da IA é coordenado
+por `GerarBuildService`; localizar a conta e solicitar recuperação ficam em
+`SolicitarRecuperacaoSenhaService`. O envio de e-mail continua encapsulado em seu
+Service específico, e o SQL especial fica nos Repositories.
 
 ## Diagrama de classes
 
@@ -299,9 +301,13 @@ atuais, incluindo a diferença entre `Build` e `BuildSalva`, cujo estado é JSON
 ## Validação da versão
 
 Na revisão de **23/10/2026**, a suíte local aprovou **521 testes JavaScript** e
-**583 testes Python**, além de **13 subtestes Python**. Os testes cobrem, entre
+**615 testes Python**, além de **13 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
+Há testes específicos para as sete classes de Controller e para preservar o
+contrato das 34 rotas declaradas, incluindo o blueprint legado de peças, que
+continua fora do registro do aplicativo principal. O catálogo ativo permanece
+em `/build/catalogo`.
 
 Os testes utilizam isolamento, bancos temporários e mocks quando necessário.
 Não comprovam todas as combinações de hardware, a disponibilidade permanente de

@@ -6,6 +6,24 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Entrega acadêmica: Controllers em classes — 23/10/2026
+
+- Sete classes por recurso, com métodos estáticos: Auth, Usuario, Build, Email,
+  Benchmark, Saude e Peca. Blueprints, nomes de endpoint, URLs, autorização, CSRF
+  e limites foram preservados. O blueprint antigo de peças continua não registrado
+  no app; seu Service agora usa os nomes reais de Models e o contrato de catálogo.
+- `GerarBuildService` coordena trava/fallback sem mudar modelo, número de tentativas
+  ou cota. `SolicitarRecuperacaoSenhaService` localiza/valida a conta para recuperação,
+  preservando resposta genérica contra enumeração. Services de verificação resolvem
+  o usuário; Controllers não consultam as Models de usuário diretamente.
+- CRUD básico de peças usa `salvar()`/`buscar_por_id()` das Models. SQL especial
+  de saúde e migração de links fica em Repositories, sem duplicar CRUD. A migração
+  não foi executada no banco real; somente testes em bancos temporários.
+- 615 testes Python (+13 subtestes) e 521 Node aprovados. Incluem identidade das
+  sete classes, contrato de 34 rotas declaradas, recuperação, limites, fallback
+  único, OAuth, CSRF, persistência e compartilhamento. Nenhuma chamada real à LLM,
+  SMTP, coleta de preços/imagens ou mudança no banco do usuário nesta adaptação.
+
 ### Revisão em seis etapas — 23/10/2026
 
 6. **Mensagens acessíveis:** regiões persistentes `status`/`alert`, com contexto

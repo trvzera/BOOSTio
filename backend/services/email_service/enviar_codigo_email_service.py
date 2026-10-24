@@ -6,6 +6,9 @@ import secrets
 
 
 class EnviarEmailService:
+  def executar_para_usuario(self, usuario_id):
+    return self.executar(Usuario.buscar_por_id(usuario_id))
+
   def executar(self,usuario:Usuario):
     if not usuario:
       raise ValueError("Nenhum usuario encontrado")
