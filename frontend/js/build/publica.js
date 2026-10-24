@@ -58,7 +58,7 @@ export async function mostrarBuildPublica(main,id) {
     } catch(erro) { informar(erro.message,true); }
     finally { salvar.disabled = false; }
   };
-  main.querySelector('#public-buy').onclick = () => { try { abrirCompraBuild(build,catalogo); } catch(erro) { informar(erro.message,true); } };
+  main.querySelector('#public-buy').onclick = () => { try { abrirCompraBuild(build,catalogo,{publica:true}); } catch(erro) { informar(erro.message,true); } };
   iniciarIndicadores(main); iniciarIcones(main);
   const perfil = await carregarPerfil().catch(()=>({auth:false}));
   if (perfil.auth) informar('Você pode testar ou salvar uma cópia privada, respeitando as vagas da sua conta.');

@@ -238,6 +238,13 @@ document.addEventListener("DOMContentLoaded",async () => {
         finally { if (botao.isConnected) botao.disabled = Boolean(motivoBenchmark(build,catalogo)); }
       };
       main.querySelector("#buy-configuration").onclick = () => { try { abrirCompraBuild(build,catalogo); } catch (erro) { avisar(erro.message); } };
+      main.querySelectorAll('.component-buy').forEach(link=>link.addEventListener('click',evento=>{
+        evento.preventDefault();
+        const linha=link.closest('.component-selected'),remover=linha.querySelector('[data-remove]');
+        const categoria=remover.dataset.remove,id=remover.dataset.item;
+        try { abrirCompraBuild({...build,componentes:{[categoria]:itensCategoria(build,categoria).filter(i=>i.id===id)}},catalogo); }
+        catch(erro) { avisar(erro.message); }
+      }));
       main.querySelector("#improve-configuration").onclick = () => {
         try {
           const janela = abrirMelhorias(build,catalogo,async proxima => {

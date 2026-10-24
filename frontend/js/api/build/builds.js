@@ -26,8 +26,8 @@ export function buscarBuild(id) {
   return fetchComErro(`/build/${encodeURIComponent(id)}`, { method: "GET" });
 }
 
-export function catalogoBuilds() {
-  return fetchComErro("/build/catalogo", { method: "GET" });
+export function catalogoBuilds(opcoes = {}) {
+  return fetchComErro("/build/catalogo", { ...opcoes, method: "GET", cache:"no-store" });
 }
 
 export function criarBuildManual(dados) {

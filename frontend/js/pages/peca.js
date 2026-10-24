@@ -6,7 +6,7 @@ import { selecionarPecaCompativel } from "../build/compatibilidade.js";
 import { avisar, mostrarFalha } from "../build/interface.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { navegarPara } from "../components/page-loading.js";
-import { avisoCompraHtml } from "../build/acoes-build.js";
+import { avisoCompraHtml, abrirCompraBuild } from "../build/acoes-build.js";
 import { salvarAlteracaoLocal } from "../build/autosalvar.js";
 import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta } from "../build/conta.js";
 
@@ -48,6 +48,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       '</dl></section>';
     main.querySelector(".product-stores > p").insertAdjacentHTML("afterend",avisoCompraHtml());
     main.querySelectorAll(".store-logo").forEach(img => img.addEventListener("error",() => { img.hidden = true; img.nextElementSibling.hidden = false; },{once:true}));
+    main.querySelectorAll('.store-card').forEach((card,indice)=>card.querySelectorAll('a').forEach(link=>link.addEventListener('click',evento=>{
+      evento.preventDefault();
+      try { abrirCompraBuild({...build,componentes:{[peca.categoria]:{id:peca.id,quantidade:1}}},catalogo,{loja:ofertasPeca(peca)[indice].codigo}); }
+      catch(erro) { avisar(erro.message); }
+    })));
     iniciarIcones(main);
     main.querySelector("#add-product").onclick = async () => {
       try {

@@ -8,6 +8,16 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
 
 ### Revisão em seis etapas — 23/10/2026
 
+3. **Compra revalidada:** abrir Comprar build ou comprar uma peça consulta de novo
+   `/build/catalogo` com `no-store`, sem reutilizar a promessa em memória. O fluxo
+   público reconsulta a rota pública e a visibilidade. Links só aparecem após
+   resposta válida; falha mostra retry sem usar cotações antigas. O resumo compara
+   centavos × quantidades, total anterior/atual e diferença, sem simular diferença
+   completa para itens sem preço. Peças sem estoque confirmado/preço não liberam
+   compra. Fechar cancela a consulta; nenhuma build é alterada. Dados são o último
+   registro do catálogo, não scraping em tempo real. Modo demo é explicitamente
+   demonstrativo. 508 testes Node e 21 verificações Chrome/axe do fluxo.
+
 2. **Motivos de exclusão:** o catálogo separa busca/marca sem resultado de peças
    bloqueadas pelas regras da build. Um painel nativo mostra categorias de causa,
    contagens e até três exemplos por causa (DDR, slots, estoque, conexões, espaço,
