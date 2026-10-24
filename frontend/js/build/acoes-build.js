@@ -111,7 +111,8 @@ export function abrirCompraBuild(build,catalogo,{publica = false,loja,recarregar
   verificar();return dialogo;
 }
 
-function conteudoCompra(build,catalogo,comparacao,loja) {
+export function conteudoCompra(build,catalogo,comparacao,loja) {
+  const itens = itensSelecionados(build,catalogo);
   const linhas = comparacao.linhas.map(({item,depois:peca,indisponivel,antigo,novo,diferenca}) => '<article class="build-purchase-item"><h3 class="font-1-m-b">' + h(peca ? nomePeca(peca) : item.proprio || "Modelo não encontrado") + '</h3><p class="planning-help">Quantidade: ' + item.quantidade
     +(novo!=null?' · preço cadastrado: '+moeda(novo*item.quantidade/100):' · sem cotação confirmada')
     +(diferenca!=null&&diferenca!==0?' · antes: '+moeda(antigo*item.quantidade/100)+' · diferença: '+(diferenca>0?'+':'−')+moeda(Math.abs(diferenca)/100):'')+'</p>'
