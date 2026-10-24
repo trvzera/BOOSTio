@@ -8,6 +8,15 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
 
 ### Revisão em seis etapas — 23/10/2026
 
+5. **Expansão SSD/HD:** a prévia permite aumentar/diminuir as unidades novas do
+   modelo escolhido, sem remover os discos atuais. Quantidades entram no custo
+   combinado e na validação M.2/SATA/portas compartilhadas; baias de 2,5/3,5 pol.
+   conhecidas também limitam a proposta. O botão de aumentar explica o limite.
+   Dados ausentes continuam pendentes, não viram espaço garantido. Substituir é
+   explícito e mantém os critérios de não regressão. 514 testes Node e 97
+   verificações Chrome/axe em celular, tablet, desktop e paisagem, com catálogo
+   somente leitura e aplicação simulada.
+
 4. **Desfazer:** histórico de um nível em memória no editor para remoção,
    quantidades, upgrades confirmados e opções de peças/periféricos/rede. Restaura
    só os campos de montagem; nome/orçamento atuais são preservados. Uma configuração

@@ -115,6 +115,21 @@ test("UI permite consulta sem budget, mas confirmação continua exigindo o teto
   assert.match(js,/const confirmada = simular\(trocas,build\)/);
   assert.match(js,/data-upgrade-disk-mode=/);
   assert.match(js,/modosDiscos\.set\(categoria,caixa\.value\); trocas\.delete\(categoria\)/);
-  assert.match(js,/planejarMelhoriaDisco\(proxima,peca,catalogo,\{modo:modoTroca\(peca\.categoria\)\}\)/);
+  assert.match(js,/planejarMelhoriaDisco\(proxima,peca,catalogo,\{modo:modoTroca\(peca\.categoria\),quantidade:quantidadeTroca\(peca\.categoria\)\}\)/);
   assert.match(js,/Todos os slots disponíveis de RAM estão ocupados/);
+});
+
+test("quantidades novas respeitam portas e preservam o disco atual",()=>{
+  const mb={...placa,quantidade_slots_m2:4};
+  const r=planejarMelhoriaDisco(base(),nova,[mb,ssd,nova],{quantidade:2});
+  assert.deepEqual(r.componentes.ssd,[{id:ssd.id,quantidade:1},{id:nova.id,quantidade:2}]);
+  assert.throws(()=>planejarMelhoriaDisco(base(),nova,[mb,ssd,nova],{quantidade:4}),/slots M\.2/);
+  for (const quantidade of [0,-1,1.5,true,null,65]) assert.throws(()=>planejarMelhoriaDisco(base(),nova,catalogo,{quantidade}),/unidades/);
+});
+test("baias do gabinete limitam SSD SATA e HD, incluindo unidades já instaladas",()=>{
+  const gabinete={id:"case",categoria:"gabinete",baias_35:1,baias_25:1};
+  const disco={...hd,formato:"3.5"};
+  const build=base();build.componentes.gabinete={id:"case",quantidade:1};
+  assert.throws(()=>planejarMelhoriaDisco(build,disco,[...catalogo.filter(p=>p.id!==hd.id),disco,gabinete],{quantidade:2}),/baias/);
+  assert.equal(build.componentes.hd,undefined);
 });
