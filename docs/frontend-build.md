@@ -6,6 +6,30 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Exemplos de gabinete e seleção por uso — 24/10/2026
+
+- Aparência sem dropdown de produto/preço: fotos de exemplo para Mini/Mid/Full
+  Tower e visual discreto/vidro/panorâmico. Porte e visual são campos separados;
+  nenhum exemplo obriga comprar aquele modelo. Cores em radios com amostra, nome,
+  estado selecionado e navegação por setas do teclado; duas colunas em celular estreito.
+  O formulário não precisa consultar o catálogo para desenhar esses exemplos.
+- Fontes e regras das imagens em [geracao-build.md](geracao-build.md). Falhas de foto
+  usam o placeholder existente e não removem o rótulo da opção.
+- Python filtra os monitores novos da geração por IPS/VA confirmado e revalida a
+  saída. Critérios de Hz para gamer e resolução/polegadas para trabalho/edição
+  influenciam a amostra e os exemplos viáveis. Preservados orçamento, itens próprios
+  e catálogo manual. Mecânico/switch documentado é preferência, não motivo para exceder teto.
+- Nova checagem real da FPSHQ: jogos, FPS e OpenAPI devolveram 302 + HTML145 bytes
+  para `premium52.timeweb.ru/noactive/`. Não seguir o destino. HTML com HTTP200
+  agora é distinguido de JSON inválido e ativa pausa, sem inventar FPS. Não é
+  evidência de erro de parsing da BOOSTio neste retorno; não havia JSON.
+- AliExpress aguarda acesso aprovado, confirmado pelo usuário. Não há integração
+  ativa nem novas ofertas; plano e fontes em [integracoes-perifericos.md](integracoes-perifericos.md).
+- Chrome: 261 verificações em cinco tamanhos, incluindo imagens, radios por teclado,
+  fontes/axe, envio das preferências e preservação das respostas após erro simulado.
+  Sem exceções JS, escrita no banco ou chamadas LLM reais. A suíte local tem
+  559 testes JS e 720 Python, além de 20 subtestes.
+
 ### Formulário, conta e diagnóstico — 24/10/2026 (nova rodada)
 
 - Originais da marca, esboços, anotações e termos históricos preservados em

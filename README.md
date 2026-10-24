@@ -112,8 +112,9 @@ O Python confere os subtotais pelos preços e quantidades do catálogo antes de
 salvar a sugestão. O **frete não está incluído**: é importante reservar parte do
 orçamento para a entrega.
 
-O formulário oferece **estilo do gabinete, cor e referência visual** com fotos
-disponíveis no catálogo, incluindo “sem preferência”. São preferências flexíveis:
+O formulário oferece **porte do gabinete, visual e cor**, com imagens de exemplo
+sem preços ou ofertas e opções de “sem preferência”. Mini/Mid/Full Tower e
+visual panorâmico/vidro são escolhas independentes. São preferências flexíveis:
 não autorizam exceder o orçamento nem ignorar medidas, ventilação ou estoque.
 Cor e características ausentes não são inventadas. O editor também mostra a
 capacidade total de SSDs/HDs em GB/TB; quando faltam dados, identifica o subtotal
@@ -167,6 +168,8 @@ de hospedagem inativa, em vez do JSON da API. O Python não segue esse destino:
 informa indisponibilidade e aplica uma pausa, preservando apenas cache previamente
 validado com aviso de desatualização. É uma observação deste ambiente e momento,
 não uma garantia sobre o estado permanente do provedor.
+Busca, FPS e contrato OpenAPI apresentaram esse mesmo retorno na nova checagem.
+HTML com HTTP 200 também é tratado como resposta inválida, nunca como FPS.
 
 Nas builds salvas, **Verificar requisitos** usa o catálogo Python para comparar RAM,
 VRAM dedicada e capacidade/tipo de armazenamento quando há um mínimo oficial
@@ -272,6 +275,14 @@ resultados dos testes estão na [revisão da geração](docs/geracao-build.md).
 Esses ajustes recentes foram validados com respostas controladas; novas chamadas
 reais à LLM e o vínculo com o Google ainda precisam de homologação online.
 
+Monitores **novos da geração inteligente** exigem painel confirmado IPS/VA,
+incluindo Fast IPS e Fast VA. Para jogos, o planejamento destaca Hz e alternativas
+de teclado mecânico com switch documentado quando couberem no conjunto. Para
+edição/trabalho, destaca resolução e polegadas. Recursos ausentes não viram
+garantia de precisão de cor ou qualidade. Itens próprios são preservados e o
+catálogo manual não perde produtos. A integração AliExpress depende de acesso
+aprovado e ainda não está ativa; veja o [escopo e as dependências](docs/integracoes-perifericos.md).
+
 Em 23/10/2026, um teste isolado pelo fluxo completo do formulário gerou, revisou,
 validou e persistiu uma configuração de estudos em banco temporário. Isso não
 comprova todos os cenários de uso nem garante respostas válidas de um provedor externo.
@@ -307,8 +318,8 @@ Os originais da marca, esboços e anotações estão reunidos em [materiais](mat
 
 ## Validação da versão
 
-Na revisão de **24/10/2026**, a suíte local aprovou **558 testes JavaScript** e
-**696 testes Python**, além de **17 subtestes Python**. Os testes cobrem, entre
+Na revisão de **24/10/2026**, a suíte local aprovou **559 testes JavaScript** e
+**720 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
 Há testes específicos para as sete classes de Controller e para preservar o

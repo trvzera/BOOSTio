@@ -1,5 +1,30 @@
 # Geração de builds — revisão de 24/10/2026
 
+## Porte, aparência e periféricos — atualização
+
+- A etapa de aparência usa fotos estáticas como exemplos, sem preço, SKU de compra
+  ou seleção de produto. Há porte (Mini/Mid/Full Tower), visual (discreto, vidro
+  lateral, panorâmico) e cores em radios com amostra e texto. As opções são
+  independentes e podem ficar sem preferência; são acessíveis por teclado.
+- `aparencia.porte` é validado por enum no Python e persistido no JSON, sem migração;
+  registros antigos recebem “sem preferência”. O legado `gabinete_id` continua
+  aceito para preservar versões anteriores, mas a nova interface não o define.
+- Exemplos: [Q300L / Mini Tower](https://www.coolermaster.com/en-us/products/masterbox-q300l.html),
+  [TD500 / Mid Tower](https://www.coolermaster.com/en-global/products/masterbox-td500-argb.html),
+  [7000D / Full Tower](https://www.corsair.com/us/en/p/pc-cases/cc-9011218-ww/7000d-airflow-full-tower-atx-pc-case-black-cc-9011218-ww),
+  [H5 Flow / vidro lateral](https://support.nzxt.com/hc/en-us/articles/40225168535451-H5-Flow-2024-Specs)
+  e [O11 Dynamic / vidro frontal e lateral](https://lian-li.com/product/pc-o11-dynamic/).
+  O visual “aquário” não implica Full Tower nem capacidade de peças/fans. Office X1
+  usa a fotografia já existente do catálogo como referência discreta.
+- Fotos anteriores foram reutilizadas; adicionada uma miniatura oficial 320×320
+  WebP do 7000D para Full Tower. Apenas material de referência: não cadastra o
+  produto nem afirma disponibilidade, preço ou licença aberta da imagem.
+- A seleção técnica de monitores/teclados agora influencia a amostra e os conjuntos
+  viáveis, além do prompt. Regras, testes do catálogo local e dependência AliExpress
+  estão em [integrações de periféricos](integracoes-perifericos.md).
+- Nenhuma chamada real à LLM foi consumida nesta atualização. O prompt está coberto
+  por testes controlados; a qualidade da escolha real ainda precisa de homologação.
+
 ## Orçamento e catálogo
 
 O formulário continua usando `POST /build/`, `GerarBuildService` e
