@@ -3,8 +3,9 @@
 ## Porte, aparência e periféricos — atualização
 
 - A etapa de aparência usa fotos estáticas como exemplos, sem preço, SKU de compra
-  ou seleção de produto. Há porte (Mini/Mid/Full Tower), visual (discreto, vidro
-  lateral, panorâmico) e cores em radios com amostra e texto. As opções são
+  ou seleção de produto. Há tamanho (Mini/Mid/Full Tower), estilo (sem vidro, vidro
+  lateral, aquário com frente/lateral de vidro, panorâmico com frente/lateral/teto)
+  e cores em radios com amostra e texto. As opções são
   independentes e podem ficar sem preferência; são acessíveis por teclado.
 - `aparencia.porte` é validado por enum no Python e persistido no JSON, sem migração;
   registros antigos recebem “sem preferência”. O legado `gabinete_id` continua
@@ -13,12 +14,32 @@
   [TD500 / Mid Tower](https://www.coolermaster.com/en-global/products/masterbox-td500-argb.html),
   [7000D / Full Tower](https://www.corsair.com/us/en/p/pc-cases/cc-9011218-ww/7000d-airflow-full-tower-atx-pc-case-black-cc-9011218-ww),
   [H5 Flow / vidro lateral](https://support.nzxt.com/hc/en-us/articles/40225168535451-H5-Flow-2024-Specs)
-  e [O11 Dynamic / vidro frontal e lateral](https://lian-li.com/product/pc-o11-dynamic/).
+  [O11 Dynamic / vidro frontal e lateral](https://lian-li.com/product/pc-o11-dynamic/)
+  e [O11 Vision / três faces de vidro](https://lian-li.com/product/o11-vision/).
   O visual “aquário” não implica Full Tower nem capacidade de peças/fans. Office X1
   usa a fotografia já existente do catálogo como referência discreta.
 - Fotos anteriores foram reutilizadas; adicionada uma miniatura oficial 320×320
-  WebP do 7000D para Full Tower. Apenas material de referência: não cadastra o
+  WebP do 7000D para Full Tower e uma foto oficial WebP do O11 Vision
+  (`O11_Vision_07.webp`, 688×688, cerca de 104 KiB), sem alteração da imagem.
+  Apenas material de referência: não cadastra o
   produto nem afirma disponibilidade, preço ou licença aberta da imagem.
+- Ao selecionar o tamanho, aparece um guia do exemplo: Q300L, 387×230×381 mm,
+  Micro-ATX/Mini-ITX, radiador frontal até 240 mm; TD500 ARGB,
+  493×217×469 mm com saliências, radiador até 360 mm; 7000D,
+  550×248×600 mm, ATX/E-ATX limitada à largura declarada, radiadores conforme
+  posição. Ordem: profundidade × largura × altura. As fontes são as fichas oficiais
+  acima, revisadas em 24/10/2026. São exemplos, nunca limites universais do porte.
+- O formulário diferencia ventoinhas comuns de 120/140 mm de radiadores nominais
+  de 240/360 mm (normalmente 2/3 ventoinhas de 120 mm). Comprimento total,
+  espessura, conexões e tubos precisam de espaço real. Não inferir encaixe pela soma.
+- Valores antigos `discreto` e `panoramico` permanecem válidos; o novo estilo
+  `panoramico-3-faces` também é aceito no Python e no JSON salvo. O prompt recebe
+  a distinção entre painéis e não considera um teto de vidro como espaço livre
+  para ventoinhas/radiador. Um único `painel_vidro=True` não comprova as três faces.
+- Chrome: 216 verificações em cinco formatos, incluindo sete fotos locais,
+  teclado, guias por tamanho, fontes/axe, independência entre tamanho/estilo/cor
+  e payload simulado. Sem escrita real, migração ou chamadas LLM. Regressão:
+  586 testes JavaScript e 738 Python, além de 20 subtestes.
 - A seleção técnica de monitores/teclados agora influencia a amostra e os conjuntos
   viáveis, além do prompt. Regras, testes do catálogo local e dependência AliExpress
   estão em [integrações de periféricos](integracoes-perifericos.md).

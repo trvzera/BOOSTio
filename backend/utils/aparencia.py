@@ -4,7 +4,7 @@ def validar_aparencia(valor=None):
     if not isinstance(valor, dict) or set(valor) - {"estilo", "porte", "cor", "gabinete_id"}:
         raise ValueError("Preferências de aparência inválidas")
     estilo, cor, gabinete = valor.get("estilo", "sem-preferencia"), valor.get("cor", "sem-preferencia"), valor.get("gabinete_id")
-    if estilo not in ("sem-preferencia", "discreto", "vidro", "compacto", "panoramico") or cor not in ("sem-preferencia", "preto", "branco", "misto"):
+    if estilo not in ("sem-preferencia", "discreto", "vidro", "compacto", "panoramico", "panoramico-3-faces") or cor not in ("sem-preferencia", "preto", "branco", "misto"):
         raise ValueError("Escolha um estilo e uma cor válidos")
     porte=valor.get("porte","sem-preferencia")
     if porte not in ("sem-preferencia","mini-tower","mid-tower","full-tower"):

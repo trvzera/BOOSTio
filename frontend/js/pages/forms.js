@@ -1,7 +1,7 @@
 import "../header.js";
 import "../auth/auth.js";
 import { normalizarRede, vincularRede } from "../build/rede.js";
-import { normalizarAparencia, aparenciaHtml } from "../build/aparencia.js";
+import { normalizarAparencia, aparenciaHtml, atualizarGuiaPorteGabinete } from "../build/aparencia.js";
 import { opcoesUso, prioridadesUso } from "../build/uso-formulario.js";
 import { iniciarImagens } from "../build/imagens-produtos.js";
 import { planejamentoLocal } from "../build/planejamento.js";
@@ -337,6 +337,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         cor:campo.querySelector('input[name="appearance-color"]:checked').value,
         gabinete_id:null,
       });
+      atualizarGuiaPorteGabinete(campo,respostas.aparencia.porte);
     };
     sincronizar();campo.addEventListener("change",sincronizar);
   }

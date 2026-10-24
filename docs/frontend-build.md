@@ -6,6 +6,23 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Tamanho e estilo do gabinete — 24/10/2026
+
+- Tamanho separado em Mini/Mid/Full Tower; estilo separado em sem vidro,
+  vidro lateral, aquário (frente/lateral) e panorâmico de três faces
+  (frente/lateral/teto). A imagem nova é do O11 Vision. Fontes dos exemplos e
+  das medidas em [geracao-build.md](geracao-build.md).
+- O guia técnico do exemplo muda apenas ao escolher tamanho, sem redesenhar
+  radios ou reiniciar estilo/cor. Anúncio curto de status, nome e descrição
+  acessíveis por opção; cards de tamanho em coluna no celular e estilos em duas colunas.
+- Medidas/placa-mãe/ventoinhas/radiador são dados dos modelos de referência,
+  não garantias de encaixe para todo um porte. Ventoinhas 120/140 mm e radiadores
+  nominais 240/360 mm são explicados separadamente, com a ressalva de espaço extra.
+- `panoramico-3-faces` é validado e persistido no backend; valores legados continuam
+  aceitos. Sem migração, alteração do catálogo ou geração real pela LLM.
+- Testes: 586 JS, 738 Python +20 subtestes; 216 verificações Chrome em cinco
+  formatos, sem exceções JavaScript, falhas de fontes/axe ou overflow horizontal.
+
 ### Linguagem e conexão — 24/10/2026
 
 - `uso-formulario.js` mantém os IDs dos cinco usos e explica prioridades em termos

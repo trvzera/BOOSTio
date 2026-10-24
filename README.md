@@ -112,9 +112,13 @@ O Python confere os subtotais pelos preços e quantidades do catálogo antes de
 salvar a sugestão. O **frete não está incluído**: é importante reservar parte do
 orçamento para a entrega.
 
-O formulário oferece **porte do gabinete, visual e cor**, com imagens de exemplo
-sem preços ou ofertas e opções de “sem preferência”. Mini/Mid/Full Tower e
-visual panorâmico/vidro são escolhas independentes. São preferências flexíveis:
+O formulário separa **tamanho do gabinete**, **estilo** e **cor**, com imagens de
+exemplo sem preços ou ofertas e opções de “sem preferência”. Os tamanhos são
+Mini, Mid e Full Tower; os estilos são sem vidro, vidro lateral, aquário
+(frente/lateral) e panorâmico com três faces de vidro (frente/lateral/teto).
+Ao escolher o tamanho, um exemplo mostra medidas externas, placas-mãe,
+ventoinhas e radiador suportados. Esses dados são do modelo de referência,
+não um padrão de todos os gabinetes daquele tamanho. São preferências flexíveis:
 não autorizam exceder o orçamento nem ignorar medidas, ventilação ou estoque.
 Cor e características ausentes não são inventadas. O editor também mostra a
 capacidade total de SSDs/HDs em GB/TB; quando faltam dados, identifica o subtotal
@@ -334,8 +338,8 @@ Os originais da marca, esboços e anotações estão reunidos em [materiais](mat
 
 ## Validação da versão
 
-Na revisão de **24/10/2026**, a suíte local aprovou **583 testes JavaScript** e
-**725 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
+Na revisão de **24/10/2026**, a suíte local aprovou **586 testes JavaScript** e
+**738 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
 Há testes específicos para as sete classes de Controller e para preservar o
