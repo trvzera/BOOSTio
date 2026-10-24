@@ -48,6 +48,17 @@ def test_redirecionamento_preserva_resposta_validada_com_aviso_de_desatualizada(
     assert resultado["cache"] and resultado["desatualizado"]
 
 
+def test_html_com_http_200_nao_vira_fps_e_pausa_novas_consultas():
+    buscar=Mock(return_value=Mock(status_code=200,headers={"Content-Type":"text/html; charset=utf-8"},json=Mock(side_effect=ValueError())))
+    api=cliente(buscar)
+    for _ in range(2):
+        with pytest.raises(ErroBenchmark) as erro:
+            api.executar("fps",CONSULTA,1)
+        assert erro.value.codigo=="resposta-nao-json" and erro.value.status==502
+    assert buscar.call_count==1
+    assert not api.cache
+
+
 @pytest.mark.parametrize("campo,valor", [("cpu", None), ("gpu", "../gpu"), ("game", "http://externo.test"), ("res", "8k"), ("preset", "extreme")])
 def test_valida_antes_da_rede(campo, valor):
     api = cliente()

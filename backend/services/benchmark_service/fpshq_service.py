@@ -115,8 +115,13 @@ class FpshqService:
             raise ErroBenchmark("O provedor não conseguiu atender à consulta agora.")
         try:
             dados = resposta.json()
-        except ValueError as erro:
-            raise ErroBenchmark("O provedor retornou uma resposta inválida.", "resposta") from erro
+        except ValueError as causa:
+            html = "text/html" in str(resposta.headers.get("Content-Type", "")).lower()
+            mensagem = "A FPSHQ retornou uma página HTML, não dados da API. Resposta inválida; tente novamente mais tarde." if html else "O provedor retornou uma resposta inválida. Aguarde antes de tentar novamente."
+            erro = self._falhar(mensagem, "resposta-nao-json" if html else "resposta", 502, 60)
+            if salvo:
+                return {**deepcopy(salvo[1]), "cache": True, "desatualizado": True}
+            raise erro from causa
         if not isinstance(dados, dict) or dados.get("ok") is not True:
             raise ErroBenchmark("Não há dados disponíveis para esta consulta.", "sem-dados", 422)
         return {"dados": dados, "consultadoEm": int(self.data_atual() * 1000), "cache": False}
