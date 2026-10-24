@@ -16,7 +16,7 @@ test("Docker da API inclui os dois manifestos compartilhados de runtime",()=>{
 test("artefatos locais são ignorados, fontes, testes e dados de runtime não",()=>{
   const ignorado=caminho=>spawnSync("git",["check-ignore","--no-index","-q",caminho],
     {cwd:fileURLToPath(raiz)}).status;
-  for (const arquivo of ["node_modules/exemplo.js","output/arte.png","backend/.pytest_cache/v/cache",
+  for (const arquivo of ["node_modules/exemplo.js","output/arte.png","materiais/exportacoes/arte.png","backend/.pytest_cache/v/cache",
     "database/banco.db","database/banco.db-wal","database/banco.sqlite3-shm",".env.development",
     ".env.production.local","frontend/.DS_Store","debug.log","playwright-report/index.html"]) {
     assert.equal(ignorado(arquivo),0,arquivo);
@@ -26,4 +26,10 @@ test("artefatos locais são ignorados, fontes, testes e dados de runtime não",(
     "backend/data/pecas_basicas_medias.json","backend/tests/conftest.py","docs/diagrama-classes.png"]) {
     assert.equal(ignorado(arquivo),1,arquivo);
   }
+});
+
+test("materiais históricos ficam juntos e fora das imagens de produção",()=>{
+  for(const pasta of ["brand","esbocos-site","anotacoes","termos-historicos"])
+    assert.ok(existsSync(new URL("materiais/"+pasta+"/",raiz)),pasta);
+  assert.match(readFileSync(new URL(".dockerignore",raiz),"utf8"),/^materiais$/m);
 });

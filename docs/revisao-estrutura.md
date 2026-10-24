@@ -34,7 +34,7 @@ Revisão de 24/10/2026, sem apagar o banco ou reescrever o histórico Git.
 
 - **`node_modules/`**: dependências reinstaláveis. Antes desta revisão havia
   313 arquivos / aproximadamente 25,4 MB versionados nessa pasta.
-- **`output/`**: exportações de Instagram, ZIP, prévias e diagrama gerado.
+- **`materiais/exportacoes/`** (antes `output/`): exportações de Instagram, ZIP, prévias e diagrama gerado.
   Aproximadamente 34,6 MB; originais permanecem no computador e no histórico Git.
   O diagrama final foi promovido para `docs/diagrama-classes.png`, com fonte DOT.
 - **`.DS_Store`**: metadados do Finder. O arquivo que estava versionado foi
@@ -57,12 +57,12 @@ commits nem redução equivalente de `.git`.
 
 ## Material histórico — preservado para decisão da equipe
 
-- **`BRAND/`**: originais da marca. Não são dependência do site atual, mas são
+- **`materiais/brand/`**: originais da marca. Não são dependência do site atual, mas são
   material autoral; podem ser arquivados fora da branch de produção depois.
-- **`primeiroEsbocoSITE/`**: imagens do primeiro layout, candidatas a arquivo.
-- **`termosdeuso/`**: PDF de uma versão histórica dos termos; não confundir com a
+- **`materiais/esbocos-site/`**: imagens do primeiro layout, candidatas a arquivo.
+- **`materiais/termos-historicos/`**: PDF de uma versão histórica dos termos; não confundir com a
   página de termos usada no site.
-- **`ANOTAÇÕES/`**: notas pessoais pequenas; conteúdo não foi apagado.
+- **`materiais/anotacoes/`**: notas pessoais pequenas; conteúdo não foi apagado.
 - **`frontend/imgs/devs/`**: foto remanescente da antiga página da equipe. Não há
   referência direta atual, mas é imagem pessoal e foi preservada.
 - **`backend/models/setup.py`**: Model legada ainda importada pelo pacote de

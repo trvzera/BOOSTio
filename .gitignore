@@ -17,6 +17,7 @@ coverage/
 .cache/
 node_modules/
 /output/
+/materiais/exportacoes/
 /test-results/
 /playwright-report/
 /.cursor/

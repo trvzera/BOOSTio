@@ -288,6 +288,7 @@ não representa um diagrama de todos os Services e Controllers.
 
 A [revisão de estrutura](docs/revisao-estrutura.md) explica o papel das pastas,
 os recursos necessários ao site e os arquivos locais/gerados que não entram no PR.
+Os originais da marca, esboços e anotações estão reunidos em [materiais](materiais/README.md).
 
 ## Validação da versão
 
