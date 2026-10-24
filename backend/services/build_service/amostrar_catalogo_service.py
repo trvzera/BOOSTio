@@ -1,4 +1,5 @@
 from decimal import Decimal
+from .preferencias_perifericos_service import PreferenciasPerifericosService
 
 
 class AmostrarCatalogoService:
@@ -17,11 +18,14 @@ class AmostrarCatalogoService:
         "gabinete": ("formato", "painel_vidro", "fans_inclusos"),
     }
 
-    def executar(self, tipo, pecas, limite=12):
+    def executar(self, tipo, pecas, limite=12, utilidade=""):
         ordenadas = sorted(pecas, key=lambda p: (Decimal(str(p["preco"])), p["id"]))
         if len(ordenadas) <= limite:
             return ordenadas
         escolhidas = {ordenadas[0]["id"]: ordenadas[0], ordenadas[-1]["id"]: ordenadas[-1]}
+        for peca in PreferenciasPerifericosService.destaques(tipo, ordenadas, utilidade):
+            if len(escolhidas) < limite:
+                escolhidas[peca["id"]] = peca
         campos = self.GRUPOS.get(tipo)
         if campos:
             grupos = {}

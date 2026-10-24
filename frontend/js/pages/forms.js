@@ -2,7 +2,7 @@ import "../header.js";
 import "../auth/auth.js";
 import { normalizarRede, vincularRede } from "../build/rede.js";
 import { normalizarAparencia, aparenciaHtml } from "../build/aparencia.js";
-import { carregarCatalogoConta } from "../build/conta.js";
+import { iniciarImagens } from "../build/imagens-produtos.js";
 import { planejamentoLocal } from "../build/planejamento.js";
 import { orcamentoValido, dividirOrcamento } from "../build/orcamento-formulario.js";
 import { carregarPerfil } from "../conta/perfil.js";
@@ -339,18 +339,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     iniciarIcones(conteudo);
   }
 
-  async function renderizarAparencia() {
+  function renderizarAparencia() {
     const campo=conteudo.querySelector("#form-appearance");
-    let catalogo=[];
-    try { catalogo=await carregarCatalogoConta(); } catch { /* As preferências não dependem da galeria. */ }
-    if(!campo.isConnected)return;
-    campo.innerHTML=aparenciaHtml(respostas.aparencia,catalogo,{orcamento:valorOrcamento(),possuiGabinete:respostas.pecas?.includes("gabinete")});
+    campo.innerHTML=aparenciaHtml(respostas.aparencia,[],{possuiGabinete:respostas.pecas?.includes("gabinete")});
     campo.setAttribute("aria-busy","false");
+    iniciarImagens(campo);
     const sincronizar=()=>{
       respostas.aparencia=normalizarAparencia({
-        estilo:campo.querySelector("#appearance-style").value,
-        cor:campo.querySelector("#appearance-color").value,
-        gabinete_id:Number(campo.querySelector('input[name="case-reference"]:checked')?.value)||null,
+        estilo:campo.querySelector('input[name="appearance-style"]:checked')?.value,
+        porte:campo.querySelector('input[name="appearance-size"]:checked')?.value,
+        cor:campo.querySelector('input[name="appearance-color"]:checked').value,
+        gabinete_id:null,
       });
     };
     sincronizar();campo.addEventListener("change",sincronizar);

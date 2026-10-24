@@ -55,6 +55,8 @@ def cadastrar_pecas(tipos):
             dados["potencia_w"] = 500
         if tipo == "gabinete":
             dados["fans_inclusos"] = 1
+        if tipo == "monitor":
+            dados["tipo_painel"] = "IPS"
         db.session.add(modelo(**dados))
     db.session.commit()
 
@@ -263,6 +265,7 @@ def resposta_com_perifericos():
     catalogo = {item["tipo"]: [{"id": 1, "fabricante": "Teste", "modelo": item["tipo"],
                 "preco": 800 if item["tipo"] == "processador" else 50 if item["tipo"] in CriarBuildService.PERIFERICOS else 20}] for item in itens}
     catalogo["gabinete"][0]["fans_inclusos"] = 1
+    catalogo["monitor"][0]["tipo_painel"] = "IPS"
     return {**PEDIDO, "componentes": itens}, catalogo
 
 
@@ -312,7 +315,7 @@ def test_geracao_rejeita_transferencia_de_sobra_antes_de_salvar(app_build, mocke
             MODELOS["monitor"].buscar_por_id(1).preco = 750
             # Existe uma alternativa viável; a saída da IA escolhe a que excede o conjunto.
             db.session.add(MODELOS["monitor"](fabricante="Teste", modelo="Alternativa", preco=400,
-                consumo_energia=1, tamanho_polegadas=24, resolucao="1920x1080", taxa_atualizacao_hz=60, conexao="HDMI"))
+                consumo_energia=1, tamanho_polegadas=24, resolucao="1920x1080", taxa_atualizacao_hz=60, conexao="HDMI",tipo_painel="IPS"))
         else:
             # Cada peça cabe no filtro individual, mas o subtotal do PC excede R$ 4.000.
             MODELOS["processador"].buscar_por_id(1).preco = 3000
@@ -386,7 +389,7 @@ def test_geracao_persiste_original_e_estado_em_uma_transacao(app_build, mocker, 
             "nome": "PC gerado", "descricao": "Com periféricos", "utilidade": "Jogos",
             "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos],
         })
-        preferencia={"estilo":"vidro","cor":"branco","gabinete_id":1}
+        preferencia={"estilo":"vidro","porte":"mid-tower","cor":"branco","gabinete_id":1}
         resposta = CriarBuildService().executar(1, {**PEDIDO, "percentual_perifericos": 20,"aparencia":preferencia})
         assert resposta["estado"]["aparencia"] == preferencia
         assert resposta["estado"]["percentualPerifericos"] == 20

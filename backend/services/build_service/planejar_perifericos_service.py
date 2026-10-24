@@ -1,6 +1,7 @@
 from decimal import Decimal
 from itertools import product
 from math import isfinite
+from .preferencias_perifericos_service import PreferenciasPerifericosService
 
 
 class PlanejarPerifericosService:
@@ -8,7 +9,7 @@ class PlanejarPerifericosService:
 
     TIPOS = ("monitor", "teclado", "mouse", "fone")
 
-    def executar(self, catalogo, teto, proprias=None):
+    def executar(self, catalogo, teto, proprias=None, utilidade=""):
         teto = Decimal(str(teto))
         tipos = [tipo for tipo in self.TIPOS if tipo not in (proprias or {})]
         opcoes = []
@@ -32,8 +33,23 @@ class PlanejarPerifericosService:
             if total <= teto:
                 combinacoes.append((total, conjunto))
         combinacoes.sort(key=lambda item: (item[0], tuple(peca["id"] for peca in item[1])))
+        # Destaques são alternativas viáveis, não obrigações de gasto. Se um
+        # teclado mecânico não couber com o conjunto, a opção econômica continua.
+        prioritarias = []
+        if utilidade:
+            def criterio(item):
+                conjunto = dict(zip(tipos,item[1]))
+                monitor = conjunto.get("monitor",{})
+                teclado = conjunto.get("teclado",{})
+                mecanico = PreferenciasPerifericosService.teclado_documentado(teclado) if PreferenciasPerifericosService.jogos(utilidade) else False
+                return (-int(mecanico), *(-v for v in PreferenciasPerifericosService.monitor(monitor,utilidade)), item[0])
+            prioritarias = sorted(combinacoes, key=criterio)[:3]
         if len(combinacoes) > 12:
             combinacoes = [combinacoes[i * (len(combinacoes) - 1) // 11] for i in range(12)]
+            for prioridade in prioritarias:
+                if prioridade not in combinacoes:
+                    combinacoes.pop(-1)
+                    combinacoes.insert(0, prioridade)
         return {"viavel": True, "teto": float(teto), "minimo_catalogado": float(minimo),
                 "combinacoes": [{"total": float(total), "componentes": [
                     {"tipo": tipo, "id": peca["id"], "quantidade": 1}

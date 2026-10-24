@@ -18,6 +18,7 @@ class CriarBuildPerifericosTest(unittest.TestCase):
             for indice, tipo in enumerate(self.tipos, start=1)
         }
         self.catalogo["gabinete"][0]["fans_inclusos"] = 1
+        self.catalogo["monitor"][0]["tipo_painel"] = "IPS"
         self.build = {
             "nome": "Setup", "descricao": "Completo", "utilidade": "jogos",
             "componentes": [
@@ -48,6 +49,7 @@ class CriarBuildPerifericosTest(unittest.TestCase):
             id=1, fabricante="Marca", modelo="Monitor", preco=500.0,
             tamanho_polegadas=Decimal("23.8"), resolucao="1920x1080",
             taxa_atualizacao_hz=144,
+            tipo_painel="IPS",
         )
         modelo = SimpleNamespace(__tablename__="monitor", listar_disponiveis_ate=lambda *args, **kwargs: [monitor])
         with patch("services.build_service.criar_build_service.MODELOS_PECAS", (modelo,)):
@@ -80,6 +82,18 @@ class CriarBuildPerifericosTest(unittest.TestCase):
             item["preco"] = 0
         with self.assertRaisesRegex(ValueError, "limite reservado para periféricos"):
             CriarBuildService._validar_build(self.build, self.catalogo, 2000, percentual=20)
+
+    def test_monitor_novo_nao_permite_painel_proibido_ou_desconhecido(self):
+        for painel in ("TN", "OLED", None):
+            with self.subTest(painel=painel):
+                self.catalogo["monitor"][0]["tipo_painel"] = painel
+                with self.assertRaisesRegex(ValueError, "painel IPS ou VA"):
+                    CriarBuildService._validar_build(self.build, self.catalogo, 2000, percentual=20)
+
+    def test_monitor_proprio_e_preservado_mesmo_sem_painel_confirmado(self):
+        build = {**self.build,"componentes":[i.copy() for i in self.build["componentes"] if i["tipo"]!="monitor"]}
+        self.catalogo["monitor"][0]["tipo_painel"] = "OLED"
+        assert CriarBuildService._validar_build(build,self.catalogo,2000,percentual=20,proprias={"monitor":"Meu OLED"})["preco_total"] == 900
 
     def test_nao_compra_novamente_uma_categoria_propria(self):
         with self.assertRaisesRegex(ValueError, "repetiu"):

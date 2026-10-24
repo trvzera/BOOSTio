@@ -1,26 +1,39 @@
-import { htmlSeguro as h, imagemPeca, nomePeca, moeda } from "./catalogo.js";
+import { htmlSeguro as h, imagemPeca } from "./catalogo.js";
 
-export const estilosGabinete=[['sem-preferencia','Sem preferência'],['discreto','Discreto'],['vidro','Com vidro'],['compacto','Compacto'],['panoramico','Panorâmico']];
+export const estilosGabinete=[['sem-preferencia','Sem preferência'],['discreto','Discreto'],['vidro','Vidro lateral'],['compacto','Compacto'],['panoramico','Panorâmico']];
+export const portesGabinete=[['sem-preferencia','Sem preferência'],['mini-tower','Mini Tower'],['mid-tower','Mid Tower'],['full-tower','Full Tower']];
 export const coresSetup=[['sem-preferencia','Sem preferência'],['preto','Preto'],['branco','Branco'],['misto','Preto e branco']];
+
+// Exemplos visuais, não ofertas. As fontes/modelos estão em docs/geracao-build.md.
+const exemplos={
+  'mini-tower':{modelo:'Cooler Master MasterBox Q300L',imagem:'../imgs/produtos/gabinete-1.webp'},
+  'mid-tower':{modelo:'Cooler Master MasterBox TD500',imagem:'../imgs/produtos/gabinete-2.webp'},
+  'full-tower':{modelo:'Corsair 7000D Airflow',imagem:'../imgs/referencia-gabinete-full-tower.webp'},
+  discreto:{modelo:'Rise Mode Office X1',imagem:'../imgs/produtos/gabinete-54.jpg'},
+  vidro:{modelo:'NZXT H5 Flow',imagem:'../imgs/produtos/gabinete-43.jpg'},
+  panoramico:{modelo:'Lian Li O11 Dynamic',imagem:'../imgs/produtos/gabinete-29.webp'},
+};
 export function normalizarAparencia(valor={}) {
-  return {estilo:estilosGabinete.some(([v])=>v===valor?.estilo)?valor.estilo:'sem-preferencia',
-    cor:coresSetup.some(([v])=>v===valor?.cor)?valor.cor:'sem-preferencia',
+  const escolher=(campo,opcoes)=>opcoes.some(([v])=>v===valor?.[campo])?valor[campo]:'sem-preferencia';
+  return {estilo:escolher('estilo',estilosGabinete),porte:escolher('porte',portesGabinete),cor:escolher('cor',coresSetup),
     gabinete_id:Number.isInteger(valor?.gabinete_id)&&valor.gabinete_id>0&&valor.gabinete_id<=1000000000?valor.gabinete_id:null};
 }
-export function aparenciaHtml(valor,catalogo,{orcamento,possuiGabinete=false}={}) {
+function referencias(campo,titulo,opcoes,atual) {
+  return '<fieldset class="appearance-references"><legend class="font-1-xs">'+titulo+'</legend>'
+    +'<label class="appearance-no-preference"><input type="radio" name="appearance-'+campo+'" value="sem-preferencia" '+(atual==='sem-preferencia'?'checked':'')+'> Sem preferência</label>'
+    +'<div class="appearance-cases">'+opcoes.filter(([v])=>v!=='sem-preferencia'&&v!=='compacto').map(([v,n])=>{
+      const foto=exemplos[v];
+      return '<label class="appearance-case"><input type="radio" name="appearance-'+campo+'" value="'+v+'" '+(v===atual?'checked':'')+'>'+imagemPeca({...foto,categoria:'gabinete'},'appearance-case-image')+'<span>'+h(n)+'</span></label>';
+    }).join('')+'</div></fieldset>';
+}
+export function aparenciaHtml(valor,_catalogo=[],{possuiGabinete=false}={}) {
   const atual=normalizarAparencia(valor);
-  const campo=(id,titulo,opcoes,selecionado)=>'<label class="appearance-field" for="'+id+'"><span>'+titulo+'</span><select id="'+id+'">'+opcoes.map(([v,n])=>'<option value="'+v+'" '+(v===selecionado?'selected':'')+'>'+n+'</option>').join('')+'</select></label>';
-  const idPeca=p=>Number(String(p.id).split(':').at(-1));
-  const disponiveis=catalogo.filter(p=>p.categoria==='gabinete'&&p.esgotado===false&&Number.isFinite(p.preco)&&p.preco>0&&Number.isInteger(idPeca(p))&&idPeca(p)>0&&(!orcamento||p.preco<=orcamento)).sort((a,b)=>a.preco-b.preco);
-  const referencias=disponiveis.length<=6?disponiveis:Array.from({length:6},(_,i)=>disponiveis[Math.round(i*(disponiveis.length-1)/5)]);
-  const escolhida=disponiveis.find(p=>idPeca(p)===atual.gabinete_id);
-  if(escolhida&&!referencias.includes(escolhida))referencias[referencias.length-1]=escolhida;
-  return '<div class="appearance-fields">'+campo('appearance-style','Estilo do gabinete',estilosGabinete,atual.estilo)+campo('appearance-color','Cor do setup',coresSetup,atual.cor)+'</div>'
-    +'<p class="font-2-xs planning-help">Preferências, não exigências. Compatibilidade, orçamento e disponibilidade vêm primeiro. A cor só será considerada quando informada no catálogo.</p>'
+  if(atual.estilo==='compacto')atual.estilo='sem-preferencia';
+  return '<fieldset class="appearance-colors"><legend class="font-1-xs">Cor do setup</legend><div class="appearance-swatches">'+coresSetup.map(([v,n])=>
+    '<label class="appearance-swatch"><input type="radio" name="appearance-color" value="'+v+'" '+(v===atual.cor?'checked':'')+'><span class="appearance-color-dot color-'+v+'" aria-hidden="true"></span><span>'+n+'</span></label>').join('')+'</div></fieldset>'
     +(possuiGabinete?'<p class="font-2-xs">O gabinete que você já possui será preservado.</p>':
-      '<fieldset class="appearance-references"><legend class="font-1-xs">Algum destes modelos combina com você?</legend><label class="appearance-no-preference font-2-xs"><input type="radio" name="case-reference" value="" '+(!escolhida?'checked':'')+'> Sem modelo de referência</label>'
-      +(referencias.length?'<div class="appearance-cases" role="region" aria-label="Referências de gabinetes com imagens" tabindex="0">'+referencias.map(p=>{
-        const id=Number(String(p.id).split(':').at(-1));
-        return '<label class="appearance-case"><input type="radio" name="case-reference" value="'+id+'" '+(atual.gabinete_id===id?'checked':'')+'>'+imagemPeca(p,'appearance-case-image')+'<span>'+h(nomePeca(p))+'</span><small>'+h(moeda(p.preco))+'</small></label>';
-      }).join('')+'</div>':'<p class="font-2-xs">Nenhum modelo disponível nesta faixa para mostrar como referência.</p>')+'</fieldset>');
+      '<div class="appearance-examples" role="region" aria-label="Exemplos de porte e visual de gabinete" tabindex="0">'
+      +referencias('size','Porte do gabinete',portesGabinete,atual.porte)
+      +referencias('style','Visual do gabinete',estilosGabinete,atual.estilo)+'</div>')
+    +'<p class="font-2-xs planning-help">Fotos de exemplo, não produtos selecionados. Porte e visual são independentes; medidas e orçamento vêm primeiro. Cor sem ficha fica a confirmar.</p>';
 }

@@ -16,6 +16,7 @@ from .avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 from .planejar_perifericos_service import PlanejarPerifericosService
 from .completar_ventilacao_service import CompletarVentilacaoService
 from .amostrar_catalogo_service import AmostrarCatalogoService
+from .preferencias_perifericos_service import PreferenciasPerifericosService
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +37,7 @@ class CriarBuildService:
     "potencia_w", "formato", "formatos_placa_mae", "memoria_gb",
     "videointegrado", "cooler", "quantidade_pentes", "frequencia_mhz", "latencia", "conexao",
     "tamanho_polegadas", "resolucao", "taxa_atualizacao_hz",
-    "tipo_painel", "layout", "switch", "mecanico", "dpi_max", "microfone",
+    "tipo_painel", "tempo_resposta_ms", "hdr", "layout", "switch", "mecanico", "dpi_max", "microfone",
     "quantidade_slots_ram", "memoria_maxima_gb", "quantidade_slots_m2",
     "quantidade_portas_sata", "quantidade_slots_m2_sata", "portas_sata_desativadas_por_m2_sata",
     "interface", "velocidade_leitura_mbps", "velocidade_gravacao_mbps", "velocidade_rpm", "memoria_cache_mb", "compatibilidade", "esgotado",
@@ -97,19 +98,21 @@ class CriarBuildService:
     teto_pc, teto_perifericos = self._dividir_orcamento(orcamento, percentual)
     inicio_catalogo = perf_counter()
     catalogo = self._gerar_catalogo(min(orcamento - margem, teto_pc), teto_perifericos, excluidas,
-                                  aparencia["gabinete_id"] if "gabinete" not in proprias else None)
+                                  aparencia["gabinete_id"] if "gabinete" not in proprias else None, dados["utilidade"])
     logger.info("Geração: etapa=catalogo duracao_ms=%d categorias=%d", (perf_counter()-inicio_catalogo)*1000, len(catalogo))
     disponiveis = set(catalogo) | set(proprias)
     obrigatorias = {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"}
     if not obrigatorias <= disponiveis or not {"ssd", "hd"} & disponiveis:
       raise ValueError("Não há peças suficientes para montar um PC nesse orçamento")
+    if percentual and "monitor" not in disponiveis:
+      raise ValueError("Não há monitor com painel IPS ou VA confirmado dentro da reserva. Aumente o orçamento ou a porcentagem de periféricos; nenhuma build foi salva.")
     if percentual and not self.PERIFERICOS <= disponiveis:
       raise ValueError("Não foi possível gerar uma configuração dentro do orçamento informado com os periféricos disponíveis. Ajuste o orçamento ou revise as peças.")
 
     if acessorio_rede and rede.get("possuiAcessorio") is False and acessorio_rede not in disponiveis:
       raise ValueError("Não há acessório de rede com preço e disponibilidade confirmados")
 
-    plano_perifericos = PlanejarPerifericosService().executar(catalogo, teto_perifericos, proprias) if percentual else None
+    plano_perifericos = PlanejarPerifericosService().executar(catalogo, teto_perifericos, proprias, dados["utilidade"]) if percentual else None
     if plano_perifericos and not plano_perifericos["viavel"]:
       minimo = plano_perifericos.get("minimo_catalogado")
       detalhe = f" O menor conjunto disponível custa R$ {minimo:.2f}, mas a reserva é de R$ {teto_perifericos:.2f}." if minimo is not None else ""
@@ -256,7 +259,7 @@ class CriarBuildService:
     }
 
   @classmethod
-  def _gerar_catalogo(cls, preco_maximo, reserva_perifericos=0, excluidas=(), referencia_gabinete=None):
+  def _gerar_catalogo(cls, preco_maximo, reserva_perifericos=0, excluidas=(), referencia_gabinete=None, utilidade=""):
     catalogo = {}
     for modelo in MODELOS_PECAS:
       periferico = modelo.__tablename__ in cls.PERIFERICOS
@@ -264,7 +267,11 @@ class CriarBuildService:
         continue
       pecas = modelo.listar_disponiveis_ate(reserva_perifericos if periferico else preco_maximo, limite=200)
       if pecas:
-        catalogo[modelo.__tablename__] = AmostrarCatalogoService().executar(modelo.__tablename__, [cls._campos_pecas(peca) for peca in pecas])
+        fichas = [cls._campos_pecas(peca) for peca in pecas]
+        if modelo.__tablename__ == "monitor":
+          fichas = [p for p in fichas if PreferenciasPerifericosService.painel_permitido(p)]
+        if fichas:
+          catalogo[modelo.__tablename__] = AmostrarCatalogoService().executar(modelo.__tablename__, fichas, utilidade=utilidade)
     if referencia_gabinete is not None and "gabinete" not in excluidas:
       referencia = MODELOS["gabinete"].buscar_por_id(referencia_gabinete)
       if referencia:
@@ -287,7 +294,7 @@ class CriarBuildService:
     proprias = proprias or {}
     pc, perifericos = CriarBuildService._dividir_orcamento(orcamento, percentual)
     if percentual and plano_perifericos is None:
-      plano_perifericos = PlanejarPerifericosService().executar(catalogo, perifericos, proprias)
+      plano_perifericos = PlanejarPerifericosService().executar(catalogo, perifericos, proprias, dados["utilidade"])
     teto_peca = min(Decimal(str(orcamento - margem)), pc)
     # Tornar explícitas decisões determinísticas ajuda a LLM a não cruzar IDs de
     # plataformas diferentes. É apenas socket: não certifica BIOS nem o conjunto.
@@ -398,11 +405,34 @@ class CriarBuildService:
         "DPI alto, RGB, marca ou preço alto isolados não comprovam qualidade. Não invente avaliações "
         "ou vendas. Prefira equilíbrio de qualidade entre os quatro periféricos; a reserva continua "
         "sendo teto, não gasto mínimo.\n"
+        "Monitores NOVOS devem ter painel confirmado IPS ou VA, incluindo Fast IPS, Rapid IPS, "
+        "Nano IPS e Fast VA. Não escolha TN, OLED ou painel desconhecido; preserve monitores próprios. "
+        "Para jogos, priorize taxa de atualização (Hz): avalie 144 Hz ou mais quando o conjunto e a "
+        "reserva permitirem, sem prometer FPS nem sacrificar o PC. Mais Hz só é aproveitado conforme "
+        "a GPU, o jogo e as conexões. Não troque um painel conhecido por um monitor sem ficha. "
+        "Para edição e trabalho, priorize resolução, área útil e polegadas equilibradas: avalie "
+        "27 polegadas e QHD/4K quando couber, evitando escolher um ultrawide enorme só pelo tamanho. "
+        "Prefira IPS com características de cor documentadas para edição; VA/Fast VA também são "
+        "permitidos se atenderem ao uso. Tipo de painel sozinho não garante qualidade. Compare "
+        "cobertura de cor, precisão/calibração, brilho e ergonomia somente quando constarem da ficha. "
+        "Não invente sRGB, Delta E, HDR real ou ausência de ghosting; tempo de resposta anunciado "
+        "não substitui medições.\n"
+        "Para gamer, prefira teclado mecânico com modelo de switch identificado, layout adequado "
+        "e especificações verificáveis, quando couber no conjunto de periféricos. Não escolha sempre "
+        "um teclado de membrana por ser o primeiro ou o mais barato. Tipo/cor do switch, RGB e marca "
+        "isolados não comprovam qualidade: não invente durabilidade, polling rate ou ranking de switches. "
+        "Se um mecânico não couber, use uma alternativa honesta sem passar do teto nem retirar itens "
+        "obrigatórios. Mouse e headset devem manter equilíbrio, conexão adequada e dados confirmados. "
+        "Não inclua produtos do AliExpress ou de outra loja que não existam no catálogo validado.\n"
         "Aparência é preferência flexível. gabinete_id é uma referência visual, não uma obrigação "
         "de compra. Use o estilo/cor somente quando houver dados confirmados; não deduza medidas "
         "ou suporte de radiador pelo estilo. Preserve gabinete próprio. Nunca escolha um gabinete "
         "incompatível, de ventilação inadequada ou caro demais só para atender estética. "
         "Sem preferência, priorize encaixe, ventilação e custo-benefício.\n\n"
+        "O campo porte diferencia Mini Tower, Mid Tower e Full Tower. Panorâmico/aquário e painel "
+        "lateral de vidro são características visuais independentes do porte. As fotos são apenas "
+        "exemplos, não itens que precisam ser comprados. Nunca deduza suporte a placa-mãe, dimensões "
+        "de GPU ou radiadores pela categoria visual; valide pela ficha técnica.\n\n"
 
         "# PASSO 1: ANALISE O USO\n"
         "Leia nome, descricao e utilidade e classifique o uso principal. "
@@ -604,6 +634,8 @@ class CriarBuildService:
         raise ValueError("Uma peça sugerida está sem preço válido no catálogo. Revise as peças ou tente novamente.")
       if peca.get("esgotado") is True:
         raise ValueError("Uma peça sugerida está indisponível no catálogo. Tente novamente.")
+      if tipo == "monitor" and not PreferenciasPerifericosService.painel_permitido(peca):
+        raise ValueError("O monitor sugerido deve ter painel IPS ou VA confirmado, incluindo Fast IPS e Fast VA. Escolha outro monitor do catálogo dentro da reserva.")
       if tipo == "fan" and (type(peca.get("quantidade")) is not int or not 1 <= peca["quantidade"] <= 64):
         raise ValueError("Falta uma quantidade válida de fans por unidade/kit no catálogo. Escolha outro modelo cadastrado.")
       componente["nome"] = f'{peca["fabricante"]} {peca["modelo"]}'
