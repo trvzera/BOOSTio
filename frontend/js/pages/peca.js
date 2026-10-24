@@ -1,6 +1,6 @@
 import "../header.js";
 import "../auth/auth.js";
-import { carregarCatalogo, categorias, moeda, htmlSeguro as h, nomePeca, imagemPeca, ofertasPeca, fichaTecnica, informacoesPreco } from "../build/catalogo.js";
+import { carregarCatalogo, categorias, moeda, htmlSeguro as h, nomePeca, imagemPeca, ofertasPeca, destaquesFichaTecnica, gruposFichaTecnica, informacoesPreco } from "../build/catalogo.js";
 import { abrirBuild, guardarRascunho } from "../build/estado.js";
 import { selecionarPecaCompativel } from "../build/compatibilidade.js";
 import { avisar, mostrarFalha } from "../build/interface.js";
@@ -21,7 +21,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const categoria = categorias.find((c) => c.id === peca.categoria);
     let build = conta ? await carregarBuildConta(parametros.get("build")) : abrirBuild(new URLSearchParams({ id: parametros.get("build") || "" }));
     if (!conta) guardarRascunho(build);
-    const detalhes = fichaTecnica(peca);
+    const destaques = destaquesFichaTecnica(peca);
+    const gruposTecnicos = gruposFichaTecnica(peca);
     const preco = informacoesPreco(peca,conta);
     let motivo = "";
     try { selecionarPecaCompativel(build,peca,catalogo); } catch (erro) { motivo = erro.message; }
@@ -32,7 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       '" aria-label="Voltar ao catálogo de ' + categoria.nome + '" title="Voltar à categoria">' + iconeAnimado("arrow","back") + '</a></header>' +
       '<section class="product-detail-layout"><div class="product-detail-visual glass-card">' + imagemPeca(peca) + (peca.imagem ? "" : '<span class="font-2-xs summary-note">Imagem ainda não cadastrada</span>') + '</div>' +
       '<div class="product-detail-copy"><span class="component-category font-1-xs">' + categoria.nome + '</span><h1 class="font-1-xl">' + h(nomePeca(peca)) +
-      '</h1><ul class="product-detail-highlights">' + detalhes.slice(3,7).map(([rotulo,valor]) => '<li class="font-2-xs"><span>' + h(rotulo) + '</span><strong>' + h(valor) + '</strong></li>').join("") +
+      '</h1><ul class="product-detail-highlights">' + destaques.map(([rotulo,valor]) => '<li class="font-2-xs"><span>' + h(rotulo) + '</span><strong>' + h(valor) + '</strong></li>').join("") +
       '</ul><span class="summary-eyebrow font-1-xs">' + h(preco.rotulo) + '</span><strong class="summary-total font-1-xl">' + h(preco.valor) + '</strong><p class="font-2-xs summary-note">' + h(preco.nota) + '</p>' +
       '<button type="button" id="add-product" class="btn-primary" aria-label="Adicionar à build: ' + h(nomePeca(peca)) + '" ' + (motivo ? 'disabled data-disabled-reason="' + h(motivo) + '"' : "") + '>' + iconeAnimado("plus") + 'Adicionar à build</button>' +
       '<p class="font-2-xs summary-note">' + h(motivo || "Sem novos conflitos detectados nas verificações disponíveis. Confirme os dados no fabricante.") + '</p></div></section>' +
@@ -43,9 +44,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       '<p class="font-2-xs">' +
       (oferta.esgotado ? "Último preço cadastrado · produto indisponível" : oferta.preco != null ? "Preço cadastrado, sem frete · confirme na loja" : oferta.direta ? "Página do produto cadastrada" : "Busca pelo modelo · anúncio não cadastrado") + '</p><a class="btn-ghost" href="' + h(oferta.url) +
       '" target="_blank" rel="noopener noreferrer" aria-label="' + (oferta.direta ? "Comprar na loja" : "Buscar na loja") + ' ' + h(oferta.loja) + ' em uma nova aba">' + iconeAnimado("cart") + (oferta.direta ? "Comprar na loja" : "Buscar na loja") + '</a></article>').join("") + '</div></section>' +
-      '<section class="product-specifications glass-card" aria-labelledby="spec-title"><h2 class="font-1-l" id="spec-title">Informações técnicas</h2><dl>' +
-      detalhes.map(([rotulo,valor]) => '<div><dt class="font-2-xs">' + h(rotulo) + '</dt><dd class="font-1-xs">' + h(valor) + '</dd></div>').join("") +
-      '</dl></section>';
+      '<section class="product-specifications glass-card" aria-labelledby="spec-title"><h2 class="font-1-l" id="spec-title">Informações técnicas</h2>' +
+      '<p class="font-2-xs summary-note product-specifications-note">Dados cadastrados para este modelo, usados nas verificações disponíveis da build. Campos não informados não são considerados compatibilidade confirmada. Consumo estimado não representa uma medição em uso.</p>' +
+      gruposTecnicos.map((grupo, indice) => '<section class="product-specification-group" aria-labelledby="spec-group-' + indice + '"><h3 class="font-1-m-b" id="spec-group-' + indice + '">' + h(grupo.titulo) + '</h3><dl>' +
+        grupo.campos.map(([rotulo,valor]) => '<div><dt class="font-2-xs">' + h(rotulo) + '</dt><dd class="font-1-xs">' + h(valor) + '</dd></div>').join("") + '</dl></section>').join("") +
+      '</section>';
     main.querySelector(".product-stores > p").insertAdjacentHTML("afterend",avisoCompraHtml());
     main.querySelectorAll(".store-logo").forEach(img => img.addEventListener("error",() => { img.hidden = true; img.nextElementSibling.hidden = false; },{once:true}));
     main.querySelectorAll('.store-card').forEach((card,indice)=>card.querySelectorAll('a').forEach(link=>link.addEventListener('click',evento=>{

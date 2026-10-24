@@ -117,7 +117,7 @@ export function ofertasPeca(peca) {
 }
 
 export const rotulosTecnicos = {
-  fabricante: "Fabricante", modelo: "Modelo", consumo_energia: "Consumo estimado (W)",
+  fabricante: "Fabricante", modelo: "Modelo", part_number: "Referência do catálogo / part number", consumo_energia: "Consumo estimado (W)",
   soquete: "Socket", socket: "Socket", nucleo: "Núcleos", thread: "Threads",
   clockbase: "Clock base (GHz)", clockmax: "Clock máximo (GHz)", videointegrado: "Vídeo integrado",
   modelo_videointegrado: "GPU integrada", cooler: "Cooler incluso", modelo_cooler: "Cooler incluso",
@@ -167,18 +167,74 @@ export const rotulosTecnicos = {
   mecanico: "Mecânico", tamanho: "Tamanho", dpi_max: "DPI máximo", botoes: "Botões", sensor: "Sensor",
   tamanho_polegadas: "Tela (polegadas)", resolucao: "Resolução", taxa_atualizacao_hz: "Taxa de atualização (Hz)",
   tipo_painel: "Tipo de painel", tempo_resposta_ms: "Tempo de resposta (ms)", hdr: "HDR",
+  padrao_wifi: "Padrão Wi-Fi", velocidade_mbps: "Velocidade de rede (Mbps)", bluetooth: "Bluetooth",
+  comprimento_m: "Comprimento do cabo (m)", conector: "Conector",
 };
 
-export function fichaTecnica(peca) {
+function entradasFichaTecnica(peca) {
   const ignorados = new Set(["id", "categoria", "imagem", "preco", "preco_atualizado_em", "link", "part_number", "esgotado", "ofertas"]);
   // Medidas genéricas antigas não devem contradizer a ficha exata revisada.
   if (peca.modelo_ficha_tecnica && peca.baias_25 != null && peca.baias_35 != null) ignorados.add("bays_disco");
   if (peca.modelo_ficha_tecnica && [peca.comprimento_mm,peca.largura_mm,peca.altura_mm].every(v=>v!=null)) ignorados.add("dimensoes");
-  return Object.entries(peca).filter(([chave, valor]) => !ignorados.has(chave) && valor != null)
-    .map(([chave, valor]) => [
+  return Object.entries(peca).filter(([chave, valor]) => !ignorados.has(chave) && valor != null && valor !== "");
+}
+
+function linhaTecnica([chave, valor]) {
+  return [
       rotulosTecnicos[chave] || chave.replaceAll("_", " "),
       formatarEspecificacao(chave,valor),
-    ]);
+  ];
+}
+
+export function fichaTecnica(peca) {
+  return entradasFichaTecnica(peca).map(linhaTecnica);
+}
+
+const camposDestaque = {
+  processador: ["soquete", "nucleo", "thread", "videointegrado", "cooler", "consumo_energia"],
+  placa_mae: ["socket", "tipo_memoria", "quantidade_slots_ram", "memoria_maxima_gb", "quantidade_slots_m2", "quantidade_portas_sata"],
+  memoria_ram: ["capacidade_gb", "ddr", "frequencia_mhz", "quantidade_pentes", "latencia", "altura_mm"],
+  placa_video: ["memoria_gb", "tipo_memoria", "comprimento_mm", "slots_ocupados", "conectores_energia", "consumo_energia"],
+  gabinete: ["formatos_placa_mae", "tamanho_max_gpu_mm", "tamanho_max_cooler_mm", "fans_inclusos", "quantidade_max_fans", "radiadores_suportados_mm"],
+  fonte: ["potencia_w", "formato", "comprimento_mm", "certificacao_fonte", "conectores_pcie_8pinos", "conectores_sata"],
+  ssd: ["capacidade_gb", "tipo", "interface", "formato", "velocidade_leitura_mbps", "velocidade_gravacao_mbps"],
+  hd: ["capacidade_gb", "interface", "formato", "velocidade_rpm", "memoria_cache_mb", "consumo_energia"],
+  air_cooler: ["compatibilidade", "altura_mm", "tamanhos_fans_cooler_mm", "quantidade_fans", "iluminacao", "consumo_energia"],
+  water_cooler: ["compatibilidade", "tamanho_radiador_mm", "comprimento_radiador_mm", "espessura_radiador_mm", "quantidade_fans", "consumo_energia"],
+  fan: ["tamanho_mm", "quantidade", "espessura_mm", "fluxo_ar", "conector_fan", "consumo_energia"],
+  adaptador_wifi: ["interface", "padrao_wifi", "velocidade_mbps", "bluetooth"],
+  cabo_rede: ["comprimento_m", "conector"],
+};
+
+export function destaquesFichaTecnica(peca) {
+  const campos = camposDestaque[peca.categoria];
+  if (!campos) return entradasFichaTecnica(peca)
+    .filter(([chave]) => !["fabricante", "modelo", "fonte_medidas", "observacoes_medidas"].includes(chave))
+    .slice(0, 6).map(linhaTecnica);
+  return campos.map(chave => [rotulosTecnicos[chave],
+    peca[chave] == null || peca[chave] === "" ? "Não informado" : formatarEspecificacao(chave, peca[chave])]);
+}
+
+export function gruposFichaTecnica(peca) {
+  const grupos = [
+    {titulo: "Identificação", campos: []},
+    {titulo: "Desempenho e consumo", campos: []},
+    {titulo: "Compatibilidade e instalação", campos: []},
+    {titulo: "Recursos e características", campos: []},
+    {titulo: "Origem das informações", campos: []},
+  ];
+  const desempenho = /^(consumo_|tdp_|clock|nucleo$|thread$|capacidade_gb$|memoria_gb$|frequencia_mhz$|latencia$|potencia|velocidade_|memoria_cache_|fluxo_ar_cfm$|pressao_estatica_|durabilidade_|taxa_atualizacao_|tempo_resposta_|resolucao$|dpi_max$)/;
+  const encaixe = /^(soquete$|socket$|chipset$|formato|tipo_memoria$|ddr$|interface|quantidade_slots_|quantidade_portas_|portas_sata_|memoria_maxima_|tipos_memoria_cpu$|quantidade_pentes$|quantidade_max_fans$|comprimento_|largura_|altura_|espessura_|dimensoes|tamanho_|tamanhos_|slots_|baias_|bays_|posicoes_|limites_radiador_|radiadores_|compatibilidade$|placas_mae_incompativeis$|conector|numero_pinos$|versao_atx$|suporte_water_cooler$|fans_inclusos$|quantidade_fans$|cooler$|modelo_cooler$|videointegrado$|modelo_videointegrado$|observacoes_medidas$)/;
+  const entradas = entradasFichaTecnica(peca);
+  if (peca.part_number) entradas.push(["part_number", peca.part_number]);
+  for (const entrada of entradas) {
+    const chave = entrada[0];
+    const grupo = ["fabricante", "modelo", "part_number"].includes(chave) ? 0
+      : ["fonte_medidas", "fonte_fluxo_ar", "modelo_ficha_tecnica", "ficha_tecnica_verificada_em"].includes(chave) ? 4
+      : desempenho.test(chave) ? 1 : encaixe.test(chave) ? 2 : 3;
+    grupos[grupo].campos.push(linhaTecnica(entrada));
+  }
+  return grupos.filter(grupo => grupo.campos.length);
 }
 
 function formatarEspecificacao(chave,valor) {

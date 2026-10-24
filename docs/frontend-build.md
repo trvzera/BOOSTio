@@ -6,6 +6,25 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Ficha da peça e requisito 13 — 23/10/2026
+
+- RF13 marcado como implementado no escopo de exibir o diagnóstico de compatibilidade,
+  consumo estimado e informações técnicas cadastradas. Isso não certifica combinações
+  sem dados nem significa que todas as fichas do catálogo estejam completas.
+- A página da peça destaca informações próprias de cada categoria, incluindo socket,
+  slots, memória, medidas e ventilação. Campos importantes ausentes mostram “Não informado”,
+  sem inventar capacidade ou aprovar um encaixe desconhecido.
+- Ficha organizada em identificação, desempenho/consumo, compatibilidade/instalação,
+  recursos e origem das informações, com fonte/data quando cadastradas. Valores e
+  observações são escapados; grupos vazios não aparecem. Mantidos Lexend/Poppins e
+  o layout de uma coluna da ficha em celulares. Sem mudança de banco ou backend.
+- O prompt do diagrama está em `prompt-diagrama-classes.md`. A imagem final ainda
+  precisa ser conferida e adicionada pelo usuário antes da entrega.
+- Validação: 527 testes Node aprovados e 86 verificações no Chrome, com três
+  categorias em 320, 390, 768 e 1440 px. Sem overflow, exceções JavaScript ou
+  violações axe WCAG A/AA no conteúdo testado. Sessão e API simuladas; sem
+  alterações no banco, chamadas LLM, SMTP ou consulta real a lojas.
+
 ### Entrega acadêmica: Controllers em classes — 23/10/2026
 
 - Sete classes por recurso, com métodos estáticos: Auth, Usuario, Build, Email,

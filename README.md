@@ -45,10 +45,9 @@ As **20 funcionalidades obrigatórias do projeto**, na ordem dos requisitos
 definidos para a entrega e a apresentação em vídeo, com o status e o escopo atual
 de cada uma.
 
-**Resumo do produto: 19 implementadas no escopo descrito · 1 parcial.**
+**Resumo do produto: 20 funcionalidades obrigatórias implementadas no escopo descrito.**
 
 - ✅ **Implementado:** fluxo disponível no código do projeto.
-- 🟡 **Parcial:** já possui partes implementadas, mas ainda há pontos a concluir.
 
 Os status descrevem a implementação atual, não a homologação em produção.
 As limitações de cada funcionalidade estão indicadas na última coluna. E-mail
@@ -74,7 +73,7 @@ de builds no backend para persistir a configuração na conta.
 | 10 | O sistema deve permitir ao usuário ver configurações prontas | ✅ **Implementado** | 16 modelos sem periféricos, referências revisadas no catálogo, filtro de budget e preço crescente. A cópia respeita e-mail verificado e limite da conta. |
 | 11 | O sistema deve permitir ao usuário editar e modificar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento; desfazer a última alteração de montagem enquanto o editor estiver aberto. |
 | 12 | O sistema deve permitir ao usuário verificar o preço da peça direto pelo site, sem precisar consultar em diversas abas | ✅ **Implementado** | Preços cadastrados, data quando disponível e links das lojas. Antes da compra, o catálogo é reconsultado e diferenças/indisponibilidade são mostradas. Não inclui frete nem garante o valor no checkout. |
-| 13 | O sistema deve permitir ao usuário ver todas as informações de compatibilidade e consumo de energia do setup que está montando | 🟡 **Parcial** | Medidas disponíveis, formatos, baias, fans e radiador; substituição explícita das fans do water cooler e painel de informações. Completar fichas técnicas e interferências físicas. |
+| 13 | O sistema deve permitir ao usuário ver todas as informações de compatibilidade e consumo de energia do setup que está montando | ✅ **Implementado** | Diagnóstico da build, consumo estimado e fichas técnicas com socket, memória, slots, conexões, medidas, fans e radiador conforme os dados cadastrados. A página da peça organiza especificações e fontes por assunto. Dados ausentes são sinalizados, não aprovados por suposição; ampliar a cobertura de modelos permanece uma melhoria de catálogo. |
 | 14 | O sistema deve permitir ao usuário adicionar ao setup periféricos, que muitas vezes não pensado anteriormente, acaba estourando o orçamento | ✅ **Implementado** | Inclusão e reaproveitamento com tetos separados para PC e periféricos. |
 | 15 | O sistema deve permitir ao usuário registrar em seu perfil o seu budget, assim fica registrado o seu dinheiro disponível para comprar e futuras melhorias | ✅ **Implementado** | Valor e autorização usados no formulário e em novas montagens manuais, sem alterar builds existentes. |
 | 16 | O sistema deve permitir ao usuário baixar a build em JSON e CSV para ter o arquivo local | ✅ **Implementado** | Exportação para guardar a configuração localmente. |
@@ -267,10 +266,12 @@ O diagrama de classes do domínio está sendo finalizado para esta entrega.
 O local previsto é `docs/diagrama-classes.png`; o arquivo e o link de visualização
 ainda precisam ser incluídos antes da submissão. Ele deve refletir as Models
 atuais, incluindo a diferença entre `Build` e `BuildSalva`, cujo estado é JSON.
+O [prompt baseado nas classes atuais](docs/prompt-diagrama-classes.md) está disponível
+para gerar a imagem e conferir seus relacionamentos antes de incluí-la.
 
 ## Validação da versão
 
-Na revisão de **23/10/2026**, a suíte local aprovou **521 testes JavaScript** e
+Na revisão de **23/10/2026**, a suíte local aprovou **527 testes JavaScript** e
 **615 testes Python**, além de **13 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
