@@ -44,3 +44,12 @@ def test_preservar_sockets_nao_remove_as_opcoes_de_maior_investimento():
     amostra = AmostrarCatalogoService().executar("processador",pecas)
     assert {1,99} <= {p["id"] for p in amostra}
     assert {p["soquete"] for p in amostra} == {"AM4","AM5","LGA1700"}
+
+
+def test_monitores_preservam_resolucoes_distintas_sem_classificar_por_preco():
+    pecas=[{"id":i,"preco":100+i,"resolucao":"1080p","taxa_atualizacao_hz":60} for i in range(1,40)]
+    pecas += [{"id":40,"preco":160,"resolucao":"1440p","taxa_atualizacao_hz":165},
+              {"id":41,"preco":200,"resolucao":"4K","taxa_atualizacao_hz":60}]
+    amostra=AmostrarCatalogoService().executar("monitor",pecas)
+    assert {1,40,41} <= {p["id"] for p in amostra}
+    assert len(amostra)==12

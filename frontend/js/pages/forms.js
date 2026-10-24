@@ -1,12 +1,14 @@
 import "../header.js";
 import "../auth/auth.js";
 import { normalizarRede, vincularRede } from "../build/rede.js";
+import { normalizarAparencia, aparenciaHtml } from "../build/aparencia.js";
+import { carregarCatalogoConta } from "../build/conta.js";
 import { planejamentoLocal } from "../build/planejamento.js";
 import { orcamentoValido, dividirOrcamento } from "../build/orcamento-formulario.js";
 import { carregarPerfil } from "../conta/perfil.js";
 import { acompanharCarregamento } from "../components/page-loading.js";
-import { criarBuild, verificarEspacoBuild } from "../api/build/builds.js";
-import { pecasPropriasFormulario } from "../build/pecas-proprias.js";
+import { criarBuild, verificarEspacoBuild, catalogoBuilds } from "../api/build/builds.js";
+import { pecasPropriasFormulario, reconhecerPecaPropria, categoriaPecaPropria } from "../build/pecas-proprias.js";
 import { buscarUsuarioLogado } from "../api/usuario/buscarUsuarioLogado.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { iniciarControlesNumericos } from "../components/number-stepper.js";
@@ -109,6 +111,12 @@ const perguntas = [
     descricao:"Informe se usará cabo de rede ou Wi-Fi e se já possui o necessário. Você poderá adicionar o acessório pelo catálogo da build quando houver produtos cadastrados.",
     opcoes:[],
   },
+  {
+    chave:"aparencia",etapa:"Aparência",tag:"Etapa 06",
+    titulo:"Como você imagina seu setup?",
+    descricao:"Escolha o estilo do gabinete e a cor de que gosta, ou continue sem preferência. A aparência nunca terá prioridade sobre compatibilidade, qualidade e orçamento.",
+    opcoes:[],
+  },
 ];
 
 const exemplosPecas = {
@@ -136,7 +144,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const painel = document.querySelector("#question-info");
   await acompanharCarregamento(carregarPerfil().catch(() => null));
   const planejamento = planejamentoLocal();
-  const respostas = {rede:normalizarRede()};
+  const respostas = {rede:normalizarRede(),aparencia:normalizarAparencia()};
+  let catalogoProprio;
+  const carregarPecasProprias=()=>catalogoProprio??=catalogoBuilds().then(r=>r.pecas).catch(e=>{catalogoProprio=null;throw e;});
   if (planejamento.usarBudget && planejamento.budget != null) {
     respostas.orcamento = "personalizado";
     respostas.orcamentoPersonalizado = planejamento.budget;
@@ -162,6 +172,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function atualizarMenu() {
+    document.querySelector("#forms-header").dataset.activeStep=`Etapa ${indiceAtual+1} de ${perguntas.length} · ${perguntas[indiceAtual].etapa}`;
     document.querySelectorAll(".form-step").forEach((item, indice) => {
       item.classList.toggle("active", indice === indiceAtual);
       item.classList.toggle("completed", indice < indiceAtual);
@@ -211,7 +222,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const detalhe = respostas.pecasDetalhes?.[valor] || "";
     const placeholder = exemplosPecas[valor] || "Informe a marca e o modelo";
 
-    return `<div class="piece-detail${visivel ? " is-visible" : ""}"><label class="font-1-xs" for="detalhe-${valor}">Qual ${titulo.toLowerCase()} você possui?</label><input class="piece-model-input font-2-xs" type="text" id="detalhe-${valor}" data-piece-detail="${valor}" value="${escaparHtml(detalhe)}" placeholder="${placeholder}" maxlength="120" autocomplete="off" required aria-describedby="ajuda-${valor}"><span class="piece-detail-help font-2-xs" id="ajuda-${valor}">Informe marca e modelo para verificarmos a compatibilidade.</span></div>`;
+    return `<div class="piece-detail${visivel ? " is-visible" : ""}"><label class="font-1-xs" for="detalhe-${valor}">Qual ${titulo.toLowerCase()} você possui?</label><input class="piece-model-input font-2-xs" type="text" id="detalhe-${valor}" data-piece-detail="${valor}" value="${escaparHtml(detalhe)}" placeholder="${placeholder}" maxlength="120" autocomplete="off" list="modelos-${valor}" required aria-describedby="ajuda-${valor}"><datalist id="modelos-${valor}"></datalist><span class="piece-detail-help font-2-xs" id="ajuda-${valor}" role="status" aria-live="polite">Informe marca e modelo para verificarmos a compatibilidade.</span></div>`;
   }
 
   function rangeHtml() {
@@ -288,10 +299,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     conteudo.classList.add("question-enter");
     conteudo.classList.toggle("pieces-question-content", pergunta.chave === "pecas");
     const rotuloAvancar = indiceAtual === perguntas.length - 1 ? "Gerar build" : "Avançar";
-    const campos = pergunta.chave === "rede" ? '<div id="form-network"></div>' : `<fieldset class="question-options ${pergunta.multipla ? "pieces-grid" : ""}"><legend class="sr-only">${pergunta.titulo}</legend>${opcoesHtml(pergunta)}</fieldset>`;
+    const campos = pergunta.chave === "aparencia" ? '<div id="form-appearance" aria-busy="true"><p class="font-2-xs">Carregando referências do catálogo…</p></div>' : pergunta.chave === "rede" ? '<div id="form-network"></div>' : `<fieldset class="question-options ${pergunta.multipla ? "pieces-grid" : ""}"><legend class="sr-only">${pergunta.titulo}</legend>${opcoesHtml(pergunta)}</fieldset>`;
     conteudo.innerHTML = `
       <div class="options-heading">
-        <p class="font-1-m-b">${pergunta.chave === "rede" ? "Planeje sua conexão" : pergunta.multipla ? "Selecione as opções aplicáveis" : "Escolha uma opção"}</p>
+        <p class="font-1-m-b">${pergunta.chave === "aparencia" ? "Preferências opcionais" : pergunta.chave === "rede" ? "Planeje sua conexão" : pergunta.multipla ? "Selecione as opções aplicáveis" : "Escolha uma opção"}</p>
         <span class="font-2-xs">${indiceAtual + 1} de ${perguntas.length}</span>
       </div>
       ${pergunta.chave === "orcamento" ? `<div class="budget-fields">${campos}${rangeHtml()}</div>` : campos}
@@ -304,6 +315,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       respostas.rede = rede;
       conteudo.querySelector("#next-question").disabled = !podeAvancar();
     }});
+    if(pergunta.chave === "aparencia") void renderizarAparencia();
     conteudo
       .querySelector("#previous-question")
       .addEventListener("click", () => navegarPara(indiceAtual - 1));
@@ -327,16 +339,53 @@ document.addEventListener("DOMContentLoaded", async () => {
     iniciarIcones(conteudo);
   }
 
+  async function renderizarAparencia() {
+    const campo=conteudo.querySelector("#form-appearance");
+    let catalogo=[];
+    try { catalogo=await carregarCatalogoConta(); } catch { /* As preferências não dependem da galeria. */ }
+    if(!campo.isConnected)return;
+    campo.innerHTML=aparenciaHtml(respostas.aparencia,catalogo,{orcamento:valorOrcamento(),possuiGabinete:respostas.pecas?.includes("gabinete")});
+    campo.setAttribute("aria-busy","false");
+    const sincronizar=()=>{
+      respostas.aparencia=normalizarAparencia({
+        estilo:campo.querySelector("#appearance-style").value,
+        cor:campo.querySelector("#appearance-color").value,
+        gabinete_id:Number(campo.querySelector('input[name="case-reference"]:checked')?.value)||null,
+      });
+    };
+    sincronizar();campo.addEventListener("change",sincronizar);
+  }
+
   function vincularCamposDetalhesPecas() {
     conteudo.querySelectorAll(".piece-model-input").forEach((input) => {
       if (input.dataset.listener === "true") return;
       input.dataset.listener = "true";
+      const ajudar=async()=>{
+        const valor=input.value,tipo=input.dataset.pieceDetail;
+        const ajuda=conteudo.querySelector("#ajuda-"+tipo);
+        try {
+          const catalogo=await carregarPecasProprias();
+          if(!input.isConnected||input.value!==valor)return;
+          const lista=conteudo.querySelector("#modelos-"+tipo);
+          if(lista&&!lista.childElementCount)lista.innerHTML=catalogo.filter(p=>p.categoria===categoriaPecaPropria(tipo))
+            .map(p=>'<option value="'+escaparHtml([p.fabricante,p.modelo].filter(Boolean).join(" "))+'"></option>').join("");
+          const r=reconhecerPecaPropria(catalogo,tipo,valor);
+          const texto=r.estado==="encontrada"?"Modelo encontrado no catálogo. Usaremos a ficha cadastrada para verificar a compatibilidade."
+            :r.estado==="ambigua"?"Há mais de uma variante com esse nome. As especificações precisam ser confirmadas."
+            :r.estado==="vazio"?"Digite ou escolha um modelo cadastrado."
+            :"Modelo não encontrado. Você pode continuar, mas as especificações e a compatibilidade ficarão a confirmar.";
+          if(ajuda.textContent!==texto)ajuda.textContent=texto;
+        }catch{if(input.isConnected)ajuda.textContent="Não foi possível consultar o catálogo. Informe o modelo; as especificações ficarão a confirmar.";}
+      };
+      input.addEventListener("focus",ajudar,{once:true});
       input.addEventListener("input", () => {
         respostas.pecasDetalhes ??= {};
         respostas.pecasDetalhes[input.dataset.pieceDetail] = input.value;
         input.classList.toggle("invalid", input.value.trim().length === 0);
         conteudo.querySelector("#next-question").disabled = !podeAvancar();
+        void ajudar();
       });
+      if(input.value.trim())void ajudar();
     });
   }
 
@@ -428,7 +477,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function etapaRespondida(indice) {
-    if (perguntas[indice].chave === "rede") return true;
+    if (["rede","aparencia"].includes(perguntas[indice].chave)) return true;
     if (perguntas[indice].chave === "orcamento") return orcamentoValido(valorOrcamento());
     if (perguntas[indice].chave === "perifericos") {
       if (!respostas.perifericos) return false;
@@ -552,15 +601,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!sessao.auth) throw Object.assign(new Error("Entre na sua conta para salvar a build."),{status:401});
       await verificarEspacoBuild();
       painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Gerando sua build</h1><p class="font-2-s">Vamos selecionar peças compatíveis dentro do seu orçamento.</p></div>`;
-      conteudo.innerHTML = `<div class="build-loading"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-m" id="generation-message">Analisando seu perfil</h2><p class="font-2-xs">A seleção pode levar alguns instantes. Aguarde nesta página.</p></div>`;
+      conteudo.innerHTML = `<div class="build-loading"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-m" id="generation-message">Analisando seu perfil</h2><p class="font-2-xs" id="generation-elapsed" aria-live="off">A seleção pode incluir uma revisão automática. Aguarde nesta página.</p></div>`;
       anunciarStatus("Gerando sua build. A seleção pode levar alguns instantes. Aguarde nesta página.",{atraso:150});
       const frases = ["Analisando seu perfil", "Buscando peças para o seu orçamento", "Pensando no equilíbrio da configuração", "Escolhendo as melhores peças para o seu uso"];
       let frase = 0;
+      const inicio=Date.now();
       pararMensagens();
       mensagensGeracao = setInterval(() => {
         const mensagem = conteudo.querySelector("#generation-message");
         if (!mensagem) return pararMensagens();
         mensagem.textContent = frases[++frase % frases.length];
+        conteudo.querySelector("#generation-elapsed").textContent=`${Math.floor((Date.now()-inicio)/1000)} s decorridos · A seleção pode incluir uma revisão automática. Não é necessário reenviar.`;
       },4000);
       const orcamento = respostas.orcamento === "personalizado"
         ? respostas.orcamentoPersonalizado : faixas[respostas.orcamento];
@@ -568,7 +619,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const resposta = await criarBuild({nome: `PC para ${utilidade}`, descricao: `Montagem para ${utilidade}.`, utilidade, orcamento,
         percentual_perifericos:respostas.incluirPerifericos ? respostas.percentualPerifericos : 0,
-        pecas_proprias:pecasPropriasFormulario(respostas),rede:respostas.rede});
+        pecas_proprias:pecasPropriasFormulario(respostas),rede:respostas.rede,aparencia:respostas.aparencia});
       window.location.href = `${paginaConfiguracaoBuild}?build_id=${encodeURIComponent(resposta.build.id)}`;
     } catch (erro) {
       cancelarAnuncioStatus();

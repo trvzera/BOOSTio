@@ -22,6 +22,7 @@ import { criarBuildManual } from "../api/build/builds.js";
 import { atualizarValor, capturarValores, transicionarValores } from "../components/value-transition.js";
 import { criarHistoricoBuild } from "../build/historico-build.js";
 import { autoriaBuildHtml } from "../build/autoria.js";
+import { resumoCapacidadeDiscos } from "../build/estado.js";
 import { anunciarStatus, cancelarAnuncioStatus } from "../components/status-messages.js";
 
 document.addEventListener("DOMContentLoaded",async () => {
@@ -175,7 +176,7 @@ document.addEventListener("DOMContentLoaded",async () => {
       const disponivel = categoria.armazenamento && catalogo.some(p => tipos.includes(p.categoria) && (() => { try { selecionarPecaCompativel(build,p,catalogo); return true; } catch { return false; } })());
       const cabecalho = '<div class="component-group-heading"><h2>' + categoria.nome + ' ' + badge(obrigatoria) + '</h2>' +
         (categoria.id === "memoria_ram" ? '<span class="component-count">' + info.usados + ' / ' + (info.placa ? info.slots : "—") + ' pentes · ' + info.capacidade + ' GB' + (info.slotsProvisorios ? ' · limite provisório' : '') + '</span>'
-          : categoria.armazenamento ? '<span class="component-count">' + discos.ssd + ' SSD · ' + discos.hd + ' HD</span>'
+          : categoria.armazenamento ? '<span class="component-count">' + discos.ssd + ' SSD · ' + discos.hd + ' HD · ' + resumoCapacidadeDiscos(discos,catalogo) + '</span>'
           : fans ? '<span class="component-count">' + vagasFans + '</span>' : "") + '</div>' +
         (categoria.id === "memoria_ram" && info.slotsProvisorios ? '<p class="component-connections">' + AVISO_SLOTS_RAM_PROVISORIOS + '</p>' : '') +
         (fans ? '<p class="component-connections">' + (fans.selecionadas ?? "?") + ' selecionadas · ' + (fans.inclusas ?? "?") + ' inclusas · ' + (fans.radiador ?? "?") + ' do radiador' +

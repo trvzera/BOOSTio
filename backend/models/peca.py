@@ -67,8 +67,9 @@ class Peca(ModeloBase):
   @classmethod
   def buscar_por_nome(cls, nome):
     normalizado = " ".join(nome.split()).casefold()
-    return next((peca for peca in cls.query.all()
-                 if normalizado in (f"{peca.fabricante} {peca.modelo}".casefold(), peca.modelo.casefold())), None)
+    exatas = [peca for peca in cls.query.all()
+              if normalizado in (" ".join(f"{peca.fabricante} {peca.modelo}".split()).casefold(), " ".join(peca.modelo.split()).casefold())]
+    return exatas[0] if len(exatas) == 1 else None
 
   def recarregar(self):
     db.session.refresh(self)

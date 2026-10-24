@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { pecasPropriasFormulario } from "../js/build/pecas-proprias.js";
+import { pecasPropriasFormulario, reconhecerPecaPropria } from "../js/build/pecas-proprias.js";
 import { normalizarBuild } from "../js/build/estado.js";
 import { estadoParaConta } from "../js/build/conta.js";
 
@@ -13,6 +13,14 @@ test("converte as peças do formulário para as categorias enviadas ao backend",
     water_cooler:"Corsair H100i",webcam:"Logitech C920",
   });
   assert.deepEqual(pecasPropriasFormulario({pecas:["nenhuma"]}),{});
+});
+
+test("reconhecimento exige categoria e modelo exatos e não confunde F/sem F ou variantes",()=>{
+  const catalogo=[{id:"a",categoria:"processador",fabricante:"Intel",modelo:"Core i3-12100F"}];
+  assert.equal(reconhecerPecaPropria(catalogo,"processador"," intel  core i3-12100f ").peca.id,"a");
+  assert.equal(reconhecerPecaPropria(catalogo,"processador","Core i3-12100").estado,"nao_encontrada");
+  assert.equal(reconhecerPecaPropria(catalogo,"placa-mae","Core i3-12100F").estado,"nao_encontrada");
+  assert.equal(reconhecerPecaPropria([...catalogo,{...catalogo[0],id:"b"}],"processador","Core i3-12100F").estado,"ambigua");
 });
 
 test("peças adicionais próprias permanecem no JSON de salvamento", () => {

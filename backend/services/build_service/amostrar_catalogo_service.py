@@ -10,6 +10,11 @@ class AmostrarCatalogoService:
         "memoria_ram": ("ddr", "capacidade_gb", "quantidade_pentes"),
         "fan": ("tamanho_mm", "quantidade"),
         "fonte": ("formato",),
+        "monitor": ("resolucao", "taxa_atualizacao_hz", "tipo_painel"),
+        "teclado": ("layout", "mecanico", "switch"),
+        "mouse": ("conexao",),
+        "fone": ("conexao", "microfone"),
+        "gabinete": ("formato", "painel_vidro", "fans_inclusos"),
     }
 
     def executar(self, tipo, pecas, limite=12):

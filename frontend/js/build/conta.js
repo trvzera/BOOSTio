@@ -40,7 +40,7 @@ export function estadoParaConta(build) {
     incluirPerifericos:build.incluirPerifericos,incluirRede:build.incluirRede,
     percentualPerifericos:build.percentualPerifericos || 0,
     substituirFansWaterCooler:build.substituirFansWaterCooler === true,
-    rede:build.rede,pecasExtras:build.pecasExtras,componentes:build.componentes,
+    rede:build.rede,aparencia:build.aparencia,pecasExtras:build.pecasExtras,componentes:build.componentes,
   };
 }
 

@@ -59,6 +59,36 @@ def cadastrar_pecas(tipos):
     db.session.commit()
 
 
+def test_peca_propria_reconhece_so_modelo_exato_e_inequivoco(app_build):
+    with app_build.app_context():
+        cadastrar_pecas(["processador"])
+        cpu=MODELOS["processador"].query.first()
+        cpu.modelo="CPU Teste 100F"
+        db.session.commit()
+        assert MODELOS["processador"].buscar_por_nome("  teste  CPU Teste 100F ").id == cpu.id
+        assert MODELOS["processador"].buscar_por_nome("CPU Teste 100") is None
+        copia={c.name:getattr(cpu,c.name) for c in cpu.__table__.columns if c.name not in ("id","part_number")}
+        db.session.add(MODELOS["processador"](**{**copia,"fabricante":"Outro"}))
+        db.session.commit()
+        assert MODELOS["processador"].buscar_por_nome("CPU Teste 100F") is None
+
+
+def test_referencia_gabinete_so_enriquece_amostra_se_disponivel_dentro_do_teto(app_build,mocker):
+    with app_build.app_context():
+        cadastrar_pecas(["gabinete"])
+        gabinete=MODELOS["gabinete"].query.first()
+        gabinete.esgotado=False
+        db.session.commit()
+        # Força a referência a ficar de fora da amostra normal.
+        mocker.patch("services.build_service.criar_build_service.MODELOS_PECAS",())
+        assert CriarBuildService._gerar_catalogo(200,referencia_gabinete=gabinete.id)["gabinete"][0]["id"] == gabinete.id
+        assert not CriarBuildService._gerar_catalogo(50,referencia_gabinete=gabinete.id)
+        assert not CriarBuildService._gerar_catalogo(200,excluidas={"gabinete"},referencia_gabinete=gabinete.id)
+        gabinete.esgotado=True
+        db.session.commit()
+        assert not CriarBuildService._gerar_catalogo(200,referencia_gabinete=gabinete.id)
+
+
 def test_limite_em_manual_importacao_duplicacao_e_llm(app_build, mocker):
     llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
     cliente = app_build.test_client()
@@ -347,7 +377,8 @@ def test_geracao_completa_fans_omitidas_antes_de_persistir(app_build, mocker):
         assert Build.query.count() == BuildSalva.query.count() == 1
 
 
-def test_geracao_persiste_original_e_estado_em_uma_transacao(app_build, mocker):
+def test_geracao_persiste_original_e_estado_em_uma_transacao(app_build, mocker, caplog):
+    caplog.set_level("INFO",logger="services.build_service.criar_build_service")
     tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "monitor", "teclado", "mouse", "fone"]
     with app_build.app_context():
         cadastrar_pecas(tipos)
@@ -355,7 +386,9 @@ def test_geracao_persiste_original_e_estado_em_uma_transacao(app_build, mocker):
             "nome": "PC gerado", "descricao": "Com periféricos", "utilidade": "Jogos",
             "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos],
         })
-        resposta = CriarBuildService().executar(1, {**PEDIDO, "percentual_perifericos": 20})
+        preferencia={"estilo":"vidro","cor":"branco","gabinete_id":1}
+        resposta = CriarBuildService().executar(1, {**PEDIDO, "percentual_perifericos": 20,"aparencia":preferencia})
+        assert resposta["estado"]["aparencia"] == preferencia
         assert resposta["estado"]["percentualPerifericos"] == 20
         assert resposta["estado"]["orcamento"] == 5000
         assert resposta["preco_total"] == 1000
@@ -363,6 +396,9 @@ def test_geracao_persiste_original_e_estado_em_uma_transacao(app_build, mocker):
         assert Build.query.count() == BuildSalva.query.count() == 1
         assert "Teto para periféricos: R$ 1000.00" in llm.call_args.args[0]
         assert len(BuildSalva.listar_por_usuario(1)) == 1
+        logs=[r.getMessage() for r in caplog.records if r.name=="services.build_service.criar_build_service"]
+        assert all(any(f"etapa={etapa}" in linha for linha in logs) for etapa in ("catalogo","prompt","llm","validada"))
+        assert not any("componentes" in linha or "PC gerado" in linha or "@" in linha for linha in logs)
 
 
 def test_geracao_rejeita_conflito_antes_de_gravar_build(app_build, mocker):

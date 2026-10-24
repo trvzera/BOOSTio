@@ -5,6 +5,7 @@ from . import db, ModeloBase
 from .build import Build
 from .usuario import Usuario
 from sqlalchemy import update
+from utils.aparencia import validar_aparencia
 from . import Processador, PlacaMae, PlacaVideo, MemoriaRAM, SSD, HD, Fonte, Gabinete
 from . import WaterCooler, AirCooler, Fan, Fone, Teclado, Mouse, Monitor
 from . import PlacaRede, CaboRede
@@ -69,7 +70,7 @@ class BuildSalva(ModeloBase):
             raise
 
     @classmethod
-    def criar_gerada_com_pecas_proprias(cls, usuario_id, dados, proprias, rede=None, percentual=0):
+    def criar_gerada_com_pecas_proprias(cls, usuario_id, dados, proprias, rede=None, percentual=0, aparencia=None):
         componentes = {}
         for tipo, nome in proprias.items():
             if tipo not in MODELOS:
@@ -85,6 +86,7 @@ class BuildSalva(ModeloBase):
             "orcamento": dados["orcamento"], "rede": rede or {},
             "incluirPerifericos": percentual > 0 or any(tipo in componentes for tipo in ("monitor", "teclado", "mouse", "fone")),
             "percentualPerifericos": percentual,
+            "aparencia": aparencia,
             "incluirRede": (rede or {}).get("tipo") in ("cabo", "wifi"),
             "pecasExtras": {tipo: nome for tipo, nome in proprias.items() if tipo not in MODELOS},
             "componentes": componentes,
@@ -193,6 +195,7 @@ class BuildSalva(ModeloBase):
             "travada": bool(dados.get("travada", False)), "orcamento": orcamento,
             "incluirPerifericos": bool(dados.get("incluirPerifericos", False)),
             "percentualPerifericos": percentual,
+            "aparencia": validar_aparencia(dados.get("aparencia")),
             "substituirFansWaterCooler": dados.get("substituirFansWaterCooler", False),
             "incluirRede": bool(dados.get("incluirRede", False)), "rede": dados.get("rede") or {},
             "pecasExtras": {tipo: nome.strip() for tipo, nome in pecas_extras.items()},

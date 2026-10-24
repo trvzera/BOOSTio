@@ -1,4 +1,6 @@
 import json
+import logging
+from time import perf_counter
 from copy import deepcopy
 from decimal import Decimal, ROUND_DOWN
 from math import isfinite
@@ -8,11 +10,14 @@ from models import Build, BuildSalva, Usuario
 from models.build_salva import MODELOS
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from utils.validacoes import validacao_campos
+from utils.aparencia import validar_aparencia
 from services.llm_service.llm_service import LLMService
 from .avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 from .planejar_perifericos_service import PlanejarPerifericosService
 from .completar_ventilacao_service import CompletarVentilacaoService
 from .amostrar_catalogo_service import AmostrarCatalogoService
+
+logger = logging.getLogger(__name__)
 
 class ErroGeracaoBuild(ValueError):
   def __init__(self, motivo):
@@ -45,7 +50,7 @@ class CriarBuildService:
     "limites_radiador_mm", "fluxo_ar", "fonte_fluxo_ar", "observacoes_medidas",
     "fonte_medidas", "modelo_ficha_tecnica", "ficha_tecnica_verificada_em",
     "tipos_memoria_cpu", "memoria_maxima_cpu_gb", "tdp_w", "perfis_memoria", "numero_pinos",
-    "placas_mae_incompativeis",
+    "placas_mae_incompativeis", "cor", "painel_vidro",
     "conector_fan", "tensao_fan_v", "corrente_fan_a", "conector_rgb", "tensao_rgb_v",
     "rotacao_max_rpm", "fluxo_ar_cfm", "pressao_estatica_mmh2o", "ruido_dba",
     "conectores_cpu_eps", "conectores_pcie_8pinos", "conectores_pcie_16pinos", "conectores_sata",
@@ -56,6 +61,8 @@ class CriarBuildService:
   def executar(self, usuario_id, dados, modelo="gemini-3.5-flash-lite", tentativas_correcao=1):
     validacao_campos(dados, ["nome", "descricao", "utilidade", "orcamento"])
     self._validar_textos_pedido(dados)
+    aparencia = validar_aparencia(dados.get("aparencia"))
+    dados = {**dados, "aparencia": aparencia}
     if not Usuario.buscar_por_id(usuario_id):
       raise ValueError("Usuario não encontrado")
     BuildSalva.verificar_espaco(usuario_id)
@@ -88,7 +95,10 @@ class CriarBuildService:
     acessorio_rede = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
     excluidas.update({"adaptador_wifi", "cabo_rede"} - ({acessorio_rede} if rede.get("possuiAcessorio") is False else set()))
     teto_pc, teto_perifericos = self._dividir_orcamento(orcamento, percentual)
-    catalogo = self._gerar_catalogo(min(orcamento - margem, teto_pc), teto_perifericos, excluidas)
+    inicio_catalogo = perf_counter()
+    catalogo = self._gerar_catalogo(min(orcamento - margem, teto_pc), teto_perifericos, excluidas,
+                                  aparencia["gabinete_id"] if "gabinete" not in proprias else None)
+    logger.info("Geração: etapa=catalogo duracao_ms=%d categorias=%d", (perf_counter()-inicio_catalogo)*1000, len(catalogo))
     disponiveis = set(catalogo) | set(proprias)
     obrigatorias = {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"}
     if not obrigatorias <= disponiveis or not {"ssd", "hd"} & disponiveis:
@@ -105,12 +115,14 @@ class CriarBuildService:
       detalhe = f" O menor conjunto disponível custa R$ {minimo:.2f}, mas a reserva é de R$ {teto_perifericos:.2f}." if minimo is not None else ""
       raise ValueError("Não há um conjunto completo de periféricos dentro da porcentagem reservada." + detalhe + " Aumente a porcentagem ou o orçamento; nenhuma build foi salva.")
     detalhes_proprias = self._detalhes_proprias(proprias)
+    inicio_prompt = perf_counter()
     prompt = self._criar_prompt(dados, orcamento, margem, catalogo, percentual, detalhes_proprias, plano_perifericos)
+    logger.info("Geração: etapa=prompt duracao_ms=%d caracteres=%d", (perf_counter()-inicio_prompt)*1000, len(prompt))
     dados_build = self._gerar_validada(usuario_id, prompt, modelo, catalogo, orcamento,
                                      percentual, proprias, detalhes_proprias, rede, tentativas_correcao,
                                      revisar_investimento=any(termo in dados["utilidade"].casefold() for termo in ("jogo", "pesado", "render", "3d")))
     if proprias:
-      return AvaliarCompatibilidadeService().para_resposta(BuildSalva.criar_gerada_com_pecas_proprias(usuario_id, dados_build, proprias, rede, percentual))
+      return AvaliarCompatibilidadeService().para_resposta(BuildSalva.criar_gerada_com_pecas_proprias(usuario_id, dados_build, proprias, rede, percentual, aparencia))
 
     componentes = {}
     for item in dados_build["componentes"]:
@@ -121,6 +133,7 @@ class CriarBuildService:
       "orcamento": orcamento, "componentes": componentes, "rede": rede,
       "incluirRede": rede.get("tipo") in ("cabo", "wifi"),
       "incluirPerifericos": percentual > 0, "percentualPerifericos": percentual,
+      "aparencia": aparencia,
     })
     return AvaliarCompatibilidadeService().para_resposta(BuildSalva.criar_limitada(usuario_id, estado, gerada=dados_build))
 
@@ -153,8 +166,11 @@ class CriarBuildService:
         BuildSalva.verificar_espaco(usuario_id)
       resposta = None
       build = None
+      inicio_llm = perf_counter()
       try:
         resposta = LLMService().executar(instrucao, modelo)
+        logger.info("Geração: etapa=llm tentativa=%d duracao_ms=%d caracteres_prompt=%d", tentativa+1, (perf_counter()-inicio_llm)*1000, len(instrucao))
+        inicio_validacao = perf_counter()
         build = json.loads(resposta) if isinstance(resposta, str) else resposta
         teto_pc, _ = self._dividir_orcamento(orcamento, percentual)
         build = CompletarVentilacaoService().executar(build, catalogo, teto_pc, proprias, detalhes_proprias)
@@ -168,8 +184,11 @@ class CriarBuildService:
             raise ValueError(f"A configuração é válida, mas usa somente R$ {resumo['pc']:.2f} do teto de R$ {teto_pc:.2f} para o uso exigente. "
                 "Reavalie opções adequadas de CPU/GPU/RAM/SSD dentro do investimento, sem escolher só por preço. "
                 "Preserve tetos, peças próprias e compatibilidades; não acrescente itens supérfluos.")
+        logger.info("Geração: etapa=validada tentativa=%d duracao_ms=%d", tentativa+1, (perf_counter()-inicio_validacao)*1000)
         return validada
       except ValueError as erro:
+        # Somente tipo/etapa; nunca registrar prompt, peças próprias ou resposta.
+        logger.warning("Geração: etapa=revisao tentativa=%d codigo=%s", tentativa+1, self._codigo_falha(erro))
         if tentativa == limite:
           if primeira_valida is not None:
             return primeira_valida
@@ -189,9 +208,23 @@ class CriarBuildService:
           + json.dumps(revisao, ensure_ascii=False, default=str)[:24000]
         )
       except RequestException:
+        logger.warning("Geração: etapa=provedor tentativa=%d duracao_ms=%d", tentativa+1, (perf_counter()-inicio_llm)*1000)
         if primeira_valida is not None:
           return primeira_valida
         raise
+
+  @staticmethod
+  def _codigo_falha(erro):
+    if isinstance(erro, json.JSONDecodeError):
+      return "json"
+    texto = str(erro).casefold()
+    for termo, codigo in (("orçamento", "orcamento"), ("ultrapassou o limite", "orcamento"),
+                           ("incompatibilidades", "compatibilidade"), ("obrigatórias", "pecas-obrigatorias"),
+                           ("fans", "ventilacao"), ("ventilação", "ventilacao"), ("periféricos", "perifericos"),
+                           ("id de peça", "catalogo"), ("inválido", "contrato")):
+      if termo in texto:
+        return codigo
+    return "validacao"
 
   @classmethod
   def _pecas_proprias(cls, valor):
@@ -223,7 +256,7 @@ class CriarBuildService:
     }
 
   @classmethod
-  def _gerar_catalogo(cls, preco_maximo, reserva_perifericos=0, excluidas=()):
+  def _gerar_catalogo(cls, preco_maximo, reserva_perifericos=0, excluidas=(), referencia_gabinete=None):
     catalogo = {}
     for modelo in MODELOS_PECAS:
       periferico = modelo.__tablename__ in cls.PERIFERICOS
@@ -232,12 +265,25 @@ class CriarBuildService:
       pecas = modelo.listar_disponiveis_ate(reserva_perifericos if periferico else preco_maximo, limite=200)
       if pecas:
         catalogo[modelo.__tablename__] = AmostrarCatalogoService().executar(modelo.__tablename__, [cls._campos_pecas(peca) for peca in pecas])
+    if referencia_gabinete is not None and "gabinete" not in excluidas:
+      referencia = MODELOS["gabinete"].buscar_por_id(referencia_gabinete)
+      if referencia:
+        peca = cls._campos_pecas(referencia)
+        preco = peca.get("preco")
+        if peca.get("esgotado") is False and type(preco) in (int, float) and isfinite(preco) and 0 < preco <= preco_maximo:
+          amostra = catalogo.setdefault("gabinete", [])
+          if not any(item["id"] == referencia_gabinete for item in amostra):
+            if len(amostra) >= 12:
+              amostra[-1] = peca
+            else:
+              amostra.append(peca)
     return catalogo
 
   @staticmethod
   def _criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None, plano_perifericos=None):
     pedido = {campo: dados[campo] for campo in ("nome", "descricao", "utilidade")}
     pedido["rede"] = dados.get("rede") or {}
+    pedido["aparencia"] = validar_aparencia(dados.get("aparencia"))
     proprias = proprias or {}
     pc, perifericos = CriarBuildService._dividir_orcamento(orcamento, percentual)
     if percentual and plano_perifericos is None:
@@ -342,6 +388,21 @@ class CriarBuildService:
         "R$ 6.000 se o catálogo permitir ganhos relevantes dentro do teto. Em estudo/escritório, "
         "não invente necessidade de GPU cara. Não use preço isolado como prova de desempenho. "
         "Preserve integralmente a sobra dos periféricos: ela nunca reforça o PC.\n\n"
+
+        "# QUALIDADE DOS PERIFÉRICOS E APARÊNCIA\n"
+        "Não selecione sempre o primeiro item ou o conjunto mínimo de periféricos. Os exemplos "
+        "de combinações comprovam viabilidade financeira, não são uma recomendação de qualidade. "
+        "Compare as fichas dentro da reserva: para jogos, resolução e taxa de atualização do monitor "
+        "devem combinar com a GPU; para estudo/trabalho, legibilidade, tamanho e ergonomia importam. "
+        "Avalie layout e tipo de teclado, conexão e microfone do headset e recursos confirmados do mouse. "
+        "DPI alto, RGB, marca ou preço alto isolados não comprovam qualidade. Não invente avaliações "
+        "ou vendas. Prefira equilíbrio de qualidade entre os quatro periféricos; a reserva continua "
+        "sendo teto, não gasto mínimo.\n"
+        "Aparência é preferência flexível. gabinete_id é uma referência visual, não uma obrigação "
+        "de compra. Use o estilo/cor somente quando houver dados confirmados; não deduza medidas "
+        "ou suporte de radiador pelo estilo. Preserve gabinete próprio. Nunca escolha um gabinete "
+        "incompatível, de ventilação inadequada ou caro demais só para atender estética. "
+        "Sem preferência, priorize encaixe, ventilação e custo-benefício.\n\n"
 
         "# PASSO 1: ANALISE O USO\n"
         "Leia nome, descricao e utilidade e classifique o uso principal. "
