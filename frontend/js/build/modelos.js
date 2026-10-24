@@ -56,7 +56,7 @@ const MODELOS = [
   {
     id:"modelo-jogos-intel",titulo:"Jogos com plataforma Intel",objetivo:"jogos",objetivoRotulo:"Jogos",plataforma:"LGA1700",nivel:"Intermediária",
     descricao:"Core i5, RTX 4060 e dois pentes de 16 GB DDR5. Uma alternativa Intel para personalizar conforme seus jogos.",
-    pecas:[["SEED-CPU-07",1],["SEED-MB-07",1],["SEED-RAM-03",2],["SEED-SSD-04",1],["SEED-GPU-04",1],["SEED-PSU-03",1],["SEED-CASE-02",1],["SEED-FAN-01",2],["SEED-ACOOL-02",1]],
+    pecas:[["SEED-CPU-07",1],["SEED-MB-29",1],["SEED-RAM-03",2],["SEED-SSD-04",1],["SEED-GPU-04",1],["SEED-PSU-03",1],["SEED-CASE-02",1],["SEED-FAN-01",2],["SEED-ACOOL-02",1]],
   },
   {
     id:"modelo-criacao-stream",titulo:"Jogos e criação ao vivo",objetivo:"criacao",objetivoRotulo:"Criação de conteúdo",plataforma:"AM5",nivel:"Intermediária",
@@ -81,7 +81,7 @@ const MODELOS = [
   {
     id:"modelo-primeiro-intel",titulo:"Primeiro PC com Intel",objetivo:"jogos",objetivoRotulo:"Jogos",plataforma:"LGA1700",nivel:"Entrada",
     descricao:"Core i3, RX 7600, 16 GB em dois pentes e SSD. Uma base sem periféricos para escolher seus próximos upgrades.",
-    pecas:[["SEED-CPU-06",1],["SEED-MB-22",1],["SEED-RAM-02",1],["SEED-SSD-06",1],["SEED-GPU-05",1],["SEED-PSU-04",1],["SEED-CASE-01",1],["SEED-FAN-01",2],["SEED-ACOOL-02",1]],
+    pecas:[["SEED-CPU-06",1],["SEED-MB-10",1],["SEED-RAM-02",1],["SEED-SSD-06",1],["SEED-GPU-05",1],["SEED-PSU-04",1],["SEED-CASE-01",1],["SEED-FAN-01",2],["SEED-ACOOL-02",1]],
   },
 ];
 

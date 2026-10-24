@@ -6,6 +6,25 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Revisão em seis etapas — 23/10/2026
+
+1. **Fichas técnicas:** seis fichas novas e um alias adicional, abrangendo oito
+   anúncios de placas-mãe. Corrigidas MSI 940305 (DDR4) e ASRock 587807 (DDR5).
+   Slots, máximos, conexões e dimensões foram complementados só quando confirmados.
+   MSI B760 DDR5 não herda a ficha DDR4. Na H610M-S, SATA permanece desconhecido
+   porque a própria página MSI diverge; na ASRock D5 abreviada, não foram herdadas
+   medidas de outra revisão. Builds prontas Intel usam placas coerentes com a RAM.
+   Nenhuma alteração em builds salvas, preço, estoque ou banco. 501 testes Node
+   e 41 testes Python específicos passaram. Ainda faltam fichas de outros modelos;
+   não declarar a compatibilidade física completa nem substituir ausência por palpite.
+
+   Fontes: [MSI DDR4](https://www.msi.com/Motherboard/PRO-B760M-P-DDR4/Specification),
+   [MSI DDR5](https://www.msi.com/Motherboard/PRO-B760M-P/Specification),
+   [ASRock: anúncio exato](https://www.kabum.com.br/produto/587807/placa-mae-asrock-h610m-hdv-m-2-d5-intel-chipset-h610-ddr5-lga-1700-matx),
+   [ASUS A520M-E](https://www.asus.com/motherboards-components/motherboards/prime/prime-a520m-e/techspec/),
+   [ASUS B550M-A](https://www.asus.com/motherboards-components/motherboards/prime/prime-b550m-a/techspec/),
+   [MSI H610M-S](https://www.msi.com/Motherboard/PRO-H610M-S-DDR4/Specification).
+
 ### Buscar melhorias: opções ocultas e expansão de discos — 23/10/2026
 
 A listagem dependia de um budget válido antes de procurar peças. Além disso,

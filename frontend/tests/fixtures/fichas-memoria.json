@@ -1,0 +1,93 @@
+[
+  {
+    "categoria": "placa_mae",
+    "fabricante": "MSI",
+    "modelo": "PRO B760M-P",
+    "part_number": "SEED-MB-07",
+    "produto_kabum": "940305",
+    "link": "https://www.kabum.com.br/produto/940305",
+    "esperado": {
+      "tipo_memoria": "DDR4",
+      "quantidade_slots_ram": 4,
+      "memoria_maxima_gb": 128
+    }
+  },
+  {
+    "categoria": "placa_mae",
+    "fabricante": "MSI",
+    "modelo": "Pro B760m-p LGA  1700 B760 Matx Ddr5",
+    "part_number": "KABUM-643884",
+    "produto_kabum": "643884",
+    "link": "https://www.kabum.com.br/produto/643884",
+    "esperado": {
+      "tipo_memoria": "DDR5",
+      "quantidade_slots_ram": 4,
+      "memoria_maxima_gb": 256
+    }
+  },
+  {
+    "categoria": "placa_mae",
+    "fabricante": "ASRock",
+    "modelo": "H610M-HDV/M.2",
+    "part_number": "SEED-MB-22",
+    "produto_kabum": "587807",
+    "link": "https://www.kabum.com.br/produto/587807",
+    "esperado": {
+      "tipo_memoria": "DDR5",
+      "quantidade_slots_ram": 2,
+      "memoria_maxima_gb": 96
+    }
+  },
+  {
+    "categoria": "placa_mae",
+    "fabricante": "ASUS",
+    "modelo": "Prime A520M-E, AMD AM4, mATX, DDR4",
+    "part_number": "KABUM-161530",
+    "produto_kabum": "161530",
+    "link": "https://www.kabum.com.br/produto/161530",
+    "esperado": {
+      "tipo_memoria": "DDR4",
+      "quantidade_slots_ram": 2,
+      "memoria_maxima_gb": 64
+    }
+  },
+  {
+    "categoria": "placa_mae",
+    "fabricante": "ASUS",
+    "modelo": "Prime B550M-A, AMD AM4, mATX, DDR4 - 90MB14I0-M0EAY0",
+    "part_number": "KABUM-172667",
+    "produto_kabum": "172667",
+    "link": "https://www.kabum.com.br/produto/172667",
+    "esperado": {
+      "tipo_memoria": "DDR4",
+      "quantidade_slots_ram": 4,
+      "memoria_maxima_gb": 128
+    }
+  },
+  {
+    "categoria": "placa_mae",
+    "fabricante": "MSI",
+    "modelo": "Pro H610M-S, LGA  1700, DDR4, Micro-ATX, M.2, HDMI",
+    "part_number": "KABUM-724932",
+    "produto_kabum": "724932",
+    "link": "https://www.kabum.com.br/produto/724932",
+    "esperado": {
+      "tipo_memoria": "DDR4",
+      "quantidade_slots_ram": 2,
+      "memoria_maxima_gb": 64
+    }
+  },
+  {
+    "categoria": "placa_mae",
+    "fabricante": "MSI",
+    "modelo": "PRO H610M-S Intel Core, DDR4, mATX, Realtek ALC897 Codec - PROH610MSD4",
+    "part_number": "KABUM-873598",
+    "produto_kabum": "873598",
+    "link": "https://www.kabum.com.br/produto/873598",
+    "esperado": {
+      "tipo_memoria": "DDR4",
+      "quantidade_slots_ram": 2,
+      "memoria_maxima_gb": 64
+    }
+  }
+]

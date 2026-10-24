@@ -45,7 +45,9 @@ test("identidade oficial com part number funciona sem depender de anúncio e nã
   gabinete.posicoes_fans[0].opcoes[0].quantidade = 99;
   assert.equal(peca("gabinete").posicoes_fans[0].opcoes[0].quantidade,3);
   const ambigua = {categoria:"placa_mae",fabricante:"ASRock",modelo:"H610M-HDV/M.2",part_number:"SEED-MB-22",tipo_memoria:"DDR4",link:"https://www.kabum.com.br/produto/587807/placa-mae-d5"};
-  assert.equal(completarMedidas(ambigua,manifesto),ambigua);
+  assert.equal(completarMedidas(ambigua,manifesto).tipo_memoria,"DDR5");
+  const outra = {...ambigua,link:"https://www.kabum.com.br/produto/999999/placa-mae-d5"};
+  assert.equal(completarMedidas(outra,manifesto),outra);
 });
 
 test("todas as variantes ampliadas e aliases mantêm identidade, cotação e isolamento",() => {

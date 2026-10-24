@@ -233,7 +233,7 @@
     },
     {
       "categoria": "placa_mae", "fabricante": "MSI", "modelo": "A520M-A PRO", "part_numbers": [],
-      "aliases_catalogo": [{"fabricante": "MSI", "modelo": "A520M-A PRO", "part_number": "SEED-MB-02", "produto_kabum": "280890"}],
+      "aliases_catalogo": [{"fabricante": "MSI", "modelo": "A520M-A PRO", "part_number": "SEED-MB-02", "produto_kabum": "280890"}, {"fabricante": "MSI", "modelo": "A520M-A PRO, AMD AM4, mATX, DDR4, HDMI, Gigalan", "part_number": "KABUM-366243", "produto_kabum": "366243"}],
       "fonte": "https://www.msi.com/Motherboard/A520M-A-PRO/Specification", "verificado_em": "2026-10-23",
       "medidas": {
         "socket": "AM4", "chipset": "AMD A520", "formato": "mATX", "tipo_memoria": "DDR4",
@@ -471,6 +471,182 @@
         "suporte_water_cooler": null, "radiadores_suportados_mm": null,
         "observacoes_medidas": "Três fans inclusas, mas a ficha não identifica suas posições. Os cinco encaixes informados são dois na base, dois no topo e um atrás, todos de 120 mm. A ocupação total é limitada a cinco; não foi inventada uma distribuição das fans de fábrica nem suporte a water cooler. Armazenamento: um HDD de 3,5 ou dois SSDs de 2,5 polegadas em arranjos alternativos. A ordem dos eixos externos não foi presumida."
       }
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "MSI",
+      "modelo": "PRO B760M-P DDR4",
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "MSI",
+          "modelo": "PRO B760M-P",
+          "part_number": "SEED-MB-07",
+          "produto_kabum": "940305"
+        }
+      ],
+      "fonte": "https://www.msi.com/Motherboard/PRO-B760M-P-DDR4/Specification",
+      "medidas": {
+        "socket": "LGA1700",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 4,
+        "memoria_maxima_gb": 128,
+        "formato": "mATX",
+        "quantidade_slots_m2": 2,
+        "quantidade_slots_m2_sata": 1,
+        "quantidade_portas_sata": 4,
+        "portas_sata_desativadas_por_m2_sata": 1,
+        "dimensoes_fabricante": "243,84 × 243,84 mm",
+        "observacoes_medidas": "Anúncio 940305 confirmado como DDR4, não DDR5. M2_2 em SATA desativa uma porta SATA. CPU/BIOS e XMP dependem da lista de suporte."
+      },
+      "verificado_em": "2026-10-23"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "MSI",
+      "modelo": "PRO B760M-P",
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "MSI",
+          "modelo": "Pro B760m-p LGA  1700 B760 Matx Ddr5",
+          "part_number": "KABUM-643884",
+          "produto_kabum": "643884"
+        }
+      ],
+      "fonte": "https://www.msi.com/Motherboard/PRO-B760M-P/Specification",
+      "medidas": {
+        "socket": "LGA1700",
+        "tipo_memoria": "DDR5",
+        "quantidade_slots_ram": 4,
+        "memoria_maxima_gb": 256,
+        "formato": "mATX",
+        "quantidade_slots_m2": 2,
+        "quantidade_slots_m2_sata": 1,
+        "quantidade_portas_sata": 4,
+        "portas_sata_desativadas_por_m2_sata": 1,
+        "dimensoes_fabricante": "243,84 × 243,84 mm",
+        "observacoes_medidas": "Variante DDR5. Capacidade conforme ficha atual, condicionada a CPU/BIOS/módulos suportados. Não aplicar ao anúncio DDR4 940305."
+      },
+      "verificado_em": "2026-10-23"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "ASRock",
+      "modelo": "H610M-HDV/M.2 D5 (anúncio 587807)",
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "ASRock",
+          "modelo": "H610M-HDV/M.2",
+          "part_number": "SEED-MB-22",
+          "produto_kabum": "587807"
+        }
+      ],
+      "fonte": "https://www.kabum.com.br/produto/587807/placa-mae-asrock-h610m-hdv-m-2-d5-intel-chipset-h610-ddr5-lga-1700-matx",
+      "medidas": {
+        "socket": "LGA1700",
+        "tipo_memoria": "DDR5",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": 96,
+        "quantidade_slots_m2": null,
+        "quantidade_slots_m2_sata": null,
+        "quantidade_portas_sata": null,
+        "observacoes_medidas": "A seção técnica do anúncio exato confirma DDR5, dois DIMMs e 96 GB. Nome abreviado: não equiparar automaticamente à variante DDR4, + D5 ou D5 Gen5. Armazenamento e dimensões permanecem não confirmados até identificar a revisão exata."
+      },
+      "verificado_em": "2026-10-23"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "ASUS",
+      "modelo": "PRIME A520M-E",
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "ASUS",
+          "modelo": "Prime A520M-E, AMD AM4, mATX, DDR4",
+          "part_number": "KABUM-161530",
+          "produto_kabum": "161530"
+        }
+      ],
+      "fonte": "https://www.asus.com/motherboards-components/motherboards/prime/prime-a520m-e/techspec/",
+      "medidas": {
+        "socket": "AM4",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": 64,
+        "formato": "mATX",
+        "quantidade_slots_m2": 1,
+        "quantidade_slots_m2_sata": 1,
+        "quantidade_portas_sata": 4,
+        "dimensoes_fabricante": "226 × 221 mm",
+        "observacoes_medidas": "M.2 Key M 2242/2260/2280 PCIe 3.0 x4 ou SATA. OC/QVL e BIOS dependem da CPU; compartilhamento de portas não confirmado."
+      },
+      "verificado_em": "2026-10-23"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "ASUS",
+      "modelo": "PRIME B550M-A",
+      "part_numbers": [
+        "90MB14I0-M0EAY0"
+      ],
+      "aliases_catalogo": [
+        {
+          "fabricante": "ASUS",
+          "modelo": "Prime B550M-A, AMD AM4, mATX, DDR4 - 90MB14I0-M0EAY0",
+          "part_number": "KABUM-172667",
+          "produto_kabum": "172667"
+        }
+      ],
+      "fonte": "https://www.asus.com/motherboards-components/motherboards/prime/prime-b550m-a/techspec/",
+      "medidas": {
+        "socket": "AM4",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 4,
+        "memoria_maxima_gb": 128,
+        "formato": "mATX",
+        "quantidade_slots_m2": 2,
+        "quantidade_slots_m2_sata": 2,
+        "quantidade_portas_sata": 4,
+        "dimensoes_fabricante": "244 × 244 mm",
+        "observacoes_medidas": "Não corresponde à versão AC ou Wi-Fi. Ambos os M.2 aceitam PCIe/SATA, mas geração e comprimentos dependem do slot/CPU. Conferir BIOS/QVL e eventuais portas compartilhadas."
+      },
+      "verificado_em": "2026-10-23"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "MSI",
+      "modelo": "PRO H610M-S DDR4",
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "MSI",
+          "modelo": "Pro H610M-S, LGA  1700, DDR4, Micro-ATX, M.2, HDMI",
+          "part_number": "KABUM-724932",
+          "produto_kabum": "724932"
+        },
+        {
+          "fabricante": "MSI",
+          "modelo": "PRO H610M-S Intel Core, DDR4, mATX, Realtek ALC897 Codec - PROH610MSD4",
+          "part_number": "KABUM-873598",
+          "produto_kabum": "873598"
+        }
+      ],
+      "fonte": "https://www.msi.com/Motherboard/PRO-H610M-S-DDR4/Specification",
+      "medidas": {
+        "socket": "LGA1700",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": 64,
+        "formato": "mATX",
+        "quantidade_slots_m2": 1,
+        "quantidade_slots_m2_sata": 0,
+        "quantidade_portas_sata": null,
+        "dimensoes_fabricante": "236 × 200 mm",
+        "observacoes_medidas": "RAM DDR4/64 GB confirmada. Seções resumida e detalhada do fabricante divergem entre duas e quatro portas SATA; quantidade mantida desconhecida. Conferir revisão/manual antes de expandir SATA."
+      },
+      "verificado_em": "2026-10-23"
     }
   ]
 }

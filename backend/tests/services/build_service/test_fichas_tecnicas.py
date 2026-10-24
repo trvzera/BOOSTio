@@ -59,7 +59,24 @@ def test_part_number_oficial_sem_anuncio_e_dados_nao_compartilhados():
     ambigua = {"categoria": "placa_mae", "fabricante": "ASRock", "modelo": "H610M-HDV/M.2",
                "part_number": "SEED-MB-22", "tipo_memoria": "DDR4",
                "link": "https://www.kabum.com.br/produto/587807/placa-mae-d5"}
-    assert completar_medidas(ambigua) is ambigua
+    assert completar_medidas(ambigua)["tipo_memoria"] == "DDR5"
+    outra = {**ambigua, "link": "https://www.kabum.com.br/produto/999999/placa-mae-d5"}
+    assert completar_medidas(outra) is outra
+
+
+def test_fichas_memoria_corrigem_somente_anuncios_revisados():
+    import json
+    from pathlib import Path
+    caminho = Path(__file__).resolve().parents[4] / "frontend/tests/fixtures/fichas-memoria.json"
+    for entrada in json.loads(caminho.read_text()):
+        esperado = entrada["esperado"]
+        dados = {k: v for k, v in entrada.items() if k != "esperado"}
+        original = {**dados, "tipo_memoria": "DDR5" if esperado["tipo_memoria"] == "DDR4" else "DDR4", "preco": 99}
+        nova = completar_medidas(original)
+        for campo, valor in esperado.items():
+            assert nova[campo] == valor
+        assert nova["preco"] == 99
+        assert "fonte_medidas" not in completar_medidas({**dados, "link": "https://www.kabum.com.br/produto/999999"})
 
 
 def test_todas_as_variantes_novas_preservam_preco_estoque_e_identidade():
