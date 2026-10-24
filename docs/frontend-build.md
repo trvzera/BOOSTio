@@ -6,6 +6,22 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Autoria e desativação — 24/10/2026
+
+- As respostas de build incluem `criador: {nome}` calculado no Python a partir
+  do dono do registro; um campo enviado pelo cliente não define a autoria.
+  O compartilhamento continua sem e-mail, ID da conta ou orçamento do dono.
+- Editor e página pública mostram “Criada por” abaixo do título, com Poppins,
+  escape HTML e quebra para nomes longos. Respostas antigas sem metadado não
+  exibem um autor inventado. Uma cópia pertence ao usuário que criou a cópia.
+- Conta inativa aparece como “Conta desativada”, sem divulgar seu nome retido.
+  Textos do perfil agora descrevem desativação/preservação, não exclusão definitiva.
+  As rotas e a regra atual do banco não foram alteradas. Recuperação assistida e
+  a decisão sobre revogar links públicos ao desativar permanecem pendentes.
+- 61 verificações Chrome de autoria em cinco dimensões e 321 de mensagens/modais
+  aprovadas, com API simulada e sem escrita real. Regressão: 545 testes JavaScript
+  e 668 Python, além de 13 subtestes. Não houve migração nem envio de e-mail.
+
 ### Fontes e verificação de e-mail — 24/10/2026
 
 - Corpo da página com Poppins e cor-base; títulos com Lexend. Campos e botões

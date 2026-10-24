@@ -91,8 +91,13 @@ de builds no backend para persistir a configuração na conta.
   montagem manual, formulário, importação, cópia de modelo e duplicação.
 - **Tranca:** uma build trancada não pode ser editada nem excluída antes de ser destrancada.
 - **Compartilhamento:** o visitante não altera a build original nem acessa o budget
-  ou os dados do proprietário. Testar exige login; uma cópia é privada e independente.
+  ou os dados privados do proprietário. A autoria mostra somente o nome de exibição,
+  sem e-mail ou ID da conta; contas desativadas aparecem como “Conta desativada”.
+  Testar exige login; uma cópia é privada e independente.
   Tornar a original privada interrompe novas consultas e cópias pelo link público.
+- **Desativação da conta:** bloqueia o acesso, encerra sessões e libera o e-mail
+  para novo cadastro, preservando registros. A recuperação será assistida pela
+  equipe; o procedimento de identificação e restauração ainda precisa ser definido.
 
 ### Como o orçamento é respeitado
 
@@ -286,8 +291,8 @@ os recursos necessários ao site e os arquivos locais/gerados que não entram no
 
 ## Validação da versão
 
-Na revisão de **24/10/2026**, a suíte local aprovou **541 testes JavaScript** e
-**666 testes Python**, além de **13 subtestes Python**. Os testes cobrem, entre
+Na revisão de **24/10/2026**, a suíte local aprovou **545 testes JavaScript** e
+**668 testes Python**, além de **13 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
 Há testes específicos para as sete classes de Controller e para preservar o

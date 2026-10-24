@@ -1,5 +1,18 @@
 # Qualidade do frontend
 
+## Autoria e textos de conta — 24/10/2026
+
+- 61 verificações Chrome do editor e da página pública em 320/375/768/1440 px e
+  paisagem 844×390, com nome de 30 caracteres sem espaços: Poppins, quebra,
+  ausência de overflow, axe WCAG A/AA até 2.2 e JavaScript sem exceções.
+- Mais 321 verificações de mensagens/modais com os textos de desativação, nas
+  mesmas dimensões, aprovadas. APIs simuladas, nenhuma gravação em conta real.
+- Autoria calculada pelo dono no servidor, sem confiar no estado recebido e sem
+  expor e-mail, ID ou budget publicamente. A regressão cobre conta desativada,
+  cópia pertencente ao novo dono, escape de HTML e metadado antigo ausente.
+- Suítes: 545 testes Node e 668 Python (+13 subtestes). Não foram alteradas regras
+  de desativação, autenticação, compatibilidade nem dados do banco real.
+
 ## Responsividade, mensagens e fans — 24/10/2026
 
 - Lighthouse móvel nas 16 páginas: acessibilidade **100** e boas práticas **100**.

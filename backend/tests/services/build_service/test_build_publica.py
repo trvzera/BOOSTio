@@ -66,6 +66,7 @@ def test_visualizacao_anonima_nao_expoe_perfil_nem_muda_estado(app_publica):
     assert resposta.headers["Cache-Control"] == "no-store"
     dados = resposta.json["build"]
     assert "usuario_id" not in dados
+    assert dados["criador"] == {"nome": "Dono"}
     assert {p["id"] for p in dados["pecas"]} == {"processador:1", "memoria_ram:1"}
     assert dados["estado"]["travada"] is True
     for campo in ("orcamento", "rede", "pecasExtras", "percentualPerifericos", "setupAtual"):
@@ -93,6 +94,7 @@ def test_copia_exige_login_csrf_email_e_vaga_sem_alterar_original(app_publica):
     for _ in range(3):
         resposta = navegador.post("/build/s-1/copiar-publica", headers=csrf)
         assert resposta.status_code == 201
+        assert resposta.json["build"]["criador"] == {"nome": "Visitante"}
         estado = resposta.json["build"]["estado"]
         assert estado["visibilidade"] == "privado" and estado["travada"] is False
         assert estado["orcamento"] == 3500
@@ -127,3 +129,21 @@ def test_visibilidade_revalidada_na_copia_e_nos_requisitos_autenticados(app_publ
     assert navegador.get("/build/s-1/publica").status_code == 404
     assert navegador.post("/build/s-1/copiar-publica", headers=csrf).status_code == 404
     assert navegador.get(publica).status_code == 404
+
+
+def test_autoria_consulta_dono_real_sem_confiar_no_estado(app_publica):
+    navegador, _ = cliente(app_publica)
+    with app_publica.app_context():
+        build = db.session.get(BuildSalva, 1)
+        build.estado = {**build.estado, "criador": {"nome": "Falsificado"}}
+        db.session.commit()
+    assert navegador.get("/build/s-1/publica").json["build"]["criador"] == {"nome": "Dono"}
+
+
+def test_autoria_nao_expoe_nome_retido_da_conta_desativada(app_publica):
+    navegador, _ = cliente(app_publica)
+    with app_publica.app_context():
+        db.session.get(Usuario, 1).desativar()
+    resposta = navegador.get("/build/s-1/publica")
+    assert resposta.status_code == 200  # Política atual de links públicos preservada.
+    assert resposta.json["build"]["criador"] == {"nome": "Conta desativada"}

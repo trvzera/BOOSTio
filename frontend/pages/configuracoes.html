@@ -137,25 +137,26 @@
 
       <div class="settings-card danger">
         <div class="card-heading"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i><span class="font-1-m-b">Zona de perigo</span></div>
-        <p class="card-subtext font-1-l">Ações abaixo são permanentes e não podem ser desfeitas.</p>
+        <p class="card-subtext font-1-l">Gerencie o acesso à sua conta.</p>
 
         <div class="danger-row">
           <div class="danger-row-text">
-            <h3 class="font-1-m">Excluir minha conta</h3>
-            <p class="font-1-s">Todos os seus dados, builds salvas e histórico serão removidos permanentemente.</p>
+            <h3 class="font-1-m">Desativar minha conta</h3>
+            <p class="font-1-s">Encerre seu acesso e libere o e-mail para um novo cadastro. Seus registros serão preservados.</p>
           </div>
-          <button class="btn-danger" id="open-delete-modal" aria-label="Excluir conta">Excluir conta</button>
+          <button class="btn-danger" id="open-delete-modal" aria-label="Desativar conta">Desativar conta</button>
         </div>
       </div>
 
       <div class="modal-overlay" id="delete-modal">
         <div class="modal-box">
           <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
-          <h3 class="font-1-m">Tem certeza que quer excluir sua conta?</h3>
-          <p class="font-1-m">Essa ação é <strong>permanente</strong> e não pode ser desfeita. Todas as suas builds, preferências e dados de perfil serão apagados. Para confirmar, digite <strong id="confirm-username-target">seu nome de usuário</strong> abaixo.</p>
+          <h3 class="font-1-m">Deseja desativar sua conta?</h3>
+          <p class="font-1-m">O acesso será bloqueado e suas sessões encerradas. Os registros serão preservados; a recuperação deve ser solicitada à equipe. Seu e-mail ficará livre para um novo cadastro. Para confirmar, digite <strong id="confirm-username-target">seu nome de usuário</strong> abaixo.</p>
+          <p class="font-2-xs">Builds públicas podem continuar acessíveis. Revise a visibilidade antes de desativar.</p>
 
           <div class="field" style="margin-bottom: 0;">
-            <label class="sr-only" for="delete-confirm-input">Digite seu nome de usuário para confirmar a exclusão</label>
+            <label class="sr-only" for="delete-confirm-input">Digite seu nome de usuário para confirmar a desativação</label>
             <input type="text" id="delete-confirm-input" autocomplete="off" placeholder="Digite seu nome de usuário">
           </div>
 
@@ -163,11 +164,11 @@
             <label class="font-1-m" for="delete-current-password">Senha atual</label>
             <input type="password" id="delete-current-password" autocomplete="current-password">
           </div>
-          <p class="font-2-xs">Conta somente Google? Confirme sua identidade e volte para concluir a exclusão.</p>
-          <button type="button" class="btn-ghost" data-confirmar-google aria-label="Confirmar identidade com Google para excluir a conta">Confirmar identidade com Google</button>
+          <p class="font-2-xs">Conta somente Google? Confirme sua identidade e volte para concluir a desativação.</p>
+          <button type="button" class="btn-ghost" data-confirmar-google aria-label="Confirmar identidade com Google para desativar a conta">Confirmar identidade com Google</button>
           <div class="modal-actions">
-            <button class="btn-ghost" id="cancel-delete-btn" aria-label="Cancelar exclusão">Cancelar</button>
-            <button class="btn-danger" id="confirm-delete-btn" aria-label="Excluir permanentemente minha conta" disabled>Excluir permanentemente</button>
+            <button class="btn-ghost" id="cancel-delete-btn" aria-label="Cancelar desativação">Cancelar</button>
+            <button class="btn-danger" id="confirm-delete-btn" aria-label="Desativar minha conta" disabled>Desativar conta</button>
           </div>
         </div>
       </div>

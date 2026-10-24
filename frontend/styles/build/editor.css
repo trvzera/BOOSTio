@@ -19,6 +19,8 @@
 }
 .builder-heading h1 { margin: 10px 0; font: 600 2rem/1.25 var(--font-heading); }
 .builder-heading p { color: var(--cor-4); max-width: 760px; font-size: .9rem; line-height: 1.5; }
+.builder-heading .build-author { display: flex; flex-wrap: wrap; gap: .25rem .4rem; margin: 0 0 var(--espacamento-8); font: 400 .8rem/1.5 var(--font-body, "Poppins", sans-serif); }
+.build-author strong { min-width: 0; max-width: 100%; overflow-wrap: anywhere; color: var(--cor-6); font-weight: 500; }
 .builder-back { color: var(--cor-6); display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
 .builder-back:hover:not(:disabled) { color: var(--cor-p1); border-color: var(--cor-p1); }
 .builder-demo {
