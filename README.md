@@ -56,14 +56,14 @@ As limitações de cada funcionalidade estão indicadas na última coluna.
 | 02 | Cadastrar o setup atual | ✅ **Implementado** | Definir ou remover uma build como computador atual. |
 | 03 | Pesquisar peças e compatibilidade | ✅ **Implementado** | Catálogo por categoria e diagnóstico durante a montagem, com as limitações do requisito 13. |
 | 04 | Montar por formulário | ✅ **Implementado** | Geração por LLM com orçamento, ventilação obrigatória (contando fans inclusas) e uma revisão automática de saídas inválidas antes de salvar. |
-| 05 | Salvar configurações | ✅ **Implementado** | Builds persistidas na conta, inclusive incompletas, com salvamento automático. |
+| 05 | Salvar configurações | ✅ **Implementado** | Builds persistidas na conta, inclusive incompletas, com salvamento automático e avisos de falha. |
 | 06 | Excluir configurações salvas | ✅ **Implementado** | Exclusão com verificação de proprietário e tranca. |
 | 07 | Comparar configurações salvas | ✅ **Implementado** | Duas ou três builds: preços, componentes, consumo e renderização no Blender. FPS é uma ampliação pendente, não uma condição da comparação atual. |
 | 08 | Compartilhar configurações por link | ✅ **Implementado** | Builds públicas podem ser vistas sem login, somente leitura. Testar exige sessão; salvar uma cópia privada exige também e-mail verificado e vaga na conta. |
-| 09 | Buscar melhorias do setup | ✅ **Implementado** | RAM: acrescentar ou substituir pentes conforme a placa-mãe. SSD/HD: expandir mantendo os atuais ou substituir sem regressões verificáveis; orçamento obrigatório para aplicar. CPU/GPU e outras categorias dependem de métricas confiáveis. |
+| 09 | Buscar melhorias do setup | ✅ **Implementado** | RAM: acrescentar ou substituir pentes conforme a placa-mãe. SSD/HD: expandir quantidades mantendo os atuais, respeitando conexões/baias conhecidas, ou substituir sem regressões verificáveis. Orçamento obrigatório para aplicar; CPU/GPU e outras categorias dependem de métricas confiáveis. |
 | 10 | Ver configurações prontas | ✅ **Implementado** | 16 modelos sem periféricos, referências revisadas no catálogo, filtro de budget e preço crescente. A cópia respeita e-mail verificado e limite da conta. |
-| 11 | Editar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento. |
-| 12 | Consultar preços das peças pelo site | ✅ **Implementado** | Preços cadastrados, data de atualização quando disponível e links das lojas. Não inclui frete nem garante o valor no checkout. |
+| 11 | Editar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento; desfazer a última alteração de montagem enquanto o editor estiver aberto. |
+| 12 | Consultar preços das peças pelo site | ✅ **Implementado** | Preços cadastrados, data quando disponível e links das lojas. Antes da compra, o catálogo é reconsultado e diferenças/indisponibilidade são mostradas. Não inclui frete nem garante o valor no checkout. |
 | 13 | Ver compatibilidade e consumo de energia | 🟡 **Parcial** | Medidas disponíveis, formatos, baias, fans e radiador; substituição explícita das fans do water cooler e painel de informações. Completar fichas técnicas e interferências físicas. |
 | 14 | Incluir periféricos no orçamento | ✅ **Implementado** | Inclusão e reaproveitamento com tetos separados para PC e periféricos. |
 | 15 | Registrar budget no perfil | ✅ **Implementado** | Valor e autorização usados no formulário e em novas montagens manuais, sem alterar builds existentes. |

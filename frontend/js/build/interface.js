@@ -1,14 +1,15 @@
 import { destinoBuild, rotuloVoltar } from "../components/navigation-back.js";
+import { anunciarStatus } from "../components/status-messages.js";
 
-export function avisar(mensagem) {
+export function avisar(mensagem, {urgente = false} = {}) {
   let toast = document.querySelector("#builder-feedback");
   if (!toast) {
     toast = document.createElement("div");
     toast.id = "builder-feedback";
-    toast.setAttribute("role", "status");
     document.body.append(toast);
   }
   toast.textContent = mensagem;
+  anunciarStatus(mensagem, {urgente, atraso:urgente ? 50 : 150});
   toast.classList.add("show");
   clearTimeout(avisar.timer);
   avisar.timer = setTimeout(() => toast.classList.remove("show"), 4500);

@@ -9,6 +9,7 @@ import { avaliarTrocaMelhoria, exigirTrocaMelhoria } from "./validar-melhoria.js
 import { AVISO_DUAL_CHANNEL, contextoMelhoriaRam, planejarMelhoriaRam } from './melhorias-ram.js';
 import { planejarMelhoriaDisco } from './melhorias-discos.js';
 import { atualizarValor, capturarValores, transicionarValores } from "../components/value-transition.js";
+import { anunciarStatus } from "../components/status-messages.js";
 
 const CATEGORIAS = categoriasCatalogo;
 const MOTIVO_TRAVA = "Destranque a build para buscar e aplicar melhorias.";
@@ -56,7 +57,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     + '<div class="upgrade-real-footer" role="group" aria-label="Confirmar trocas"><div class="upgrade-real-selection"><span id="upgrade-real-selection-label">Nenhuma troca selecionada</span><strong id="upgrade-real-selection-total">Escolha uma peça para começar</strong></div>'
     + '<div class="build-action-actions"><button type="button" class="upgrade-real-button" data-upgrade-action="cancelar" aria-label="Cancelar alterações e fechar">Cancelar</button>'
     + '<button type="button" class="upgrade-real-button upgrade-real-primary" data-upgrade-action="aplicar" aria-label="Aplicar alterações" aria-describedby="upgrade-real-apply-reason">Aplicar trocas</button></div>'
-    + '<p class="planning-help" id="upgrade-real-feedback" role="status" aria-live="polite" aria-atomic="true"></p></div></div>');
+    + '<p class="planning-help" id="upgrade-real-feedback"></p></div></div>');
   dialogo.classList.add("upgrade-dialog");
   const cabecalho = dialogo.querySelector(".build-action-heading"), titulo = cabecalho.querySelector("h2");
   const contexto = document.createElement("div"); contexto.className = "upgrade-real-heading-copy";
@@ -142,7 +143,13 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     const valor = centavos(campoBudget.value);
     return campoBudget.checkValidity() && valor > 0 && valor <= 100000000 ? valor : null;
   }
-  function informar(texto,tom = "info") { feedback.textContent = texto; feedback.dataset.tone = tom; programarViewport(); }
+  function informar(texto,tom = "info",opcoes = {}) {
+    if (feedback.textContent !== texto) feedback.textContent = texto;
+    feedback.dataset.tone = tom;
+    const resumo = selecoes() ? " Prévia: " + dialogo.querySelector("#upgrade-real-selection-total").textContent + "." : "";
+    anunciarStatus(texto + resumo,{urgente:tom === "error",...opcoes});
+    programarViewport();
+  }
   function escolhidas(escolhas) {
     return CATEGORIAS.filter(({id}) => escolhas.has(id)).map(({id,nome:rotulo}) => {
       if (!categorias.has(id)) throw new Error("Selecione a categoria de " + rotulo + ".");
@@ -373,7 +380,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     if (aplicando) return;
     renderizar();
     campoBudget.setAttribute("aria-invalid",String(budget() == null));
-    informar(budget() == null ? MOTIVO_BUDGET : "Budget atualizado. O total das trocas será validado junto.",budget() == null ? "error" : "info");
+    informar(budget() == null ? MOTIVO_BUDGET : "Budget atualizado para " + valorMonetario(budget()) + ". O total das trocas será validado junto.",budget() == null ? "error" : "info",{urgente:false,atraso:700});
   });
   dialogo.addEventListener("change",evento => {
     if (aplicando) return;

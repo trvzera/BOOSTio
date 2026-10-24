@@ -114,7 +114,7 @@ test("rerender mantém foco na área visível e aplicação pendente não é des
   assert.match(js,/if \(!aplicando\) dialogo\.close\("cancelar"\)/);
   assert.match(js,/if \(aplicando && evento\.target === dialogo\) evento\.stopImmediatePropagation\(\)/);
   assert.match(js,/controle\.disabled = aplicando/);
-  assert.match(js,/role="status" aria-live="polite" aria-atomic="true"/);
+  assert.match(js,/anunciarStatus\(texto \+ resumo,\{urgente:tom === "error",\.\.\.opcoes\}\)/);
 });
 
 test("editor aguarda confirmação do salvamento e mantém base original para tentar novamente",() => {

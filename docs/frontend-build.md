@@ -8,6 +8,22 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
 
 ### Revisão em seis etapas — 23/10/2026
 
+6. **Mensagens acessíveis:** regiões persistentes `status`/`alert`, com contexto
+   completo e sem foco programático. Resumos de total/saldo e salvamento esperam
+   700 ms de pausa e apenas a revisão mais recente confirma o salvamento; falhas
+   usam o canal urgente. O aviso visual não duplica a região de anúncio. Dentro
+   de modais, as regiões ficam no diálogo ativo, não atrás dele. Fechar/sair
+   cancela mensagens pendentes. Porcentagem de periféricos e budget das melhorias
+   também usam pausa; frases decorativas da geração não são lidas a cada troca.
+   Salvar permite nova tentativa após falha, sem exigir mudar o nome.
+
+   Referência: [WCAG — mensagens de status](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html).
+   Validação final: 520 testes Node, 583 Python (+13 subtestes), 83 verificações
+   Chrome/axe de formulário/editor/status/desfazer em três larguras e nova rodada
+   de 97 verificações do modal de melhorias em cinco viewports. Falhas e gravações
+   simuladas, catálogo somente leitura; sem chamadas reais a LLM, SMTP ou lojas.
+   Axe e observação do DOM não substituem homologação manual com VoiceOver/NVDA.
+
 5. **Expansão SSD/HD:** a prévia permite aumentar/diminuir as unidades novas do
    modelo escolhido, sem remover os discos atuais. Quantidades entram no custo
    combinado e na validação M.2/SATA/portas compartilhadas; baias de 2,5/3,5 pol.
