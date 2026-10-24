@@ -1,6 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from decimal import Decimal
+from requests.exceptions import Timeout
 
 import pytest
 from flask import Flask
@@ -135,6 +136,45 @@ def test_divisao_exata_do_orcamento_e_prompt():
     assert "meta flexível" not in prompt
 
 
+def test_revisao_do_investimento_alto_e_limitada_e_usa_custos_calculados(mocker):
+    primeira, catalogo = resposta_com_perifericos()
+    primeira["componentes"] = [i for i in primeira["componentes"] if i["tipo"] not in CriarBuildService.PERIFERICOS]
+    catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": 18000})
+    segunda = deepcopy(primeira)
+    segunda["componentes"][0]["id"] = 2
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=[primeira, segunda])
+    mocker.patch("services.build_service.criar_build_service.BuildSalva.verificar_espaco")
+    resultado = CriarBuildService()._gerar_validada(1, "Pedido", "teste", catalogo, 20000, 0, {}, {}, {}, revisar_investimento=True)
+    assert resultado["preco_total"] == 18100
+    assert llm.call_count == 2
+    revisao = llm.call_args.args[0]
+    assert "custos_calculados_pelo_servidor" in revisao
+    assert '"pc": 900.0' in revisao
+    assert "não acrescente itens supérfluos" in revisao
+
+
+@pytest.mark.parametrize("erro", [ValueError("JSON inválido"), Timeout("Timeout")])
+def test_revisao_de_investimento_nao_descarta_primeira_build_valida(mocker, erro):
+    primeira, catalogo = resposta_com_perifericos()
+    primeira["componentes"] = [i for i in primeira["componentes"] if i["tipo"] not in CriarBuildService.PERIFERICOS]
+    catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": 18000})
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=[primeira, erro])
+    mocker.patch("services.build_service.criar_build_service.BuildSalva.verificar_espaco")
+    resultado = CriarBuildService()._gerar_validada(1, "Pedido", "teste", catalogo, 20000, 0, {}, {}, {}, revisar_investimento=True)
+    assert resultado["preco_total"] == 900
+    assert llm.call_count == 2
+
+
+def test_preco_alto_disponivel_nao_forca_escritorio_a_gastar_o_orcamento(mocker):
+    build, catalogo = resposta_com_perifericos()
+    build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in CriarBuildService.PERIFERICOS]
+    catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": 18000})
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value=build)
+    resultado = CriarBuildService()._gerar_validada(1, "Escritório", "teste", catalogo, 20000, 0, {}, {}, {})
+    assert resultado["preco_total"] == 900
+    llm.assert_called_once()
+
+
 @pytest.mark.parametrize("permitido,valor,esperado", [(True, "4321.75", 4321.75), (False, "4321.75", None), (True, "0", None)])
 def test_manual_usa_budget_autorizado_da_propria_conta(app_build, permitido, valor, esperado):
     with app_build.app_context():
@@ -240,6 +280,9 @@ def test_geracao_rejeita_transferencia_de_sobra_antes_de_salvar(app_build, mocke
         cadastrar_pecas(tipos)
         if excesso == "perifericos":
             MODELOS["monitor"].buscar_por_id(1).preco = 750
+            # Existe uma alternativa viável; a saída da IA escolhe a que excede o conjunto.
+            db.session.add(MODELOS["monitor"](fabricante="Teste", modelo="Alternativa", preco=400,
+                consumo_energia=1, tamanho_polegadas=24, resolucao="1920x1080", taxa_atualizacao_hz=60, conexao="HDMI"))
         else:
             # Cada peça cabe no filtro individual, mas o subtotal do PC excede R$ 4.000.
             MODELOS["processador"].buscar_por_id(1).preco = 3000
@@ -264,6 +307,44 @@ def test_faltam_perifericos_na_resposta():
     build["componentes"].pop()
     with pytest.raises(ValueError, match="não incluiu"):
         CriarBuildService._validar_build(build, catalogo, 1500, 20)
+
+
+def test_conjunto_de_perifericos_inviavel_nao_consume_llm_nem_salva(app_build, mocker):
+    tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "monitor", "teclado", "mouse", "fone"]
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+        MODELOS["monitor"].buscar_por_id(1).preco = 900
+        db.session.commit()
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    resposta = cliente.post("/build/", json={**PEDIDO, "percentual_perifericos": 20})
+    assert resposta.status_code == 400
+    assert "menor conjunto disponível custa R$ 1200.00" in resposta.json["erro"]
+    assert "reserva é de R$ 1000.00" in resposta.json["erro"]
+    llm.assert_not_called()
+    with app_build.app_context():
+        assert Build.query.count() == BuildSalva.query.count() == 0
+
+
+def test_geracao_completa_fans_omitidas_antes_de_persistir(app_build, mocker):
+    tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "fan"]
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+        catalogo = CriarBuildService._gerar_catalogo(4200)
+        catalogo["gabinete"][0].update(fans_inclusos=0, quantidade_max_fans=3, tamanhos_fan_suportados_mm=[120])
+        catalogo["fan"][0].update(quantidade=1, tamanho_mm=120, preco=10)
+    mocker.patch("services.build_service.criar_build_service.CriarBuildService._gerar_catalogo", return_value=catalogo)
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
+        **PEDIDO, "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos if tipo != "fan"]})
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    resposta = cliente.post("/build/", json=PEDIDO)
+    assert resposta.status_code == 201
+    assert resposta.json["build"]["estado"]["componentes"]["fan"] == [{"id": 1, "quantidade": 3}]
+    llm.assert_called_once()
+    with app_build.app_context():
+        assert Build.query.count() == BuildSalva.query.count() == 1
 
 
 def test_geracao_persiste_original_e_estado_em_uma_transacao(app_build, mocker):

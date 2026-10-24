@@ -54,6 +54,17 @@ class CriarBuildPerifericosTest(unittest.TestCase):
             catalogo = CriarBuildService._gerar_catalogo(1000, reserva_perifericos=1000)
         self.assertEqual(json.loads(json.dumps(catalogo))["monitor"][0]["tamanho_polegadas"], 23.8)
 
+    def test_catalogo_nao_omite_especificacoes_da_cpu_usadas_para_o_objetivo(self):
+        from models import Processador
+        cpu = Processador(id=1, fabricante="Teste", modelo="CPU", soquete="AM5", preco=1000,
+            nucleo=8, thread=16, clockbase=Decimal("3.5"), clockmax=Decimal("5.0"))
+        campos = CriarBuildService._campos_pecas(cpu)
+        self.assertEqual(campos["nucleo"], 8)
+        self.assertEqual(campos["thread"], 16)
+        self.assertEqual(campos["clockbase"], 3.5)
+        self.assertEqual(campos["clockmax"], 5.0)
+        json.dumps(campos)
+
     def test_sem_reserva_nao_exige_perifericos(self):
         build = {**self.build, "componentes": [item.copy() for item in self.build["componentes"]
                                                 if item["tipo"] not in CriarBuildService.PERIFERICOS]}
@@ -124,6 +135,24 @@ class CriarBuildPerifericosTest(unittest.TestCase):
         prompt = CriarBuildService._criar_prompt(dados, 5000, 1000, catalogo)
         self.assertIn('"acessorio_rede_obrigatorio": "adaptador_wifi"', prompt)
         self.assertIn('"categorias_rede_proibidas": ["cabo_rede"]', prompt)
+
+    def test_prompt_usa_o_investimento_sem_transformar_teto_em_gasto_minimo(self):
+        dados = {"nome": "PC", "descricao": "Jogos exigentes", "utilidade": "Jogos"}
+        prompt = CriarBuildService._criar_prompt(dados, 20000, 5000, self.catalogo)
+        self.assertIn("R$ 16000.00 a R$ 20000.00", prompt)
+        self.assertIn("NÃO é um gasto mínimo", prompt)
+        self.assertIn("não entregue por padrão", prompt)
+        self.assertIn("Não use preço isolado como prova de desempenho", prompt)
+
+    def test_prompt_separa_3000_em_2400_pc_rede_e_600_para_conjunto_perifericos(self):
+        dados = {"nome": "PC", "descricao": "Jogos", "utilidade": "Jogos", "rede": {"tipo": "wifi", "possuiAcessorio": False}}
+        prompt = CriarBuildService._criar_prompt(dados, 3000, 800, self.catalogo, 20,
+            {"placa_video": {"modelo_informado": "RTX 4060", "especificacoes_confirmadas": {}}})
+        self.assertIn("R$ 2400.00", prompt)
+        self.assertIn("R$ 600.00 (20%)", prompt)
+        self.assertIn('"total": 400.0', prompt)
+        self.assertIn("TODOS os periféricos", prompt)
+        self.assertIn("não compre outra GPU", prompt)
 
 
 if __name__ == "__main__":
