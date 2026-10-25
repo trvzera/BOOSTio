@@ -2,6 +2,7 @@ import { categorias, perifericos, acessoriosRede } from "./catalogo.js";
 import { itensSelecionados, itensCategoria, informacoesRam, informacoesArmazenamento, conflitosArmazenamento, selecionarPeca } from "./estado.js";
 import { validarEncaixe, conexaoDisco, AVISO_SLOTS_RAM_PROVISORIOS } from "./hardware.js";
 import { temFansInclusas } from "./fans.js";
+import { normalizarSocket, suporteSocketCooler } from "./sockets.js";
 
 export function avaliarBuild(build,catalogo) {
   const get = cat => catalogo.find(p => p.id === itensCategoria(build,cat)[0]?.id && p.categoria === cat);
@@ -24,8 +25,12 @@ export function avaliarBuild(build,catalogo) {
   if (!tem("ssd") && !tem("hd")) faltam.push("Armazenamento");
   if (cpu && !cpu.videointegrado && !tem("placa_video")) faltam.push("Placa de vídeo");
   if (cpu && !cpu.cooler && !tem("air_cooler") && !tem("water_cooler")) faltam.push("Cooler para o processador");
-  if (cpu && placa && String(cpu.soquete).toUpperCase() !== String(placa.socket).toUpperCase())
-    erros.push("O socket do processador (" + cpu.soquete + ") difere da placa-mãe (" + placa.socket + ").");
+  if (cpu && placa) {
+    const socketCpu=normalizarSocket(cpu.soquete),socketPlaca=normalizarSocket(placa.socket);
+    if(socketCpu&&socketPlaca&&socketCpu!==socketPlaca)
+      erros.push("O socket do processador (" + cpu.soquete + ") difere da placa-mãe (" + placa.socket + ").");
+    else if(!socketCpu||!socketPlaca)dicas.push("Falta identificar o encaixe (socket) do processador ou da placa-mãe. Não foi possível confirmar essa combinação.");
+  }
   for (const {peca:ram} of rams) {
     if (placa && ram.ddr !== placa.tipo_memoria)
       erros.push("A RAM " + ram.ddr + " não corresponde ao padrão " + placa.tipo_memoria + " da placa-mãe.");
@@ -47,11 +52,13 @@ export function avaliarBuild(build,catalogo) {
   if (get("cabo_rede")) dicas.push("Confira o comprimento e a categoria do cabo, a velocidade da porta Ethernet e do roteador.");
   for (const tipo of ["air_cooler","water_cooler"]) {
     const cooler = get(tipo);
-    if (cooler && cpu && cooler.compatibilidade) {
-      const sockets = String(cooler.compatibilidade).toUpperCase().split(/[,;/\s]+/);
-      if (sockets.includes("INTEL") || sockets.includes("AMD"))
-        dicas.push("Confirme no fabricante o suporte do cooler ao socket " + cpu.soquete + ".");
-      else if (!sockets.includes(String(cpu.soquete).toUpperCase()))
+    if (cooler && cpu) {
+      const suporte=suporteSocketCooler(cpu.soquete,cooler);
+      if (suporte===null)
+        dicas.push(cooler.sockets_suporte_condicional?.length
+          ? "Este cooler tem versões ou kits de montagem diferentes. Confirme o suporte ao socket " + cpu.soquete + " na embalagem ou no manual da unidade."
+          : "Confirme no fabricante o suporte do cooler ao socket " + cpu.soquete + ".");
+      else if (suporte===false)
         erros.push("O cooler não lista o socket do processador.");
     }
   }

@@ -118,7 +118,7 @@ export function ofertasPeca(peca) {
 
 export const rotulosTecnicos = {
   fabricante: "Fabricante", modelo: "Modelo", part_number: "Referência do catálogo / part number", consumo_energia: "Consumo estimado (W)",
-  soquete: "Socket", socket: "Socket", nucleo: "Núcleos", thread: "Threads",
+  soquete: "Socket", socket: "Socket", sockets_suporte_condicional: "Sockets que exigem confirmar a versão/kit de montagem", nucleo: "Núcleos", thread: "Threads",
   clockbase: "Clock base (GHz)", clockmax: "Clock máximo (GHz)", videointegrado: "Vídeo integrado",
   modelo_videointegrado: "GPU integrada", cooler: "Cooler incluso", modelo_cooler: "Cooler incluso",
   chipset: "Chipset", formato: "Formato", tipo_memoria: "Tipo de memória",
@@ -229,7 +229,7 @@ export function gruposFichaTecnica(peca) {
     {titulo: "Origem das informações", campos: []},
   ];
   const desempenho = /^(consumo_|tdp_|clock|nucleo$|thread$|capacidade_gb$|memoria_gb$|frequencia_mhz$|latencia$|potencia|velocidade_|rotacao_|ruido_|memoria_cache_|fluxo_ar_cfm$|pressao_estatica_|durabilidade_|taxa_atualizacao_|tempo_resposta_|resolucao$|dpi_max$)/;
-  const encaixe = /^(soquete$|socket$|chipset$|formato|tipo_memoria$|ddr$|interface|quantidade_slots_|quantidade_portas_|portas_sata_|memoria_maxima_|tipos_memoria_cpu$|quantidade_pentes$|quantidade_max_fans$|comprimento_|largura_|altura_|espessura_|dimensoes|tamanho_|tamanhos_|slots_|baias_|bays_|posicoes_|limites_radiador_|radiadores_|compatibilidade$|placas_mae_incompativeis$|conector|numero_pinos$|versao_atx$|suporte_water_cooler$|fans_inclusos$|quantidade_fans$|cooler$|modelo_cooler$|videointegrado$|modelo_videointegrado$|observacoes_medidas$)/;
+  const encaixe = /^(soquete$|socket$|sockets_suporte_condicional$|chipset$|formato|tipo_memoria$|ddr$|interface|quantidade_slots_|quantidade_portas_|portas_sata_|memoria_maxima_|tipos_memoria_cpu$|quantidade_pentes$|quantidade_max_fans$|comprimento_|largura_|altura_|espessura_|dimensoes|tamanho_|tamanhos_|slots_|baias_|bays_|posicoes_|limites_radiador_|radiadores_|compatibilidade$|placas_mae_incompativeis$|conector|numero_pinos$|versao_atx$|suporte_water_cooler$|fans_inclusos$|quantidade_fans$|cooler$|modelo_cooler$|videointegrado$|modelo_videointegrado$|observacoes_medidas$)/;
   const entradas = entradasFichaTecnica(peca);
   if (peca.part_number) entradas.push(["part_number", peca.part_number]);
   for (const entrada of entradas) {

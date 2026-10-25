@@ -1,0 +1,193 @@
+{
+  "normalizar": [
+    [
+      " LGA 1700 ",
+      "LGA1700"
+    ],
+    [
+      "Intel Socket FCLGA1700",
+      "LGA1700"
+    ],
+    [
+      "LGA-1200",
+      "LGA1200"
+    ],
+    [
+      "AMD Socket AM4",
+      "AM4"
+    ],
+    [
+      "Soquete AM5",
+      "AM5"
+    ],
+    [
+      "AM3+",
+      "AM3+"
+    ],
+    [
+      "AM3",
+      "AM3"
+    ],
+    [
+      "FM2+",
+      "FM2+"
+    ],
+    [
+      "LGA2011-v3",
+      "LGA2011-3"
+    ],
+    [
+      "LGA2011",
+      "LGA2011"
+    ],
+    [
+      "sTR4",
+      "TR4"
+    ],
+    [
+      "sTRX4",
+      "TRX4"
+    ],
+    [
+      "Intel/AMD",
+      null
+    ],
+    [
+      "AMD",
+      null
+    ],
+    [
+      "",
+      null
+    ],
+    [
+      null,
+      null
+    ],
+    [
+      1700,
+      null
+    ],
+    [
+      "LGA1700/AM4",
+      null
+    ],
+    [
+      "LGA1700-V2 teste",
+      null
+    ]
+  ],
+  "listar": [
+    [
+      "Intel/AMD",
+      []
+    ],
+    [
+      "LGA 1700, FCLGA1700 / AM4; AMD AM5",
+      [
+        "AM4",
+        "AM5",
+        "LGA1700"
+      ]
+    ],
+    [
+      "LGA2011-v3, LGA2011",
+      [
+        "LGA2011",
+        "LGA2011-3"
+      ]
+    ],
+    [
+      "LGA115X; AM3+; FM2+",
+      [
+        "AM3+",
+        "FM2+",
+        "LGA1150",
+        "LGA1151",
+        "LGA1155",
+        "LGA1156"
+      ]
+    ],
+    [
+      "IntelLGA1700, AM4x, LGA1700-mm",
+      []
+    ],
+    [
+      null,
+      []
+    ]
+  ],
+  "cooler": [
+    [
+      "Intel Socket LGA 1700",
+      {
+        "compatibilidade": "LGA1700, AM4"
+      },
+      true
+    ],
+    [
+      "AM5",
+      {
+        "compatibilidade": "LGA1700, AM4"
+      },
+      false
+    ],
+    [
+      "AM4",
+      {
+        "compatibilidade": "Intel/AMD"
+      },
+      null
+    ],
+    [
+      "AM4",
+      {
+        "compatibilidade": null
+      },
+      null
+    ],
+    [
+      null,
+      {
+        "compatibilidade": "LGA1700, AM4"
+      },
+      null
+    ],
+    [
+      "LGA1700",
+      {
+        "compatibilidade": "LGA1200, AM4",
+        "sockets_suporte_condicional": [
+          "LGA 1700"
+        ]
+      },
+      null
+    ],
+    [
+      "AM4",
+      {
+        "compatibilidade": "LGA1200, AM4",
+        "sockets_suporte_condicional": [
+          "LGA1700"
+        ]
+      },
+      true
+    ],
+    [
+      "AM5",
+      {
+        "compatibilidade": "AM4",
+        "sockets_suporte_condicional": "AM5"
+      },
+      null
+    ],
+    [
+      "AM5",
+      {
+        "compatibilidade": "AM4",
+        "sockets_suporte_condicional": null
+      },
+      null
+    ]
+  ]
+}

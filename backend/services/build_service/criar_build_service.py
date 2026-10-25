@@ -11,6 +11,7 @@ from models.build_salva import MODELOS
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from utils.validacoes import validacao_campos
 from utils.aparencia import validar_aparencia
+from utils.sockets import normalizar_socket
 from services.llm_service.llm_service import LLMService
 from .avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 from .planejar_perifericos_service import PlanejarPerifericosService
@@ -41,7 +42,7 @@ class CriarBuildService:
     "tipo_painel", "tempo_resposta_ms", "hdr", "layout", "switch", "mecanico", "dpi_max", "microfone",
     "quantidade_slots_ram", "memoria_maxima_gb", "quantidade_slots_m2",
     "quantidade_portas_sata", "quantidade_slots_m2_sata", "portas_sata_desativadas_por_m2_sata",
-    "interface", "velocidade_leitura_mbps", "velocidade_gravacao_mbps", "velocidade_rpm", "memoria_cache_mb", "compatibilidade", "esgotado",
+    "interface", "velocidade_leitura_mbps", "velocidade_gravacao_mbps", "velocidade_rpm", "memoria_cache_mb", "compatibilidade", "sockets_suporte_condicional", "esgotado",
     "comprimento_mm", "largura_mm", "altura_mm", "tamanho_max_gpu_mm", "tamanho_max_cooler_mm",
     "suporte_water_cooler", "tamanho_radiador_mm", "radiadores_suportados_mm",
     "quantidade", "tamanho_mm", "quantidade_fans", "tamanho_fan_mm", "fans_inclusos",
@@ -55,7 +56,7 @@ class CriarBuildService:
     "placas_mae_incompativeis", "cor", "cor_referencia", "fonte_cor_referencia", "painel_vidro",
     "conector_fan", "tensao_fan_v", "corrente_fan_a", "conector_rgb", "tensao_rgb_v",
     "rotacao_max_rpm", "fluxo_ar_cfm", "pressao_estatica_mmh2o", "ruido_dba",
-    "conectores_cpu_eps", "conectores_pcie_8pinos", "conectores_pcie_16pinos", "conectores_sata",
+    "conectores_cpu_eps", "conectores_pcie_8pinos", "conectores_pcie_16pinos", "conectores_sata", "conectores_energia",
     "tamanho_max_fonte_mm", "formatos_fonte", "certificacao_fonte", "versao_atx", "baias_25", "baias_35",
     "padrao_wifi", "velocidade_mbps", "bluetooth", "categoria", "comprimento_m", "conector",
   )
@@ -300,7 +301,7 @@ class CriarBuildService:
     teto_peca = min(Decimal(str(orcamento - margem)), pc)
     # Tornar explícitas decisões determinísticas ajuda a LLM a não cruzar IDs de
     # plataformas diferentes. É apenas socket: não certifica BIOS nem o conjunto.
-    socket = lambda valor: str(valor or "").upper().replace(" ", "")
+    socket = normalizar_socket
     pares = [{"processador": cpu["id"], "placas_mae": [p["id"] for p in catalogo.get("placa_mae", [])
               if socket(p.get("socket")) == socket(cpu.get("soquete"))]}
              for cpu in catalogo.get("processador", []) if socket(cpu.get("soquete"))]
@@ -580,6 +581,9 @@ class CriarBuildService:
         "- Gabinete: o formato da placa_mae (ATX, mATX, ITX) deve caber no gabinete; "
         "confira comprimento da placa_video e altura do air_cooler pelos limites explícitos. "
         "Para water_cooler, confira socket e tamanho do radiador declarado no suporte do gabinete. "
+        "sockets_suporte_condicional indica versões ou kits de montagem ainda não confirmados; "
+        "não trate essa lista como suporte garantido. Prefira outro cooler com suporte explícito "
+        "ao socket quando existir uma opção adequada no orçamento. "
         "Não conclua que cabe só pelo nome ou por três fans de 120 mm: posição, "
         "espessura e interferências precisam de dados próprios.\n"
         "- Fonte: a potência deve cobrir o consumo estimado de processador, placa_video "

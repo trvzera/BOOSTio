@@ -2,6 +2,7 @@ import math
 import re
 
 from models.build_salva import MODELOS
+from utils.sockets import normalizar_socket, suporte_socket_cooler
 from .encaixe_fisico import avaliar_medidas
 
 
@@ -75,10 +76,11 @@ class AvaliarCompatibilidadeService:
             faltam.append("cooler")
 
         if tem("processador") and tem("placa_mae"):
-            socket_cpu, socket_placa = texto(cpu.get("soquete")), texto(placa.get("socket"))
+            socket_cpu, socket_placa = normalizar_socket(cpu.get("soquete")), normalizar_socket(placa.get("socket"))
             registrar("socket", "Socket do processador e da placa-mãe",
                       socket_cpu == socket_placa if socket_cpu and socket_placa else None,
-                      "Compare os sockets cadastrados. Socket ausente não equivale a compatibilidade confirmada.")
+                      f"Encaixe do processador: {socket_cpu or 'não informado'}; placa-mãe: {socket_placa or 'não informado'}. "
+                      "O mesmo encaixe não confirma suporte ao modelo nem a BIOS instalada.")
             registrar("suporte-cpu-bios", "Suporte ao modelo da CPU e BIOS", None,
                       "Socket igual não confirma a lista de CPUs suportadas nem a versão necessária de BIOS; esses dados ainda precisam ser verificados.")
 
@@ -120,11 +122,13 @@ class AvaliarCompatibilidadeService:
         if tem("processador"):
             for tipo in ("air_cooler", "water_cooler"):
                 if tem(tipo):
-                    sockets = [texto(s) for s in re.findall(r"LGA\s*\d+|AM\d+|FM\d+|STR\d+|TR\d+", get(tipo).get("compatibilidade") or "", flags=re.I)]
-                    socket = texto(cpu.get("soquete"))
-                    conhecidos = bool(sockets)
-                    registrar(tipo + "-socket", "Socket do cooler", socket in sockets if socket and conhecidos else None,
-                              "A lista deve identificar sockets, não apenas a marca AMD/Intel.")
+                    cooler = get(tipo)
+                    suporte = suporte_socket_cooler(cpu.get("soquete"), cooler)
+                    motivo = ("Há versões ou kits de montagem diferentes deste cooler. Confirme o suporte ao socket "
+                              f"{normalizar_socket(cpu.get('soquete')) or 'da CPU'} na embalagem/manual da unidade."
+                              if cooler.get("sockets_suporte_condicional") and suporte is None else
+                              "Confere o encaixe da CPU com a lista de sockets do cooler. Apenas AMD/Intel não identifica o suporte.")
+                    registrar(tipo + "-socket", "Socket do cooler", suporte, motivo)
         if tem("air_cooler") and tem("water_cooler"):
             registrar("cooler-unico", "Cooler do processador", False, "Há air cooler e water cooler selecionados para o mesmo processador.")
 

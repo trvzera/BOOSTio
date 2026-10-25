@@ -267,7 +267,7 @@ A geração pela LLM já revalida conflitos conhecidos no catálogo, incluindo s
 DDR, slots, potência e medidas explícitas. Especificações ausentes continuam não
 verificadas; a configuração não recebe garantia de compatibilidade completa.
 
-O manifesto atual possui 48 fichas técnicas, incluindo gabinetes, GPUs, fontes,
+O manifesto atual possui 76 fichas técnicas, incluindo gabinetes, GPUs, fontes,
 air/water coolers, placas-mãe, processador, RAM, SSDs, fans e periféricos. Há limites físicos,
 slots, perfis JEDEC/XMP, dimensões por capacidade de SSD, conexões RGB/PWM e
 exceções físicas declaradas pelo fabricante do cooler. As fichas só complementam
@@ -280,6 +280,13 @@ exatas documentadas; apelidos internos também exigem o anúncio revisado. Sem a
 o banco ou inferir dados de outra revisão. Modelos/links com variantes divergentes
 continuam pendentes de revisão. Isso não certifica BIOS, QVL ou todas as
 interferências físicas.
+
+A revisão mais recente amplia slots, limites de RAM e conexões M.2/SATA em
+29 cadastros de placas-mãe. Também padroniza a leitura dos sockets no Python e
+no JavaScript, preservando diferenças como AM3/AM3+ e LGA2011/LGA2011-3.
+Coolers com versões ou kits de fixação diferentes continuam a confirmar;
+não recebem aprovação automática. O detalhamento e as lacunas de pesquisa
+estão em [Catálogo e especificações revisadas](docs/catalogo-e-especificacoes.md).
 
 A base de cadastro inclui **1.542 produtos**, com sete novos modelos de fans,
 periféricos e gabinete identificados por part number. Isso não significa que todos

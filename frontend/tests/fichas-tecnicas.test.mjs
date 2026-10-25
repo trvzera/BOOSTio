@@ -19,7 +19,7 @@ for (const {esperado,...dados} of fixture.aliases) test("ficha revisada Python/J
   const enriquecida = completarMedidas(original,manifesto);
   for (const [chave,valor] of Object.entries(esperado)) assert.deepEqual(enriquecida[chave],valor,chave);
   for (const chave of Object.keys(original)) assert.equal(enriquecida[chave],original[chave],chave);
-  assert.equal(enriquecida.ficha_tecnica_verificada_em,"2026-10-23");
+  assert.equal(enriquecida.ficha_tecnica_verificada_em,esperado.ficha_tecnica_verificada_em || "2026-10-23");
   assert.ok(enriquecida.modelo_ficha_tecnica && enriquecida.fonte_medidas.startsWith("https://"));
   assert.equal(original.fonte_medidas,undefined);
   for (const alteracao of [{part_number:"outra-revisao"},{modelo:dados.modelo + " V3"},{categoria:"processador"},{fabricante:"outro"},{link:undefined}]) {
