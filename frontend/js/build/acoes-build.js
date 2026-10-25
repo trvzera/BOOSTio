@@ -56,11 +56,11 @@ export function abrirBenchmark(build,catalogo,{publica = false} = {}) {
   const buildId = /^(?:s-)?[1-9][0-9]{0,17}$/.test(String(build.id)) ? String(build.id) : null;
   const prefixo = "build-fpshq";
   const dialogo = abrirDialogoBuild("Desempenho esperado",'<p class="planning-help">' + h(build.titulo) + '</p>' +
-    '<div class="benchmark-type-picker" role="group" aria-label="Escolha o tipo de teste"><button type="button" class="btn-secondary" data-benchmark-type="games" aria-pressed="false" aria-label="Selecionar teste de desempenho em jogos">' + iconeAnimado("gamepad") + '<span>Jogos · FPS</span></button><button type="button" class="btn-secondary" data-benchmark-type="blender" aria-pressed="false" aria-label="Selecionar teste de renderização no Blender">' + iconeAnimado("microchip") + '<span>Blender · Renderização</span></button></div><div data-benchmark-content><p class="planning-help">Escolha qual desempenho deseja consultar. Nenhum teste é executado no seu computador.</p></div>');
+    '<div class="benchmark-type-picker" role="group" aria-label="Escolha o tipo de teste"><button type="button" class="btn-secondary" data-benchmark-type="games" disabled data-disabled-reason="O teste de desempenho em jogos está em desenvolvimento." aria-pressed="false" aria-label="Jogos · FPS — em desenvolvimento">' + iconeAnimado("gamepad") + '<span class="benchmark-type-copy">Jogos · FPS<small>Em desenvolvimento</small></span></button><button type="button" class="btn-secondary" data-benchmark-type="blender" aria-pressed="false" aria-label="Selecionar teste de renderização no Blender">' + iconeAnimado("microchip") + '<span>Blender · Renderização</span></button></div><div data-benchmark-content><p class="planning-help">Escolha qual desempenho deseja consultar. Nenhum teste é executado no seu computador.</p></div>');
   dialogo.classList.add("benchmark-dialog");
   let limpar;
   dialogo.querySelectorAll("[data-benchmark-type]").forEach(botao => botao.addEventListener("click",() => {
-    if (botao.getAttribute("aria-pressed") === "true") return;
+    if (botao.disabled || botao.getAttribute("aria-pressed") === "true") return;
     limpar?.();
     dialogo.querySelectorAll("[data-benchmark-type]").forEach(outro => outro.setAttribute("aria-pressed",String(outro === botao)));
     const conteudo = dialogo.querySelector("[data-benchmark-content]");

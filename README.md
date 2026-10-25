@@ -204,12 +204,15 @@ A configuração de produção publica URLs como `/builds`, `/formulario` e
 
 ## Desempenho esperado
 
-Ao selecionar **Testar build**, o usuário escolhe o tipo de consulta:
+Ao selecionar **Testar build**, a consulta de renderização no **Blender** está
+disponível. A opção **Jogos · FPS** permanece desativada, com o aviso
+**Em desenvolvimento**.
 
 ### Jogos · FPSHQ
 
-Escolha de jogo, resolução e qualidade gráfica, com **FPS médio** e **1% low**
-quando disponíveis. Falhas e ausência de dados não geram FPS inventados.
+A integração em desenvolvimento prevê escolha de jogo, resolução e qualidade
+gráfica, com **FPS médio** e **1% low** quando disponíveis. Falhas e ausência de
+dados não geram FPS inventados.
 
 A FPSHQ apresentou timeouts nas consultas de FPS e jogos em **21 e 22/10/2026**.
 Na consulta pública de **24/10/2026**, respondeu **HTTP 302** para uma página externa
