@@ -1,3 +1,5 @@
+import { movimentoReduzido } from "../components/motion-preference.js";
+
 import "../header.js";
 import "../auth/auth.js";
 import { normalizarRede, vincularRede } from "../build/rede.js";
@@ -453,6 +455,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       estadosCheckbox.set(id, input.checked);
       const animacao = animacoesCheckbox.get(id);
       if (!animacao || !animacao.isLoaded) return;
+      if (movimentoReduzido()) {
+        animacao.goToAndStop(input.checked ? animacao.totalFrames - 1 : 0, true);
+        return;
+      }
       if (input.checked) {
         animacao.goToAndStop(0, true);
         animacao.setDirection(1);

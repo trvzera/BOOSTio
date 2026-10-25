@@ -1,4 +1,5 @@
 import { navegarPara,transicionarSaida } from "./page-loading.js";
+import { nomePagina, caminhoComparacao } from "./page-routes.js";
 const rotulos = {
   "index.html":"Voltar ao início", "formulario.html":"Voltar ao formulário",
   "configuracao-build.html":"Voltar à build", "builds.html":"Voltar para Minhas builds",
@@ -18,8 +19,8 @@ export function destinoAnterior(atual, origem, padrao, contextual = false) {
       const url = new URL(valor, base);
       if (url.origin !== base.origin || url.protocol !== base.protocol ||
           !["http:","https:","file:"].includes(url.protocol) ||
-          url.pathname.endsWith("/erro.html") ||
-          (url.pathname === base.pathname && url.search === base.search)) return null;
+          nomePagina(url.pathname) === "erro.html" ||
+          (caminhoComparacao(url.pathname) === caminhoComparacao(base.pathname) && url.search === base.search)) return null;
       return url.href;
     } catch { return null; }
   }
@@ -28,7 +29,7 @@ export function destinoAnterior(atual, origem, padrao, contextual = false) {
     // Um retorno à build/categoria não pode apontar ao início ou a outra build.
     // Preserva filtros e posição do histórico somente dentro do mesmo contexto.
     const esperado = new URL(destino), historico = anterior && new URL(anterior);
-    const mesmoContexto = historico && esperado.pathname === historico.pathname &&
+    const mesmoContexto = historico && caminhoComparacao(esperado.pathname) === caminhoComparacao(historico.pathname) &&
       ["build","build_id","id","categoria"].every(chave => esperado.searchParams.get(chave) === historico.searchParams.get(chave));
     return mesmoContexto ? anterior : destino;
   }
@@ -38,11 +39,11 @@ export function destinoAnterior(atual, origem, padrao, contextual = false) {
 // Nunca retorna o editor sem ID: essa URL inicia a criação de uma nova build.
 export function destinoBuild(atual) {
   const url = new URL(atual), id = url.searchParams.get("build");
-  if (!/\/(pecas|peca)\.html$/.test(url.pathname) || !id?.trim()) return "./builds.html";
+  if (!["pecas.html", "peca.html"].includes(nomePagina(url.pathname)) || !id?.trim()) return "./builds.html";
   return "./configuracao-build.html?" + new URLSearchParams({[id.startsWith("s-") ? "build_id" : "id"]:id});
 }
 export function rotuloVoltar(destino) {
-  return rotulos[new URL(destino).pathname.split("/").pop()] || "Voltar à página anterior";
+  return rotulos[nomePagina(new URL(destino).pathname)] || "Voltar à página anterior";
 }
 
 function retorno(controle) {

@@ -28,7 +28,8 @@
 @media (max-width: 950px) {
   #about-container { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 32px; }
   #text-about { align-items: center; text-align: center; }
-  #pc-video { width: min(380px, 100%); }
+  /* Integra o fundo preto do vídeo/poster ao azul da seção, sem formar um retângulo. */
+  #pc-video { width: min(380px, 100%); mix-blend-mode: screen; }
   #about-line { display: none; }
 }
 @media (max-width: 600px) {

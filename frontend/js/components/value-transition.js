@@ -1,17 +1,10 @@
+import { movimentoReduzido, observarMovimento } from "./motion-preference.js";
+
 const animacoes = new WeakMap(), ativas = new Set();
-let preferencia;
 const numeroValido = valor => typeof valor === "number" && Number.isFinite(valor);
 const lerValor = elemento => ({texto:elemento.textContent, numero:elemento.dataset.valueNumber == null ? null : Number(elemento.dataset.valueNumber)});
 
-function movimentoReduzido() {
-  if (!preferencia && typeof globalThis.matchMedia === "function") {
-    preferencia = globalThis.matchMedia("(prefers-reduced-motion: reduce)");
-    preferencia.addEventListener?.("change",evento => {
-      if (evento.matches) for (const animacao of ativas) animacao.cancel();
-    });
-  }
-  return preferencia?.matches;
-}
+observarMovimento(reduzido => { if (reduzido) for (const animacao of ativas) animacao.cancel(); });
 
 // O número correto aparece imediatamente. Só sua apresentação é animada;
 // não interpola preços nem duplica o texto lido por leitores de tela.

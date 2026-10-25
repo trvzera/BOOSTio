@@ -2,6 +2,7 @@
   <img src="./frontend/imgs/logoBOOSTio.gif" alt="BOOSTio" width="100%">
   <h1>BOOSTio</h1>
   <p>Planeje, monte e evolua seu computador em um só lugar.</p>
+  <p><strong>Site oficial: <a href="https://boostio.com.br/">boostio.com.br</a></strong></p>
   <p>
     <strong>Python · Flask · SQLAlchemy · JavaScript · HTML · CSS</strong><br>
     Projeto acadêmico · Colégio Cotemig · Em desenvolvimento
@@ -118,6 +119,15 @@ O Python confere os subtotais pelos preços e quantidades do catálogo antes de
 salvar a sugestão. O **frete não está incluído**: é importante reservar parte do
 orçamento para a entrega.
 
+Para jogos, trabalho pesado e **Um pouco de tudo**, uma sugestão que use menos
+de 75% do teto do PC pode passar pela revisão já disponível, quando houver
+alternativas de CPU/GPU/RAM/SSD para avaliar dentro desse limite. Isso também
+vale para orçamentos como R$ 8.000. O prompt orienta buscar uma configuração
+equilibrada na faixa de 80% a 100% do teto do PC, sem transformar isso em gasto
+mínimo nem usar preço como prova de desempenho. Peças próprias continuam com
+custo zero, e a sobra dos periféricos não é transferida ao PC. Se a revisão
+falhar ou a cota terminar, a primeira configuração válida é preservada.
+
 Se o catálogo não tiver um cabo ou adaptador adequado à conexão solicitada,
 a montagem do PC pode prosseguir **com a rede pendente**. O pedido de comprimento
 e velocidade fica registrado, e a build informa que o acessório não foi incluído
@@ -191,14 +201,27 @@ isso não significa cobertura de imagens para todo o catálogo.
 > A BOOSTio **não vende, entrega ou processa pagamentos** dos produtos. Os links
 > direcionam a lojas de terceiros, responsáveis pela venda e pelo atendimento.
 
+## Navegação e animações
+
+O menu oferece **Reduzir animações**: desativa entradas durante a rolagem e
+mantém imagens estáticas no lugar dos vídeos. A preferência fica salva no
+navegador; sem uma escolha, o site acompanha a preferência de movimento do
+sistema. Os vídeos decorativos pausam fora da tela e retomam ao voltar.
+
+A configuração de produção publica URLs como `/builds`, `/formulario` e
+`/sobre`, mantendo os links antigos e os parâmetros de compartilhamento.
+
 ## Desempenho esperado
 
-Ao selecionar **Testar build**, o usuário escolhe o tipo de consulta:
+Ao selecionar **Testar build**, a consulta de renderização no **Blender** está
+disponível. A opção **Jogos · FPS** permanece desativada, com o aviso
+**Em desenvolvimento**.
 
 ### Jogos · FPSHQ
 
-Escolha de jogo, resolução e qualidade gráfica, com **FPS médio** e **1% low**
-quando disponíveis. Falhas e ausência de dados não geram FPS inventados.
+A integração em desenvolvimento prevê escolha de jogo, resolução e qualidade
+gráfica, com **FPS médio** e **1% low** quando disponíveis. Falhas e ausência de
+dados não geram FPS inventados.
 
 A FPSHQ apresentou timeouts nas consultas de FPS e jogos em **21 e 22/10/2026**.
 Na consulta pública de **24/10/2026**, respondeu **HTTP 302** para uma página externa
@@ -226,8 +249,10 @@ continuam pendentes: capacidades suficientes não aprovam o computador completo.
 
 Dados públicos de CPU ou GPU, com **mediana em amostras por minuto**, versão do
 Blender, método de renderização e quantidade de resultados. O retorno foi validado
-pelo serviço Python e revalidado com consultas reais em **23 e 24/10/2026**. A última
-consulta de CPU respondeu HTTP 200, sem garantia de disponibilidade permanente.
+pelo serviço Python e revalidado com consultas reais em **25/10/2026** para
+Intel Core i3-12100F, Ryzen 5 5600 e RTX 3060, sem garantia de disponibilidade
+permanente. Falhas distinguem ausência de resultados, conexão, tempo esgotado e
+recusa da fonte, com uma referência para diagnóstico.
 
 A comparação de builds consulta esses dados ao clicar em **Comparar renderização**.
 CPU e GPU são analisadas separadamente; só há classificação quando todas as builds
@@ -377,8 +402,8 @@ Os originais da marca, esboços e anotações estão reunidos em [materiais](mat
 
 ## Validação da versão
 
-Na revisão de **25/10/2026**, a suíte local aprovou **711 testes JavaScript** e
-**938 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
+Na revisão de **25/10/2026**, a suíte local aprovou **719 testes JavaScript** e
+**966 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
 Há testes específicos para as sete classes de Controller e para preservar o

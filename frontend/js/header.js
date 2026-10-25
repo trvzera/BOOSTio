@@ -1,6 +1,7 @@
 import { iconeAnimado, iniciarIcones } from "./components/ui.js";
 import { linksVisitante, linksAutenticado } from "./components/navigation-config.js";
 import { marcarPaginaAtual } from "./components/navigation-current.js";
+import { movimentoReduzido, definirMovimentoReduzido, observarMovimento } from "./components/motion-preference.js";
 
 let navegacao;
 const pagina = nome => new URL("../pages/" + nome, import.meta.url).href;
@@ -40,10 +41,21 @@ export function iniciarNavegacao() {
     '<div class="site-menu-divider"></div><button type="button" class="profile-link font-1-s profile-logout" id="btn-logout" aria-label="Sair da conta">' +
     '<span class="site-menu-link-label">' + iconeAnimado("logout") + '<span>Sair</span></span></button></div></nav></div>' +
     '<div class="site-menu" data-site-menu' + (preview ? "" : " hidden") + '><nav id="site-menu-panel" class="site-menu-panel" aria-label="Navegação entre páginas" aria-hidden="true" inert>' +
-    '<div class="site-menu-group">' + links(linksMenu) + '</div></nav>' +
+    '<div class="site-menu-group">' + links(linksMenu) +
+    '<div class="site-menu-divider"></div><button type="button" class="site-menu-link site-motion-toggle" aria-label="Reduzir animações e desativar vídeos" aria-pressed="false">Reduzir animações</button></div></nav>' +
     '<button type="button" class="site-menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="site-menu-panel">' +
     '<span class="ui-lottie hamburger-animation" data-lottie="hamburger" aria-hidden="true"><span class="ui-icon-fallback hamburger-fallback"><span></span><span></span><span></span></span></span></button></div>';
   host.prepend(logo);
+  const movimento = host.querySelector(".site-motion-toggle");
+  const atualizarMovimento = () => {
+    const reduzido = movimentoReduzido();
+    movimento.setAttribute("aria-pressed", String(reduzido));
+    // O nome do botão permanece estável; leitores de tela anunciam o estado pressionado.
+    movimento.title = reduzido ? "Animações reduzidas. Clique para reativar." : "Desativar vídeos e reduzir os efeitos de movimento.";
+  };
+  movimento.addEventListener("click", () => definirMovimentoReduzido(!movimentoReduzido()));
+  observarMovimento(atualizarMovimento);
+  atualizarMovimento();
 
   const controles = [];
   function configurar(container, painel, botao, rotulo, hover = false) {
@@ -82,7 +94,10 @@ export function iniciarNavegacao() {
         if (!fixado && !container.contains(e.relatedTarget) && !container.matches(":hover")) controle.alternar(false);
       });
     }
-    painel.addEventListener("click", e => { if (e.target.closest("a,button")) controle.alternar(false); });
+    painel.addEventListener("click", e => {
+      if (e.target.closest(".site-motion-toggle")) return;
+      if (e.target.closest("a,button")) controle.alternar(false);
+    });
     controles.push(controle);
     return controle;
   }

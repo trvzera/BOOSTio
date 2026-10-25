@@ -13,6 +13,7 @@ from utils.validacoes import validacao_campos
 from utils.aparencia import validar_aparencia
 from utils.sockets import normalizar_socket
 from services.llm_service.llm_service import LLMService
+from services.llm_service.reservar_chamada_service import CotaGlobalIAError, ControleIAIndisponivelError
 from .avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 from .planejar_perifericos_service import PlanejarPerifericosService
 from .completar_ventilacao_service import CompletarVentilacaoService
@@ -130,7 +131,7 @@ class CriarBuildService:
     logger.info("Geração: etapa=prompt duracao_ms=%d caracteres=%d", (perf_counter()-inicio_prompt)*1000, len(prompt))
     dados_build = self._gerar_validada(usuario_id, prompt, modelo, catalogo, orcamento,
                                      percentual, proprias, detalhes_proprias, rede, tentativas_correcao,
-                                     revisar_investimento=any(termo in dados["utilidade"].casefold() for termo in ("jogo", "pesado", "render", "3d")), cor=aparencia["cor"], aparencia=aparencia)
+                                     revisar_investimento=self._perfil_revisa_investimento(dados["utilidade"]), cor=aparencia["cor"], aparencia=aparencia)
     if proprias:
       return AvaliarCompatibilidadeService().para_resposta(BuildSalva.criar_gerada_com_pecas_proprias(usuario_id, dados_build, proprias, rede, percentual, aparencia))
 
@@ -190,13 +191,15 @@ class CriarBuildService:
                                          detalhes_proprias, rede, aparencia or {"cor": cor})
         resumo = self._resumo_custos(validada, catalogo)
         # Uma revisão já permitida, não um mínimo de gasto nem novas tentativas.
-        if tentativa < limite and revisar_investimento and teto_pc >= 10000 and Decimal(str(resumo["pc"])) < teto_pc * Decimal("0.75"):
-          ajustaveis = [item for item in validada["componentes"] if item["tipo"] in ("processador", "placa_video", "memoria_ram", "ssd")]
-          if any(any(p["preco"] > item["preco"] for p in catalogo.get(item["tipo"], [])) for item in ajustaveis):
-            primeira_valida = deepcopy(validada)
-            raise ValueError(f"A configuração é válida, mas usa somente R$ {resumo['pc']:.2f} do teto de R$ {teto_pc:.2f} para o uso exigente. "
-                "Reavalie opções adequadas de CPU/GPU/RAM/SSD dentro do investimento, sem escolher só por preço. "
-                "Preserve tetos, peças próprias e compatibilidades; não acrescente itens supérfluos.")
+        if tentativa < limite and revisar_investimento and self._ha_margem_para_melhorar(validada, catalogo, teto_pc, proprias):
+          primeira_valida = deepcopy(validada)
+          build = validada  # A revisão recebe os custos após os ajustes do servidor.
+          raise ValueError(f"A configuração é válida, mas usa somente R$ {resumo['pc']:.2f} do teto de R$ {teto_pc:.2f} do PC. "
+              f"Reavalie combinações próximas de 80% a 100% desse teto (R$ {teto_pc * Decimal('0.8'):.2f} a R$ {teto_pc:.2f}), "
+              "buscando melhorias adequadas de CPU/GPU/RAM/SSD para o perfil solicitado, inclusive uso misto. "
+              "Não trate o pedido como o PC mais barato possível. Considere incluir GPU dedicada quando fizer sentido para jogar. "
+              "O valor maior, sozinho, não comprova desempenho melhor. Preserve tetos, peças próprias e compatibilidades; "
+              "não acrescente itens supérfluos. A sobra dos periféricos continua reservada ao usuário, sem reforçar o PC.")
         logger.info("Geração: etapa=validada tentativa=%d duracao_ms=%d", tentativa+1, (perf_counter()-inicio_validacao)*1000)
         return validada
       except ValueError as erro:
@@ -220,11 +223,37 @@ class CriarBuildService:
           "preservando as peças próprias e a rede. Nunca transfira a sobra dos periféricos ao PC.\n"
           + json.dumps(revisao, ensure_ascii=False, default=str)[:24000]
         )
-      except RequestException:
+      except (RequestException, CotaGlobalIAError, ControleIAIndisponivelError):
         logger.warning("Geração: etapa=provedor tentativa=%d duracao_ms=%d", tentativa+1, (perf_counter()-inicio_llm)*1000)
         if primeira_valida is not None:
           return primeira_valida
         raise
+
+  @staticmethod
+  def _perfil_revisa_investimento(utilidade):
+    return PreferenciasPerifericosService.jogos(utilidade) or any(
+      termo in utilidade.casefold() for termo in ("pesado", "render", "3d"))
+
+  @classmethod
+  def _ha_margem_para_melhorar(cls, build, catalogo, teto_pc, proprias):
+    gasto = Decimal(str(cls._resumo_custos(build, catalogo)["pc"]))
+    if gasto >= teto_pc * Decimal("0.75"):
+      return False
+    # Só solicita análise: preço não certifica ganho. A nova combinação ainda
+    # precisa passar por toda a validação antes de substituir a primeira válida.
+    for item in build["componentes"]:
+      tipo, quantidade = item["tipo"], item["quantidade"]
+      if tipo not in ("processador", "placa_video", "memoria_ram", "ssd") or tipo in proprias:
+        continue
+      preco_atual = Decimal(str(item["preco"]))
+      for candidata in catalogo.get(tipo, []):
+        preco = Decimal(str(candidata["preco"]))
+        if candidata.get("esgotado") is not True and preco > preco_atual and gasto + (preco - preco_atual) * quantidade <= teto_pc:
+          return True
+    if "placa_video" not in proprias and not any(item["tipo"] == "placa_video" for item in build["componentes"]):
+      return any(p.get("esgotado") is not True and gasto + Decimal(str(p["preco"])) <= teto_pc
+                 for p in catalogo.get("placa_video", []))
+    return False
 
   @staticmethod
   def _codigo_falha(erro):
@@ -472,6 +501,10 @@ class CriarBuildService:
         f"avalie combinações de aproximadamente 80% a 100% do teto do PC (R$ {pc * Decimal('0.8'):.2f} a R$ {pc:.2f}), "
         "sem ultrapassá-lo. Isso NÃO é um gasto mínimo nem autoriza extras desnecessários. "
         "Use menos quando o uso, as peças próprias ou o catálogo justificarem; não gaste só por gastar. "
+        "A referência também vale para 'Um pouco de tudo', inclusive em orçamentos intermediários: "
+        "esse perfil inclui jogar e não equivale a escritório básico nem a servidor/NAS. "
+        "Se sobrar uma parcela grande do teto do PC, compare alternativas que ampliem a capacidade "
+        "gráfica, a memória e o armazenamento, sem sacrificar o equilíbrio ou os limites. "
         "Em um pedido de R$ 20.000 para jogos exigentes, não entregue por padrão um PC de "
         "R$ 6.000 se o catálogo permitir ganhos relevantes dentro do teto. Em estudo/escritório, "
         "não invente necessidade de GPU cara. Não use preço isolado como prova de desempenho. "
@@ -559,7 +592,12 @@ class CriarBuildService:
         "armazenamento rápido e amplo; placa_video conforme o software citado.\n"
         "- Programação, estudo e trabalho de escritório: priorize processador, "
         "memoria_ram e ssd; placa_video dedicada normalmente é dispensável.\n"
-        "- Servidor, NAS ou uso misto: priorize armazenamento, RAM e estabilidade "
+        "- Um pouco de tudo / uso misto: equilibre processador, placa_video, memoria_ram e ssd "
+        "para estudar, trabalhar e jogar. Considere GPU dedicada adequada quando não for própria "
+        "e couber na plataforma completa, sem escolher automaticamente apenas vídeo integrado. "
+        "Prefira capacidade útil e bom equilíbrio; não concentre a verba em estética, fonte "
+        "superdimensionada ou placa-mãe cara enquanto CPU/GPU/RAM ficam em nível de entrada.\n"
+        "- Servidor ou NAS: priorize armazenamento, RAM e estabilidade "
         "(fonte e gabinete com boa ventilação).\n"
         "- Se o uso combinar perfis, atenda primeiro o mais exigente citado no pedido. "
         "Se o uso não se encaixar em nenhum perfil, escolha pela necessidade descrita "

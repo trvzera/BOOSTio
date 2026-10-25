@@ -1,6 +1,15 @@
 import { htmlSeguro as h } from "../build/catalogo.js";
 import { criarClienteBenchmark } from "../api/benchmark/consultarBenchmark.js";
 
+export function mensagemFalhaBlender(erro) {
+  const mensagem = erro?.message || "Não foi possível consultar o Blender agora.";
+  const referencia = [];
+  if (Number.isInteger(erro?.status)) referencia.push("HTTP " + erro.status + " da BOOSTio");
+  if (erro?.codigo) referencia.push(erro.codigo);
+  if (Number.isInteger(erro?.diagnostico?.httpProvedor)) referencia.push("Blender: HTTP " + erro.diagnostico.httpProvedor);
+  return mensagem + (referencia.length ? " Referência: " + referencia.join(" · ") + "." : "");
+}
+
 export function painelBlenderHtml(dispositivos) {
   return '<section class="blender-panel" aria-label="Desempenho de renderização no Blender"><p class="planning-help">Consulte resultados públicos de uma peça, sem executar testes no seu computador.</p>' +
     '<form id="blender-form"><label class="test-field" for="blender-device">Dispositivo de renderização<select id="blender-device">' +
@@ -34,7 +43,8 @@ export function iniciarPainelBlender(raiz,dispositivos,{cliente = criarClienteBe
       feedback.textContent = (dados.cache ? "Dados em cache" : "Consultado agora") + " · " + new Date(dados.consultadoEm).toLocaleString("pt-BR");
     } catch (erro) {
       if (!ativo) return;
-      feedback.textContent = erro.message; feedback.dataset.tone = "error";
+      feedback.textContent = mensagemFalhaBlender(erro);
+      feedback.dataset.tone = erro.codigo === "sem-dados" ? "warning" : "error";
       if (erro.espera > 0) {
         espera = Math.min(erro.espera,3600);
         botao.dataset.disabledReason = "Aguarde o intervalo solicitado pela fonte.";

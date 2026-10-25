@@ -1,3 +1,5 @@
+import { movimentoReduzido, observarMovimento } from "./motion-preference.js";
+
 let lottiePromise = null;
 
 function carregarLottie() {
@@ -11,6 +13,9 @@ function carregarLottie() {
 }
 
 const animacoesCarregadas = new Map();
+observarMovimento(reduzido => {
+  if (reduzido) animacoesCarregadas.forEach(animacao => animacao.pause());
+});
 
 export async function registrarAnimacao(id, path, opcoes = {}) {
   const container = document.getElementById(id);
@@ -30,6 +35,15 @@ export async function registrarAnimacao(id, path, opcoes = {}) {
     path,
     ...opcoes,
   });
+
+  const reproduzir = animacao.play.bind(animacao);
+  animacao.play = (...argumentos) => {
+    if (movimentoReduzido()) {
+      animacao.goToAndStop(animacao.playDirection < 0 ? 0 : animacao.totalFrames - 1, true);
+      return;
+    }
+    return reproduzir(...argumentos);
+  };
 
   animacoesCarregadas.set(id, animacao);
   return animacao;

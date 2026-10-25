@@ -1,3 +1,5 @@
+import { nomePagina } from "./page-routes.js";
+
 let redirecionando = false;
 
 function caminhoPaginaErro(codigo) {
@@ -7,7 +9,7 @@ function caminhoPaginaErro(codigo) {
 }
 
 export function redirecionarParaErro(codigo = 500, erro = null) {
-  if (redirecionando || window.location.pathname.endsWith("/erro.html")) return;
+  if (redirecionando || nomePagina(window.location.pathname) === "erro.html") return;
   redirecionando = true;
 
   try {

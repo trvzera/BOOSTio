@@ -231,6 +231,17 @@ prefixo `/api`. É o mesmo callback para login e confirmação de identidade.
 Não cadastre a URL de início `/auth/google/redirecionar` como callback.
 O callback local pode permanecer cadastrado junto do de produção.
 
+## URLs e diagnóstico do Blender (25/10/2026)
+
+As URLs limpas e a verificação de produção estão documentadas em
+`deploy/README.md`, junto de `nginx.conf`. Reconstrua os serviços `web` (URLs,
+menu, vídeos) e `api` (diagnóstico do Blender); não há alteração no banco.
+
+O Blender respondeu localmente para i3-12100F, Ryzen 5 5600 e RTX 3060. Se houver
+falha na VPS, use a referência exibida na tela e os registros `Blender:` dos logs
+da API para separar ausência de resultados (422), timeout, TLS, rede e HTTP da
+fonte. O diagnóstico local não comprova o acesso de saída da hospedagem.
+
 ## Validação após publicar
 
 ### Imagens coletadas em containers separados
