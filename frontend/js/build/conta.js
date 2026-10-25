@@ -27,6 +27,8 @@ export function buildDaConta(dados) {
     ...estado,id:dados.id,titulo:dados.nome,descricao:dados.descricao,
     criadoEm:dados.criado_em,componentes,
   });
+  if (typeof dados.criador?.nome === "string" && dados.criador.nome.trim())
+    build.criador = {nome:dados.criador.nome.trim().slice(0,30)};
   if (["incompativel","nao_verificado","sem_conflitos"].includes(dados.compatibilidade?.status)) build.compatibilidade = dados.compatibilidade;
   return build;
 }
@@ -38,7 +40,7 @@ export function estadoParaConta(build) {
     incluirPerifericos:build.incluirPerifericos,incluirRede:build.incluirRede,
     percentualPerifericos:build.percentualPerifericos || 0,
     substituirFansWaterCooler:build.substituirFansWaterCooler === true,
-    rede:build.rede,pecasExtras:build.pecasExtras,componentes:build.componentes,
+    rede:build.rede,aparencia:build.aparencia,pecasExtras:build.pecasExtras,componentes:build.componentes,
   };
 }
 

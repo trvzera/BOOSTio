@@ -108,7 +108,7 @@ const motivos = {
   "btn-create-build":"Você atingiu o limite de três builds salvas.",
   "btn-sign-in":"Preencha o e-mail e a senha para entrar.",
   "btn-create-account":"Preencha os campos, confirme a senha e aceite os termos de uso.",
-  "btn-confirm-code":"Solicite o código e preencha seus quatro dígitos.",
+  "btn-confirm-code":"Solicite o código e preencha seus seis dígitos.",
   "btn-send-link":"Informe seu e-mail para receber o link.",
   "btn-reset-password":"As senhas precisam coincidir e atender aos requisitos.",
   "save-password-btn":"Informe a senha atual e confirme a nova senha de pelo menos oito caracteres.",

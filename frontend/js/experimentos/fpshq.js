@@ -1,4 +1,5 @@
 // Exclusivo do laboratório: não importar este cliente nas páginas de produção.
+import { erroConexao } from "../api/_shared/erros-conexao.js";
 export const FPSHQ_BASE = "https://fpshq.com/api/public/v1/";
 export const REFERENCIA_FPS = Object.freeze({cpu:"ryzen-5-5600",gpu:"rtx-3060"});
 export const JOGOS_INICIAIS = Object.freeze([
@@ -77,7 +78,10 @@ export function criarClienteFPSHQ({fetcher = (...args) => fetch(...args),agora =
         if (!resposta.ok) throw new ErroFPSHQ("A FPSHQ não conseguiu atender à consulta agora. Tente novamente mais tarde.","http");
         let dados;
         try { dados = await resposta.json(); }
-        catch { throw new ErroFPSHQ("A FPSHQ retornou uma resposta inválida. Tente novamente mais tarde.","resposta"); }
+        catch(causa) {
+          if(["AbortError","TypeError","NetworkError"].includes(causa?.name))throw causa;
+          throw new ErroFPSHQ("O serviço de testes de jogos não enviou os dados necessários. Tente novamente mais tarde.","resposta");
+        }
         if (dados?.ok !== true) throw new ErroFPSHQ("Não há dados disponíveis para esta consulta.","sem-dados");
         const item = {dados,data:agora()};
         memoria.set(chave,item);
@@ -86,7 +90,8 @@ export function criarClienteFPSHQ({fetcher = (...args) => fetch(...args),agora =
       } catch (erro) {
         if (erro instanceof ErroFPSHQ) throw erro;
         if (signal?.aborted) throw new ErroFPSHQ("Consulta cancelada.","cancelado");
-        throw new ErroFPSHQ(controle.signal.aborted ? "A consulta demorou demais. Tente novamente." : "Não foi possível acessar a FPSHQ. Confira a conexão e tente novamente.",controle.signal.aborted ? "timeout" : "rede");
+        if(controle.signal.aborted)throw new ErroFPSHQ("A consulta demorou demais. Tente novamente.","timeout");
+        throw erroConexao(erro,{servico:"o serviço de testes de jogos",codigo:"rede"});
       } finally { clearTimeout(temporizador); signal?.removeEventListener("abort",cancelar); }
     })();
     pendentes.set(chave,promessa);

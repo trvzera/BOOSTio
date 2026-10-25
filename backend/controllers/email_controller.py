@@ -34,13 +34,13 @@ class EmailController:
 
 
       except SMTPAuthenticationError:
-        return jsonify({"mensagem":'Falha na autenticação do servidor de email'}),400
+        return jsonify({"erro": "Não foi possível enviar o código agora. Tente novamente mais tarde."}),503
     
       except SMTPRecipientsRefused:
-        return jsonify({"mensagem": 'Endereço de email do destinatário foi recusado'}),400
+        return jsonify({"erro": "Não foi possível entregar o código neste endereço. Confira seu e-mail."}),400
     
-      except SMTPException as erro:
-        return jsonify({"mensagem": f'Erro ao enviar email {str(erro)}'}),400
+      except (SMTPException, OSError):
+        return jsonify({"erro": "Não foi possível enviar o código agora. Tente novamente mais tarde."}),503
 
       except EmailNotValidError as e:
         return jsonify({"erro": "Email inexistente"}), 400

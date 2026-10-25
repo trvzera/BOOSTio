@@ -2,6 +2,11 @@
 const n = v => v == null || v === "" || typeof v === "boolean" || !Number.isFinite(Number(v)) || Number(v) < 0 ? null : Number(v);
 const inteiro = (v,min = 0) => Number.isInteger(n(v)) && n(v) >= min && n(v) <= 64 ? n(v) : null;
 const tamanhos = v => Array.isArray(v) && v.every(x => n(x) > 0) ? v.map(n) : null;
+// Presença de ventilação não aprova encaixe nem elimina verificações de capacidade.
+// Fans do air cooler refrigeram a CPU e não contam como fans do gabinete.
+export function temFansInclusas(gabinete,water = null) {
+  return [gabinete?.fans_inclusos,water?.quantidade_fans].some(v => inteiro(v,1) != null);
+}
 export function posicoesFans(gabinete) {
   const grupos = gabinete?.posicoes_fans;
   if (!Array.isArray(grupos) || !grupos.length || grupos.length > 12) return null;

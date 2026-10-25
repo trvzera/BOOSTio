@@ -26,6 +26,73 @@ def cliente(buscar=None, **opcoes):
     return FpshqService(buscar=buscar or Mock(return_value=resposta()), **opcoes)
 
 
+def test_redirecionamento_externo_nao_e_seguido_e_ativa_intervalo():
+    buscar=Mock(return_value=Mock(status_code=302, headers={"Location":"https://externo.invalid/noactive/"}))
+    api=cliente(buscar)
+    for _ in range(2):
+        with pytest.raises(ErroBenchmark) as erro:
+            api.executar("games",{"q":"valorant"},1)
+        assert erro.value.status == 503
+        assert erro.value.codigo == "redirecionamento"
+        assert erro.value.espera == 60
+    assert buscar.call_count == 1
+    assert buscar.call_args.kwargs["allow_redirects"] is False
+
+
+def test_diagnostico_distingue_http_do_provedor_e_pausa_sem_expor_headers(caplog):
+    buscar = Mock(return_value=Mock(status_code=302, headers={
+        "Content-Type": "text/html; charset=utf-8",
+        "Location": "https://externo.invalid/noactive/?segredo=nao-expor",
+        "Set-Cookie": "nao-expor",
+    }))
+    api = cliente(buscar, relogio=lambda: 0)
+    esperado = {"httpProvedor": 302, "tipoResposta": "html", "redirecionamento": True}
+    with pytest.raises(ErroBenchmark) as primeira:
+        api.executar("games", {"q": "valorant"}, 1)
+    assert primeira.value.status == 503
+    assert primeira.value.diagnostico == esperado
+    assert "http_boostio=503; http_provedor=302; formato=html" in caplog.text
+    assert "segredo" not in caplog.text and "Set-Cookie" not in caplog.text
+    primeira.value.diagnostico["httpProvedor"] = 200
+    with pytest.raises(ErroBenchmark) as segunda:
+        api.executar("games", {"q": "valorant"}, 1)
+    assert segunda.value.diagnostico == {**esperado, "pausa": True}
+    buscar.assert_called_once()
+
+
+@pytest.mark.parametrize("status,tipo,codigo", [
+    (200, "text/html", "resposta-nao-json"), (503, "text/html", "provedor"),
+])
+def test_diagnostico_preserva_formato_e_status_reais(status, tipo, codigo):
+    api = cliente(Mock(return_value=Mock(status_code=status, headers={"Content-Type": tipo},
+                                      json=Mock(side_effect=ValueError()))))
+    with pytest.raises(ErroBenchmark) as erro:
+        api.executar("fps", CONSULTA, 1)
+    assert erro.value.codigo == codigo
+    assert erro.value.diagnostico == {"httpProvedor": status, "tipoResposta": "html", "redirecionamento": False}
+    assert not api.cache
+
+
+def test_redirecionamento_preserva_resposta_validada_com_aviso_de_desatualizada():
+    tempo=[0]
+    api=cliente(Mock(return_value=Mock(status_code=302, headers={})),relogio=lambda:tempo[0])
+    api.salvar("games",{"q":"valorant"},{"jogos":[{"nome":"Valorant"}]})
+    tempo[0]=3601
+    resultado=api.executar("games",{"q":"valorant"},1)
+    assert resultado["cache"] and resultado["desatualizado"]
+
+
+def test_html_com_http_200_nao_vira_fps_e_pausa_novas_consultas():
+    buscar=Mock(return_value=Mock(status_code=200,headers={"Content-Type":"text/html; charset=utf-8"},json=Mock(side_effect=ValueError())))
+    api=cliente(buscar)
+    for _ in range(2):
+        with pytest.raises(ErroBenchmark) as erro:
+            api.executar("fps",CONSULTA,1)
+        assert erro.value.codigo=="resposta-nao-json" and erro.value.status==502
+    assert buscar.call_count==1
+    assert not api.cache
+
+
 @pytest.mark.parametrize("campo,valor", [("cpu", None), ("gpu", "../gpu"), ("game", "http://externo.test"), ("res", "8k"), ("preset", "extreme")])
 def test_valida_antes_da_rede(campo, valor):
     api = cliente()
@@ -188,7 +255,7 @@ def test_limites_por_usuario_globais_e_cache_limitado():
         BuscarJogosBenchmarkService(api).executar({"q": "novo"}, 2)
 
 
-@pytest.mark.parametrize("status,esperado", [(404, 404), (503, 503), (302, 502)])
+@pytest.mark.parametrize("status,esperado", [(404, 404), (503, 503), (302, 503)])
 def test_erros_http_sem_cache(status, esperado):
     api = cliente(Mock(return_value=Mock(status_code=status, headers={})))
     with pytest.raises(ErroBenchmark) as erro:

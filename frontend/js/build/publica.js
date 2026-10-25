@@ -10,6 +10,7 @@ import { indicadorBuild, iniciarIndicadores } from './indicador.js';
 import { iconeAnimado, iniciarIcones } from '../components/ui.js';
 import { navegarPara, acompanharCarregamento } from '../components/page-loading.js';
 import { guardarRetornoPublico, idCompartilhamentoPublico } from '../components/sessao-publica.js';
+import { autoriaBuildHtml } from './autoria.js';
 
 export async function mostrarBuildPublica(main,id) {
   if (idCompartilhamentoPublico(location.search) !== id) throw new Error('Link de compartilhamento inválido.');
@@ -24,7 +25,7 @@ export async function mostrarBuildPublica(main,id) {
     + '</h3><p>Quantidade: ' + h(item.quantidade) + (peca?.esgotado ? ' · sem estoque confirmado' : !peca ? ' · peça própria, especificações não verificadas' : '') + '</p></div><div class="component-purchase"><strong>'
     + (peca && Number.isFinite(peca.preco) && peca.preco > 0 ? moeda(peca.preco * item.quantidade) : peca ? 'Preço a consultar' : 'Já possuo') + '</strong></div></div></article></section>';
   main.innerHTML = '<header class="builder-heading"><div><a class="builder-back font-1-xs" href="./index.html" aria-label="Voltar ao início">' + iconeAnimado('arrow','back') + 'Voltar ao início</a><div class="builder-title-line">' + indicadorBuild(avaliacao,'public-compatibility') + '<h1>' + h(build.titulo) + '</h1>'
-    + '</div><p>Build pública · somente leitura. Alterações na sua cópia não mudam esta configuração.</p>' + (build.descricao ? '<p>' + h(build.descricao) + '</p>' : '') + '</div></header>'
+    + '</div>' + autoriaBuildHtml(build) + '<p>Build pública · somente leitura. Alterações na sua cópia não mudam esta configuração.</p>' + (build.descricao ? '<p>' + h(build.descricao) + '</p>' : '') + '</div></header>'
     + '<div class="builder-layout"><div class="component-list">' + (itens.length ? itens.map(linha).join('') : '<p class="planning-help">Esta configuração ainda não tem componentes.</p>') + '</div><aside class="build-sidebar"><section class="build-summary glass-card"><span class="summary-eyebrow">'
     + (parcial ? 'Total parcial dos preços disponíveis' : 'Total das peças') + '</span><strong class="summary-total">' + (avaliacao.preco > 0 ? moeda(avaliacao.preco) : 'Preço a consultar') + '</strong>' + avisoFreteHtml()
     + '<div class="build-public-actions"><button type="button" class="btn-primary" id="public-test" aria-label="Testar build">' + iconeAnimado('magic') + 'Testar build</button><button type="button" class="btn-secondary" id="public-save" aria-label="Salvar cópia no perfil">' + iconeAnimado('plus') + 'Salvar cópia no perfil</button><button type="button" class="btn-secondary" id="public-buy" aria-label="Consultar lojas das peças">' + iconeAnimado('cart') + 'Consultar lojas</button></div><p id="public-feedback" class="planning-help" role="status" aria-live="polite">Entre na sua conta para testar ou salvar uma cópia.</p></section></aside></div>';

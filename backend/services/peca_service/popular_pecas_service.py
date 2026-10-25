@@ -21,6 +21,7 @@ from .atualizar_precos_service import AtualizarPrecosService
 from .restaurar_links_kabum_service import RestaurarLinksKabumService
 from .pecas_estudo_medio import pecas_estudo_medio
 from .pecas_basicas_medias import pecas_basicas_medias
+from .pecas_complementares import pecas_complementares
 
 
 class PopularPecasService:
@@ -66,6 +67,8 @@ class PopularPecasService:
     for modelo, itens in pecas_estudo_medio().items():
       dados[modelo].extend(itens)
     for modelo, itens in pecas_basicas_medias().items():
+      dados[modelo].extend(itens)
+    for modelo, itens in pecas_complementares().items():
       dados[modelo].extend(itens)
     return dados
 

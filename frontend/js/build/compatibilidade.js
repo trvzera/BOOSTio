@@ -1,6 +1,7 @@
 import { categorias, perifericos, acessoriosRede } from "./catalogo.js";
 import { itensSelecionados, itensCategoria, informacoesRam, informacoesArmazenamento, conflitosArmazenamento, selecionarPeca } from "./estado.js";
 import { validarEncaixe, conexaoDisco, AVISO_SLOTS_RAM_PROVISORIOS } from "./hardware.js";
+import { temFansInclusas } from "./fans.js";
 
 export function avaliarBuild(build,catalogo) {
   const get = cat => catalogo.find(p => p.id === itensCategoria(build,cat)[0]?.id && p.categoria === cat);
@@ -18,7 +19,7 @@ export function avaliarBuild(build,catalogo) {
     preco += Number(peca.preco || 0) * item.quantidade;
     if (![...perifericos,...acessoriosRede,"fonte"].includes(categoria)) watts += Number(peca.consumo_energia || 0) * item.quantidade;
   }
-  const fansInclusas = Number.isInteger(gabinete?.fans_inclusos) && gabinete.fans_inclusos > 0;
+  const fansInclusas = temFansInclusas(gabinete,get("water_cooler"));
   const faltam = categorias.filter(c => c.obrigatoria && !tem(c.id) && !(c.id === "fan" && fansInclusas)).map(c => c.nome);
   if (!tem("ssd") && !tem("hd")) faltam.push("Armazenamento");
   if (cpu && !cpu.videointegrado && !tem("placa_video")) faltam.push("Placa de vídeo");

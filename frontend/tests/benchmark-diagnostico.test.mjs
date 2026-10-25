@@ -44,7 +44,56 @@ test("diagnóstico de rede não inventa status HTTP ou certeza de CORS",async ()
   const cliente = criarDiagnosticoBenchmark({modo:()=>"direto",aoRegistro:r=>{registro=r;},fetcher:async () => { throw new TypeError("Failed to fetch"); }});
   await assert.rejects(cliente.consultar(consulta),{codigo:"rede"});
   assert.equal(registro.http,null); assert.match(textoDiagnostico(registro),/Nenhuma resposta HTTP/);
+  assert.equal(registro.redirecionado,null); assert.match(textoDiagnostico(registro),/acessível ao JavaScript/);
   assert.match(textoDiagnostico(registro),/rede ou CORS/);
+});
+
+test("diagnóstico mostra HTTP do provedor sem confundir com resposta local e pausa",async () => {
+  let registro;
+  const cliente=criarDiagnosticoBenchmark({aoRegistro:r=>{registro=r;},requisitar:async()=>{
+    throw Object.assign(new Error("Serviço indisponível"),{status:503,codigo:"redirecionamento",diagnostico:{httpProvedor:302,tipoResposta:"html",redirecionamento:true,pausa:true}});
+  }});
+  await assert.rejects(cliente.consultar(consulta),{status:503});
+  const texto=textoDiagnostico(registro);
+  assert.match(texto,/HTTP 503 da BOOSTio/);
+  assert.match(texto,/FPSHQ: HTTP 302 · formato html · redirecionamento bloqueado/);
+  assert.match(texto,/não consultou a FPSHQ novamente/);
+  assert.doesNotMatch(texto,/rede ou CORS/);
+});
+
+test("falha entre servidor e provedor não é atribuída ao Wi-Fi do usuário",async()=>{
+  let registro;
+  const cliente=criarDiagnosticoBenchmark({aoRegistro:r=>{registro=r;},requisitar:async()=>{
+    throw Object.assign(new Error("Provedor não respondeu"),{status:503,codigo:"rede"});
+  }});
+  await assert.rejects(cliente.consultar(consulta));
+  assert.match(textoDiagnostico(registro),/falha ocorreu entre o servidor e a FPSHQ/);
+  assert.doesNotMatch(textoDiagnostico(registro),/rede ou CORS/);
+});
+
+test("queda na leitura direta é falha de conexão, não de formato JSON",async()=>{
+  let registro;
+  const cliente=criarDiagnosticoBenchmark({modo:()=>"direto",aoRegistro:r=>{registro=r;},fetcher:async()=>({
+    status:200,ok:true,json:async()=>{throw new TypeError("stream closed");},
+  })});
+  await assert.rejects(cliente.consultar(consulta),{codigo:"rede"});
+  assert.equal(registro.http,200);assert.equal(registro.codigo,"rede");
+});
+
+test("cancelamento durante leitura direta não vira erro de resposta",async()=>{
+  const controle=new AbortController();
+  const cliente=criarDiagnosticoBenchmark({modo:()=>"direto",fetcher:async()=>{
+    controle.abort();
+    return {status:200,ok:true,json:async()=>{throw new DOMException("cancelado","AbortError");}};
+  }});
+  await assert.rejects(cliente.consultar(consulta,{signal:controle.signal}),{codigo:"cancelado"});
+});
+
+test("timeout durante leitura direta continua sendo timeout",async()=>{
+  const cliente=criarDiagnosticoBenchmark({modo:()=>"direto",timeoutMs:5,fetcher:async(_url,{signal})=>({
+    status:200,ok:true,json:()=>new Promise((_resolver,rejeitar)=>signal.addEventListener("abort",()=>rejeitar(new DOMException("prazo","AbortError")),{once:true})),
+  })});
+  await assert.rejects(cliente.consultar(consulta),{codigo:"timeout"});
 });
 
 test("trocar modo não consulta automaticamente e backend pode devolver cache",async () => {

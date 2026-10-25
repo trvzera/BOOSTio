@@ -6,13 +6,12 @@ import { criarUsuario } from "../api/usuario/criarUsuario.js";
 import { entrarComGoogle } from "../api/usuario/entrarComGoogle.js";
 import { enviarEmailVerificar } from "../api/email/enviarEmailVerificar.js";
 import { conferirEmailVerificar } from "../api/email/conferirEmailVerificar.js";
-import { iniciarCodigoVerificacao } from "../components/verification-code.js";
+import { iniciarFluxoVerificacaoEmail } from "../components/verification-flow.js";
 import {
   registrarAnimacao,
   destruirTodas,
 } from "../components/lottie-controller.js";
 
-const SEGUNDOS_REENVIO = 30;
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
@@ -198,111 +197,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // --- Modal de verificação de e-mail ---
     const modalVerificacao = document.querySelector("#verify-email-modal");
-    const alvoEmail = document.querySelector("#verify-email-target");
-    const botaoEnviarCodigo = document.querySelector("#btn-send-code");
-    const inputsCodigo = Array.from(document.querySelectorAll(".code-input"));
-    const erroVerificacao = document.querySelector("#verify-email-error");
-    const botaoConfirmarCodigo = document.querySelector(
-      "#btn-confirm-code",
-    );
-    const botaoVerificarDepois = document.querySelector(
-      "#btn-verify-later",
-    );
-
-    let usuarioCriado = null;
-    let temporizadorReenvio = null;
-
-    function irParaDashboard() {
-      window.location.href = "./index.html";
-    }
-
-    function alternarInputsCodigo(habilitado) {
-      inputsCodigo.forEach((input) => {
-        input.disabled = !habilitado;
-      });
-    }
-
-    function validarCodigoCompleto() {
-      const codigo = inputsCodigo.map((input) => input.value).join("");
-      botaoConfirmarCodigo.disabled = codigo.length !== inputsCodigo.length;
-    }
-
-    function iniciarContagemReenvio() {
-      let restante = SEGUNDOS_REENVIO;
-      botaoEnviarCodigo.disabled = true;
-
-      clearInterval(temporizadorReenvio);
-      temporizadorReenvio = setInterval(() => {
-        restante -= 1;
-
-        if (restante <= 0) {
-          clearInterval(temporizadorReenvio);
-          botaoEnviarCodigo.disabled = false;
-          botaoEnviarCodigo.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Reenviar código`;
-          return;
-        }
-
-        botaoEnviarCodigo.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Reenviar em ${restante}s`;
-      }, 1000);
-    }
-
-    function abrirModalVerificacao(usuario) {
-      usuarioCriado = usuario;
-      alvoEmail.textContent = usuario.email;
-      erroVerificacao.textContent = "";
-      inputsCodigo.forEach((input) => (input.value = ""));
-      alternarInputsCodigo(false);
-      botaoConfirmarCodigo.disabled = true;
-      botaoEnviarCodigo.disabled = false;
-      botaoEnviarCodigo.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Enviar código`;
-      modalVerificacao.classList.add("open");
-    }
-
-    botaoEnviarCodigo.addEventListener("click", async () => {
-      if (!usuarioCriado) return;
-
-      erroVerificacao.textContent = "";
-      botaoEnviarCodigo.disabled = true;
-
-      try {
-        await enviarEmailVerificar(usuarioCriado.id);
-        alternarInputsCodigo(true);
-        inputsCodigo[0].focus();
-        iniciarContagemReenvio();
-      } catch (erro) {
-        console.error("Falha ao enviar código de verificação:", erro);
-        erroVerificacao.textContent =
-          erro.message || "Não foi possível enviar o código. Tente novamente.";
-        botaoEnviarCodigo.disabled = false;
-      }
+    const fluxoVerificacao = iniciarFluxoVerificacaoEmail({
+      modal:modalVerificacao,enviar:enviarEmailVerificar,confirmar:conferirEmailVerificar,
+      aoConfirmar:()=>{ window.location.href="./index.html"; },
     });
-
-    iniciarCodigoVerificacao(inputsCodigo,validarCodigoCompleto);
-
-    botaoConfirmarCodigo.addEventListener("click", async () => {
-      if (!usuarioCriado) return;
-
-      const codigo = inputsCodigo.map((input) => input.value).join("");
-      erroVerificacao.textContent = "";
-      botaoConfirmarCodigo.disabled = true;
-
-      try {
-        await conferirEmailVerificar(usuarioCriado.id, codigo);
-        clearInterval(temporizadorReenvio);
-        modalVerificacao.classList.remove("open");
-        irParaDashboard();
-      } catch (erro) {
-        console.error("Falha ao verificar código:", erro);
-        erroVerificacao.textContent =
-          erro.message ||
-          "Não foi possível verificar o código. Tente novamente.";
-        botaoConfirmarCodigo.disabled = false;
-      }
-    });
-
-    botaoVerificarDepois.addEventListener("click", () => {
-      clearInterval(temporizadorReenvio);
-      irParaDashboard();
+    const abrirModalVerificacao=usuario=>fluxoVerificacao.abrir(usuario);
+    window.addEventListener("pagehide",()=>fluxoVerificacao.destruir(),{once:true});
+    document.querySelector("#btn-verify-later").addEventListener("click",()=>{
+      fluxoVerificacao.fechar();window.location.href="./index.html";
     });
 
     const formCriarConta = document.querySelector("#signin-form");

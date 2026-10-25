@@ -3,7 +3,7 @@ import "../auth/auth.js";
 import { carregarCatalogo,categoriasEditor,perifericos,acessoriosRede,moeda,htmlSeguro as h,nomePeca,imagemPeca,ofertasPeca } from "../build/catalogo.js";
 import { abrirBuild,guardarRascunho,buildsLocais,itensCategoria,categoriasMultiplas,informacoesRam,informacoesArmazenamento,motivoSelecao,removerPeca,reduzirQuantidade,linkCompartilhado } from "../build/estado.js";
 import { avaliarBuild,selecionarPecaCompativel } from "../build/compatibilidade.js";
-import { informacoesFans, fluxoFan } from "../build/fans.js";
+import { informacoesFans, fluxoFan, temFansInclusas } from "../build/fans.js";
 import { slotsRam, AVISO_SLOTS_RAM_PROVISORIOS } from "../build/hardware.js";
 import { avisar,copiarTexto,mostrarFalha } from "../build/interface.js";
 import { iconeAnimado,iniciarIcones } from "../components/ui.js";
@@ -21,6 +21,8 @@ import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta, linkBuildC
 import { criarBuildManual } from "../api/build/builds.js";
 import { atualizarValor, capturarValores, transicionarValores } from "../components/value-transition.js";
 import { criarHistoricoBuild } from "../build/historico-build.js";
+import { autoriaBuildHtml } from "../build/autoria.js";
+import { resumoCapacidadeDiscos } from "../build/estado.js";
 import { anunciarStatus, cancelarAnuncioStatus } from "../components/status-messages.js";
 
 document.addEventListener("DOMContentLoaded",async () => {
@@ -159,7 +161,8 @@ document.addEventListener("DOMContentLoaded",async () => {
     }
     function grupo(categoria) {
       const cooler = categoria.id === "cooler", cpu = get("processador");
-      const obrigatoria = categoria.obrigatoria || (cooler && cpu && !cpu.cooler) ||
+      const ventilacaoInclusa = categoria.id === "fan" && temFansInclusas(get("gabinete"),get("water_cooler"));
+      const obrigatoria = (categoria.obrigatoria && !ventilacaoInclusa) || (cooler && cpu && !cpu.cooler) ||
         (categoria.id === "placa_video" && cpu && !cpu.videointegrado);
       const tipos = categoria.tipos || [categoria.id];
       const itens = tipos.flatMap(cat => itensCategoria(build,cat).map(item => ({categoria:cat,item})));
@@ -173,7 +176,7 @@ document.addEventListener("DOMContentLoaded",async () => {
       const disponivel = categoria.armazenamento && catalogo.some(p => tipos.includes(p.categoria) && (() => { try { selecionarPecaCompativel(build,p,catalogo); return true; } catch { return false; } })());
       const cabecalho = '<div class="component-group-heading"><h2>' + categoria.nome + ' ' + badge(obrigatoria) + '</h2>' +
         (categoria.id === "memoria_ram" ? '<span class="component-count">' + info.usados + ' / ' + (info.placa ? info.slots : "—") + ' pentes · ' + info.capacidade + ' GB' + (info.slotsProvisorios ? ' · limite provisório' : '') + '</span>'
-          : categoria.armazenamento ? '<span class="component-count">' + discos.ssd + ' SSD · ' + discos.hd + ' HD</span>'
+          : categoria.armazenamento ? '<span class="component-count">' + discos.ssd + ' SSD · ' + discos.hd + ' HD · ' + resumoCapacidadeDiscos(discos,catalogo) + '</span>'
           : fans ? '<span class="component-count">' + vagasFans + '</span>' : "") + '</div>' +
         (categoria.id === "memoria_ram" && info.slotsProvisorios ? '<p class="component-connections">' + AVISO_SLOTS_RAM_PROVISORIOS + '</p>' : '') +
         (fans ? '<p class="component-connections">' + (fans.selecionadas ?? "?") + ' selecionadas · ' + (fans.inclusas ?? "?") + ' inclusas · ' + (fans.radiador ?? "?") + ' do radiador' +
@@ -187,8 +190,9 @@ document.addEventListener("DOMContentLoaded",async () => {
         (categoria.id === "fan" ? '<button type="button" class="btn-ghost ram-add-model" data-category="fan" aria-label="Adicionar outro modelo de fan" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("plus") + 'Adicionar outro modelo de fan</button>' : "") +
         (categoria.rede && itens.length < tipos.length ? '<button type="button" class="btn-ghost ram-add-model" data-category="rede" aria-label="Adicionar outro acessório de rede" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("plus") + 'Adicionar outro acessório de rede</button>' : "") + '</section>';
       const incluido = cooler && cpu?.cooler, total = catalogo.filter(p => tipos.includes(p.categoria)).length;
-      const acao = categoria.rede ? "Adicionar cabo ou adaptador" : "Selecionar componente";
+      const acao = categoria.rede ? "Adicionar cabo ou adaptador" : ventilacaoInclusa ? "Adicionar fans extras" : "Selecionar componente";
       const dica = categoria.rede ? resumoRede(build.rede) + (total ? " · escolha um modelo no catálogo" : " · produtos ainda não cadastrados")
+        : ventilacaoInclusa ? "Já há fans inclusas no gabinete ou water cooler. Extras dependem das posições e medidas disponíveis."
         : incluido ? "Cooler incluso no processador" + (cpu.modelo_cooler ? " · " + cpu.modelo_cooler : "") + ". Adicional opcional."
           : cooler ? "Air cooler e water cooler" : categoria.armazenamento ? "SSD ou HD · escolha ao menos um armazenamento" : "Escolha um modelo no catálogo";
       return '<section class="component-group">' + cabecalho + '<article class="component-row glass-card"><button type="button" class="component-empty' + (perifericos.includes(categoria.id) ? ' component-empty-peripheral' : '') + '" data-category="' + categoria.id +
@@ -206,7 +210,7 @@ document.addEventListener("DOMContentLoaded",async () => {
       const avisoVideo = cpuSelecionada?.videointegrado ? '<p class="integrated-video-note">Este processador possui vídeo integrado' + (cpuSelecionada.modelo_videointegrado ? ': ' + h(cpuSelecionada.modelo_videointegrado) : '') + '. ' + (itensCategoria(build,"placa_video").length ? 'A build também inclui uma placa de vídeo dedicada.' : 'É possível usar imagem sem uma placa de vídeo dedicada. Jogos e tarefas gráficas exigentes podem precisar de uma GPU separada.') + '</p>' : '';
       const categorias = categoriasEditor.filter(c => (build.incluirPerifericos || !perifericos.includes(c.id)) && (build.incluirRede || !c.rede));
       main.innerHTML = '<header class="builder-heading"><div><a class="builder-back font-1-xs" href="./builds.html" aria-label="Voltar para Minhas builds">' + iconeAnimado("arrow","back") + 'Voltar para Minhas builds</a><div class="builder-title-line">' +
-        indicadorBuild(resultado,"compatibility-details") + '<h1 id="builder-title">' + h(build.titulo) + '</h1><button type="button" class="builder-rename" id="rename-build" aria-label="Editar nome da build" aria-haspopup="dialog" ' + bloqueado(build.travada,"Destranque a build para alterar o nome.") + '>' + iconeAnimado("pencil") + '</button></div><p>Configure sua build: escolha os componentes da sua configuração.</p></div><button type="button" class="btn-primary benchmark-trigger" id="benchmark-build" aria-label="Testar build" ' + bloqueado(Boolean(motivoBenchmark(build,catalogo)),motivoBenchmark(build,catalogo)) + '>' + iconeAnimado("magic") + 'Testar build</button></header>' +
+        indicadorBuild(resultado,"compatibility-details") + '<h1 id="builder-title">' + h(build.titulo) + '</h1><button type="button" class="builder-rename" id="rename-build" aria-label="Editar nome da build" aria-haspopup="dialog" ' + bloqueado(build.travada,"Destranque a build para alterar o nome.") + '>' + iconeAnimado("pencil") + '</button></div>' + autoriaBuildHtml(build) + '<p>Configure sua build: escolha os componentes da sua configuração.</p></div><button type="button" class="btn-primary benchmark-trigger" id="benchmark-build" aria-label="Testar build" ' + bloqueado(Boolean(motivoBenchmark(build,catalogo)),motivoBenchmark(build,catalogo)) + '>' + iconeAnimado("magic") + 'Testar build</button></header>' +
         avisoVideo + '<div class="builder-layout"><section class="component-list" aria-label="Componentes"><div class="builder-options"><label class="ui-check font-2-xs"><input type="checkbox" id="include-peripherals" ' + (build.incluirPerifericos ? "checked " : "") +
         bloqueado(build.travada,trancada) + '>' + iconeAnimado("checkbox") + '<span>Incluir periféricos</span></label><label class="ui-check font-2-xs"><input type="checkbox" id="include-network" ' + (build.incluirRede ? "checked " : "") + bloqueado(build.travada,trancada) + '>' + iconeAnimado("checkbox") + '<span>Incluir rede</span></label></div>' + categorias.map(grupo).join("") +
         '</section><aside class="build-sidebar"><section class="build-summary glass-card"><span class="summary-eyebrow">Total da configuração</span><strong class="summary-total" data-value-key="total" data-value-number="' + resultado.preco + '">' + moeda(resultado.preco) +

@@ -18,6 +18,7 @@ class CriarBuildPerifericosTest(unittest.TestCase):
             for indice, tipo in enumerate(self.tipos, start=1)
         }
         self.catalogo["gabinete"][0]["fans_inclusos"] = 1
+        self.catalogo["monitor"][0]["tipo_painel"] = "IPS"
         self.build = {
             "nome": "Setup", "descricao": "Completo", "utilidade": "jogos",
             "componentes": [
@@ -48,11 +49,23 @@ class CriarBuildPerifericosTest(unittest.TestCase):
             id=1, fabricante="Marca", modelo="Monitor", preco=500.0,
             tamanho_polegadas=Decimal("23.8"), resolucao="1920x1080",
             taxa_atualizacao_hz=144,
+            tipo_painel="IPS",
         )
         modelo = SimpleNamespace(__tablename__="monitor", listar_disponiveis_ate=lambda *args, **kwargs: [monitor])
         with patch("services.build_service.criar_build_service.MODELOS_PECAS", (modelo,)):
             catalogo = CriarBuildService._gerar_catalogo(1000, reserva_perifericos=1000)
         self.assertEqual(json.loads(json.dumps(catalogo))["monitor"][0]["tamanho_polegadas"], 23.8)
+
+    def test_catalogo_nao_omite_especificacoes_da_cpu_usadas_para_o_objetivo(self):
+        from models import Processador
+        cpu = Processador(id=1, fabricante="Teste", modelo="CPU", soquete="AM5", preco=1000,
+            nucleo=8, thread=16, clockbase=Decimal("3.5"), clockmax=Decimal("5.0"))
+        campos = CriarBuildService._campos_pecas(cpu)
+        self.assertEqual(campos["nucleo"], 8)
+        self.assertEqual(campos["thread"], 16)
+        self.assertEqual(campos["clockbase"], 3.5)
+        self.assertEqual(campos["clockmax"], 5.0)
+        json.dumps(campos)
 
     def test_sem_reserva_nao_exige_perifericos(self):
         build = {**self.build, "componentes": [item.copy() for item in self.build["componentes"]
@@ -69,6 +82,18 @@ class CriarBuildPerifericosTest(unittest.TestCase):
             item["preco"] = 0
         with self.assertRaisesRegex(ValueError, "limite reservado para periféricos"):
             CriarBuildService._validar_build(self.build, self.catalogo, 2000, percentual=20)
+
+    def test_monitor_novo_nao_permite_painel_proibido_ou_desconhecido(self):
+        for painel in ("TN", "OLED", None):
+            with self.subTest(painel=painel):
+                self.catalogo["monitor"][0]["tipo_painel"] = painel
+                with self.assertRaisesRegex(ValueError, "painel IPS ou VA"):
+                    CriarBuildService._validar_build(self.build, self.catalogo, 2000, percentual=20)
+
+    def test_monitor_proprio_e_preservado_mesmo_sem_painel_confirmado(self):
+        build = {**self.build,"componentes":[i.copy() for i in self.build["componentes"] if i["tipo"]!="monitor"]}
+        self.catalogo["monitor"][0]["tipo_painel"] = "OLED"
+        assert CriarBuildService._validar_build(build,self.catalogo,2000,percentual=20,proprias={"monitor":"Meu OLED"})["preco_total"] == 900
 
     def test_nao_compra_novamente_uma_categoria_propria(self):
         with self.assertRaisesRegex(ValueError, "repetiu"):
@@ -124,6 +149,24 @@ class CriarBuildPerifericosTest(unittest.TestCase):
         prompt = CriarBuildService._criar_prompt(dados, 5000, 1000, catalogo)
         self.assertIn('"acessorio_rede_obrigatorio": "adaptador_wifi"', prompt)
         self.assertIn('"categorias_rede_proibidas": ["cabo_rede"]', prompt)
+
+    def test_prompt_usa_o_investimento_sem_transformar_teto_em_gasto_minimo(self):
+        dados = {"nome": "PC", "descricao": "Jogos exigentes", "utilidade": "Jogos"}
+        prompt = CriarBuildService._criar_prompt(dados, 20000, 5000, self.catalogo)
+        self.assertIn("R$ 16000.00 a R$ 20000.00", prompt)
+        self.assertIn("NÃO é um gasto mínimo", prompt)
+        self.assertIn("não entregue por padrão", prompt)
+        self.assertIn("Não use preço isolado como prova de desempenho", prompt)
+
+    def test_prompt_separa_3000_em_2400_pc_rede_e_600_para_conjunto_perifericos(self):
+        dados = {"nome": "PC", "descricao": "Jogos", "utilidade": "Jogos", "rede": {"tipo": "wifi", "possuiAcessorio": False}}
+        prompt = CriarBuildService._criar_prompt(dados, 3000, 800, self.catalogo, 20,
+            {"placa_video": {"modelo_informado": "RTX 4060", "especificacoes_confirmadas": {}}})
+        self.assertIn("R$ 2400.00", prompt)
+        self.assertIn("R$ 600.00 (20%)", prompt)
+        self.assertIn('"total": 400.0', prompt)
+        self.assertIn("TODOS os periféricos", prompt)
+        self.assertIn("não compre outra GPU", prompt)
 
 
 if __name__ == "__main__":

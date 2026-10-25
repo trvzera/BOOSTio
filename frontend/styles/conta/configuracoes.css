@@ -394,3 +394,6 @@
   border: 1px solid var(--cor-d1);
   box-shadow: 0px 0px 15px rgba(255, 59, 48, 0.3);
 }
+#google-link-fields:not([hidden]) { display: grid; gap: 1rem; padding-top: 1rem; }
+#google-link-fields > button { justify-self: start; }
+#google-link-feedback:empty { display: none; }

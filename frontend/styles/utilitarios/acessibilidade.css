@@ -34,6 +34,11 @@
 main:focus { outline: none; }
 /* O HTML estático não revela a área interna antes da confirmação da sessão. */
 body[data-private-page]:not([data-session-state="authorized"]) main { visibility: hidden; }
+.session-connection-dialog { width: min(34rem,calc(100vw - 2rem)); max-height: calc(100svh - 2rem); margin: auto; padding: clamp(1.25rem,4vw,2rem); border: 1px solid var(--glass-border,var(--cor-2)); border-radius: 1.5rem; background: var(--cor-1); color: var(--cor-6); overflow-y: auto; }
+.session-connection-dialog::backdrop { background: rgba(0,0,0,.85); }
+.session-connection-dialog h2 { margin-bottom: 1rem; }
+.session-connection-dialog p { color: var(--cor-4); line-height: 1.7; overflow-wrap: anywhere; }
+.session-connection-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }
 .checkbox-wrapper:has(input:focus-visible) {
   outline: 2px solid var(--cor-p1);
   outline-offset: 4px;

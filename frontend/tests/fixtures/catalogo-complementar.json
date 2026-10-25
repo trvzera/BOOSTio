@@ -1,0 +1,6 @@
+[
+  {"categoria":"fan","fabricante":"Corsair","modelo":"QL120","part_number":"SEED-FAN-14","link":"https://www.kabum.com.br/produto/108137/ventoinha","esperado":{"quantidade":1,"tamanho_mm":120,"espessura_mm":25}},
+  {"categoria":"fan","fabricante":"Lian Li","modelo":"Uni Fan SL120","part_number":"SEED-FAN-33","link":"https://www.kabum.com.br/produto/931169/ventoinha","esperado":{"quantidade":1,"tamanho_mm":120,"espessura_mm":28,"fluxo_ar":"reverso"}},
+  {"categoria":"gabinete","fabricante":"Lian Li","modelo":"O11 Dynamic","part_number":"SEED-CASE-29","link":"https://www.kabum.com.br/produto/582808/gabinete","esperado":{"comprimento_mm":478,"largura_mm":290,"altura_mm":471,"tamanho_max_gpu_mm":455.7,"fans_inclusos":0,"quantidade_max_fans":10,"baias_25":null}},
+  {"categoria":"gabinete","fabricante":"Corsair","modelo":"2000D","part_number":"SEED-CASE-44","link":"https://www.kabum.com.br/produto/433279/gabinete","esperado":{"formatos_placa_mae":"ITX","comprimento_mm":271,"largura_mm":200,"altura_mm":458,"fans_inclusos":0,"quantidade_max_fans":null,"posicoes_fans":null}}
+]

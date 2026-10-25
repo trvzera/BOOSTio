@@ -1,4 +1,56 @@
-# Qualidade do frontend — 20/10/2026
+# Qualidade do frontend
+
+## Autoria e textos de conta — 24/10/2026
+
+- 61 verificações Chrome do editor e da página pública em 320/375/768/1440 px e
+  paisagem 844×390, com nome de 30 caracteres sem espaços: Poppins, quebra,
+  ausência de overflow, axe WCAG A/AA até 2.2 e JavaScript sem exceções.
+- Mais 321 verificações de mensagens/modais com os textos de desativação, nas
+  mesmas dimensões, aprovadas. APIs simuladas, nenhuma gravação em conta real.
+- Autoria calculada pelo dono no servidor, sem confiar no estado recebido e sem
+  expor e-mail, ID ou budget publicamente. A regressão cobre conta desativada,
+  cópia pertencente ao novo dono, escape de HTML e metadado antigo ausente.
+- Suítes: 545 testes Node e 668 Python (+13 subtestes). Não foram alteradas regras
+  de desativação, autenticação, compatibilidade nem dados do banco real.
+
+## Responsividade, mensagens e fans — 24/10/2026
+
+- Lighthouse móvel nas 16 páginas: acessibilidade **100** e boas práticas **100**.
+  SEO **100** no início, Sobre e Termos; as outras 13 telas mantêm `noindex`
+  intencional e recebem 63 nesse indicador. O editor e os Termos foram medidos
+  novamente após os ajustes, preservando essas notas. Não remover `noindex` de
+  telas pessoais para aumentar a pontuação. Performance móvel ficou entre 62 e
+  77 na rodada completa, sem desativar fontes, loading ou animações.
+- As fontes locais Lexend/Poppins carregaram corretamente. As mensagens longas
+  simuladas da API — erro de catálogo/ID, login, cadastro, exclusão de conta,
+  verificação de e-mail, toast e falha no salvamento — herdaram Poppins sem cortes.
+  Não foi reproduzido fallback para Times/serif nos estados auditados; não houve
+  substituição da tipografia nem alteração das respostas do backend.
+- Testes de fontes, overflow e axe WCAG A/AA até 2.2 em 320×800, 375×812,
+  768×1024, 1440×900 e paisagem 844×390: **721 verificações aprovadas**, sem
+  exceções JavaScript. As mesmas 16 páginas também passaram
+  pelo ensaio de texto a 200% em 320/1440 px: 129 verificações. Corrigidos o
+  contraste do destaque dos Termos, a quebra de palavras nas listas legais e o
+  preço/botão de compra do editor quando a linha não comporta o texto ampliado.
+- Corrigida uma divergência do editor: fans confirmadas do water cooler já
+  atendiam à presença de ventilação no Python, mas ainda apareciam como compra
+  obrigatória/progresso pendente no JavaScript. Agora contam também no frontend,
+  sem somar duas vezes nem considerar fans do air cooler como fans do gabinete.
+  Medidas ausentes continuam desconhecidas e conflitos físicos não são ignorados.
+- Fluxo de fans: 136 verificações com movimento reduzido nas cinco dimensões e
+  59 com Lottie real/movimento normal em celular e desktop. Foram testados kits,
+  modelos misturados, duplicação no limite, remoção, adição pelo catálogo,
+  substituição explícita das fans do AIO, build trancada e capacidade desconhecida.
+  As 45 e 18 gravações dessas baterias foram **simuladas**, sem escrita no banco.
+  As medições visuais/contraste aguardam o fim das transições de entrada.
+- Regressão: **541 testes Node e 666 Python (+13 subtestes)** aprovados. Permanecem
+  204 avisos legados de SQLAlchemy/Flask-Login; nenhuma chamada a LLM, coleta de
+  preços, envio de e-mail ou gravação em conta/banco real foi feita nesta rodada.
+
+Esses resultados são locais, em Chrome, com APIs simuladas e catálogo real lido
+somente para consulta. Não comprovam conformidade WCAG integral nem garantem as
+mesmas notas em produção. Safari/VoiceOver, aparelhos reais, desempenho de rede e
+integrações reais ainda precisam de homologação. As seções abaixo são históricas.
 
 ## Melhorias de RAM e e-mail — 23/10/2026
 

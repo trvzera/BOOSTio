@@ -125,7 +125,7 @@
       <div class="modal-box" id="verify-email-box">
         <div class="modal-icon"><i class="fa-solid fa-envelope-circle-check" aria-hidden="true"></i></div>
         <h2 class="font-1-m">Confirme seu e-mail</h2>
-        <p class="font-1-m">Para ativar sua conta, envie o código de verificação para <strong id="verify-email-target">seu e-mail</strong> e digite os 4 dígitos recebidos abaixo.</p>
+        <p class="font-1-m">Enviaremos um código para <strong id="verify-email-target">seu e-mail</strong>. Digite os 6 dígitos para verificar automaticamente.</p>
 
         <div id="send-code-container">
           <button type="button" class="btn-ghost" id="btn-send-code" aria-label="Enviar código de verificação para o e-mail">
@@ -143,7 +143,8 @@
           <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="5" aria-label="Sexto dígito do código" disabled>
         </div>
 
-        <p id="verify-email-error" class="font-1-xs form-error"></p>
+        <p id="verify-email-status" class="font-2-xs" role="status" aria-live="polite"></p>
+        <p id="verify-email-error" class="font-1-xs form-error" role="alert"></p>
 
         <div class="modal-actions">
           <button type="button" class="btn-ghost" id="btn-verify-later" aria-label="Fazer isso depois: verificar e-mail mais tarde">Fazer isso depois</button>

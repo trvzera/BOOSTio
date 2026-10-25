@@ -61,10 +61,10 @@ de builds no backend para persistir a configuração na conta.
 
 | Nº | Requisito | Status | Escopo atual |
 | --- | --- | --- | --- |
-| 01 | O sistema deve permitir ao usuário criar sua conta e fazer login | ✅ **Implementado** | Cadastro, autenticação, logout e sessão. |
+| 01 | O sistema deve permitir ao usuário criar sua conta e fazer login | ✅ **Implementado** | Cadastro, autenticação, logout e sessão. Código de e-mail enviado ao iniciar a verificação e conferido ao completar seis dígitos; vínculo Google explícito no perfil, com confirmação de identidade. |
 | 02 | O sistema deve permitir ao usuário cadastrar seu setup atual | ✅ **Implementado** | Definir ou remover uma build como computador atual. |
 | 03 | O sistema deve permitir ao usuário pesquisar compatibilidade e peças | ✅ **Implementado** | Catálogo por categoria e diagnóstico durante a montagem, com as limitações do requisito 13. |
-| 04 | O sistema deve permitir ao usuário montar seu setup atual através de formulário | ✅ **Implementado** | Geração por LLM com orçamento, ventilação obrigatória (contando fans inclusas) e uma revisão automática de saídas inválidas antes de salvar. |
+| 04 | O sistema deve permitir ao usuário montar seu setup atual através de formulário | ✅ **Implementado** | Geração por LLM com orçamento, peças próprias identificadas pelo catálogo, preferências opcionais de gabinete/cor, ventilação obrigatória (contando fans inclusas) e uma revisão automática de saídas inválidas antes de salvar. |
 | 05 | O sistema deve permitir ao usuário salvar configurações de computadores feitas | ✅ **Implementado** | Builds persistidas na conta, inclusive incompletas, com salvamento automático e avisos de falha. |
 | 06 | O sistema deve permitir ao usuário excluir configurações salvas no perfil | ✅ **Implementado** | Exclusão com verificação de proprietário e tranca. |
 | 07 | O sistema deve permitir ao usuário comparar configurações salvas | ✅ **Implementado** | Duas ou três builds: preços, componentes, consumo e renderização no Blender. FPS é uma ampliação pendente, não uma condição da comparação atual. |
@@ -91,8 +91,13 @@ de builds no backend para persistir a configuração na conta.
   montagem manual, formulário, importação, cópia de modelo e duplicação.
 - **Tranca:** uma build trancada não pode ser editada nem excluída antes de ser destrancada.
 - **Compartilhamento:** o visitante não altera a build original nem acessa o budget
-  ou os dados do proprietário. Testar exige login; uma cópia é privada e independente.
+  ou os dados privados do proprietário. A autoria mostra somente o nome de exibição,
+  sem e-mail ou ID da conta; contas desativadas aparecem como “Conta desativada”.
+  Testar exige login; uma cópia é privada e independente.
   Tornar a original privada interrompe novas consultas e cópias pelo link público.
+- **Desativação da conta:** bloqueia o acesso, encerra sessões e libera o e-mail
+  para novo cadastro, preservando registros. A recuperação será assistida pela
+  equipe; o procedimento de identificação e restauração ainda precisa ser definido.
 
 ### Como o orçamento é respeitado
 
@@ -106,6 +111,36 @@ define o limite do PC, incluindo acessórios de rede.
 O Python confere os subtotais pelos preços e quantidades do catálogo antes de
 salvar a sugestão. O **frete não está incluído**: é importante reservar parte do
 orçamento para a entrega.
+
+O formulário separa **tamanho do gabinete**, **estilo** e **cor**, com imagens de
+exemplo sem preços ou ofertas e opções de “sem preferência”. Os tamanhos são
+Mini, Mid e Full Tower; os estilos são sem vidro, vidro lateral, aquário
+(frente/lateral) e panorâmico com três faces de vidro (frente/lateral/teto).
+Ao escolher o tamanho, um exemplo mostra medidas externas, placas-mãe,
+ventoinhas e radiador suportados. Esses dados são do modelo de referência,
+não um padrão de todos os gabinetes daquele tamanho. São preferências flexíveis:
+não autorizam exceder o orçamento nem ignorar medidas, ventilação ou estoque.
+Na geração inteligente, a preferência de cor se aplica a **todas as peças e
+periféricos novos**, incluindo gabinete, ventoinhas e resfriadores. A amostra de
+produtos e os conjuntos de periféricos preservam opções da cor desejada sem
+eliminar alternativas econômicas e padrões técnicos. O complemento automático
+de fans também considera a cor, depois de verificar encaixe e orçamento.
+Cor cadastrada tem prioridade; nomes com indicação de cor são referências
+comerciais, não confirmação técnica da versão. RGB, switch, fotos e URLs não
+comprovam a cor da carcaça. Peças próprias são preservadas; ausência da cor
+preferida não impede usar uma alternativa adequada, sem exceder os tetos.
+Características ausentes não são inventadas. O editor também mostra a
+capacidade total de SSDs/HDs em GB/TB; quando faltam dados, identifica o subtotal
+como parcial.
+
+O uso escolhido no formulário explica **quais peças terão prioridade**. As páginas
+do catálogo e da peça também apresentam uma descrição simples da função de cada
+componente, mantendo as informações técnicas para quem quiser conferir os detalhes.
+
+Avisos distinguem falta de conexão, demora e erro respondido pelo servidor.
+Se a resposta de uma criação ou alteração se perder, orientamos conferir o
+resultado antes de repetir. Falhar ao verificar a sessão não significa sair da
+conta: é possível tentar novamente, mantendo o conteúdo privado bloqueado até a confirmação.
 
 ## Builds prontas
 
@@ -150,7 +185,18 @@ Escolha de jogo, resolução e qualidade gráfica, com **FPS médio** e **1% low
 quando disponíveis. Falhas e ausência de dados não geram FPS inventados.
 
 A FPSHQ apresentou timeouts nas consultas de FPS e jogos em **21 e 22/10/2026**.
-Isso não comprova indisponibilidade global; a consulta depende da resposta do provedor.
+Na consulta pública de **24/10/2026**, respondeu **HTTP 302** para uma página externa
+de hospedagem inativa, em vez do JSON da API. O Python não segue esse destino:
+informa indisponibilidade e aplica uma pausa, preservando apenas cache previamente
+validado com aviso de desatualização. É uma observação deste ambiente e momento,
+não uma garantia sobre o estado permanente do provedor.
+Busca, FPS e contrato OpenAPI apresentaram esse mesmo retorno na nova checagem.
+HTML com HTTP 200 também é tratado como resposta inválida, nunca como FPS.
+O teste direto no Chrome, sem cache da aplicação, também falhou em 24/10:
+o navegador registrou bloqueio por ausência do cabeçalho de CORS. O endereço
+consultado é o mesmo do primeiro protótipo. Isso não comprova a causa interna
+da indisponibilidade nem descarta diferenças entre redes, mas a falha atual não
+se limita à integração Python: nesta consulta, o serviço não entregou JSON.
 
 Nas builds salvas, **Verificar requisitos** usa o catálogo Python para comparar RAM,
 VRAM dedicada e capacidade/tipo de armazenamento quando há um mínimo oficial
@@ -164,8 +210,8 @@ continuam pendentes: capacidades suficientes não aprovam o computador completo.
 
 Dados públicos de CPU ou GPU, com **mediana em amostras por minuto**, versão do
 Blender, método de renderização e quantidade de resultados. O retorno foi validado
-pelo serviço Python e revalidado com consultas reais em **23/10/2026**, sem garantia
-de disponibilidade permanente.
+pelo serviço Python e revalidado com consultas reais em **23 e 24/10/2026**. A última
+consulta de CPU respondeu HTTP 200, sem garantia de disponibilidade permanente.
 
 A comparação de builds consulta esses dados ao clicar em **Comparar renderização**.
 CPU e GPU são analisadas separadamente; só há classificação quando todas as builds
@@ -189,7 +235,9 @@ Fontes: [FPSHQ](https://fpshq.com/pt/api/) e
 
 No laboratório (`testes.html`), é possível comparar uma consulta FPS pelo Python
 com uma consulta direta pelo JavaScript, sem cache local neste último caminho.
-O diagnóstico informa tempo, HTTP recebido e falhas de transporte/validação;
+O diagnóstico informa tempo, HTTP recebido e falhas de transporte/validação.
+Quando disponíveis, distingue o HTTP da BOOSTio do status e formato recebidos
+da FPSHQ e informa se a tentativa apenas encontrou a pausa após uma falha anterior;
 não troca automaticamente de caminho nem altera a montagem real.
 
 Os **requisitos dos cinco jogos padrão** usam fontes oficiais revisadas em 21/10/2026
@@ -210,7 +258,7 @@ Ainda estão em evolução a validação completa de compatibilidade física no
 servidor e a consolidação dos dados usados pelas sugestões e consultas:
 
 - **Compatibilidade:** regras de encaixe e capacidade de fans implementadas no Python e no frontend; ampliar medidas confiáveis por modelo, conectores e interferências. Dados ausentes permanecem não verificados.
-- **Peças próprias:** identificar modelos para avaliar suas especificações reais.
+- **Peças próprias:** ampliar a identificação. O formulário já sugere modelos por categoria e reconhece correspondências exatas e únicas; nomes desconhecidos ou ambíguos continuam a confirmar, sem substituir variantes por aproximação.
 - **Jogos:** ampliar equivalências e recursos de CPU/GPU e requisitos além das capacidades já verificadas.
 - **Preços:** consolidar o monitoramento agendado e a atualização do catálogo.
 - **Desempenho:** concluir a comparação de FPS e tratar a instabilidade das fontes externas.
@@ -219,8 +267,8 @@ A geração pela LLM já revalida conflitos conhecidos no catálogo, incluindo s
 DDR, slots, potência e medidas explícitas. Especificações ausentes continuam não
 verificadas; a configuração não recebe garantia de compatibilidade completa.
 
-O manifesto atual possui 37 fichas revisadas, incluindo gabinetes, GPUs, fontes,
-air/water coolers, placas-mãe, processador, RAM, SSDs e fan. Há limites físicos,
+O manifesto atual possui 48 fichas técnicas, incluindo gabinetes, GPUs, fontes,
+air/water coolers, placas-mãe, processador, RAM, SSDs, fans e periféricos. Há limites físicos,
 slots, perfis JEDEC/XMP, dimensões por capacidade de SSD, conexões RGB/PWM e
 exceções físicas declaradas pelo fabricante do cooler. As fichas só complementam
 cadastros com identidade correspondente; não representam todo o catálogo.
@@ -233,11 +281,36 @@ o banco ou inferir dados de outra revisão. Modelos/links com variantes divergen
 continuam pendentes de revisão. Isso não certifica BIOS, QVL ou todas as
 interferências físicas.
 
-Saídas inválidas da IA recebem **uma tentativa automática de correção**, com o erro
-da validação e as regras originais. A nova resposta é validada por completo antes
+A base de cadastro inclui **1.542 produtos**, com sete novos modelos de fans,
+periféricos e gabinete identificados por part number. Isso não significa que todos
+tenham preço, estoque ou ficha completa confirmados. A auditoria aponta campos
+técnicos ausentes por categoria; novas peças só entram nas sugestões após cotação
+válida e disponibilidade. Veja as [fontes e os limites da revisão do catálogo](docs/catalogo-e-especificacoes.md).
+
+Saídas inválidas da IA recebem **uma tentativa automática de correção**, com o erro,
+os subtotais calculados pelo servidor e as regras originais. A nova resposta é validada por completo antes
 de persistir. Isso cobre falhas como GPU obrigatória ausente, JSON inválido, IDs,
 quantidades, orçamento e conflitos conhecidos; não garante solução quando o catálogo
 ou o orçamento não permitem a montagem. Falhas de transporte e cotas recebem mensagens próprias.
+
+O planejamento fornece conjuntos de periféricos que cabem na reserva e preserva
+opções de socket, DDR, recursos dos periféricos e faixas de preço no catálogo enviado
+à IA. O prompt diferencia o conjunto mínimo viável de uma recomendação de qualidade
+e considera referências visuais sem torná-las obrigatórias. Fans omitidas
+podem ser completadas pelo Python somente quando encaixe e orçamento são conhecidos.
+Pedidos exigentes com investimento alto subutilizado podem aproveitar a revisão
+já prevista, sem exigir gasto mínimo ou novas tentativas ilimitadas. Detalhes e
+resultados dos testes estão na [revisão da geração](docs/geracao-build.md).
+Esses ajustes recentes foram validados com respostas controladas; novas chamadas
+reais à LLM e o vínculo com o Google ainda precisam de homologação online.
+
+Monitores **novos da geração inteligente** exigem painel confirmado IPS/VA,
+incluindo Fast IPS e Fast VA. Para jogos, o planejamento destaca Hz e alternativas
+de teclado mecânico com switch documentado quando couberem no conjunto. Para
+edição/trabalho, destaca resolução e polegadas. Recursos ausentes não viram
+garantia de precisão de cor ou qualidade. Itens próprios são preservados e o
+catálogo manual não perde produtos. A integração AliExpress depende de acesso
+aprovado e ainda não está ativa; veja o [escopo e as dependências](docs/integracoes-perifericos.md).
 
 Em 23/10/2026, um teste isolado pelo fluxo completo do formulário gerou, revisou,
 validou e persistiu uma configuração de estudos em banco temporário. Isso não
@@ -262,21 +335,24 @@ Service específico, e o SQL especial fica nos Repositories.
 
 ## Diagrama de classes
 
-O diagrama de classes do domínio está sendo finalizado para esta entrega.
-O local previsto é `docs/diagrama-classes.png`; o arquivo e o link de visualização
-ainda precisam ser incluídos antes da submissão. Ele deve refletir as Models
-atuais, incluindo a diferença entre `Build` e `BuildSalva`, cujo estado é JSON.
-O [prompt baseado nas classes atuais](docs/prompt-diagrama-classes.md) está disponível
-para gerar a imagem e conferir seus relacionamentos antes de incluí-la.
+O [diagrama de classes do domínio](docs/diagrama-classes.png) apresenta as Models,
+suas heranças e relações, incluindo a diferença entre `Build` e `BuildSalva`,
+cujo estado é JSON. A [fonte editável em DOT](docs/diagrama-classes.dot) também
+está versionada. A imagem foi preservada dos arquivos de entrega já existentes;
+não representa um diagrama de todos os Services e Controllers.
+
+A [revisão de estrutura](docs/revisao-estrutura.md) explica o papel das pastas,
+os recursos necessários ao site e os arquivos locais/gerados que não entram no PR.
+Os originais da marca, esboços e anotações estão reunidos em [materiais](materiais/README.md).
 
 ## Validação da versão
 
-Na revisão de **23/10/2026**, a suíte local aprovou **527 testes JavaScript** e
-**615 testes Python**, além de **13 subtestes Python**. Os testes cobrem, entre
+Na revisão de **24/10/2026**, a suíte local aprovou **586 testes JavaScript** e
+**781 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
 Há testes específicos para as sete classes de Controller e para preservar o
-contrato das 34 rotas declaradas, incluindo o blueprint legado de peças, que
+contrato das 35 rotas declaradas, incluindo o blueprint legado de peças, que
 continua fora do registro do aplicativo principal. O catálogo ativo permanece
 em `/build/catalogo`.
 

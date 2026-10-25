@@ -1,6 +1,8 @@
 import { categorias, perifericos, acessoriosRede } from "./catalogo.js";
 import { conexaoDisco, limitesArmazenamento, numeroConhecido, slotsRam } from "./hardware.js";
 import { normalizarRede } from "./rede.js";
+import { normalizarAparencia } from "./aparencia.js";
+import { reconhecerPecaPropria } from "./pecas-proprias.js";
 import { planejamentoLocal } from "./planejamento.js";
 import { posicoesFans } from "./fans.js";
 
@@ -61,6 +63,7 @@ export function normalizarBuild(valor = {}) {
     incluirPerifericos:typeof valor.incluirPerifericos === "boolean" ? valor.incluirPerifericos : perifericos.some(cat => componentes[cat]),
     incluirRede:typeof valor.incluirRede === "boolean" ? valor.incluirRede : acessoriosRede.some(cat => componentes[cat]) || ["cabo","wifi"].includes(valor.rede?.tipo),
     rede:normalizarRede(valor.rede),
+    aparencia:normalizarAparencia(valor.aparencia),
     pecasExtras:Object.fromEntries(Object.entries(valor.pecasExtras || {})
       .filter(([tipo,nome]) => ["webcam","microfone"].includes(tipo) && typeof nome === "string" && nome.trim())
       .map(([tipo,nome]) => [tipo,nome.trim().slice(0,120)])),
@@ -159,6 +162,15 @@ export function informacoesArmazenamento(build,catalogo) {
     sata:contar(({peca}) => conexaoDisco(peca) === "sata"),
     ssd:contar(({categoria}) => categoria === "ssd"),hd:contar(({categoria}) => categoria === "hd"),
     capacidade:itens.reduce((n,{item,peca}) => n + Number(peca?.capacidade_gb || 0) * item.quantidade,0)};
+}
+export function resumoCapacidadeDiscos(info,catalogo=[]) {
+  // Apenas capacidade para exibição; não transforma peça própria em compra.
+  const itens=info.itens.map(dado=>({...dado,peca:dado.peca || (dado.item.proprio?reconhecerPecaPropria(catalogo,dado.categoria,dado.item.proprio).peca:null)}));
+  const conhecidos=itens.filter(({peca})=>typeof peca?.capacidade_gb==="number"&&Number.isFinite(peca.capacidade_gb)&&peca.capacidade_gb>0);
+  if(!conhecidos.length)return "Capacidade não informada";
+  const gb=conhecidos.reduce((s,{item,peca})=>s+peca.capacidade_gb*item.quantidade,0);
+  const valor=new Intl.NumberFormat("pt-BR",{maximumFractionDigits:2}).format(gb>=1000?gb/1000:gb);
+  return valor+(gb>=1000?" TB":" GB")+(conhecidos.length<info.itens.length?" conhecidos · parcial":" no total");
 }
 export function conflitosArmazenamento(info) {
   const erros = [];

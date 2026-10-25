@@ -12,11 +12,10 @@ import { formatarMesAno } from "../utils/formatarData.js";
 import { enviarEmailVerificar } from "../api/email/enviarEmailVerificar.js";
 import { conferirEmailVerificar } from "../api/email/conferirEmailVerificar.js";
 import { acompanharCarregamento } from "../components/page-loading.js";
-import { iniciarCodigoVerificacao } from "../components/verification-code.js";
+import { iniciarFluxoVerificacaoEmail } from "../components/verification-flow.js";
 import { listarBuilds } from "../api/build/builds.js";
 import { textoBuildsSalvas } from "../conta/resumo-perfil.js";
 
-const SEGUNDOS_REENVIO = 30;
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
@@ -89,7 +88,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function validatePasswordForm() {
-      const hasCurrent = currentPassword.value.length > 0;
+      const hasCurrent = usuarioAtual?.possui_senha === false || currentPassword.value.length > 0;
       const newVal = newPassword.value;
       const confirmVal = confirmPassword.value;
       const strongEnough = newVal.length >= 8;
@@ -164,11 +163,11 @@ document.addEventListener("DOMContentLoaded", async () => {
           const dadosExclusao = await buscarUsuarioLogado();
           await deletarUsuario(dadosExclusao.usuario.id, document.getElementById("delete-current-password").value);
           closeModal();
-          showToast("Conta excluída. Redirecionando...", true);
+          showToast("Conta desativada. Redirecionando...", true);
           window.location.href = "./index.html";
         } catch (erro) {
-          console.error("Falha ao excluir conta:", erro);
-          showToast(erro.message || "Não foi possível excluir a conta.", false);
+          console.error("Falha ao desativar conta:", erro);
+          showToast(erro.message || "Não foi possível desativar a conta.", false);
         }
       });
     }
@@ -195,6 +194,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     let usuarioAtual = null;
+    function atualizarAcesso() {
+      const google=usuarioAtual?.google_vinculado===true,senha=usuarioAtual?.possui_senha!==false;
+      document.querySelector("#google-access-status").textContent=google?"Conta vinculada ao Google" : "Google não vinculado";
+      document.querySelector("#google-link-fields").hidden=google||!senha;
+      document.querySelector(".profile-identity-confirmation").hidden=senha;
+      document.querySelector("#profile-current-password").closest(".field").hidden=!senha;
+      currentPassword.closest(".field").hidden=!senha;
+      document.querySelector("#delete-current-password").closest(".field").hidden=!senha;
+      document.querySelector('#delete-modal [data-confirmar-google]').hidden=senha;
+      document.querySelector("#password-google-confirm").hidden=senha;
+      document.querySelector("#password-settings-title").textContent=senha?"Alterar senha":"Criar senha de acesso";
+      document.querySelector("#password-settings-description").textContent=senha?"Utilize esse campo para alterar a sua senha.":"Confirme sua identidade pelo Google e crie uma senha em até cinco minutos. Você continuará podendo entrar pelo Google.";
+      validatePasswordForm();
+    }
+    document.querySelector("#link-google").addEventListener("click",async()=>{
+      const botao=document.querySelector("#link-google"),campo=document.querySelector("#google-link-password"),feedback=document.querySelector("#google-link-feedback");
+      if(!campo.value){feedback.textContent="Confirme sua senha atual antes de vincular.";campo.focus();return;}
+      botao.disabled=true;feedback.textContent="Abrindo a confirmação do Google…";
+      try{
+        const resposta=await fetchComErro("/auth/google/vincular",{method:"POST",body:JSON.stringify({senha_atual:campo.value})});
+        campo.value="";location.assign(resposta.url);
+      }catch(erro){feedback.textContent=erro.message;botao.disabled=false;}
+    });
 
     async function atualizarQuantidadeBuilds() {
       const resumo = document.querySelector("#profile-build-count");
@@ -219,6 +241,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const dataFormatada = formatarMesAno(resposta.usuario.criado_em);
 
       usuarioAtual = resposta.usuario;
+      atualizarAcesso();
 
       nomeConfigs.textContent = resposta.usuario.nome;
       emailConfigs.textContent = resposta.usuario.email;
@@ -231,119 +254,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // --- Modal de verificação de e-mail ---
     const modalVerificacao = document.querySelector("#verify-email-modal");
-    const alvoEmail = document.querySelector("#verify-email-target");
-    const botaoAbrirVerificacao = document.querySelector(
-      "#btn-verify-now",
-    );
-    const botaoEnviarCodigo = document.querySelector("#btn-send-code");
-    const inputsCodigo = Array.from(document.querySelectorAll(".code-input"));
-    const erroVerificacao = document.querySelector("#verify-email-error");
-    const botaoConfirmarCodigo = document.querySelector(
-      "#btn-confirm-code",
-    );
-    const botaoFecharVerificacao = document.querySelector(
-      "#btn-close-verification",
-    );
-
-    let temporizadorReenvio = null;
-
-    function alternarInputsCodigo(habilitado) {
-      inputsCodigo.forEach((input) => {
-        input.disabled = !habilitado;
-      });
-    }
-
-    function validarCodigoCompleto() {
-      const codigo = inputsCodigo.map((input) => input.value).join("");
-      botaoConfirmarCodigo.disabled = codigo.length !== inputsCodigo.length;
-    }
-
-    function iniciarContagemReenvio() {
-      let restante = SEGUNDOS_REENVIO;
-      botaoEnviarCodigo.disabled = true;
-
-      clearInterval(temporizadorReenvio);
-      temporizadorReenvio = setInterval(() => {
-        restante -= 1;
-
-        if (restante <= 0) {
-          clearInterval(temporizadorReenvio);
-          botaoEnviarCodigo.disabled = false;
-          botaoEnviarCodigo.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Reenviar código`;
-          return;
-        }
-
-        botaoEnviarCodigo.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Reenviar em ${restante}s`;
-      }, 1000);
-    }
-
-    function fecharModalVerificacao() {
-      clearInterval(temporizadorReenvio);
-      modalVerificacao.classList.remove("open");
-    }
-
-    function abrirModalVerificacao() {
-      if (!usuarioAtual) return;
-
-      alvoEmail.textContent = usuarioAtual.email;
-      erroVerificacao.textContent = "";
-      inputsCodigo.forEach((input) => (input.value = ""));
-      alternarInputsCodigo(false);
-      botaoConfirmarCodigo.disabled = true;
-      botaoEnviarCodigo.disabled = false;
-      botaoEnviarCodigo.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Enviar código`;
-      modalVerificacao.classList.add("open");
-    }
-
-    botaoAbrirVerificacao.addEventListener("click", abrirModalVerificacao);
-
-    botaoEnviarCodigo.addEventListener("click", async () => {
-      if (!usuarioAtual) return;
-
-      erroVerificacao.textContent = "";
-      botaoEnviarCodigo.disabled = true;
-
-      try {
-        await enviarEmailVerificar(usuarioAtual.id);
-        alternarInputsCodigo(true);
-        inputsCodigo[0].focus();
-        iniciarContagemReenvio();
-      } catch (erro) {
-        console.error("Falha ao enviar código de verificação:", erro);
-        erroVerificacao.textContent =
-          erro.message || "Não foi possível enviar o código. Tente novamente.";
-        botaoEnviarCodigo.disabled = false;
-      }
+    const fluxoVerificacao = iniciarFluxoVerificacaoEmail({
+      modal:modalVerificacao,enviar:enviarEmailVerificar,confirmar:conferirEmailVerificar,
+      aoConfirmar:resposta=>{
+        usuarioAtual=resposta.usuario;atualizarPillVerificado(true);
+        showToast("E-mail verificado com sucesso.",true);
+      },
     });
-
-    iniciarCodigoVerificacao(inputsCodigo,validarCodigoCompleto);
-
-    botaoConfirmarCodigo.addEventListener("click", async () => {
-      if (!usuarioAtual) return;
-
-      const codigo = inputsCodigo.map((input) => input.value).join("");
-      erroVerificacao.textContent = "";
-      botaoConfirmarCodigo.disabled = true;
-
-      try {
-        const resposta = await conferirEmailVerificar(usuarioAtual.id, codigo);
-        usuarioAtual = resposta.usuario;
-        atualizarPillVerificado(true);
-        fecharModalVerificacao();
-        showToast("E-mail verificado com sucesso.", true);
-      } catch (erro) {
-        console.error("Falha ao verificar código:", erro);
-        erroVerificacao.textContent =
-          erro.message ||
-          "Não foi possível verificar o código. Tente novamente.";
-        botaoConfirmarCodigo.disabled = false;
-      }
-    });
-
-    botaoFecharVerificacao.addEventListener("click", fecharModalVerificacao);
-    modalVerificacao.addEventListener("click", (e) => {
-      if (e.target === modalVerificacao) fecharModalVerificacao();
-    });
+    const abrirModalVerificacao=()=>fluxoVerificacao.abrir(usuarioAtual);
+    document.querySelector("#btn-verify-now").addEventListener("click",abrirModalVerificacao);
+    document.querySelector("#btn-close-verification").addEventListener("click",()=>fluxoVerificacao.fechar());
+    window.addEventListener("pagehide",()=>fluxoVerificacao.destruir(),{once:true});
 
     btnSalvar.addEventListener("click", atualizaDados);
 
@@ -418,7 +339,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         strengthBars.forEach((bar) => (bar.className = "strength-bar"));
         matchHint.textContent = "";
         savePasswordBtn.disabled = true;
-        showToast("Senha atualizada com sucesso.", true);
+        showToast("Senha atualizada. Entre novamente para continuar.", true);
+        window.location.href=caminhoLogin();
       } catch (erro) {
         showToast(erro.message, false);
         return;
@@ -430,6 +352,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     await acompanharCarregamento(trocarDadosConfigs());
+    const retornoGoogle=new URLSearchParams(location.search);
+    if(retornoGoogle.has("google_erro")||retornoGoogle.get("google")==="vinculado"){
+      document.querySelector("#google-link-feedback").textContent=retornoGoogle.get("google_erro")||"Google vinculado com sucesso.";
+      retornoGoogle.delete("google_erro");retornoGoogle.delete("google");
+      history.replaceState(null,"",location.pathname+(retornoGoogle.size?"?"+retornoGoogle:"")+location.hash);
+    }
     window.addEventListener("pageshow",evento => { if (evento.persisted) acompanharCarregamento(trocarDadosConfigs()); });
     if (new URLSearchParams(location.search).has("verificar")) abrirModalVerificacao();
   } catch (erro) {

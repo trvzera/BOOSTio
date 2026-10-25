@@ -6,6 +6,157 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Tamanho e estilo do gabinete — 24/10/2026
+
+- Complemento de cor: a orientação da etapa agora explica que a escolha vale para
+  todos os itens novos, não só o gabinete. Python preserva referências de cor na
+  amostra por categoria, exemplos de conjuntos de periféricos e complemento de
+  fans, sem mudar tetos ou encaixe. Cor do nome é indicação, não ficha confirmada;
+  peças próprias e alternativas adequadas são mantidas. Detalhes em `geracao-build.md`.
+- Regressão após essa extensão: 586 JS, 781 Python (+20 subtestes), 216 verificações
+  Chrome em cinco formatos. APIs simuladas; sem LLM real ou escrita na base.
+
+- Tamanho separado em Mini/Mid/Full Tower; estilo separado em sem vidro,
+  vidro lateral, aquário (frente/lateral) e panorâmico de três faces
+  (frente/lateral/teto). A imagem nova é do O11 Vision. Fontes dos exemplos e
+  das medidas em [geracao-build.md](geracao-build.md).
+- O guia técnico do exemplo muda apenas ao escolher tamanho, sem redesenhar
+  radios ou reiniciar estilo/cor. Anúncio curto de status, nome e descrição
+  acessíveis por opção; cards de tamanho em coluna no celular e estilos em duas colunas.
+- Medidas/placa-mãe/ventoinhas/radiador são dados dos modelos de referência,
+  não garantias de encaixe para todo um porte. Ventoinhas 120/140 mm e radiadores
+  nominais 240/360 mm são explicados separadamente, com a ressalva de espaço extra.
+- `panoramico-3-faces` é validado e persistido no backend; valores legados continuam
+  aceitos. Sem migração, alteração do catálogo ou geração real pela LLM.
+- Testes: 586 JS, 738 Python +20 subtestes; 216 verificações Chrome em cinco
+  formatos, sem exceções JavaScript, falhas de fontes/axe ou overflow horizontal.
+
+### Linguagem e conexão — 24/10/2026
+
+- `uso-formulario.js` mantém os IDs dos cinco usos e explica prioridades em termos
+  simples. `forms.js` atualiza o texto por seleção com anúncio educado; catálogo e
+  peça explicam a função do componente, sem esconder os detalhes técnicos.
+- `erros-conexao.js` centraliza os avisos offline/transporte. `fetchComErro.js`
+  preserva HTTP conhecido, diferencia falha de leitura de JSON inválido e valida
+  CSRF antes da ação. Uma resposta perdida após envio deixa o resultado incerto;
+  a geração sugere conferir as builds antes de repetir, sem reenvio automático.
+- `session-feedback.js` usa diálogo nativo com retorno ao início baseado no
+  caminho do módulo (inclusive em `testes.html`). A sessão indisponível mantém
+  o main oculto/inert; a nova tentativa não apaga respostas do formulário.
+- FPSHQ, 24/10: teste direto real no Chrome sem cache falhou por CORS
+  (`MissingAllowOriginHeader`). Serviço Python recebeu 302/HTML e devolveu
+  503/`redirecionamento`; pausa subsequente não consultou de novo. Diagnóstico
+  separa esses status (também nos logs) e só expõe metadados permitidos, nunca corpo/headers externos.
+  Endereço do protótipo original é o mesmo; causa operacional do provedor não confirmada.
+- Regressão isolada: 583 JS e 725 Python (+20 subtestes). Chrome: 151 verificações
+  de conexão/sessão/prioridades e 261 de formulário/conta em cinco tamanhos, sem
+  exceções JS ou escrita real; mais 721 verificações das páginas/erros e 29 do
+  visual/teclado. Não certifica toda a WCAG nem disponibilidade de terceiros.
+
+### Exemplos de gabinete e seleção por uso — 24/10/2026
+
+- Aparência sem dropdown de produto/preço: fotos de exemplo para Mini/Mid/Full
+  Tower e visual discreto/vidro/panorâmico. Porte e visual são campos separados;
+  nenhum exemplo obriga comprar aquele modelo. Cores em radios com amostra, nome,
+  estado selecionado e navegação por setas do teclado; duas colunas em celular estreito.
+  O formulário não precisa consultar o catálogo para desenhar esses exemplos.
+- Fontes e regras das imagens em [geracao-build.md](geracao-build.md). Falhas de foto
+  usam o placeholder existente e não removem o rótulo da opção.
+- Python filtra os monitores novos da geração por IPS/VA confirmado e revalida a
+  saída. Critérios de Hz para gamer e resolução/polegadas para trabalho/edição
+  influenciam a amostra e os exemplos viáveis. Preservados orçamento, itens próprios
+  e catálogo manual. Mecânico/switch documentado é preferência, não motivo para exceder teto.
+- Nova checagem real da FPSHQ: jogos, FPS e OpenAPI devolveram 302 + HTML145 bytes
+  para `premium52.timeweb.ru/noactive/`. Não seguir o destino. HTML com HTTP200
+  agora é distinguido de JSON inválido e ativa pausa, sem inventar FPS. Não é
+  evidência de erro de parsing da BOOSTio neste retorno; não havia JSON.
+- AliExpress aguarda acesso aprovado, confirmado pelo usuário. Não há integração
+  ativa nem novas ofertas; plano e fontes em [integracoes-perifericos.md](integracoes-perifericos.md).
+- Chrome: 261 verificações em cinco tamanhos, incluindo imagens, radios por teclado,
+  fontes/axe, envio das preferências e preservação das respostas após erro simulado.
+  Sem exceções JS, escrita no banco ou chamadas LLM reais. A suíte local tem
+  559 testes JS e 720 Python, além de 20 subtestes.
+
+### Formulário, conta e diagnóstico — 24/10/2026 (nova rodada)
+
+- Originais da marca, esboços, anotações e termos históricos preservados em
+  `materiais/`. Exportações ficam em `materiais/exportacoes/`, ignoradas no Git;
+  materiais não são enviados na imagem Docker. Nenhum recurso de runtime foi removido.
+- `verification-flow.js` centraliza envio inicial único por destino/página,
+  reenvio manual com intervalo, colagem/autofill e confirmação ao sexto dígito.
+  Eventos repetidos não repetem a mesma tentativa automática; há botão de confirmação
+  como alternativa. Respostas antigas não alteram outro destino. Erros SMTP públicos
+  não expõem o texto da exceção. O limite de tentativas continua no Python.
+- Perfil mostra Google vinculado e existência de senha, nunca `sub`/hash/token.
+  `POST /auth/google/vincular` confirma senha, CSRF, sessão, OAuth state e tempo;
+  o callback existente associa somente uma identidade livre, sem mesclar contas
+  por e-mail. Vínculo revoga outras sessões. Google-only pode criar senha após
+  confirmação recente da mesma identidade. Senha vazia foi bloqueada no servidor.
+  Homologação real do OAuth permanece necessária; nenhum login externo foi executado.
+- Peças próprias recebem sugestões nativas por categoria. Apenas nome completo
+  ou modelo exato e único usa a ficha cadastrada; desconhecidos/ambíguos permanecem
+  a confirmar. F/Ti/DDR e outras variantes não são intercambiadas por aproximação.
+- Sexta etapa opcional de aparência: estilo, cor e até seis gabinetes disponíveis
+  como referência, usando fotos reais/placeholder. Galeria com rolagem interna,
+  navegação por teclado e preferência “nenhuma”; o gabinete próprio é preservado.
+  Preferências validadas por enum/ID no Python e persistidas no JSON da build,
+  sem migração. São flexíveis; não certificam cor, medidas ou encaixe desconhecidos.
+- A amostra para IA preserva recursos de periféricos/gabinetes e uma referência
+  disponível dentro do filtro financeiro. O prompt distingue viabilidade mínima
+  de qualidade; preço, RGB ou DPI isolados não representam desempenho. Mantidos
+  os tetos independentes e sobra dos periféricos com o usuário.
+- Geração mostra tempo decorrido, sem percentual fictício. Logs INFO medem catálogo,
+  prompt, provedor e validação; revisão usa categorias de erro, sem registrar
+  prompt, resposta, nome/e-mail ou modelo de peça própria. Nenhuma chamada LLM real
+  foi consumida nesta rodada; mudanças de qualidade ainda precisam dessa homologação.
+- SSD/HD exibe total em GB/TB, multiplicando as quantidades; 1 TB = 1.000 GB,
+  como capacidade comercial. Itens sem capacidade produzem subtotal parcial.
+- Comprar build voltou a renderizar links quando há acessório de rede pendente:
+  corrigida a variável `itens` fora do escopo. Não abre lojas automaticamente.
+- FPSHQ: chamada pública retornou 302 para hospedagem externa `noactive`; mantida
+  a proibição de redirecionamento e adicionados erro específico/pausa/cache válido.
+  Blender respondeu 200 para Ryzen 5 5600 CPU. Nenhuma das observações garante SLA.
+- Regressão: 558 testes JS e 696 Python (+17 subtestes). Chrome: 221 verificações
+  de aparência, peças próprias, erros de geração e estados Google; mais 76 de OTP
+  e 321 de estados de erro das páginas/modais,
+  em 320/375/768/1440 px e 844 px paisagem, sem falhas. APIs simuladas, catálogo
+  real somente leitura, nenhum e-mail, build ou conta real alterados. Isso não
+  certifica conformidade integral WCAG nem todos os dispositivos.
+
+### Autoria e desativação — 24/10/2026
+
+- As respostas de build incluem `criador: {nome}` calculado no Python a partir
+  do dono do registro; um campo enviado pelo cliente não define a autoria.
+  O compartilhamento continua sem e-mail, ID da conta ou orçamento do dono.
+- Editor e página pública mostram “Criada por” abaixo do título, com Poppins,
+  escape HTML e quebra para nomes longos. Respostas antigas sem metadado não
+  exibem um autor inventado. Uma cópia pertence ao usuário que criou a cópia.
+- Conta inativa aparece como “Conta desativada”, sem divulgar seu nome retido.
+  Textos do perfil agora descrevem desativação/preservação, não exclusão definitiva.
+  As rotas e a regra atual do banco não foram alteradas. Recuperação assistida e
+  a decisão sobre revogar links públicos ao desativar permanecem pendentes.
+- 61 verificações Chrome de autoria em cinco dimensões e 321 de mensagens/modais
+  aprovadas, com API simulada e sem escrita real. Regressão: 545 testes JavaScript
+  e 668 Python, além de 13 subtestes. Não houve migração nem envio de e-mail.
+
+### Fontes e verificação de e-mail — 24/10/2026
+
+- Corpo da página com Poppins e cor-base; títulos com Lexend. Campos e botões
+  sem regra própria herdam a fonte, mantendo tamanhos/classes já existentes.
+  Isso cobre também mensagens inseridas pelo JavaScript e retornadas pelo backend.
+- Cadastro e tooltip do botão Confirmar agora informam seis dígitos, coerentes
+  com os seis campos e a validação Python. Instruções/senha do modal de exclusão
+  receberam classes explícitas; removido um fechamento `div` excedente na página.
+- 530 testes Node aprovados. Herança de fontes inspecionada em 16 páginas HTML,
+  celular/desktop, com scripts desativados e mensagem dinâmica de teste: 97
+  verificações/1.020 textos, sem fontes padrão inesperadas. Isso não equivale a
+  testar todas as interações dessas páginas.
+- Mais 29 verificações com JavaScript ativo nos modais de excluir conta e
+  verificar e-mail, em 320/390/768/1440 px: fontes, abertura/fechamento, papel
+  acessível e largura. API/sessão simuladas, sem SMTP ou exclusão real.
+- A revisão da geração, seus testes e limitações de provedor estão em
+  [geracao-build.md](geracao-build.md).
+
 ### Ficha da peça e requisito 13 — 23/10/2026
 
 - RF13 marcado como implementado no escopo de exibir o diagnóstico de compatibilidade,

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { informacoesFans, encaixeRadiador, orientacoesVentilacao, fluxoFan } from "../js/build/fans.js";
+import { informacoesFans, encaixeRadiador, orientacoesVentilacao, fluxoFan, temFansInclusas } from "../js/build/fans.js";
 import { completarCatalogoDemo, validarEncaixe } from "../js/build/hardware.js";
 import { normalizarBuild, removerPeca } from "../js/build/estado.js";
 import { avaliarBuild, selecionarPecaCompativel, pecaCompativel } from "../js/build/compatibilidade.js";
@@ -70,6 +70,24 @@ test("fans já inclusas atendem a presença de ventilação sem exigir compra ex
   assert.ok(!avaliarBuild(build,[gabinete]).faltam.includes("Fans"));
   assert.ok(avaliarBuild(build,[{...gabinete,fans_inclusos:null}]).faltam.includes("Fans"));
   assert.ok(avaliarBuild(build,[{...gabinete,fans_inclusos:0}]).faltam.includes("Fans"));
+});
+
+test("fans confirmadas do water cooler atendem presença e progresso sem compra duplicada",() => {
+  const gabinete={id:'case',categoria:'gabinete',fans_inclusos:0,quantidade_max_fans:2,tamanhos_fan_suportados_mm:[120]};
+  const water={id:'water',categoria:'water_cooler',quantidade_fans:2,tamanho_fan_mm:120,tamanho_radiador_mm:240};
+  const build=normalizarBuild({componentes:{gabinete:{id:'case'},water_cooler:{id:'water'}}});
+  const resultado=avaliarBuild(build,[gabinete,water]);
+  assert.ok(!resultado.faltam.includes('Fans'));
+  assert.equal(resultado.preenchidos,3); // gabinete, refrigeração e ventilação
+  assert.equal(informacoesFans(gabinete,[],water).total,2);
+  assert.equal(informacoesFans(gabinete,[],water).livres,0);
+  for(const quantidade_fans of [undefined,null,0,-1,1.5,true,65]) {
+    assert.equal(temFansInclusas(gabinete,{...water,quantidade_fans}),false);
+    assert.ok(avaliarBuild(build,[gabinete,{...water,quantidade_fans}]).faltam.includes('Fans'));
+  }
+  // Só presença: não certifica um radiador incompatível nem ignora excesso.
+  assert.ok(avaliarBuild(build,[{...gabinete,quantidade_max_fans:1},water]).erros.length>0);
+  assert.equal(temFansInclusas(gabinete),false);
 });
 
 test('duplicar e misturar modelos de fans usa posições e não restrições de RAM',() => {

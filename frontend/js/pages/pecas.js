@@ -9,6 +9,7 @@ import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { navegarPara } from "../components/page-loading.js";
 import { salvarAlteracaoLocal } from "../build/autosalvar.js";
 import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta } from "../build/conta.js";
+import { ajudaCategorias } from "../build/uso-formulario.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const main = document.querySelector("#catalog-main");
@@ -25,11 +26,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const temPecas = Object.keys(build.componentes).length > 0;
     const produtos = catalogo.filter((p) => (categoria.tipos || [categoria.id]).includes(p.categoria));
     main.innerHTML = '<header class="builder-heading"><div><a class="builder-back font-1-xs" data-page-back data-back-destination href="./configuracao-build.html?' + new URLSearchParams({[conta ? "build_id" : "id"]:build.id}) + '" aria-label="Voltar à build">' + iconeAnimado("arrow","back") + '<span data-back-label>Voltar à build</span></a><h1 class="font-1-xl">' + categoria.nome +
-      '</h1><p class="font-2-s">Compare os modelos e selecione a peça para sua configuração.</p></div><span class="builder-demo font-1-xs">' + (conta ? "Catálogo da conta" : "Catálogo demonstrativo") + '</span></header>' +
+      '</h1><p class="font-2-s">' + h(ajudaCategorias[categoria.id]||"Compare os modelos e selecione a peça para seu computador.") + '</p></div><span class="builder-demo font-1-xs">' + (conta ? "Catálogo da conta" : "Catálogo demonstrativo") + '</span></header>' +
       '<div class="catalog-toolbar glass-card"><label class="catalog-search font-1-xs">Buscar modelo<input class="input-text" id="component-search" type="search" placeholder="Marca ou modelo"></label>' +
       '<label class="font-1-xs">Marca<select id="brand-filter" class="input-text"><option value="">Todas</option>' + [...new Set(produtos.map((p) => p.fabricante))].sort().map((marca) => '<option>' + h(marca) + '</option>').join("") + '</select></label>' +
       '<label class="font-1-xs">Ordenar<select id="component-sort" class="input-text"><option value="preco-asc">Menor preço</option><option value="preco-desc">Maior preço</option><option value="nome">Nome</option></select></label>' +
-      '</div><p class="catalog-context">' + (temPecas ? 'Mostrando apenas opções sem conflitos detectados com sua build. Modelos não identificados precisam de conferência.' : 'Selecione a primeira peça; as próximas categorias serão filtradas automaticamente.') + '</p>' +
+      '</div><p class="catalog-context">' + (temPecas ? 'Mostrando peças sem problemas identificados com as que você já escolheu. Quando faltam informações, ainda é preciso conferir.' : 'Escolha a primeira peça. Vamos conferir as próximas opções com base no que você selecionar.') + '</p>' +
       '<p id="catalog-count" class="font-2-xs summary-note" role="status"></p><section id="catalog-results" class="catalog-grid" aria-label="Peças da categoria"></section><div id="catalog-exclusions"></div><nav class="catalog-pagination" aria-label="Páginas do catálogo"><button type="button" id="previous-products" class="btn-ghost" aria-label="Página anterior do catálogo">Anterior</button><span id="catalog-page" class="font-2-xs"></span><button type="button" id="next-products" class="btn-ghost" aria-label="Próxima página do catálogo">Próxima</button></nav>';
     const campoBusca = main.querySelector("#component-search");
     const marca = main.querySelector("#brand-filter"), ordem = main.querySelector("#component-sort");

@@ -83,6 +83,17 @@
         </div>
       </div>
 
+      <section class="settings-card" aria-labelledby="google-access-title">
+        <div class="card-heading"><h2 class="font-1-m-b" id="google-access-title">Formas de acesso</h2></div>
+        <p id="google-access-status" class="font-2-xs" role="status" aria-live="polite">Consultando vínculo com o Google…</p>
+        <div id="google-link-fields" hidden>
+          <label class="planning-field" for="google-link-password"><span>Confirme sua senha atual</span><input type="password" id="google-link-password" autocomplete="current-password" maxlength="1024"></label>
+          <p class="planning-help">Confirme sua conta BOOSTio e escolha a conta Google que deseja vincular. Contas já vinculadas a outro perfil não serão mescladas.</p>
+          <button type="button" class="btn-secondary" id="link-google" aria-label="Vincular minha conta ao Google">Vincular Google</button>
+        </div>
+        <p id="google-link-feedback" class="planning-help" role="status" aria-live="polite"></p>
+      </section>
+
       <section class="settings-card" aria-labelledby="profile-budget-title">
         <div class="card-heading"><h2 class="font-1-m-b" id="profile-budget-title">Seu budget</h2></div>
         <p class="card-subtext font-2-xs">Registre quanto pretende investir nas próximas montagens e melhorias.</p>
@@ -95,9 +106,10 @@
         </form>
       </section>
 
-      <div class="settings-card">
-        <div class="card-heading"><i class="fa-solid fa-lock" aria-hidden="true"></i><span class="font-1-m-b">Alterar senha</span></div>
-        <p class="card-subtext font-1-m">Utilize esse campo para alterar a sua senha.</p>
+      <div class="settings-card" id="password-settings-card">
+        <div class="card-heading"><i class="fa-solid fa-lock" aria-hidden="true"></i><span class="font-1-m-b" id="password-settings-title">Alterar senha</span></div>
+        <p class="card-subtext font-1-m" id="password-settings-description">Utilize esse campo para alterar a sua senha.</p>
+        <button type="button" class="btn-ghost" id="password-google-confirm" data-confirmar-google aria-label="Confirmar identidade com Google para criar uma senha" hidden>Confirmar identidade com Google</button>
 
         <div class="field">
           <label for="current-password" class="font-1-m">Senha atual</label>
@@ -137,39 +149,38 @@
 
       <div class="settings-card danger">
         <div class="card-heading"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i><span class="font-1-m-b">Zona de perigo</span></div>
-        <p class="card-subtext font-1-l">Ações abaixo são permanentes e não podem ser desfeitas.</p>
+        <p class="card-subtext font-1-l">Gerencie o acesso à sua conta.</p>
 
         <div class="danger-row">
           <div class="danger-row-text">
-            <h3 class="font-1-m">Excluir minha conta</h3>
-            <p class="font-1-s">Todos os seus dados, builds salvas e histórico serão removidos permanentemente.</p>
+            <h3 class="font-1-m">Desativar minha conta</h3>
+            <p class="font-1-s">Encerre seu acesso e libere o e-mail para um novo cadastro. Seus registros serão preservados.</p>
           </div>
-          <button class="btn-danger" id="open-delete-modal" aria-label="Excluir conta">Excluir conta</button>
+          <button class="btn-danger" id="open-delete-modal" aria-label="Desativar conta">Desativar conta</button>
         </div>
-      </div>
-
       </div>
 
       <div class="modal-overlay" id="delete-modal">
         <div class="modal-box">
           <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
-          <h3 class="font-1-m">Tem certeza que quer excluir sua conta?</h3>
-          <p class="font-1-m">Essa ação é <strong>permanente</strong> e não pode ser desfeita. Todas as suas builds, preferências e dados de perfil serão apagados. Para confirmar, digite <strong id="confirm-username-target">seu nome de usuário</strong> abaixo.</p>
+          <h3 class="font-1-m">Deseja desativar sua conta?</h3>
+          <p class="font-1-m">O acesso será bloqueado e suas sessões encerradas. Os registros serão preservados; a recuperação deve ser solicitada à equipe. Seu e-mail ficará livre para um novo cadastro. Para confirmar, digite <strong id="confirm-username-target">seu nome de usuário</strong> abaixo.</p>
+          <p class="font-2-xs">Builds públicas podem continuar acessíveis. Revise a visibilidade antes de desativar.</p>
 
           <div class="field" style="margin-bottom: 0;">
-            <label class="sr-only" for="delete-confirm-input">Digite seu nome de usuário para confirmar a exclusão</label>
+            <label class="sr-only" for="delete-confirm-input">Digite seu nome de usuário para confirmar a desativação</label>
             <input type="text" id="delete-confirm-input" autocomplete="off" placeholder="Digite seu nome de usuário">
           </div>
 
           <div class="field">
-            <label for="delete-current-password">Senha atual</label>
+            <label class="font-1-m" for="delete-current-password">Senha atual</label>
             <input type="password" id="delete-current-password" autocomplete="current-password">
           </div>
-          <p>Conta somente Google? Confirme sua identidade e volte para concluir a exclusão.</p>
-          <button type="button" class="btn-ghost" data-confirmar-google aria-label="Confirmar identidade com Google para excluir a conta">Confirmar identidade com Google</button>
+          <p class="font-2-xs">Conta somente Google? Confirme sua identidade e volte para concluir a desativação.</p>
+          <button type="button" class="btn-ghost" data-confirmar-google aria-label="Confirmar identidade com Google para desativar a conta">Confirmar identidade com Google</button>
           <div class="modal-actions">
-            <button class="btn-ghost" id="cancel-delete-btn" aria-label="Cancelar exclusão">Cancelar</button>
-            <button class="btn-danger" id="confirm-delete-btn" aria-label="Excluir permanentemente minha conta" disabled>Excluir permanentemente</button>
+            <button class="btn-ghost" id="cancel-delete-btn" aria-label="Cancelar desativação">Cancelar</button>
+            <button class="btn-danger" id="confirm-delete-btn" aria-label="Desativar minha conta" disabled>Desativar conta</button>
           </div>
         </div>
       </div>
@@ -178,7 +189,7 @@
         <div class="modal-box" id="verify-email-box">
           <div class="modal-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg></div>
           <h3 class="font-1-l">Confirme seu e-mail</h3>
-          <p id="verify-email-description" class="font-2-xs">Envie o código para <strong id="verify-email-target">seu e-mail</strong> e informe os 6 dígitos recebidos. Ele é válido por 5 minutos.</p>
+          <p id="verify-email-description" class="font-2-xs">Enviaremos um código para <strong id="verify-email-target">seu e-mail</strong>. Digite os 6 dígitos para verificar automaticamente. Ele é válido por 5 minutos.</p>
 
           <div id="send-code-container">
             <button type="button" class="btn-ghost" id="btn-send-code" aria-label="Enviar código de verificação para o e-mail">
@@ -196,7 +207,8 @@
             <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="5" aria-label="Sexto dígito do código" disabled>
           </div>
 
-          <p id="verify-email-error" class="font-2-xs form-error" role="status" aria-live="polite"></p>
+          <p id="verify-email-status" class="font-2-xs" role="status" aria-live="polite"></p>
+          <p id="verify-email-error" class="font-2-xs form-error" role="alert"></p>
 
           <div class="modal-actions">
             <button type="button" class="btn-ghost" id="btn-close-verification" aria-label="Fechar verificação de e-mail">Fechar</button>
