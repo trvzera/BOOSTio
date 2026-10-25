@@ -119,6 +119,15 @@ O Python confere os subtotais pelos preços e quantidades do catálogo antes de
 salvar a sugestão. O **frete não está incluído**: é importante reservar parte do
 orçamento para a entrega.
 
+Para jogos, trabalho pesado e **Um pouco de tudo**, uma sugestão que use menos
+de 75% do teto do PC pode passar pela revisão já disponível, quando houver
+alternativas de CPU/GPU/RAM/SSD para avaliar dentro desse limite. Isso também
+vale para orçamentos como R$ 8.000. O prompt orienta buscar uma configuração
+equilibrada na faixa de 80% a 100% do teto do PC, sem transformar isso em gasto
+mínimo nem usar preço como prova de desempenho. Peças próprias continuam com
+custo zero, e a sobra dos periféricos não é transferida ao PC. Se a revisão
+falhar ou a cota terminar, a primeira configuração válida é preservada.
+
 Se o catálogo não tiver um cabo ou adaptador adequado à conexão solicitada,
 a montagem do PC pode prosseguir **com a rede pendente**. O pedido de comprimento
 e velocidade fica registrado, e a build informa que o acessório não foi incluído
@@ -394,7 +403,7 @@ Os originais da marca, esboços e anotações estão reunidos em [materiais](mat
 ## Validação da versão
 
 Na revisão de **25/10/2026**, a suíte local aprovou **719 testes JavaScript** e
-**944 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
+**966 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
 Há testes específicos para as sete classes de Controller e para preservar o
