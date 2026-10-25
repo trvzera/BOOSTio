@@ -118,7 +118,16 @@ export function ofertasPeca(peca) {
 
 export const rotulosTecnicos = {
   fabricante: "Fabricante", modelo: "Modelo", part_number: "Referência do catálogo / part number", consumo_energia: "Consumo estimado (W)",
-  soquete: "Socket", socket: "Socket", nucleo: "Núcleos", thread: "Threads",
+  soquete: "Socket", socket: "Socket", sockets_suporte_condicional: "Sockets que exigem confirmar a versão/kit de montagem", nucleo: "Núcleos", thread: "Threads",
+  conectores_alimentacao:"Conectores de alimentação", cabos_pcie_independentes:"Cabos separados para a placa de vídeo",
+  conectores_alimentacao_completos:"Dados dos conectores completos", topologia_armazenamento_verificada:"Conexões de armazenamento revisadas",
+  configuracoes_baias_completas:"Arranjos de baias revisados",
+  cabos_pcie_independentes_minimos:"Cabos separados exigidos pela placa de vídeo", slots_m2:"Detalhes dos slots M.2",
+  portas_sata:"Identificação das portas SATA", formato_m2:"Tamanho do SSD M.2", configuracoes_baias:"Opções de instalação dos discos",
+  atx_24:"Principal de 24 pinos", eps_8:"CPU de 8 pinos", atx12v_4:"CPU de 4 pinos", eps_4_4:"CPU 4+4 pinos",
+  pcie_6:"Placa de vídeo de 6 pinos", pcie_8:"Placa de vídeo de 8 pinos", pcie_6_2:"Placa de vídeo 6+2 pinos",
+  '12vhpwr':'12VHPWR', '12v_2x6':'12V-2x6', sata:'SATA', molex_4:'Molex de 4 pinos',
+  m2:'NVMe (PCIe)', 'm2-sata':'M.2 SATA',
   clockbase: "Clock base (GHz)", clockmax: "Clock máximo (GHz)", videointegrado: "Vídeo integrado",
   modelo_videointegrado: "GPU integrada", cooler: "Cooler incluso", modelo_cooler: "Cooler incluso",
   chipset: "Chipset", formato: "Formato", tipo_memoria: "Tipo de memória",
@@ -154,6 +163,7 @@ export const rotulosTecnicos = {
   conectores_pcie_16pinos:"Conectores PCIe de 16 pinos", conectores_sata:"Conectores de alimentação SATA",
   radiadores_suportados_mm:"Radiadores suportados (mm)", tamanhos_fan_suportados_mm:"Fans suportadas (mm)",
   quantidade_max_fans:"Posições de fans (total)",
+  estimativa_fans:"Planejamento de fans (estimativa visual)",
   frequencia_mhz: "Frequência (MHz)", latencia: "Latência", quantidade_pentes: "Pentes no kit",
   iluminacao: "Iluminação", potencia: "Potência (W)", tamanho_mm: "Tamanho (mm)",
   compatibilidade: "Sockets suportados", interface: "Interface", tipo: "Tipo",
@@ -171,13 +181,14 @@ export const rotulosTecnicos = {
   resposta_frequencia: "Resposta de frequência", layout: "Layout", switch: "Switch",
   mecanico: "Mecânico", tamanho: "Tamanho", dpi_max: "DPI máximo", botoes: "Botões", sensor: "Sensor",
   tamanho_polegadas: "Tela (polegadas)", resolucao: "Resolução", taxa_atualizacao_hz: "Taxa de atualização (Hz)",
+  gpu_chip: "Chip gráfico", fonte_cor: "Fonte da identificação de cor",
   tipo_painel: "Tipo de painel", tempo_resposta_ms: "Tempo de resposta (ms)", hdr: "HDR",
   padrao_wifi: "Padrão Wi-Fi", velocidade_mbps: "Velocidade de rede (Mbps)", bluetooth: "Bluetooth",
   comprimento_m: "Comprimento do cabo (m)", conector: "Conector",
 };
 
 function entradasFichaTecnica(peca) {
-  const ignorados = new Set(["id", "categoria", "imagem", "preco", "preco_atualizado_em", "link", "part_number", "esgotado", "ofertas"]);
+  const ignorados = new Set(["id", "categoria", "imagem", "preco", "preco_atualizado_em", "link", "part_number", "esgotado", "ofertas", "topologia_armazenamento_verificada", "conectores_alimentacao_completos", "configuracoes_baias_completas"]);
   // Medidas genéricas antigas não devem contradizer a ficha exata revisada.
   if (peca.modelo_ficha_tecnica && peca.baias_25 != null && peca.baias_35 != null) ignorados.add("bays_disco");
   if (peca.modelo_ficha_tecnica && [peca.comprimento_mm,peca.largura_mm,peca.altura_mm].every(v=>v!=null)) ignorados.add("dimensoes");
@@ -229,7 +240,7 @@ export function gruposFichaTecnica(peca) {
     {titulo: "Origem das informações", campos: []},
   ];
   const desempenho = /^(consumo_|tdp_|clock|nucleo$|thread$|capacidade_gb$|memoria_gb$|frequencia_mhz$|latencia$|potencia|velocidade_|rotacao_|ruido_|memoria_cache_|fluxo_ar_cfm$|pressao_estatica_|durabilidade_|taxa_atualizacao_|tempo_resposta_|resolucao$|dpi_max$)/;
-  const encaixe = /^(soquete$|socket$|chipset$|formato|tipo_memoria$|ddr$|interface|quantidade_slots_|quantidade_portas_|portas_sata_|memoria_maxima_|tipos_memoria_cpu$|quantidade_pentes$|quantidade_max_fans$|comprimento_|largura_|altura_|espessura_|dimensoes|tamanho_|tamanhos_|slots_|baias_|bays_|posicoes_|limites_radiador_|radiadores_|compatibilidade$|placas_mae_incompativeis$|conector|numero_pinos$|versao_atx$|suporte_water_cooler$|fans_inclusos$|quantidade_fans$|cooler$|modelo_cooler$|videointegrado$|modelo_videointegrado$|observacoes_medidas$)/;
+  const encaixe = /^(soquete$|socket$|sockets_suporte_condicional$|chipset$|formato|tipo_memoria$|ddr$|interface|quantidade_slots_|quantidade_portas_|portas_sata$|portas_sata_|configuracoes_baias$|cabos_pcie_|memoria_maxima_|tipos_memoria_cpu$|quantidade_pentes$|quantidade_max_fans$|comprimento_|largura_|altura_|espessura_|dimensoes|tamanho_|tamanhos_|slots_|baias_|bays_|posicoes_|limites_radiador_|radiadores_|compatibilidade$|placas_mae_incompativeis$|conector|numero_pinos$|versao_atx$|suporte_water_cooler$|fans_inclusos$|quantidade_fans$|cooler$|modelo_cooler$|videointegrado$|modelo_videointegrado$|observacoes_medidas$)/;
   const entradas = entradasFichaTecnica(peca);
   if (peca.part_number) entradas.push(["part_number", peca.part_number]);
   for (const entrada of entradas) {
@@ -243,6 +254,16 @@ export function gruposFichaTecnica(peca) {
 }
 
 function formatarEspecificacao(chave,valor) {
+  if(chave==='estimativa_fans'&&valor&&typeof valor==='object')return 'Referência inicial de planejamento: '+String(valor.quantidade_inicial)+' fans. '+String(valor.observacao||'Confirme os encaixes antes de comprar.')+' Estimativa visual; não confirma tamanho, capacidade ou encaixe.';
+  if(chave==='conectores_alimentacao'&&valor&&typeof valor==='object')return Object.entries(valor).filter(([,q])=>Number(q)>0)
+    .map(([tipo,q])=>q+' × '+(rotulosTecnicos[tipo]||tipo)).join('; ')||'Nenhum conector externo cadastrado';
+  if(chave==='configuracoes_baias'&&Array.isArray(valor))return valor.filter(a=>a&&typeof a==='object').map(a=>[
+    a.baias_25>0?a.baias_25+' '+(a.baias_25===1?'SSD':'SSDs')+' de 2,5 polegadas':'',
+    a.baias_35>0?a.baias_35+' '+(a.baias_35===1?'HD':'HDs')+' de 3,5 polegadas':''
+  ].filter(Boolean).join(' + ')||'Sem baia neste arranjo').join(' OU ')||'Dados incompletos';
+  if(chave==='slots_m2'&&Array.isArray(valor))return valor.filter(s=>s&&typeof s==='object').map(s=>s.nome+': '+(Array.isArray(s.interfaces)?s.interfaces:[]).map(v=>rotulosTecnicos[v]||v).join(' / ')
+    +'; tamanhos: '+(Array.isArray(s.formatos)?s.formatos:[]).join(' / ')+(s.condicional_cpu?' (depende do processador)':'')
+    +Object.entries(s.portas_sata_desativadas||{}).filter(([,p])=>Array.isArray(p)&&p.length).map(([tipo,p])=>'; usando '+(rotulosTecnicos[tipo]||tipo)+' desativa '+p.join(', ')).join('')).join(' · ')||'Dados incompletos';
   if (chave === "ficha_tecnica_verificada_em" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) return valor.split("-").reverse().join("/");
   if (chave === "posicoes_fans" && Array.isArray(valor)) {
     const fans = lista => (lista || []).map(f => f.quantidade + " × " + f.tamanho_mm + " mm").join(" ou ");

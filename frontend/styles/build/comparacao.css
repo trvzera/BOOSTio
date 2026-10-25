@@ -141,7 +141,7 @@
 .compare-render-feedback { flex-basis: 100%; }
 .compare-render-controls .compare-render-feedback[data-tone="error"] { color: var(--status-error); }
 .compare-render-controls .compare-render-feedback[data-tone="warning"] { color: var(--status-warning); }
-.compare-field-detail a { color: var(--cor-p1); text-decoration: underline; text-underline-offset: .2em; }
+.compare-field-detail a { color: var(--text-accent); text-decoration: underline; text-underline-offset: .2em; }
 @media (max-width: 600px) { .compare-render-actions > * { width: 100%; } }
 
 .compare-options {
@@ -254,7 +254,7 @@
 .compare-card-title { margin: 0; font: 500 1.25rem/1.35 var(--font-heading, "Lexend", sans-serif); letter-spacing: -.025em; }
 .compare-card-description { margin: 0; color: var(--text-secondary, #a1a1a6); font-size: .75rem; }
 .compare-tags { display: flex; flex-wrap: wrap; gap: .375rem; }
-.compare-tag { padding: .25rem .5rem; border-radius: var(--radius-control, 999px); background: #007bff17; color: var(--cor-p1, #007bff); font: 400 .6875rem/1.5 var(--font-heading, "Lexend", sans-serif); }
+.compare-tag { padding: .25rem .5rem; border-radius: var(--radius-control, 999px); background: #007bff17; color: var(--text-accent, #3395ff); font: 400 .6875rem/1.5 var(--font-heading, "Lexend", sans-serif); }
 .compare-tag-warning { background: #ffcc0010; color: var(--status-warning, #ffcc00); }
 .compare-specs { display: grid; margin: 0; }
 .compare-field { display: grid; align-content: start; gap: .5rem; min-width: 0; min-height: 7.5rem; padding: 1.125rem 1.25rem; border-top: 1px solid var(--cor-2, #3a3a3c); }
@@ -262,7 +262,7 @@
 .compare-field-value { margin: 0; font: 500 1rem/1.45 var(--font-heading, "Lexend", sans-serif); }
 .compare-field-detail { margin: 0; color: var(--text-secondary, #a1a1a6); font-size: .75rem; }
 .compare-field-best { background: #007bff08; }
-.compare-field-best > .compare-field-value { color: var(--cor-p1, #007bff); }
+.compare-field-best > .compare-field-value { color: var(--text-accent, #3395ff); }
 .compare-status-error { color: var(--status-error, #ff3b30); }
 .compare-status-warning { color: var(--status-warning, #ffcc00); }
 .compare-status-success { color: var(--status-success, #34c759); }

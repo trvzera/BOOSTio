@@ -3,13 +3,14 @@ import "../auth/auth.js";
 import { carregarCatalogo,categoriasEditor,perifericos,acessoriosRede,moeda,htmlSeguro as h,nomePeca,imagemPeca,ofertasPeca } from "../build/catalogo.js";
 import { abrirBuild,guardarRascunho,buildsLocais,itensCategoria,categoriasMultiplas,informacoesRam,informacoesArmazenamento,motivoSelecao,removerPeca,reduzirQuantidade,linkCompartilhado } from "../build/estado.js";
 import { avaliarBuild,selecionarPecaCompativel } from "../build/compatibilidade.js";
-import { informacoesFans, fluxoFan, temFansInclusas } from "../build/fans.js";
+import { informacoesFans, fluxoFan, temFansInclusas, planejamentoFans } from "../build/fans.js";
 import { slotsRam, AVISO_SLOTS_RAM_PROVISORIOS } from "../build/hardware.js";
 import { avisar,copiarTexto,mostrarFalha } from "../build/interface.js";
 import { iconeAnimado,iniciarIcones } from "../components/ui.js";
 import { indicadorBuild,iniciarIndicadores } from "../build/indicador.js";
 import { navegarPara } from "../components/page-loading.js";
 import { resumoRede } from "../build/rede.js";
+import { resumoMonitor } from "../build/monitor.js";
 import { salvarAlteracaoLocal } from "../build/autosalvar.js";
 import { iniciarDetalhesAnimados } from "../components/animated-details.js";
 import { abrirBenchmark, abrirCompraBuild, abrirDialogoBuild, motivoBenchmark, avisoCompraHtml, avisoFreteHtml } from "../build/acoes-build.js";
@@ -171,17 +172,23 @@ document.addEventListener("DOMContentLoaded",async () => {
         : info.usados >= info.slots ? "Todos os slots de RAM da placa-mãe estão ocupados." : "";
       const discos = informacoesArmazenamento(build,catalogo);
       const fans = categoria.id === "fan" ? informacoesFans(get("gabinete"),itensCategoria(build,"fan").map(item => ({item,peca:catalogo.find(p => p.id === item.id)})),get("water_cooler") || (itensCategoria(build,"water_cooler").length ? {} : null),build.substituirFansWaterCooler) : null;
+      const planejamento = fans ? planejamentoFans(get("gabinete")) : null;
       const bloquearSubstituicao = build.travada || !build.substituirFansWaterCooler && !(fans?.radiador > 0 && fans.selecionadas >= fans.radiador);
       const vagasFans = fans ? 'Fans: ' + (fans.total ?? "?") + ' / ' + (fans.capacidade ?? "?") + ' posições' : '';
       const disponivel = categoria.armazenamento && catalogo.some(p => tipos.includes(p.categoria) && (() => { try { selecionarPecaCompativel(build,p,catalogo); return true; } catch { return false; } })());
       const cabecalho = '<div class="component-group-heading"><h2>' + categoria.nome + ' ' + badge(obrigatoria) + '</h2>' +
         (categoria.id === "memoria_ram" ? '<span class="component-count">' + info.usados + ' / ' + (info.placa ? info.slots : "—") + ' pentes · ' + info.capacidade + ' GB' + (info.slotsProvisorios ? ' · limite provisório' : '') + '</span>'
           : categoria.armazenamento ? '<span class="component-count">' + discos.ssd + ' SSD · ' + discos.hd + ' HD · ' + resumoCapacidadeDiscos(discos,catalogo) + '</span>'
-          : fans ? '<span class="component-count">' + vagasFans + '</span>' : "") + '</div>' +
+          : fans ? '<span class="component-count">' + vagasFans + '</span>'
+          : categoria.id === "monitor" && get("monitor") ? '<span class="component-count">' + h(resumoMonitor(get("monitor"))) + '</span>' : "") + '</div>' +
         (categoria.id === "memoria_ram" && info.slotsProvisorios ? '<p class="component-connections">' + AVISO_SLOTS_RAM_PROVISORIOS + '</p>' : '') +
         (fans ? '<p class="component-connections">' + (fans.selecionadas ?? "?") + ' selecionadas · ' + (fans.inclusas ?? "?") + ' inclusas · ' + (fans.radiador ?? "?") + ' do radiador' +
           (fans.substituidas ? ' · ' + fans.substituidas + ' originais substituídas (sem dupla contagem)' : '') +
           (fans.livres != null ? ' · até ' + fans.livres + ' posições livres, conforme o tamanho' : ' · capacidade não totalmente verificada') + '</p>' : '') +
+        (planejamento ? '<details class="component-fan-plan"><summary>Referência inicial: ' + planejamento.quantidade + ' fans <span>Estimativa visual</span></summary>' +
+          '<p>Posições aparentes nas fotos: ' + h(planejamento.posicoes) + '. O tamanho dos encaixes precisa ser conferido manualmente.</p>' +
+          (planejamento.dimensoes ? '<p>Medidas externas: ' + h(planejamento.dimensoes) + '. Elas não representam o espaço interno livre.</p>' : '') +
+          '<p>A sugestão não confirma o encaixe nem garante refrigeração suficiente. Confira a instalação antes de comprar.</p></details>' : '') +
         (fans && itensCategoria(build,"water_cooler").length ? '<label class="ui-check fan-replacement font-2-xs"><input type="checkbox" id="replace-water-fans" ' + (build.substituirFansWaterCooler ? 'checked ' : '') + bloqueado(bloquearSubstituicao,build.travada ? trancada : 'Adicione fans suficientes para substituir todas as fans cadastradas do water cooler.') + ' aria-describedby="replace-water-help">' + iconeAnimado("checkbox") + '<span>Usar fans selecionadas no lugar das fans do water cooler</span></label><p id="replace-water-help" class="component-connections">As originais substituídas não contam como instaladas. Veja medidas, fluxo e cuidados com parafusos no botão de informações da build.</p>' : '') +
         (categoria.armazenamento && itens.length ? '<p class="component-connections">M.2: ' + discos.m2 + ' / ' + (discos.limites.m2 ?? "não informado") + ' · SATA: ' + discos.sata + ' / ' + (discos.limites.sata ?? "não informado") + '</p>' : "");
       if (itens.length) return '<section class="component-group">' + cabecalho + itens.map(({categoria,item}) => selecionada(categoria,item)).join("") +

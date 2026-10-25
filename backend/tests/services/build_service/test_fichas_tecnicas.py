@@ -27,7 +27,7 @@ def test_alias_exige_identidade_e_produto_revisados(caso):
         assert dados[chave] == valor
     for chave in original:
         assert dados[chave] == original[chave]
-    assert dados["ficha_tecnica_verificada_em"] == "2026-10-23"
+    assert dados["ficha_tecnica_verificada_em"] == caso['esperado'].get('ficha_tecnica_verificada_em', "2026-10-23")
     assert dados["modelo_ficha_tecnica"] and dados["fonte_medidas"].startswith("https://")
     assert "fonte_medidas" not in original
     for alteracao in ({"part_number": "outra-revisao"}, {"modelo": original["modelo"] + " V3"},

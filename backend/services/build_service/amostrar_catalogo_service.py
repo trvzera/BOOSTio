@@ -1,6 +1,7 @@
 from decimal import Decimal
 from .preferencias_perifericos_service import PreferenciasPerifericosService
 from .preferencias_cores_service import PreferenciasCoresService
+from .preferencias_processador_service import PreferenciasProcessadorService
 
 
 class AmostrarCatalogoService:
@@ -24,6 +25,10 @@ class AmostrarCatalogoService:
         if len(ordenadas) <= limite:
             return ordenadas
         escolhidas = {ordenadas[0]["id"]: ordenadas[0], ordenadas[-1]["id"]: ordenadas[-1]}
+        if tipo == "processador":
+            for peca in PreferenciasProcessadorService.destaques(ordenadas, utilidade):
+                if len(escolhidas) < max(2, limite - 4):
+                    escolhidas[peca["id"]] = peca
         for peca in PreferenciasPerifericosService.destaques(tipo, ordenadas, utilidade):
             if len(escolhidas) < limite:
                 escolhidas[peca["id"]] = peca

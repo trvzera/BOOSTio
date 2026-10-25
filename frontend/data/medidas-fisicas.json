@@ -168,7 +168,19 @@
       "modelo": "RTX 5060 Shadow 2X OC GeForce",
       "part_numbers": ["SEED-GPU-06", "G5060-8S2C"],
       "fonte": "https://www.msi.com/Graphics-Card/GeForce-RTX-5060-8G-SHADOW-2X-OC/Specification",
-      "medidas": {"comprimento_mm": 197, "altura_mm": 120, "espessura_mm": 40}
+      "verificado_em": "2026-10-25",
+      "medidas": {"comprimento_mm": 197, "altura_mm": 120, "espessura_mm": 40,
+        "gpu_chip": "NVIDIA GeForce RTX 5060", "cor": "preto",
+        "fonte_cor": "https://www.bestbuy.com/product/msi-nvidia-geforce-rtx-5060-8g-shadow-2x-oc-8gb-gddr6-pci-express-gen-5-graphics-card-black/6632720"}
+    },
+    {
+      "categoria": "placa_video", "fabricante": "Gigabyte", "modelo": "GeForce RTX 5060 AERO OC 8G",
+      "part_numbers": ["GV-N5060AERO OC-8GD"],
+      "aliases_catalogo": [{"fabricante": "Gigabyte", "modelo": "RTX 5060 AERO OC 8G GeForce", "part_number": "SEED-GPU-14", "produto_kabum": "777072"}],
+      "fonte": "https://www.gigabyte.com/Graphics-Card/GV-N5060AERO-OC-8GD",
+      "verificado_em": "2026-10-25",
+      "medidas": {"gpu_chip": "NVIDIA GeForce RTX 5060", "cor": "branco",
+        "fonte_cor": "https://www.staples.com/gigabyte-aero-geforce-rtx-5060-pci-e-5-0-8gb-gddr7-gaming-graphics-card-2595-mhz-core-28000-mhz-white-gv-n5060aero-oc-8gd/product_24700829"}
     },
     {
       "categoria": "gabinete",
@@ -324,16 +336,35 @@
       "categoria": "fonte",
       "fabricante": "Corsair",
       "modelo": "CX650 CP-9020278-BR",
-      "part_numbers": ["CP-9020278-BR"],
-      "aliases_catalogo": [
-        {"fabricante": "Corsair", "modelo": "CX Series CX650", "part_number": "SEED-PSU-04", "produto_kabum": "516056"}
+      "part_numbers": [
+        "CP-9020278-BR"
       ],
-      "fonte": "https://www.corsair.com/br/pt/p/psu/cp-9020278-br/cx-series-cx650-650-watt-80-plus-bronze-atx-power-supply-br-cp-9020278-br",
-      "verificado_em": "2026-10-23",
+      "aliases_catalogo": [
+        {
+          "fabricante": "Corsair",
+          "modelo": "CX Series CX650",
+          "part_number": "SEED-PSU-04",
+          "produto_kabum": "516056"
+        }
+      ],
+      "fonte": "https://www.kabum.com.br/produto/516056/fonte-corsair-cx-series-cx650-650w-80-plus-bronze-com-cabo-preto-cp-9020278-br",
+      "verificado_em": "2026-10-24",
       "medidas": {
         "comprimento_mm": 125,
         "formato": "ATX",
-        "observacoes_medidas": "Comprimento da revisão CP-9020278-BR. Não aplicar a outras revisões da CX650. Reservar espaço adicional para passagem e curvatura dos cabos."
+        "conectores_cpu_eps": 1,
+        "conectores_pcie_8pinos": 2,
+        "conectores_sata": 3,
+        "observacoes_medidas": "Revisão CP-9020278-BR: um cabo EPS 4+4, dois conectores PCIe 6+2 no mesmo cabo e três SATA. Não são dois cabos PCIe independentes; confirmar exigências da GPU e folga dos cabos. Não aplicar a outras revisões da CX650.",
+        "conectores_alimentacao": {
+          "atx_24": 1,
+          "eps_4_4": 1,
+          "pcie_6_2": 2,
+          "sata": 3,
+          "molex_4": 2
+        },
+        "conectores_alimentacao_completos": true,
+        "cabos_pcie_independentes": 1
       }
     },
     {
@@ -606,33 +637,152 @@
       }
     },
     {
-      "categoria": "gabinete", "fabricante": "Hayom", "modelo": "GB1727", "part_numbers": ["GB1727", "GB.17.10.27"],
-      "aliases_catalogo": [{"fabricante": "Hayom", "modelo": "Gamer HAYOM GB1727, Mid Tower, Lateral em Vidro, com 3X Fans, Preto - GB.17.10.27", "part_number": "KABUM-938469", "produto_kabum": "938469"}],
-      "fonte": "https://www.hayom.com.br/produtos/gabinete-gamer-c-3-fans-gb1727", "verificado_em": "2026-10-23",
+      "categoria": "gabinete",
+      "fabricante": "Hayom",
+      "modelo": "GB1727",
+      "part_numbers": [
+        "GB1727",
+        "GB.17.10.27"
+      ],
+      "aliases_catalogo": [
+        {
+          "fabricante": "Hayom",
+          "modelo": "Gamer HAYOM GB1727, Mid Tower, Lateral em Vidro, com 3X Fans, Preto - GB.17.10.27",
+          "part_number": "KABUM-938469",
+          "produto_kabum": "938469"
+        }
+      ],
+      "fonte": "https://www.hayom.com.br/produtos/gabinete-gamer-c-3-fans-gb1727",
+      "verificado_em": "2026-10-24",
       "medidas": {
         "dimensoes_fabricante": "295 × 190 × 405 mm (ordem dos eixos não declarada)",
-        "formatos_placa_mae": "mATX, ITX", "slots_expansao": 4, "tamanho_max_gpu_mm": 290, "formatos_fonte": ["ATX"],
-        "fans_inclusos": 3, "quantidade_max_fans": 8, "tamanhos_fan_suportados_mm": [120], "posicoes_fans_completas": false,
-        "suporte_water_cooler": null, "radiadores_suportados_mm": null,
-        "posicoes_fans": [
-          {"nome": "Frente", "opcoes": [{"tamanho_mm": 120, "quantidade": 3}], "fans_inclusas": [{"tamanho_mm": 120, "quantidade": 3}], "radiadores_mm": []},
-          {"nome": "Traseira", "opcoes": [{"tamanho_mm": 120, "quantidade": 1}], "fans_inclusas": [], "radiadores_mm": []},
-          {"nome": "Topo", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": []},
-          {"nome": "Base", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": []}
+        "formatos_placa_mae": "mATX, ITX",
+        "slots_expansao": 4,
+        "tamanho_max_gpu_mm": 290,
+        "formatos_fonte": [
+          "ATX"
         ],
-        "observacoes_medidas": "Três fans frontais de 120 mm inclusas e oito encaixes listados ao todo; somar fábrica, radiador e fans adicionais sem repetir posições. O fabricante não declara suporte a radiador, altura de air cooler ou comprimento de fonte nesta ficha; esses limites não foram inventados. Armazenamento é alternativo: um HDD de 3,5 ou um SSD de 2,5 polegadas. A ordem dos eixos externos não foi presumida."
+        "fans_inclusos": 3,
+        "quantidade_max_fans": 8,
+        "tamanhos_fan_suportados_mm": [
+          120
+        ],
+        "posicoes_fans_completas": false,
+        "suporte_water_cooler": null,
+        "radiadores_suportados_mm": null,
+        "posicoes_fans": [
+          {
+            "nome": "Frente",
+            "opcoes": [
+              {
+                "tamanho_mm": 120,
+                "quantidade": 3
+              }
+            ],
+            "fans_inclusas": [
+              {
+                "tamanho_mm": 120,
+                "quantidade": 3
+              }
+            ],
+            "radiadores_mm": []
+          },
+          {
+            "nome": "Traseira",
+            "opcoes": [
+              {
+                "tamanho_mm": 120,
+                "quantidade": 1
+              }
+            ],
+            "fans_inclusas": [],
+            "radiadores_mm": []
+          },
+          {
+            "nome": "Topo",
+            "opcoes": [
+              {
+                "tamanho_mm": 120,
+                "quantidade": 2
+              }
+            ],
+            "fans_inclusas": [],
+            "radiadores_mm": []
+          },
+          {
+            "nome": "Base",
+            "opcoes": [
+              {
+                "tamanho_mm": 120,
+                "quantidade": 2
+              }
+            ],
+            "fans_inclusas": [],
+            "radiadores_mm": []
+          }
+        ],
+        "observacoes_medidas": "Três fans frontais de 120 mm inclusas e oito encaixes listados ao todo; somar fábrica, radiador e fans adicionais sem repetir posições. O fabricante não declara suporte a radiador, altura de air cooler ou comprimento de fonte nesta ficha; esses limites não foram inventados. Armazenamento é alternativo: um HDD de 3,5 ou um SSD de 2,5 polegadas. A ordem dos eixos externos não foi presumida.",
+        "baias_25": 1,
+        "baias_35": 1,
+        "configuracoes_baias": [
+          {
+            "baias_25": 1,
+            "baias_35": 0
+          },
+          {
+            "baias_25": 0,
+            "baias_35": 1
+          }
+        ],
+        "configuracoes_baias_completas": true
       }
     },
     {
-      "categoria": "gabinete", "fabricante": "Hayom", "modelo": "GB1787", "part_numbers": ["GB1787"],
-      "aliases_catalogo": [{"fabricante": "Hayom", "modelo": "Gamer Hayom Gb1787, Mini Tower, Vidro Temperado, M-atx, Com 3 Fans, Sem Fonte, Preto", "part_number": "KABUM-933255", "produto_kabum": "933255"}],
-      "fonte": "https://www.hayom.com.br/produtos/1271", "verificado_em": "2026-10-23",
+      "categoria": "gabinete",
+      "fabricante": "Hayom",
+      "modelo": "GB1787",
+      "part_numbers": [
+        "GB1787"
+      ],
+      "aliases_catalogo": [
+        {
+          "fabricante": "Hayom",
+          "modelo": "Gamer Hayom Gb1787, Mini Tower, Vidro Temperado, M-atx, Com 3 Fans, Sem Fonte, Preto",
+          "part_number": "KABUM-933255",
+          "produto_kabum": "933255"
+        }
+      ],
+      "fonte": "https://www.hayom.com.br/produtos/1271",
+      "verificado_em": "2026-10-24",
       "medidas": {
         "dimensoes_fabricante": "265 × 280 × 285 mm (ordem dos eixos não declarada)",
-        "formatos_placa_mae": "mATX, ITX", "slots_expansao": 4, "tamanho_max_gpu_mm": 260, "formatos_fonte": ["ATX"],
-        "fans_inclusos": 3, "quantidade_max_fans": 5, "tamanhos_fan_suportados_mm": [120],
-        "suporte_water_cooler": null, "radiadores_suportados_mm": null,
-        "observacoes_medidas": "Três fans inclusas, mas a ficha não identifica suas posições. Os cinco encaixes informados são dois na base, dois no topo e um atrás, todos de 120 mm. A ocupação total é limitada a cinco; não foi inventada uma distribuição das fans de fábrica nem suporte a water cooler. Armazenamento: um HDD de 3,5 ou dois SSDs de 2,5 polegadas em arranjos alternativos. A ordem dos eixos externos não foi presumida."
+        "formatos_placa_mae": "mATX, ITX",
+        "slots_expansao": 4,
+        "tamanho_max_gpu_mm": 260,
+        "formatos_fonte": [
+          "ATX"
+        ],
+        "fans_inclusos": 3,
+        "quantidade_max_fans": 5,
+        "tamanhos_fan_suportados_mm": [
+          120
+        ],
+        "suporte_water_cooler": null,
+        "radiadores_suportados_mm": null,
+        "observacoes_medidas": "Três fans inclusas, mas a ficha não identifica suas posições. Os cinco encaixes informados são dois na base, dois no topo e um atrás, todos de 120 mm. A ocupação total é limitada a cinco; não foi inventada uma distribuição das fans de fábrica nem suporte a water cooler. Armazenamento: um HDD de 3,5 ou dois SSDs de 2,5 polegadas em arranjos alternativos. A ordem dos eixos externos não foi presumida.",
+        "baias_25": 2,
+        "baias_35": 1,
+        "configuracoes_baias": [
+          {
+            "baias_25": 2,
+            "baias_35": 0
+          },
+          {
+            "baias_25": 0,
+            "baias_35": 1
+          }
+        ],
+        "configuracoes_baias_completas": true
       }
     },
     {
@@ -660,9 +810,46 @@
         "quantidade_portas_sata": 4,
         "portas_sata_desativadas_por_m2_sata": 1,
         "dimensoes_fabricante": "243,84 × 243,84 mm",
-        "observacoes_medidas": "Anúncio 940305 confirmado como DDR4, não DDR5. M2_2 em SATA desativa uma porta SATA. CPU/BIOS e XMP dependem da lista de suporte."
+        "observacoes_medidas": "Anúncio 940305 confirmado como DDR4, não DDR5. M2_2 em SATA desativa SATA5. Slots aceitam 2242/2260/2280. CPU/BIOS e XMP dependem da lista de suporte.",
+        "topologia_armazenamento_verificada": true,
+        "slots_m2": [
+          {
+            "nome": "M.2_1",
+            "interfaces": [
+              "m2"
+            ],
+            "formatos": [
+              "2242",
+              "2260",
+              "2280"
+            ],
+            "condicional_cpu": false,
+            "portas_sata_desativadas": {
+              "m2": []
+            }
+          },
+          {
+            "nome": "M.2_2",
+            "interfaces": [
+              "m2",
+              "m2-sata"
+            ],
+            "formatos": [
+              "2242",
+              "2260",
+              "2280"
+            ],
+            "condicional_cpu": false,
+            "portas_sata_desativadas": {
+              "m2": [],
+              "m2-sata": [
+                "SATA5"
+              ]
+            }
+          }
+        ]
       },
-      "verificado_em": "2026-10-23"
+      "verificado_em": "2026-10-24"
     },
     {
       "categoria": "placa_mae",
@@ -810,6 +997,868 @@
         "observacoes_medidas": "RAM DDR4/64 GB confirmada. Seções resumida e detalhada do fabricante divergem entre duas e quatro portas SATA; quantidade mantida desconhecida. Conferir revisão/manual antes de expandir SATA."
       },
       "verificado_em": "2026-10-23"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "ASUS",
+      "modelo": "PRIME H610M-A D4",
+      "fonte": "https://www.asus.com/motherboards-components/motherboards/prime/prime-h610m-a-d4/techspec/",
+      "medidas": {
+        "socket": "LGA1700",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": 64,
+        "quantidade_slots_m2": 2,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "quantidade_slots_m2_sata": 0,
+        "observacoes_medidas": "Corrige cadastro antigo de quatro pentes/128 GB: este D4 possui dois DIMMs e suporta 64 GB. São dois M.2 de armazenamento PCIe (não SATA); o Key E para Wi-Fi não é uma terceira conexão para SSD. BIOS e QVL continuam por confirmar.",
+        "conectores_alimentacao": {
+          "atx_24": 1,
+          "eps_8": 1
+        },
+        "conectores_alimentacao_completos": true,
+        "topologia_armazenamento_verificada": true,
+        "portas_sata": [
+          "SATA6G_1",
+          "SATA6G_2",
+          "SATA6G_3",
+          "SATA6G_4"
+        ],
+        "slots_m2": [
+          {
+            "nome": "M.2_1",
+            "interfaces": [
+              "m2"
+            ],
+            "formatos": [
+              "2242",
+              "2260",
+              "2280"
+            ],
+            "condicional_cpu": false,
+            "portas_sata_desativadas": {
+              "m2": []
+            }
+          },
+          {
+            "nome": "M.2_2",
+            "interfaces": [
+              "m2"
+            ],
+            "formatos": [
+              "2242",
+              "2260",
+              "2280"
+            ],
+            "condicional_cpu": false,
+            "portas_sata_desativadas": {
+              "m2": []
+            }
+          }
+        ]
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "ASUS",
+          "modelo": "Prime H610M-A D4",
+          "part_number": "SEED-MB-10",
+          "produto_kabum": "276263"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "MSI",
+      "modelo": "B550M-A PRO",
+      "fonte": "https://www.msi.com/Motherboard/B550M-A-PRO/Specification",
+      "medidas": {
+        "socket": "AM4",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": 64,
+        "quantidade_slots_m2": 1,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "quantidade_slots_m2_sata": 1,
+        "observacoes_medidas": "Variante micro-ATX B550M-A PRO, não B550-A PRO ATX. Dois DIMMs e 64 GB; M.2 2242/2260/2280 aceita NVMe ou SATA. O fabricante exclui Ryzen 3200G/3400G; socket AM4 sozinho não aprova CPUs. Confirmar lista e BIOS."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "MSI",
+          "modelo": "B550M-A PRO",
+          "part_number": "SEED-MB-14",
+          "produto_kabum": "941257"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "MSI",
+      "modelo": "MAG B650 TOMAHAWK WIFI",
+      "fonte": "https://www.msi.com/Motherboard/MAG-B650-TOMAHAWK-WIFI/Specification",
+      "medidas": {
+        "socket": "AM5",
+        "tipo_memoria": "DDR5",
+        "quantidade_slots_ram": 4,
+        "memoria_maxima_gb": 256,
+        "quantidade_slots_m2": 3,
+        "quantidade_portas_sata": 6,
+        "formato": "ATX",
+        "observacoes_medidas": "M2_2 não funciona com Ryzen 8500/8300; M2_3 compartilha banda com PCI_E2. Contagem física, não garantia de uso simultâneo para toda CPU. RAM máxima depende de CPU/BIOS."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "MSI",
+          "modelo": "MAG B650 Tomahawk",
+          "part_number": "SEED-MB-08",
+          "produto_kabum": "502496"
+        },
+        {
+          "fabricante": "MSI",
+          "modelo": "MAG Tomahawk Wi-Fi",
+          "part_number": "SEED-MB-38",
+          "produto_kabum": "392611"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "MSI",
+      "modelo": "MAG X870E TOMAHAWK WIFI",
+      "fonte": "https://www.msi.com/Motherboard/MAG-X870E-TOMAHAWK-WIFI/Specification",
+      "medidas": {
+        "socket": "AM5",
+        "tipo_memoria": "DDR5",
+        "quantidade_slots_ram": 4,
+        "memoria_maxima_gb": 256,
+        "quantidade_slots_m2": 4,
+        "quantidade_portas_sata": 4,
+        "formato": "ATX",
+        "observacoes_medidas": "M2_2 depende da CPU e compartilha banda com USB4; pode ser desativado com Ryzen 8500/8300. Contagens físicas não aprovam todas as combinações."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "MSI",
+          "modelo": "MAG X870E TOMAHAWK WIFI",
+          "part_number": "SEED-MB-21",
+          "produto_kabum": "701357"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "MSI",
+      "modelo": "MAG B850 TOMAHAWK MAX WIFI",
+      "fonte": "https://www.msi.com/Motherboard/MAG-B850-TOMAHAWK-MAX-WIFI/Specification",
+      "medidas": {
+        "socket": "AM5",
+        "tipo_memoria": "DDR5",
+        "quantidade_slots_ram": 4,
+        "memoria_maxima_gb": 256,
+        "quantidade_slots_m2": 4,
+        "quantidade_portas_sata": 4,
+        "formato": "ATX",
+        "observacoes_medidas": "M2_3 e PCI_E3 têm opções de compartilhamento na BIOS; slots ligados à CPU dependem do processador. Contagens físicas, não garantia de todos os slots ativos."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "MSI",
+          "modelo": "MAG B850 TOMAHAWK MAX WIFI",
+          "part_number": "SEED-MB-27",
+          "produto_kabum": "701358"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "MSI",
+      "modelo": "PRO B650M-P",
+      "fonte": "https://www.msi.com/Motherboard/PRO-B650M-P/Specification",
+      "medidas": {
+        "socket": "AM5",
+        "tipo_memoria": "DDR5",
+        "quantidade_slots_ram": 4,
+        "memoria_maxima_gb": 256,
+        "quantidade_slots_m2": 2,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "observacoes_medidas": "Capacidade máxima de RAM conforme ficha atual, condicionada à CPU, BIOS e memória suportada."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "MSI",
+          "modelo": "Pro B650M-P",
+          "part_number": "SEED-MB-40",
+          "produto_kabum": "524346"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "MSI",
+      "modelo": "PRO A620M-E",
+      "fonte": "https://www.msi.com/Motherboard/PRO-A620M-E/Specification",
+      "medidas": {
+        "socket": "AM5",
+        "tipo_memoria": "DDR5",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": 128,
+        "quantidade_slots_m2": 1,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "observacoes_medidas": "Dois DIMMs DDR5. Capacidade conforme ficha atual, condicionada à CPU/BIOS e aos pentes suportados."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "MSI",
+          "modelo": "PRO A620M-E",
+          "part_number": "SEED-MB-39",
+          "produto_kabum": "524344"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "MSI",
+      "modelo": "B850M GAMING PLUS WIFI6E",
+      "fonte": "https://www.msi.com/Motherboard/B850M-GAMING-PLUS-WIFI6E/Specification",
+      "medidas": {
+        "socket": "AM5",
+        "tipo_memoria": "DDR5",
+        "quantidade_slots_ram": 4,
+        "memoria_maxima_gb": 256,
+        "quantidade_slots_m2": 2,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "observacoes_medidas": "Slots ligados ao processador dependem da CPU instalada; confirmar disponibilidade com Ryzen 8000. RAM máxima depende da lista de suporte."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "MSI",
+          "modelo": "B850M GAMING PLUS WIFI6E",
+          "part_number": "SEED-MB-33",
+          "produto_kabum": "941251"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "MSI",
+      "modelo": "X870E GAMING PLUS WIFI",
+      "fonte": "https://www.msi.com/Motherboard/X870E-GAMING-PLUS-WIFI/Specification",
+      "medidas": {
+        "socket": "AM5",
+        "tipo_memoria": "DDR5",
+        "quantidade_slots_ram": 4,
+        "memoria_maxima_gb": 256,
+        "quantidade_slots_m2": 3,
+        "quantidade_portas_sata": 4,
+        "formato": "ATX",
+        "observacoes_medidas": "Capacidades físicas e máximo atual de RAM; velocidade e disponibilidade de M.2 dependem do processador."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "MSI",
+          "modelo": "X870E GAMING PLUS WIFI",
+          "part_number": "SEED-MB-36",
+          "produto_kabum": "941248"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "MSI",
+      "modelo": "PRO B760M-A WIFI",
+      "fonte": "https://www.msi.com/Motherboard/PRO-B760M-A-WIFI/Specification",
+      "medidas": {
+        "socket": "LGA1700",
+        "tipo_memoria": "DDR5",
+        "quantidade_slots_ram": 4,
+        "memoria_maxima_gb": 256,
+        "quantidade_slots_m2": 2,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "quantidade_slots_m2_sata": 1,
+        "portas_sata_desativadas_por_m2_sata": 1,
+        "observacoes_medidas": "Anúncio 941241 DDR5, não DDR4. M2_2 em SATA desativa SATA8. RAM máxima depende de CPU/BIOS e memória suportada."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "MSI",
+          "modelo": "PRO B760M-A WIFI",
+          "part_number": "SEED-MB-29",
+          "produto_kabum": "941241"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "MSI",
+      "modelo": "PRO B550M-B",
+      "fonte": "https://www.msi.com/Motherboard/PRO-B550M-B/Specification",
+      "medidas": {
+        "socket": "AM4",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": 64,
+        "quantidade_slots_m2": 2,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "quantidade_slots_m2_sata": 1,
+        "observacoes_medidas": "Dois DIMMs e 64 GB. M2_1 aceita SATA ou PCIe; M2_2 é PCIe. Não confundir com B550M-A PRO."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "MSI",
+          "modelo": "Pro B550m-b Am4 2xDDR4 Chipset Amd B550 Matx",
+          "part_number": "KABUM-1062017",
+          "produto_kabum": "1062017"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "MSI",
+      "modelo": "PRO H610M-B DDR5 (anúncio 992997)",
+      "fonte": "https://www.msi.com/Motherboard/PRO-H610M-B/Specification",
+      "medidas": {
+        "socket": "LGA1700",
+        "tipo_memoria": "DDR5",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": null,
+        "quantidade_slots_m2": 1,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "quantidade_slots_m2_sata": 1,
+        "portas_sata_desativadas_por_m2_sata": 1,
+        "observacoes_medidas": "Anúncio exato DDR5. A página oficial mistura resumo DDR5/128 GB e seção antiga DDR4/64 GB: máximo permanece desconhecido até confirmação da revisão. Ambas as seções indicam dois DIMMs, um M.2 e quatro SATA. M.2 SATA desativa SATA5."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "MSI",
+          "modelo": "PRO H610M-B, Intel LGA 1700, mATX, DDR5 - PROH610MB",
+          "part_number": "KABUM-992997",
+          "produto_kabum": "992997"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "Husky",
+      "modelo": "Nexus H610 HPM610",
+      "fonte": "https://www.kabum.com.br/produto/692458/placa-mae-husky-nexus-h610-lga-1700-12-13-gen-m-2-nvme-sata-ddr4-3200mhz-micro-atx-hdmi-vga-hpm610",
+      "medidas": {
+        "socket": "LGA1700",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": 64,
+        "quantidade_slots_m2": 1,
+        "quantidade_portas_sata": 3,
+        "formato": "mATX",
+        "quantidade_slots_m2_sata": 1,
+        "dimensoes_fabricante": "170 × 210 mm",
+        "chipset": null,
+        "observacoes_medidas": "Ficha técnica do anúncio HPM610: dois DIMMs/64 GB, um M.2 NVMe/SATA e três SATA. Há divergência H610/Q670 na página: chipset não confirmado. Lista de CPUs e BIOS instalada continuam por verificar.",
+        "conectores_alimentacao": {
+          "atx_24": 1,
+          "eps_8": 1
+        },
+        "conectores_alimentacao_completos": true
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "Husky",
+          "modelo": "Nexus H610, LGA 1700, 12ª/13ª Gen, M.2 NVMe/SATA, DDR4 3200MHz, Micro-ATX, HDMI/VGA - HPM610",
+          "part_number": "KABUM-692458",
+          "produto_kabum": "692458"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "Husky",
+      "modelo": "Nexus B450 HPM450",
+      "fonte": "https://www.kabum.com.br/produto/692459/placa-mae-husky-nexus-b450-m-2-nvme-ddr4-3200mhz-ryzen-5000-3000-2000-micro-atx-64gb-dual-channel-hpm450",
+      "medidas": {
+        "socket": "AM4",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": null,
+        "memoria_maxima_gb": 64,
+        "quantidade_slots_m2": 1,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "observacoes_medidas": "Anúncios da HPM450 divergem entre dois e quatro DIMMs: quantidade mantida desconhecida até confirmar manual/revisão. Capacidade de 64 GB, um M.2 e quatro SATA na ficha do anúncio exato; não herdar os dois slots da HPM610."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "Husky",
+          "modelo": "Nexus B450, M.2 NVMe, DDR4 3200MHz, Ryzen 5000/3000/2000, Micro-ATX, 64GB Dual Channel - HPM450",
+          "part_number": "KABUM-692459",
+          "produto_kabum": "692459"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "PCWARE",
+      "modelo": "IPMH610G",
+      "fonte": "https://pcwarebr.com.br/drivers/IPMH610G/manual/MANUAL_IPMH610G.pdf",
+      "medidas": {
+        "socket": "LGA1700",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": 64,
+        "quantidade_slots_m2": 1,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "quantidade_slots_m2_sata": 0,
+        "dimensoes_fabricante": "230 × 215 mm",
+        "observacoes_medidas": "Manual IPMH610G: M.2 Key M 2260/2280 PCIe 3.0 x4/x2 para SSD. Não há suporte M.2 SATA declarado; não confundir com variantes IPMH610 sem G. BIOS instalada não informada."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "Outros",
+          "modelo": "PCware Ipmh610g, Chipset H610, Intel LGA  1700, Matx, Ddr4",
+          "part_number": "KABUM-573251",
+          "produto_kabum": "573251"
+        },
+        {
+          "fabricante": "PCWARE",
+          "modelo": "I3/i5/i7 Pcware Ipmh610g",
+          "part_number": "KABUM-504413",
+          "produto_kabum": "504413"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "PCYES",
+      "modelo": "B450 PCYB450-RZ564",
+      "fonte": "https://dev.pcyes.com.br/placa-m-e-pcyes-b450-amd-am4-2x-ddr4-max-64gb-m-2-nvme-4x-usb-3-0-rede-1000-hdmi-vga-m-atx-pcyb450-rz564-270436-pcyes",
+      "medidas": {
+        "socket": "AM4",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": 64,
+        "quantidade_slots_m2": 1,
+        "quantidade_portas_sata": null,
+        "formato": "mATX",
+        "observacoes_medidas": "Duas conexões DIMM e 64 GB confirmados para PCYB450-RZ564; um M.2 NVMe. Quantidade de SATA e compartilhamento não confirmados. A página de produto da marca pode estar indisponível; não confundir com outras B450."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "PCYES",
+          "modelo": "B450, Amd Am4, 2x Ddr4 (max 64gb), M.2 Nvme, 4x Usb 3.0, Rede 1000, HDMI, Vga, M-atx - PCyb450-rz564",
+          "part_number": "KABUM-876028",
+          "produto_kabum": "876028"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "Gigabyte",
+      "modelo": "A520M K V2",
+      "fonte": "https://www.gigabyte.com/Motherboard/A520M-K-V2-rev-10/sp",
+      "medidas": {
+        "socket": "AM4",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": 64,
+        "quantidade_slots_m2": 1,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "quantidade_slots_m2_sata": 1,
+        "observacoes_medidas": "Dados básicos comuns às fichas das revisões 1.0, 1.1 e 1.2. Dois DIMMs/64 GB, um M.2 NVMe/SATA, quatro SATA. BIOS e lista de CPUs devem ser da revisão impressa na placa."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "Gigabyte",
+          "modelo": "A520m K V2, Socket Amd Am4, M-Atx, Ddr4, Chipset Amd A520 - A520m-K-V2",
+          "part_number": "KABUM-474499",
+          "produto_kabum": "474499"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "Gigabyte",
+      "modelo": "H610M K DDR4",
+      "fonte": "https://www.gigabyte.com/Motherboard/H610M-K-DDR4-rev-20/sp",
+      "medidas": {
+        "socket": "LGA1700",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": 64,
+        "quantidade_slots_m2": 1,
+        "quantidade_portas_sata": 2,
+        "formato": "mATX",
+        "quantidade_slots_m2_sata": 0,
+        "observacoes_medidas": "Contagens comuns às revisões 1.0 e 2.0: M.2 2260/2280 PCIe (não SATA), duas portas SATA e dois DIMMs/64 GB. Anúncio 636798 identifica 9MH610MK-00-20; não aplicar a GEN5 ou DDR5."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "Gigabyte",
+          "modelo": "H610m K, DDR4, LGA 1700, Micro ATX",
+          "part_number": "KABUM-594194",
+          "produto_kabum": "594194"
+        },
+        {
+          "fabricante": "Gigabyte",
+          "modelo": "H610M K DDR4, Intel LGA 1700, Micro ATX, DDR4, HDMI, M.2 - 9MH610MK-00-20",
+          "part_number": "KABUM-636798",
+          "produto_kabum": "636798"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "Gigabyte",
+      "modelo": "A620M H (contagens físicas)",
+      "fonte": "https://download.gigabyte.com/FileList/Manual/mb_manual_a620m-s2h_a620m-h_2101_e.pdf",
+      "medidas": {
+        "socket": "AM5",
+        "tipo_memoria": "DDR5",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": null,
+        "quantidade_slots_m2": 1,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "quantidade_slots_m2_sata": 0,
+        "observacoes_medidas": "Manual da família A620M H: dois DIMMs, um M.2 NVMe e quatro SATA. Revisão exata do anúncio não confirmada; limite máximo de RAM não foi transferido de outra revisão."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "Gigabyte",
+          "modelo": "A620m H, DDR5, Micro ATX, Am5",
+          "part_number": "KABUM-527608",
+          "produto_kabum": "527608"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "Gigabyte",
+      "modelo": "B550M K",
+      "fonte": "https://www.gigabyte.com/Motherboard/B550M-K-rev-10/sp",
+      "medidas": {
+        "socket": "AM4",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 4,
+        "memoria_maxima_gb": 128,
+        "quantidade_slots_m2": 2,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "quantidade_slots_m2_sata": 1,
+        "observacoes_medidas": "Quatro DIMMs/128 GB nas revisões 1.0/1.1 consultadas; anúncio 474337 identifica quatro DDR4. M2A aceita NVMe/SATA; M2B é PCIe. Confirmar revisão e suporte CPU/BIOS antes de comprar."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "Gigabyte",
+          "modelo": "B550m K Ultra Durable, AMD AM4, Micro ATX, 4 x DDR4, Chipset B550",
+          "part_number": "KABUM-474337",
+          "produto_kabum": "474337"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "ASUS",
+      "modelo": "PRIME B550M-A AC",
+      "fonte": "https://www.asus.com/rs-en/motherboards-components/motherboards/prime/prime-b550m-a-ac/techspec/",
+      "medidas": {
+        "socket": "AM4",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 4,
+        "memoria_maxima_gb": 128,
+        "quantidade_slots_m2": 2,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "quantidade_slots_m2_sata": 2,
+        "observacoes_medidas": "Variante AC com Wi-Fi; quatro DIMMs/128 GB, dois M.2 para SSD SATA/PCIe e quatro SATA. Desempenho dos slots depende da CPU; perfis e BIOS não aprovados automaticamente."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "ASUS",
+          "modelo": "PRIME B550M-A AC",
+          "part_number": "SEED-MB-20",
+          "produto_kabum": "952749"
+        },
+        {
+          "fabricante": "ASUS",
+          "modelo": "Prime B550m-a Ac Socket Am4 Amd Ddr4",
+          "part_number": "KABUM-658054",
+          "produto_kabum": "658054"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_mae",
+      "fabricante": "ASUS",
+      "modelo": "PRIME H610M-CS D4",
+      "fonte": "https://www.asus.com/in/motherboards-components/motherboards/prime/prime-h610m-cs-d4/techspec/",
+      "medidas": {
+        "socket": "LGA1700",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": 64,
+        "quantidade_slots_m2": 1,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "quantidade_slots_m2_sata": 0,
+        "dimensoes_fabricante": "226 × 193 mm",
+        "observacoes_medidas": "Variante CS D4: dois DIMMs/64 GB, um M.2 PCIe 3.0 2242/2260/2280 e quatro SATA. Não confundir com H610M-A D4 (dois M.2)."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "ASUS",
+          "modelo": "Prime H610m-cs D4, Intel LGA  1700, Matx, Ddr4 - Prime H610m-cs D4",
+          "part_number": "KABUM-707813",
+          "produto_kabum": "707813"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Office X1 White RM-GA-OFX1-FW",
+      "fonte": "https://www.kabum.com.br/produto/516120/gabinete-office-rise-mode-x1-white-mini-tower-m-atx-sem-fans-branco-rm-ga-ofx1-fw",
+      "medidas": {
+        "comprimento_mm": 315,
+        "largura_mm": 170,
+        "altura_mm": 350,
+        "formatos_placa_mae": "mATX, ITX",
+        "formatos_fonte": [
+          "ATX"
+        ],
+        "slots_expansao": 4,
+        "fans_inclusos": 0,
+        "quantidade_max_fans": 3,
+        "baias_25": 3,
+        "baias_35": 2,
+        "posicoes_fans_completas": false,
+        "tamanhos_fan_suportados_mm": null,
+        "posicoes_fans": null,
+        "tamanho_max_gpu_mm": null,
+        "tamanho_max_altura_gpu_mm": null,
+        "tamanho_max_espessura_gpu_mm": null,
+        "tamanho_max_cooler_mm": null,
+        "tamanho_max_fonte_mm": null,
+        "observacoes_medidas": "Ficha do RM-GA-OFX1-FW confirma três fans (não inclusas), quatro slots e fonte ATX. Não publica diâmetros/posições das fans nem folgas internas de GPU, cooler ou fonte. As medidas externas 315 × 170 × 350 mm não foram usadas como espaço interno.",
+        "estimativa_fans": {
+          "origem": "revisao_visual",
+          "quantidade_inicial": 2,
+          "posicoes_aparentes": [{"nome": "Lateral", "quantidade": 1}, {"nome": "Traseira", "quantidade": 1}],
+          "fontes": [
+            "https://images.kabum.com.br/produtos/fotos/516120/gabinete-rise-mode-x1-white-mini-tower-m-atx-branco-rm-ga-ofx1-fw_1718978929_gg.jpg",
+            "https://images.kabum.com.br/produtos/fotos/516120/gabinete-rise-mode-x1-white-mini-tower-m-atx-branco-rm-ga-ofx1-fw_1718978933_gg.jpg"
+          ],
+          "revisado_em": "2026-10-24",
+          "observacao": "As fotos sugerem um encaixe lateral e um traseiro, sem escala para confirmar os tamanhos. A ficha informa três fans no total; a terceira posição não foi identificada nas fotos. Iluminação ilustrativa não significa fans inclusas. Confirme manualmente os encaixes e suas medidas."
+        }
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "Rise Mode",
+          "modelo": "Office Rise Mode X1 White, Mini Tower, M-ATX, Sem FANs, Branco - RM-GA-OFX1-FW",
+          "part_number": "KABUM-516120",
+          "produto_kabum": "516120"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "placa_video",
+      "fabricante": "Zotac",
+      "modelo": "GeForce RTX 3050 6GB GDDR6 Twin Edge OC",
+      "fonte": "https://www.zotac.com/download/mediadrivers/External/GraphicsCard/3050/Brochure/ZT-A30510H-10L-brochure.pdf",
+      "medidas": {
+        "comprimento_mm": 161.9,
+        "altura_mm": 111.2,
+        "espessura_mm": 40.2,
+        "slots_ocupados": 2,
+        "conectores_energia": "Sem alimentação externa; alimentada pelo PCIe",
+        "consumo_energia": 70,
+        "observacoes_medidas": "Ficha ZT-A30510H-10L da Twin Edge OC 6 GB; não é a versão 8 GB de 224 mm nem Solo/LP. Comprimento × altura × espessura, dois slots. Continua necessário conhecer os limites internos do gabinete.",
+        "conectores_alimentacao": {},
+        "conectores_alimentacao_completos": true
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "Zotac",
+          "modelo": "RTX 3050 6gb Twin Edge Oc Gddr6 96 Bits Zotac",
+          "part_number": "KABUM-1063804",
+          "produto_kabum": "1063804"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "categoria": "air_cooler",
+      "fabricante": "Gamemax",
+      "modelo": "Gamma 200 (kit de montagem a confirmar)",
+      "fonte": "https://gamemax-br.com/produto/gamma200",
+      "medidas": {
+        "comprimento_mm": 127,
+        "largura_mm": 127,
+        "altura_mm": 82,
+        "tamanho_fan_mm": 120,
+        "espessura_fan_mm": 25,
+        "quantidade_fans": 1,
+        "compatibilidade": "LGA775, LGA1150, LGA1151, LGA1155, LGA1156, LGA1200, AM4",
+        "sockets_suporte_condicional": [
+          "AM2",
+          "AM2+",
+          "AM3",
+          "AM3+",
+          "FM1",
+          "FM2",
+          "LGA1366",
+          "LGA1700",
+          "LGA1851",
+          "AM5"
+        ],
+        "tdp_w": 95,
+        "conector_fan": "4 pinos PWM, 12 V",
+        "observacoes_medidas": "O fabricante atual lista LGA1366/1700/1851/AM5; o anúncio antigo 156726 não os lista. AM2/AM3/FM1/FM2 e variantes constam apenas na ficha antiga. Esses sockets exigem confirmar revisão e kit incluído, sem aprovação automática. Altura total 82 mm; o valor genérico antigo de 155 não foi interpretado como altura. Não inferir RGB/ARGB pelo nome."
+      },
+      "part_numbers": [],
+      "aliases_catalogo": [
+        {
+          "fabricante": "Gamemax",
+          "modelo": "Gamma 200",
+          "part_number": "SEED-ACOOL-19",
+          "produto_kabum": "156726"
+        }
+      ],
+      "verificado_em": "2026-10-24"
+    },
+    {
+      "fabricante": "Duex",
+      "modelo": "DX H310ZG M.2",
+      "fonte": "https://www.duex.com.br/produtos/placa-mae/placa-mae-dx-h310zg-m2-intel-lga-1151-ddr4",
+      "medidas": {
+        "socket": "LGA1151",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": 32,
+        "quantidade_slots_m2": 1,
+        "quantidade_slots_m2_sata": 0,
+        "quantidade_portas_sata": 3,
+        "formato": "mATX",
+        "observacoes_medidas": "DX H310ZG M.2, não H110 nem H510. Dois DIMMs/32 GB, M.2 NVMe e três SATA conforme fabricante. Socket LGA1151 não aprova CPUs de 6ª/7ª geração: esta placa é para 8ª/9ª, sujeito à BIOS."
+      },
+      "categoria": "placa_mae",
+      "part_numbers": [],
+      "verificado_em": "2026-10-24",
+      "aliases_catalogo": [
+        {
+          "fabricante": "Duex",
+          "modelo": "H310zg M2 Intel 1151, Ddr4, Micro Atx",
+          "part_number": "KABUM-742071",
+          "produto_kabum": "742071"
+        }
+      ]
+    },
+    {
+      "fabricante": "ASRock",
+      "modelo": "B450M-HDV (contagens comuns; revisão a confirmar)",
+      "fonte": "https://www.asrock.com/MB/AMD/B450M-HDV/",
+      "medidas": {
+        "socket": "AM4",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": null,
+        "quantidade_slots_m2": 1,
+        "quantidade_slots_m2_sata": 1,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "observacoes_medidas": "Dois DIMMs, um M.2 SATA/PCIe e quatro SATA comuns à original e R4.0. Anúncio não confirma revisão e documentos antigos indicam limites de RAM diferentes; máximo mantido desconhecido. Confirmar revisão para BIOS, QVL e capacidade."
+      },
+      "categoria": "placa_mae",
+      "part_numbers": [],
+      "verificado_em": "2026-10-24",
+      "aliases_catalogo": [
+        {
+          "fabricante": "ASRock",
+          "modelo": "AMD AM4, HDMI, DVI e VGA - B450M-HDV",
+          "part_number": "KABUM-221040",
+          "produto_kabum": "221040"
+        }
+      ]
+    },
+    {
+      "fabricante": "ASUS",
+      "modelo": "PRIME B550M-K ARGB",
+      "fonte": "https://www.asus.com/uk/motherboards-components/motherboards/prime/prime-b550m-k-argb/techspec/",
+      "medidas": {
+        "socket": "AM4",
+        "tipo_memoria": "DDR4",
+        "quantidade_slots_ram": 2,
+        "memoria_maxima_gb": 64,
+        "quantidade_slots_m2": 2,
+        "quantidade_slots_m2_sata": 2,
+        "quantidade_portas_sata": 4,
+        "formato": "mATX",
+        "observacoes_medidas": "Anúncio 992806/90MB1GC0-M0EAY0 identifica ARGB. Esta variante tem dois DIMMs/64 GB, não os quatro DIMMs/128 GB da PRIME B550M-K original. M2_1 até 2280; M2_2 até 22110. Não aplicar por prefixo B550M-K."
+      },
+      "categoria": "placa_mae",
+      "part_numbers": [],
+      "verificado_em": "2026-10-24",
+      "aliases_catalogo": [
+        {
+          "fabricante": "ASUS",
+          "modelo": "Prime B550m-k, Am4, Ddr4, HDMI, Display Port, Micro Atx, ARGB - 90mb1gc0-m0eay0",
+          "part_number": "KABUM-992806",
+          "produto_kabum": "992806"
+        }
+      ]
     }
   ]
 }

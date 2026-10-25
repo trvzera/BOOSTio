@@ -250,9 +250,9 @@
   font-family: var(--font-body); color: var(--cor-6);
   border: 1px solid var(--cor-2); border-radius: 20px; background: rgba(20,20,23,.96); box-shadow: 0 16px 40px #0006;
   opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(5px); filter: blur(3px);
-  transition: opacity .18s, visibility .18s, transform .18s, filter .18s; }
+  transition: opacity .18s, visibility 0s linear .18s, transform .18s, filter .18s; }
 .compatibility-details::before { content: ""; position: absolute; inset: -14px 0 auto; height: 14px; }
-.compatibility-popover[data-open] .compatibility-details { opacity: 1; visibility: visible; pointer-events: auto; transform: none; filter: none; }
+.compatibility-popover[data-open] .compatibility-details { opacity: 1; visibility: visible; pointer-events: auto; transform: none; filter: none; transition-delay: 0s; }
 .compatibility-details h2 { font-size: var(--text-body); margin-bottom: 12px; }
 .compatibility-details h3 { font: 600 .85rem/1.5 var(--font-heading); color: var(--cor-6); }
 .compatibility-details { max-height: min(70svh,32rem); overflow-y: auto; }
@@ -263,6 +263,23 @@
 .compatibility-unknown ul { padding-left: 1rem; list-style: disc; }
 .compatibility-messages li { font-size: var(--text-caption); }
 .compatibility-messages li.tip { border-color: var(--cor-p1); }
+.compatibility-messages:empty { display: none; }
+.compatibility-section { border-top: 1px solid var(--cor-2); margin-top: .75rem; padding-top: .25rem; }
+.compatibility-section > summary, .compatibility-topic > summary { padding-block: .65rem; min-height: 2.75rem; cursor: pointer; font: 500 .8125rem/1.5 var(--font-body); color: var(--cor-6); }
+.compatibility-section > summary::marker, .compatibility-topic > summary::marker { color: var(--cor-p1); }
+.compatibility-count { color: var(--cor-p1); font-variant-numeric: tabular-nums; margin-inline-start: .25rem; }
+.compatibility-topic { border-top: 1px solid var(--cor-2); }
+.compatibility-topic > summary { font-weight: 400; }
+.compatibility-topic > p, .compatibility-topic li { font: 400 .75rem/1.6 var(--font-body); color: var(--text-secondary); overflow-wrap: anywhere; }
+.compatibility-topic > p { color: var(--cor-6); margin-block: .25rem .75rem; }
+.compatibility-topic ul { list-style: disc; padding-left: 1rem; margin-bottom: .75rem; }
+.compatibility-topic li + li { margin-top: .5rem; }
+.compatibility-section summary:focus-visible, .component-fan-plan summary:focus-visible { outline: 2px solid var(--cor-p1); outline-offset: 2px; border-radius: .25rem; }
+.component-fan-plan { margin-block: .25rem .75rem; padding: .5rem .875rem; border: 1px solid var(--cor-2); border-radius: 1rem; background: rgba(0,123,255,.035); }
+.component-fan-plan > summary { cursor: pointer; min-height: 2.75rem; align-content: center; font: 500 .8125rem/1.6 var(--font-body); color: var(--cor-6); }
+.component-fan-plan > summary::marker { color: var(--cor-p1); }
+.component-fan-plan > summary > span { display: inline-block; color: var(--cor-p1); font-size: .75rem; margin-inline-start: .5rem; }
+.component-fan-plan > p { font: 400 .75rem/1.7 var(--font-body); color: var(--text-secondary); margin-block: .5rem; }
 .compatibility-trigger:focus-visible { outline: 2px solid var(--indicator-color); outline-offset: 2px; }
 .builder-title-line > .build-indicator, .build-title-line > .build-indicator { position: absolute; left: -.5rem; top: 0; margin: 0; }
 .builder-title-line > .build-indicator { top: 50%; transform: translateY(-50%); }

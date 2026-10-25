@@ -113,3 +113,21 @@ def test_cor_propagada_para_complemento_de_fans_sem_chamar_llm_real(mocker):
     mocker.patch.object(CriarBuildService, "_validar_build", return_value={"componentes": []})
     CriarBuildService()._gerar_validada(1, "Prompt", "teste", {}, 1000, 0, {}, {}, {}, tentativas_correcao=0, cor="branco")
     assert completar.call_args.kwargs == {"cor": "branco"}
+
+
+def test_cor_da_variante_exata_no_nome_da_ficha_nao_fica_desconhecida():
+    dados = {"modelo": "Modelo resumido", "categoria": "gabinete", "modelo_ficha_tecnica": "Modelo White"}
+    assert Cores.identificar(dados) == (frozenset({"branco"}), "nome_ficha_tecnica")
+    assert Cores.identificar({**dados, "cor": "preto"}) == (frozenset({"preto"}), "cor_cadastrada")
+    assert Cores.identificar({**dados, "modelo_ficha_tecnica": "Modelo 80 Plus White"}) == (frozenset(), None)
+
+
+def test_catalogo_preserva_variante_preta_equivalente_omitida_pela_amostra(mocker):
+    from models import Teclado
+    branco = Teclado(id=1, fabricante="Marca", modelo="GM1 White", preco=100, mecanico=True, switch="Brown", layout="ABNT2")
+    preto = Teclado(id=2, fabricante="Marca", modelo="GM1 Black", preco=120, mecanico=True, switch="Brown", layout="ABNT2")
+    modelo = SimpleNamespace(__tablename__="teclado", listar_disponiveis_ate=lambda *a, **k:[branco,preto])
+    mocker.patch("services.build_service.criar_build_service.MODELOS_PECAS", (modelo,))
+    mocker.patch.object(AmostrarCatalogoService, "executar", return_value=[CriarBuildService._campos_pecas(branco)])
+    catalogo = CriarBuildService._gerar_catalogo(200, reserva_perifericos=200, cor="preto")
+    assert {p["id"] for p in catalogo["teclado"]} == {1, 2}

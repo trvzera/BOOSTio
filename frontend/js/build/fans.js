@@ -7,6 +7,23 @@ const tamanhos = v => Array.isArray(v) && v.every(x => n(x) > 0) ? v.map(n) : nu
 export function temFansInclusas(gabinete,water = null) {
   return [gabinete?.fans_inclusos,water?.quantidade_fans].some(v => inteiro(v,1) != null);
 }
+// Sugestão editorial por modelo revisado. Não preenche capacidade, diâmetro,
+// fans inclusas ou aprovação de encaixe; dimensões externas são só contexto.
+export function planejamentoFans(gabinete) {
+  const estimativa = gabinete?.estimativa_fans;
+  const quantidade = inteiro(estimativa?.quantidade_inicial,1);
+  if (estimativa?.origem !== "revisao_visual" || quantidade == null
+      || !Array.isArray(estimativa.posicoes_aparentes) || !estimativa.posicoes_aparentes.length) return null;
+  const posicoes = estimativa.posicoes_aparentes;
+  if (posicoes.some(p => typeof p?.nome !== "string" || !p.nome.trim() || inteiro(p.quantidade,1) == null)
+      || posicoes.reduce((total,p) => total + inteiro(p.quantidade,1),0) < quantidade) return null;
+  const capacidade = inteiro(gabinete.quantidade_max_fans);
+  if (capacidade != null && quantidade > capacidade) return null;
+  const medidas = [gabinete.comprimento_mm,gabinete.largura_mm,gabinete.altura_mm].map(n);
+  return {quantidade, posicoes:posicoes.map(p => p.quantidade + " na " + p.nome.toLowerCase()).join(" e "),
+    dimensoes:medidas.every(v => v > 0) ? medidas.join(" × ") + " mm" : null,
+    observacao:typeof estimativa.observacao === "string" ? estimativa.observacao : "Confirme as posições e o tamanho das fans antes de comprar."};
+}
 export function posicoesFans(gabinete) {
   const grupos = gabinete?.posicoes_fans;
   if (!Array.isArray(grupos) || !grupos.length || grupos.length > 12) return null;

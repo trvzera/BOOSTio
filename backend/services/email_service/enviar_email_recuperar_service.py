@@ -39,7 +39,13 @@ class EnviarEmailRecuperarService:
   @staticmethod
   def _monta_mensagem(msg:Message,link:str):
     msg.body = f'Para redefinir sua senha, acesse o link: {link}'
-    msg.html = f'''
+    # O layout já é escuro: light only impede a conversão automática do Gmail,
+    # sem transformar o fundo autoral em branco.
+    # https://emailmarkup.org/en/blog/2026/gmail-app-dark-mode-update
+    msg.html = f'''<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light only"><title>Recuperar senha — BOOSTio</title></head>
+<body style="margin:0;padding:0;background-color:#000000;color:#e5e5ea;font-family:Arial,Helvetica,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#000000" style="background-color:#000000;"><tr><td style="padding:24px 12px;">
         <div style="font-family: Arial, sans-serif; background-color:#1c1c1e; padding: 32px; border-radius: 16px; max-width: 480px; margin: 0 auto; border: 1px solid #3a3a3c;">
   <h2 style="color:#ffffff; text-align:center;">Recuperar senha</h2>
   <p style="color:#8e8e93; text-align:center;">Recebemos uma solicitação para redefinir a senha da sua conta BOOSTio. Clique no botão abaixo para criar uma nova senha:</p>
@@ -48,4 +54,5 @@ class EnviarEmailRecuperarService:
   </div>
   <p style="color:#696969; text-align:center; font-size:13px;">Esse link expira em <strong style="color:#8e8e93;">30 minutos</strong>. Se você não solicitou essa alteração, ignore este email.</p>
 </div>
+</td></tr></table></body></html>
     '''

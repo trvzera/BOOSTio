@@ -5,6 +5,7 @@ alternativas, não capacidades somáveis. Não simula espessura/interferência.
 """
 import math
 from functools import lru_cache
+from .armazenamento import avaliar_baias
 
 
 def n(valor):
@@ -214,13 +215,9 @@ def avaliar_medidas(itens, registrar, substituir=False):
     if tem("placa_video"):
         registrar("gpu-interferencias", "Espaço completo da GPU", None,
                   "Conferir cabos e folgas com radiador/fans frontais; comprimento isolado não confirma o conjunto.")
-    for formato, campo in (("2.5", "baias_25"), ("3.5", "baias_35")):
-        discos = [(item, p) for tipo, item, p in itens if tipo in ("ssd", "hd") and p and str(p.get("formato", "")).replace('"', "") == formato]
-        if discos:
-            quantidade = sum(item.get("quantidade", 1) for item, _ in discos)
-            limite = n(gabinete.get(campo))
-            registrar("baias-" + campo, "Baias de " + formato + '"', quantidade <= limite if limite is not None else None,
-                      "Baias dedicadas informadas no gabinete; baias compartilhadas ainda exigem verificação.")
+    discos = [(item, p) for tipo, item, p in itens if tipo in ("ssd", "hd")]
+    for r in avaliar_baias(gabinete, discos):
+        registrar(r['codigo'], r['titulo'], r['condicao'], r['mensagem'])
     if not tem("fan") and not tem("water_cooler"):
         return avaliar_fans(gabinete, [])
     fans = [(item, p) for tipo, item, p in itens if tipo == "fan"]

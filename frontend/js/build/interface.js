@@ -6,6 +6,8 @@ export function avisar(mensagem, {urgente = false} = {}) {
   if (!toast) {
     toast = document.createElement("div");
     toast.id = "builder-feedback";
+    // O texto acessível é anunciado por anunciarStatus; esta é a cópia visual.
+    toast.setAttribute("aria-hidden", "true");
     document.body.append(toast);
   }
   toast.textContent = mensagem;

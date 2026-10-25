@@ -284,9 +284,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p class="font-1-m-b">${pergunta.chave === "aparencia" ? "Preferências opcionais" : pergunta.chave === "rede" ? "Planeje sua conexão" : pergunta.multipla ? "Selecione as opções aplicáveis" : "Escolha uma opção"}</p>
         <span class="font-2-xs">${indiceAtual + 1} de ${perguntas.length}</span>
       </div>
+      <div class="question-options-scroll" role="region" aria-label="Respostas da etapa ${indiceAtual + 1}" tabindex="0">
       ${pergunta.chave === "orcamento" ? `<div class="budget-fields">${campos}${rangeHtml()}</div>` : campos}
       ${pergunta.chave === "perifericos" ? '<div id="perifericos-fields"></div>' : ""}
       ${pergunta.chave === "objetivo" ? '<aside class="usage-priority" aria-labelledby="usage-priority-title"><h2 id="usage-priority-title" class="font-1-xs">O que vamos priorizar</h2><p id="usage-priority-copy" class="font-2-xs" aria-live="polite"></p></aside>' : ""}
+      </div>
       <div id="form-navigation">
         <button type="button" class="btn-ghost" id="previous-question" aria-label="Voltar à etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}>${iconeAnimado("arrow","back")}<span>Voltar</span></button>
         <button type="button" class="btn-primary-form" id="next-question" aria-label="${rotuloAvancar}" ${podeAvancar() ? "" : "disabled"}><span>${rotuloAvancar}</span>${iconeAnimado("arrow")}</button>
@@ -571,9 +573,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     indiceAtual = indice;
     atualizarMenu();
     renderizarPergunta();
-    if (window.matchMedia("(max-width: 850px)").matches) {
-      window.scrollTo({ top: 0, behavior: "instant" });
-    }
+    document.querySelector("#questions").scrollTop = 0;
+    painel.scrollTop = 0;
+    const titulo = painel.querySelector("h1");
+    titulo?.setAttribute("tabindex", "-1");
+    titulo?.focus({preventScroll:true});
   }
 
   async function mostrarGerando() {
@@ -589,6 +593,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       await verificarEspacoBuild();
       painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Última etapa</span><h1 class="font-1-xl">Gerando sua build</h1><p class="font-2-s">Vamos selecionar peças compatíveis dentro do seu orçamento.</p></div>`;
       conteudo.innerHTML = `<div class="build-loading"><span class="build-loader" aria-hidden="true"></span><h2 class="font-1-m" id="generation-message">Analisando seu perfil</h2><p class="font-2-xs" id="generation-elapsed" aria-live="off">A seleção pode incluir uma revisão automática. Aguarde nesta página.</p></div>`;
+      document.querySelector("#questions").scrollTop = 0;
       anunciarStatus("Gerando sua build. A seleção pode levar alguns instantes. Aguarde nesta página.",{atraso:150});
       const frases = ["Analisando seu perfil", "Buscando peças para o seu orçamento", "Pensando no equilíbrio da configuração", "Escolhendo as melhores peças para o seu uso"];
       let frase = 0;
@@ -615,11 +620,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       atualizarMenu();
       const semEspaco = erro.codigo === "limite-builds";
       const incerto=erro.resultadoIncerto===true;
-      conteudo.innerHTML = `<div class="build-generation-error"><h2 class="font-1-m" tabindex="-1">${semEspaco ? "Suas três vagas estão ocupadas" : incerto ? "Não conseguimos confirmar sua montagem" : "Não foi possível gerar sua build"}</h2><p id="erro-gerar-build" class="font-2-s" role="alert"></p><div class="generation-actions">${semEspaco||incerto ? '<a href="./builds.html" class="btn-primary" aria-label="Conferir minhas builds">'+(incerto?'Conferir minhas builds':'Minhas builds')+'</a>' : '<button type="button" id="tentar-gerar-build" class="btn-primary" aria-label="Tentar gerar build novamente">Tentar novamente</button>'}<button type="button" id="revisar-orcamento" class="btn-secondary" aria-label="Revisar orçamento">Revisar orçamento</button>${erro.status === 401 ? '<a href="./login.html" class="btn-ghost" aria-label="Entrar na conta">Entrar na conta</a>' : ""}</div></div>`;
+      conteudo.innerHTML = `<div class="build-generation-error"><h1 class="font-1-m" tabindex="-1">${semEspaco ? "Suas três vagas estão ocupadas" : incerto ? "Não conseguimos confirmar sua montagem" : "Não foi possível gerar sua build"}</h1><p id="erro-gerar-build" class="font-2-s" role="alert"></p><div class="generation-actions">${semEspaco||incerto ? '<a href="./builds.html" class="btn-primary" aria-label="Conferir minhas builds">'+(incerto?'Conferir minhas builds':'Minhas builds')+'</a>' : '<button type="button" id="tentar-gerar-build" class="btn-primary" aria-label="Tentar gerar build novamente">Tentar novamente</button>'}<button type="button" id="revisar-orcamento" class="btn-secondary" aria-label="Revisar orçamento">Revisar orçamento</button>${erro.status === 401 ? '<a href="./login.html" class="btn-ghost" aria-label="Entrar na conta">Entrar na conta</a>' : ""}</div></div>`;
       conteudo.querySelector("#erro-gerar-build").textContent = erro.message;
       conteudo.querySelector("#tentar-gerar-build")?.addEventListener("click", mostrarGerando);
       conteudo.querySelector("#revisar-orcamento").addEventListener("click",() => navegarPara(1));
-      conteudo.querySelector("h2").focus({preventScroll:true});
+      conteudo.querySelector("h1").focus({preventScroll:true});
     } finally { pararMensagens(); }
   }
 

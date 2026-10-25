@@ -73,7 +73,7 @@ de builds no backend para persistir a configuração na conta.
 | 10 | O sistema deve permitir ao usuário ver configurações prontas | ✅ **Implementado** | 16 modelos sem periféricos, referências revisadas no catálogo, filtro de budget e preço crescente. A cópia respeita e-mail verificado e limite da conta. |
 | 11 | O sistema deve permitir ao usuário editar e modificar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento; desfazer a última alteração de montagem enquanto o editor estiver aberto. |
 | 12 | O sistema deve permitir ao usuário verificar o preço da peça direto pelo site, sem precisar consultar em diversas abas | ✅ **Implementado** | Preços cadastrados, data quando disponível e links das lojas. Antes da compra, o catálogo é reconsultado e diferenças/indisponibilidade são mostradas. Não inclui frete nem garante o valor no checkout. |
-| 13 | O sistema deve permitir ao usuário ver todas as informações de compatibilidade e consumo de energia do setup que está montando | ✅ **Implementado** | Diagnóstico da build, consumo estimado e fichas técnicas com socket, memória, slots, conexões, medidas, fans e radiador conforme os dados cadastrados. A página da peça organiza especificações e fontes por assunto. Dados ausentes são sinalizados, não aprovados por suposição; ampliar a cobertura de modelos permanece uma melhoria de catálogo. |
+| 13 | O sistema deve permitir ao usuário ver todas as informações de compatibilidade e consumo de energia do setup que está montando | ✅ **Implementado** | Diagnóstico da build, consumo estimado e fichas técnicas conforme os dados cadastrados. Conflitos ficam em destaque; conferências e dicas são agrupadas por assunto, com detalhes recolhidos. Referências visuais de fans são identificadas como estimativas e não aprovam encaixes. Ampliar a cobertura de modelos permanece uma melhoria de catálogo. |
 | 14 | O sistema deve permitir ao usuário adicionar ao setup periféricos, que muitas vezes não pensado anteriormente, acaba estourando o orçamento | ✅ **Implementado** | Inclusão e reaproveitamento com tetos separados para PC e periféricos. |
 | 15 | O sistema deve permitir ao usuário registrar em seu perfil o seu budget, assim fica registrado o seu dinheiro disponível para comprar e futuras melhorias | ✅ **Implementado** | Valor e autorização usados no formulário e em novas montagens manuais, sem alterar builds existentes. |
 | 16 | O sistema deve permitir ao usuário baixar a build em JSON e CSV para ter o arquivo local | ✅ **Implementado** | Exportação para guardar a configuração localmente. |
@@ -101,6 +101,12 @@ de builds no backend para persistir a configuração na conta.
 
 ### Como o orçamento é respeitado
 
+Nas montagens para jogos, **AMD Ryzen é uma preferência de plataforma**, quando
+houver uma combinação adequada no catálogo. Peças próprias, compatibilidade e
+orçamento têm prioridade: a geração pode escolher Intel quando necessário, sem
+reduzir a placa de vídeo apenas para manter a marca do processador. A preferência
+não significa que todo Ryzen tenha desempenho superior a qualquer Intel.
+
 O percentual para periféricos é um **teto, não uma meta de gasto**. O restante
 define o limite do PC, incluindo acessórios de rede.
 
@@ -111,6 +117,11 @@ define o limite do PC, incluindo acessórios de rede.
 O Python confere os subtotais pelos preços e quantidades do catálogo antes de
 salvar a sugestão. O **frete não está incluído**: é importante reservar parte do
 orçamento para a entrega.
+
+Se o catálogo não tiver um cabo ou adaptador adequado à conexão solicitada,
+a montagem do PC pode prosseguir **com a rede pendente**. O pedido de comprimento
+e velocidade fica registrado, e a build informa que o acessório não foi incluído
+no total. Um cabo curto não substitui automaticamente o comprimento necessário.
 
 O formulário separa **tamanho do gabinete**, **estilo** e **cor**, com imagens de
 exemplo sem preços ou ofertas e opções de “sem preferência”. Os tamanhos são
@@ -129,9 +140,14 @@ Cor cadastrada tem prioridade; nomes com indicação de cor são referências
 comerciais, não confirmação técnica da versão. RGB, switch, fotos e URLs não
 comprovam a cor da carcaça. Peças próprias são preservadas; ausência da cor
 preferida não impede usar uma alternativa adequada, sem exceder os tetos.
+Variantes da mesma família e ficha podem ser ajustadas para a cor solicitada
+após nova validação de orçamento e compatibilidade. Para o gabinete, a seleção
+também considera o estilo disponível quando o porte escolhido não existir;
+preferências não confirmadas ficam indicadas nas orientações da build.
 Características ausentes não são inventadas. O editor também mostra a
 capacidade total de SSDs/HDs em GB/TB; quando faltam dados, identifica o subtotal
-como parcial.
+como parcial. Monitores selecionados mostram a taxa de atualização em Hz e a
+resolução cadastrada ao lado do título da categoria.
 
 O uso escolhido no formulário explica **quais peças terão prioridade**. As páginas
 do catálogo e da peça também apresentam uma descrição simples da função de cada
@@ -267,7 +283,14 @@ A geração pela LLM já revalida conflitos conhecidos no catálogo, incluindo s
 DDR, slots, potência e medidas explícitas. Especificações ausentes continuam não
 verificadas; a configuração não recebe garantia de compatibilidade completa.
 
-O manifesto atual possui 48 fichas técnicas, incluindo gabinetes, GPUs, fontes,
+O diagnóstico também confere os tipos e quantidades de conectores da fonte,
+placa-mãe, GPU e discos quando há ficha detalhada. Armazenamento considera o
+padrão e tamanho do SSD, a distribuição por slot M.2, portas SATA compartilhadas
+e arranjos alternativos de baias. As mesmas regras orientam o editor JavaScript;
+o Python revalida os conflitos. Dicas gerais ficam separadas das verificações
+pendentes, preservando os avisos sobre dados realmente ausentes.
+
+O manifesto atual possui 77 fichas técnicas, incluindo gabinetes, GPUs, fontes,
 air/water coolers, placas-mãe, processador, RAM, SSDs, fans e periféricos. Há limites físicos,
 slots, perfis JEDEC/XMP, dimensões por capacidade de SSD, conexões RGB/PWM e
 exceções físicas declaradas pelo fabricante do cooler. As fichas só complementam
@@ -280,6 +303,13 @@ exatas documentadas; apelidos internos também exigem o anúncio revisado. Sem a
 o banco ou inferir dados de outra revisão. Modelos/links com variantes divergentes
 continuam pendentes de revisão. Isso não certifica BIOS, QVL ou todas as
 interferências físicas.
+
+A revisão mais recente amplia slots, limites de RAM e conexões M.2/SATA em
+29 cadastros de placas-mãe. Também padroniza a leitura dos sockets no Python e
+no JavaScript, preservando diferenças como AM3/AM3+ e LGA2011/LGA2011-3.
+Coolers com versões ou kits de fixação diferentes continuam a confirmar;
+não recebem aprovação automática. O detalhamento e as lacunas de pesquisa
+estão em [Catálogo e especificações revisadas](docs/catalogo-e-especificacoes.md).
 
 A base de cadastro inclui **1.542 produtos**, com sete novos modelos de fans,
 periféricos e gabinete identificados por part number. Isso não significa que todos
@@ -347,14 +377,27 @@ Os originais da marca, esboços e anotações estão reunidos em [materiais](mat
 
 ## Validação da versão
 
-Na revisão de **24/10/2026**, a suíte local aprovou **586 testes JavaScript** e
-**781 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
+Na revisão de **25/10/2026**, a suíte local aprovou **711 testes JavaScript** e
+**938 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
 Há testes específicos para as sete classes de Controller e para preservar o
 contrato das 35 rotas declaradas, incluindo o blueprint legado de peças, que
 continua fora do registro do aplicativo principal. O catálogo ativo permanece
 em `/build/catalogo`.
+
+As **17 entradas do front-end** (15 páginas, testes e redirecionamento 404) foram
+revisadas em **13 tamanhos de tela**, entre 320 e 1920 px, incluindo paisagem,
+rodapés, menus e modais. A revisão também cobre texto a 200%, 39 cenários de
+catálogo preenchido e 48 cenários de mudança de orientação com telas abertas.
+O formulário e o monitor passaram por **195 cenários no Chrome**, com API
+simulada. Em telas baixas, a navegação do formulário ocupa uma linha e o card
+rola inteiro, evitando comprimir os campos de resposta.
+
+O pedido de jogos de
+R$ 8.000 com periféricos a 10% e cabo de 20 m também foi validado com duas
+consultas gratuitas ao Gemini e revalidação local das preferências, sem salvar
+builds na conta.
 
 Os testes utilizam isolamento, bancos temporários e mocks quando necessário.
 Não comprovam todas as combinações de hardware, a disponibilidade permanente de

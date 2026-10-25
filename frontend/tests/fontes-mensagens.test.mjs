@@ -27,12 +27,12 @@ test("instruções de exclusão e senha recebem tipografia explícita",async()=>
   assert.match(html,/<p class="font-2-xs">Conta somente Google\?/);
 });
 
-test("interface descreve desativação, preservação e recuperação assistida sem prometer apagar dados",async()=>{
+test("interface apresenta exclusão da conta e suas consequências sem prometer apagar todos os dados",async()=>{
   const html=await readFile(new URL("../pages/configuracoes.html",import.meta.url),"utf8");
   const js=await readFile(new URL("../js/pages/configuracoes.js",import.meta.url),"utf8");
-  assert.match(html,/Desativar minha conta/);
-  assert.match(html,/a recuperação deve ser solicitada à equipe/);
+  assert.match(html,/Excluir minha conta/);
+  assert.match(html,/Você perderá o acesso ao perfil e suas sessões serão encerradas/);
   assert.match(html,/Builds públicas podem continuar acessíveis/);
-  assert.doesNotMatch(html,/removidos permanentemente|serão apagados|Excluir permanentemente/);
-  assert.match(js,/Conta desativada\. Redirecionando/);
+  assert.doesNotMatch(html,/desativ|registros serão preservados|recuperação deve ser solicitada|removidos permanentemente|serão apagados|Excluir permanentemente/i);
+  assert.match(js,/Conta excluída\. Redirecionando/);
 });

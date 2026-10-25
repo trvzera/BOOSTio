@@ -1,5 +1,7 @@
 .builder-page-main { padding-top: var(--page-top); }
 .builder-heading > *, .builder-layout > *, .component-empty > div { min-width: 0; }
+.component-list, .component-group { grid-template-columns: minmax(0, 1fr); }
+.component-group, .component-group-heading, .component-group-heading > *, .builder-options > * { min-width: 0; }
 .component-empty p { font-size: var(--text-small); }
 .component-image { flex-shrink: 0; }
 .component-add, .status-dot { flex-shrink: 0; }
@@ -58,12 +60,15 @@
   .catalog-grid, .store-grid { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 600px) {
+  .component-fan-plan { padding-inline: .75rem; }
+  .component-fan-plan > summary > span { display: block; margin-inline-start: 0; }
   .builder-page-main, .builder-footer-wrapper { padding-bottom: 96px; }
   .component-empty, .component-selected-main { padding: 16px; gap: 12px; }
   .component-empty { gap: 12px; padding: 18px 16px; }
   .component-purchase { grid-column: 1 / -1; flex-wrap: wrap; }
   .component-purchase strong { min-width: 0; max-width: 100%; margin-inline-start: auto; white-space: normal; overflow-wrap: anywhere; }
   .component-group-heading { flex-wrap: wrap; }
+  .component-group-heading .component-count { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
   .ram-add-model, .component-group > .disabled-tip-anchor:has(> .ram-add-model) { width: 100%; justify-self: stretch; }
   .builder-options { flex-direction: column; gap: 8px; }
   .build-summary, .compatibility-card, .product-specifications, .store-card { padding: 20px; }
@@ -84,5 +89,6 @@
   .catalog-empty { padding: 24px; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .compatibility-details { transition: none; }
   .builder-page *, .builder-page *::before { transition-duration: .01ms !important; }
 }

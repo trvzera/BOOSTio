@@ -4,16 +4,16 @@ import { iniciarFluxoVerificacaoEmail } from "../js/components/verification-flow
 
 const drenar=()=>new Promise(r=>setImmediate(r));
 function ambiente(t,{enviar=async()=>{},confirmar=async()=>({usuario:{verificado:true}}),aoConfirmar=()=>{}}={}) {
-  let tempo=100000,focos=0;
+  let tempo=100000,focos=0,ativo;
   const elemento=()=>({value:"",textContent:"",disabled:false,isConnected:true,handlers:{},
-    addEventListener(e,h){this.handlers[e]=h;},setAttribute(k,v){this[k]=v;},focus(){focos++;}});
+    addEventListener(e,h){this.handlers[e]=h;},setAttribute(k,v){this[k]=v;},focus(){focos++;ativo=this;}});
   const inputs=Array.from({length:6},elemento),classes=new Set();
   const elementos=Object.fromEntries(["btn-send-code","btn-confirm-code","verify-email-error","verify-email-status","verify-email-target"].map(id=>["#"+id,elemento()]));
   const modal={querySelector:s=>elementos[s],querySelectorAll:()=>inputs,addEventListener(){},
     classList:{add:c=>classes.add(c),remove:c=>classes.delete(c),contains:c=>classes.has(c)}};
   const fluxo=iniciarFluxoVerificacaoEmail({modal,enviar,confirmar,aoConfirmar,agora:()=>tempo});
   t.after(()=>fluxo.destruir());
-  return {fluxo,inputs,elementos,modal,focos:()=>focos,avancar:ms=>tempo+=ms,
+  return {fluxo,inputs,elementos,modal,focos:()=>focos,ativo:()=>ativo,avancar:ms=>tempo+=ms,
     digitar(codigo){inputs[0].value=codigo;inputs[0].handlers.input();}};
 }
 const usuario={id:1,email:"teste@example.test",verificado:false};
@@ -56,6 +56,17 @@ test("cooldown protege reenvio e falha de rede não dispara loop ao reabrir",asy
   a.elementos["#btn-send-code"].handlers.click();await drenar();assert.equal(envios,2);
   a.elementos["#btn-send-code"].handlers.click();await drenar();assert.equal(envios,2);
   a.avancar(30001);a.elementos["#btn-send-code"].handlers.click();await drenar();assert.equal(envios,3);
+});
+
+test("código rejeitado devolve foco ao campo para corrigir e não repete o envio",async t=>{
+  let envios=0;
+  const a=ambiente(t,{enviar:async()=>envios++,confirmar:async()=>{throw Error("Código incorreto");}});
+  a.fluxo.abrir(usuario);await drenar();a.digitar("001234");await drenar();
+  assert.equal(a.inputs.map(i=>i.value).join(""),"001234");
+  assert.equal(a.ativo(),a.inputs[0]);
+  assert.equal(a.inputs[0].disabled,false);
+  assert.equal(a.modal.classList.contains("open"),true);
+  assert.equal(envios,1);
 });
 
 test("resposta de destino anterior não altera a verificação de outro e-mail",async t=>{

@@ -23,7 +23,7 @@ const exemplos={
 export function guiaPorteGabineteHtml(porte) {
   const exemplo=portesGabinete.some(([v])=>v===porte)&&exemplos[porte];
   if(!exemplo)return '<p class="font-2-xs">Escolha um tamanho para ver medidas e encaixes de um modelo de exemplo. Não existe uma medida única para todos os Mini, Mid ou Full Tower.</p>';
-  return '<h3 class="font-1-xs">Exemplo de tamanho: '+h(exemplo.modelo)+'</h3><dl class="appearance-size-specs">'
+  return '<h2 class="font-1-xs">Exemplo de tamanho: '+h(exemplo.modelo)+'</h2><dl class="appearance-size-specs">'
     +[['Medidas externas',exemplo.medidas+' (profundidade × largura × altura).'],['Placa-mãe',exemplo.placas],['Ventoinhas (fans)',exemplo.fans],['Radiador do water cooler',exemplo.radiador]]
       .map(([nome,valor])=>'<div><dt>'+h(nome)+'</dt><dd>'+h(valor)+'</dd></div>').join('')
     +'</dl><p class="font-2-xs">Estas medidas são desse exemplo, não de todos os gabinetes desse tamanho. A montagem usa a ficha do modelo que for escolhido.</p>';

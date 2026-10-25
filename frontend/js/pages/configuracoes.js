@@ -163,11 +163,11 @@ document.addEventListener("DOMContentLoaded", async () => {
           const dadosExclusao = await buscarUsuarioLogado();
           await deletarUsuario(dadosExclusao.usuario.id, document.getElementById("delete-current-password").value);
           closeModal();
-          showToast("Conta desativada. Redirecionando...", true);
+          showToast("Conta excluída. Redirecionando...", true);
           window.location.href = "./index.html";
         } catch (erro) {
-          console.error("Falha ao desativar conta:", erro);
-          showToast(erro.message || "Não foi possível desativar a conta.", false);
+          console.error("Falha ao excluir conta:", erro);
+          showToast(erro.message || "Não foi possível excluir a conta.", false);
         }
       });
     }

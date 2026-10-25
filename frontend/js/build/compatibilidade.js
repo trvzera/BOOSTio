@@ -2,6 +2,9 @@ import { categorias, perifericos, acessoriosRede } from "./catalogo.js";
 import { itensSelecionados, itensCategoria, informacoesRam, informacoesArmazenamento, conflitosArmazenamento, selecionarPeca } from "./estado.js";
 import { validarEncaixe, conexaoDisco, AVISO_SLOTS_RAM_PROVISORIOS } from "./hardware.js";
 import { temFansInclusas } from "./fans.js";
+import { normalizarSocket, suporteSocketCooler } from "./sockets.js";
+import { avaliarConectores } from "./conectores.js";
+import { avaliarArmazenamento } from "./armazenamento.js";
 
 export function avaliarBuild(build,catalogo) {
   const get = cat => catalogo.find(p => p.id === itensCategoria(build,cat)[0]?.id && p.categoria === cat);
@@ -24,8 +27,12 @@ export function avaliarBuild(build,catalogo) {
   if (!tem("ssd") && !tem("hd")) faltam.push("Armazenamento");
   if (cpu && !cpu.videointegrado && !tem("placa_video")) faltam.push("Placa de vídeo");
   if (cpu && !cpu.cooler && !tem("air_cooler") && !tem("water_cooler")) faltam.push("Cooler para o processador");
-  if (cpu && placa && String(cpu.soquete).toUpperCase() !== String(placa.socket).toUpperCase())
-    erros.push("O socket do processador (" + cpu.soquete + ") difere da placa-mãe (" + placa.socket + ").");
+  if (cpu && placa) {
+    const socketCpu=normalizarSocket(cpu.soquete),socketPlaca=normalizarSocket(placa.socket);
+    if(socketCpu&&socketPlaca&&socketCpu!==socketPlaca)
+      erros.push("O socket do processador (" + cpu.soquete + ") difere da placa-mãe (" + placa.socket + ").");
+    else if(!socketCpu||!socketPlaca)dicas.push("Falta identificar o encaixe (socket) do processador ou da placa-mãe. Não foi possível confirmar essa combinação.");
+  }
   for (const {peca:ram} of rams) {
     if (placa && ram.ddr !== placa.tipo_memoria)
       erros.push("A RAM " + ram.ddr + " não corresponde ao padrão " + placa.tipo_memoria + " da placa-mãe.");
@@ -47,11 +54,13 @@ export function avaliarBuild(build,catalogo) {
   if (get("cabo_rede")) dicas.push("Confira o comprimento e a categoria do cabo, a velocidade da porta Ethernet e do roteador.");
   for (const tipo of ["air_cooler","water_cooler"]) {
     const cooler = get(tipo);
-    if (cooler && cpu && cooler.compatibilidade) {
-      const sockets = String(cooler.compatibilidade).toUpperCase().split(/[,;/\s]+/);
-      if (sockets.includes("INTEL") || sockets.includes("AMD"))
-        dicas.push("Confirme no fabricante o suporte do cooler ao socket " + cpu.soquete + ".");
-      else if (!sockets.includes(String(cpu.soquete).toUpperCase()))
+    if (cooler && cpu) {
+      const suporte=suporteSocketCooler(cpu.soquete,cooler);
+      if (suporte===null)
+        dicas.push(cooler.sockets_suporte_condicional?.length
+          ? "Este cooler tem versões ou kits de montagem diferentes. Confirme o suporte ao socket " + cpu.soquete + " na embalagem ou no manual da unidade."
+          : "Confirme no fabricante o suporte do cooler ao socket " + cpu.soquete + ".");
+      else if (suporte===false)
         erros.push("O cooler não lista o socket do processador.");
     }
   }
@@ -69,6 +78,16 @@ export function avaliarBuild(build,catalogo) {
       dicas.push("Faltam as quantidades de slots M.2 ou portas SATA da placa-mãe para confirmar o armazenamento.");
     if (placa && discos.m2Sata && discos.limites.m2Sata == null) dicas.push("Confirme quais slots M.2 da placa-mãe aceitam SSD SATA.");
     if (placa && discos.limites.compartilhamentoDesconhecido) dicas.push("Confirme se o SSD M.2 SATA desativa alguma porta SATA da placa-mãe.");
+    if(placa)for(const regra of avaliarArmazenamento(placa,discos.itens.map(({item,peca})=>[item,peca]))) {
+      if(regra.condicao===false)erros.push(regra.mensagem);
+      else if(regra.condicao===null)dicas.push(regra.mensagem);
+    }
+  }
+  if(fonte){
+    const consumidores=itensSelecionados(build,catalogo).filter(({categoria})=>['placa_mae','placa_video','ssd','hd'].includes(categoria))
+      .map(({categoria,item,peca})=>[categoria,item,peca]);
+    const [resultado,mensagem]=avaliarConectores(fonte,consumidores);
+    if(resultado===false)erros.push(mensagem);else if(resultado===null)dicas.push(mensagem);
   }
   const encaixe = validarEncaixe({gpu:get("placa_video"),air:get("air_cooler"),water:get("water_cooler") || (tem("water_cooler") ? {} : null),gabinete,placa,fonte:get("fonte"),
     substituir:build.substituirFansWaterCooler === true,
@@ -82,6 +101,7 @@ export function avaliarBuild(build,catalogo) {
     : cat === "fan" ? tem(cat) || fansInclusas
     : tem(cat)).length;
   const compatibilidade = build.compatibilidade || {status:"nao_verificado",rotulo:"Dados ainda não totalmente verificados",naoVerificado:[],aviso:"As verificações locais não confirmam medidas ou especificações ausentes. Uma build preenchida não é garantia de compatibilidade."};
+  for(const orientacao of Array.isArray(compatibilidade.orientacoes)?compatibilidade.orientacoes:[])if(typeof orientacao?.mensagem==='string')dicas.push(orientacao.mensagem);
   for (const erro of build.compatibilidade?.erros || []) if (typeof erro.mensagem === "string") erros.push(erro.mensagem);
   return {erros:[...new Set(erros)],avisos:[...new Set(avisos)],dicas:[...new Set(dicas)],faltam,preco,watts:Math.round(watts),compatibilidade,
     preenchidos,total:grupos.length,status:erros.length ? "erro" : faltam.length ? "incompleta" : avisos.length ? "atencao" : "completa"};
