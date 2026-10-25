@@ -234,7 +234,6 @@ O callback local pode permanecer cadastrado junto do de produção.
 As URLs limpas e a verificação de produção estão documentadas em
 `deploy/README.md`, junto de `nginx.conf`. Reconstrua os serviços `web` (URLs,
 menu, vídeos) e `api` (diagnóstico do Blender); não há alteração no banco.
-O cadastro do callback Google deve ser feito no cliente OAuth usado pela API.
 
 O Blender respondeu localmente para i3-12100F, Ryzen 5 5600 e RTX 3060. Se houver
 falha na VPS, use a referência exibida na tela e os registros `Blender:` dos logs

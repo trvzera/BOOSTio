@@ -12,27 +12,6 @@ As regras estão em `deploy/nginx.conf`, copiadas pelo `Dockerfile.frontend`.
 Atualizar apenas os arquivos HTML não instala essas regras. A prévia estática
 do editor continua usando os arquivos `.html`.
 
-## Login Google: redirect_uri_mismatch
-
-Em 25/10/2026, a rota pública de login enviou ao Google este `redirect_uri`:
-
-```text
-https://api.boostio.com.br/auth/google/entrar
-```
-
-No Google Cloud, abra o cliente OAuth do tipo **Aplicativo da Web** usado pela
-API e adicione esse endereço em **URIs de redirecionamento autorizados**.
-Ele precisa coincidir exatamente, inclusive protocolo, domínio, caminho e
-ausência de barra final. Não use a página inicial ou a rota de início do login
-(`/auth/google/redirecionar`). Preserve os retornos locais que ainda usa.
-
-O servidor deriva o callback de `API_PUBLIC_URL`; por isso ele permanece HTTPS
-mesmo quando a comunicação entre Traefik e API é HTTP. Não é preciso alterar
-o código do OAuth para o endereço público observado. O cadastro no Google
-Cloud é uma etapa externa ao repositório e não foi modificado nesta revisão.
-
-Referência: [OAuth para aplicações web — Google](https://developers.google.com/identity/protocols/oauth2/web-server#redirect-uri).
-
 ## Blender Open Data
 
 O navegador consulta a rota autenticada `/benchmark/blender` da BOOSTio.
