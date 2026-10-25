@@ -55,8 +55,11 @@ class EnviarEmailService:
     )
     # HTML transacional sem imagens remotas, rastreamento, anexos ou fontes externas.
     # A versão em texto acima mantém o mesmo conteúdo e código.
+    # Gmail (2026): light only preserva as cores autorais, inclusive neste layout
+    # já escuro. Declarar apenas dark não impede a inversão de luminância no app.
+    # https://emailmarkup.org/en/blog/2026/gmail-app-dark-mode-update
     msg.html = f'''<!DOCTYPE html>
-<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="color-scheme" content="dark"><meta name="supported-color-schemes" content="dark"><title>Confirme seu e-mail — BOOSTio</title></head>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light only"><title>Confirme seu e-mail — BOOSTio</title></head>
 <body style="margin:0;padding:0;background-color:#000000;color:#e5e5ea;font-family:Poppins,Arial,Helvetica,sans-serif;">
 <div style="display:none;max-height:0;overflow:hidden;">Confirme seu e-mail com o código de uso único. Ele é válido por 5 minutos.</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#000000" style="background-color:#000000;"><tr><td align="center" style="padding:24px 12px;">
