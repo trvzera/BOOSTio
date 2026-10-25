@@ -27,6 +27,11 @@ class PreferenciasCoresService:
             # Não usar fotos, slug da loja, fabricante ou código do produto.
             if peca.get("categoria") == "processador" or not isinstance(peca.get("modelo"), str):
                 return frozenset(), None
+            ficha = peca.get("modelo_ficha_tecnica")
+            if isinstance(ficha, str) and ficha.strip():
+                cores, _ = cls.identificar({"modelo": ficha, "categoria": peca.get("categoria")})
+                if cores:
+                    return cores, "nome_ficha_tecnica"
             texto, origem = cls._texto(peca["modelo"]), "nome_cadastrado"
             texto = re.sub(r"\b(?:wd[_\s]+black|black\s+edition|white\s+label|80\s*(?:plus|\+)\s*white)\b", "", texto)
         # Cor do switch/iluminação não é a cor da carcaça. Nomes ambíguos ficam desconhecidos.
@@ -71,3 +76,30 @@ class PreferenciasCoresService:
                 chave += (tuple(sorted(cls.identificar(peca)[0])),)
             grupos.setdefault(chave, peca)
         return list(grupos.values())[:limite]
+
+    @classmethod
+    def alternativas_equivalentes(cls, peca, pecas, preferencia):
+        if preferencia not in ("preto", "branco", "misto") or cls.prioridade(peca, preferencia) < 2:
+            return []
+        def familia(item):
+            texto = cls._texto(str(item.get("modelo") or ""))
+            texto = re.sub(r"\b(?:preto|preta|branco|branca|black|white)\b", " ", texto)
+            return re.sub(r"[^a-z0-9]+", "", texto)
+        # Mesma família e ficha. Não troca GPU por outra inferior só para combinar a cor.
+        campos = ("capacidade_gb", "memoria_gb", "ddr", "frequencia_mhz", "quantidade_pentes",
+                  "resolucao", "taxa_atualizacao_hz", "tipo_painel", "tamanho_polegadas",
+                  "mecanico", "switch", "layout", "conexao", "potencia_w", "tamanho_mm", "quantidade")
+        def mesma_versao(item):
+            chip = peca.get("gpu_chip")
+            if peca.get("categoria") == "placa_video" and isinstance(chip, str) and chip.strip():
+                # Variantes da MESMA GPU e memória; não é comparação de FPS.
+                return (item.get("gpu_chip") == chip and bool(peca.get("memoria_gb"))
+                        and all(peca.get(c) is not None and peca[c] == item.get(c)
+                                for c in ("memoria_gb", "tipo_memoria", "interface_memoria")))
+            return (familia(peca) and familia(item) == familia(peca)
+                    and item.get("fabricante") == peca.get("fabricante")
+                    and all(item.get(c) == peca.get(c) for c in campos))
+        return sorted((p for p in pecas if mesma_versao(p)
+            and cls.prioridade(p, preferencia) < cls.prioridade(peca, preferencia)
+            and cls.prioridade(p, preferencia) <= 1),
+            key=lambda p: (cls.prioridade(p, preferencia), p["preco"], p["id"]))

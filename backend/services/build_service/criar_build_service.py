@@ -19,6 +19,8 @@ from .completar_ventilacao_service import CompletarVentilacaoService
 from .amostrar_catalogo_service import AmostrarCatalogoService
 from .preferencias_perifericos_service import PreferenciasPerifericosService
 from .preferencias_cores_service import PreferenciasCoresService
+from .planejar_rede_service import PlanejarRedeService
+from .preferencias_gabinete_service import PreferenciasGabineteService
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +63,7 @@ class CriarBuildService:
     "slots_m2", "portas_sata", "topologia_armazenamento_verificada", "formato_m2", "configuracoes_baias", "configuracoes_baias_completas",
     "tamanho_max_fonte_mm", "formatos_fonte", "certificacao_fonte", "versao_atx", "baias_25", "baias_35",
     "padrao_wifi", "velocidade_mbps", "bluetooth", "categoria", "comprimento_m", "conector",
+    "porte_referencia", "estilo_referencia", "gpu_chip", "interface_memoria", "fonte_cor",
   )
 
   def executar(self, usuario_id, dados, modelo="gemini-3.5-flash-lite", tentativas_correcao=1):
@@ -102,7 +105,9 @@ class CriarBuildService:
     teto_pc, teto_perifericos = self._dividir_orcamento(orcamento, percentual)
     inicio_catalogo = perf_counter()
     catalogo = self._gerar_catalogo(min(orcamento - margem, teto_pc), teto_perifericos, excluidas,
-                                  aparencia["gabinete_id"] if "gabinete" not in proprias else None, dados["utilidade"], cor=aparencia["cor"])
+                                  aparencia["gabinete_id"] if "gabinete" not in proprias else None, dados["utilidade"], cor=aparencia["cor"], aparencia=aparencia, rede=rede)
+    if acessorio_rede and rede.get("possuiAcessorio") is False:
+      catalogo[acessorio_rede] = PlanejarRedeService.opcoes(catalogo, rede, proprias)
     logger.info("Geração: etapa=catalogo duracao_ms=%d categorias=%d", (perf_counter()-inicio_catalogo)*1000, len(catalogo))
     disponiveis = set(catalogo) | set(proprias)
     obrigatorias = {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"}
@@ -112,9 +117,6 @@ class CriarBuildService:
       raise ValueError("Não há monitor com painel IPS ou VA confirmado dentro da reserva. Aumente o orçamento ou a porcentagem de periféricos; nenhuma build foi salva.")
     if percentual and not self.PERIFERICOS <= disponiveis:
       raise ValueError("Não foi possível gerar uma configuração dentro do orçamento informado com os periféricos disponíveis. Ajuste o orçamento ou revise as peças.")
-
-    if acessorio_rede and rede.get("possuiAcessorio") is False and acessorio_rede not in disponiveis:
-      raise ValueError("Não há acessório de rede com preço e disponibilidade confirmados")
 
     plano_perifericos = PlanejarPerifericosService().executar(catalogo, teto_perifericos, proprias, dados["utilidade"], cor=aparencia["cor"]) if percentual else None
     if plano_perifericos and not plano_perifericos["viavel"]:
@@ -127,7 +129,7 @@ class CriarBuildService:
     logger.info("Geração: etapa=prompt duracao_ms=%d caracteres=%d", (perf_counter()-inicio_prompt)*1000, len(prompt))
     dados_build = self._gerar_validada(usuario_id, prompt, modelo, catalogo, orcamento,
                                      percentual, proprias, detalhes_proprias, rede, tentativas_correcao,
-                                     revisar_investimento=any(termo in dados["utilidade"].casefold() for termo in ("jogo", "pesado", "render", "3d")), cor=aparencia["cor"])
+                                     revisar_investimento=any(termo in dados["utilidade"].casefold() for termo in ("jogo", "pesado", "render", "3d")), cor=aparencia["cor"], aparencia=aparencia)
     if proprias:
       return AvaliarCompatibilidadeService().para_resposta(BuildSalva.criar_gerada_com_pecas_proprias(usuario_id, dados_build, proprias, rede, percentual, aparencia))
 
@@ -163,7 +165,7 @@ class CriarBuildService:
         raise ValueError(f"{campo} deve ser um texto de até {limite} caracteres")
 
   def _gerar_validada(self, usuario_id, prompt, modelo, catalogo, orcamento,
-                     percentual, proprias, detalhes_proprias, rede, tentativas_correcao=1, revisar_investimento=False, cor="sem-preferencia"):
+                     percentual, proprias, detalhes_proprias, rede, tentativas_correcao=1, revisar_investimento=False, cor="sem-preferencia", aparencia=None):
     # No máximo uma revisão: não repetir indefinidamente nem persistir uma saída inválida.
     limite = 1 if tentativas_correcao else 0
     instrucao = prompt
@@ -179,9 +181,12 @@ class CriarBuildService:
         logger.info("Geração: etapa=llm tentativa=%d duracao_ms=%d caracteres_prompt=%d", tentativa+1, (perf_counter()-inicio_llm)*1000, len(instrucao))
         inicio_validacao = perf_counter()
         build = json.loads(resposta) if isinstance(resposta, str) else resposta
+        build = PlanejarRedeService.completar(build, catalogo, rede, proprias)
         teto_pc, _ = self._dividir_orcamento(orcamento, percentual)
         build = CompletarVentilacaoService().executar(build, catalogo, teto_pc, proprias, detalhes_proprias, cor=cor)
         validada = self._validar_build(build, catalogo, orcamento, percentual, proprias, detalhes_proprias, rede)
+        validada = self._ajustar_aparencia(validada, catalogo, orcamento, percentual, proprias,
+                                         detalhes_proprias, rede, aparencia or {"cor": cor})
         resumo = self._resumo_custos(validada, catalogo)
         # Uma revisão já permitida, não um mínimo de gasto nem novas tentativas.
         if tentativa < limite and revisar_investimento and teto_pc >= 10000 and Decimal(str(resumo["pc"])) < teto_pc * Decimal("0.75"):
@@ -233,6 +238,31 @@ class CriarBuildService:
         return codigo
     return "validacao"
 
+  def _ajustar_aparencia(self, build, catalogo, orcamento, percentual, proprias, detalhes, rede, aparencia):
+    atual = build
+    teto_pc, _ = self._dividir_orcamento(orcamento, percentual)
+    for item in list(build["componentes"]):
+      tipo = item["tipo"]
+      peca = next((p for p in catalogo.get(tipo, []) if p["id"] == item["id"]), None)
+      if not peca:
+        continue
+      if tipo == "gabinete":
+        opcoes = [p for p in PreferenciasGabineteService.destaques(catalogo[tipo], aparencia)
+                  if PreferenciasGabineteService.prioridade(p, aparencia) < PreferenciasGabineteService.prioridade(peca, aparencia)]
+      else:
+        opcoes = PreferenciasCoresService.alternativas_equivalentes(peca, catalogo[tipo], aparencia.get("cor"))
+      for candidata in opcoes:
+        tentativa = deepcopy(atual)
+        next(i for i in tentativa["componentes"] if i["tipo"] == tipo)["id"] = candidata["id"]
+        try:
+          tentativa = CompletarVentilacaoService().executar(tentativa, catalogo, teto_pc, proprias, detalhes, cor=aparencia.get("cor"))
+          tentativa = self._validar_build(tentativa, catalogo, orcamento, percentual, proprias, detalhes, rede)
+        except ValueError:
+          continue  # Estética nunca transforma uma montagem válida em falha.
+        atual = tentativa
+        break
+    return atual
+
   @classmethod
   def _pecas_proprias(cls, valor):
     if not isinstance(valor, dict) or set(valor) - (set(MODELOS) | set(cls.EXTRAS_PROPRIOS)):
@@ -258,13 +288,15 @@ class CriarBuildService:
     # continua recebendo o ID numérico exigido pelo contrato de geração.
     dados = {**peca.to_catalogo(), "id": peca.id}
     dados.update(PreferenciasCoresService.metadados(dados))
+    if dados.get("categoria") == "gabinete":
+      dados.update({chave + "_referencia": valor for chave, valor in PreferenciasGabineteService.identificar(dados).items() if valor})
     return {
       campo: float(valor) if isinstance(valor, Decimal) else valor for campo in cls.CAMPOS_PECAS
       if (valor := dados.get(campo)) is not None
     }
 
   @classmethod
-  def _gerar_catalogo(cls, preco_maximo, reserva_perifericos=0, excluidas=(), referencia_gabinete=None, utilidade="", cor="sem-preferencia"):
+  def _gerar_catalogo(cls, preco_maximo, reserva_perifericos=0, excluidas=(), referencia_gabinete=None, utilidade="", cor="sem-preferencia", aparencia=None, rede=None):
     catalogo = {}
     for modelo in MODELOS_PECAS:
       periferico = modelo.__tablename__ in cls.PERIFERICOS
@@ -275,8 +307,24 @@ class CriarBuildService:
         fichas = [cls._campos_pecas(peca) for peca in pecas]
         if modelo.__tablename__ == "monitor":
           fichas = [p for p in fichas if PreferenciasPerifericosService.painel_permitido(p)]
+        if modelo.__tablename__ in ("cabo_rede", "adaptador_wifi") and rede:
+          fichas = PlanejarRedeService.opcoes({modelo.__tablename__: fichas}, rede)
         if fichas:
           catalogo[modelo.__tablename__] = AmostrarCatalogoService().executar(modelo.__tablename__, fichas, utilidade=utilidade, cor=cor)
+          # A amostra pode conter a versão branca econômica e omitir sua irmã
+          # preta. Preserve variantes equivalentes para a preferência funcionar
+          # sem enviar o catálogo inteiro nem trocar por um produto inferior.
+          amostra = catalogo[modelo.__tablename__]
+          variantes = []
+          for selecionada in list(amostra):
+            for variante in PreferenciasCoresService.alternativas_equivalentes(selecionada, fichas, cor)[:1]:
+              if variante not in amostra and variante not in variantes:
+                variantes.append(variante)
+          amostra.extend(variantes[:3])
+          if modelo.__tablename__ == "gabinete" and aparencia:
+            for destaque in PreferenciasGabineteService.destaques(fichas, aparencia):
+              if destaque not in amostra:
+                amostra.append(destaque)
     if referencia_gabinete is not None and "gabinete" not in excluidas:
       referencia = MODELOS["gabinete"].buscar_por_id(referencia_gabinete)
       if referencia:
@@ -309,10 +357,17 @@ class CriarBuildService:
              for cpu in catalogo.get("processador", []) if socket(cpu.get("soquete"))]
     rede = dados.get("rede") or {}
     acessorio = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
-    comprar_rede = acessorio if acessorio and rede.get("possuiAcessorio") is False and acessorio not in proprias else None
+    plano_rede = PlanejarRedeService.executar(catalogo, rede, proprias)
+    comprar_rede = plano_rede["tipo"] if not plano_rede["pendente"] else None
     restricoes = {"pares_por_socket_apenas": pares,
                   "acessorio_rede_obrigatorio": comprar_rede,
+                  "planejamento_rede": plano_rede,
                   "categorias_rede_proibidas": sorted({"adaptador_wifi", "cabo_rede"} - ({comprar_rede} if comprar_rede else set()))}
+    restricoes["preferencias_visuais"] = {
+      "cor_prioritaria_por_categoria": {tipo: [p["id"] for p in itens if PreferenciasCoresService.prioridade(p, pedido["aparencia"]["cor"]) <= 1]
+                                       for tipo, itens in catalogo.items() if pedido["aparencia"]["cor"] != "sem-preferencia"},
+      "gabinetes_a_avaliar_primeiro": [p["id"] for p in PreferenciasGabineteService.destaques(catalogo.get("gabinete", []), pedido["aparencia"])],
+    }
     regra_perifericos = (
       "Complete monitor, teclado, mouse e fone (headset), exceto os já possuídos; "
       "escolha itens adequados ao uso sem ultrapassar o teto reservado, nem tentar consumi-lo exatamente. "
@@ -349,6 +404,10 @@ class CriarBuildService:
         "uma lista vazia não autoriza outro socket. Pares por socket NÃO aprovam BIOS, "
         "RAM ou dimensões. Inclua acessorio_rede_obrigatorio somente quando não for null. "
         "Nunca inclua categorias_rede_proibidas, mesmo que sobrem recursos.\n\n"
+        "Se planejamento_rede.pendente for true, monte o PC normalmente e OMITA o acessório "
+        "de rede: o catálogo não atende às medidas/velocidade informadas. Isso não inviabiliza "
+        "as peças do computador. O sistema manterá a conexão como pendência, sem preço estimado. "
+        "Quando houver ids_permitidos, use somente um deles; nunca encurte o cabo solicitado.\n\n"
 
         "# PEÇAS QUE O USUÁRIO JÁ POSSUI\n"
         f"{json.dumps(proprias, ensure_ascii=False)}\n"
@@ -437,15 +496,23 @@ class CriarBuildService:
         "A cor escolhida vale para TODOS os itens novos, não só para o gabinete: placa-mãe, GPU, RAM, "
         "resfriadores, ventoinhas, fonte, armazenamento, monitor, teclado, mouse, fone e acessórios. "
         "Entre opções adequadas ao uso, compatíveis e dentro dos tetos, prefira a cor escolhida. "
+        "Consulte cor_prioritaria_por_categoria e avalie esses IDs primeiro. Não escolha uma versão "
+        "branca para um pedido preto (ou o contrário) quando a mesma família/ficha na cor pedida "
+        "caber nos tetos. Ausência de cor não confirma preto nem branco. "
         "Para misto, busque combinação de preto e branco, não obrigatoriamente cada peça bicolor. "
-        "cor é um dado cadastrado; cor_referencia com fonte_cor_referencia=nome_cadastrado é apenas "
+        "cor é um dado cadastrado; cor_referencia com fonte_cor_referencia=nome_cadastrado ou nome_ficha_tecnica é apenas "
         "uma indicação comercial, não cor confirmada de toda a peça ou de uma versão diferente. "
         "Não deduza cor por imagem, URL, RGB, cor do switch ou nome de linha. Nunca substitua peças "
         "próprias para combinar a cor. Sem opção adequada da cor, use alternativa compatível; "
         "não afirme que todos os itens têm cor confirmada quando houver dados ausentes. Nunca "
         "sacrifique orçamento, segurança, ventilação ou recursos importantes do uso só pela cor.\n\n"
         "O campo porte diferencia Mini Tower, Mid Tower e Full Tower. Panorâmico/aquário e painel "
-        "lateral de vidro são características visuais independentes do porte. As fotos são apenas "
+        "lateral de vidro são características visuais independentes do porte. "
+        "Avalie primeiro gabinetes_a_avaliar_primeiro: porte_referencia e estilo_referencia vêm "
+        "de informações explícitas do cadastro e são independentes. Se Full Tower não existir "
+        "no catálogo, ainda tente atender ao estilo aquário e à cor pedidos. Não ignore todas "
+        "as preferências só porque uma delas não está disponível. "
+        "As fotos são apenas "
         "exemplos, não itens que precisam ser comprados. Nunca deduza suporte a placa-mãe, dimensões "
         "de GPU ou radiadores pela categoria visual; valide pela ficha técnica.\n\n"
         "No campo estilo, discreto significa sem vidro ou janela transparente; vidro indica lateral "
@@ -571,7 +638,8 @@ class CriarBuildService:
 
         "# REDE\n"
         "Se rede.possuiAcessorio for false, inclua exatamente um cabo_rede para tipo cabo "
-        "ou um adaptador_wifi para tipo wifi, respeitando o comprimento solicitado quando houver. "
+        "ou um adaptador_wifi para tipo wifi dentre os ids_permitidos, respeitando o comprimento solicitado quando houver. "
+        "Exceção: planejamento_rede.pendente=true exige omitir esse acessório e continuar o PC, sem retornar erro por isso. "
         "Adaptadores USB servem quando não há slot PCIe livre. Se o usuário já possui o "
         "acessório ou ainda vai confirmar, não acrescente nenhum. Nunca inclua ambos.\n\n"
 
@@ -682,14 +750,19 @@ class CriarBuildService:
     rede = rede or {}
     acessorio = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
     escolhidos_rede = set(tipos) & {"adaptador_wifi", "cabo_rede"}
-    esperado_rede = {acessorio} if acessorio and rede.get("possuiAcessorio") is False and acessorio not in proprias else set()
-    if escolhidos_rede != esperado_rede:
-      raise ValueError("A IA não respeitou a escolha de conexão da build")
     if "cabo_rede" in escolhidos_rede and rede.get("comprimentoCaboM"):
       item = next(c for c in build["componentes"] if c["tipo"] == "cabo_rede")
       comprimento = pecas[("cabo_rede", item["id"])].get("comprimento_m")
       if type(comprimento) in (int, float, Decimal) and isfinite(comprimento) and comprimento < rede["comprimentoCaboM"]:
         raise ValueError("O cabo de rede sugerido é menor que o comprimento solicitado. Escolha outro cabo cadastrado, respeitando o teto do PC.")
+    plano_rede = PlanejarRedeService.executar(catalogo, rede, proprias)
+    esperado_rede = {acessorio} if plano_rede["tipo"] and not plano_rede["pendente"] else set()
+    if escolhidos_rede != esperado_rede:
+      raise ValueError("A IA não respeitou a escolha de conexão da build")
+    if esperado_rede:
+      item_rede = next(c for c in build["componentes"] if c["tipo"] == acessorio)
+      if item_rede["id"] not in plano_rede["ids_permitidos"]:
+        raise ValueError("O acessório de rede não atende ao comprimento ou à velocidade solicitada. Escolha um dos IDs permitidos no planejamento de rede.")
     if percentual and not CriarBuildService.PERIFERICOS <= finais:
       raise ValueError("A IA não incluiu os periféricos solicitados. Tente novamente.")
     if not {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"} <= finais or not {"ssd", "hd"} & finais:

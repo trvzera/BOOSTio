@@ -6,6 +6,7 @@ from utils.sockets import normalizar_socket, suporte_socket_cooler
 from .encaixe_fisico import avaliar_medidas
 from .armazenamento import avaliar_armazenamento
 from .conectores import avaliar_conectores
+from .preferencias_gabinete_service import PreferenciasGabineteService
 
 
 def numero(valor):
@@ -48,7 +49,16 @@ class AvaliarCompatibilidadeService:
                         peca = modelo.to_catalogo() if modelo else None
                 itens.append((tipo, item, peca))
 
-        regras, orientacoes = [], []
+        regras, orientacoes = [], PreferenciasGabineteService.orientacoes(estado, itens)
+        rede = estado.get("rede") if isinstance(estado.get("rede"), dict) else {}
+        acessorio_rede = {"cabo": "cabo_rede", "wifi": "adaptador_wifi"}.get(rede.get("tipo"))
+        if acessorio_rede and rede.get("possuiAcessorio") is False and not componentes.get(acessorio_rede):
+            descricao = "Cabo de rede" if acessorio_rede == "cabo_rede" else "Adaptador Wi-Fi"
+            comprimento = numero(rede.get("comprimentoCaboM"))
+            if acessorio_rede == "cabo_rede" and comprimento:
+                descricao += f" de pelo menos {comprimento:g} m"
+            orientacoes.append({"codigo": "rede-pendente", "mensagem": descricao +
+                " pendente: não foi incluído na build nem no total. Adicione um modelo adequado ou compre separadamente; confira a velocidade e as conexões antes de comprar."})
         def registrar(codigo, titulo, condicao, motivo, fonte="catalogo_da_conta"):
             status = "nao_verificado" if condicao is None else "sem_conflitos" if condicao else "incompativel"
             mensagem = "Conflito confirmado: " + titulo + ". " + motivo if condicao is False else motivo

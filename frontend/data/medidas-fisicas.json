@@ -168,7 +168,19 @@
       "modelo": "RTX 5060 Shadow 2X OC GeForce",
       "part_numbers": ["SEED-GPU-06", "G5060-8S2C"],
       "fonte": "https://www.msi.com/Graphics-Card/GeForce-RTX-5060-8G-SHADOW-2X-OC/Specification",
-      "medidas": {"comprimento_mm": 197, "altura_mm": 120, "espessura_mm": 40}
+      "verificado_em": "2026-10-25",
+      "medidas": {"comprimento_mm": 197, "altura_mm": 120, "espessura_mm": 40,
+        "gpu_chip": "NVIDIA GeForce RTX 5060", "cor": "preto",
+        "fonte_cor": "https://www.bestbuy.com/product/msi-nvidia-geforce-rtx-5060-8g-shadow-2x-oc-8gb-gddr6-pci-express-gen-5-graphics-card-black/6632720"}
+    },
+    {
+      "categoria": "placa_video", "fabricante": "Gigabyte", "modelo": "GeForce RTX 5060 AERO OC 8G",
+      "part_numbers": ["GV-N5060AERO OC-8GD"],
+      "aliases_catalogo": [{"fabricante": "Gigabyte", "modelo": "RTX 5060 AERO OC 8G GeForce", "part_number": "SEED-GPU-14", "produto_kabum": "777072"}],
+      "fonte": "https://www.gigabyte.com/Graphics-Card/GV-N5060AERO-OC-8GD",
+      "verificado_em": "2026-10-25",
+      "medidas": {"gpu_chip": "NVIDIA GeForce RTX 5060", "cor": "branco",
+        "fonte_cor": "https://www.staples.com/gigabyte-aero-geforce-rtx-5060-pci-e-5-0-8gb-gddr7-gaming-graphics-card-2595-mhz-core-28000-mhz-white-gv-n5060aero-oc-8gd/product_24700829"}
     },
     {
       "categoria": "gabinete",

@@ -181,6 +181,7 @@ export const rotulosTecnicos = {
   resposta_frequencia: "Resposta de frequência", layout: "Layout", switch: "Switch",
   mecanico: "Mecânico", tamanho: "Tamanho", dpi_max: "DPI máximo", botoes: "Botões", sensor: "Sensor",
   tamanho_polegadas: "Tela (polegadas)", resolucao: "Resolução", taxa_atualizacao_hz: "Taxa de atualização (Hz)",
+  gpu_chip: "Chip gráfico", fonte_cor: "Fonte da identificação de cor",
   tipo_painel: "Tipo de painel", tempo_resposta_ms: "Tempo de resposta (ms)", hdr: "HDR",
   padrao_wifi: "Padrão Wi-Fi", velocidade_mbps: "Velocidade de rede (Mbps)", bluetooth: "Bluetooth",
   comprimento_m: "Comprimento do cabo (m)", conector: "Conector",

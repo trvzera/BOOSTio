@@ -112,6 +112,11 @@ O Python confere os subtotais pelos preços e quantidades do catálogo antes de
 salvar a sugestão. O **frete não está incluído**: é importante reservar parte do
 orçamento para a entrega.
 
+Se o catálogo não tiver um cabo ou adaptador adequado à conexão solicitada,
+a montagem do PC pode prosseguir **com a rede pendente**. O pedido de comprimento
+e velocidade fica registrado, e a build informa que o acessório não foi incluído
+no total. Um cabo curto não substitui automaticamente o comprimento necessário.
+
 O formulário separa **tamanho do gabinete**, **estilo** e **cor**, com imagens de
 exemplo sem preços ou ofertas e opções de “sem preferência”. Os tamanhos são
 Mini, Mid e Full Tower; os estilos são sem vidro, vidro lateral, aquário
@@ -129,9 +134,14 @@ Cor cadastrada tem prioridade; nomes com indicação de cor são referências
 comerciais, não confirmação técnica da versão. RGB, switch, fotos e URLs não
 comprovam a cor da carcaça. Peças próprias são preservadas; ausência da cor
 preferida não impede usar uma alternativa adequada, sem exceder os tetos.
+Variantes da mesma família e ficha podem ser ajustadas para a cor solicitada
+após nova validação de orçamento e compatibilidade. Para o gabinete, a seleção
+também considera o estilo disponível quando o porte escolhido não existir;
+preferências não confirmadas ficam indicadas nas orientações da build.
 Características ausentes não são inventadas. O editor também mostra a
 capacidade total de SSDs/HDs em GB/TB; quando faltam dados, identifica o subtotal
-como parcial.
+como parcial. Monitores selecionados mostram a taxa de atualização em Hz e a
+resolução cadastrada ao lado do título da categoria.
 
 O uso escolhido no formulário explica **quais peças terão prioridade**. As páginas
 do catálogo e da peça também apresentam uma descrição simples da função de cada
@@ -274,7 +284,7 @@ e arranjos alternativos de baias. As mesmas regras orientam o editor JavaScript;
 o Python revalida os conflitos. Dicas gerais ficam separadas das verificações
 pendentes, preservando os avisos sobre dados realmente ausentes.
 
-O manifesto atual possui 76 fichas técnicas, incluindo gabinetes, GPUs, fontes,
+O manifesto atual possui 77 fichas técnicas, incluindo gabinetes, GPUs, fontes,
 air/water coolers, placas-mãe, processador, RAM, SSDs, fans e periféricos. Há limites físicos,
 slots, perfis JEDEC/XMP, dimensões por capacidade de SSD, conexões RGB/PWM e
 exceções físicas declaradas pelo fabricante do cooler. As fichas só complementam
@@ -361,14 +371,20 @@ Os originais da marca, esboços e anotações estão reunidos em [materiais](mat
 
 ## Validação da versão
 
-Na revisão de **24/10/2026**, a suíte local aprovou **586 testes JavaScript** e
-**781 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
+Na revisão de **25/10/2026**, a suíte local aprovou **711 testes JavaScript** e
+**930 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
 Há testes específicos para as sete classes de Controller e para preservar o
 contrato das 35 rotas declaradas, incluindo o blueprint legado de peças, que
 continua fora do registro do aplicativo principal. O catálogo ativo permanece
 em `/build/catalogo`.
+
+O formulário e o monitor foram conferidos em **90 cenários no Chrome**, com API
+simulada, incluindo texto a 200% e telas de 320 a 1440 px. O pedido de jogos de
+R$ 8.000 com periféricos a 10% e cabo de 20 m também foi validado com duas
+consultas gratuitas ao Gemini e revalidação local das preferências, sem salvar
+builds na conta.
 
 Os testes utilizam isolamento, bancos temporários e mocks quando necessário.
 Não comprovam todas as combinações de hardware, a disponibilidade permanente de

@@ -404,6 +404,34 @@ def test_geracao_persiste_original_e_estado_em_uma_transacao(app_build, mocker, 
         assert not any("componentes" in linha or "PC gerado" in linha or "@" in linha for linha in logs)
 
 
+@pytest.mark.parametrize("comprimento,esperado", [(20, False), (5, True)])
+def test_geracao_8000_perifericos_10_rede_pendente_ou_comprada(app_build, mocker, comprimento, esperado):
+    tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "monitor", "teclado", "mouse", "fone", "cabo_rede"]
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+        MODELOS["cabo_rede"].buscar_por_id(1).comprimento_m = 10
+        db.session.commit()
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
+        "nome": "PC gerado", "descricao": "Completo", "utilidade": "Jogos",
+        "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos],
+    })
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    rede = {"tipo": "cabo", "possuiAcessorio": False, "comprimentoCaboM": comprimento, "velocidadeMbps": 500}
+    resposta = cliente.post("/build/", json={**PEDIDO, "orcamento": 8000, "percentual_perifericos": 10,
+        "rede": rede, "aparencia": {"porte": "full-tower", "estilo": "panoramico", "cor": "preto"}})
+    assert resposta.status_code == 201, resposta.json
+    build = resposta.json["build"]
+    assert ("cabo_rede" in build["estado"]["componentes"]) is esperado
+    assert build["estado"]["rede"] == rede
+    assert build["estado"]["incluirRede"] is True
+    assert build["estado"]["percentualPerifericos"] == 10
+    assert any(o["codigo"] == "rede-pendente" for o in build["compatibilidade"]["orientacoes"]) is not esperado
+    llm.assert_called_once()
+    with app_build.app_context():
+        assert Build.query.count() == BuildSalva.query.count() == 1
+
+
 def test_geracao_rejeita_conflito_antes_de_gravar_build(app_build, mocker):
     tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd"]
     with app_build.app_context():

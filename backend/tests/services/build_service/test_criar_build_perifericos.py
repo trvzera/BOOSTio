@@ -146,6 +146,7 @@ class CriarBuildPerifericosTest(unittest.TestCase):
         self.assertIsNone(bloco["acessorio_rede_obrigatorio"])
         self.assertEqual(bloco["categorias_rede_proibidas"], ["adaptador_wifi", "cabo_rede"])
         dados["rede"] = {"tipo": "wifi", "possuiAcessorio": False}
+        catalogo["adaptador_wifi"] = [{"id": 99, "preco": 100, "modelo": "Adaptador"}]
         prompt = CriarBuildService._criar_prompt(dados, 5000, 1000, catalogo)
         self.assertIn('"acessorio_rede_obrigatorio": "adaptador_wifi"', prompt)
         self.assertIn('"categorias_rede_proibidas": ["cabo_rede"]', prompt)
