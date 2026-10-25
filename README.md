@@ -386,8 +386,15 @@ contrato das 35 rotas declaradas, incluindo o blueprint legado de peças, que
 continua fora do registro do aplicativo principal. O catálogo ativo permanece
 em `/build/catalogo`.
 
-O formulário e o monitor foram conferidos em **90 cenários no Chrome**, com API
-simulada, incluindo texto a 200% e telas de 320 a 1440 px. O pedido de jogos de
+As **17 entradas do front-end** (15 páginas, testes e redirecionamento 404) foram
+revisadas em **13 tamanhos de tela**, entre 320 e 1920 px, incluindo paisagem,
+rodapés, menus e modais. A revisão também cobre texto a 200%, 39 cenários de
+catálogo preenchido e 48 cenários de mudança de orientação com telas abertas.
+O formulário e o monitor passaram por **195 cenários no Chrome**, com API
+simulada. Em telas baixas, a navegação do formulário ocupa uma linha e o card
+rola inteiro, evitando comprimir os campos de resposta.
+
+O pedido de jogos de
 R$ 8.000 com periféricos a 10% e cabo de 20 m também foi validado com duas
 consultas gratuitas ao Gemini e revalidação local das preferências, sem salvar
 builds na conta.
