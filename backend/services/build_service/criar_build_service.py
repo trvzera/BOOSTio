@@ -21,6 +21,7 @@ from .preferencias_perifericos_service import PreferenciasPerifericosService
 from .preferencias_cores_service import PreferenciasCoresService
 from .planejar_rede_service import PlanejarRedeService
 from .preferencias_gabinete_service import PreferenciasGabineteService
+from .preferencias_processador_service import PreferenciasProcessadorService
 
 logger = logging.getLogger(__name__)
 
@@ -368,6 +369,20 @@ class CriarBuildService:
                                        for tipo, itens in catalogo.items() if pedido["aparencia"]["cor"] != "sem-preferencia"},
       "gabinetes_a_avaliar_primeiro": [p["id"] for p in PreferenciasGabineteService.destaques(catalogo.get("gabinete", []), pedido["aparencia"])],
     }
+    ryzen = PreferenciasProcessadorService.ids_prioritarios(catalogo, dados["utilidade"], proprias)
+    restricoes["processadores_ryzen_prioritarios"] = ryzen
+    regra_processador = (
+      "Para jogos, dê preferência a AMD Ryzen: avalie primeiro processadores_ryzen_prioritarios "
+      "e o custo da plataforma completa (CPU + placa-mãe + RAM + cooler). É preferência, não "
+      "requisito obrigatório nem prova de que todo Ryzen supera todo Intel. Compare os modelos "
+      "e os dados disponíveis; não reduza a capacidade gráfica, a memória necessária ou a "
+      "segurança apenas para escolher Ryzen. Use outra plataforma se o catálogo, as peças "
+      "próprias, a compatibilidade ou o orçamento justificarem. Não recompre CPU própria nem "
+      "troque uma placa-mãe própria para atender essa preferência. Socket igual não confirma BIOS."
+      if ryzen else
+      "Não há preferência de processador aplicável a este pedido/catálogo. Preserve as peças "
+      "próprias e escolha uma plataforma adequada ao uso e compatível, sem favorecer marca."
+    )
     regra_perifericos = (
       "Complete monitor, teclado, mouse e fone (headset), exceto os já possuídos; "
       "escolha itens adequados ao uso sem ultrapassar o teto reservado, nem tentar consumi-lo exatamente. "
@@ -408,6 +423,8 @@ class CriarBuildService:
         "de rede: o catálogo não atende às medidas/velocidade informadas. Isso não inviabiliza "
         "as peças do computador. O sistema manterá a conexão como pendência, sem preço estimado. "
         "Quando houver ids_permitidos, use somente um deles; nunca encurte o cabo solicitado.\n\n"
+        "# PREFERÊNCIA DE PROCESSADOR\n"
+        f"{regra_processador}\n\n"
 
         "# PEÇAS QUE O USUÁRIO JÁ POSSUI\n"
         f"{json.dumps(proprias, ensure_ascii=False)}\n"
@@ -559,7 +576,8 @@ class CriarBuildService:
         "4. Não repita categorias já possuídas nem entre as peças novas. Use quantidade 1 para tudo, "
         "exceto memoria_ram, ssd, hd e fan.\n"
         "5. Use apenas peças disponíveis, se o catálogo tiver esse campo.\n"
-        "6. Sem preferência pessoal: não favoreça marca, linha ou fabricante. "
+        "6. Respeite a preferência de processador calculada para jogos quando aplicável. "
+        "Fora dessa preferência, não favoreça marca, linha ou fabricante. "
         "Entre opções equivalentes, decida por especificação, compatibilidade e preço.\n\n"
 
         "# MEMÓRIA RAM\n"

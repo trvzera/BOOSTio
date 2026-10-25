@@ -101,6 +101,12 @@ de builds no backend para persistir a configuração na conta.
 
 ### Como o orçamento é respeitado
 
+Nas montagens para jogos, **AMD Ryzen é uma preferência de plataforma**, quando
+houver uma combinação adequada no catálogo. Peças próprias, compatibilidade e
+orçamento têm prioridade: a geração pode escolher Intel quando necessário, sem
+reduzir a placa de vídeo apenas para manter a marca do processador. A preferência
+não significa que todo Ryzen tenha desempenho superior a qualquer Intel.
+
 O percentual para periféricos é um **teto, não uma meta de gasto**. O restante
 define o limite do PC, incluindo acessórios de rede.
 
@@ -372,7 +378,7 @@ Os originais da marca, esboços e anotações estão reunidos em [materiais](mat
 ## Validação da versão
 
 Na revisão de **25/10/2026**, a suíte local aprovou **711 testes JavaScript** e
-**930 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
+**938 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
 Há testes específicos para as sete classes de Controller e para preservar o
