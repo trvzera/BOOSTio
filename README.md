@@ -2,6 +2,7 @@
   <img src="./frontend/imgs/logoBOOSTio.gif" alt="BOOSTio" width="100%">
   <h1>BOOSTio</h1>
   <p>Planeje, monte e evolua seu computador em um só lugar.</p>
+  <p><strong>Site oficial: <a href="https://boostio.com.br/">boostio.com.br</a></strong></p>
   <p>
     <strong>Python · Flask · SQLAlchemy · JavaScript · HTML · CSS</strong><br>
     Projeto acadêmico · Colégio Cotemig · Em desenvolvimento
