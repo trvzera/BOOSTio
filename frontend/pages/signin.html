@@ -121,20 +121,20 @@
       <a href="#" class="btn-login-secondary" id="btn-google-login" aria-label="Criar com Google uma conta">Criar com Google</a>
     </div>
 
-    <div class="modal-overlay" id="verify-email-modal">
-      <div class="modal-box" id="verify-email-box">
-        <div class="modal-icon"><i class="fa-solid fa-envelope-circle-check" aria-hidden="true"></i></div>
-        <h2 class="font-1-m">Confirme seu e-mail</h2>
-        <p class="font-1-m">Enviaremos um código para <strong id="verify-email-target">seu e-mail</strong>. Digite os 6 dígitos para verificar automaticamente.</p>
-
-        <div id="send-code-container">
-          <button type="button" class="btn-ghost" id="btn-send-code" aria-label="Enviar código de verificação para o e-mail">
-            <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
-            Enviar código
-          </button>
+    <div class="modal-overlay email-verification-overlay" id="verify-email-modal">
+      <div class="modal-box email-verification" id="verify-email-box" role="dialog" aria-modal="true" aria-labelledby="verify-email-title" aria-describedby="verify-email-description" tabindex="-1">
+        <header class="email-verification-heading">
+          <div class="email-verification-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg></div>
+          <h2 id="verify-email-title">Confirme <span>seu e-mail</span></h2>
+          <button type="button" class="ui-close-button email-verification-close" id="btn-verify-later" aria-label="Fechar e verificar o e-mail depois"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+        </header>
+        <p id="verify-email-description" class="email-verification-description">Use o código de 6 dígitos para confirmar o endereço da sua conta.</p>
+        <div class="email-verification-recipient">
+          <span>Seu e-mail</span>
+          <strong id="verify-email-target">seu e-mail</strong>
         </div>
-
-        <div class="code-inputs" id="code-inputs">
+        <div class="email-verification-code-heading"><span id="verify-email-code-label">Código de verificação</span><span>6 dígitos</span></div>
+        <div class="code-inputs" id="code-inputs" role="group" aria-labelledby="verify-email-code-label" aria-describedby="verify-email-code-help">
           <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" autocomplete="one-time-code" data-index="0" aria-label="Primeiro dígito do código" disabled>
           <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="1" aria-label="Segundo dígito do código" disabled>
           <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="2" aria-label="Terceiro dígito do código" disabled>
@@ -143,13 +143,19 @@
           <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" data-index="5" aria-label="Sexto dígito do código" disabled>
         </div>
 
-        <p id="verify-email-status" class="font-2-xs" role="status" aria-live="polite"></p>
-        <p id="verify-email-error" class="font-1-xs form-error" role="alert"></p>
-
-        <div class="modal-actions">
-          <button type="button" class="btn-ghost" id="btn-verify-later" aria-label="Fazer isso depois: verificar e-mail mais tarde">Fazer isso depois</button>
-          <button type="button" class="btn-primary" id="btn-confirm-code" aria-label="Confirmar código de verificação" disabled>Confirmar</button>
+        <p id="verify-email-code-help" class="email-verification-help">Válido por 5 minutos. Confirmação automática.</p>
+        <div class="email-verification-feedback">
+          <p id="verify-email-status" role="status" aria-live="polite" aria-atomic="true"></p>
+          <p id="verify-email-error" class="form-error" role="alert"></p>
         </div>
+        <div class="modal-actions email-verification-actions">
+          <button type="button" class="btn-primary" id="btn-confirm-code" aria-label="Confirmar código de verificação" disabled>Confirmar código</button>
+        </div>
+        <div class="email-verification-resend" id="send-code-container">
+          <span>Não recebeu o código?</span>
+          <button type="button" class="btn-ghost" id="btn-send-code" aria-label="Enviar código de verificação para o e-mail">Enviar código</button>
+        </div>
+        <p class="email-verification-delivery-tip">Confira também a pasta de spam.</p>
       </div>
     </div>
   </main>

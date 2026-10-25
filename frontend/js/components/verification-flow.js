@@ -14,11 +14,16 @@ export function iniciarFluxoVerificacaoEmail({modal,enviar,confirmar,aoConfirmar
     enviarBtn.disabled=enviando||conferindo||concluido||segundos>0;
     enviarBtn.textContent=enviando?"Enviando…":segundos?"Reenviar em "+segundos+"s":automaticos.has(chave)?"Reenviar código":"Enviar código";
     enviarBtn.setAttribute("aria-label",enviarBtn.textContent);
+    enviarBtn.setAttribute("aria-busy",String(enviando));
+    enviarBtn.setAttribute("data-disabled-reason",enviando?"Aguarde o envio do código.":segundos?"Aguarde "+segundos+" segundos antes de reenviar.":"Conclua a verificação em andamento.");
     inputs.forEach(i=>i.disabled=!enviado||conferindo||concluido||enviando);
     confirmarBtn.disabled=!enviado||conferindo||concluido||!/^[0-9]{6}$/.test(codigo());
+    confirmarBtn.textContent=conferindo?"Verificando…":"Confirmar código";
+    confirmarBtn.setAttribute("aria-busy",String(conferindo));
+    confirmarBtn.setAttribute("data-disabled-reason",conferindo?"Aguarde a conferência do código.":!enviado?"Aguarde o envio do código para este e-mail.":"Preencha os 6 dígitos do código recebido.");
   }
   function iniciarTimer() { clearInterval(timer);timer=setInterval(atualizar,1000); }
-  function focar() { if(aberto()&&!inputs[0].disabled)inputs.find(i=>!i.value)?.focus(); }
+  function focar() { if(aberto()&&!inputs[0].disabled)(inputs.find(i=>!i.value)||inputs[0]).focus(); }
   async function enviarCodigo() {
     if(!usuario||enviando||conferindo||concluido||agora()<proximoEnvio)return;
     const versao=revisao,atual=usuario;
@@ -28,7 +33,7 @@ export function iniciarFluxoVerificacaoEmail({modal,enviar,confirmar,aoConfirmar
       if(versao!==revisao)return;
       enviado=true;expiraEm=agora()+5*60*1000;ultimoCodigo="";
       inputs.forEach(i=>i.value="");proximoEnvio=agora()+30000;
-      status.textContent="Código enviado. Ao completar os 6 dígitos, a verificação será automática.";
+      status.textContent="Código enviado. Confira sua caixa de entrada.";
     } catch(e) {
       if(versao!==revisao)return;
       erro.textContent=e.message||"Não foi possível enviar o código. Tente novamente.";
@@ -52,7 +57,7 @@ export function iniciarFluxoVerificacaoEmail({modal,enviar,confirmar,aoConfirmar
       if(versao!==revisao)return;
       erro.textContent=e.message||"Não foi possível verificar o código. Tente novamente.";
       status.textContent="";
-    } finally { if(versao===revisao){conferindo=false;atualizar();} }
+    } finally { if(versao===revisao){conferindo=false;atualizar();if(!concluido)focar();} }
   }
   function fechar() { clearInterval(timer);modal.classList.remove("open"); }
   function abrir(atual) {

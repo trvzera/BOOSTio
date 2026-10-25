@@ -47,6 +47,7 @@
 @import "./build/prontas.css";
 @import "./build/melhorias.css";
 @import "./componentes/feedback.css";
+@import "./componentes/email-verification.css";
 
 /* Ajustes por largura de tela */
 @import "./responsividades/r-site.css";
@@ -59,5 +60,6 @@
 @import "./responsividades/r-erro.css";
 @import "./responsividades/r-sobre.css";
 @import "./responsividades/r-editor-build.css";
+@import "./responsividades/r-email-verification.css";
 @import "./responsividades/r-melhorias.css";
 @import "./componentes/navigation-controls.css";

@@ -205,64 +205,6 @@
   color: var(--cor-d1);
 }
 
-/* MODAL VERIFICAÇÃO DE EMAIL */
-#verify-email-box .modal-icon {
-  background: rgba(0, 123, 255, 0.12);
-  color: var(--cor-p1);
-}
-
-#verify-email-box h3 {
-  color: var(--cor-p1);
-}
-
-#send-code-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-bottom: var(--espacamento-20);
-}
-
-#btn-send-code {
-  display: flex;
-  align-items: center;
-  gap: var(--espacamento-8);
-}
-
-#btn-send-code:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.code-inputs {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: var(--espacamento-8);
-  margin-bottom: var(--espacamento-16);
-}
-
-.code-input {
-  color: var(--cor-6);
-  background: var(--cor-1);
-  border: 1px solid var(--cor-3);
-  border-radius: .75rem;
-  font-family: var(--font-heading);
-  width: 52px;
-  height: 60px;
-  text-align: center;
-  font-size: 1.4rem;
-  font-weight: bold;
-  padding: 0;
-}
-
-.code-input:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-#verify-email-box { color: var(--cor-6); }
-#verify-email-box p { color: var(--cor-5); }
-#verify-email-box .form-error { color: var(--status-error); }
-
 /* LOGIN */
 #login-page {
   height: 100vh;
