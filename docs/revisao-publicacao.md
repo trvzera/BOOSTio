@@ -27,7 +27,7 @@ O código revisado possui CSRF, cookies Secure/HttpOnly em produção, CORS rest
 5. Subir API/frontend e validar saúde, login por senha/Google, verificação e recuperação por e-mail, sessão, ações com CSRF, geração de builds e persistência das imagens após recriar os containers.
 6. Agendar backup fora da VPS e testar restauração do MySQL e das imagens coletadas. Agendar a atualização de preços se desejada.
 
-Docker não está instalado/disponível neste ambiente. Build das imagens, validação pelo Docker Compose, integração com MySQL 8.4/Redis/Traefik e testes públicos continuam pendentes; os testes Python foram executados com Python 3.14 local, enquanto a imagem utiliza Python 3.12.
+Atualização após instalar Docker: imagens construídas e stack isolada validada com Python 3.12, Gunicorn, Nginx, MySQL 8.4 e Redis reais. Cadastro/login, permissões, CSRF/CORS, builds, persistência e restauração do banco passaram. Foram corrigidos o redirecionamento do Nginx, um teste dependente do .env privado e o pip vulnerável herdado da imagem base. Veja `testes-docker.md`. Traefik, HTTPS público, credenciais reais e integrações externas continuam pendentes na VPS.
 
 ## Melhorias adicionais
 

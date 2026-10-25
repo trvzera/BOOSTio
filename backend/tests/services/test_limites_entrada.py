@@ -31,9 +31,13 @@ def test_cadastro_e_login_rejeitam_tamanho_excessivo():
         EntrarUsuarioService().executar({"email": "a" * 151, "senha": "Senha123!"})
 
 
-def test_limite_http_responde_json():
-    from app import requisicao_grande
+def test_limite_http_responde_json(monkeypatch):
     from configs import Desenvolvimento
+    # O teste deve funcionar sem o .env privado do desenvolvedor.
+    monkeypatch.setenv("APP_ENV", "desenvolvimento")
+    monkeypatch.setattr(Desenvolvimento, "SQLALCHEMY_DATABASE_URI", "sqlite:///:memory:")
+    monkeypatch.setattr(Desenvolvimento, "SECRET_KEY", "somente-testes")
+    from app import requisicao_grande
     from werkzeug.exceptions import RequestEntityTooLarge
     app = Flask(__name__)
     app.config.from_object(Desenvolvimento)
