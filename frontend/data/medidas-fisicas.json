@@ -324,9 +324,16 @@
       "categoria": "fonte",
       "fabricante": "Corsair",
       "modelo": "CX650 CP-9020278-BR",
-      "part_numbers": ["CP-9020278-BR"],
+      "part_numbers": [
+        "CP-9020278-BR"
+      ],
       "aliases_catalogo": [
-        {"fabricante": "Corsair", "modelo": "CX Series CX650", "part_number": "SEED-PSU-04", "produto_kabum": "516056"}
+        {
+          "fabricante": "Corsair",
+          "modelo": "CX Series CX650",
+          "part_number": "SEED-PSU-04",
+          "produto_kabum": "516056"
+        }
       ],
       "fonte": "https://www.kabum.com.br/produto/516056/fonte-corsair-cx-series-cx650-650w-80-plus-bronze-com-cabo-preto-cp-9020278-br",
       "verificado_em": "2026-10-24",
@@ -336,7 +343,16 @@
         "conectores_cpu_eps": 1,
         "conectores_pcie_8pinos": 2,
         "conectores_sata": 3,
-        "observacoes_medidas": "Revisão CP-9020278-BR: um cabo EPS 4+4, dois conectores PCIe 6+2 no mesmo cabo e três SATA. Não são dois cabos PCIe independentes; confirmar exigências da GPU e folga dos cabos. Não aplicar a outras revisões da CX650."
+        "observacoes_medidas": "Revisão CP-9020278-BR: um cabo EPS 4+4, dois conectores PCIe 6+2 no mesmo cabo e três SATA. Não são dois cabos PCIe independentes; confirmar exigências da GPU e folga dos cabos. Não aplicar a outras revisões da CX650.",
+        "conectores_alimentacao": {
+          "atx_24": 1,
+          "eps_4_4": 1,
+          "pcie_6_2": 2,
+          "sata": 3,
+          "molex_4": 2
+        },
+        "conectores_alimentacao_completos": true,
+        "cabos_pcie_independentes": 1
       }
     },
     {
@@ -609,33 +625,152 @@
       }
     },
     {
-      "categoria": "gabinete", "fabricante": "Hayom", "modelo": "GB1727", "part_numbers": ["GB1727", "GB.17.10.27"],
-      "aliases_catalogo": [{"fabricante": "Hayom", "modelo": "Gamer HAYOM GB1727, Mid Tower, Lateral em Vidro, com 3X Fans, Preto - GB.17.10.27", "part_number": "KABUM-938469", "produto_kabum": "938469"}],
-      "fonte": "https://www.hayom.com.br/produtos/gabinete-gamer-c-3-fans-gb1727", "verificado_em": "2026-10-23",
+      "categoria": "gabinete",
+      "fabricante": "Hayom",
+      "modelo": "GB1727",
+      "part_numbers": [
+        "GB1727",
+        "GB.17.10.27"
+      ],
+      "aliases_catalogo": [
+        {
+          "fabricante": "Hayom",
+          "modelo": "Gamer HAYOM GB1727, Mid Tower, Lateral em Vidro, com 3X Fans, Preto - GB.17.10.27",
+          "part_number": "KABUM-938469",
+          "produto_kabum": "938469"
+        }
+      ],
+      "fonte": "https://www.hayom.com.br/produtos/gabinete-gamer-c-3-fans-gb1727",
+      "verificado_em": "2026-10-24",
       "medidas": {
         "dimensoes_fabricante": "295 × 190 × 405 mm (ordem dos eixos não declarada)",
-        "formatos_placa_mae": "mATX, ITX", "slots_expansao": 4, "tamanho_max_gpu_mm": 290, "formatos_fonte": ["ATX"],
-        "fans_inclusos": 3, "quantidade_max_fans": 8, "tamanhos_fan_suportados_mm": [120], "posicoes_fans_completas": false,
-        "suporte_water_cooler": null, "radiadores_suportados_mm": null,
-        "posicoes_fans": [
-          {"nome": "Frente", "opcoes": [{"tamanho_mm": 120, "quantidade": 3}], "fans_inclusas": [{"tamanho_mm": 120, "quantidade": 3}], "radiadores_mm": []},
-          {"nome": "Traseira", "opcoes": [{"tamanho_mm": 120, "quantidade": 1}], "fans_inclusas": [], "radiadores_mm": []},
-          {"nome": "Topo", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": []},
-          {"nome": "Base", "opcoes": [{"tamanho_mm": 120, "quantidade": 2}], "fans_inclusas": [], "radiadores_mm": []}
+        "formatos_placa_mae": "mATX, ITX",
+        "slots_expansao": 4,
+        "tamanho_max_gpu_mm": 290,
+        "formatos_fonte": [
+          "ATX"
         ],
-        "observacoes_medidas": "Três fans frontais de 120 mm inclusas e oito encaixes listados ao todo; somar fábrica, radiador e fans adicionais sem repetir posições. O fabricante não declara suporte a radiador, altura de air cooler ou comprimento de fonte nesta ficha; esses limites não foram inventados. Armazenamento é alternativo: um HDD de 3,5 ou um SSD de 2,5 polegadas. A ordem dos eixos externos não foi presumida."
+        "fans_inclusos": 3,
+        "quantidade_max_fans": 8,
+        "tamanhos_fan_suportados_mm": [
+          120
+        ],
+        "posicoes_fans_completas": false,
+        "suporte_water_cooler": null,
+        "radiadores_suportados_mm": null,
+        "posicoes_fans": [
+          {
+            "nome": "Frente",
+            "opcoes": [
+              {
+                "tamanho_mm": 120,
+                "quantidade": 3
+              }
+            ],
+            "fans_inclusas": [
+              {
+                "tamanho_mm": 120,
+                "quantidade": 3
+              }
+            ],
+            "radiadores_mm": []
+          },
+          {
+            "nome": "Traseira",
+            "opcoes": [
+              {
+                "tamanho_mm": 120,
+                "quantidade": 1
+              }
+            ],
+            "fans_inclusas": [],
+            "radiadores_mm": []
+          },
+          {
+            "nome": "Topo",
+            "opcoes": [
+              {
+                "tamanho_mm": 120,
+                "quantidade": 2
+              }
+            ],
+            "fans_inclusas": [],
+            "radiadores_mm": []
+          },
+          {
+            "nome": "Base",
+            "opcoes": [
+              {
+                "tamanho_mm": 120,
+                "quantidade": 2
+              }
+            ],
+            "fans_inclusas": [],
+            "radiadores_mm": []
+          }
+        ],
+        "observacoes_medidas": "Três fans frontais de 120 mm inclusas e oito encaixes listados ao todo; somar fábrica, radiador e fans adicionais sem repetir posições. O fabricante não declara suporte a radiador, altura de air cooler ou comprimento de fonte nesta ficha; esses limites não foram inventados. Armazenamento é alternativo: um HDD de 3,5 ou um SSD de 2,5 polegadas. A ordem dos eixos externos não foi presumida.",
+        "baias_25": 1,
+        "baias_35": 1,
+        "configuracoes_baias": [
+          {
+            "baias_25": 1,
+            "baias_35": 0
+          },
+          {
+            "baias_25": 0,
+            "baias_35": 1
+          }
+        ],
+        "configuracoes_baias_completas": true
       }
     },
     {
-      "categoria": "gabinete", "fabricante": "Hayom", "modelo": "GB1787", "part_numbers": ["GB1787"],
-      "aliases_catalogo": [{"fabricante": "Hayom", "modelo": "Gamer Hayom Gb1787, Mini Tower, Vidro Temperado, M-atx, Com 3 Fans, Sem Fonte, Preto", "part_number": "KABUM-933255", "produto_kabum": "933255"}],
-      "fonte": "https://www.hayom.com.br/produtos/1271", "verificado_em": "2026-10-23",
+      "categoria": "gabinete",
+      "fabricante": "Hayom",
+      "modelo": "GB1787",
+      "part_numbers": [
+        "GB1787"
+      ],
+      "aliases_catalogo": [
+        {
+          "fabricante": "Hayom",
+          "modelo": "Gamer Hayom Gb1787, Mini Tower, Vidro Temperado, M-atx, Com 3 Fans, Sem Fonte, Preto",
+          "part_number": "KABUM-933255",
+          "produto_kabum": "933255"
+        }
+      ],
+      "fonte": "https://www.hayom.com.br/produtos/1271",
+      "verificado_em": "2026-10-24",
       "medidas": {
         "dimensoes_fabricante": "265 × 280 × 285 mm (ordem dos eixos não declarada)",
-        "formatos_placa_mae": "mATX, ITX", "slots_expansao": 4, "tamanho_max_gpu_mm": 260, "formatos_fonte": ["ATX"],
-        "fans_inclusos": 3, "quantidade_max_fans": 5, "tamanhos_fan_suportados_mm": [120],
-        "suporte_water_cooler": null, "radiadores_suportados_mm": null,
-        "observacoes_medidas": "Três fans inclusas, mas a ficha não identifica suas posições. Os cinco encaixes informados são dois na base, dois no topo e um atrás, todos de 120 mm. A ocupação total é limitada a cinco; não foi inventada uma distribuição das fans de fábrica nem suporte a water cooler. Armazenamento: um HDD de 3,5 ou dois SSDs de 2,5 polegadas em arranjos alternativos. A ordem dos eixos externos não foi presumida."
+        "formatos_placa_mae": "mATX, ITX",
+        "slots_expansao": 4,
+        "tamanho_max_gpu_mm": 260,
+        "formatos_fonte": [
+          "ATX"
+        ],
+        "fans_inclusos": 3,
+        "quantidade_max_fans": 5,
+        "tamanhos_fan_suportados_mm": [
+          120
+        ],
+        "suporte_water_cooler": null,
+        "radiadores_suportados_mm": null,
+        "observacoes_medidas": "Três fans inclusas, mas a ficha não identifica suas posições. Os cinco encaixes informados são dois na base, dois no topo e um atrás, todos de 120 mm. A ocupação total é limitada a cinco; não foi inventada uma distribuição das fans de fábrica nem suporte a water cooler. Armazenamento: um HDD de 3,5 ou dois SSDs de 2,5 polegadas em arranjos alternativos. A ordem dos eixos externos não foi presumida.",
+        "baias_25": 2,
+        "baias_35": 1,
+        "configuracoes_baias": [
+          {
+            "baias_25": 2,
+            "baias_35": 0
+          },
+          {
+            "baias_25": 0,
+            "baias_35": 1
+          }
+        ],
+        "configuracoes_baias_completas": true
       }
     },
     {
@@ -663,9 +798,46 @@
         "quantidade_portas_sata": 4,
         "portas_sata_desativadas_por_m2_sata": 1,
         "dimensoes_fabricante": "243,84 × 243,84 mm",
-        "observacoes_medidas": "Anúncio 940305 confirmado como DDR4, não DDR5. M2_2 em SATA desativa uma porta SATA. CPU/BIOS e XMP dependem da lista de suporte."
+        "observacoes_medidas": "Anúncio 940305 confirmado como DDR4, não DDR5. M2_2 em SATA desativa SATA5. Slots aceitam 2242/2260/2280. CPU/BIOS e XMP dependem da lista de suporte.",
+        "topologia_armazenamento_verificada": true,
+        "slots_m2": [
+          {
+            "nome": "M.2_1",
+            "interfaces": [
+              "m2"
+            ],
+            "formatos": [
+              "2242",
+              "2260",
+              "2280"
+            ],
+            "condicional_cpu": false,
+            "portas_sata_desativadas": {
+              "m2": []
+            }
+          },
+          {
+            "nome": "M.2_2",
+            "interfaces": [
+              "m2",
+              "m2-sata"
+            ],
+            "formatos": [
+              "2242",
+              "2260",
+              "2280"
+            ],
+            "condicional_cpu": false,
+            "portas_sata_desativadas": {
+              "m2": [],
+              "m2-sata": [
+                "SATA5"
+              ]
+            }
+          }
+        ]
       },
-      "verificado_em": "2026-10-23"
+      "verificado_em": "2026-10-24"
     },
     {
       "categoria": "placa_mae",
@@ -828,7 +1000,51 @@
         "quantidade_portas_sata": 4,
         "formato": "mATX",
         "quantidade_slots_m2_sata": 0,
-        "observacoes_medidas": "Corrige cadastro antigo de quatro pentes/128 GB: este D4 possui dois DIMMs e suporta 64 GB. São dois M.2 de armazenamento PCIe (não SATA); o Key E para Wi-Fi não é uma terceira conexão para SSD. BIOS e QVL continuam por confirmar."
+        "observacoes_medidas": "Corrige cadastro antigo de quatro pentes/128 GB: este D4 possui dois DIMMs e suporta 64 GB. São dois M.2 de armazenamento PCIe (não SATA); o Key E para Wi-Fi não é uma terceira conexão para SSD. BIOS e QVL continuam por confirmar.",
+        "conectores_alimentacao": {
+          "atx_24": 1,
+          "eps_8": 1
+        },
+        "conectores_alimentacao_completos": true,
+        "topologia_armazenamento_verificada": true,
+        "portas_sata": [
+          "SATA6G_1",
+          "SATA6G_2",
+          "SATA6G_3",
+          "SATA6G_4"
+        ],
+        "slots_m2": [
+          {
+            "nome": "M.2_1",
+            "interfaces": [
+              "m2"
+            ],
+            "formatos": [
+              "2242",
+              "2260",
+              "2280"
+            ],
+            "condicional_cpu": false,
+            "portas_sata_desativadas": {
+              "m2": []
+            }
+          },
+          {
+            "nome": "M.2_2",
+            "interfaces": [
+              "m2"
+            ],
+            "formatos": [
+              "2242",
+              "2260",
+              "2280"
+            ],
+            "condicional_cpu": false,
+            "portas_sata_desativadas": {
+              "m2": []
+            }
+          }
+        ]
       },
       "part_numbers": [],
       "aliases_catalogo": [
@@ -1155,7 +1371,12 @@
         "quantidade_slots_m2_sata": 1,
         "dimensoes_fabricante": "170 × 210 mm",
         "chipset": null,
-        "observacoes_medidas": "Ficha técnica do anúncio HPM610: dois DIMMs/64 GB, um M.2 NVMe/SATA e três SATA. Há divergência H610/Q670 na página: chipset não confirmado. Lista de CPUs e BIOS instalada continuam por verificar."
+        "observacoes_medidas": "Ficha técnica do anúncio HPM610: dois DIMMs/64 GB, um M.2 NVMe/SATA e três SATA. Há divergência H610/Q670 na página: chipset não confirmado. Lista de CPUs e BIOS instalada continuam por verificar.",
+        "conectores_alimentacao": {
+          "atx_24": 1,
+          "eps_8": 1
+        },
+        "conectores_alimentacao_completos": true
       },
       "part_numbers": [],
       "aliases_catalogo": [
@@ -1480,7 +1701,9 @@
         "slots_ocupados": 2,
         "conectores_energia": "Sem alimentação externa; alimentada pelo PCIe",
         "consumo_energia": 70,
-        "observacoes_medidas": "Ficha ZT-A30510H-10L da Twin Edge OC 6 GB; não é a versão 8 GB de 224 mm nem Solo/LP. Comprimento × altura × espessura, dois slots. Continua necessário conhecer os limites internos do gabinete."
+        "observacoes_medidas": "Ficha ZT-A30510H-10L da Twin Edge OC 6 GB; não é a versão 8 GB de 224 mm nem Solo/LP. Comprimento × altura × espessura, dois slots. Continua necessário conhecer os limites internos do gabinete.",
+        "conectores_alimentacao": {},
+        "conectores_alimentacao_completos": true
       },
       "part_numbers": [],
       "aliases_catalogo": [

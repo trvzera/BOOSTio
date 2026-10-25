@@ -185,3 +185,93 @@ não é atualizado sozinho. Validação desta rodada: 624 testes JavaScript,
 823 Python (+20 subtestes) e 41 verificações no Chrome em 320/768/1440 px.
 As APIs de conta/build foram simuladas no navegador e o catálogo real foi aberto
 somente para leitura; não houve escrita no banco nem consumo de LLM.
+
+## Conectores e armazenamento — segunda etapa de 24/10/2026
+
+Os serviços puros `build_service/conectores.py` e `armazenamento.py` são chamados
+pelo diagnóstico existente. O editor usa regras equivalentes em `conectores.js`
+e `armazenamento.js`, com casos de teste compartilhados. As rotas, permissões,
+Models e esquema do banco permanecem os mesmos. A LLM recebe os novos campos e
+sua resposta continua revalidada pelo Python; não foi chamada nesta etapa.
+
+### Alimentação
+
+`conectores_alimentacao` informa as tomadas disponíveis na fonte ou as exigidas
+na placa-mãe/GPU. `conectores_alimentacao_completos: true` confirma que a relação
+foi revisada: apenas nesse caso uma chave ausente significa zero. Lista ou valor
+ausente, inválido ou parcial permanece desconhecido.
+
+- EPS/CPU e PCIe são famílias diferentes. Um EPS 4+4 atende um encaixe CPU de
+  oito ou quatro pinos; não é contado como dois conectores independentes.
+- PCIe 6+2 atende um encaixe de seis ou oito pinos, sem duplicar a unidade.
+- Para GPU com vários conectores auxiliares, também se conferem
+  `cabos_pcie_independentes_minimos` e `cabos_pcie_independentes`. Sem exigência
+  ou quantidade confirmada, a checagem fica pendente.
+- Versões de 16 pinos com nomes diferentes ficam a confirmar; isso não gera
+  incompatibilidade só pela nomenclatura. Falta confirmada de quantidade é conflito.
+- Adaptadores não são presumidos. A validação de conectores não simula corrente,
+  potência por cabo, hubs/fans ou a montagem física de cabos modulares.
+- M.2 é alimentado pelo slot; SSD/HD SATA interno de 2,5/3,5 polegadas usa tomada
+  SATA da fonte. Interface ou formato desconhecido não vira esta classificação.
+  NVMe com formato U.2, PCIe/AIC ou 2,5 polegadas não é presumido M.2.
+
+Foram revisados os conectores da CX650 CP-9020278-BR, HPM610, PRIME H610M-A D4
+e Zotac Twin Edge OC 6 GB. A CX650 tem dois plugs PCIe no mesmo cabo, não dois
+cabos independentes. A Zotac usa apenas alimentação do slot.
+
+### SSDs e portas compartilhadas
+
+`slots_m2` descreve cada slot, com nome, `interfaces` (`m2` ou `m2-sata`),
+`formatos` (por exemplo `2242`, `2260`, `2280`), `condicional_cpu` e
+`portas_sata_desativadas` por interface. `topologia_armazenamento_verificada`
+indica que as condições dessa lista foram revisadas. Os totais legados continuam
+servindo de limites e devem ser coerentes com a lista.
+
+A regra procura uma distribuição que use cada slot uma única vez e preserve
+portas SATA suficientes. Uma mesma porta desativada por duas condições é
+descontada uma vez. Condição de CPU pendente, comprimento não informado ou mapa
+incompleto não recebem aprovação. A busca tem limites de tamanho/trabalho e
+retorna desconhecido ao excedê-los. O editor usa o teto nominal de SATA quando
+há mapa por slot; a distribuição real é revalidada antes de aceitar a peça.
+
+PRIME H610M-A D4 e PRO B760M-P DDR4 receberam mapas individuais. Na MSI, M2_2
+aceita SATA e desativa **SATA5** nessa modalidade. Nenhum mapa foi copiado para
+outra revisão DDR ou para a HPM610, cujos comprimentos/compartilhamentos não
+foram confirmados. A indicação H610/Q670 dessa placa permanece pendente.
+
+### Baias e orientações
+
+`baias_25`/`baias_35` são limites por formato. `configuracoes_baias` descreve
+arranjos simultâneos possíveis; `configuracoes_baias_completas` confirma que
+todos os arranjos foram revisados. Um arranjo documentado que acomoda os discos
+comprova possibilidade; ausência em uma lista incompleta continua pendente.
+Os máximos isolados de SSD e HDD não são somados como montagens simultâneas.
+
+Hayom GB1727 permite um HDD **ou** um SSD; GB1787 permite um HDD **ou** dois
+SSDs. As fichas agora registram essas alternativas e bloqueiam sua soma.
+O formato físico desconhecido do disco também aparece como pendência.
+
+As observações gerais do gabinete passam em `compatibilidade.orientacoes` e
+continuam visíveis como dicas. Não entram em `verificacoes`/`naoVerificado`.
+Medidas ausentes, BIOS, QVL e condições reais não resolvidas continuam pendentes.
+
+Na reprodução somente leitura da build recebida, a checagem de conectores passou
+a sem conflitos e a nota geral saiu do contador: **14 para 12 pendências**, sem
+incompatibilidade confirmada. Isso não aprova medidas internas do X1 White nem
+o kit do Gamma 200. A revisão continua dependente dessas informações.
+
+Fontes consultadas: [manual da PRIME H610M-A D4](https://dlcdnets.asus.com/pub/ASUS/mb/LGA1700/PRIME%20H610M-A%20D4/E19122_PRIME_H610M-A_D4_UM_WEB.pdf),
+[MSI PRO B760M-P DDR4](https://www.msi.com/Motherboard/PRO-B760M-P-DDR4/Specification),
+[CX650](https://www.kabum.com.br/produto/516056/fonte-corsair-cx-series-cx650-650w-80-plus-bronze-com-cabo-preto-cp-9020278-br),
+[HPM610](https://www.kabum.com.br/produto/692458/placa-mae-husky-nexus-h610-lga-1700-12-13-gen-m-2-nvme-sata-ddr4-3200mhz-micro-atx-hdmi-vga-hpm610),
+[Zotac 6 GB](https://www.zotac.com/download/mediadrivers/External/GraphicsCard/3050/Brochure/ZT-A30510H-10L-brochure.pdf),
+[GB1727](https://www.hayom.com.br/produtos/gabinete-gamer-c-3-fans-gb1727) e
+[GB1787](https://www.hayom.com.br/produtos/1271).
+
+Validação desta etapa: **700 testes JavaScript**, **899 Python (+20 subtestes)**
+e **77 verificações no Chrome**, em 320/768/1440 px. São 73 cenários de conectores,
+slots e baias compartilhados entre as duas implementações, além das integrações
+com o diagnóstico/editor e das regressões existentes. As verificações de navegador
+usaram API simulada e catálogo real somente leitura. Não houve migração, escrita
+no banco, consulta paga ou chamada à LLM. Reiniciar o processo do backend é
+necessário para recarregar o manifesto em cache.

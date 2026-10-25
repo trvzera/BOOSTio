@@ -4,6 +4,8 @@ import re
 from models.build_salva import MODELOS
 from utils.sockets import normalizar_socket, suporte_socket_cooler
 from .encaixe_fisico import avaliar_medidas
+from .armazenamento import avaliar_armazenamento
+from .conectores import avaliar_conectores
 
 
 def numero(valor):
@@ -46,7 +48,7 @@ class AvaliarCompatibilidadeService:
                         peca = modelo.to_catalogo() if modelo else None
                 itens.append((tipo, item, peca))
 
-        regras = []
+        regras, orientacoes = [], []
         def registrar(codigo, titulo, condicao, motivo, fonte="catalogo_da_conta"):
             status = "nao_verificado" if condicao is None else "sem_conflitos" if condicao else "incompativel"
             mensagem = "Conflito confirmado: " + titulo + ". " + motivo if condicao is False else motivo
@@ -69,7 +71,8 @@ class AvaliarCompatibilidadeService:
             faltam.append("armazenamento")
         cpu, placa, gabinete, fonte = (get(tipo) for tipo in ("processador", "placa_mae", "gabinete", "fonte"))
         if gabinete.get("observacoes_medidas"):
-            registrar("gabinete-condicoes", "Condições da ficha do gabinete", None, gabinete["observacoes_medidas"])
+            orientacoes.append({"codigo": "gabinete-condicoes", "titulo": "Condições da ficha do gabinete",
+                               "mensagem": gabinete["observacoes_medidas"], "fonte": "catalogo_da_conta"})
         if tem("processador") and cpu.get("videointegrado") is False and not tem("placa_video"):
             faltam.append("placa_video")
         if tem("processador") and cpu.get("cooler") is False and not tem("air_cooler") and not tem("water_cooler"):
@@ -133,31 +136,10 @@ class AvaliarCompatibilidadeService:
             registrar("cooler-unico", "Cooler do processador", False, "Há air cooler e water cooler selecionados para o mesmo processador.")
 
         if tem("placa_mae"):
-            discos = [(tipo, item, peca) for tipo, item, peca in itens if tipo in ("ssd", "hd")]
-            m2 = sata = 0
-            interfaces_conhecidas = True
-            for _, item, peca in discos:
-                interface = texto((peca or {}).get("interface") or (peca or {}).get("tipo"))
-                formato = texto((peca or {}).get("formato")) or ""
-                if interface and any(v in interface + formato for v in ("NVME", "PCIE", "M.2", "M2")):
-                    m2 += item.get("quantidade", 1)
-                    if "SATA" in interface:
-                        registrar("m2-sata", "M.2 SATA", None, "É necessário confirmar quais slots M.2 aceitam SATA e quais portas são compartilhadas.")
-                elif interface and "SATA" in interface:
-                    sata += item.get("quantidade", 1)
-                else:
-                    interfaces_conhecidas = False
+            discos = [(item, peca) for tipo, item, peca in itens if tipo in ("ssd", "hd")]
             if discos:
-                registrar("discos-interface", "Identificação dos discos", True if interfaces_conhecidas else None,
-                          "Interface desconhecida não é tratada como NVMe nem SATA automaticamente.")
-            for usados, campo, codigo in ((m2, "quantidade_slots_m2", "m2"), (sata, "quantidade_portas_sata", "sata")):
-                if usados:
-                    limite = numero(placa.get(campo))
-                    registrar("discos-" + codigo, "Conexões " + codigo.upper(), usados <= limite if limite is not None else None,
-                              f"Compara as unidades com {campo}; campo ausente não representa conexões livres.")
-            if discos:
-                registrar("discos-compartilhamento", "Compartilhamento de conexões e baias", None,
-                          "Falta confirmar desativação de portas, padrões/comprimentos M.2 e baias necessárias no gabinete.")
+                for r in avaliar_armazenamento(placa, discos):
+                    registrar(r['codigo'], r['titulo'], r['condicao'], r['mensagem'])
 
         if tem("fonte"):
             internos = [(item, peca) for tipo, item, peca in itens if tipo not in ("fonte", "monitor", "teclado", "mouse", "fone", "cabo_rede", "adaptador_wifi")]
@@ -174,8 +156,9 @@ class AvaliarCompatibilidadeService:
                     condicao = True
             registrar("fonte-potencia", "Consumo estimado e fonte", condicao,
                       "A potência deve superar o consumo estimado cadastrado; essa soma não mede picos reais de carga.")
-            registrar("fonte-conectores", "Conectores e encaixe da fonte", None,
-                      "Conectores, padrão e espaço para a fonte ainda precisam de confirmação no catálogo.")
+            consumidores = [(t, i, p) for t, i, p in itens if t in ('placa_mae', 'placa_video', 'ssd', 'hd')]
+            condicao, mensagem = avaliar_conectores(fonte, consumidores)
+            registrar("fonte-conectores", "Conectores da placa-mãe, GPU e discos", condicao, mensagem)
 
         erros = [r for r in regras if r["status"] == "incompativel"]
         desconhecidas = [r for r in regras if r["status"] == "nao_verificado"]
@@ -183,7 +166,7 @@ class AvaliarCompatibilidadeService:
         rotulos = {"incompativel": "Incompatibilidade identificada", "nao_verificado": "Compatibilidade não totalmente verificada",
                    "sem_conflitos": "Sem conflitos nas verificações disponíveis"}
         return {"status": status, "rotulo": rotulos[status], "escopo": "parcial", "pecasPendentes": faltam,
-                "verificacoes": regras, "erros": erros, "naoVerificado": desconhecidas, "fans": fans,
+                "verificacoes": regras, "erros": erros, "naoVerificado": desconhecidas, "orientacoes": orientacoes, "fans": fans,
                 "aviso": "Peças preenchidas não significam compatibilidade completa. BIOS, conectores e interferências não são aprovados sem dados."}
 
     def para_resposta(self, build, incluir_links=False):

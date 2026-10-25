@@ -3,12 +3,13 @@ import { nomePeca, htmlSeguro as h } from "./catalogo.js";
 
 const normal = valor => String(valor || "").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 const rotulos = {estoque:"Indisponíveis",trancada:"Build trancada",selecionada:"Peça já selecionada",ddr:"Padrão DDR ou frequência incompatível",
-  slots:"Slots ou capacidade de RAM",dados:"Dados insuficientes",encaixe:"Espaço ou formato incompatível",conexoes:"Conexões de armazenamento",conflito:"Outros conflitos"};
+  slots:"Slots ou capacidade de RAM",dados:"Dados insuficientes",encaixe:"Espaço ou formato incompatível",conexoes:"Conexões de armazenamento",alimentacao:"Conectores de alimentação",conflito:"Outros conflitos"};
 function grupo(motivo) {
   const texto=normal(motivo);
   if (/indisponivel/.test(texto)) return "estoque";
   if (/destranque|trancada/.test(texto)) return "trancada";
   if (/remova.*atual/.test(texto)) return "selecionada";
+  if (/conectores suficientes|eps\/cpu|cabos pcie independentes/.test(texto)) return "alimentacao";
   if (/falta|identifique|confirme|selecione a placa/.test(texto)) return "dados";
   if (/ddr|frequencia/.test(texto)) return "ddr";
   if (/pentes|ram.*maximo|capacidade de ram/.test(texto)) return "slots";

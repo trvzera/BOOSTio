@@ -36,7 +36,7 @@ def test_identidade_medidas_e_preservacao_catalogo(caso):
     for k in ("preco", "imagem", "esgotado", "ofertas", "modelo", "part_number", "link"):
         assert p[k] == original[k]
     assert original["fans_inclusos"] is None
-    assert p["ficha_tecnica_verificada_em"] == "2026-10-23" and p["fonte_medidas"].startswith("https://")
+    assert p["ficha_tecnica_verificada_em"] == caso['esperado'].get('ficha_tecnica_verificada_em', "2026-10-23") and p["fonte_medidas"].startswith("https://")
     for alteracao in ({"part_number": "outro"}, {"modelo": caso["modelo"] + " RGB"}, {"fabricante": "outro"},
                       {"link": "https://www.kabum.com.br/produto/999999"}, {"link": None}):
         assert "fonte_medidas" not in completar_medidas({**base(caso), **alteracao})

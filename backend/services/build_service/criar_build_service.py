@@ -57,6 +57,8 @@ class CriarBuildService:
     "conector_fan", "tensao_fan_v", "corrente_fan_a", "conector_rgb", "tensao_rgb_v",
     "rotacao_max_rpm", "fluxo_ar_cfm", "pressao_estatica_mmh2o", "ruido_dba",
     "conectores_cpu_eps", "conectores_pcie_8pinos", "conectores_pcie_16pinos", "conectores_sata", "conectores_energia",
+    "conectores_alimentacao", "conectores_alimentacao_completos", "cabos_pcie_independentes", "cabos_pcie_independentes_minimos",
+    "slots_m2", "portas_sata", "topologia_armazenamento_verificada", "formato_m2", "configuracoes_baias", "configuracoes_baias_completas",
     "tamanho_max_fonte_mm", "formatos_fonte", "certificacao_fonte", "versao_atx", "baias_25", "baias_35",
     "padrao_wifi", "velocidade_mbps", "bluetooth", "categoria", "comprimento_m", "conector",
   )

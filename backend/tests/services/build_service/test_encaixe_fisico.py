@@ -86,7 +86,8 @@ def test_nr200_nao_aceita_matx_atx_psu_ou_radiador_360():
         assert regra(resultado, codigo)["status"] == "incompativel"
     assert fonte["comprimento_mm"] == 140 and case["fans_inclusos"] == 2
     assert case["radiadores_suportados_mm"] == [120, 140, 240, 280]
-    assert "custom loop" in regra(resultado, "gabinete-condicoes")["mensagem"]
+    assert "custom loop" in next(r for r in resultado['orientacoes'] if r['codigo'] == 'gabinete-condicoes')['mensagem']
+    assert not any(r['codigo'] == 'gabinete-condicoes' for r in resultado['verificacoes'])
     assert not next(p for p in case["posicoes_fans"] if p["nome"] == "Base")["radiadores_mm"]
     fans = avaliar_fans(case, [({"quantidade": 6}, {"quantidade": 1, "tamanho_mm": 120})], None)
     assert fans["quantidade"] is False  # 6 novas + 2 inclusas > 7; não sete de 120 mm

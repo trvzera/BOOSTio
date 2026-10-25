@@ -267,6 +267,13 @@ A geração pela LLM já revalida conflitos conhecidos no catálogo, incluindo s
 DDR, slots, potência e medidas explícitas. Especificações ausentes continuam não
 verificadas; a configuração não recebe garantia de compatibilidade completa.
 
+O diagnóstico também confere os tipos e quantidades de conectores da fonte,
+placa-mãe, GPU e discos quando há ficha detalhada. Armazenamento considera o
+padrão e tamanho do SSD, a distribuição por slot M.2, portas SATA compartilhadas
+e arranjos alternativos de baias. As mesmas regras orientam o editor JavaScript;
+o Python revalida os conflitos. Dicas gerais ficam separadas das verificações
+pendentes, preservando os avisos sobre dados realmente ausentes.
+
 O manifesto atual possui 76 fichas técnicas, incluindo gabinetes, GPUs, fontes,
 air/water coolers, placas-mãe, processador, RAM, SSDs, fans e periféricos. Há limites físicos,
 slots, perfis JEDEC/XMP, dimensões por capacidade de SSD, conexões RGB/PWM e

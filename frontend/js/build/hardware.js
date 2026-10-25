@@ -1,5 +1,7 @@
 import { informacoesFans, orientacoesVentilacao, encaixeRadiador } from "./fans.js";
 import { completarMedidas } from "./medidas-fisicas.js";
+import { avaliarBaias } from "./armazenamento.js";
+export { conexaoDisco } from "./armazenamento.js";
 export { informacoesFans } from "./fans.js";
 // Campos ausentes são desconhecidos, nunca zero ou uma medida inferida pelo nome.
 export function numeroConhecido(valor) {
@@ -15,23 +17,16 @@ export function slotsRam(placa) {
   // Zero ou um slot explicitamente cadastrado não vira dois. Não altera a ficha.
   return numero != null && Number.isInteger(numero) ? {slots:numero,provisorio:false} : {slots:2,provisorio:true};
 }
-export function conexaoDisco(peca) {
-  if (!peca) return null;
-  const formato = String(peca.formato || "").toUpperCase();
-  const interfacePeca = String(peca.interface || peca.tipo || "").toUpperCase();
-  if (/M\.?2|NVME|PCI[E-]/.test(formato + " " + interfacePeca))
-    return /SATA/.test(interfacePeca) ? "m2-sata" : "m2";
-  if (/SATA/.test(interfacePeca)) return "sata";
-  return null;
-}
 export function limitesArmazenamento(placa, m2Sata = 0) {
   const sata = numeroConhecido(placa?.quantidade_portas_sata);
   const compartilhadas = numeroConhecido(placa?.portas_sata_desativadas_por_m2_sata);
   return {
     m2:numeroConhecido(placa?.quantidade_slots_m2),
     m2Sata:numeroConhecido(placa?.quantidade_slots_m2_sata),
-    sata:sata == null ? null : Math.max(0,sata - m2Sata * (compartilhadas ?? 0)),
-    compartilhamentoDesconhecido:m2Sata > 0 && compartilhadas == null,
+    // Com mapa por slot, este é o teto nominal. A distribuição completa é
+    // revalidada antes de adicionar, sem descontar duas vezes uma porta compartilhada.
+    sata:sata == null ? null : placa?.slots_m2 && placa.topologia_armazenamento_verificada === true ? sata : Math.max(0,sata - m2Sata * (compartilhadas ?? 0)),
+    compartilhamentoDesconhecido:m2Sata > 0 && compartilhadas == null && placa?.topologia_armazenamento_verificada !== true,
   };
 }
 function medidas(valor) {
@@ -76,11 +71,8 @@ export function validarEncaixe({gpu,air,water,fans = [],gabinete,placa,fonte,dis
       if (!gabinete.formatos_fonte.map(normalizar).includes(normalizar(fonte.formato))) erros.push("O formato da fonte não é aceito pelo gabinete.");
     } else avisos.push("Faltam os formatos de fonte aceitos pelo gabinete.");
   }
-  for (const [formato,campo] of [["2.5","baias_25"],["3.5","baias_35"]]) {
-    const unidades = discos.filter(({peca}) => String(peca?.formato || "").replaceAll('"',"") === formato).reduce((s,{item}) => s + item.quantidade,0);
-    const limite = numeroConhecido(gabinete[campo]);
-    if (unidades && limite != null && unidades > limite) erros.push('As unidades de ' + formato + ' polegadas excedem as baias do gabinete.');
-    else if (unidades && limite == null) avisos.push('Falta a quantidade de baias de ' + formato + ' polegadas do gabinete.');
+  for(const r of avaliarBaias(gabinete,discos.map(({item,peca})=>[item,peca]))){
+    if(r.condicao===false)erros.push(r.mensagem);else if(r.condicao===null)avisos.push(r.mensagem);
   }
   const radiadores = medidas(gabinete.radiadores_suportados_mm);
   const tamanhoRadiador = numeroConhecido(water?.tamanho_radiador_mm);

@@ -21,7 +21,7 @@ for (const caso of casos) {
     for (const [k,v] of Object.entries(caso.esperado)) assert.deepEqual(p[k],v,k);
     for (const k of ["preco","imagem","esgotado","ofertas","modelo","part_number","link"]) assert.deepEqual(p[k],original[k]);
     assert.equal(original.fans_inclusos,null);
-    assert.equal(p.ficha_tecnica_verificada_em,"2026-10-23");
+    assert.equal(p.ficha_tecnica_verificada_em,caso.esperado.ficha_tecnica_verificada_em || "2026-10-23");
     assert.match(p.fonte_medidas,/^https:\/\//);
     for (const alteracao of [{part_number:"outro"},{modelo:caso.modelo+" RGB"},{fabricante:"outro"},{link:"https://www.kabum.com.br/produto/999999"},{link:null}])
       assert.equal(completarMedidas({...base(caso),...alteracao},manifesto).fonte_medidas,undefined);
