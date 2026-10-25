@@ -6,6 +6,8 @@ import { iniciarEntradaPagina } from "../components/page-entry.js";
 import { iniciarRevealsGlobais } from "../components/scroll-reveal.js";
 import { aguardarCarregamentos, perfilLoading, iniciarTransicaoLinks } from "../components/page-loading.js";
 import { iniciarModaisAcessiveis } from "../components/modal-accessibility.js";
+import { movimentoReduzido } from "../components/motion-preference.js";
+import { nomePagina } from "../components/page-routes.js";
 
 iniciarTratamentoGlobalDeErros();
 let tela = document.querySelector("#loading-screen");
@@ -16,11 +18,12 @@ try {
   cache = sessionStorage.getItem("boostio:catalogo-pronto") === "1";
   sessionStorage.setItem("boostio:visita-iniciada","1");
 } catch {}
-const home = /\/index\.html$/.test(location.pathname) || document.body.id === "inicio";
-const frequente = /\/(configuracao-build|pecas|peca)\.html$/.test(location.pathname);
+const pagina = nomePagina(location.pathname);
+const home = pagina === "index.html";
+const frequente = ["configuracao-build.html", "pecas.html", "peca.html"].includes(pagina);
 const pesada = document.body.classList.contains("settings-page-body") || document.body.dataset.loading === "heavy";
 const perfil = perfilLoading({home,visitada,frequente,cache,formulario:document.body.classList.contains("form-page")});
-const reduzido = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const reduzido = movimentoReduzido();
 if (!tela) {
   tela = document.createElement("div"); tela.id = "loading-screen"; document.body.prepend(tela);
 }
@@ -92,7 +95,7 @@ window.addEventListener("pageshow",e => {
   if (home || frequente) { location.reload(); return; } // Reabre o rascunho atual, não o snapshot antigo do editor.
   document.querySelectorAll(".navigation-fade").forEach(el => el.remove());
   document.body.classList.remove("loading-active");
-  if (reduzido) return;
+  if (movimentoReduzido()) return;
   // O bfcache não executa os módulos novamente: ainda precisa de uma transição curta.
   const rapida = document.createElement("div"); rapida.id = "loading-screen";
   rapida.className = "loading-fade"; rapida.setAttribute("aria-hidden","true");

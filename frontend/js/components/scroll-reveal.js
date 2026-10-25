@@ -1,8 +1,16 @@
+import { movimentoReduzido, observarMovimento } from "./motion-preference.js";
+
 const observados = new Map();
 let observador;
+observarMovimento(reduzido => {
+  if (!reduzido) return;
+  observador?.disconnect();
+  for (const elemento of observados.keys()) elemento.classList.remove("reveal-pending", "is-visible");
+  observados.clear();
+});
 // Um único observador atende também os cards renderizados pelo JS.
 export function iniciarScrollReveal(raiz = document, seletor = "[data-reveal]") {
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches ||
+  if (movimentoReduzido() ||
       !("IntersectionObserver" in window)) return;
   observador ??= new IntersectionObserver((entradas) => {
     entradas.forEach(({ target, isIntersecting }) => {
@@ -24,6 +32,7 @@ export function iniciarScrollReveal(raiz = document, seletor = "[data-reveal]") 
 export function iniciarRevealsGlobais() {
   const seletores = "[data-reveal], footer, .component-group, .build-summary, .build-card, .settings-card, .product-card, .product-stores, .product-specifications, .terms-clause, #questions, #login-container, #signin-container, #forgot-password-container, #reset-password-container, .error-card, .form-manual-build";
   const atualizar = () => iniciarScrollReveal(document,seletores);
+  observarMovimento(atualizar);
   atualizar();
   let agendado = false;
   new MutationObserver(() => {

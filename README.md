@@ -191,6 +191,16 @@ isso não significa cobertura de imagens para todo o catálogo.
 > A BOOSTio **não vende, entrega ou processa pagamentos** dos produtos. Os links
 > direcionam a lojas de terceiros, responsáveis pela venda e pelo atendimento.
 
+## Navegação e animações
+
+O menu oferece **Reduzir animações**: desativa entradas durante a rolagem e
+mantém imagens estáticas no lugar dos vídeos. A preferência fica salva no
+navegador; sem uma escolha, o site acompanha a preferência de movimento do
+sistema. Os vídeos decorativos pausam fora da tela e retomam ao voltar.
+
+A configuração de produção publica URLs como `/builds`, `/formulario` e
+`/sobre`, mantendo os links antigos e os parâmetros de compartilhamento.
+
 ## Desempenho esperado
 
 Ao selecionar **Testar build**, o usuário escolhe o tipo de consulta:
@@ -226,8 +236,10 @@ continuam pendentes: capacidades suficientes não aprovam o computador completo.
 
 Dados públicos de CPU ou GPU, com **mediana em amostras por minuto**, versão do
 Blender, método de renderização e quantidade de resultados. O retorno foi validado
-pelo serviço Python e revalidado com consultas reais em **23 e 24/10/2026**. A última
-consulta de CPU respondeu HTTP 200, sem garantia de disponibilidade permanente.
+pelo serviço Python e revalidado com consultas reais em **25/10/2026** para
+Intel Core i3-12100F, Ryzen 5 5600 e RTX 3060, sem garantia de disponibilidade
+permanente. Falhas distinguem ausência de resultados, conexão, tempo esgotado e
+recusa da fonte, com uma referência para diagnóstico.
 
 A comparação de builds consulta esses dados ao clicar em **Comparar renderização**.
 CPU e GPU são analisadas separadamente; só há classificação quando todas as builds
@@ -377,8 +389,8 @@ Os originais da marca, esboços e anotações estão reunidos em [materiais](mat
 
 ## Validação da versão
 
-Na revisão de **25/10/2026**, a suíte local aprovou **711 testes JavaScript** e
-**938 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
+Na revisão de **25/10/2026**, a suíte local aprovou **719 testes JavaScript** e
+**944 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
 Há testes específicos para as sete classes de Controller e para preservar o

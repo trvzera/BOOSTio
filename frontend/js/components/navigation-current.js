@@ -1,10 +1,11 @@
+import { caminhoComparacao } from "./page-routes.js";
+
 export function linkDaPaginaAtual(href,atual) {
   try {
     const pagina = new URL(atual), destino = new URL(href,pagina);
-    const caminho = url => url.pathname.endsWith("/") ? url.pathname + "index.html" : url.pathname;
     // Ações (criar=1) e âncoras continuam disponíveis, mesmo na mesma página.
     return destino.origin === pagina.origin && !destino.search && !destino.hash
-      && caminho(destino) === caminho(pagina);
+      && caminhoComparacao(destino.pathname) === caminhoComparacao(pagina.pathname);
   } catch { return false; }
 }
 

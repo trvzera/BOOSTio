@@ -6,8 +6,9 @@ import { acompanharCarregamento } from "../components/page-loading.js";
 import { verificarEspacoBuild } from "../api/build/builds.js";
 import { idCompartilhamentoPublico, consumirRetornoPublico } from '../components/sessao-publica.js';
 import { mostrarFalhaSessao, limparFalhaSessao } from "../components/session-feedback.js";
+import { nomePagina } from "../components/page-routes.js";
 
-const paginaAtual = location.pathname.split("/").pop();
+const paginaAtual = nomePagina(location.pathname);
 const publica = paginaAtual === 'configuracao-build.html' && idCompartilhamentoPublico(location.search);
 const privada = paginaPrivada(paginaAtual,location.search);
 if (publica) document.body.removeAttribute('data-private-page');
@@ -31,7 +32,7 @@ export async function confirmaUsuario() {
   const destino = redirecionamentoSessao(paginaAtual,autenticado,location.search);
   if (destino) location.replace(new URL("../../pages/" + destino,import.meta.url).href);
   else {
-    if (location.pathname.endsWith("/formulario.html")) {
+    if (paginaAtual === "formulario.html") {
       try { await verificarEspacoBuild(resposta); }
       catch (erro) {
         if(!["email-nao-verificado","limite-builds"].includes(erro.codigo))throw erro;

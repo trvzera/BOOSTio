@@ -1,0 +1,18 @@
+/* A preferência do menu vale para todas as páginas, incluindo conteúdo dinâmico. */
+html[data-reduced-motion="true"] { scroll-behavior: auto; }
+html[data-reduced-motion="true"] *,
+html[data-reduced-motion="true"] *::before,
+html[data-reduced-motion="true"] *::after {
+  animation-duration: .01ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .01ms !important;
+  transition-delay: 0ms !important;
+  scroll-behavior: auto !important;
+}
+html[data-reduced-motion="true"] :is(.reveal-pending, .page-entry) {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+}
+.site-motion-toggle[aria-pressed="true"] { color: var(--cor-p1); }

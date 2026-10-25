@@ -1,4 +1,5 @@
 import { idCompartilhamentoPublico } from './sessao-publica.js';
+import { nomePagina } from './page-routes.js';
 
 export const linksVisitante = [
   {pagina:"login.html",rotulo:"Entrar",icone:"login"},
@@ -16,9 +17,11 @@ export const paginasPublicas = new Set([
   "login.html", "signin.html", "esqueci-senha.html", "reset-senha.html", "erro.html",
 ]);
 export function paginaPrivada(pagina,busca = '') {
+  pagina = nomePagina(pagina);
   return !(pagina === 'configuracao-build.html' && idCompartilhamentoPublico(busca)) && !paginasPublicas.has(pagina);
 }
 export function redirecionamentoSessao(pagina,autenticado,busca = '') {
+  pagina = nomePagina(pagina);
   if (autenticado && ["login.html","signin.html"].includes(pagina)) return "index.html";
   if (!autenticado && paginaPrivada(pagina,busca)) return "login.html";
   return null;

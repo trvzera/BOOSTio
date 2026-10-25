@@ -1,3 +1,5 @@
+import { movimentoReduzido } from "./components/motion-preference.js";
+
 // Carrossel dos cards de serviço (só existe na página inicial, id "cards-grid").
 document.addEventListener("DOMContentLoaded", () => {
   const cardsGrid = document.getElementById("cards-grid");
@@ -13,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function centerCard(card) {
     const target =
       card.offsetLeft + card.offsetWidth / 2 - cardsGrid.clientWidth / 2;
-    cardsGrid.scrollTo({ left: target, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+    cardsGrid.scrollTo({ left: target, behavior: movimentoReduzido() ? "instant" : "smooth" });
   }
 
   cards.forEach((card) => {

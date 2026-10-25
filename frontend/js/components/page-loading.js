@@ -1,3 +1,6 @@
+import { paginaDoSite, caminhoComparacao } from "./page-routes.js";
+import { movimentoReduzido } from "./motion-preference.js";
+
 const pendentes = new Set();
 export function escolherModoLoading({home,visitada}) { return home || !visitada ? "full" : "fade"; }
 export function perfilLoading({home,visitada,frequente=false,cache=false,formulario=false}) {
@@ -16,7 +19,7 @@ export function navegarPara(destino) {
 }
 export function transicionarSaida(acao,externo = false) {
   if (saindo) return;
-  const reduzido = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduzido = movimentoReduzido();
   if (reduzido || externo) { acao(); return; }
   saindo = true;
   const tela = document.createElement("div");
@@ -30,7 +33,7 @@ export function iniciarTransicaoLinks() {
     const link = evento.target.closest("a[href]");
     if (!link || evento.defaultPrevented || evento.button !== 0 || evento.metaKey || evento.ctrlKey || evento.shiftKey || evento.altKey || link.download || link.target === "_blank" || link.hasAttribute("data-page-back")) return;
     const url = new URL(link.href,location.href);
-    if (url.origin !== location.origin || !/\.html$/.test(url.pathname) || (url.pathname === location.pathname && url.search === location.search)) return;
+    if (url.origin !== location.origin || !paginaDoSite(url.pathname) || (caminhoComparacao(url.pathname) === caminhoComparacao(location.pathname) && url.search === location.search)) return;
     evento.preventDefault(); navegarPara(url.href);
   });
   window.addEventListener("pageshow",() => { saindo = false; document.querySelectorAll(".navigation-fade").forEach(tela => tela.remove()); });

@@ -116,3 +116,34 @@ def test_intel_aceita_prefixo_de_geracao_sem_trocar_sufixo_f():
     assert ("device_name",nome) in service.buscar.call_args.kwargs["params"]
     with pytest.raises(ErroBenchmark):
         service.executar({"dispositivo":"Intel Core i3-12100","tipo":"cpu"},1)
+
+
+@pytest.mark.parametrize("http,codigo", [(403, "acesso-provedor"), (401, "acesso-provedor"), (302, "redirecionamento"), (503, "provedor")])
+def test_diagnostico_distingue_http_da_fonte_sem_expor_conteudo(http, codigo, caplog):
+    buscar = Mock(return_value=Mock(status_code=http, headers={"Content-Type": "text/html", "Set-Cookie": "segredo"}, text="conteudo-privado"))
+    service = BlenderService(buscar=buscar)
+    with pytest.raises(ErroBenchmark) as erro:
+        service.executar(CONSULTA, 1)
+    assert erro.value.status == 503 and erro.value.codigo == codigo
+    assert erro.value.diagnostico == {"httpProvedor": http, "tipoResposta": "html", "redirecionamento": http == 302}
+    assert "segredo" not in caplog.text and "conteudo-privado" not in caplog.text
+    assert f"http_provedor={http}" in caplog.text
+    assert not service.cache
+
+
+def test_tls_tem_mensagem_do_servidor_e_nao_do_wifi_do_usuario():
+    with pytest.raises(ErroBenchmark) as erro:
+        BlenderService(buscar=Mock(side_effect=requests.exceptions.SSLError("detalhe-interno"))).executar(CONSULTA, 1)
+    assert erro.value.codigo == "tls" and erro.value.status == 503
+    assert "servidor da BOOSTio" in str(erro.value) and "detalhe-interno" not in str(erro.value)
+
+
+def test_html_com_http_200_nao_vira_score_ou_cache():
+    bruto = Mock(status_code=200, headers={"Content-Type": "text/html"}, json=Mock(side_effect=ValueError()))
+    service = BlenderService(buscar=Mock(return_value=bruto))
+    with pytest.raises(ErroBenchmark) as erro:
+        service.executar(CONSULTA, 1)
+    assert erro.value.status == 502 and erro.value.codigo == "resposta"
+    assert erro.value.diagnostico["httpProvedor"] == 200
+    assert erro.value.diagnostico["tipoResposta"] == "html"
+    assert not service.cache

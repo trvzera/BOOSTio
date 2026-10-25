@@ -1,3 +1,5 @@
+import { movimentoReduzido } from "./motion-preference.js";
+
 const estados = new WeakMap();
 
 function preparar(details) {
@@ -30,7 +32,7 @@ export function definirDetalheAberto(details,aberto,{animar = true} = {}) {
   estado.desejado = Boolean(aberto);
   estado.summary.setAttribute("aria-expanded",String(estado.desejado));
   delete details.dataset.animating;
-  if (!animar || matchMedia("(prefers-reduced-motion: reduce)").matches || !details.animate) {
+  if (!animar || movimentoReduzido() || !details.animate) {
     details.open = estado.desejado;
     return;
   }

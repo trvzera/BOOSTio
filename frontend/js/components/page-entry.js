@@ -1,5 +1,7 @@
+import { movimentoReduzido } from "./motion-preference.js";
+
 export function iniciarEntradaPagina() {
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (movimentoReduzido()) return;
   const seletores = "#main-title, #main-description, #main-page > .btn-primary, .builder-heading, .catalog-toolbar, .product-detail-layout, .builds-header, .builds-quota-card, .settings-header, .company-hero, .terms-header, .error-card, #login-container, #signin-container, #forgot-password-container, #reset-password-container, #forms-header, #question-info, #question-content";
   [...document.querySelectorAll(seletores)].filter(el => {
     const r = el.getBoundingClientRect();

@@ -1,5 +1,6 @@
 from collections import OrderedDict, deque
 from copy import deepcopy
+import logging
 import math
 import re
 from threading import RLock
@@ -8,6 +9,8 @@ import time
 import requests
 
 from .fpshq_service import ErroBenchmark, FpshqService
+
+logger = logging.getLogger(__name__)
 
 
 class BlenderService:
@@ -49,21 +52,30 @@ class BlenderService:
                 resposta = self.buscar(self.URL, params=parametros, headers={"Accept": "application/json"},
                                       timeout=(4, 10), allow_redirects=False)
             except requests.Timeout as erro:
-                raise ErroBenchmark("O Blender Open Data não respondeu a tempo. Tente novamente mais tarde.", "timeout", 504) from erro
+                raise self._falha("O Blender Open Data não respondeu a tempo. Tente novamente mais tarde.", "timeout", 504, causa=erro) from erro
+            except requests.exceptions.SSLError as erro:
+                raise self._falha("O servidor da BOOSTio não conseguiu estabelecer uma conexão segura com o Blender Open Data. Tente novamente mais tarde.", "tls", 503, causa=erro) from erro
             except requests.RequestException as erro:
-                raise ErroBenchmark("Não foi possível consultar o Blender Open Data agora.", "rede", 503) from erro
+                raise self._falha("O servidor da BOOSTio não conseguiu se conectar ao Blender Open Data agora. Tente novamente mais tarde.", "rede", 503, causa=erro) from erro
             if resposta.status_code == 429:
                 espera = FpshqService._espera(resposta.headers.get("Retry-After"))
                 with self.lock:
                     self.bloqueado_ate = self.relogio() + espera
-                raise ErroBenchmark("A fonte solicitou uma pausa. Aguarde para consultar novamente.", "limite", 429, espera)
+                raise self._falha("A fonte solicitou uma pausa. Aguarde para consultar novamente.", "limite", 429, resposta, espera=espera)
+            if resposta.status_code in (401, 403):
+                raise self._falha("O Blender Open Data recusou a consulta feita pelo servidor da BOOSTio. Tente novamente mais tarde.", "acesso-provedor", 503, resposta)
+            if 300 <= resposta.status_code < 400:
+                raise self._falha("O endereço do Blender Open Data redirecionou a consulta. A integração precisa ser verificada.", "redirecionamento", 503, resposta)
             if resposta.status_code != 200:
-                raise ErroBenchmark("O Blender Open Data está indisponível no momento.", "provedor", 503)
+                raise self._falha("O Blender Open Data está indisponível no momento.", "provedor", 503, resposta)
             try:
                 bruto = resposta.json()
             except ValueError as erro:
-                raise ErroBenchmark("O Blender retornou dados inválidos.", "resposta") from erro
-            resultado = self._normalizar(bruto, nome, tipo)
+                raise self._falha("O Blender retornou uma resposta que não pôde ser lida. Tente novamente mais tarde.", "resposta", 502, resposta, causa=erro) from erro
+            try:
+                resultado = self._normalizar(bruto, nome, tipo)
+            except ErroBenchmark as erro:
+                raise self._falha(str(erro), erro.codigo, erro.status, resposta) from erro
             resultado.update(consultadoEm=int(self.data_atual() * 1000), cache=False)
             with self.lock:
                 self.cache[chave] = (self.relogio(), deepcopy(resultado))
@@ -71,6 +83,17 @@ class BlenderService:
                 while len(self.cache) > self.MAX_CACHE:
                     self.cache.popitem(last=False)
             return resultado
+
+    @staticmethod
+    def _falha(mensagem, codigo, status, resposta=None, *, espera=0, causa=None):
+        meta = FpshqService._metadados(resposta) if resposta is not None else None
+        erro = ErroBenchmark(mensagem, codigo, status, espera, meta)
+        # Sem cookies, chaves, conteúdo de terceiros ou dados da conta nos logs.
+        logger.warning("Blender: %s; http_boostio=%s; http_provedor=%s; formato=%s; causa=%s",
+                       codigo, status, erro.diagnostico.get("httpProvedor", "desconhecido"),
+                       erro.diagnostico.get("tipoResposta", "desconhecido"),
+                       type(causa).__name__ if causa else "resposta")
+        return erro
 
     def _normalizar(self, bruto, nome, tipo):
         if not isinstance(bruto, dict) or not isinstance(bruto.get("columns"), list) or not isinstance(bruto.get("rows"), list) or len(bruto["rows"]) > 1000:
