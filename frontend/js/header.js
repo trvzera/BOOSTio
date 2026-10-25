@@ -9,15 +9,16 @@ export function iniciarNavegacao() {
   if (navegacao) return navegacao;
   const host = document.querySelector("[data-site-navigation]") || document.body.appendChild(document.createElement("div"));
   host.dataset.siteNavigation = "";
+  host.setAttribute("role", "banner");
+  host.setAttribute("aria-label", "Navegação da BOOSTio");
   const preview = host.hasAttribute("data-menu-preview");
-  if (!document.querySelector(".site-brand")) {
-    const logo = document.createElement("a");
+  let logo = document.querySelector(".site-brand");
+  if (!logo) {
+    logo = document.createElement("a");
     logo.className = "site-brand";
     logo.href = pagina("index.html");
     logo.setAttribute("aria-label", "BOOSTio — página inicial");
     logo.innerHTML = '<img src="' + new URL("../imgs/logo.webp", import.meta.url).href + '" alt="BOOSTio" width="668" height="237" decoding="async">';
-    const atalho = document.querySelector(".skip-link");
-    if (atalho) atalho.after(logo); else document.body.prepend(logo);
   }
   const links = (itens, perfil = false) => itens.map(item =>
     '<a class="' + (perfil ? 'profile-link font-1-s' : 'site-menu-link') + '" href="' + pagina(item.pagina) + '" aria-label="Ir para ' + item.rotulo + '"' +
@@ -42,6 +43,7 @@ export function iniciarNavegacao() {
     '<div class="site-menu-group">' + links(linksMenu) + '</div></nav>' +
     '<button type="button" class="site-menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="site-menu-panel">' +
     '<span class="ui-lottie hamburger-animation" data-lottie="hamburger" aria-hidden="true"><span class="ui-icon-fallback hamburger-fallback"><span></span><span></span><span></span></span></span></button></div>';
+  host.prepend(logo);
 
   const controles = [];
   function configurar(container, painel, botao, rotulo, hover = false) {

@@ -81,7 +81,8 @@ test("o conteúdo principal aceita foco e modais/menus fechados saem da navegaç
   const global = await ler(new URL("../styles/global/global.css",import.meta.url));
   assert.match(global,/main\s*\{\s*display:\s*block/);
   const header = await ler(new URL("../js/header.js",import.meta.url));
-  assert.match(header,/atalho\.after\(logo\)/);
+  assert.match(header,/host\.setAttribute\("role", "banner"\)/);
+  assert.match(header,/host\.prepend\(logo\)/);
   const menus = await ler(new URL("../js/pages/builds-conta.js",import.meta.url));
   assert.match(menus,/role="group"[^>]*aria-hidden="true" inert/);
   assert.match(menus,/role="progressbar" aria-label=/);
