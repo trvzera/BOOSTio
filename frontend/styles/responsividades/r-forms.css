@@ -1,15 +1,19 @@
 .form-page {
-  height: auto;
-  min-height: 100svh;
-  padding: clamp(72px,8svh,96px) var(--page-gutter) calc(88px + env(safe-area-inset-bottom,0px));
-  overflow-x: clip;
-  overflow-y: visible;
+  height: 100dvh;
+  min-height: 0;
+  padding: clamp(72px,8svh,96px) var(--page-gutter) calc(20px + env(safe-area-inset-bottom,0px));
+  overflow: hidden;
 }
-#forms-page-container { height: auto; min-height: calc(100svh - 180px); gap: 16px; }
-#questions { height: auto; min-height: clamp(460px,calc(100svh - 260px),700px); grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: auto; }
-#question-content, #question-info { min-width: 0; min-height: 0; padding: clamp(20px,2.5vw,32px); overflow: visible; }
-#question-content { gap: 16px; justify-content: flex-start; }
-#question-info { gap: 28px; }
+#forms-page-container { height: 100%; min-height: 0; gap: 16px; }
+.form-page-back, #forms-header { flex-shrink: 0; }
+#questions { flex: 1; height: auto; min-height: 0; grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: minmax(0,1fr); }
+#question-content, #question-info { min-width: 0; min-height: 0; padding: clamp(20px,2.5vw,32px); }
+#question-content { gap: 16px; justify-content: flex-start; overflow: hidden; }
+#question-info { gap: 28px; overflow-y: auto; }
+.form-page .question-intro h1:focus { outline: none; }
+.question-options-scroll { flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; padding: .25rem .5rem .5rem .25rem; }
+.question-options-scroll:focus-visible { outline: 2px solid var(--cor-p1); outline-offset: -2px; }
+.options-heading, #form-navigation { flex-shrink: 0; }
 .question-options { flex: none; min-height: 0; max-height: none; overflow: visible; }
 .options-heading { flex-wrap: wrap; gap: 8px; }
 .options-heading > p { min-width: 0; }
@@ -35,7 +39,7 @@
 .edit-answer { min-height: 44px; }
 
 /* Feedback ocupa o card inteiro, sem manter um título de geração ao lado do erro. */
-.form-page #questions[data-form-state="error"] { grid-template-columns: minmax(0,1fr); grid-template-rows: minmax(0,1fr); min-height: clamp(360px,55svh,560px); }
+.form-page #questions[data-form-state="error"] { grid-template-columns: minmax(0,1fr); grid-template-rows: minmax(0,1fr); min-height: 0; overflow-y: auto; }
 .form-page #questions[data-form-state="error"] > #question-info { display: none; }
 .form-page #questions[data-form-state="error"] > #question-content { grid-column: 1; grid-row: 1; border: 0; justify-content: center; }
 
@@ -52,9 +56,10 @@
   .pieces-grid { grid-template-columns: minmax(0,1fr); }
 }
 @media (max-width: 850px) {
-  .form-page #questions { grid-template-columns: minmax(0,1fr); grid-template-rows: auto auto; }
-  .form-page #question-content { grid-column: 1; grid-row: 2; border-left: 0; border-top: 1px solid var(--cor-2); }
-  .form-page #question-info { grid-column: 1; grid-row: 1; gap: 12px; }
+  .form-page #questions { display: block; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; }
+  .form-page #question-content { overflow: visible; border-left: 0; border-top: 1px solid var(--cor-2); }
+  .form-page #question-info { overflow: visible; gap: 12px; }
+  .question-options-scroll { overflow: visible; flex: none; padding: .25rem; }
   .form-page .question-tag { display: none; }
   .form-page #question-info h1 { font-size: clamp(1.3rem,4vw,1.8rem); margin-bottom: 8px; }
   .form-page #question-info .question-intro > p { font-size: .875rem; line-height: 1.6; }
@@ -93,8 +98,8 @@
 @media (prefers-reduced-motion: reduce) {
   .question-enter { animation: none; }
 }
-#question-content[data-question="pecas"] .pieces-grid { max-height: clamp(20rem,55svh,36rem); overflow-y: auto; padding: .25rem .5rem .5rem .25rem; scrollbar-width: thin; }
-.peripheral-owned-list { border: 0; padding: .25rem .5rem; display: grid; gap: .75rem; max-height: 32svh; overflow-y: auto; scrollbar-width: thin; }
+#question-content[data-question="pecas"] .pieces-grid { max-height: none; overflow: visible; padding: .25rem; }
+.peripheral-owned-list { border: 0; padding: .25rem .5rem; display: grid; gap: .75rem; }
 .peripheral-owned-list legend { padding-bottom: .75rem; color: var(--cor-6); }
 .peripheral-owned { min-width: 0; }
 #perifericos-fields { display: grid; gap: 1rem; font: 400 .875rem/1.6 var(--font-body); color: var(--cor-6); }
@@ -109,7 +114,7 @@
 .appearance-references { display: grid; gap: .75rem; min-width: 0; padding: 0; border: 0; }
 .appearance-references legend, .appearance-colors legend { margin-bottom: .5rem; }
 .appearance-no-preference { display: flex; align-items: center; gap: .5rem; min-height: 2.75rem; }
-.appearance-examples { display: grid; gap: 1rem; min-width: 0; max-height: clamp(19rem,48svh,27rem); overflow-y: auto; padding: .25rem .5rem .25rem .25rem; scrollbar-width: thin; }
+.appearance-examples { display: grid; gap: 1rem; min-width: 0; padding: .25rem; }
 .appearance-cases { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .6rem; }
 .appearance-references--style .appearance-cases { grid-template-columns: repeat(2,minmax(0,1fr)); }
 .appearance-case, .appearance-swatch { position: relative; display: grid; justify-items: center; align-content: start; gap: .5rem; min-width: 0; padding: .65rem; border: 1px solid var(--cor-2); border-radius: 1rem; background: rgba(255,255,255,.025); cursor: pointer; transition: border-color .2s ease,background .2s ease; }
