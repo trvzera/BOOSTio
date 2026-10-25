@@ -37,6 +37,31 @@ class ImagensKabumTest(unittest.TestCase):
         db.drop_all()
         self.contexto.pop()
 
+    def test_volume_guarda_imagem_e_manifesto(self):
+        peca = PlacaVideo(fabricante="Marca", modelo="Modelo", memoria_gb=6, consumo_energia=70,
+                         preco=100, kabum_external=URL, part_number="VOLUME-123")
+        db.session.add(peca)
+        db.session.commit()
+        with TemporaryDirectory() as pasta:
+            volume = Path(pasta) / "coletados"
+            with patch("services.peca_service.atualizar_imagem_peca_service.PASTA_IMAGENS", volume / "imagens"), \
+                 patch("services.peca_service.atualizar_imagem_peca_service.MANIFESTO", volume / "imagens-produtos.json"), \
+                 patch.object(BuscarImagemKabumService, "executar", return_value=(b"foto-nova", "jpg")):
+                destino = AtualizarImagemPecaService().executar(peca)
+                self.assertEqual(destino.read_bytes(), b"foto-nova")
+                self.assertEqual(AtualizarImagemPecaService.exportar_manifesto(), 1)
+                manifesto = json.loads((volume / "imagens-produtos.json").read_text())
+                self.assertEqual(manifesto["VOLUME-123"], f"../coletados/imagens/placa_video-{peca.id}.jpg")
+                self.assertTrue((volume.parent / "pages" / manifesto["VOLUME-123"]).resolve().is_file())
+                self.assertEqual(list(volume.rglob(".tmp-*")), [])
+
+    def test_manifesto_vazio_cria_pasta_na_primeira_execucao(self):
+        with TemporaryDirectory() as pasta:
+            manifesto = Path(pasta) / "coletados" / "imagens-produtos.json"
+            with patch("services.peca_service.atualizar_imagem_peca_service.MANIFESTO", manifesto):
+                self.assertEqual(AtualizarImagemPecaService.exportar_manifesto(), 0)
+                self.assertEqual(json.loads(manifesto.read_text()), {})
+
     def test_valida_codigo_da_imagem(self):
         self.assertEqual(BuscarImagemKabumService._imagem_do_anuncio(pagina(), "123"), IMAGEM)
         with self.assertRaisesRegex(ValueError, "não encontrada"):
@@ -68,7 +93,7 @@ class ImagensKabumTest(unittest.TestCase):
                     destino = AtualizarImagemPecaService().executar(peca)
                 self.assertEqual(destino.read_bytes(), jpg)
                 self.assertEqual(buscar.call_count, 2)
-                self.assertEqual(peca.to_catalogo()["imagem"], "../imgs/produtos/placa_video-1.jpg")
+                self.assertEqual(peca.to_catalogo()["imagem"], "../coletados/imagens/placa_video-1.jpg")
                 self.assertEqual(len(PlacaVideo.sem_imagem_com_link()), 0)
 
 

@@ -58,11 +58,27 @@ test("falha no manifesto não derruba catálogo e permite nova consulta",async t
   let chamadas=0;
   t.mock.method(globalThis,"fetch",async()=>{
     chamadas++;
-    return new Response(JSON.stringify({A:"../imgs/produtos/processador-1.jpg"}),{status:chamadas<=2?503:200});
+    return new Response(JSON.stringify({A:"../imgs/produtos/processador-1.jpg"}),{status:chamadas<=3?503:200});
   });
   assert.deepEqual(await carregarManifestoImagens(),{});
   assert.equal((await carregarManifestoImagens()).A,"../imgs/produtos/processador-1.jpg");
-  assert.equal(chamadas,4);
+  assert.equal(chamadas,6);
+});
+
+test("manifesto do volume complementa imagens estáticas e tem prioridade",async t => {
+  const modulo=await import("../js/build/imagens-produtos.js?volume-compartilhado");
+  const chamadas=[];
+  t.mock.method(globalThis,"fetch",async (url,options)=>{
+    chamadas.push({url,options});
+    return new Response(JSON.stringify(url.pathname.includes("/coletados/")
+      ? {A:"../coletados/imagens/placa_video-1.jpg"}
+      : {A:"../imgs/produtos/antiga.jpg",B:"../imgs/produtos/outra.jpg"}));
+  });
+  const mapa=await modulo.carregarManifestoImagens();
+  assert.equal(mapa.A,"../coletados/imagens/placa_video-1.jpg");
+  assert.equal(mapa.B,"../imgs/produtos/outra.jpg");
+  assert.equal(chamadas.find(c=>c.url.pathname.includes("/coletados/")).options.cache,"no-store");
+  assert.equal(modulo.enderecoImagem(mapa.A),new URL("../coletados/imagens/placa_video-1.jpg",import.meta.url).href);
 });
 
 test("referências recuperadas exigem categoria, fabricante, modelo e part number; arquivos existem",async () => {

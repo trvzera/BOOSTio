@@ -3,10 +3,10 @@ let manifestoPendente;
 export function carregarManifestoImagens() {
   const carregar = (nome,cache) => fetch(new URL("../../data/" + nome,import.meta.url),{cache})
     .then(async r => { if (!r.ok) return null; const m = await r.json(); return m && typeof m === 'object' && !Array.isArray(m) ? m : null; }).catch(() => null);
-  manifestoPendente ??= Promise.all([carregar('imagens-referencia.json','force-cache'),carregar('imagens-produtos.json','no-cache')])
-    .then(([referencias,geradas]) => {
+  manifestoPendente ??= Promise.all([carregar('imagens-referencia.json','force-cache'),carregar('imagens-produtos.json','no-cache'),carregar('../coletados/imagens-produtos.json','no-store')])
+    .then(([referencias,geradas,coletadas]) => {
       if (!referencias || !geradas) manifestoPendente = null;
-      return {...referencias,...geradas};
+      return {...referencias,...geradas,...coletadas};
     });
   return manifestoPendente;
 }
