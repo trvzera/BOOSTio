@@ -32,3 +32,4 @@ coverage
 htmlcov
 test-results
 playwright-report
+frontend/coletados

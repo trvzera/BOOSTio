@@ -148,8 +148,10 @@ TRUSTED_PROXY_HOPS=0
 TRUSTED_PROXY_PROTO_HOPS=0
 ```
 
-O arquivo `backend/.env.producao.example` lista as variáveis necessárias. Preencha
-os segredos nas variáveis da hospedagem, sem publicá-los no frontend ou no Git.
+Para Docker, use o arquivo `.env.production.example` da raiz como modelo para
+`.env.production`. O `compose.yaml` complementa essas configurações com
+`APP_ENV=producao` e os valores de proxy. Preencha os segredos sem publicá-los
+no frontend ou no Git.
 O backend recusa iniciar em produção sem `SECRET_KEY` de pelo menos 32 caracteres,
 `URL_DATABASE`, credenciais Google, chave Gemini e credenciais de e-mail. O Redis
 também é obrigatório para o Flask-Limiter. Mantenha a mesma `SECRET_KEY` entre
@@ -230,6 +232,32 @@ Não cadastre a URL de início `/auth/google/redirecionar` como callback.
 O callback local pode permanecer cadastrado junto do de produção.
 
 ## Validação após publicar
+
+### Imagens coletadas em containers separados
+
+O Compose monta o volume persistente `imagens_coletadas` na API em
+`/dados/coletados` (leitura e escrita) e no Nginx em
+`/usr/share/nginx/html/coletados` (somente leitura). A variável
+`IMAGENS_COLETADAS_DIR` da API aponta para esse diretório. As imagens e o manifesto
+gerados pela coleta ficam disponíveis em `/coletados/` no domínio do frontend.
+As imagens estáticas existentes continuam em `imgs/produtos`, sem serem ocultadas
+pelo volume. Antes da primeira coleta, o Nginx retorna um manifesto vazio.
+
+Para aplicar e executar uma coleta limitada na VPS, na pasta do projeto:
+
+```sh
+docker compose --env-file .env.production up -d --build api web
+docker compose --env-file .env.production run --rm --no-deps api python -m flask --app app pecas-imagens --limite 20
+```
+
+O comando de coleta usa o mesmo volume sem parar a API. Execute com o mesmo
+projeto Compose usado para subir os serviços. Recriar os containers preserva o
+volume; `docker compose down -v` o remove. Inclua esse volume no backup, pois o
+backup do banco não contém os arquivos das imagens.
+
+Localmente, sem `IMAGENS_COLETADAS_DIR`, a coleta grava em `frontend/coletados`,
+ignorada pelo Git e pelo build Docker. O frontend combina o manifesto dessa pasta
+com os manifestos estáticos, dando prioridade às imagens coletadas.
 
 Confirme que o navegador chama a API HTTPS correta, recebe o cookie de sessão,
 conclui login Google, obtém `/auth/me`, envia ações com CSRF e recebe links de

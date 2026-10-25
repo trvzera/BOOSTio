@@ -29,6 +29,8 @@ node_modules/
 .env.*
 !.env.example
 !.env.sample
+!.env.production.example
+frontend/coletados/
 instance/
 *.db
 *.db-*
