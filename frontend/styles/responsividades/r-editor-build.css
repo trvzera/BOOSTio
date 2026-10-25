@@ -58,6 +58,8 @@
   .catalog-grid, .store-grid { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 600px) {
+  .component-fan-plan { padding-inline: .75rem; }
+  .component-fan-plan > summary > span { display: block; margin-inline-start: 0; }
   .builder-page-main, .builder-footer-wrapper { padding-bottom: 96px; }
   .component-empty, .component-selected-main { padding: 16px; gap: 12px; }
   .component-empty { gap: 12px; padding: 18px 16px; }
@@ -84,5 +86,6 @@
   .catalog-empty { padding: 24px; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .compatibility-details { transition: none; }
   .builder-page *, .builder-page *::before { transition-duration: .01ms !important; }
 }

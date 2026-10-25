@@ -4,6 +4,42 @@ Revisão de 24/10/2026. A base de cadastro passa de 1.535 para 1.542 produtos.
 O manifesto compartilhado possui agora 76 fichas técnicas (48 antes desta rodada). Isso não representa
 revisão completa de todos os produtos do catálogo.
 
+## Referência visual de fans e painel compacto
+
+O painel apresenta conflitos confirmados e peças obrigatórias ausentes antes
+das seções recolhidas. `naoVerificado` continua integral no diagnóstico, mas a
+interface agrupa as conferências por componente. Mensagens locais equivalentes
+a regras conhecidas do servidor não são repetidas. Todos os detalhes técnicos
+continuam acessíveis por clique, toque ou teclado; dicas gerais ficam recolhidas.
+A contagem de assuntos não substitui a quantidade de verificações do backend.
+
+`estimativa_fans` é uma orientação editorial por modelo exato, separada de
+`posicoes_fans`, `quantidade_max_fans`, `fans_inclusos` e tamanhos confirmados.
+Não preenche dados ausentes, não gera bloqueios/aprovações e não é enviada como
+capacidade para a LLM. As dimensões externas são exibidas apenas como contexto;
+não há fórmula para subtrair uma margem genérica e declarar um espaço útil.
+
+No Rise Mode X1 White RM-GA-OFX1-FW, a revisão visual de 24/10/2026 registra
+uma posição aparente lateral e uma traseira. A referência inicial de duas fans
+é planejamento sujeito a confirmação manual, não mínimo térmico garantido.
+A ficha mantém até três fans, zero inclusas; a terceira posição e os diâmetros
+não foram identificados. As imagens ilustrativas com iluminação não alteram
+o número de fans inclusas. Revisão visual não comprova furação, espessura,
+interferência de outras peças nem alimentação elétrica.
+
+Fotos consultadas: [lateral](https://images.kabum.com.br/produtos/fotos/516120/gabinete-rise-mode-x1-white-mini-tower-m-atx-branco-rm-ga-ofx1-fw_1718978929_gg.jpg)
+e [traseira](https://images.kabum.com.br/produtos/fotos/516120/gabinete-rise-mode-x1-white-mini-tower-m-atx-branco-rm-ga-ofx1-fw_1718978933_gg.jpg).
+
+Validação: **708 testes JavaScript**, **900 Python (+20 subtestes)** e
+**58 verificações no Chrome por execução**, repetidas com animações ativas e
+movimento reduzido. Larguras 320/390/768/1440 px; editor, cards da conta e build
+compartilhada. Conferidos teclado (Enter/Espaço/Escape), retorno de foco,
+painel compacto, fontes, limites da tela e ausência de overflow horizontal.
+Sem violações nos testes axe do painel aberto; isso não é uma auditoria completa
+do site. API simulada, catálogo real em modo somente leitura, nenhuma escrita
+no banco ou chamada à LLM. A visibilidade do painel abre imediatamente e o fade
+continua nos demais atributos; movimento reduzido dispensa a transição.
+
 ## Como os dados são aplicados
 
 `frontend/data/medidas-fisicas.json` é lido tanto pelas Models Python quanto pelo

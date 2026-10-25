@@ -10,6 +10,22 @@ from services.build_service.criar_build_service import CriarBuildService
 from services.build_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
 
+def test_estimativa_visual_nao_substitui_limites_fisicos_confirmados():
+    gabinete = completar_medidas({"categoria": "gabinete", "fabricante": "Rise Mode",
+        "modelo": "Office Rise Mode X1 White, Mini Tower, M-ATX, Sem FANs, Branco - RM-GA-OFX1-FW",
+        "part_number": "KABUM-516120", "link": "https://www.kabum.com.br/produto/516120"})
+    assert gabinete["estimativa_fans"]["quantidade_inicial"] == 2
+    fans = [({"quantidade": 2}, {"quantidade": 1, "tamanho_mm": 120})]
+    info = avaliar_fans(gabinete, fans)
+    assert info["capacidade"] == 3 and info["inclusas"] == 0
+    assert info["tamanhos"] is None and info["distribuicao"] is None
+    assert avaliar_fans(gabinete, [({"quantidade": 4}, fans[0][1])])["quantidade"] is False
+    sem_limites = {**gabinete, "quantidade_max_fans": None,
+                   "comprimento_mm": 1000, "largura_mm": 1000, "altura_mm": 1000}
+    assert avaliar_fans(sem_limites, fans)["capacidade"] is None
+    assert avaliar_fans(sem_limites, fans)["quantidade"] is None
+
+
 def avaliar(pecas, componentes=None):
     if componentes is None:
         componentes = {p["categoria"]: {"id": p["id"], "quantidade": 1} for p in pecas}

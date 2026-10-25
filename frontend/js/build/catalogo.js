@@ -163,6 +163,7 @@ export const rotulosTecnicos = {
   conectores_pcie_16pinos:"Conectores PCIe de 16 pinos", conectores_sata:"Conectores de alimentação SATA",
   radiadores_suportados_mm:"Radiadores suportados (mm)", tamanhos_fan_suportados_mm:"Fans suportadas (mm)",
   quantidade_max_fans:"Posições de fans (total)",
+  estimativa_fans:"Planejamento de fans (estimativa visual)",
   frequencia_mhz: "Frequência (MHz)", latencia: "Latência", quantidade_pentes: "Pentes no kit",
   iluminacao: "Iluminação", potencia: "Potência (W)", tamanho_mm: "Tamanho (mm)",
   compatibilidade: "Sockets suportados", interface: "Interface", tipo: "Tipo",
@@ -252,6 +253,7 @@ export function gruposFichaTecnica(peca) {
 }
 
 function formatarEspecificacao(chave,valor) {
+  if(chave==='estimativa_fans'&&valor&&typeof valor==='object')return 'Referência inicial de planejamento: '+String(valor.quantidade_inicial)+' fans. '+String(valor.observacao||'Confirme os encaixes antes de comprar.')+' Estimativa visual; não confirma tamanho, capacidade ou encaixe.';
   if(chave==='conectores_alimentacao'&&valor&&typeof valor==='object')return Object.entries(valor).filter(([,q])=>Number(q)>0)
     .map(([tipo,q])=>q+' × '+(rotulosTecnicos[tipo]||tipo)).join('; ')||'Nenhum conector externo cadastrado';
   if(chave==='configuracoes_baias'&&Array.isArray(valor))return valor.filter(a=>a&&typeof a==='object').map(a=>[
