@@ -1,7 +1,7 @@
 # Laboratório de FPS local · BOOSTio
 
 Branch: `experimento/fps-local`. Experimento separado do frontend, Flask, banco de
-usuários e integrações FPSHQ/Blender. Não há chamadas de rede nem novas dependências.
+usuários e integrações FPSHQ/Blender. Os scripts não fazem chamadas de rede nem exigem novas dependências.
 O botão de jogos do site continua em desenvolvimento.
 
 A investigação de **FPSHQ e HowManyFPS**, os retornos verificados e a preparação
@@ -15,6 +15,14 @@ O código desta fase valida os dados e consulta referências medidas de uma
 configuração exata. Não prevê FPS de hardware diferente e não usa pontuações
 genéricas de CPU/GPU, requisitos mínimos ou respostas de LLM como benchmark.
 
+Há um caso de estudo externo observado no calculador web da HowManyFPS:
+Valorant, Ryzen 5 5600, **RTX 3060 de 8 GB**, 16 GB de RAM, 1080p/Alto,
+Lotus/Multiplayer, Offset desligado. Na consulta de 26/10/2026, o site exibiu
+**351 FPS médios e 230 FPS de 1% low**. O registro está em
+[`dados/referencias-web.json`](dados/referencias-web.json), com a origem e os
+metadados ausentes. Ele não entra em `medicoes.json` nem representa um modelo
+próprio calibrado. A variante de 12 GB da consulta-exemplo permanece distinta.
+
 Jogos iniciais: Valorant, Counter-Strike 2, Fortnite, Cyberpunk 2077 e
 Red Dead Redemption 2. A primeira fase considera resolução nativa, sem ray tracing,
 upscaling ou geração de quadros. Presets customizados precisam de um cenário que
@@ -27,6 +35,7 @@ Na raiz do projeto, com Python 3.12 ou superior:
 ```bash
 python3 experimentos/fps-local/laboratorio.py validar
 python3 experimentos/fps-local/laboratorio.py consultar --consulta experimentos/fps-local/dados/consulta-exemplo.json
+python3 experimentos/fps-local/referencias.py --listar-web
 python3 -m unittest discover -s experimentos/fps-local -p 'test_*.py' -v
 ```
 

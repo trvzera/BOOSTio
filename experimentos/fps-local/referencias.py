@@ -65,12 +65,21 @@ def normalizar_referencia(provedor, consulta, resposta):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--provedor", required=True, choices=("fpshq", "howmanyfps"))
-    parser.add_argument("--consulta", type=Path, required=True)
-    parser.add_argument("--resposta", type=Path, required=True)
+    modo = parser.add_mutually_exclusive_group(required=True)
+    modo.add_argument("--provedor", choices=("fpshq", "howmanyfps"))
+    modo.add_argument("--listar-web", action="store_true", help="Exibir os casos pontuais observados na interface pública.")
+    parser.add_argument("--consulta", type=Path)
+    parser.add_argument("--resposta", type=Path)
     args = parser.parse_args()
     try:
-        resultado = normalizar_referencia(args.provedor, ler_json(args.consulta), ler_json(args.resposta))
+        if args.listar_web:
+            if args.consulta or args.resposta:
+                raise ValueError("--listar-web exibe o registro local e não recebe consulta/resposta de API.")
+            resultado = ler_json(Path(__file__).resolve().parent / "dados" / "referencias-web.json")
+        else:
+            if args.consulta is None or args.resposta is None:
+                raise ValueError("Informe --consulta e --resposta para normalizar uma referência de API.")
+            resultado = normalizar_referencia(args.provedor, ler_json(args.consulta), ler_json(args.resposta))
         print(json.dumps(resultado, ensure_ascii=False, allow_nan=False, indent=2))
         return 0
     except (OSError, ValueError) as erro:

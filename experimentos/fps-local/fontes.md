@@ -1,7 +1,8 @@
 # Fontes externas para o laboratório
 
-Revisão em **26/10/2026**. Não há resultados de FPS importados ou autorização de
-treinamento confirmada. A base `dados/medicoes.json` continua vazia.
+Revisão em **26/10/2026**. Há um caso pontual do calculador web registrado como
+referência externa; ainda não há autorização de treinamento confirmada. A base
+`dados/medicoes.json` continua vazia.
 
 ## FPSHQ
 
@@ -30,8 +31,25 @@ no retorno, preset, RAM, patch ou cena. Precisamos da coleção Postman e contra
 enviados com o acesso antes de implementar o cliente HTTP.
 
 O projeto ainda aguarda resposta ao e-mail de acesso, conforme confirmado pelo
-responsável em 26/10. Não houve POST à API, contratação, consumo de plano ou extração
-automatizada das páginas de resultados.
+responsável em 26/10. Não houve chamada da Developer API, contratação, consumo de
+plano ou coleta em lote. O teste pontual abaixo usou a interface pública.
+
+### Caso de estudo · Valorant na interface web
+
+O [calculador de Valorant](https://howmanyfps.com/games/valorant) funcionou no
+Safari sem login. Foram selecionados Ryzen 5 5600, GeForce RTX 3060 **8 GB** e
+16 GB de RAM, mantendo 1920×1080, High, mapa Lotus, modo Multiplayer e Apply Offset
+desmarcado. A interface exibiu **351 FPS médios e 230 FPS de 1% low**. O indicador
+de Offset mostrava ±15%, mas não foi aplicado e não comprova intervalo estatístico.
+
+O resultado e a configuração visível foram registrados em `dados/referencias-web.json`.
+Não houve execução de jogo no computador do usuário ou acesso a tempos de quadros.
+Frequência/pentes de RAM, versão do jogo, driver e outros campos não exibidos
+permanecem desconhecidos. Não reutilizar esse resultado para a RTX 3060 de 12 GB.
+
+Esse registro testa o fluxo de dados do laboratório e permite comparar futuramente
+um resultado próprio com a referência. A autorização para calibração/treinamento
+continua pendente; o exemplo não forma uma base autorizada de benchmarks.
 
 O destaque “10K Requests” não informa, sozinho, gratuidade, período de renovação
 ou direito a exportar a base. A gratuidade das ferramentas públicas não comprova
@@ -56,6 +74,7 @@ existente; HowManyFPS segue apenas o exemplo público, ainda não homologado com
 ```bash
 python3 experimentos/fps-local/referencias.py --provedor fpshq --consulta caminho/consulta.json --resposta caminho/resposta.json
 python3 experimentos/fps-local/referencias.py --provedor howmanyfps --consulta caminho/consulta.json --resposta caminho/resposta.json
+python3 experimentos/fps-local/referencias.py --listar-web
 ```
 
 Esses arquivos de consulta usam os nomes de campo do respectivo provedor, não os

@@ -1,0 +1,61 @@
+{
+  "versao": 1,
+  "tipo": "referencias-externas",
+  "modelo_calibrado": false,
+  "referencias": [
+    {
+      "id": "howmanyfps-web-valorant-5600-3060-8gb-2026-10-26",
+      "tipo": "referencia-externa",
+      "provedor": "howmanyfps",
+      "canal": "web",
+      "coletado_em": "2026-10-26",
+      "fonte": {
+        "url": "https://howmanyfps.com/games/valorant",
+        "metodo": "consulta-pontual-da-interface-publica-no-Safari",
+        "acesso_autenticado": false,
+        "natureza": "estimativa-exibida-pelo-calculador"
+      },
+      "configuracao_visivel": {
+        "jogo": "valorant",
+        "cpu": "amd-ryzen-5-5600",
+        "cpu_rotulo": "Ryzen 5 5600",
+        "gpu": "nvidia-geforce-rtx-3060-8gb",
+        "gpu_rotulo": "GeForce RTX 3060 8 GB",
+        "gpu_vram_gb": 8,
+        "ram_gb": 16,
+        "resolucao": "1080p",
+        "resolucao_pixels": "1920x1080",
+        "qualidade": "high",
+        "mapa": "Lotus",
+        "modo": "Multiplayer",
+        "offset_aplicado": false,
+        "offset_percentual_exibido": 15
+      },
+      "fps_medio": 351,
+      "fps_1_low": 230,
+      "contexto_nao_confirmado": [
+        "ram_pentes",
+        "ram_mts",
+        "versao_jogo",
+        "cenario_de_captura",
+        "api_grafica",
+        "sistema",
+        "driver_gpu",
+        "ray_tracing",
+        "upscaling",
+        "frame_generation",
+        "duracao_s",
+        "metodo_1_low"
+      ],
+      "direitos_de_armazenamento_e_treinamento": "nao-verificados",
+      "pronta_para_calibracao": false,
+      "observacoes": [
+        "Caso de estudo pontual solicitado pelo usuário, não coleta em lote ou medição realizada pela BOOSTio.",
+        "A GPU selecionada é a variante de 8 GB; não substituir a RTX 3060 de 12 GB da consulta-exemplo.",
+        "O percentual de Offset é apenas o texto exibido pelo site, com a opção desligada; não é um intervalo de confiança validado.",
+        "O resultado descreve o calculador na data da observação e não garante o desempenho real dessa configuração.",
+        "Esta referência não é lida pela consulta de medições e não autoriza uso no treinamento de um modelo."
+      ]
+    }
+  ]
+}
