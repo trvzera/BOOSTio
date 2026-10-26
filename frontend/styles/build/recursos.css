@@ -17,6 +17,8 @@
 .benchmark-trigger:not(:disabled) { box-shadow: 0 0 20px rgba(0,123,255,.22); }
 .builder-heading .benchmark-trigger { flex-shrink: 0; }
 .build-action-dialog { box-sizing: border-box; width: min(860px,calc(100vw - 32px)); max-width: none; max-height: 88svh; margin: auto; padding: 28px; border: 1px solid var(--cor-2); border-radius: 24px; background: rgba(16,17,20,.98); box-shadow: 0 24px 90px #0009; color: var(--cor-6); font-family: var(--font-body); overflow-y: auto; }
+/* Os estilos de botão não devem tornar visíveis controles marcados como ocultos. */
+.build-action-dialog [hidden] { display: none !important; }
 .build-action-dialog::backdrop { background: #000b; backdrop-filter: blur(6px); }
 body:has(.build-action-dialog[open]), body:has(.compare-dialog[open]) { overflow: hidden; }
 .build-action-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 16px; }

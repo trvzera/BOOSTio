@@ -1,17 +1,17 @@
 import { registrarAnimacao, destruirAnimacao } from "./lottie-controller.js";
 import { iniciarVoltar, atualizarBotoesVoltar } from "./navigation-back.js";
 import { iniciarImagens } from "../build/imagens-produtos.js";
-import { movimentoReduzido, observarMovimento } from "./motion-preference.js";
 
 const arquivos = {
   plus:"plus.json", trash:"buildTrash.json", cart:"cartshopping.json", import:"login.json",
-  arrow:"arrow.json", chevron:"chavron.json", checkbox:"checkbox.json", hamburger:"hamburger.json",
+  arrow:"arrow.json", chevron:"chavron.json", checkbox:"checkbox.json", hamburger:"hamburger.json", toggle:"toggle.json",
   login:"login.json", signup:"logon.json", build:"build.json", user:"user.json", profile:"profile.json", logout:"logout-lt.json",
   circledot:"circledot.json", magnifying:"magnifying.json", magic:"magic.json", dots:"dots.json",
   gamepad:"gamepad.json", microchip:"microchip.json", handsparkle:"handsparkle.json", normalhand:"normalhand.json",
   lock:"buildLock.json", visibility:"buildPublic.json", pencil:"buildPencil.json", clone:"buildClone.json", copy:"buildCopy.json", download:"buildDownload.json",
 };
 const alternativas = {plus:"+",trash:"×",cart:"↗",import:"→",arrow:"→",chevron:"⌄",checkbox:"✓",
+  toggle:'<svg viewBox="0 0 28 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="26" height="14" rx="7"/><circle cx="8" cy="8" r="4.5" fill="currentColor" stroke="none"/></svg>',
   lock:"▣",visibility:"◉",pencil:"✎",clone:"▢",copy:"⧉",download:"↓",
   dots:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="20" cy="12" r="2"/></svg>',
   hamburger:"☰",login:"→",signup:"+",build:"▦",
@@ -25,9 +25,6 @@ const alternativas = {plus:"+",trash:"×",cart:"↗",import:"→",arrow:"→",ch
   normalhand:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 12V5a1.5 1.5 0 0 1 3 0v6-8a1.5 1.5 0 0 1 3 0v8-6a1.5 1.5 0 0 1 3 0v7-4a1.5 1.5 0 0 1 3 0v8a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-3L3 13a1.5 1.5 0 0 1 2-2l2 2"/></svg>',
   magic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 20 12-12 4 4L8 24M4 3v6M1 6h6M18 1v6M15 4h6"/></svg>'};
 const ativos = new Map();
-observarMovimento(reduzido => {
-  if (reduzido) for (const {animacao} of ativos.values()) animacao.pause();
-});
 let sequencia = 0, iniciada = false;
 
 export function iconeAnimado(nome, direcao = "internal", {invertido = false} = {}) {
@@ -56,18 +53,20 @@ export function iniciarIcones(raiz = document) {
       // (o renderer aplica seu próprio transform inline) ou aumentar o espaço do menu.
       const opcoes = elemento.dataset.lottie === "user"
         ? {rendererSettings:{viewBoxSize:"175 170 750 750",preserveAspectRatio:"xMidYMid meet"}}
+        : elemento.dataset.lottie === "toggle"
+        ? {rendererSettings:{viewBoxSize:"110 195 430 250",preserveAspectRatio:"xMidYMid meet"}}
         : {};
       const animacao = await registrarAnimacao(elemento.id,new URL("../../lottie/" + arquivo,import.meta.url).href,opcoes);
       if (!animacao) return;
       if (!elemento.isConnected) { destruirAnimacao(elemento.id,animacao); return; }
       const controle = elemento.closest("button,a,label,summary");
       const input = controle?.querySelector('input[type="checkbox"]');
-      const alternavel = ["checkbox","chevron","hamburger","profile","dots"].includes(elemento.dataset.lottie);
-      const aberto = () => input ? input.checked : controle?.getAttribute("aria-expanded") === "true";
+      const alternavel = ["checkbox","chevron","hamburger","profile","dots","toggle"].includes(elemento.dataset.lottie);
+      const atributoEstado = elemento.dataset.lottie === "toggle" ? "aria-pressed" : "aria-expanded";
+      const aberto = () => input ? input.checked : controle?.getAttribute(atributoEstado) === "true";
       const invertido = elemento.dataset.lottieReversed === "true";
       const mover = direcao => {
         if (controle?.disabled || controle?.getAttribute("aria-current") === "page" || input?.disabled) return;
-        if (movimentoReduzido()) { animacao.goToAndStop(direcao > 0 ? animacao.totalFrames - 1 : 0,true); return; }
         animacao.setDirection(direcao); animacao.play();
       };
       const atualizarEstado = () => {
@@ -81,7 +80,7 @@ export function iniciarIcones(raiz = document) {
         input?.addEventListener("change",atualizarEstado);
         if (controle && !input) {
           observador = new MutationObserver(atualizarEstado);
-          observador.observe(controle,{attributes:true,attributeFilter:["aria-expanded"]});
+          observador.observe(controle,{attributes:true,attributeFilter:[atributoEstado]});
         }
       }
       if (!alternavel || elemento.dataset.lottie === "profile") {

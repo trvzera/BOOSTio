@@ -298,12 +298,12 @@ def test_teto_percentual_preserva_centavos_sem_arredondar_para_cima():
         CriarBuildService._validar_build(deepcopy(build), catalogo, 1234.56, 20)
 
 
-def test_catalogo_respeita_os_dois_tetos_antes_de_chamar_a_llm(app_build, mocker):
+def test_reserva_nao_pode_reduzir_pc_abaixo_do_minimo_antes_do_catalogo_e_llm(app_build, mocker):
     gerar_catalogo = mocker.patch("services.build_service.criar_build_service.CriarBuildService._gerar_catalogo", return_value={})
     llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
-    with app_build.app_context(), pytest.raises(ValueError, match="Não há peças suficientes"):
+    with app_build.app_context(), pytest.raises(ValueError, match="pelo menos R\$ 2000"):
         CriarBuildService().executar(1, {**PEDIDO, "percentual_perifericos": 90})
-    assert gerar_catalogo.call_args.args[:2] == (Decimal("500.00"), Decimal("4500.00"))
+    gerar_catalogo.assert_not_called()
     llm.assert_not_called()
 
 
@@ -891,3 +891,52 @@ def test_fallback_sem_revisoes_nao_gasta_uma_chamada_extra(mocker):
                                                  tentativas_correcao=0, revisar_investimento=True)
     assert resultado["preco_total"] == 900
     llm.assert_called_once()
+
+
+@pytest.mark.parametrize("total,percentual,motivo", [(1, 0, "orcamento"), (1999.99, 0, "orcamento"),
+    (2000, 20, "orcamento"), (5000, 1, "perifericos")])
+def test_api_rejeita_limites_minimos_sem_chamar_ia_ou_salvar(app_build, mocker, total, percentual, motivo):
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
+    catalogo = mocker.patch.object(CriarBuildService, "_gerar_catalogo")
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    resposta = cliente.post("/build/", json={**PEDIDO, "orcamento": total, "percentual_perifericos": percentual})
+    assert resposta.status_code == 400
+    assert resposta.json["codigo"] == "planejamento-invalido"
+    assert resposta.json["geracao"]["motivo"] == motivo
+    assert resposta.json["geracao"]["orcamentoSugerido"] >= 2000
+    llm.assert_not_called()
+    catalogo.assert_not_called()
+    with app_build.app_context():
+        assert Build.query.count() == BuildSalva.query.count() == 0
+
+
+def test_api_aceita_pc_2000_perifericos_500_como_tetos_sem_impor_gasto(app_build, mocker):
+    tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "monitor", "teclado", "mouse", "fone"]
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
+        **PEDIDO, "componentes": [{"tipo": t, "id": 1, "quantidade": 1} for t in tipos]})
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    resposta = cliente.post("/build/", json={**PEDIDO, "orcamento": 2500, "percentual_perifericos": 20})
+    assert resposta.status_code == 201, resposta.json
+    assert resposta.json["build"]["preco_total"] == 1000
+    llm.assert_called_once()
+
+
+def test_recusa_de_cor_vira_orientacao_publica_sem_dizer_que_faltou_orcamento(app_build, mocker):
+    with app_build.app_context():
+        cadastrar_pecas(["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd"])
+    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={"erro": "texto bruto SEGREDO", "motivo": "cor", "componentes": []})
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    resposta = cliente.post("/build/", json={**PEDIDO, "aparencia": {"cor": "branco"}})
+    assert resposta.status_code == 502
+    assert resposta.json["geracao"]["motivo"] == "cor"
+    assert resposta.json["geracao"]["etapa"] == "aparencia"
+    assert "orcamentoSugerido" not in resposta.json["geracao"]
+    assert "SEGREDO" not in resposta.json["erro"]
+    assert llm.call_count == 2
+    with app_build.app_context():
+        assert BuildSalva.query.count() == 0

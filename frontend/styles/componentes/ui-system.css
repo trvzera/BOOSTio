@@ -31,8 +31,8 @@
 .social-link { display: inline-flex; align-items: center; gap: 8px; }
 .ui-lottie { display: inline-grid; place-items: center; width: 20px; height: 20px; flex: 0 0 20px; position: relative; }
 .ui-lottie svg { width: 100% !important; height: 100% !important; }
-.ui-lottie:not([data-lottie="checkbox"]):not([data-lottie="profile"]) svg path[fill]:not([fill="none"]) { fill: currentColor; }
-.ui-lottie:not([data-lottie="checkbox"]):not([data-lottie="profile"]) svg path[stroke]:not([stroke="none"]) { stroke: currentColor; }
+.ui-lottie:not([data-lottie="checkbox"]):not([data-lottie="profile"]):not([data-lottie="toggle"]) svg path[fill]:not([fill="none"]) { fill: currentColor; }
+.ui-lottie:not([data-lottie="checkbox"]):not([data-lottie="profile"]):not([data-lottie="toggle"]) svg path[stroke]:not([stroke="none"]) { stroke: currentColor; }
 .ui-lottie[data-ready] > .ui-icon-fallback { display: none; }
 .ui-icon-fallback { font: 500 1.15rem/1 var(--font-heading); }
 .page-back-link { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }

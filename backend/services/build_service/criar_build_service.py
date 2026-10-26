@@ -23,16 +23,15 @@ from .preferencias_cores_service import PreferenciasCoresService
 from .planejar_rede_service import PlanejarRedeService
 from .preferencias_gabinete_service import PreferenciasGabineteService
 from .preferencias_processador_service import PreferenciasProcessadorService
+from .planejamento_geracao import ErroPlanejamentoBuild, RecusaModeloBuild, validar_minimos, orientar_falha, sugerir_total
 
 logger = logging.getLogger(__name__)
 
 class ErroGeracaoBuild(ValueError):
-  def __init__(self, motivo):
-    explicacao = ""
-    if motivo.startswith(("A configuração sugerida ultrapassou o limite", "A IA não completou a ventilação", "A IA não incluiu fans", "A IA não incluiu os periféricos")):
-      explicacao = " " + motivo
-    super().__init__("Não foi possível concluir uma configuração válida. Nenhuma build foi salva." + explicacao + " Revise o orçamento e as peças ou tente novamente.")
-    self.motivo = motivo
+  def __init__(self, motivo, orcamento=None, percentual=0, custos=None):
+    mensagem, self.geracao = orientar_falha(motivo, orcamento, percentual, custos)
+    super().__init__(mensagem)
+    self.motivo = str(motivo)
 
 class CriarBuildService:
   EXTRAS_PROPRIOS = ("webcam", "microfone")
@@ -105,6 +104,7 @@ class CriarBuildService:
     acessorio_rede = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
     excluidas.update({"adaptador_wifi", "cabo_rede"} - ({acessorio_rede} if rede.get("possuiAcessorio") is False else set()))
     teto_pc, teto_perifericos = self._dividir_orcamento(orcamento, percentual)
+    validar_minimos(teto_pc, teto_perifericos, percentual)
     inicio_catalogo = perf_counter()
     catalogo = self._gerar_catalogo(min(orcamento - margem, teto_pc), teto_perifericos, excluidas,
                                   aparencia["gabinete_id"] if "gabinete" not in proprias else None, dados["utilidade"], cor=aparencia["cor"], aparencia=aparencia, rede=rede)
@@ -114,17 +114,22 @@ class CriarBuildService:
     disponiveis = set(catalogo) | set(proprias)
     obrigatorias = {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"}
     if not obrigatorias <= disponiveis or not {"ssd", "hd"} & disponiveis:
-      raise ValueError("Não há peças suficientes para montar um PC nesse orçamento")
+      raise ErroPlanejamentoBuild("Não há peças suficientes para montar um PC nesse orçamento. Faltam opções disponíveis de componentes obrigatórios no catálogo recebido. Revise o orçamento ou as peças já possuídas.",
+                                  "catalogo", "Faltam opções para completar o PC", "pecas")
     if percentual and "monitor" not in disponiveis:
-      raise ValueError("Não há monitor com painel IPS ou VA confirmado dentro da reserva. Aumente o orçamento ou a porcentagem de periféricos; nenhuma build foi salva.")
+      raise ErroPlanejamentoBuild("Não há monitor com painel IPS ou VA confirmado dentro da reserva. Revise o orçamento ou a porcentagem de periféricos; nenhuma build foi salva.",
+                                  "perifericos", "Não encontramos um monitor dentro da reserva", "perifericos")
     if percentual and not self.PERIFERICOS <= disponiveis:
-      raise ValueError("Não foi possível gerar uma configuração dentro do orçamento informado com os periféricos disponíveis. Ajuste o orçamento ou revise as peças.")
+      raise ErroPlanejamentoBuild("Não há opções disponíveis para completar os periféricos dentro da reserva. Revise a porcentagem, o orçamento ou os itens já possuídos.",
+                                  "perifericos", "Não foi possível completar os periféricos", "perifericos")
 
     plano_perifericos = PlanejarPerifericosService().executar(catalogo, teto_perifericos, proprias, dados["utilidade"], cor=aparencia["cor"]) if percentual else None
     if plano_perifericos and not plano_perifericos["viavel"]:
       minimo = plano_perifericos.get("minimo_catalogado")
       detalhe = f" O menor conjunto disponível custa R$ {minimo:.2f}, mas a reserva é de R$ {teto_perifericos:.2f}." if minimo is not None else ""
-      raise ValueError("Não há um conjunto completo de periféricos dentro da porcentagem reservada." + detalhe + " Aumente a porcentagem ou o orçamento; nenhuma build foi salva.")
+      raise ErroPlanejamentoBuild("Não há um conjunto completo de periféricos dentro da porcentagem reservada." + detalhe + " Revise a porcentagem ou o orçamento; nenhuma build foi salva.",
+                                  "perifericos", "O conjunto de periféricos não cabe na reserva", "perifericos",
+                                  sugerir_total(percentual, minimo_perifericos=minimo) if minimo is not None else None)
     detalhes_proprias = self._detalhes_proprias(proprias)
     inicio_prompt = perf_counter()
     prompt = self._criar_prompt(dados, orcamento, margem, catalogo, percentual, detalhes_proprias, plano_perifericos)
@@ -208,7 +213,7 @@ class CriarBuildService:
         if tentativa == limite:
           if primeira_valida is not None:
             return primeira_valida
-          raise ErroGeracaoBuild(str(erro)) from erro
+          raise ErroGeracaoBuild(erro, orcamento, percentual, self._resumo_custos(build, catalogo)) from erro
         revisao = {"falha_detectada_pelo_servidor": str(erro),
                    "custos_calculados_pelo_servidor": self._resumo_custos(build, catalogo),
                    "resposta_anterior_nao_confiavel": resposta}
@@ -427,7 +432,7 @@ class CriarBuildService:
             {"tipo": "<categoria ainda não possuída>", "id": 1, "quantidade": 1},
         ],
     }
-    exemplo_erro = {"erro": "<motivo objetivo em uma frase>", "componentes": []}
+    exemplo_erro = {"erro": "<motivo objetivo em uma frase>", "motivo": "orcamento", "componentes": []}
 
     return (
         "# PAPEL\n"
@@ -746,6 +751,8 @@ class CriarBuildService:
         "já serão adicionadas pela aplicação. Copie nome, descricao e utilidade do pedido.\n"
         f"Estrutura (o ID 1 é ilustrativo: substitua por um ID existente do tipo escolhido):\n{json.dumps(exemplo_saida, ensure_ascii=False)}\n\n"
         "Se for impossível montar um PC compatível dentro do orçamento com este catálogo, "
+        "informe em motivo apenas um dos códigos: orcamento, cor, aparencia, catalogo, compatibilidade ou outro. "
+        "Não atribua tudo ao orçamento. Cor e aparência são preferências: use alternativas quando possível e informe a diferença na descrição, sem inventar indisponibilidade. "
         f"responda apenas com:\n{json.dumps(exemplo_erro, ensure_ascii=False)}\n\n"
 
         "# CATÁLOGO\n"
@@ -755,7 +762,7 @@ class CriarBuildService:
   @staticmethod
   def _validar_build(build, catalogo, orcamento, percentual=0, proprias=None, detalhes_proprias=None, rede=None):
     if isinstance(build, dict) and build.get("erro"):
-      raise ValueError("Não foi possível gerar uma configuração dentro do orçamento informado. Ajuste o valor ou revise as peças.")
+      raise RecusaModeloBuild(build.get("motivo"))
     if not isinstance(build, dict) or not isinstance(build.get("componentes"), list):
       raise ValueError("A IA não retornou uma build válida")
     validacao_campos(build, ["nome", "descricao", "utilidade", "componentes"])

@@ -26,6 +26,16 @@ function diagnosticoSeguro(valor) {
   return Object.keys(dados).length?dados:undefined;
 }
 
+export function orientacaoGeracaoSegura(valor) {
+  if (!valor || !["orcamento","perifericos","cor","aparencia","catalogo","compatibilidade","pecas","resposta"].includes(valor.motivo)
+    || !["orcamento","perifericos","aparencia","pecas","objetivo"].includes(valor.etapa)) return undefined;
+  const dados = {motivo:valor.motivo,etapa:valor.etapa};
+  if (typeof valor.titulo === "string" && valor.titulo.trim() && valor.titulo.length <= 160) dados.titulo = valor.titulo;
+  if (typeof valor.orcamentoSugerido === "number" && Number.isFinite(valor.orcamentoSugerido) && valor.orcamentoSugerido > 0 && valor.orcamentoSugerido <= 1000000)
+    dados.orcamentoSugerido = Math.ceil(valor.orcamentoSugerido * 100) / 100;
+  return dados;
+}
+
 export async function fetchComErro(caminho,opcoes={}) {
   const {headers,...resto}=opcoes,metodo=(resto.method||"GET").toUpperCase();
   const mutacao=!["GET","HEAD","OPTIONS","TRACE"].includes(metodo);
@@ -49,6 +59,7 @@ export async function fetchComErro(caminho,opcoes={}) {
         status:resposta.status,codigo:typeof dados?.codigo==="string"?dados.codigo:"http",
         espera:Number.isFinite(dados?.espera)&&dados.espera>0?dados.espera:Number.isFinite(retry)&&retry>0&&retry<=86400?retry:0,
         diagnostico:diagnosticoSeguro(dados?.diagnostico),
+        geracao:orientacaoGeracaoSegura(dados?.geracao),
       });
     }
     return dados;
