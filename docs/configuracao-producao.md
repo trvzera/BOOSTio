@@ -157,6 +157,25 @@ O backend recusa iniciar em produção sem `SECRET_KEY` de pelo menos 32 caracte
 também é obrigatório para o Flask-Limiter. Mantenha a mesma `SECRET_KEY` entre
 workers e implantações para preservar as sessões.
 
+### E-mail local e de produção
+
+O `.env.production.example` usa a caixa `no-reply@boostio.com.br` da Hostinger
+com `smtp.hostinger.com`, porta `465`, SSL ativado e TLS/STARTTLS desativado.
+Preencha `MAIL_PASSWORD` com a senha dessa caixa de e-mail, não a senha de acesso
+ao hPanel. `MAIL_DEFAULT_SENDER` é opcional; sem ele, o remetente será
+`MAIL_USERNAME`. Os envios de verificação e recuperação de senha usam essa
+configuração compartilhada do Flask-Mail.
+
+O `backend/.env` local também pode usar essa mesma caixa: defina nele
+`MAIL_SERVER=smtp.hostinger.com`, `MAIL_PORT=465`, `MAIL_USE_TLS=false`,
+`MAIL_USE_SSL=true` e `MAIL_USERNAME=no-reply@boostio.com.br`. Os padrões do
+código agora são os da Hostinger em todos os ambientes. Preencha a senha da
+caixa em `MAIL_PASSWORD` tanto no ambiente local quanto na VPS; nunca a
+publique no Git. Reinicie o Flask local ou recrie a API na VPS para carregar os
+novos valores: `docker compose --env-file .env.production up -d --force-recreate api`.
+Antes do teste real de envio, conclua no DNS do Registro.br os registros MX,
+SPF, DKIM e DMARC solicitados pela Hostinger.
+
 A geração de builds limita cada conta a dez tentativas por dia e reserva no Redis
 até 100 chamadas diárias à IA para o projeto inteiro, contando revisões e tentativas
 com outro modelo. O dia vira à meia-noite de São Paulo. Há uma trava por usuário
