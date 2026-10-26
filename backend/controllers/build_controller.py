@@ -8,6 +8,7 @@ from requests.exceptions import RequestException, HTTPError, Timeout, Connection
 
 from services.build_service.listar_builds_service import ListarBuildService
 from services.build_service.criar_build_service import ErroGeracaoBuild
+from services.build_service.planejamento_geracao import ErroPlanejamentoBuild
 from services.build_service.gerar_build_service import GerarBuildService
 from services.build_service.buscar_build_service import BuscarBuildService
 from services.build_service.listar_catalogo_build_service import ListarCatalogoBuildService
@@ -78,7 +79,9 @@ class BuildController:
       except ControleIAIndisponivelError:
         return jsonify({"erro": "A geração está temporariamente indisponível. Tente novamente mais tarde.", "codigo": "ia-controle-indisponivel"}),503
       except ErroGeracaoBuild as erro:
-        return jsonify({"erro": str(erro), "codigo": "geracao-invalida"}),502
+        return jsonify({"erro": str(erro), "codigo": "geracao-invalida", "geracao": erro.geracao}),502
+      except ErroPlanejamentoBuild as erro:
+        return jsonify({"erro": str(erro), "codigo": "planejamento-invalido", "geracao": erro.geracao}),400
       except ValueError as e:
         return jsonify({"erro": str(e)}),400
 

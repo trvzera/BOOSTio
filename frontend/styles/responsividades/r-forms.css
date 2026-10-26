@@ -42,6 +42,7 @@
 .form-page #questions[data-form-state="error"] { grid-template-columns: minmax(0,1fr); grid-template-rows: minmax(0,1fr); min-height: 0; overflow-y: auto; }
 .form-page #questions[data-form-state="error"] > #question-info { display: none; }
 .form-page #questions[data-form-state="error"] > #question-content { grid-column: 1; grid-row: 1; border: 0; justify-content: center; }
+.form-page #questions[data-form-state="error"] > #question-content { justify-content: safe center; }
 
 @media (min-width: 851px) and (max-height: 850px) {
   #question-info { gap: 24px; }

@@ -111,6 +111,15 @@ não significa que todo Ryzen tenha desempenho superior a qualquer Intel.
 O percentual para periféricos é um **teto, não uma meta de gasto**. O restante
 define o limite do PC, incluindo acessórios de rede.
 
+Na **montagem inteligente**, é necessário reservar pelo menos **R$ 2.000 para
+o PC**, depois de descontar os periféricos. Para incluir periféricos novos, a
+reserva deve ser de pelo menos **R$ 500** e comportar o conjunto disponível no
+catálogo, que pode custar mais. Por exemplo, R$ 2.500 com 20% atende aos mínimos
+iniciais: R$ 2.000 para o PC e R$ 500 para periféricos. Isso não garante uma
+configuração adequada a qualquer objetivo. O formulário e o Python conferem os
+limites antes de chamar a IA; a regra não impõe gasto mínimo nem restringe o
+orçamento da montagem manual.
+
 > Com **R$ 5.000** e uma reserva de **20%**, o PC tem teto de **R$ 4.000** e os
 > periféricos, de **R$ 1.000**. Se os periféricos custarem menos, a sobra fica com
 > o usuário: não aumenta o teto do PC.
@@ -118,6 +127,15 @@ define o limite do PC, incluindo acessórios de rede.
 O Python confere os subtotais pelos preços e quantidades do catálogo antes de
 salvar a sugestão. O **frete não está incluído**: é importante reservar parte do
 orçamento para a entrega.
+
+Se a geração falhar, a resposta distingue orçamento, reserva de periféricos,
+catálogo, compatibilidade, aparência e saída incompleta da IA. Falhas de conexão,
+cota ou disponibilidade do serviço recebem orientações próprias. No erro de
+orçamento, o usuário pode **editar o valor e confirmar uma nova tentativa na
+mesma tela**, mantendo as demais respostas e a porcentagem reservada. Também
+pode revisar a etapa relacionada ou tentar sem preferência de cor/aparência.
+Nenhum aumento é aplicado automaticamente ou altera o budget do perfil; uma
+recusa da IA por cor não comprova indisponibilidade em todo o catálogo.
 
 Para jogos, trabalho pesado e **Um pouco de tudo**, uma sugestão que use menos
 de 75% do teto do PC pode passar pela revisão já disponível, quando houver
@@ -402,8 +420,8 @@ Os originais da marca, esboços e anotações estão reunidos em [materiais](mat
 
 ## Validação da versão
 
-Na revisão de **25/10/2026**, a suíte local aprovou **719 testes JavaScript** e
-**966 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
+Na revisão de **26/10/2026**, a suíte local aprovou **725 testes JavaScript** e
+**989 testes Python**, além de **20 subtestes Python**. Os testes cobrem, entre
 outros pontos, conta, permissões, budget, limite de builds, persistência,
 compartilhamento, arquivos, compatibilidade e tratamento de falhas.
 Há testes específicos para as sete classes de Controller e para preservar o
@@ -418,6 +436,13 @@ catálogo preenchido e 48 cenários de mudança de orientação com telas aberta
 O formulário e o monitor passaram por **195 cenários no Chrome**, com API
 simulada. Em telas baixas, a navegação do formulário ocupa uma linha e o card
 rola inteiro, evitando comprimir os campos de resposta.
+
+Os novos limites de geração e a recuperação dos erros foram conferidos no
+Chrome em larguras de 320, 390, 844 e 1440 px, incluindo paisagem, com API
+simulada. Os fluxos preservaram respostas, exigiram confirmação para mudar o
+orçamento e distinguiram cor, indisponibilidade e falta de internet. A tela de
+erro de cor passou pelo axe sem violações detectadas. Esta rodada não consumiu
+chamadas reais da IA nem salvou builds na conta.
 
 O pedido de jogos de
 R$ 8.000 com periféricos a 10% e cabo de 20 m também foi validado com duas

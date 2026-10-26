@@ -7,7 +7,8 @@ import { normalizarAparencia, aparenciaHtml, atualizarGuiaPorteGabinete } from "
 import { opcoesUso, prioridadesUso } from "../build/uso-formulario.js";
 import { iniciarImagens } from "../build/imagens-produtos.js";
 import { planejamentoLocal } from "../build/planejamento.js";
-import { orcamentoValido, dividirOrcamento } from "../build/orcamento-formulario.js";
+import { orcamentoValido, dividirOrcamento, avaliarOrcamentoGeracao, MINIMO_PC_GERACAO } from "../build/orcamento-formulario.js";
+import { feedbackGeracao } from "../build/generation-feedback.js";
 import { carregarPerfil } from "../conta/perfil.js";
 import { acompanharCarregamento } from "../components/page-loading.js";
 import { criarBuild, verificarEspacoBuild, catalogoBuilds } from "../api/build/builds.js";
@@ -38,7 +39,7 @@ const perguntas = [
     tag: "Etapa 02",
     titulo: "Quanto você pode gastar no computador?",
     descricao:
-      "Informe o máximo que pode gastar. Escolha um valor, ajuste pelo controle ou digite quanto pretende investir.",
+      "Informe o máximo que pode gastar. A montagem inteligente exige pelo menos R$ 2.000 para o PC, além da reserva para periféricos novos, se incluídos.",
     opcoes: [
       ["ate-3000", "Até R$ 3.000", "Configuração essencial e econômica."],
       [
@@ -211,7 +212,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const valor = Number.isFinite(recebido) ? recebido : "";
     const maximo = Math.max(20000,valor);
     const isActive = respostas.orcamento === "personalizado" ? "active" : "";
-    return `<div class="budget-range ${isActive}"><div><label class="font-1-m-b" for="budget-input">Orçamento personalizado (R$)</label><strong class="font-2-xs value-transition" id="budget-value"${valor === "" ? "" : ` data-value-number="${valor}"`}>${valor === "" ? "Informe um valor" : moeda.format(valor)}</strong></div><input id="budget-input" type="number" inputmode="decimal" min="0.01" max="1000000" step="0.01" data-number-step="100" value="${valor}" aria-describedby="budget-help"><input type="range" id="budget-range" min="0" max="${Math.ceil(maximo / 100) * 100}" step="100" value="${Math.round(valor / 100) * 100}" style="--range-progress: ${progressoRange(valor)}%" aria-label="Ajustar orçamento de cem em cem reais"><p id="budget-help" class="font-2-xs">Controle e setas de R$ 100 em R$ 100. Digite para usar outro valor.</p></div>
+    return `<div class="budget-range ${isActive}"><div><label class="font-1-m-b" for="budget-input">Orçamento personalizado (R$)</label><strong class="font-2-xs value-transition" id="budget-value"${valor === "" ? "" : ` data-value-number="${valor}"`}>${valor === "" ? "Informe um valor" : moeda.format(valor)}</strong></div><input id="budget-input" type="number" inputmode="decimal" min="2000" max="1000000" step="0.01" data-number-step="100" value="${valor}" aria-describedby="budget-help budget-validation"><input type="range" id="budget-range" min="2000" max="${Math.ceil(maximo / 100) * 100}" step="100" value="${Math.max(2000,Math.round(valor / 100) * 100)}" style="--range-progress: ${progressoRange(valor)}%" aria-label="Ajustar orçamento de cem em cem reais"><p id="budget-help" class="font-2-xs">Mínimo de R$ 2.000 para o PC. Controle e setas de R$ 100 em R$ 100. Digite para usar outro valor.</p><p id="budget-validation" class="form-budget-validation font-2-xs" role="status" aria-live="polite"></p></div>
       `;
   }
 
@@ -230,7 +231,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const proprios = respostas.perifericosProprios || [];
     alvo.innerHTML = (respostas.perifericos === "alguns-perifericos" ? '<fieldset class="peripheral-owned-list"><legend>Quais periféricos você já possui?</legend>' +
       listaPerifericos.map(([tipo,nome]) => '<div class="peripheral-owned" data-owned="' + tipo + '"><label class="ui-check"><input type="checkbox" data-owned-peripheral="' + tipo + '" ' + (proprios.includes(tipo) ? 'checked' : '') + '>' + iconeAnimado("checkbox") + '<span>' + nome + '</span></label>' + (proprios.includes(tipo) ? detalhePecaHtml(tipo,nome) : '') + '</div>').join("") + '</fieldset>' : '') +
-      '<div class="peripheral-budget" id="peripheral-allocation" ' + (respostas.incluirPerifericos ? '' : 'hidden') + '><label for="peripheral-percent">Quanto reservar para monitor, teclado, mouse e fone?</label><div class="peripheral-percent-field"><input type="number" id="peripheral-percent" min="1" max="99" step="1" inputmode="numeric" aria-describedby="peripheral-budget-summary peripheral-budget-help" value="' + respostas.percentualPerifericos + '"><span aria-hidden="true">%</span></div><p id="peripheral-budget-summary" class="font-2-xs"></p><p id="peripheral-budget-help" class="font-2-xs">Essa é a parte máxima do seu dinheiro para esses itens. Não é preciso gastar tudo. Se sobrar, o dinheiro fica com você e não aumenta o limite das peças do computador.</p></div>';
+      '<div class="peripheral-budget" id="peripheral-allocation" ' + (respostas.incluirPerifericos ? '' : 'hidden') + '><label for="peripheral-percent">Quanto reservar para monitor, teclado, mouse e fone?</label><div class="peripheral-percent-field"><input type="number" id="peripheral-percent" min="1" max="99" step="1" inputmode="numeric" aria-describedby="peripheral-budget-summary peripheral-budget-help" value="' + respostas.percentualPerifericos + '"><span aria-hidden="true">%</span></div><p id="peripheral-budget-summary" class="font-2-xs"></p><p id="peripheral-budget-help" class="font-2-xs">Reserve pelo menos R$ 500 para os periféricos novos; o catálogo pode exigir mais. Essa é a parte máxima do seu dinheiro para esses itens. Não é preciso gastar tudo. Se sobrar, o dinheiro fica com você e não aumenta o limite das peças do computador.</p><p id="peripheral-budget-validation" class="form-budget-validation font-2-xs" role="status" aria-live="polite"></p></div>';
     alvo.querySelectorAll("[data-owned-peripheral]").forEach(input => input.addEventListener("change",() => {
       const escolhidos = new Set(respostas.perifericosProprios || []), tipo = input.dataset.ownedPeripheral;
       if (input.checked) escolhidos.add(tipo); else escolhidos.delete(tipo);
@@ -259,12 +260,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     const resumo = conteudo.querySelector("#peripheral-budget-summary");
     if (resumo) resumo.textContent = divisao
       ? `Até ${moeda.format(divisao.perifericos)} para monitor, teclado, mouse e fone · até ${moeda.format(divisao.pc)} para as peças do computador e a conexão com a internet.` : "Informe quanto pode gastar e uma porcentagem de 1 a 99, sem casas decimais.";
+    const validacao = avaliarOrcamentoGeracao(valor,percentual);
+    const aviso = conteudo.querySelector("#peripheral-budget-validation, #budget-validation");
+    if (aviso) aviso.textContent = validacao.valido ? "" : validacao.mensagem;
+    const numero = conteudo.querySelector("#budget-input");
+    if (numero) numero.setAttribute("aria-invalid",String(!orcamentoValido(valor) || valor < MINIMO_PC_GERACAO));
     if (anunciar && resumo) anunciarStatus(resumo.textContent);
     conteudo.querySelector("#next-question").disabled = !podeAvancar();
   }
 
   function progressoRange(valor) {
-    return Number.isFinite(valor) ? Math.min(100,Math.max(0,valor / Math.max(20000,respostas.orcamentoPersonalizado || 0) * 100)) : 0;
+    return Number.isFinite(valor) ? Math.min(100,Math.max(0,(valor - MINIMO_PC_GERACAO) / (Math.max(20000,respostas.orcamentoPersonalizado || 0) - MINIMO_PC_GERACAO) * 100)) : 0;
   }
 
   function renderizarPergunta() {
@@ -472,11 +478,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function etapaRespondida(indice) {
     if (["rede","aparencia"].includes(perguntas[indice].chave)) return true;
-    if (perguntas[indice].chave === "orcamento") return orcamentoValido(valorOrcamento());
+    if (perguntas[indice].chave === "orcamento") return orcamentoValido(valorOrcamento()) && valorOrcamento() >= MINIMO_PC_GERACAO;
     if (perguntas[indice].chave === "perifericos") {
       if (!respostas.perifericos) return false;
       if (respostas.perifericos === "alguns-perifericos" && (!(respostas.perifericosProprios?.length) || !respostas.perifericosProprios.every(tipo => respostas.pecasDetalhes?.[tipo]?.trim()))) return false;
-      return !respostas.incluirPerifericos || Number.isInteger(respostas.percentualPerifericos) && respostas.percentualPerifericos > 0 && respostas.percentualPerifericos < 100;
+      return avaliarOrcamentoGeracao(valorOrcamento(),respostas.incluirPerifericos ? respostas.percentualPerifericos : 0).valido;
     }
     const resposta = respostas[perguntas[indice].chave];
     if (!Array.isArray(resposta)) return Boolean(resposta);
@@ -594,6 +600,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.querySelectorAll(".form-step").forEach(botao => botao.disabled = true);
     limparCheckboxesLottie();
     try {
+      const validacao = avaliarOrcamentoGeracao(valorOrcamento(),respostas.incluirPerifericos ? respostas.percentualPerifericos : 0);
+      if (!validacao.valido) throw Object.assign(new Error(validacao.mensagem),{status:400,geracao:{motivo:validacao.motivo,
+        titulo:"Ajuste o orçamento antes de gerar",etapa:validacao.motivo === "perifericos" ? "perifericos" : "orcamento",orcamentoSugerido:validacao.minimoTotal}});
       const sessao = await buscarUsuarioLogado();
       if (!sessao.auth) throw Object.assign(new Error("Entre na sua conta para salvar a build."),{status:401});
       await verificarEspacoBuild();
@@ -624,12 +633,29 @@ document.addEventListener("DOMContentLoaded", async () => {
       gerando = false;
       document.querySelector("#questions").dataset.formState = "error";
       atualizarMenu();
-      const semEspaco = erro.codigo === "limite-builds";
-      const incerto=erro.resultadoIncerto===true;
-      conteudo.innerHTML = `<div class="build-generation-error"><h1 class="font-1-m" tabindex="-1">${semEspaco ? "Suas três vagas estão ocupadas" : incerto ? "Não conseguimos confirmar sua montagem" : "Não foi possível gerar sua build"}</h1><p id="erro-gerar-build" class="font-2-s" role="alert"></p><div class="generation-actions">${semEspaco||incerto ? '<a href="./builds.html" class="btn-primary" aria-label="Conferir minhas builds">'+(incerto?'Conferir minhas builds':'Minhas builds')+'</a>' : '<button type="button" id="tentar-gerar-build" class="btn-primary" aria-label="Tentar gerar build novamente">Tentar novamente</button>'}<button type="button" id="revisar-orcamento" class="btn-secondary" aria-label="Revisar orçamento">Revisar orçamento</button>${erro.status === 401 ? '<a href="./login.html" class="btn-ghost" aria-label="Entrar na conta">Entrar na conta</a>' : ""}</div></div>`;
-      conteudo.querySelector("#erro-gerar-build").textContent = erro.message;
+      conteudo.innerHTML = feedbackGeracao(erro,{total:valorOrcamento(),percentual:respostas.incluirPerifericos ? respostas.percentualPerifericos : 0,aparencia:respostas.aparencia}).html;
       conteudo.querySelector("#tentar-gerar-build")?.addEventListener("click", mostrarGerando);
       conteudo.querySelector("#revisar-orcamento").addEventListener("click",() => navegarPara(1));
+      conteudo.querySelectorAll("[data-generation-step]").forEach(botao => botao.addEventListener("click",() => {
+        const indice = perguntas.findIndex(pergunta => pergunta.chave === botao.dataset.generationStep);
+        if (indice >= 0) navegarPara(indice);
+      }));
+      conteudo.querySelector("#generation-budget-form")?.addEventListener("submit",evento => {
+        evento.preventDefault();
+        const input = conteudo.querySelector("#generation-budget"), valor = input.valueAsNumber;
+        if (!input.reportValidity()) return;
+        const validacao = avaliarOrcamentoGeracao(valor,respostas.incluirPerifericos ? respostas.percentualPerifericos : 0);
+        if (!validacao.valido) { conteudo.querySelector("#generation-budget-feedback").textContent = validacao.mensagem; return; }
+        respostas.orcamento = "personalizado"; respostas.orcamentoPersonalizado = valor;
+        mostrarGerando();
+      });
+      conteudo.querySelector("#generation-without-color")?.addEventListener("click",() => {
+        respostas.aparencia = {...respostas.aparencia,cor:"sem-preferencia"}; mostrarGerando();
+      });
+      conteudo.querySelector("#generation-without-appearance")?.addEventListener("click",() => {
+        respostas.aparencia = normalizarAparencia(); mostrarGerando();
+      });
+      iniciarControlesNumericos(conteudo); iniciarIcones(conteudo);
       conteudo.querySelector("h1").focus({preventScroll:true});
     } finally { pararMensagens(); }
   }

@@ -109,8 +109,9 @@ test("montagem e benchmark usam os ícones correspondentes sem alterar ações e
   const css = await readFile(new URL("../styles/build/recursos.css",import.meta.url),"utf8");
   for (const [nome,rotulo] of [["handsparkle","Formulário inteligente"],["normalhand","Montagem manual"]])
     assert.ok(builds.includes('iconeAnimado("' + nome + '") + \'<strong>' + rotulo + '</strong>'));
-  for (const [nome,rotulo] of [["gamepad","Jogos · FPS"],["microchip","Blender · Renderização"]])
-    assert.ok(acoes.includes('iconeAnimado("' + nome + '") + \'<span>' + rotulo + '</span>'));
+  assert.match(acoes,/iconeAnimado\("microchip"\) \+ '<span>Blender · Renderização<\/span>/);
+  assert.match(acoes,/data-benchmark-type="games" disabled/);
+  assert.match(acoes,/iconeAnimado\("gamepad"\).*Jogos · FPS<small>Em desenvolvimento<\/small>/);
   assert.match(css,/\.build-create-option:is\(:hover,:focus-visible\)/);
   assert.match(css,/\.build-create-option > \.ui-lottie \{[^}]*color: var\(--cor-p1\)/);
   assert.match(css,/span:not\(\.build-create-option-action\):not\(\.ui-lottie\)/);

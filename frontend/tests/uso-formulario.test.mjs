@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { opcoesUso, prioridadesUso, ajudaCategorias } from '../js/build/uso-formulario.js';
+import { feedbackGeracao } from '../js/build/generation-feedback.js';
 
 test('os cinco usos mantêm valores e explicam as prioridades sem promessa de resultado',()=>{
   assert.deepEqual(opcoesUso.map(o=>o[0]),['estudos','jogos','trabalho-casual','trabalho-pesado','todos']);
@@ -19,6 +20,7 @@ test('formulário anuncia prioridade selecionada e orienta conferir criações i
   const forms=await readFile(new URL('../js/pages/forms.js',import.meta.url),'utf8');
   assert.match(forms,/usage-priority-copy[^>]*aria-live="polite"/);
   assert.match(forms,/prioridadesUso\[respostas.objetivo\]/);
-  assert.match(forms,/erro.resultadoIncerto===true/);
-  assert.match(forms,/Conferir minhas builds/);
+  const html=feedbackGeracao({message:'Confira se foi salva.',resultadoIncerto:true},{total:5000}).html;
+  assert.match(html,/Conferir minhas builds/);
+  assert.doesNotMatch(html,/id="tentar-gerar-build"|generation-budget-form/);
 });
