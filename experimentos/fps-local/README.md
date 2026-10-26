@@ -4,6 +4,10 @@ Branch: `experimento/fps-local`. Experimento separado do frontend, Flask, banco 
 usuários e integrações FPSHQ/Blender. Não há chamadas de rede nem novas dependências.
 O botão de jogos do site continua em desenvolvimento.
 
+A investigação de **FPSHQ e HowManyFPS**, os retornos verificados e a preparação
+para receber referências externas estão em [fontes.md](fontes.md). O normalizador
+é offline e mantém essas referências separadas das medições usadas na calibração.
+
 ## Estado inicial
 
 Ainda não temos medições. A base começa vazia e o modelo **não está calibrado**.
