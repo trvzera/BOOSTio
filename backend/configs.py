@@ -29,13 +29,13 @@ class Config:
     SQLALCHEMY_DATABASE_URI = resolver_uri_banco(os.getenv("URL_DATABASE"))
     FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:5500/frontend") #Base usada para montar links enviados por email (ex: recuperar senha)
     
-    MAIL_SERVER = 'smtp.gmail.com'        # endereço do servidor SMTP
-    MAIL_PORT = 587                        # porta (587 = TLS, 465 = SSL, 25 = sem criptografia/raro hoje)
-    MAIL_USE_TLS = True                    # criptografia via STARTTLS (usa com porta 587)
-    MAIL_USE_SSL = False                   # criptografia via SSL direto (usa com porta 465) — nunca True junto com USE_TLS
-    MAIL_USERNAME = os.getenv('MAIL_USERNAME')      # seu email de envio
-    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')      # senha de app (não a senha normal)
-    MAIL_DEFAULT_SENDER = os.getenv('MAIL_USERNAME')  # remetente padrão, se não especificar em cada Message
+    MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.hostinger.com')
+    MAIL_PORT = int(os.getenv('MAIL_PORT', '465'))
+    MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', 'false').lower() == 'true'
+    MAIL_USE_SSL = os.getenv('MAIL_USE_SSL', 'true').lower() == 'true'
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER') or MAIL_USERNAME
     MAIL_MAX_EMAILS = None                 # limite de emails por conexão (None = sem limite)
     MAIL_SUPPRESS_SEND = False             # se True, NÃO envia de verdade (usado em testes automatizados)
     MAIL_ASCII_ATTACHMENTS = False         # força nomes de anexos em ASCII puro
