@@ -1,0 +1,16 @@
+{
+  "jogo": "valorant",
+  "versao_jogo": "informar-versao-medida",
+  "cenario": "informar-cena-ou-percurso",
+  "cpu": "amd-ryzen-5-5600",
+  "gpu": "nvidia-geforce-rtx-3060-12gb",
+  "ram_gb": 16,
+  "ram_pentes": 2,
+  "ram_mts": 3200,
+  "resolucao": "1080p",
+  "qualidade": "high",
+  "api_grafica": "dx11",
+  "ray_tracing": false,
+  "upscaling": "nativo",
+  "frame_generation": false
+}

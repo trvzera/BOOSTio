@@ -293,6 +293,12 @@ Fontes: [FPSHQ](https://fpshq.com/pt/api/) e
 
 ### Laboratório de testes
 
+O [laboratório de FPS local](experimentos/fps-local/README.md), na branch
+`experimento/fps-local`, inicia um experimento independente das APIs de desempenho.
+Nesta primeira fase, valida medições e consulta referências de configurações exatas;
+a base começa vazia e ainda não há um modelo calibrado de previsão. O experimento
+não é consumido pelas rotas ou telas do site.
+
 No laboratório (`testes.html`), é possível comparar uma consulta FPS pelo Python
 com uma consulta direta pelo JavaScript, sem cache local neste último caminho.
 O diagnóstico informa tempo, HTTP recebido e falhas de transporte/validação.
