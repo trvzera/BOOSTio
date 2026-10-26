@@ -16,3 +16,6 @@ html[data-reduced-motion="true"] :is(.reveal-pending, .page-entry) {
   filter: none !important;
 }
 .site-motion-toggle[aria-pressed="true"] { color: var(--cor-p1); }
+.site-motion-toggle > .ui-lottie { width: 3rem; height: 1.75rem; flex: 0 0 3rem; }
+.site-motion-toggle .ui-icon-fallback { width: 100%; height: 100%; }
+.site-motion-toggle[aria-pressed="true"] .ui-icon-fallback circle { transform: translateX(12px); }

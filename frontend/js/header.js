@@ -42,7 +42,7 @@ export function iniciarNavegacao() {
     '<span class="site-menu-link-label">' + iconeAnimado("logout") + '<span>Sair</span></span></button></div></nav></div>' +
     '<div class="site-menu" data-site-menu' + (preview ? "" : " hidden") + '><nav id="site-menu-panel" class="site-menu-panel" aria-label="Navegação entre páginas" aria-hidden="true" inert>' +
     '<div class="site-menu-group">' + links(linksMenu) +
-    '<div class="site-menu-divider"></div><button type="button" class="site-menu-link site-motion-toggle" aria-label="Reduzir animações e desativar vídeos" aria-pressed="false">Reduzir animações</button></div></nav>' +
+    '<div class="site-menu-divider"></div><button type="button" class="site-menu-link site-motion-toggle" aria-label="Reduzir animações e desativar vídeos" aria-pressed="false"><span>Reduzir animações</span>' + iconeAnimado("toggle") + '</button></div></nav>' +
     '<button type="button" class="site-menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="site-menu-panel">' +
     '<span class="ui-lottie hamburger-animation" data-lottie="hamburger" aria-hidden="true"><span class="ui-icon-fallback hamburger-fallback"><span></span><span></span><span></span></span></span></button></div>';
   host.prepend(logo);
