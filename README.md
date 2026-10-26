@@ -222,7 +222,8 @@ isso não significa cobertura de imagens para todo o catálogo.
 ## Navegação e animações
 
 O menu oferece **Reduzir animações**: desativa entradas durante a rolagem e
-mantém imagens estáticas no lugar dos vídeos. A preferência fica salva no
+mantém imagens estáticas no lugar dos vídeos. Os **Lotties dos ícones e controles
+continuam funcionando**, inclusive o toggle e os checkboxes. A preferência fica salva no
 navegador; sem uma escolha, o site acompanha a preferência de movimento do
 sistema. Os vídeos decorativos pausam fora da tela e retomam ao voltar.
 
