@@ -1,7 +1,7 @@
 export const niveisHardware = [
-  ["iniciante", "Estou começando", "Quero entender para que serve cada peça."],
-  ["intermediario", "Conheço o básico", "Reconheço as peças, mas ainda preciso de algumas orientações."],
-  ["experiente", "Tenho experiência", "Prefiro uma apresentação mais compacta, com ajuda quando precisar."],
+  ["iniciante", "Estou começando", "Ainda não conheço bem as peças e a função de cada uma."],
+  ["intermediario", "Conheço o básico", "Reconheço as principais peças e entendo para que servem."],
+  ["experiente", "Tenho experiência", "Já conheço as peças e sei avaliar a montagem de um computador."],
 ];
 
 export function preferenciasUso(usuario) {
