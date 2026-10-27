@@ -33,6 +33,8 @@ body:has(.onboarding-dialog[open]) { overflow: hidden; }
 .usage-priority[open] summary { margin-bottom: .5rem; }
 .component-beginner-help { display: none; color: var(--cor-4); line-height: 1.65; }
 html[data-hardware-level="iniciante"] .component-beginner-help { display: block; }
+.appearance-beginner-note { display: none; margin-top: .5rem; color: var(--cor-5); }
+html[data-hardware-level="iniciante"] .appearance-beginner-note { display: block; }
 @media (max-width: 480px) {
   .onboarding-steps { width: 100%; margin: 0; }
   .onboarding-steps > button { flex: 1 1 6rem; min-width: 0; }

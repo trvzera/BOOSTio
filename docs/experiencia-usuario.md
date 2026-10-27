@@ -7,10 +7,41 @@ o botão **Rever tutorial** fica em Configurações da conta.
 
 O primeiro passo permite escolher **Estou começando**, **Conheço o básico** ou
 **Tenho experiência**. A escolha é opcional e pode ser alterada no perfil.
-Iniciantes veem explicações junto das peças. O nível básico mantém as orientações
-por etapa; para quem tem experiência, elas começam recolhidas. A ajuda e as mesmas funções continuam
-disponíveis em todos os níveis. Essa preferência não altera a escolha de hardware
-nem aprova compatibilidade.
+O tutorial apresenta as duas formas de montagem, sem exigir um roteiro de navegação.
+
+## Diferenças entre os níveis
+
+- **Estou começando:** guias do formulário inicialmente abertos, explicações sobre
+  a função de cada categoria junto das peças e orientações extras de preço dos
+  tamanhos de gabinete.
+- **Conheço o básico:** guias inicialmente abertos, sem os parágrafos extras junto
+  das peças nem as dicas de preço específicas para iniciantes.
+- **Tenho experiência:** guias inicialmente recolhidos, podendo ser abertos; sem
+  os parágrafos e dicas específicos para iniciantes.
+- **Prefiro não informar:** mesma apresentação do nível básico.
+
+As orientações gerais sobre vidro e peças brancas aparecem para todos. O glossário
+explica termos que aparecem nas peças (GB, TB, MHz, DDR, entre outros), em vez de
+repetir a função da categoria. Pode ser aberto por toque ou teclado, rolado pelo
+teclado e fechado com Escape. Medidas técnicas do gabinete continuam acessíveis
+em detalhes opcionais, inicialmente recolhidos em todos os níveis.
+
+O formulário mantém pergunta e ajuda juntas à direita, respostas à esquerda e
+pergunta antes das respostas no celular. A preferência não muda catálogo, orçamento,
+motor de compatibilidade, seleção da IA ou acesso a funcionalidades.
+
+## Desfazer e refazer no editor
+
+- Até 25 alterações em memória: remoção/quantidade de peças, melhorias aplicadas
+  e opções de periféricos, rede e fans. Sair ou recarregar limpa o histórico.
+- Ctrl/Cmd+Z desfaz; Ctrl/Cmd+Shift+Z refaz. Existem botões equivalentes e razões
+  acessíveis quando estão indisponíveis. Nova alteração descarta o refazer anterior.
+- Inputs de texto/número, descrição e campos editáveis mantêm o desfazer nativo.
+  Nome, orçamento, descrição e privacidade não são revertidos pelo histórico de peças.
+  Atalhos da build não são aplicados enquanto outra janela modal está aberta.
+- A operação aguarda a fila de salvamento e grava o estado restaurado pela mesma
+  API. Tranca, outra build ou mudança inesperada de componentes impedem a restauração.
+  Falhas são apresentadas como erro, preservando o estado local para conferência.
 
 ## Preparação do banco existente
 

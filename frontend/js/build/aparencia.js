@@ -7,11 +7,11 @@ export const coresSetup=[['sem-preferencia','Sem preferência'],['preto','Preto'
 
 // Exemplos visuais, não ofertas. As fontes/modelos estão em docs/geracao-build.md.
 const exemplos={
-  'mini-tower':{modelo:'Cooler Master MasterBox Q300L',imagem:'../imgs/produtos/gabinete-1.webp',descricao:'Mini Tower · ocupa menos espaço. Costuma usar placas-mãe menores.',
+  'mini-tower':{modelo:'Cooler Master MasterBox Q300L',imagem:'../imgs/produtos/gabinete-1.webp',descricao:'Mini Tower · ocupa menos espaço. Costuma usar placas-mãe menores.',preco:'Geralmente tem opções econômicas. Modelos muito compactos podem custar mais.',
     medidas:'387 × 230 × 381 mm',placas:'Micro-ATX e Mini-ITX.',fans:'120 mm; na frente também aceita 140 mm.',radiador:'Até 240 mm na frente.'},
-  'mid-tower':{modelo:'Cooler Master MasterBox TD500 ARGB',imagem:'../imgs/produtos/gabinete-2.webp',descricao:'Mid Tower · tamanho intermediário, com espaço para a maioria das montagens.',
+  'mid-tower':{modelo:'Cooler Master MasterBox TD500 ARGB',imagem:'../imgs/produtos/gabinete-2.webp',descricao:'Mid Tower · tamanho intermediário, com espaço para a maioria das montagens.',preco:'Costuma oferecer mais opções de modelos e preços, desde os simples aos mais caros.',
     medidas:'493 × 217 × 469 mm',placas:'ATX, Micro-ATX e Mini-ITX, entre os formatos suportados.',fans:'120 ou 140 mm, conforme a posição.',radiador:'Até 360 mm na frente ou no teto, respeitando os limites de espaço do modelo.'},
-  'full-tower':{modelo:'Corsair 7000D Airflow',imagem:'../imgs/referencia-gabinete-full-tower.webp',descricao:'Full Tower · ocupa mais espaço e permite montagens maiores, conforme o modelo.',
+  'full-tower':{modelo:'Corsair 7000D Airflow',imagem:'../imgs/referencia-gabinete-full-tower.webp',descricao:'Full Tower · ocupa mais espaço e permite montagens maiores, conforme o modelo.',preco:'Geralmente custa mais. Um gabinete grande não é necessário para toda montagem.',
     medidas:'550 × 248 × 600 mm',placas:'ATX e E-ATX até 277 mm de largura, além de formatos menores.',fans:'120 ou 140 mm, conforme a posição.',radiador:'Até 480 mm na lateral ou 420 mm na frente/no teto. As combinações dependem da montagem.'},
   discreto:{modelo:'Rise Mode Office X1',imagem:'../imgs/produtos/gabinete-54.jpg',descricao:'Painéis fechados ou perfurados, sem janela transparente.'},
   vidro:{modelo:'NZXT H5 Flow',imagem:'../imgs/produtos/gabinete-43.jpg',descricao:'Lateral de vidro, com a frente fechada ou perfurada.'},
@@ -47,7 +47,7 @@ function referencias(campo,titulo,opcoes,atual) {
     +'<label class="appearance-no-preference"><input type="radio" name="appearance-'+campo+'" value="sem-preferencia" '+(atual==='sem-preferencia'?'checked':'')+'> Sem preferência</label>'
     +'<div class="appearance-cases">'+opcoes.filter(([v])=>v!=='sem-preferencia'&&v!=='compacto').map(([v,n])=>{
       const foto=exemplos[v],id='appearance-'+campo+'-'+v;
-      return '<label class="appearance-case"><input type="radio" name="appearance-'+campo+'" value="'+v+'" aria-labelledby="'+id+'-name" aria-describedby="'+id+'-description" '+(v===atual?'checked':'')+'><span class="appearance-case-media">'+imagemPeca({...foto,categoria:'gabinete'},'appearance-case-image')+'</span><span class="appearance-case-name" id="'+id+'-name">'+h(n)+'</span><span class="appearance-case-description" id="'+id+'-description">'+h(foto.descricao)+'</span></label>';
+      return '<label class="appearance-case"><input type="radio" name="appearance-'+campo+'" value="'+v+'" aria-labelledby="'+id+'-name" aria-describedby="'+id+'-description" '+(v===atual?'checked':'')+'><span class="appearance-case-media">'+imagemPeca({...foto,categoria:'gabinete'},'appearance-case-image')+'</span><span class="appearance-case-name" id="'+id+'-name">'+h(n)+'</span><span class="appearance-case-description" id="'+id+'-description">'+h(foto.descricao)+(foto.preco?'<span class="appearance-beginner-note">'+h(foto.preco)+'</span>':'')+'</span></label>';
     }).join('')+'</div>'+(campo==='size'?'<p class="sr-only" id="appearance-size-feedback" role="status"></p><div class="appearance-size-guide" id="appearance-size-guide" data-porte="'+atual+'">'+guiaPorteGabineteHtml(atual)+'</div>':'')+'</fieldset>';
 }
 export function aparenciaHtml(valor,_catalogo=[],{possuiGabinete=false}={}) {
@@ -59,6 +59,6 @@ export function aparenciaHtml(valor,_catalogo=[],{possuiGabinete=false}={}) {
       '<div class="appearance-examples" role="region" aria-label="Tamanho e estilo do gabinete" tabindex="0">'
       +referencias('size','Tamanho do gabinete',portesGabinete,atual.porte)
       +referencias('style','Estilo do gabinete',estilosGabinete,atual.estilo)
-      +'<p class="font-2-xs appearance-fan-help">Uma ventoinha comum mede 120 ou 140 mm. Um water cooler de 240 mm costuma usar 2 ventoinhas de 120 mm; um de 360 mm, 3. O radiador completo, os tubos e as conexões precisam de espaço extra.</p></div>')
+      +'<p class="font-2-xs appearance-fan-help">As ventoinhas ajudam a tirar o ar quente de dentro do gabinete. Alguns modelos já vêm com elas. Vamos conferir se há espaço para resfriar as peças escolhidas.</p></div>')
     +'<p class="font-2-xs planning-help">A cor é uma preferência para todas as peças e periféricos novos, incluindo gabinete e ventoinhas. Vamos buscar opções da cor escolhida quando ela estiver cadastrada ou indicada no nome do modelo, sem passar do orçamento ou prejudicar a montagem. As peças que você já possui serão mantidas. As fotos são apenas exemplos.</p>';
 }

@@ -174,7 +174,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     painel.classList.remove("question-enter");
     void painel.offsetWidth;
     painel.classList.add("question-enter");
-    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Montagem inteligente · ${pergunta.tag}</span><h1 class="font-1-xl">${pergunta.titulo}</h1><p class="font-2-s">${pergunta.descricao}</p></div><div class="manual-build"><h2 class="font-1-m-b">Deseja montar manualmente?</h2><p class="font-2-s">Escolha os componentes da sua build por conta própria no editor.</p><a href="./configuracao-build.html" class="btn-primary-form" aria-label="Montar manualmente no editor de build">Montar manualmente</a></div>`;
+    const ajuda = pergunta.chave === "objetivo"
+      ? '<details class="usage-priority" data-knowledge-guide open><summary class="font-1-xs">O que vamos priorizar</summary><p id="usage-priority-copy" class="font-2-xs" aria-live="polite"></p></details>'
+      : orientacoesEtapas[pergunta.chave] ? `<details class="usage-priority" data-knowledge-guide open><summary class="font-1-xs">Como essa escolha ajuda</summary><p class="font-2-xs">${orientacoesEtapas[pergunta.chave]}</p></details>` : "";
+    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Montagem inteligente · ${pergunta.tag}</span><h1 class="font-1-xl">${pergunta.titulo}</h1><p class="font-2-s">${pergunta.descricao}</p>${ajuda}</div><div class="manual-build"><h2 class="font-1-m-b">Deseja montar manualmente?</h2><p class="font-2-s">Escolha os componentes da sua build por conta própria no editor.</p><a href="./configuracao-build.html" class="btn-primary-form" aria-label="Montar manualmente no editor de build">Montar manualmente</a></div>`;
+    ajustarGuiasConhecimento(painel);
   }
 
   function opcoesHtml(pergunta) {
@@ -294,14 +298,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       <div class="question-options-scroll" role="region" aria-label="Respostas da etapa ${indiceAtual + 1}" tabindex="0">
       ${pergunta.chave === "orcamento" ? `<div class="budget-fields">${campos}${rangeHtml()}</div>` : campos}
       ${pergunta.chave === "perifericos" ? '<div id="perifericos-fields"></div>' : ""}
-      ${pergunta.chave === "objetivo" ? '<details class="usage-priority" data-knowledge-guide open><summary class="font-1-xs">O que vamos priorizar</summary><p id="usage-priority-copy" class="font-2-xs" aria-live="polite"></p></details>' : ""}
-      ${orientacoesEtapas[pergunta.chave] ? `<details class="usage-priority" data-knowledge-guide open><summary class="font-1-xs">Como essa escolha ajuda</summary><p class="font-2-xs">${orientacoesEtapas[pergunta.chave]}</p></details>` : ""}
       </div>
       <div id="form-navigation">
         <button type="button" class="btn-ghost" id="previous-question" aria-label="Voltar à etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}>${iconeAnimado("arrow","back")}<span>Voltar</span></button>
         <button type="button" class="btn-primary-form" id="next-question" aria-label="${rotuloAvancar}" ${podeAvancar() ? "" : "disabled"}><span>${rotuloAvancar}</span>${iconeAnimado("arrow")}</button>
       </div>`;
-    ajustarGuiasConhecimento(conteudo);
     if (pergunta.chave === "rede") vincularRede(conteudo.querySelector("#form-network"),respostas.rede,{prefixo:"form-rede",aoRenderizar:iniciarControlesNumericos,aoAlterar:rede => {
       respostas.rede = rede;
       conteudo.querySelector("#next-question").disabled = !podeAvancar();
@@ -332,8 +333,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function atualizarPrioridadeUso() {
-    const texto=conteudo.querySelector("#usage-priority-copy");
-    if(texto)texto.textContent=prioridadesUso[respostas.objetivo]||"Selecione uma opção acima para entender como vamos escolher as peças. Todas as escolhas respeitam seu limite de gasto.";
+    const texto=painel.querySelector("#usage-priority-copy");
+    if(texto)texto.textContent=prioridadesUso[respostas.objetivo]||"Escolha um uso para entender como vamos selecionar as peças, respeitando seu limite de gasto.";
   }
 
   function renderizarAparencia() {

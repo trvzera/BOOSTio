@@ -45,8 +45,9 @@ test('referências de encaixe são específicas do exemplo, não limites do port
   }
   for(const valor of ['sem-preferencia','panoramico-3-faces','__proto__','<script>'])assert.match(guiaPorteGabineteHtml(valor),/Não existe uma medida única/);
   const html=aparenciaHtml({});
-  assert.match(html,/240 mm costuma usar 2 ventoinhas de 120 mm/);
-  assert.match(html,/radiador completo, os tubos e as conexões precisam de espaço extra/);
+  assert.match(html,/As ventoinhas ajudam/);
+  assert.doesNotMatch(html,/240 mm costuma usar|radiador completo, os tubos/);
+  assert.equal((html.match(/class="appearance-beginner-note"/g)||[]).length,3);
 });
 test('guia muda apenas com tamanho, sem reiniciar opções de estilo e cor',()=>{
   const guia={dataset:{porte:'sem-preferencia'},innerHTML:''},aviso={textContent:''};let mudancas=0;
