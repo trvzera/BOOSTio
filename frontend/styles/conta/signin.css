@@ -47,16 +47,22 @@
 
 #signin-title {
   color: var(--cor-p1);
-  margin-bottom: var(--espacamento-8);
+  margin-bottom: var(--espacamento-32);
 }
 
-#signin-description {
+:is(#signin-description, #login-description) {
   text-align: center;
   color: var(--cor-4);
-  margin-bottom: var(--espacamento-32);
+  margin-top: var(--espacamento-24);
   font-size: 0.9rem;
   a {
-    color: var(--cor-6);
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    vertical-align: middle;
+    color: var(--text-accent);
+    text-decoration: underline;
+    text-underline-offset: .2em;
   }
 }
 
@@ -229,18 +235,8 @@
 
 #login-title {
   color: var(--cor-p1);
-  margin-bottom: var(--espacamento-8);
-  font-size: 1.5rem;
-}
-
-#login-description {
-  text-align: center;
-  color: var(--cor-4);
   margin-bottom: var(--espacamento-32);
-  font-size: 0.9rem;
-  a {
-    color: var(--cor-6);
-  }
+  font-size: 1.5rem;
 }
 
 #login-form {

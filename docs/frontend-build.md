@@ -6,6 +6,20 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Ajuda, glossário e histórico — 27/10/2026
+
+- No formulário, pergunta e ajuda ficam no painel direito; respostas ficam à
+  esquerda. No celular, a pergunta e a ajuda vêm antes das opções.
+- Rede e ventilação usam linguagem simples. Dicas por tamanho de gabinete aparecem
+  para iniciantes; especificações técnicas permanecem opcionais para todos.
+- O “?” é um glossário de termos efetivamente usados na peça (GB, TB, MHz, DDR,
+  conexões e medidas), sem repetir a função da categoria.
+- A implementação anterior de desfazer de um nível, documentada historicamente
+  abaixo, foi substituída por até 25 etapas com refazer, botões e Ctrl/Cmd+Z / Shift+Z.
+  O histórico de peças não intercepta edição de texto nem atua sobre builds trancadas
+  ou outra configuração. Nova ação descarta o redo; sair/recarregar limpa as pilhas.
+- Diferenças exatas dos níveis e regras do histórico em [experiencia-usuario.md](experiencia-usuario.md).
+
 ### Tamanho e estilo do gabinete — 24/10/2026
 
 - Complemento de cor: a orientação da etapa agora explica que a escolha vale para

@@ -74,7 +74,7 @@ class AuthController:
         if current_user.is_authenticated:
             return jsonify({
                 "auth":True,
-                "usuario":current_user.to_dict(incluir_budget=True)
+                "usuario":current_user.to_dict(incluir_budget=True, incluir_preferencias=True)
             }),200
 
         return jsonify({

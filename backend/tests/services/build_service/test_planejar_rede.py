@@ -43,6 +43,30 @@ def test_nao_compra_rede_ja_possuida_ou_nao_solicitada():
         assert Rede.executar(CATALOGO, rede, proprias)["tipo"] is None
 
 
+def test_wifi_padrao_exige_taxa_anunciada_conhecida_e_adequada():
+    rede = {"tipo": "wifi", "possuiAcessorio": False, "velocidadeMbps": 500}
+    catalogo = {"adaptador_wifi": [
+        {"id": 1, "preco": 30, "velocidade_mbps": 300},
+        {"id": 2, "preco": 60},
+        {"id": 3, "preco": 80, "velocidade_mbps": 600},
+        {"id": 4, "preco": 100, "velocidade_mbps": 1200, "esgotado": True},
+    ]}
+    assert Rede.executar(catalogo, rede)["ids_permitidos"] == [3]
+
+
+def test_cat6_tem_prioridade_sem_ocultar_cabo_adequado_mais_barato():
+    cat5 = {"id": 1, "preco": 20, "comprimento_m": 20, "modelo": "Cat5e"}
+    cat6 = {"id": 2, "preco": 35, "comprimento_m": 20, "categoria": "CAT 6"}
+    curto = {"id": 3, "preco": 10, "comprimento_m": 1, "modelo": "CAT6"}
+    catalogo = {"cabo_rede": [cat5, cat6, curto]}
+    antes = deepcopy(catalogo)
+    assert Rede.opcoes(catalogo, PEDIDO) == [cat6, cat5]
+    assert Rede.opcoes({"cabo_rede": [cat5]}, PEDIDO) == [cat5]
+    assert not Rede._cat6({"modelo": "Adaptador CAT60"})
+    assert Rede._cat6({"modelo": "Cabo Cat6a"})
+    assert catalogo == antes
+
+
 def test_complemento_remove_somente_cabo_impossivel_sem_inventar_produto():
     build = {"componentes": [{"tipo": "processador", "id": 9}, {"tipo": "cabo_rede", "id": 1}]}
     antes = deepcopy(build)

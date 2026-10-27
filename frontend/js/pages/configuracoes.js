@@ -2,6 +2,7 @@
 // edição de perfil, troca de senha e exclusão de conta.
 import "../header.js";
 import "./budget-perfil.js";
+import "./experiencia-perfil.js";
 import "../services-carousel.js";
 import { caminhoLogin } from "../auth/auth.js";
 import { carregarPerfil as buscarUsuarioLogado } from "../conta/perfil.js";

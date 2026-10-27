@@ -117,6 +117,7 @@ export function ofertasPeca(peca) {
 }
 
 export const rotulosTecnicos = {
+  categoria_cabo: "Padrão do cabo",
   fabricante: "Fabricante", modelo: "Modelo", part_number: "Referência do catálogo / part number", consumo_energia: "Consumo estimado (W)",
   soquete: "Socket", socket: "Socket", sockets_suporte_condicional: "Sockets que exigem confirmar a versão/kit de montagem", nucleo: "Núcleos", thread: "Threads",
   conectores_alimentacao:"Conectores de alimentação", cabos_pcie_independentes:"Cabos separados para a placa de vídeo",
@@ -219,7 +220,7 @@ const camposDestaque = {
   water_cooler: ["compatibilidade", "tamanho_radiador_mm", "comprimento_radiador_mm", "espessura_radiador_mm", "quantidade_fans", "consumo_energia"],
   fan: ["tamanho_mm", "quantidade", "espessura_mm", "fluxo_ar", "conector_fan", "consumo_energia"],
   adaptador_wifi: ["interface", "padrao_wifi", "velocidade_mbps", "bluetooth"],
-  cabo_rede: ["comprimento_m", "conector"],
+  cabo_rede: ["categoria_cabo", "comprimento_m", "conector"],
 };
 
 export function destaquesFichaTecnica(peca) {

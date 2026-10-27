@@ -11,6 +11,8 @@ import { indicadorBuild,iniciarIndicadores } from "../build/indicador.js";
 import { navegarPara } from "../components/page-loading.js";
 import { resumoRede } from "../build/rede.js";
 import { resumoMonitor } from "../build/monitor.js";
+import { introducaoPecaHtml } from "../build/ajuda-pecas.js";
+import { iniciarGlossarios } from "../build/glossario.js";
 import { salvarAlteracaoLocal } from "../build/autosalvar.js";
 import { iniciarDetalhesAnimados } from "../components/animated-details.js";
 import { abrirBenchmark, abrirCompraBuild, abrirDialogoBuild, motivoBenchmark, avisoCompraHtml, avisoFreteHtml } from "../build/acoes-build.js";
@@ -21,7 +23,7 @@ import { mostrarBuildPublica } from "../build/publica.js";
 import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta, linkBuildConta, estadoParaConta } from "../build/conta.js";
 import { criarBuildManual } from "../api/build/builds.js";
 import { atualizarValor, capturarValores, transicionarValores } from "../components/value-transition.js";
-import { criarHistoricoBuild } from "../build/historico-build.js";
+import { criarHistoricoBuild, acaoAtalhoHistorico } from "../build/historico-build.js";
 import { autoriaBuildHtml } from "../build/autoria.js";
 import { resumoCapacidadeDiscos } from "../build/estado.js";
 import { anunciarStatus, cancelarAnuncioStatus } from "../components/status-messages.js";
@@ -56,8 +58,34 @@ document.addEventListener("DOMContentLoaded",async () => {
     let desfazendo = false;
     window.addEventListener("pagehide",() => {
       historico.limpar();
-      const desfazer = main.querySelector("#undo-configuration");
-      if (desfazer) { desfazer.disabled=true; desfazer.dataset.disabledReason=historico.motivo(build); }
+      for(const [id,acao] of [["undo-configuration","desfazer"],["redo-configuration","refazer"]]){
+        const botao=main.querySelector("#"+id);
+        if(botao){botao.disabled=true;botao.dataset.disabledReason=historico.motivo(build,acao);}
+      }
+    });
+    async function moverHistorico(acao) {
+      if(desfazendo || historico.motivo(build,acao))return;
+      const foco=document.activeElement?.id;
+      desfazendo=true;
+      main.querySelectorAll('button,input,textarea,select').forEach(controle=>controle.disabled=true);
+      try {
+        await filaSalvamento;
+        build=acao === "refazer" ? historico.refazer(build) : historico.desfazer(build);
+        persistir();
+        if(conta){await filaSalvamento;if(falhaSalvamento)throw falhaSalvamento;}
+        avisar(acao === "refazer" ? "Alteração refeita." : "Alteração desfeita.");
+      }catch(erro){avisar("Não foi possível concluir o " + acao + ": " + erro.message,{urgente:true});}
+      finally {
+        desfazendo=false;renderizar(true);
+        const anterior=foco && document.getElementById(foco);
+        const alvo=anterior && !anterior.disabled ? anterior : main.querySelector("#builder-title");
+        if(alvo){if(alvo.id === "builder-title")alvo.tabIndex=-1;alvo.focus({preventScroll:true});}
+      }
+    }
+    document.addEventListener("keydown",evento=>{
+      const acao=acaoAtalhoHistorico(evento);
+      if(!acao || desfazendo || document.querySelector('dialog[open],.modal-overlay.open') || historico.motivo(build,acao))return;
+      evento.preventDefault();void moverHistorico(acao);
     });
     // Um resumo mais alto que a tela precisa poder subir ao rolar até as ações.
     const observarResumo = typeof ResizeObserver === "function" ? new ResizeObserver(entradas => {
@@ -176,11 +204,11 @@ document.addEventListener("DOMContentLoaded",async () => {
       const bloquearSubstituicao = build.travada || !build.substituirFansWaterCooler && !(fans?.radiador > 0 && fans.selecionadas >= fans.radiador);
       const vagasFans = fans ? 'Fans: ' + (fans.total ?? "?") + ' / ' + (fans.capacidade ?? "?") + ' posições' : '';
       const disponivel = categoria.armazenamento && catalogo.some(p => tipos.includes(p.categoria) && (() => { try { selecionarPecaCompativel(build,p,catalogo); return true; } catch { return false; } })());
-      const cabecalho = '<div class="component-group-heading"><h2>' + categoria.nome + ' ' + badge(obrigatoria) + '</h2>' +
+      const cabecalho = '<div class="component-group-heading"><div class="component-heading-label"><h2>' + categoria.nome + ' ' + badge(obrigatoria) + '</h2><span data-glossary-slot></span></div>' +
         (categoria.id === "memoria_ram" ? '<span class="component-count">' + info.usados + ' / ' + (info.placa ? info.slots : "—") + ' pentes · ' + info.capacidade + ' GB' + (info.slotsProvisorios ? ' · limite provisório' : '') + '</span>'
           : categoria.armazenamento ? '<span class="component-count">' + discos.ssd + ' SSD · ' + discos.hd + ' HD · ' + resumoCapacidadeDiscos(discos,catalogo) + '</span>'
           : fans ? '<span class="component-count">' + vagasFans + '</span>'
-          : categoria.id === "monitor" && get("monitor") ? '<span class="component-count">' + h(resumoMonitor(get("monitor"))) + '</span>' : "") + '</div>' +
+          : categoria.id === "monitor" && get("monitor") ? '<span class="component-count">' + h(resumoMonitor(get("monitor"))) + '</span>' : "") + '</div>' + introducaoPecaHtml(categoria.id) +
         (categoria.id === "memoria_ram" && info.slotsProvisorios ? '<p class="component-connections">' + AVISO_SLOTS_RAM_PROVISORIOS + '</p>' : '') +
         (fans ? '<p class="component-connections">' + (fans.selecionadas ?? "?") + ' selecionadas · ' + (fans.inclusas ?? "?") + ' inclusas · ' + (fans.radiador ?? "?") + ' do radiador' +
           (fans.substituidas ? ' · ' + fans.substituidas + ' originais substituídas (sem dupla contagem)' : '') +
@@ -233,22 +261,9 @@ document.addEventListener("DOMContentLoaded",async () => {
         (build.travada ? '<p class="summary-note">Build trancada. Destranque-a em Minhas builds.</p>' : "") + '</section></aside></div>';
       if (opcoes) main.querySelector(".builder-options").replaceWith(opcoes);
       main.querySelectorAll('.builder-options input').forEach(input=>input.disabled=build.travada);
-      main.querySelector('.summary-progress').insertAdjacentHTML('afterend','<button type="button" class="btn-secondary" id="undo-configuration" aria-label="Desfazer última alteração de peças" '+bloqueado(Boolean(historico.motivo(build)),historico.motivo(build))+'>Desfazer última alteração</button><p class="summary-note">Histórico desta página; recarregar ou sair do editor limpa o desfazer.</p>');
-      main.querySelector('#undo-configuration').onclick=async()=>{
-        if (desfazendo||historico.motivo(build)) return;
-        desfazendo=true;
-        main.querySelectorAll('button,input,textarea,select').forEach(controle=>controle.disabled=true);
-        try {
-          await filaSalvamento;
-          build=historico.desfazer(build);persistir();
-          if (conta) {await filaSalvamento;if(falhaSalvamento)throw falhaSalvamento;}
-          avisar('Última alteração desfeita.');
-        } catch(erro) {avisar('Não foi possível concluir o desfazer: '+erro.message);}
-        finally {
-          desfazendo=false;renderizar(true);
-          const titulo=main.querySelector('#builder-title');titulo.tabIndex=-1;titulo.focus({preventScroll:true});
-        }
-      };
+      main.querySelector('.summary-progress').insertAdjacentHTML('afterend','<div class="builder-history-actions"><button type="button" class="btn-secondary" id="undo-configuration" aria-label="Desfazer alteração de peças" aria-keyshortcuts="Control+Z Meta+Z" '+bloqueado(Boolean(historico.motivo(build)),historico.motivo(build))+'>Desfazer</button><button type="button" class="btn-secondary" id="redo-configuration" aria-label="Refazer alteração de peças" aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z" '+bloqueado(Boolean(historico.motivo(build,"refazer")),historico.motivo(build,"refazer"))+'>Refazer</button></div><p class="summary-note">Ctrl/Cmd + Z: desfazer · Ctrl/Cmd + Shift + Z: refazer. Até 25 alterações de peças nesta página; sair ou recarregar limpa o histórico.</p>');
+      main.querySelector('#undo-configuration').onclick=()=>moverHistorico("desfazer");
+      main.querySelector('#redo-configuration').onclick=()=>moverHistorico("refazer");
       const atualizarCustos = () => {
         const total = avaliarBuild(build,catalogo).preco;
         atualizarValor(main.querySelector(".summary-total"),moeda(total),total);
@@ -355,7 +370,7 @@ document.addEventListener("DOMContentLoaded",async () => {
       main.querySelector("#share-configuration").onclick = async () => {
         try { if (conta) { await filaSalvamento; if (falhaSalvamento) throw falhaSalvamento; } copiarTexto(conta ? linkBuildConta(build.id) : linkCompartilhado(build)); } catch (erro) { avisar(erro.message); }
       };
-      iniciarIndicadores(main); iniciarDetalhesAnimados(main); iniciarIcones(main);
+      iniciarGlossarios(main); iniciarIndicadores(main); iniciarDetalhesAnimados(main); iniciarIcones(main);
       transicionarValores(main,valoresAnteriores);
       observarResumo?.observe(main.querySelector(".build-sidebar"));
     }

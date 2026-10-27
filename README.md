@@ -30,6 +30,10 @@ Desenvolvida como projeto de software anual e final do curso no **Colégio Cotem
 a plataforma acompanha o planejamento do primeiro computador e as melhorias de
 um setup existente. Conheça a proposta na [página Sobre nós](frontend/pages/sobre.html).
 
+Novas contas recebem um tutorial opcional de três passos. O nível de conhecimento
+ajusta as explicações, mantendo todas as ferramentas disponíveis, e pode ser alterado
+nas configurações junto do botão para rever o tutorial.
+
 <details>
   <summary>English overview</summary>
 
@@ -72,7 +76,7 @@ de builds no backend para persistir a configuração na conta.
 | 08 | O sistema deve permitir ao usuário compartilhar suas configurações por link | ✅ **Implementado** | Builds públicas podem ser vistas sem login, somente leitura. Testar exige sessão; salvar uma cópia privada exige também e-mail verificado e vaga na conta. |
 | 09 | O sistema deve permitir ao usuário buscar melhorias do seu setup | ✅ **Implementado** | RAM: acrescentar ou substituir pentes conforme a placa-mãe. SSD/HD: expandir quantidades mantendo os atuais, respeitando conexões/baias conhecidas, ou substituir sem regressões verificáveis. Orçamento obrigatório para aplicar; CPU/GPU e outras categorias dependem de métricas confiáveis. |
 | 10 | O sistema deve permitir ao usuário ver configurações prontas | ✅ **Implementado** | 16 modelos sem periféricos, referências revisadas no catálogo, filtro de budget e preço crescente. A cópia respeita e-mail verificado e limite da conta. |
-| 11 | O sistema deve permitir ao usuário editar e modificar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento; desfazer a última alteração de montagem enquanto o editor estiver aberto. |
+| 11 | O sistema deve permitir ao usuário editar e modificar configurações salvas | ✅ **Implementado** | Alteração de componentes, nome, descrição e orçamento; desfazer/refazer até 25 alterações de peças nesta visita ao editor, por botões ou Ctrl/Cmd+Z e Ctrl/Cmd+Shift+Z. Campos de texto mantêm o desfazer nativo. |
 | 12 | O sistema deve permitir ao usuário verificar o preço da peça direto pelo site, sem precisar consultar em diversas abas | ✅ **Implementado** | Preços cadastrados, data quando disponível e links das lojas. Antes da compra, o catálogo é reconsultado e diferenças/indisponibilidade são mostradas. Não inclui frete nem garante o valor no checkout. |
 | 13 | O sistema deve permitir ao usuário ver todas as informações de compatibilidade e consumo de energia do setup que está montando | ✅ **Implementado** | Diagnóstico da build, consumo estimado e fichas técnicas conforme os dados cadastrados. Conflitos ficam em destaque; conferências e dicas são agrupadas por assunto, com detalhes recolhidos. Referências visuais de fans são identificadas como estimativas e não aprovam encaixes. Ampliar a cobertura de modelos permanece uma melhoria de catálogo. |
 | 14 | O sistema deve permitir ao usuário adicionar ao setup periféricos, que muitas vezes não pensado anteriormente, acaba estourando o orçamento | ✅ **Implementado** | Inclusão e reaproveitamento com tetos separados para PC e periféricos. |
