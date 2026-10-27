@@ -3,6 +3,7 @@ import "../auth/auth.js";
 import { normalizarRede, vincularRede } from "../build/rede.js";
 import { normalizarAparencia, aparenciaHtml, atualizarGuiaPorteGabinete } from "../build/aparencia.js";
 import { opcoesUso, prioridadesUso, orientacoesEtapas } from "../build/uso-formulario.js";
+import { ajustarGuiasConhecimento } from "../conta/preferencias-uso.js";
 import { iniciarImagens } from "../build/imagens-produtos.js";
 import { planejamentoLocal } from "../build/planejamento.js";
 import { orcamentoValido, dividirOrcamento, avaliarOrcamentoGeracao, MINIMO_PC_GERACAO } from "../build/orcamento-formulario.js";
@@ -293,13 +294,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       <div class="question-options-scroll" role="region" aria-label="Respostas da etapa ${indiceAtual + 1}" tabindex="0">
       ${pergunta.chave === "orcamento" ? `<div class="budget-fields">${campos}${rangeHtml()}</div>` : campos}
       ${pergunta.chave === "perifericos" ? '<div id="perifericos-fields"></div>' : ""}
-      ${pergunta.chave === "objetivo" ? '<aside class="usage-priority" aria-labelledby="usage-priority-title"><h2 id="usage-priority-title" class="font-1-xs">O que vamos priorizar</h2><p id="usage-priority-copy" class="font-2-xs" aria-live="polite"></p></aside>' : ""}
-      ${orientacoesEtapas[pergunta.chave] ? `<aside class="usage-priority" aria-labelledby="step-help-title"><h2 id="step-help-title" class="font-1-xs">Como essa escolha ajuda</h2><p class="font-2-xs">${orientacoesEtapas[pergunta.chave]}</p></aside>` : ""}
+      ${pergunta.chave === "objetivo" ? '<details class="usage-priority" data-knowledge-guide open><summary class="font-1-xs">O que vamos priorizar</summary><p id="usage-priority-copy" class="font-2-xs" aria-live="polite"></p></details>' : ""}
+      ${orientacoesEtapas[pergunta.chave] ? `<details class="usage-priority" data-knowledge-guide open><summary class="font-1-xs">Como essa escolha ajuda</summary><p class="font-2-xs">${orientacoesEtapas[pergunta.chave]}</p></details>` : ""}
       </div>
       <div id="form-navigation">
         <button type="button" class="btn-ghost" id="previous-question" aria-label="Voltar à etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}>${iconeAnimado("arrow","back")}<span>Voltar</span></button>
         <button type="button" class="btn-primary-form" id="next-question" aria-label="${rotuloAvancar}" ${podeAvancar() ? "" : "disabled"}><span>${rotuloAvancar}</span>${iconeAnimado("arrow")}</button>
       </div>`;
+    ajustarGuiasConhecimento(conteudo);
     if (pergunta.chave === "rede") vincularRede(conteudo.querySelector("#form-network"),respostas.rede,{prefixo:"form-rede",aoRenderizar:iniciarControlesNumericos,aoAlterar:rede => {
       respostas.rede = rede;
       conteudo.querySelector("#next-question").disabled = !podeAvancar();

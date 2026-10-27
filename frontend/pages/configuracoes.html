@@ -106,6 +106,19 @@
         </form>
       </section>
 
+      <section class="settings-card" aria-labelledby="experience-title">
+        <h2 id="experience-title" class="font-1-m-b">Sua experiência na BOOSTio</h2>
+        <p class="card-subtext font-2-xs">Escolha quantas explicações quer ver. Todas as funções e informações técnicas continuam disponíveis.</p>
+        <form id="experience-profile-form">
+          <label class="planning-field" for="profile-hardware-level"><span>Seu conhecimento sobre peças de computador</span><select id="profile-hardware-level" aria-describedby="experience-level-help" disabled>
+            <option value="">Prefiro não informar</option><option value="iniciante">Estou começando</option><option value="intermediario">Conheço o básico</option><option value="experiente">Tenho experiência</option>
+          </select></label>
+          <p id="experience-level-help" class="planning-help">Para quem está começando, mostramos explicações junto das peças. No nível básico, mantemos as orientações por etapa. Para quem tem experiência, elas começam recolhidas e podem ser abertas quando quiser.</p>
+          <div class="experience-actions"><button type="submit" class="btn-primary" aria-label="Salvar preferências de experiência" disabled>Salvar preferências</button><button type="button" id="replay-tutorial" class="btn-secondary" aria-label="Rever tutorial da BOOSTio" disabled>Rever tutorial</button></div>
+          <p id="experience-feedback" class="planning-help" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
       <div class="settings-card" id="password-settings-card">
         <div class="card-heading"><i class="fa-solid fa-lock" aria-hidden="true"></i><span class="font-1-m-b" id="password-settings-title">Alterar senha</span></div>
         <p class="card-subtext font-1-m" id="password-settings-description">Utilize esse campo para alterar a sua senha.</p>

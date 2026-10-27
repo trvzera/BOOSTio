@@ -30,6 +30,10 @@ Desenvolvida como projeto de software anual e final do curso no **Colégio Cotem
 a plataforma acompanha o planejamento do primeiro computador e as melhorias de
 um setup existente. Conheça a proposta na [página Sobre nós](frontend/pages/sobre.html).
 
+Novas contas recebem um tutorial opcional de três passos. O nível de conhecimento
+ajusta as explicações, mantendo todas as ferramentas disponíveis, e pode ser alterado
+nas configurações junto do botão para rever o tutorial.
+
 <details>
   <summary>English overview</summary>
 

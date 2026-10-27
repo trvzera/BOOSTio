@@ -15,6 +15,7 @@ class Usuario(ModeloBase,UserMixin):
   versao_sessao = db.Column(db.Integer, nullable=False, default=1, server_default="1")
   budget = db.Column(db.Numeric(12, 2), nullable=True)
   usar_budget = db.Column(db.Boolean, default=False, server_default=db.false(), nullable=False)
+  preferencias_uso = db.relationship("PreferenciasUso", uselist=False, cascade="all, delete-orphan")
 
   @property
   def is_active(self):
@@ -34,7 +35,7 @@ class Usuario(ModeloBase,UserMixin):
       id=int(partes[0]), versao_sessao=int(partes[1]), ativo=True,
     ).first()
 
-  def to_dict(self, incluir_budget=False) -> dict:
+  def to_dict(self, incluir_budget=False, incluir_preferencias=False) -> dict:
     dados = {
       "id":self.id,
       "nome": self.nome,
@@ -48,6 +49,9 @@ class Usuario(ModeloBase,UserMixin):
     if incluir_budget:
       dados.update(budget=float(self.budget) if self.budget is not None else None,
                    usar_budget=bool(self.usar_budget))
+    if incluir_preferencias:
+      dados["preferencias_uso"] = self.preferencias_uso.to_dict() if self.preferencias_uso else {
+        "nivel_hardware": None, "tutorial": "nao-oferecido", "versao_tutorial": 1}
     return dados
 
   def atualizar_dados(self, nome: str | None = None, email: str | None = None, senha: str | None = None,ativo = None) -> None:

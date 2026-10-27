@@ -11,7 +11,7 @@ import { indicadorBuild,iniciarIndicadores } from "../build/indicador.js";
 import { navegarPara } from "../components/page-loading.js";
 import { resumoRede } from "../build/rede.js";
 import { resumoMonitor } from "../build/monitor.js";
-import { ajudaPecaHtml } from "../build/ajuda-pecas.js";
+import { ajudaPecaHtml, introducaoPecaHtml } from "../build/ajuda-pecas.js";
 import { salvarAlteracaoLocal } from "../build/autosalvar.js";
 import { iniciarDetalhesAnimados } from "../components/animated-details.js";
 import { abrirBenchmark, abrirCompraBuild, abrirDialogoBuild, motivoBenchmark, avisoCompraHtml, avisoFreteHtml } from "../build/acoes-build.js";
@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded",async () => {
         (categoria.id === "memoria_ram" ? '<span class="component-count">' + info.usados + ' / ' + (info.placa ? info.slots : "—") + ' pentes · ' + info.capacidade + ' GB' + (info.slotsProvisorios ? ' · limite provisório' : '') + '</span>'
           : categoria.armazenamento ? '<span class="component-count">' + discos.ssd + ' SSD · ' + discos.hd + ' HD · ' + resumoCapacidadeDiscos(discos,catalogo) + '</span>'
           : fans ? '<span class="component-count">' + vagasFans + '</span>'
-          : categoria.id === "monitor" && get("monitor") ? '<span class="component-count">' + h(resumoMonitor(get("monitor"))) + '</span>' : "") + '</div>' +
+          : categoria.id === "monitor" && get("monitor") ? '<span class="component-count">' + h(resumoMonitor(get("monitor"))) + '</span>' : "") + '</div>' + introducaoPecaHtml(categoria.id) +
         (categoria.id === "memoria_ram" && info.slotsProvisorios ? '<p class="component-connections">' + AVISO_SLOTS_RAM_PROVISORIOS + '</p>' : '') +
         (fans ? '<p class="component-connections">' + (fans.selecionadas ?? "?") + ' selecionadas · ' + (fans.inclusas ?? "?") + ' inclusas · ' + (fans.radiador ?? "?") + ' do radiador' +
           (fans.substituidas ? ' · ' + fans.substituidas + ' originais substituídas (sem dupla contagem)' : '') +

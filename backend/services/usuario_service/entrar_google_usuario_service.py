@@ -1,4 +1,4 @@
-from models import Usuario
+from models import Usuario, PreferenciasUso
 
 class EntrarGoogleService:
   def executar(self, dados_google: dict):
@@ -33,6 +33,7 @@ class EntrarGoogleService:
       verificado=True
     )
 
+    usuario.preferencias_uso = PreferenciasUso(tutorial="pendente")
     usuario.salvar()
 
     return usuario
