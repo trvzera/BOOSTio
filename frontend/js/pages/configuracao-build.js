@@ -11,6 +11,7 @@ import { indicadorBuild,iniciarIndicadores } from "../build/indicador.js";
 import { navegarPara } from "../components/page-loading.js";
 import { resumoRede } from "../build/rede.js";
 import { resumoMonitor } from "../build/monitor.js";
+import { ajudaPecaHtml } from "../build/ajuda-pecas.js";
 import { salvarAlteracaoLocal } from "../build/autosalvar.js";
 import { iniciarDetalhesAnimados } from "../components/animated-details.js";
 import { abrirBenchmark, abrirCompraBuild, abrirDialogoBuild, motivoBenchmark, avisoCompraHtml, avisoFreteHtml } from "../build/acoes-build.js";
@@ -176,7 +177,7 @@ document.addEventListener("DOMContentLoaded",async () => {
       const bloquearSubstituicao = build.travada || !build.substituirFansWaterCooler && !(fans?.radiador > 0 && fans.selecionadas >= fans.radiador);
       const vagasFans = fans ? 'Fans: ' + (fans.total ?? "?") + ' / ' + (fans.capacidade ?? "?") + ' posições' : '';
       const disponivel = categoria.armazenamento && catalogo.some(p => tipos.includes(p.categoria) && (() => { try { selecionarPecaCompativel(build,p,catalogo); return true; } catch { return false; } })());
-      const cabecalho = '<div class="component-group-heading"><h2>' + categoria.nome + ' ' + badge(obrigatoria) + '</h2>' +
+      const cabecalho = '<div class="component-group-heading"><div class="component-heading-label"><h2>' + categoria.nome + ' ' + badge(obrigatoria) + '</h2>' + ajudaPecaHtml(categoria.id,categoria.nome) + '</div>' +
         (categoria.id === "memoria_ram" ? '<span class="component-count">' + info.usados + ' / ' + (info.placa ? info.slots : "—") + ' pentes · ' + info.capacidade + ' GB' + (info.slotsProvisorios ? ' · limite provisório' : '') + '</span>'
           : categoria.armazenamento ? '<span class="component-count">' + discos.ssd + ' SSD · ' + discos.hd + ' HD · ' + resumoCapacidadeDiscos(discos,catalogo) + '</span>'
           : fans ? '<span class="component-count">' + vagasFans + '</span>'

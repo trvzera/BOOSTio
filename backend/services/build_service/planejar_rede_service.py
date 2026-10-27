@@ -1,12 +1,18 @@
 from decimal import Decimal
 from math import isfinite
 from copy import deepcopy
+import re
 
 
 class PlanejarRedeService:
     """Separa acessórios utilizáveis de uma pendência, sem inventar um produto."""
 
     TIPOS = {"cabo": "cabo_rede", "wifi": "adaptador_wifi"}
+
+    @staticmethod
+    def _cat6(peca):
+        texto = " ".join(str(peca.get(campo) or "") for campo in ("categoria_cabo", "categoria", "modelo"))
+        return bool(re.search(r"\bcat(?:egoria)?[\s.-]*6a?\b", texto, re.I))
 
     @staticmethod
     def _numero(valor):
@@ -31,7 +37,13 @@ class PlanejarRedeService:
             # Taxa ausente não vira uma garantia; o editor continua orientando a conferência.
             if velocidade and solicitada and velocidade < solicitada:
                 continue
+            if tipo == "adaptador_wifi" and solicitada and velocidade is None:
+                continue
             opcoes.append(peca)
+        # Preferência de catálogo, sem afirmar que um cabo de padrão desconhecido é Cat6.
+        # Mantém as alternativas para não inviabilizar o PC quando só elas cabem no teto.
+        if tipo == "cabo_rede":
+            opcoes.sort(key=lambda p: not cls._cat6(p))
         return opcoes
 
     @classmethod

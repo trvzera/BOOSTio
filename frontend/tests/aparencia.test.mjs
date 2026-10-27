@@ -53,7 +53,7 @@ test('guia muda apenas com tamanho, sem reiniciar opções de estilo e cor',()=>
   const raiz={querySelector:s=>s==='#appearance-size-guide'?guia:aviso};
   Object.defineProperty(guia,'innerHTML',{set(v){this.html=v;mudancas++;},get(){return this.html;}});
   atualizarGuiaPorteGabinete(raiz,'mid-tower');
-  assert.equal(mudancas,1);assert.match(guia.innerHTML,/TD500/);assert.match(aviso.textContent,/Referência de Mid Tower/);
+  assert.equal(mudancas,1);assert.match(guia.innerHTML,/TD500/);assert.match(aviso.textContent,/Referência de Médio/);
   atualizarGuiaPorteGabinete(raiz,'mid-tower');assert.equal(mudancas,1);
   atualizarGuiaPorteGabinete(raiz,'sem-preferencia');assert.equal(mudancas,2);assert.equal(aviso.textContent,'Tamanho sem preferência.');
   assert.doesNotThrow(()=>atualizarGuiaPorteGabinete({querySelector:()=>null},'mini-tower'));

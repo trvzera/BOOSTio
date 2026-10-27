@@ -63,7 +63,7 @@ class CriarBuildService:
     "conectores_alimentacao", "conectores_alimentacao_completos", "cabos_pcie_independentes", "cabos_pcie_independentes_minimos",
     "slots_m2", "portas_sata", "topologia_armazenamento_verificada", "formato_m2", "configuracoes_baias", "configuracoes_baias_completas",
     "tamanho_max_fonte_mm", "formatos_fonte", "certificacao_fonte", "versao_atx", "baias_25", "baias_35",
-    "padrao_wifi", "velocidade_mbps", "bluetooth", "categoria", "comprimento_m", "conector",
+    "padrao_wifi", "velocidade_mbps", "bluetooth", "categoria", "categoria_cabo", "comprimento_m", "conector",
     "porte_referencia", "estilo_referencia", "gpu_chip", "interface_memoria", "fonte_cor",
   )
 
@@ -700,6 +700,8 @@ class CriarBuildService:
         "# REDE\n"
         "Se rede.possuiAcessorio for false, inclua exatamente um cabo_rede para tipo cabo "
         "ou um adaptador_wifi para tipo wifi dentre os ids_permitidos, respeitando o comprimento solicitado quando houver. "
+        "Para cabo, priorize Cat6 ou Cat6a identificado no catálogo quando couber no teto do PC; "
+        "não invente o padrão de um produto sem esse dado. A taxa anunciada do adaptador não garante a velocidade real da internet. "
         "Exceção: planejamento_rede.pendente=true exige omitir esse acessório e continuar o PC, sem retornar erro por isso. "
         "Adaptadores USB servem quando não há slot PCIe livre. Se o usuário já possui o "
         "acessório ou ainda vai confirmar, não acrescente nenhum. Nunca inclua ambos.\n\n"

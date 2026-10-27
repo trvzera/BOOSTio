@@ -1,13 +1,27 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { normalizarRede, custoRede, selecionarAcessorioRede } from "../js/build/rede.js";
+import { normalizarRede, custoRede, selecionarAcessorioRede, redeFormulario, camposRede } from "../js/build/rede.js";
 import { normalizarBuild, abrirBuild } from "../js/build/estado.js";
 import { planejamentoLocal, salvarPlanejamento, sincronizarBudgetPerfil } from "../js/build/planejamento.js";
 import { avaliarBuild } from "../js/build/compatibilidade.js";
 import { modelosProntos, copiarModelo } from "../js/build/modelos.js";
 
 const catalogo = JSON.parse(await readFile(new URL("../data/catalogo-demo.json",import.meta.url),"utf8"));
+
+test("formulário simplifica rede sem reescrever medidas de builds importadas",() => {
+  const antiga = {tipo:"cabo",possuiAcessorio:false,velocidadeMbps:1000,comprimentoCaboM:20};
+  assert.equal(normalizarRede(antiga).velocidadeMbps,1000);
+  assert.equal(redeFormulario(antiga).comprimentoCaboM,20);
+  assert.equal(redeFormulario(antiga).velocidadeMbps,null);
+  assert.equal(redeFormulario({tipo:"wifi",possuiAcessorio:false}).velocidadeMbps,500);
+  assert.equal(redeFormulario({tipo:"wifi",possuiAcessorio:true}).velocidadeMbps,null);
+  assert.equal(redeFormulario().velocidadeMbps,null);
+  const html=camposRede(antiga);
+  assert.doesNotMatch(html,/data-network="velocidadeMbps"/);
+  assert.match(html,/data-network="comprimentoCaboM"/);
+  assert.equal(antiga.velocidadeMbps,1000);
+});
 function armazenamento() {
   const dados = new Map();
   return {getItem:chave => dados.get(chave) ?? null,setItem:(chave,valor) => dados.set(chave,String(valor)),removeItem:chave => dados.delete(chave)};
