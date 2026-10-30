@@ -4,6 +4,9 @@ from services.build_service.criar_build_manual_service import CriarBuildManualSe
 
 class DuplicarBuildService:
     def executar(self, usuario_id, identificador):
+        if not usuario_id or not identificador:
+            raise ValueError("Build não encontrada")
+
         original = BuildSalva.buscar(usuario_id, identificador)
         if original is None:
             raise ValueError("Build não encontrada")
