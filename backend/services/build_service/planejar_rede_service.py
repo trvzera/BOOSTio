@@ -4,8 +4,6 @@ from copy import deepcopy
 
 
 class PlanejarRedeService:
-    """Separa acessórios utilizáveis de uma pendência, sem inventar um produto."""
-
     TIPOS = {"cabo": "cabo_rede", "wifi": "adaptador_wifi"}
 
     @staticmethod
@@ -28,7 +26,7 @@ class PlanejarRedeService:
                 continue
             velocidade = cls._numero(peca.get("velocidade_mbps"))
             solicitada = cls._numero(rede.get("velocidadeMbps"))
-            # Taxa ausente não vira uma garantia; o editor continua orientando a conferência.
+
             if velocidade and solicitada and velocidade < solicitada:
                 continue
             opcoes.append(peca)
@@ -36,6 +34,9 @@ class PlanejarRedeService:
 
     @classmethod
     def executar(cls, catalogo, rede=None, proprias=None):
+        if not isinstance(catalogo, dict):
+            raise ValueError("Informe catalogo como um objeto válido")
+
         rede = rede or {}
         tipo = cls.TIPOS.get(rede.get("tipo"))
         comprar = tipo if rede.get("possuiAcessorio") is False and tipo not in (proprias or {}) else None
@@ -51,7 +52,7 @@ class PlanejarRedeService:
         nova = deepcopy(build)
         itens = [i for i in nova["componentes"] if isinstance(i, dict) and i.get("tipo") == plano["tipo"]]
         if len(itens) > 1:
-            return nova  # Duplicações continuam sendo rejeitadas pelo contrato da montagem.
+            return nova
         if plano["pendente"]:
             nova["componentes"] = [i for i in nova["componentes"] if i not in itens]
         elif not itens or itens[0].get("id") not in plano["ids_permitidos"]:
