@@ -139,7 +139,7 @@ class UsuarioController:
     
         except SQLAlchemyError:
             db.session.rollback()
-            return jsonify({"erro":"Erro ao atualizar o usuario no banco de dados"})
+            return jsonify({"erro":"Erro ao atualizar o usuario no banco de dados"}), 500
 
     @staticmethod
     @usuario_bp.post("/esqueci-senha")
