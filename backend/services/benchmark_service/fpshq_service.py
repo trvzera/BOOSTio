@@ -32,7 +32,6 @@ class ErroBenchmark(Exception):
 
 
 class FpshqService:
-    """Cliente compartilhado por processo; não persiste dados de builds ou usuários."""
     BASE_URL = "https://fpshq.com/api/public/v1/"
     TTL = 3600
     TTL_RESERVA = 86400
@@ -59,6 +58,9 @@ class FpshqService:
         return self.chaves[hash(chave) % len(self.chaves)]
 
     def executar(self, caminho, parametros, usuario_id):
+        if not isinstance(parametros, dict):
+            raise ValueError("Informe parametros como um objeto válido")
+
         if caminho not in ("fps", "games"):
             raise ValueError("Consulta de benchmark inválida.")
         chave = (caminho, tuple(sorted(parametros.items())))
@@ -79,7 +81,9 @@ class FpshqService:
                     raise ErroBenchmark(mensagem, codigo, status, math.ceil(ate - agora), {**diagnostico, "pausa": True})
                 self.falha_temporaria = None
             self._validar_limites(agora, usuario_id)
-        # Consultas diferentes não seguram o lock global durante o acesso à rede.
+        return self._consultar(caminho, parametros, salvo)
+
+    def _consultar(self, caminho, parametros, salvo):
         try:
             resposta = self.buscar(
                 self.BASE_URL + caminho, params={**parametros, "lang": "pt"},
@@ -102,8 +106,8 @@ class FpshqService:
                 return {**deepcopy(salvo[1]), "cache": True, "desatualizado": True}
             raise erro from causa
         if 300 <= resposta.status_code < 400:
-            # A API pública chegou a redirecionar para uma página externa de
-            # hospedagem inativa. Nunca seguir destinos fornecidos pelo provedor.
+
+
             erro = self._falhar("O serviço de testes de jogos está indisponível agora. Tente novamente mais tarde. Não calculamos um resultado sem os dados.",
                                 "redirecionamento", 503, 60, diagnostico=self._metadados(resposta))
             if salvo:
@@ -147,7 +151,6 @@ class FpshqService:
         }
 
     def _falhar(self, mensagem, codigo, status, espera, causa=None, diagnostico=None):
-        # Registra a categoria, nunca a sessão/conta nem conteúdo de respostas externas.
         erro = ErroBenchmark(mensagem, codigo, status, espera, diagnostico)
         meta = erro.diagnostico
         logger.warning("FPSHQ: %s; http_boostio=%s; http_provedor=%s; formato=%s; causa=%s",
@@ -158,7 +161,6 @@ class FpshqService:
         return erro
 
     def salvar(self, caminho, parametros, resultado):
-        # Apenas serviços que validaram o conteúdo podem inserir respostas no cache.
         chave = (caminho, tuple(sorted(parametros.items())))
         with self.lock:
             self.cache[chave] = (self.relogio(), deepcopy(resultado))
