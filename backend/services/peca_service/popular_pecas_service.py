@@ -25,20 +25,22 @@ from .pecas_complementares import pecas_complementares
 
 
 class PopularPecasService:
-  """Cadastra peças ausentes e atualiza os preços dos links cadastrados."""
-
   def executar(self, limite: int | None = None, intervalo: float = 1.0, atualizar_precos: bool = True):
     for classe, itens in self._dados_seed().items():
       self._popular_classe(classe, itens)
+    self._atualizar_links_rede()
+    RestaurarLinksKabumService().executar()
+    if atualizar_precos:
+      return AtualizarPrecosService().executar(limite=limite, intervalo=intervalo)
+
+  @staticmethod
+  def _atualizar_links_rede():
     PlacaRede.atualizar_links_antigos({
       "https://www.kabum.com.br/produto/1049525/adaptador-wi-fi-tp-link-archer-t2u-plus-ac600-dual-band-usb-2-0-600mbps-antena-externa-compativel-windows-mac":
         "https://www.kabum.com.br/produto/173198/adaptador-wireless-tp-link-archer-t2u-plus-ac600-usb-dual-band",
       "https://www.kabum.com.br/produto/101797/adaptador-wireless-tp-link-usb-3-0-ac1300-archer-t3u":
         "https://www.kabum.com.br/produto/169217/adaptador-de-rede-tp-link-archer-t3u-wireless-omni-direcional-usb-mini-dual-band-mu-mimo-ac1300",
     })
-    RestaurarLinksKabumService().executar()
-    if atualizar_precos:
-      return AtualizarPrecosService().executar(limite=limite, intervalo=intervalo)
 
   def _popular_classe(self, classe, itens: list[dict]) -> None:
     novos = classe.cadastrar_ausentes(itens)
@@ -74,7 +76,6 @@ class PopularPecasService:
 
   @staticmethod
   def _placas_rede() -> list[dict]:
-    # Inclui USB para placas-mãe sem slot PCIe livre.
     modelos = [
       ("Archer T2U Plus", "USB 2.0", "Wi-Fi 5", 600, False,
        "https://www.kabum.com.br/produto/173198/adaptador-wireless-tp-link-archer-t2u-plus-ac600-usb-dual-band"),
@@ -1251,4 +1252,4 @@ class PopularPecasService:
 
   @staticmethod
   def _preco(indice: int, base: float, passo: float) -> float:
-    return 0.0  # Sem cotação: não apresentar os preços artificiais da seed como preços de loja.
+    return 0.0
