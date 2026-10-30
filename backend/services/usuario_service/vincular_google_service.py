@@ -5,11 +5,17 @@ from .entrar_google_usuario_service import EntrarGoogleService
 
 class VincularGoogleService:
   def executar(self, usuario, identidade):
+    if usuario is None:
+      raise ValueError("Usuário não encontrado")
     EntrarGoogleService()._validar_identidade(identidade)
     sub = identidade["sub"]
     existente = Usuario.buscar_por_google_sub(sub)
     if existente is not None and existente.id != usuario.id:
       raise ValueError("Esta conta Google já está vinculada a outra conta BOOSTio")
+    return self._vincular(usuario, sub)
+
+  @staticmethod
+  def _vincular(usuario, sub):
     try:
       atualizados = Usuario.query.filter_by(id=usuario.id, ativo=True, google_sub=None,
                                             versao_sessao=usuario.versao_sessao).update({
