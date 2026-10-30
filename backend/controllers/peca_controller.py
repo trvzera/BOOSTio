@@ -1,4 +1,4 @@
-from flask import Blueprint,jsonify
+from flask import Blueprint,jsonify,current_app
 from services.peca_service.mostrar_pecas_service import MostrarPecasService
 
 peca_bp = Blueprint("peca",__name__,url_prefix='/pecas')
@@ -17,5 +17,6 @@ class PecaController:
 
         except ValueError as erro:
             return jsonify({"erro": str(erro)}), 400
-        except Exception as e:
-            return jsonify({"erro": "Ocorreu um erro ao buscar as peças.", "detalhes": str(e)}), 500
+        except Exception:
+            current_app.logger.exception("Falha ao buscar as peças")
+            return jsonify({"erro": "Ocorreu um erro ao buscar as peças."}), 500
