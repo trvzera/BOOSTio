@@ -8,6 +8,7 @@ import { iniciarImagens } from "../build/imagens-produtos.js";
 import { planejamentoLocal } from "../build/planejamento.js";
 import { orcamentoValido, dividirOrcamento, avaliarOrcamentoGeracao, MINIMO_PC_GERACAO } from "../build/orcamento-formulario.js";
 import { feedbackGeracao } from "../build/generation-feedback.js";
+import { confirmarPrioridadeMontagem, prioridadeMontagemValida } from "../build/generation-priority.js";
 import { carregarPerfil } from "../conta/perfil.js";
 import { acompanharCarregamento } from "../components/page-loading.js";
 import { criarBuild, verificarEspacoBuild, catalogoBuilds } from "../api/build/builds.js";
@@ -288,7 +289,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     void conteudo.offsetWidth;
     conteudo.classList.add("question-enter");
     conteudo.classList.toggle("pieces-question-content", pergunta.chave === "pecas");
-    const rotuloAvancar = indiceAtual === perguntas.length - 1 ? "Gerar build" : "Avançar";
+    const rotuloAvancar = indiceAtual === perguntas.length - 1 ? "Revisar e gerar" : "Avançar";
     const campos = pergunta.chave === "aparencia" ? '<div id="form-appearance" aria-busy="true"><p class="font-2-xs">Carregando referências do catálogo…</p></div>' : pergunta.chave === "rede" ? '<div id="form-network"></div>' : `<fieldset class="question-options ${pergunta.multipla ? "pieces-grid" : ""}"><legend class="sr-only">${pergunta.titulo}</legend>${opcoesHtml(pergunta)}</fieldset>`;
     conteudo.innerHTML = `
       <div class="options-heading">
@@ -567,16 +568,30 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   let gerando = false;
+  let confirmando = false;
   let mensagensGeracao;
   const pararMensagens = () => clearInterval(mensagensGeracao);
   window.addEventListener("pagehide",pararMensagens);
   function avancar() {
     if (gerando || !podeAvancar()) return;
     if (indiceAtual === perguntas.length - 1) {
-      mostrarGerando();
+      confirmarGeracao();
       return;
     }
     navegarPara(indiceAtual + 1);
+  }
+
+  async function confirmarGeracao() {
+    if (gerando || confirmando) return;
+    confirmando = true;
+    try {
+      const prioridade = await confirmarPrioridadeMontagem(respostas.prioridadeMontagem);
+      if (!prioridade) return;
+      respostas.prioridadeMontagem = prioridade;
+      mostrarGerando();
+    } finally {
+      confirmando = false;
+    }
   }
 
   function navegarPara(indice) {
@@ -592,6 +607,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function mostrarGerando() {
     if (gerando) return;
+    if (!prioridadeMontagemValida(respostas.prioridadeMontagem)) return confirmarGeracao();
     gerando = true;
     document.querySelector("#questions").dataset.formState = "loading";
     conteudo.querySelectorAll("#form-navigation button, #tentar-gerar-build").forEach(botao => botao.disabled = true);
@@ -623,6 +639,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const utilidade = perguntas[0].opcoes.find(opcao => opcao[0] === respostas.objetivo)?.[1] || respostas.objetivo;
 
       const resposta = await criarBuild({nome: `PC para ${utilidade}`, descricao: `Montagem para ${utilidade}.`, utilidade, orcamento,
+        prioridade_montagem:respostas.prioridadeMontagem,
         percentual_perifericos:respostas.incluirPerifericos ? respostas.percentualPerifericos : 0,
         pecas_proprias:pecasPropriasFormulario(respostas),rede:respostas.rede,aparencia:respostas.aparencia});
       window.location.href = `${paginaConfiguracaoBuild}?build_id=${encodeURIComponent(resposta.build.id)}`;
