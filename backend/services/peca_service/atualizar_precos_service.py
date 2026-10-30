@@ -25,9 +25,7 @@ class AtualizarPrecosService:
         for classe, peca in self._selecionar_pecas():
             if limite is not None and resumo["consultas"] >= limite:
                 break
-            try:
-                ValidarLinkService().executar(peca.kabum_external)
-            except ValueError:
+            if not self._link_valido(peca.kabum_external):
                 resumo["ignoradas"] += 1
                 continue
 
@@ -99,3 +97,11 @@ class AtualizarPrecosService:
             resumo["falhas"] += 1
         consulta.confirmar()
         return continuar
+
+    @staticmethod
+    def _link_valido(url):
+        try:
+            ValidarLinkService().executar(url)
+            return True
+        except ValueError:
+            return False
