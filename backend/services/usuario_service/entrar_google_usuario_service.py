@@ -2,7 +2,6 @@ from models import Usuario
 
 class EntrarGoogleService:
   def executar(self, dados_google: dict):
-    # O controller fornece as informações do ID token validado pelo Authlib.
     self._validar_identidade(dados_google)
     google_sub = dados_google["sub"]
     usuario = Usuario.buscar_por_google_sub(google_sub)
@@ -23,6 +22,10 @@ class EntrarGoogleService:
         "a vinculação automática com o Google não é permitida."
       )
 
+    return self._criar_usuario(dados_google, email, google_sub)
+
+  @staticmethod
+  def _criar_usuario(dados_google, email, google_sub):
     nome = dados_google.get("name")
     usuario = Usuario(
       nome=nome[:30] if isinstance(nome, str) and nome.strip() else "Usuário Google",
