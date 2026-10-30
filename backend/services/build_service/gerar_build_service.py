@@ -5,8 +5,6 @@ from services.llm_service.bloquear_geracao_service import BloquearGeracaoService
 
 
 class GerarBuildService:
-    """Coordena uma geração e seu fallback, mantendo a mesma trava e cota."""
-
     def executar(self, usuario_id, dados):
         with BloquearGeracaoService().executar(usuario_id):
             try:
