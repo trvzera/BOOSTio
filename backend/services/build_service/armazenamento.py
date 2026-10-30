@@ -1,4 +1,3 @@
-"""Regras puras de armazenamento; metadados ausentes não são capacidade livre."""
 import math
 import re
 from functools import lru_cache
@@ -21,7 +20,7 @@ def conexao_disco(peca):
     formato = str(peca.get('formato') or '').upper()
     interface = str(peca.get('interface') or peca.get('tipo') or '').upper()
     if formato_disco(peca).upper() in ('2.5', '3.5', 'U.2', 'U.3', 'PCIE', 'ADD-IN-CARD') and re.search(r'NVME|PCI[E-]', interface):
-        return None  # NVMe também existe em outros formatos; não é um M.2 confirmado.
+        return None
     if re.search(r'M\.?2|NVME|PCI[E-]', formato + ' ' + interface):
         return 'm2-sata' if 'SATA' in interface else 'm2'
     return 'sata' if 'SATA' in interface else None
@@ -39,11 +38,6 @@ def formato_m2(peca):
 
 
 def encaixe_m2(placa, discos, sata):
-    """Procura uma distribuição real; não atribui vários discos ao mesmo slot.
-
-    True exige padrão/tamanho e topologia confirmados. None permite informar
-    lacunas sem rejeitar um encaixe possível. A busca tem limite de trabalho.
-    """
     slots, portas = placa.get('slots_m2'), placa.get('portas_sata')
     if not isinstance(slots, list) or len(slots) > 16:
         return None
@@ -124,7 +118,6 @@ def encaixe_m2(placa, discos, sata):
 
 
 def avaliar_armazenamento(placa, discos):
-    """discos: pares (item selecionado, ficha ou None). Não altera o estado."""
     regras = []
     def adicionar(codigo, titulo, condicao, mensagem):
         regras.append(dict(codigo=codigo, titulo=titulo, condicao=condicao, mensagem=mensagem))

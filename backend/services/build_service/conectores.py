@@ -1,4 +1,3 @@
-"""Tipos e quantidades de conectores; não simula potência por cabo ou adaptadores."""
 from .armazenamento import contagem, conexao_disco, formato_disco
 
 
@@ -18,8 +17,8 @@ def avaliar_conectores(fonte, consumidores):
             pendente = True
             continue
         if categoria in ('ssd', 'hd'):
-            # M.2 é alimentado pelo slot. SATA de 2,5/3,5 usa alimentação SATA;
-            # interfaces/formas desconhecidas não são tratadas como estes padrões.
+
+
             conexao = conexao_disco(peca)
             if conexao in ('m2', 'm2-sata') and str(peca.get('formato') or '').upper().replace('.', '').startswith('M2'):
                 continue
@@ -58,7 +57,7 @@ def avaliar_conectores(fonte, consumidores):
             if all(v is not None for v in totais) and sum(exigidos.get(t, 0) for t in dezesseis) > sum(totais):
                 conflitos.append('conectores de 16 pinos')
             else:
-                pendente = True  # Variações de 16 pinos não são declaradas incompatíveis só pelo nome.
+                pendente = True
     agrupados = {t for g in grupos for t in g} | set(dezesseis)
     for tipos in grupos + [(t,) for t in TIPOS - agrupados]:
         fixos, flex = tipos[:-1], tipos[-1]
