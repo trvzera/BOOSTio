@@ -1,4 +1,3 @@
-"""Limites da geração automática e orientações públicas, sem expor a resposta da IA."""
 from decimal import Decimal, ROUND_CEILING
 
 MINIMO_PC = Decimal("2000")
@@ -72,10 +71,10 @@ def orientar_falha(erro, orcamento=None, percentual=0, custos=None):
         custos = custos or {}
         sugerido = sugerir_total(percentual, max(MINIMO_PC, Decimal(str(custos.get("pc", 0)))),
                                  max(MINIMO_PERIFERICOS, Decimal(str(custos.get("perifericos", 0)))))
-        # É uma alternativa para o usuário editar, nunca uma promessa de viabilidade.
+
         dados["orcamentoSugerido"] = min(1000000, max(sugerido, float((Decimal(str(orcamento)) * Decimal("1.1") / 100).to_integral_value(rounding=ROUND_CEILING) * 100)))
     if not isinstance(erro, RecusaModeloBuild) and motivo in ("orcamento", "perifericos", "compatibilidade", "pecas"):
-        # Apenas mensagens geradas pelas validações locais; nunca texto da LLM.
+
         detalhe = str(erro)
         if detalhe.startswith(("A configuração sugerida", "A IA não completou", "A IA não incluiu")):
             mensagem += " " + detalhe[:600]

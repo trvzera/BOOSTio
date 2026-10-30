@@ -76,16 +76,7 @@ class CriarBuildService:
       raise ValueError("Usuario não encontrado")
     BuildSalva.verificar_espaco(usuario_id)
 
-    if isinstance(dados["orcamento"], bool):
-      raise ValueError("O orçamento deve ser um número positivo")
-    try:
-      orcamento = float(dados["orcamento"])
-    except (TypeError, ValueError, OverflowError) as erro:
-      raise ValueError("O orçamento deve ser um número positivo") from erro
-    if not isfinite(orcamento) or not 0 < orcamento <= 1000000:
-      raise ValueError("O orçamento deve ser um número positivo")
-    if Decimal(str(orcamento)) != Decimal(str(orcamento)).quantize(Decimal("0.01")):
-      raise ValueError("O orçamento deve ter no máximo duas casas decimais")
+    orcamento = self._validar_orcamento(dados["orcamento"])
     percentual = dados.get("percentual_perifericos", 0)
     if type(percentual) is not int or not 0 <= percentual <= 99:
       raise ValueError("A porcentagem para periféricos deve ser de 0 a 99")
@@ -96,6 +87,36 @@ class CriarBuildService:
     proprias = self._pecas_proprias(dados.get("pecas_proprias", {}))
     margem = min(orcamento / 2, max(800, orcamento * 0.25))
 
+    teto_pc, teto_perifericos = self._dividir_orcamento(orcamento, percentual)
+    validar_minimos(teto_pc, teto_perifericos, percentual)
+    catalogo = self._preparar_catalogo(dados, proprias, rede, aparencia, orcamento, margem, teto_pc, teto_perifericos)
+    self._validar_disponibilidade(catalogo, proprias, percentual)
+
+    plano_perifericos = self._planejar_perifericos(catalogo, teto_perifericos, proprias, dados["utilidade"], aparencia["cor"], percentual)
+    detalhes_proprias = self._detalhes_proprias(proprias)
+    inicio_prompt = perf_counter()
+    prompt = self._criar_prompt(dados, orcamento, margem, catalogo, percentual, detalhes_proprias, plano_perifericos)
+    logger.info("Geração: etapa=prompt duracao_ms=%d caracteres=%d", (perf_counter()-inicio_prompt)*1000, len(prompt))
+    dados_build = self._gerar_validada(usuario_id, prompt, modelo, catalogo, orcamento,
+                                     percentual, proprias, detalhes_proprias, rede, tentativas_correcao,
+                                     revisar_investimento=self._perfil_revisa_investimento(dados["utilidade"]), cor=aparencia["cor"], aparencia=aparencia)
+    return self._salvar_build(usuario_id, dados_build, proprias, rede, percentual, aparencia, orcamento)
+
+  @staticmethod
+  def _validar_orcamento(valor):
+    if isinstance(valor, bool):
+      raise ValueError("O orçamento deve ser um número positivo")
+    try:
+      orcamento = float(valor)
+    except (TypeError, ValueError, OverflowError) as erro:
+      raise ValueError("O orçamento deve ser um número positivo") from erro
+    if not isfinite(orcamento) or not 0 < orcamento <= 1000000:
+      raise ValueError("O orçamento deve ser um número positivo")
+    if Decimal(str(orcamento)) != Decimal(str(orcamento)).quantize(Decimal("0.01")):
+      raise ValueError("O orçamento deve ter no máximo duas casas decimais")
+    return orcamento
+
+  def _preparar_catalogo(self, dados, proprias, rede, aparencia, orcamento, margem, teto_pc, teto_perifericos):
     excluidas = set(proprias)
     if {"ssd", "hd"} & excluidas:
       excluidas.update(("ssd", "hd"))
@@ -103,14 +124,15 @@ class CriarBuildService:
       excluidas.update(("air_cooler", "water_cooler"))
     acessorio_rede = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
     excluidas.update({"adaptador_wifi", "cabo_rede"} - ({acessorio_rede} if rede.get("possuiAcessorio") is False else set()))
-    teto_pc, teto_perifericos = self._dividir_orcamento(orcamento, percentual)
-    validar_minimos(teto_pc, teto_perifericos, percentual)
     inicio_catalogo = perf_counter()
     catalogo = self._gerar_catalogo(min(orcamento - margem, teto_pc), teto_perifericos, excluidas,
                                   aparencia["gabinete_id"] if "gabinete" not in proprias else None, dados["utilidade"], cor=aparencia["cor"], aparencia=aparencia, rede=rede)
     if acessorio_rede and rede.get("possuiAcessorio") is False:
       catalogo[acessorio_rede] = PlanejarRedeService.opcoes(catalogo, rede, proprias)
     logger.info("Geração: etapa=catalogo duracao_ms=%d categorias=%d", (perf_counter()-inicio_catalogo)*1000, len(catalogo))
+    return catalogo
+
+  def _validar_disponibilidade(self, catalogo, proprias, percentual):
     disponiveis = set(catalogo) | set(proprias)
     obrigatorias = {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"}
     if not obrigatorias <= disponiveis or not {"ssd", "hd"} & disponiveis:
@@ -123,20 +145,18 @@ class CriarBuildService:
       raise ErroPlanejamentoBuild("Não há opções disponíveis para completar os periféricos dentro da reserva. Revise a porcentagem, o orçamento ou os itens já possuídos.",
                                   "perifericos", "Não foi possível completar os periféricos", "perifericos")
 
-    plano_perifericos = PlanejarPerifericosService().executar(catalogo, teto_perifericos, proprias, dados["utilidade"], cor=aparencia["cor"]) if percentual else None
+
+  def _planejar_perifericos(self, catalogo, teto_perifericos, proprias, utilidade, cor, percentual):
+    plano_perifericos = PlanejarPerifericosService().executar(catalogo, teto_perifericos, proprias, utilidade, cor=cor) if percentual else None
     if plano_perifericos and not plano_perifericos["viavel"]:
       minimo = plano_perifericos.get("minimo_catalogado")
       detalhe = f" O menor conjunto disponível custa R$ {minimo:.2f}, mas a reserva é de R$ {teto_perifericos:.2f}." if minimo is not None else ""
       raise ErroPlanejamentoBuild("Não há um conjunto completo de periféricos dentro da porcentagem reservada." + detalhe + " Revise a porcentagem ou o orçamento; nenhuma build foi salva.",
                                   "perifericos", "O conjunto de periféricos não cabe na reserva", "perifericos",
                                   sugerir_total(percentual, minimo_perifericos=minimo) if minimo is not None else None)
-    detalhes_proprias = self._detalhes_proprias(proprias)
-    inicio_prompt = perf_counter()
-    prompt = self._criar_prompt(dados, orcamento, margem, catalogo, percentual, detalhes_proprias, plano_perifericos)
-    logger.info("Geração: etapa=prompt duracao_ms=%d caracteres=%d", (perf_counter()-inicio_prompt)*1000, len(prompt))
-    dados_build = self._gerar_validada(usuario_id, prompt, modelo, catalogo, orcamento,
-                                     percentual, proprias, detalhes_proprias, rede, tentativas_correcao,
-                                     revisar_investimento=self._perfil_revisa_investimento(dados["utilidade"]), cor=aparencia["cor"], aparencia=aparencia)
+    return plano_perifericos
+
+  def _salvar_build(self, usuario_id, dados_build, proprias, rede, percentual, aparencia, orcamento):
     if proprias:
       return AvaliarCompatibilidadeService().para_resposta(BuildSalva.criar_gerada_com_pecas_proprias(usuario_id, dados_build, proprias, rede, percentual, aparencia))
 
@@ -173,7 +193,6 @@ class CriarBuildService:
 
   def _gerar_validada(self, usuario_id, prompt, modelo, catalogo, orcamento,
                      percentual, proprias, detalhes_proprias, rede, tentativas_correcao=1, revisar_investimento=False, cor="sem-preferencia", aparencia=None):
-    # No máximo uma revisão: não repetir indefinidamente nem persistir uma saída inválida.
     limite = 1 if tentativas_correcao else 0
     instrucao = prompt
     primeira_valida = None
@@ -195,10 +214,10 @@ class CriarBuildService:
         validada = self._ajustar_aparencia(validada, catalogo, orcamento, percentual, proprias,
                                          detalhes_proprias, rede, aparencia or {"cor": cor})
         resumo = self._resumo_custos(validada, catalogo)
-        # Uma revisão já permitida, não um mínimo de gasto nem novas tentativas.
+
         if tentativa < limite and revisar_investimento and self._ha_margem_para_melhorar(validada, catalogo, teto_pc, proprias):
           primeira_valida = deepcopy(validada)
-          build = validada  # A revisão recebe os custos após os ajustes do servidor.
+          build = validada
           raise ValueError(f"A configuração é válida, mas usa somente R$ {resumo['pc']:.2f} do teto de R$ {teto_pc:.2f} do PC. "
               f"Reavalie combinações próximas de 80% a 100% desse teto (R$ {teto_pc * Decimal('0.8'):.2f} a R$ {teto_pc:.2f}), "
               "buscando melhorias adequadas de CPU/GPU/RAM/SSD para o perfil solicitado, inclusive uso misto. "
@@ -208,7 +227,7 @@ class CriarBuildService:
         logger.info("Geração: etapa=validada tentativa=%d duracao_ms=%d", tentativa+1, (perf_counter()-inicio_validacao)*1000)
         return validada
       except ValueError as erro:
-        # Somente tipo/etapa; nunca registrar prompt, peças próprias ou resposta.
+
         logger.warning("Geração: etapa=revisao tentativa=%d codigo=%s", tentativa+1, self._codigo_falha(erro))
         if tentativa == limite:
           if primeira_valida is not None:
@@ -244,8 +263,8 @@ class CriarBuildService:
     gasto = Decimal(str(cls._resumo_custos(build, catalogo)["pc"]))
     if gasto >= teto_pc * Decimal("0.75"):
       return False
-    # Só solicita análise: preço não certifica ganho. A nova combinação ainda
-    # precisa passar por toda a validação antes de substituir a primeira válida.
+
+
     for item in build["componentes"]:
       tipo, quantidade = item["tipo"], item["quantidade"]
       if tipo not in ("processador", "placa_video", "memoria_ram", "ssd") or tipo in proprias:
@@ -293,7 +312,7 @@ class CriarBuildService:
           tentativa = CompletarVentilacaoService().executar(tentativa, catalogo, teto_pc, proprias, detalhes, cor=aparencia.get("cor"))
           tentativa = self._validar_build(tentativa, catalogo, orcamento, percentual, proprias, detalhes, rede)
         except ValueError:
-          continue  # Estética nunca transforma uma montagem válida em falha.
+          continue
         atual = tentativa
         break
     return atual
@@ -319,8 +338,6 @@ class CriarBuildService:
 
   @classmethod
   def _campos_pecas(cls, peca):
-    # Usa o mesmo complemento técnico do catálogo exibido no editor. O LLM
-    # continua recebendo o ID numérico exigido pelo contrato de geração.
     dados = {**peca.to_catalogo(), "id": peca.id}
     dados.update(PreferenciasCoresService.metadados(dados))
     if dados.get("categoria") == "gabinete":
@@ -346,9 +363,8 @@ class CriarBuildService:
           fichas = PlanejarRedeService.opcoes({modelo.__tablename__: fichas}, rede)
         if fichas:
           catalogo[modelo.__tablename__] = AmostrarCatalogoService().executar(modelo.__tablename__, fichas, utilidade=utilidade, cor=cor)
-          # A amostra pode conter a versão branca econômica e omitir sua irmã
-          # preta. Preserve variantes equivalentes para a preferência funcionar
-          # sem enviar o catálogo inteiro nem trocar por um produto inferior.
+
+
           amostra = catalogo[modelo.__tablename__]
           variantes = []
           for selecionada in list(amostra):
@@ -384,8 +400,8 @@ class CriarBuildService:
     if percentual and plano_perifericos is None:
       plano_perifericos = PlanejarPerifericosService().executar(catalogo, perifericos, proprias, dados["utilidade"], cor=pedido["aparencia"]["cor"])
     teto_peca = min(Decimal(str(orcamento - margem)), pc)
-    # Tornar explícitas decisões determinísticas ajuda a LLM a não cruzar IDs de
-    # plataformas diferentes. É apenas socket: não certifica BIOS nem o conjunto.
+
+
     socket = normalizar_socket
     pares = [{"processador": cpu["id"], "placas_mae": [p["id"] for p in catalogo.get("placa_mae", [])
               if socket(p.get("socket")) == socket(cpu.get("soquete"))]}
@@ -830,8 +846,8 @@ class CriarBuildService:
       raise ValueError("A IA não incluiu os periféricos solicitados. Tente novamente.")
     if not {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"} <= finais or not {"ssd", "hd"} & finais:
       raise ValueError("A IA não completou as peças obrigatórias da build")
-    # Reutiliza o diagnóstico do servidor antes de persistir a sugestão da IA.
-    # O catálogo fornecido é o do Python, nunca especificações geradas pela LLM.
+
+
     verificacao = [{**peca, "categoria": tipo} for tipo, itens in catalogo.items() for peca in itens]
     componentes = {item["tipo"]: {"id": item["id"], "quantidade": item["quantidade"]}
                    for item in build["componentes"]}
