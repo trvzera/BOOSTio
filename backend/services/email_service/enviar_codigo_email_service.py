@@ -16,7 +16,7 @@ class EnviarEmailService:
       raise ValueError("Email já verificado")
 
     Codigo.verificar_limite_envio(usuario.id)
-    
+
     email_destino = usuario.email
     msg = Message(
         subject='Seu código de verificação — BOOSTio',
@@ -53,11 +53,8 @@ class EnviarEmailService:
       "Se você não solicitou a verificação, ignore este e-mail.\n\n"
       "Equipe BOOSTio\nMensagem automática de segurança da sua conta."
     )
-    # HTML transacional sem imagens remotas, rastreamento, anexos ou fontes externas.
-    # A versão em texto acima mantém o mesmo conteúdo e código.
-    # Gmail (2026): light only preserva as cores autorais, inclusive neste layout
-    # já escuro. Declarar apenas dark não impede a inversão de luminância no app.
-    # https://emailmarkup.org/en/blog/2026/gmail-app-dark-mode-update
+
+
     msg.html = f'''<!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light only"><title>Confirme seu e-mail — BOOSTio</title></head>
 <body style="margin:0;padding:0;background-color:#000000;color:#e5e5ea;font-family:Poppins,Arial,Helvetica,sans-serif;">
