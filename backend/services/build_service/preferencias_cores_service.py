@@ -4,8 +4,6 @@ from decimal import Decimal
 
 
 class PreferenciasCoresService:
-    """Preferência visual, nunca uma regra de compatibilidade ou cor inventada."""
-
     CORES = {"preto": "preto", "preta": "preto", "black": "preto",
              "branco": "branco", "branca": "branco", "white": "branco"}
     OUTRAS = {"azul", "blue", "vermelho", "vermelha", "red", "verde", "green",
@@ -24,7 +22,7 @@ class PreferenciasCoresService:
         elif cor is not None and not isinstance(cor, str):
             return frozenset(), None
         else:
-            # Não usar fotos, slug da loja, fabricante ou código do produto.
+
             if peca.get("categoria") == "processador" or not isinstance(peca.get("modelo"), str):
                 return frozenset(), None
             ficha = peca.get("modelo_ficha_tecnica")
@@ -34,7 +32,7 @@ class PreferenciasCoresService:
                     return cores, "nome_ficha_tecnica"
             texto, origem = cls._texto(peca["modelo"]), "nome_cadastrado"
             texto = re.sub(r"\b(?:wd[_\s]+black|black\s+edition|white\s+label|80\s*(?:plus|\+)\s*white)\b", "", texto)
-        # Cor do switch/iluminação não é a cor da carcaça. Nomes ambíguos ficam desconhecidos.
+
         cores_texto = "|".join(sorted(set(cls.CORES) | cls.OUTRAS, key=len, reverse=True))
         texto = re.sub(r"\b(?:switch(?:es)?|led|luz|iluminacao|rgb|argb)\s+(?:de\s+)?(?:" + cores_texto + r")\b", "", texto)
         texto = re.sub(r"\bswitch(?:es)?\s+[a-z]+\s+(?:" + cores_texto + r")\b", "", texto)
@@ -85,14 +83,14 @@ class PreferenciasCoresService:
             texto = cls._texto(str(item.get("modelo") or ""))
             texto = re.sub(r"\b(?:preto|preta|branco|branca|black|white)\b", " ", texto)
             return re.sub(r"[^a-z0-9]+", "", texto)
-        # Mesma família e ficha. Não troca GPU por outra inferior só para combinar a cor.
+
         campos = ("capacidade_gb", "memoria_gb", "ddr", "frequencia_mhz", "quantidade_pentes",
                   "resolucao", "taxa_atualizacao_hz", "tipo_painel", "tamanho_polegadas",
                   "mecanico", "switch", "layout", "conexao", "potencia_w", "tamanho_mm", "quantidade")
         def mesma_versao(item):
             chip = peca.get("gpu_chip")
             if peca.get("categoria") == "placa_video" and isinstance(chip, str) and chip.strip():
-                # Variantes da MESMA GPU e memória; não é comparação de FPS.
+
                 return (item.get("gpu_chip") == chip and bool(peca.get("memoria_gb"))
                         and all(peca.get(c) is not None and peca[c] == item.get(c)
                                 for c in ("memoria_gb", "tipo_memoria", "interface_memoria")))
