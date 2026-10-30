@@ -7,6 +7,9 @@ class BuscarJogosBenchmarkService:
         self.cliente = cliente or cliente_fpshq
 
     def executar(self, dados, usuario_id):
+        if not isinstance(dados, dict):
+            raise ValueError("Informe dados como um objeto válido")
+
         with self.cliente.travar("games", dados):
             return self._buscar(dados, usuario_id)
 
