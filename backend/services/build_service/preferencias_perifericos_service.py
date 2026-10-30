@@ -4,7 +4,6 @@ import re
 
 
 class PreferenciasPerifericosService:
-    """Critérios técnicos de seleção, não notas de qualidade ou desempenho."""
 
     @staticmethod
     def jogos(utilidade):
@@ -24,7 +23,7 @@ class PreferenciasPerifericosService:
         resolucao = re.fullmatch(r"\s*(\d{3,5})\s*[x×]\s*(\d{3,5})\s*", str(peca.get("resolucao") or ""), re.I)
         pixels = int(resolucao[1])*int(resolucao[2]) if resolucao else 0
         hz, tamanho = cls.numero(peca.get("taxa_atualizacao_hz")), cls.numero(peca.get("tamanho_polegadas"))
-        # Só compara dados cadastrados; não afirma fidelidade de cor ou resposta real.
+
         return (hz, pixels, tamanho) if cls.jogos(utilidade) else (pixels, tamanho, hz)
 
     @staticmethod
