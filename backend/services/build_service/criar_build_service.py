@@ -372,7 +372,11 @@ class CriarBuildService:
 
   @classmethod
   def _campos_pecas(cls, peca):
-    dados = {**peca.to_catalogo(), "id": peca.id}
+    return cls._campos_catalogo({**peca.to_catalogo(), "id": peca.id})
+
+  @classmethod
+  def _campos_catalogo(cls, dados):
+    dados = dict(dados)
     dados.update(PreferenciasCoresService.metadados(dados))
     if dados.get("categoria") == "gabinete":
       dados.update({chave + "_referencia": valor for chave, valor in PreferenciasGabineteService.identificar(dados).items() if valor})
@@ -425,7 +429,7 @@ class CriarBuildService:
     return catalogo
 
   @staticmethod
-  def _criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None, plano_perifericos=None):
+  def _criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None, plano_perifericos=None, planejamento_componentes=None, preferencia_neutra=False):
     pedido = {campo: dados[campo] for campo in ("nome", "descricao", "utilidade")}
     pedido["prioridade_montagem"] = CriarBuildService._validar_prioridade_montagem(dados)
     armazenamento_minimo = RequisitosArmazenamentoService.validar_parametro(dados.get("armazenamento_minimo_gb"))
@@ -457,7 +461,9 @@ class CriarBuildService:
                                        for tipo, itens in catalogo.items() if pedido["aparencia"]["cor"] != "sem-preferencia"},
       "gabinetes_a_avaliar_primeiro": [p["id"] for p in PreferenciasGabineteService.destaques(catalogo.get("gabinete", []), pedido["aparencia"])],
     }
-    ryzen = PreferenciasProcessadorService.ids_prioritarios(catalogo, dados["utilidade"], proprias)
+    if planejamento_componentes is not None:
+      restricoes["planejamento_componentes"] = planejamento_componentes
+    ryzen = [] if preferencia_neutra else PreferenciasProcessadorService.ids_prioritarios(catalogo, dados["utilidade"], proprias)
     restricoes["processadores_ryzen_prioritarios"] = ryzen
     regra_processador = (
       "Para jogos, dê preferência a AMD Ryzen: avalie primeiro processadores_ryzen_prioritarios "
@@ -509,6 +515,9 @@ class CriarBuildService:
 
         "# RESTRIÇÕES CALCULADAS PELO SERVIDOR\n"
         f"{json.dumps(restricoes, ensure_ascii=False)}\n"
+        "Se houver planejamento_componentes, use as metas de busca para equilibrar o conjunto. "
+        "São estimativas e não parcelas para somar nem um benchmark da build. Preserve os tetos "
+        "obrigatórios e os requisitos do cliente; uma plataforma barata pode deixar mais dinheiro à GPU.\n"
         "Para CPU/placa-mãe novas com socket conhecido, escolha um dos pares listados; "
         "uma lista vazia não autoriza outro socket. Pares por socket NÃO aprovam BIOS, "
         "RAM ou dimensões. Inclua acessorio_rede_obrigatorio somente quando não for null. "

@@ -15,8 +15,19 @@ class BenchmarkMixin:
         """Candidatos comparáveis por pontuação ou pontos por real, sem gravar."""
         pontuacao = getattr(cls, cls.BENCHMARK_CAMPO)
         criterio = pontuacao / cls.preco if prioridade == "custo_beneficio" else pontuacao
-        return (cls.query.filter(
+        return (cls._consulta_benchmark(preco_maximo)
+                .order_by(criterio.desc(), cls.preco.asc(), cls.id.asc()).limit(limite).all())
+
+    @classmethod
+    def listar_pool_benchmark(cls, preco_maximo):
+        """Carrega todos os elegíveis antes de Pareto, faixas e diversidade."""
+        return cls._consulta_benchmark(preco_maximo).order_by(cls.preco.asc(), cls.id.asc()).all()
+
+    @classmethod
+    def _consulta_benchmark(cls, preco_maximo):
+        pontuacao = getattr(cls, cls.BENCHMARK_CAMPO)
+        return cls.query.filter(
             cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False),
             pontuacao.isnot(None), pontuacao > 0,
             cls.benchmark_teste == cls.BENCHMARK_TESTE, cls.benchmark_versao.is_(None),
-        ).order_by(criterio.desc(), cls.preco.asc(), cls.id.asc()).limit(limite).all())
+        )

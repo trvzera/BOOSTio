@@ -1991,3 +1991,17 @@ O fallback de transporte conserva sua configuração sem um novo ciclo de corre�
 Uma resposta incorreta não é salva. Uma build previamente válida pode ser preservada
 quando uma tentativa opcional de melhorar investimento falha, como já ocorria.
 Campos de diagnóstico são limitados individualmente para não cortar o JSON ao meio.
+
+### Etapa 3: orçamento dinâmico, Pareto e diversidade
+
+A preparação experimental evoluiu para planejar reservas e metas por uso/orçamento,
+carregar o pool antes de cortá-lo, remover dominados comparáveis e misturar faixas,
+plataformas e rankings. `SeletorInteligenteService.preparar_geracao` fornece o catálogo
+numérico e o prompt com planejamento e sem preferência artificial por Ryzen.
+O endpoint antigo continua independente. A seleção experimental aplica limites estritos,
+configuráveis com `limites_candidatos`; diagnósticos registram cortes e fallbacks.
+
+O guia completo de algoritmo, parâmetros, limitações e manutenção está em
+[Seleção inteligente — Etapa 3](selecao-inteligente-etapa-3.md). Ele substitui as descrições
+anteriores que diziam que o seletor somente ordenava CPU/GPU ou reutilizava integralmente
+`_gerar_catalogo`: agora os pools são carregados pelos models antes da amostragem.

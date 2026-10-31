@@ -66,7 +66,7 @@ def test_categoria_limite_e_desempate_deterministico(banco):
     dados = dict(orcamento=Decimal('2000'), preferencias='desempenho', categoria='processador',
                  limite=1)
     assert ids(dados) == [a]
-    assert ids({**dados, 'limite': 2}) == [a, b]
+    assert ids({**dados, 'limite': 2}) == [a, menor]
     assert ids({**dados, 'limite': 3}) == [a, b, menor]
 
 
@@ -118,21 +118,21 @@ def test_mesmas_validacoes_de_orcamento_da_montagem_antes_da_consulta(dados):
 
 @pytest.mark.parametrize('gpu', [False, True])
 def test_custo_beneficio_ordena_pontos_por_real_antes_de_aplicar_limite(banco, gpu):
-    inserir(1000, 15000, gpu)  # 15 pontos por real
+    alto = inserir(1000, 15000, gpu)  # 15 pontos por real
     melhor = inserir(800, 20000, gpu)  # 25 pontos por real
     intermediario = inserir(500, 10000, gpu)  # 20 pontos por real
     inserir(1201, 100000, gpu)  # Acima do teto de 1200, mesmo com ótima relação.
-    resultado = ids(dict(orcamento=2000, prioridade_montagem='custo_beneficio', limite=2))
-    assert resultado == [melhor, intermediario]
+    resultado = ids(dict(orcamento=2000, prioridade_montagem='custo_beneficio', limite=3))
+    assert resultado == [melhor, intermediario, alto]
 
 
 @pytest.mark.parametrize('gpu', [False, True])
 def test_empate_custo_beneficio_prioriza_menor_preco_depois_id(banco, gpu):
-    inserir(1000, 20000, gpu)
+    alto = inserir(1000, 20000, gpu)
     primeiro = inserir(500, 10000, gpu)
     segundo = inserir(500, 10000, gpu)
-    resultado = ids(dict(orcamento=2000, prioridade_montagem='custo_beneficio', limite=2))
-    assert resultado == [primeiro, segundo]
+    resultado = ids(dict(orcamento=2000, prioridade_montagem='custo_beneficio', limite=3))
+    assert resultado == [primeiro, segundo, alto]
 
 
 def salvar_modelo(classe, preco, **campos):
@@ -225,11 +225,15 @@ def test_placas_distribuem_24_vagas_por_socket_e_reaproveitam_sobras(banco, quan
     assert ids(dict(orcamento=4000, prioridade_montagem='desempenho')) == [p['id'] for p in selecionadas]
 
 
-def test_sem_cpu_elegivel_nao_reintroduz_placas_de_socket_aleatorio(banco):
+def test_sem_benchmark_preserva_fallback_tecnico_sem_inventar_pontuacao(banco):
     from models import PlacaMae
-    inserir(500, None, soquete='AM4')
-    salvar_modelo(PlacaMae, 300, socket='AM4')
-    assert ids(dict(orcamento=4000, prioridade_montagem='desempenho')) == []
+    cpu = inserir(500, None, soquete='AM4')
+    placa = salvar_modelo(PlacaMae, 300, socket='AM4')
+    r = SeletorInteligenteService().executar(dict(orcamento=4000, prioridade_montagem='desempenho'))
+    assert [p['id'] for p in r['componentes_selecionados']] == [cpu, placa]
+    assert r['componentes_selecionados'][0]['benchmark_multi_core'] is None
+    assert r['amostragem']['processador']['sem_benchmark'] is True
+    assert any('sem classificação' in aviso for aviso in r['planejamento_orcamento']['avisos'])
 
 
 def test_placas_consideram_cpu_propria_e_categoria_especifica(banco):
@@ -324,3 +328,136 @@ def test_seletor_preserva_requisito_de_armazenamento_para_etapa_de_geracao(banco
     resultado = SeletorInteligenteService().executar(dados)
     assert resultado['armazenamento_minimo_gb'] == 1000
     assert SeletorInteligenteService().executar({**dados, 'armazenamento_minimo_gb': None})['armazenamento_minimo_gb'] is None
+
+
+def cadastrar_plataforma(socket, ddr, preco_cpu, pontos, preco_placa=400, preco_ram=200):
+    from models import PlacaMae, MemoriaRAM
+    cpu = inserir(preco_cpu, pontos, soquete=socket)
+    salvar_modelo(PlacaMae, preco_placa, socket=socket, tipo_memoria=ddr)
+    salvar_modelo(MemoriaRAM, preco_ram, ddr=ddr, capacidade_gb=16, frequencia_mhz=3200, quantidade_pentes=1)
+    return cpu
+
+
+def test_jogos_preserva_plataformas_viaveis_e_impede_cpu_consumir_resto(banco):
+    from models import Fonte, Gabinete, SSD
+    am4 = cadastrar_plataforma('AM4', 'DDR4', 1000, 15000)
+    am5 = cadastrar_plataforma('AM5', 'DDR5', 1500, 25000)
+    cara = inserir(5500, 90000, soquete='AM5')
+    inserir(2000, 20000, gpu=True)
+    salvar_modelo(Fonte, 300, potencia_w=650)
+    salvar_modelo(Gabinete, 200, formato='ATX', formatos_placa_mae='ATX')
+    salvar_modelo(SSD, 400, capacidade_gb=1000, tipo='NVMe', interface='PCIe')
+    r = SeletorInteligenteService().executar(dict(orcamento=8000, utilidade='Jogos', prioridade_montagem='desempenho'))
+    cpus = {p['id'] for p in r['componentes_selecionados'] if p['categoria']=='processador'}
+    assert {am4, am5} <= cpus and cara not in cpus
+    assert r['planejamento_orcamento']['tetos_sugeridos']['processador'] == 1760
+    assert not r['categorias_pendentes']
+
+
+def test_fallback_de_meta_nao_elimina_unica_plataforma_viavel(banco):
+    cpu = cadastrar_plataforma('AM4', 'DDR4', 2200, 20000)
+    r = SeletorInteligenteService().executar(dict(orcamento=8000, utilidade='Jogos', prioridade_montagem='desempenho'))
+    assert cpu in [p['id'] for p in r['componentes_selecionados']]
+    assert r['planejamento_orcamento']['flexibilizacoes']
+
+
+def test_placa_propria_exclui_cpus_de_outro_socket_antes_da_amostra(banco):
+    from models import PlacaMae
+    am4 = inserir(1000, 15000, soquete='AM4')
+    inserir(1000, 90000, soquete='AM5')
+    salvar_modelo(PlacaMae, 400, modelo='Minha AM4', socket='AM4', tipo_memoria='DDR4')
+    r = SeletorInteligenteService().executar(dict(orcamento=8000, utilidade='Jogos', prioridade_montagem='desempenho',
+                                                pecas_proprias={'placa_mae': 'Minha AM4'}))
+    assert [p['id'] for p in r['componentes_selecionados'] if p['categoria']=='processador'] == [am4]
+
+
+def test_limites_por_categoria_sao_estritos_inclusive_um(banco):
+    from models import Fonte
+    for n in range(5):
+        salvar_modelo(Fonte, 200+n*10, potencia_w=500)
+    r = SeletorInteligenteService().executar(dict(orcamento=8000, prioridade_montagem='desempenho',
+                                                limites_candidatos={'fonte': 1}))
+    assert len([p for p in r['componentes_selecionados'] if p['categoria']=='fonte']) == 1
+
+
+@pytest.mark.parametrize('limites', [[], {'inexistente': 10}, {'processador': True}, {'placa_mae': 0}, {'ssd': 201}])
+def test_limites_por_categoria_invalidos_nao_consultam_banco(limites):
+    with pytest.raises(ValueError):
+        SeletorInteligenteService().executar(dict(orcamento=8000, prioridade_montagem='desempenho', limites_candidatos=limites))
+
+
+def test_armazenamento_requerido_preserva_referencia_que_soma_capacidade(banco):
+    from models import SSD
+    for n in range(20):
+        salvar_modelo(SSD, 100+n*10, capacidade_gb=120, tipo='SATA', interface='SATA')
+    ident = salvar_modelo(SSD, 500, capacidade_gb=1000, tipo='NVMe', interface='PCIe')
+    r = SeletorInteligenteService().executar(dict(orcamento=8000, utilidade='Jogos', prioridade_montagem='desempenho',
+                                                armazenamento_minimo_gb=1000, limites_candidatos={'ssd': 1}))
+    assert [p['id'] for p in r['componentes_selecionados'] if p['categoria']=='ssd'] == [ident]
+    assert r['planejamento_orcamento']['armazenamento_referencia']['capacidade_total_gb'] == 1000
+
+
+def test_preparar_geracao_usa_plano_calculado_e_prompt_neutro_sem_gravar(banco):
+    from models import Fonte, Gabinete, SSD, BuildSalva
+    cadastrar_plataforma('AM4', 'DDR4', 1000, 15000)
+    inserir(1500, 20000, gpu=True)
+    salvar_modelo(Fonte, 300, potencia_w=650)
+    salvar_modelo(Gabinete, 200, formato='ATX', formatos_placa_mae='ATX')
+    salvar_modelo(SSD, 300, capacidade_gb=500, tipo='NVMe', interface='PCIe')
+    pedido = dict(nome='PC', descricao='Teste', utilidade='Jogos', orcamento=8000,
+                  prioridade_montagem='desempenho', armazenamento_minimo_gb=500)
+    r = SeletorInteligenteService().preparar_geracao(pedido)
+    assert 'dê preferência a AMD Ryzen' not in r['prompt']
+    assert '"planejamento_componentes"' in r['prompt']
+    assert '"armazenamento_minimo_gb": 500' in r['prompt']
+    assert isinstance(r['catalogo']['processador'][0]['id'], int)
+    assert r['catalogo']['processador'][0]['benchmark_multi_core'] == 15000
+    assert r['catalogo']['processador'][0]['benchmark_teste'].startswith('PassMark')
+    assert BuildSalva.query.count() == 0
+
+
+def test_reserva_independente_de_perifericos_nao_recebe_teto_do_pc(banco):
+    from models import Monitor
+    campos = dict(conexao='HDMI', tamanho_polegadas=24, resolucao='1920x1080', taxa_atualizacao_hz=60, tipo_painel='IPS')
+    barato = salvar_modelo(Monitor, 1000, **campos)
+    caro = salvar_modelo(Monitor, 3000, **campos)
+    r = ids(dict(orcamento=10000, percentual_perifericos=75, utilidade='Jogos', prioridade_montagem='desempenho'))
+    assert {barato, caro} <= set(r)
+
+
+def test_plataforma_pendente_nao_e_confundida_com_inviabilidade_comprovada(banco):
+    from models import Fonte, Gabinete, SSD
+    # Uma AM4 tem plataforma conhecida, mas seu custo mínimo não cabe no PC+GPU.
+    conhecida = cadastrar_plataforma('AM4', 'DDR4', 5000, 50000)
+    desconhecida = inserir(1000, 15000, soquete='LGA1700')
+    from models import Processador
+    Processador.buscar_por_id(int(conhecida.split(':')[1])).cooler = True
+    db.session.commit()
+    inserir(3000, 30000, gpu=True)
+    salvar_modelo(Fonte, 500, potencia_w=650)
+    salvar_modelo(Gabinete, 500, formato='ATX', formatos_placa_mae='ATX')
+    salvar_modelo(SSD, 500, capacidade_gb=500, tipo='SATA', interface='SATA')
+    r = SeletorInteligenteService().executar(dict(orcamento=8000, utilidade='Jogos', prioridade_montagem='desempenho'))
+    assert [p['id'] for p in r['componentes_selecionados'] if p['categoria']=='processador'] == [desconhecida]
+    assert r['planejamento_orcamento']['avisos']
+
+
+def test_cor_viavel_pode_flexibilizar_meta_sem_ultrapassar_teto_absoluto(banco):
+    from models import Fonte
+    preto = salvar_modelo(Fonte, 500, modelo='Fonte preta', potencia_w=650)
+    branca = salvar_modelo(Fonte, 900, modelo='Fonte branca', potencia_w=650)
+    salvar_modelo(Fonte, 7000, modelo='Fonte branca premium', potencia_w=1000)
+    dados = dict(orcamento=8000, utilidade='Jogos', prioridade_montagem='desempenho', aparencia={'cor':'branco'})
+    r = SeletorInteligenteService().executar(dados)
+    assert {p['id'] for p in r['componentes_selecionados'] if p['categoria']=='fonte'} == {preto, branca}
+    assert any('cor pedida' in msg for msg in r['planejamento_orcamento']['flexibilizacoes'])
+
+
+def test_fallback_sem_benchmark_nao_aceita_score_invalido_ou_outra_escala(banco):
+    inserir(500, 0)
+    inserir(500, -1)
+    inserir(500, None, benchmark_teste='Outro teste')
+    inserir(500, None, benchmark_versao='Outra versão')
+    r = SeletorInteligenteService().executar(dict(orcamento=4000, prioridade_montagem='desempenho'))
+    assert not any(p['categoria']=='processador' for p in r['componentes_selecionados'])
+    assert 'processador' in r['categorias_pendentes']

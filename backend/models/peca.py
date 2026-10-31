@@ -130,10 +130,7 @@ class Peca(ModeloBase):
 
   @classmethod
   def listar_disponiveis_ate(cls, preco_maximo: float, limite: int = 30):
-    pecas = (cls.query
-      .filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
-      .order_by(cls.preco.asc(), cls.id.asc())
-      .all())
+    pecas = cls.listar_candidatos_disponiveis(preco_maximo)
     if len(pecas) <= limite:
       return pecas
     # Distribui as opções pela faixa de preços, sem enviar o catálogo inteiro ao LLM.
@@ -143,3 +140,9 @@ class Peca(ModeloBase):
   @classmethod
   def buscar_mais_barata_por_part_number(cls, part_number: str) -> "Peca | None":
     return cls.query.filter_by(part_number=part_number).order_by(cls.preco.asc()).first()
+
+  @classmethod
+  def listar_candidatos_disponiveis(cls, preco_maximo):
+    """Pool completo para planejamento; não aplica corte/amostragem prematuros."""
+    return (cls.query.filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
+            .order_by(cls.preco.asc(), cls.id.asc()).all())

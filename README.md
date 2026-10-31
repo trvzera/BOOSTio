@@ -482,3 +482,5 @@ o IP da conexão e ignora esse cabeçalho. Não habilite a opção para acesso d
 ## Importação de benchmarks
 
 CPU Mark/Single Thread e GPU G2D/G3D podem ser preenchidos a partir de snapshots CSV locais pelo comando administrativo `benchmarks-importar`, com `--simular`, sem criar peças. Veja [esquema, migração, execução e limitações da fonte](docs/benchmarks-importacao.md).
+
+A seleção experimental por orçamento, Pareto e diversidade está documentada no [guia da Etapa 3](docs/selecao-inteligente-etapa-3.md), incluindo parâmetros, diagnósticos e manutenção.
