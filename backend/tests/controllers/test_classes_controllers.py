@@ -44,6 +44,7 @@ def test_contrato_de_urls_metodos_e_endpoints_preservado():
         ("/auth/google/vincular", "POST", "auth.vincular_google"),
         ("/auth/google/entrar", "GET", "auth.callback_google"),
         ("/usuarios/<int:usuario_id>/budget", "PUT", "usuario.atualizar_budget"),
+        ("/usuarios/<int:usuario_id>/preferencias-uso", "PUT", "usuario.atualizar_preferencias_uso"),
         ("/usuarios/", "POST", "usuario.criar_usuario"),
         ("/usuarios/<int:usuario_id>", "DELETE", "usuario.excluir_usuario"),
         ("/usuarios/<int:usuario_id>", "GET", "usuario.listar_usuario_id"),

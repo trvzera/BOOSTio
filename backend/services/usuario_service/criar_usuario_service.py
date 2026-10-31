@@ -1,4 +1,4 @@
-from models import Usuario
+from models import Usuario, PreferenciasUso
 from werkzeug.security import generate_password_hash
 from email_validator import validate_email
 from utils.validacoes import validacao_campos,validar_senha_forte
@@ -33,6 +33,7 @@ class CriarUsuarioService:
       senha = senha_protegida,
     )
 
+    usuario.preferencias_uso = PreferenciasUso(tutorial="pendente")
     usuario.salvar()
 
     return usuario

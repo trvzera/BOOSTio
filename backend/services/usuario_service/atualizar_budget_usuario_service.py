@@ -18,7 +18,7 @@ class AtualizarBudgetUsuarioService:
         if usuario is None:
             return None
         usuario.atualizar_budget(budget, usar_budget)
-        return usuario.to_dict(incluir_budget=True)
+        return usuario.to_dict(incluir_budget=True, incluir_preferencias=True)
 
     @staticmethod
     def _validar_budget(valor, usar_budget):

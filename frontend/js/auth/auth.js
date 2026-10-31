@@ -7,6 +7,7 @@ import { verificarEspacoBuild } from "../api/build/builds.js";
 import { idCompartilhamentoPublico, consumirRetornoPublico } from '../components/sessao-publica.js';
 import { mostrarFalhaSessao, limparFalhaSessao } from "../components/session-feedback.js";
 import { nomePagina } from "../components/page-routes.js";
+import { tutorialPendente } from "../conta/preferencias-uso.js";
 
 const paginaAtual = nomePagina(location.pathname);
 const publica = paginaAtual === 'configuracao-build.html' && idCompartilhamentoPublico(location.search);
@@ -44,6 +45,9 @@ export async function confirmaUsuario() {
     document.body.dataset.sessionState = "authorized";
     const main = document.querySelector("main");
     if (main) main.inert = false;
+    if (autenticado && tutorialPendente(resposta.usuario) && !['signin.html','login.html'].includes(paginaAtual)) {
+      void import("../components/onboarding.js").then(modulo => modulo.oferecerTutorial(resposta.usuario)).catch(() => {});
+    }
   }
   return resposta;
 }

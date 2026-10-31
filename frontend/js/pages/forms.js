@@ -2,11 +2,13 @@ import "../header.js";
 import "../auth/auth.js";
 import { normalizarRede, vincularRede } from "../build/rede.js";
 import { normalizarAparencia, aparenciaHtml, atualizarGuiaPorteGabinete } from "../build/aparencia.js";
-import { opcoesUso, prioridadesUso } from "../build/uso-formulario.js";
+import { opcoesUso, prioridadesUso, orientacoesEtapas } from "../build/uso-formulario.js";
+import { ajustarGuiasConhecimento } from "../conta/preferencias-uso.js";
 import { iniciarImagens } from "../build/imagens-produtos.js";
 import { planejamentoLocal } from "../build/planejamento.js";
 import { orcamentoValido, dividirOrcamento, avaliarOrcamentoGeracao, MINIMO_PC_GERACAO } from "../build/orcamento-formulario.js";
 import { feedbackGeracao } from "../build/generation-feedback.js";
+import { confirmarPrioridadeMontagem, prioridadeMontagemValida } from "../build/generation-priority.js";
 import { carregarPerfil } from "../conta/perfil.js";
 import { acompanharCarregamento } from "../components/page-loading.js";
 import { criarBuild, verificarEspacoBuild, catalogoBuilds } from "../api/build/builds.js";
@@ -62,23 +64,23 @@ const perguntas = [
     multipla: true,
     opcoes: [
       ["nenhuma", "Ainda não tenho peças"],
-      ["processador", "Processador"],
-      ["placa-mae", "Placa-mãe"],
-      ["placa-video", "Placa de vídeo"],
-      ["memoria", "Memória RAM"],
-      ["ssd", "SSD"],
-      ["hd", "HD"],
-      ["fonte", "Fonte"],
-      ["gabinete", "Gabinete"],
-      ["cooler", "Air cooler"],
-      ["water-cooler", "Water cooler"],
-      ["fans", "Ventoinhas (fans)"],
+      ["processador", "Processador", "Executa os programas e as tarefas."],
+      ["placa-mae", "Placa-mãe", "Conecta e organiza as peças do computador."],
+      ["placa-video", "Placa de vídeo", "Gera as imagens de jogos e programas."],
+      ["memoria", "Memória RAM", "Mantém os programas abertos em uso."],
+      ["ssd", "SSD", "Guarda arquivos e abre programas com rapidez."],
+      ["hd", "HD", "Guarda seus arquivos e programas."],
+      ["fonte", "Fonte", "Fornece energia às peças."],
+      ["gabinete", "Gabinete", "A caixa onde as peças ficam instaladas."],
+      ["cooler", "Resfriador a ar", "Air cooler · ajuda a resfriar o processador."],
+      ["water-cooler", "Resfriador a líquido", "Water cooler · resfria o processador com líquido."],
+      ["fans", "Ventoinhas (fans)", "Fazem o ar circular dentro do gabinete."],
     ],
   },
   {
     chave:"perifericos",etapa:"Periféricos",tag:"Etapa 04",
     titulo:"Quer incluir periféricos na montagem?",
-    descricao:"Quer incluir monitor, teclado, mouse e fone? Informe o que já possui e qual parte do seu dinheiro pode ser usada nos itens que faltam.",
+    descricao:"Além da caixa do computador, você pode precisar de monitor, teclado, mouse e fone. Informe o que já possui e quanto reservar para o que faltar.",
     opcoes:[
       ["sem-perifericos","Não incluir periféricos novos","Vou montar apenas o computador."],
       ["todos-perifericos","Preciso de todos","Incluir monitor, teclado, mouse e headset."],
@@ -173,7 +175,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     painel.classList.remove("question-enter");
     void painel.offsetWidth;
     painel.classList.add("question-enter");
-    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Montagem inteligente · ${pergunta.tag}</span><h1 class="font-1-xl">${pergunta.titulo}</h1><p class="font-2-s">${pergunta.descricao}</p></div><div class="manual-build"><h2 class="font-1-m-b">Deseja montar manualmente?</h2><p class="font-2-s">Escolha os componentes da sua build por conta própria no editor.</p><a href="./configuracao-build.html" class="btn-primary-form" aria-label="Montar manualmente no editor de build">Montar manualmente</a></div>`;
+    const ajuda = pergunta.chave === "objetivo"
+      ? '<details class="usage-priority" data-knowledge-guide open><summary class="font-1-xs">O que vamos priorizar</summary><p id="usage-priority-copy" class="font-2-xs" aria-live="polite"></p></details>'
+      : orientacoesEtapas[pergunta.chave] ? `<details class="usage-priority" data-knowledge-guide open><summary class="font-1-xs">Como essa escolha ajuda</summary><p class="font-2-xs">${orientacoesEtapas[pergunta.chave]}</p></details>` : "";
+    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Montagem inteligente · ${pergunta.tag}</span><h1 class="font-1-xl">${pergunta.titulo}</h1><p class="font-2-s">${pergunta.descricao}</p>${ajuda}</div><div class="manual-build"><h2 class="font-1-m-b">Deseja montar manualmente?</h2><p class="font-2-s">Escolha os componentes da sua build por conta própria no editor.</p><a href="./configuracao-build.html" class="btn-primary-form" aria-label="Montar manualmente no editor de build">Montar manualmente</a></div>`;
+    ajustarGuiasConhecimento(painel);
   }
 
   function opcoesHtml(pergunta) {
@@ -283,7 +289,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     void conteudo.offsetWidth;
     conteudo.classList.add("question-enter");
     conteudo.classList.toggle("pieces-question-content", pergunta.chave === "pecas");
-    const rotuloAvancar = indiceAtual === perguntas.length - 1 ? "Gerar build" : "Avançar";
+    const rotuloAvancar = indiceAtual === perguntas.length - 1 ? "Revisar e gerar" : "Avançar";
     const campos = pergunta.chave === "aparencia" ? '<div id="form-appearance" aria-busy="true"><p class="font-2-xs">Carregando referências do catálogo…</p></div>' : pergunta.chave === "rede" ? '<div id="form-network"></div>' : `<fieldset class="question-options ${pergunta.multipla ? "pieces-grid" : ""}"><legend class="sr-only">${pergunta.titulo}</legend>${opcoesHtml(pergunta)}</fieldset>`;
     conteudo.innerHTML = `
       <div class="options-heading">
@@ -293,7 +299,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       <div class="question-options-scroll" role="region" aria-label="Respostas da etapa ${indiceAtual + 1}" tabindex="0">
       ${pergunta.chave === "orcamento" ? `<div class="budget-fields">${campos}${rangeHtml()}</div>` : campos}
       ${pergunta.chave === "perifericos" ? '<div id="perifericos-fields"></div>' : ""}
-      ${pergunta.chave === "objetivo" ? '<aside class="usage-priority" aria-labelledby="usage-priority-title"><h2 id="usage-priority-title" class="font-1-xs">O que vamos priorizar</h2><p id="usage-priority-copy" class="font-2-xs" aria-live="polite"></p></aside>' : ""}
       </div>
       <div id="form-navigation">
         <button type="button" class="btn-ghost" id="previous-question" aria-label="Voltar à etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}>${iconeAnimado("arrow","back")}<span>Voltar</span></button>
@@ -329,8 +334,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function atualizarPrioridadeUso() {
-    const texto=conteudo.querySelector("#usage-priority-copy");
-    if(texto)texto.textContent=prioridadesUso[respostas.objetivo]||"Selecione uma opção acima para entender como vamos escolher as peças. Todas as escolhas respeitam seu limite de gasto.";
+    const texto=painel.querySelector("#usage-priority-copy");
+    if(texto)texto.textContent=prioridadesUso[respostas.objetivo]||"Escolha um uso para entender como vamos selecionar as peças, respeitando seu limite de gasto.";
   }
 
   function renderizarAparencia() {
@@ -563,16 +568,30 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   let gerando = false;
+  let confirmando = false;
   let mensagensGeracao;
   const pararMensagens = () => clearInterval(mensagensGeracao);
   window.addEventListener("pagehide",pararMensagens);
   function avancar() {
     if (gerando || !podeAvancar()) return;
     if (indiceAtual === perguntas.length - 1) {
-      mostrarGerando();
+      confirmarGeracao();
       return;
     }
     navegarPara(indiceAtual + 1);
+  }
+
+  async function confirmarGeracao() {
+    if (gerando || confirmando) return;
+    confirmando = true;
+    try {
+      const prioridade = await confirmarPrioridadeMontagem(respostas.prioridadeMontagem);
+      if (!prioridade) return;
+      respostas.prioridadeMontagem = prioridade;
+      mostrarGerando();
+    } finally {
+      confirmando = false;
+    }
   }
 
   function navegarPara(indice) {
@@ -588,6 +607,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function mostrarGerando() {
     if (gerando) return;
+    if (!prioridadeMontagemValida(respostas.prioridadeMontagem)) return confirmarGeracao();
     gerando = true;
     document.querySelector("#questions").dataset.formState = "loading";
     conteudo.querySelectorAll("#form-navigation button, #tentar-gerar-build").forEach(botao => botao.disabled = true);
@@ -619,6 +639,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const utilidade = perguntas[0].opcoes.find(opcao => opcao[0] === respostas.objetivo)?.[1] || respostas.objetivo;
 
       const resposta = await criarBuild({nome: `PC para ${utilidade}`, descricao: `Montagem para ${utilidade}.`, utilidade, orcamento,
+        prioridade_montagem:respostas.prioridadeMontagem,
         percentual_perifericos:respostas.incluirPerifericos ? respostas.percentualPerifericos : 0,
         pecas_proprias:pecasPropriasFormulario(respostas),rede:respostas.rede,aparencia:respostas.aparencia});
       window.location.href = `${paginaConfiguracaoBuild}?build_id=${encodeURIComponent(resposta.build.id)}`;

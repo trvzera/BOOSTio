@@ -18,6 +18,7 @@ from .base import ModeloBase
 from .peca import Peca
 from .perifericos import Periferico
 from .usuario import Usuario
+from .preferencias_uso import PreferenciasUso
 from .fonte import Fonte
 from .processador import Processador
 from .placa_mae import PlacaMae
@@ -50,7 +51,7 @@ def user_loader(id: str) -> Usuario | None:
 
 
 __all__ = [
-    'lm','db','Peca','Periferico','Usuario','ModeloBase','Fonte',
+    'lm','db','Peca','Periferico','Usuario','PreferenciasUso','ModeloBase','Fonte',
     'Processador','PlacaMae','PlacaVideo','MemoriaRAM','SSD','HD',
     'Gabinete','WaterCooler','AirCooler','Fan','Fone','Teclado','Mouse','Monitor',
     'PlacaRede','CaboRede',

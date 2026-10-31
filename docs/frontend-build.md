@@ -6,6 +6,20 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Ajuda, glossário e histórico — 27/10/2026
+
+- No formulário, pergunta e ajuda ficam no painel direito; respostas ficam à
+  esquerda. No celular, a pergunta e a ajuda vêm antes das opções.
+- Rede e ventilação usam linguagem simples. Dicas por tamanho de gabinete aparecem
+  para iniciantes; especificações técnicas permanecem opcionais para todos.
+- O “?” é um glossário de termos efetivamente usados na peça (GB, TB, MHz, DDR,
+  conexões e medidas), sem repetir a função da categoria.
+- A implementação anterior de desfazer de um nível, documentada historicamente
+  abaixo, foi substituída por até 25 etapas com refazer, botões e Ctrl/Cmd+Z / Shift+Z.
+  O histórico de peças não intercepta edição de texto nem atua sobre builds trancadas
+  ou outra configuração. Nova ação descarta o redo; sair/recarregar limpa as pilhas.
+- Diferenças exatas dos níveis e regras do histórico em [experiencia-usuario.md](experiencia-usuario.md).
+
 ### Tamanho e estilo do gabinete — 24/10/2026
 
 - Complemento de cor: a orientação da etapa agora explica que a escolha vale para
@@ -1737,6 +1751,42 @@ consulta da sessão mantêm o menu de visitante disponível.
 O tooltip não reescreve textos idênticos, e seu MutationObserver ignora as próprias
 mutações e os frames Lottie. Isso evita o ciclo que congelava cliques. No cadastro,
 validação, checkbox e envio inicializam independentemente do carregamento do Lottie.
+
+## Prioridade na confirmação do formulário
+
+Depois de Aparência, **Revisar e gerar** abre uma confirmação com duas opções:
+Melhor desempenho e Maior custo-benefício. É necessário escolher uma delas antes
+de enviar; fechar, pressionar Escape ou voltar às respostas não cria uma build.
+A escolha confirmada permanece ao revisar etapas ou tentar novamente após um erro.
+
+O frontend acrescenta ao JSON de `POST /build/` somente o campo
+`prioridade_montagem`, com `"desempenho"` ou `"custo_beneficio"`.
+O controller atual encaminha o objeto ao service sem rejeitar esse campo extra.
+**A interpretação pelo backend/LLM ainda deve ser implementada pelo responsável
+pelo backend**; esta entrega não altera prompt, validações nem persistência.
+As reservas de periféricos e os limites de orçamento existentes são preservados.
+
+Validação em 30/10/2026: 737 testes Node e 62 testes Python de benchmark passaram.
+O fluxo foi conferido no Chrome em 320, 390, 844 e 1440 px, com API simulada:
+nenhum envio antes da confirmação, cancelamento/Escape com retorno de foco,
+ambas as prioridades e preservação das respostas nas novas tentativas.
+O novo diálogo passou pela auditoria axe WCAG A/AA, teclado e texto a 200%.
+Nenhuma chamada à IA ou gravação de build real foi executada.
+
+### FPSHQ: diagnóstico em 30/10/2026
+
+As consultas públicas a `/games?q=valorant&lang=pt` e `/fps` (Valorant,
+Ryzen 5 5600 + RTX 3060, 1080p, High) retornaram **HTTP 302**, conteúdo
+`text/html` e redirecionamento para `premium52.timeweb.ru/noactive/?ref=fpshq.com`.
+A página de destino informa indisponibilidade/suspensão por motivos técnicos.
+O teste verificou TLS e não seguiu redirecionamentos nos endpoints.
+
+Isso indica indisponibilidade do serviço externo neste teste, não um erro de
+leitura do JSON no frontend ou no Python. A BOOSTio já transforma esse cenário em
+503 com código `redirecionamento`, pausa de consultas e cache válido quando houver.
+O teste de jogos continua desativado; nenhuma estimativa é inventada. Documentação
+indexada ou um resultado antigo na página de testes não confirma disponibilidade
+atual. É necessário repetir a verificação na VPS quando o provedor se recuperar.
 
 ## Responsividade
 

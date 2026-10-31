@@ -78,6 +78,8 @@ class Peca(ModeloBase):
     dados = {coluna.name: getattr(self, coluna.name) for coluna in self.__table__.columns
              if coluna.name not in ("preco_atualizado_em", "criado_em", "atualizado_em")}
     dados["id"] = f"{self.__tablename__}:{self.id}"
+    if self.__tablename__ == "cabo_rede":
+      dados["categoria_cabo"] = dados.get("categoria")
     dados["categoria"] = self.__tablename__
     dados["link"] = dados.pop("kabum_external", None)
     data = self.preco_atualizado_em

@@ -2,7 +2,17 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from models import PlacaVideo
+from models import PlacaVideo, CaboRede
+from services.build_service.criar_build_service import CriarBuildService
+
+
+def test_catalogo_preserva_cat6_sem_sobrescrever_a_categoria_do_editor():
+    cabo = CaboRede(id=1, modelo="Cabo de rede 20m", categoria="CAT6", comprimento_m=20, preco=30)
+    ficha = cabo.to_catalogo()
+    assert ficha["categoria"] == "cabo_rede"
+    assert ficha["categoria_cabo"] == "CAT6"
+    assert cabo.categoria == "CAT6"
+    assert CriarBuildService._campos_pecas(cabo)["categoria_cabo"] == "CAT6"
 
 
 @pytest.mark.parametrize("data", [datetime(2026, 10, 20, 15, 30),
