@@ -12,6 +12,7 @@ from migrations.tokens_recuperacao import migrar_tokens_recuperacao
 from migrations.imagens_pecas import migrar_imagens_pecas
 from migrations.rede_build import migrar_rede_build
 from migrations.codigos_email import migrar_codigos_email
+from migrations.benchmarks_pecas import migrar_benchmarks_pecas
 from services.peca_service.migrar_links_service import MigrarLinksService
 
 
@@ -35,6 +36,7 @@ class PrepararBancoService:
     migrar_imagens_pecas()
     migrar_rede_build()
     migrar_codigos_email()
+    migrar_benchmarks_pecas()
     MigrarLinksService().executar()
     return {"backup": backup, "mensagem": "Banco preparado"}
 

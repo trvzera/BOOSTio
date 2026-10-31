@@ -1,7 +1,8 @@
 from . import db
 from . import Peca
+from .benchmark import BenchmarkMixin
 
-class Processador(Peca):
+class Processador(BenchmarkMixin, Peca):
     __tablename__ = "processador"
 
     soquete = db.Column(db.String(100), nullable=False)
@@ -13,3 +14,5 @@ class Processador(Peca):
     modelo_videointegrado = db.Column(db.String(100))
     cooler = db.Column(db.Boolean(), default=False)
     modelo_cooler = db.Column(db.String(100))
+    benchmark_multi_core = db.Column(db.Numeric(14, 2), nullable=True)
+    benchmark_single_thread = db.Column(db.Numeric(14, 2), nullable=True)
