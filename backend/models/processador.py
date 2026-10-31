@@ -4,6 +4,8 @@ from .benchmark import BenchmarkMixin
 
 class Processador(BenchmarkMixin, Peca):
     __tablename__ = "processador"
+    BENCHMARK_CAMPO = "benchmark_multi_core"
+    BENCHMARK_TESTE = "PassMark CPU Mark / Single Thread"
 
     soquete = db.Column(db.String(100), nullable=False)
     nucleo = db.Column(db.Integer(), nullable=False)

@@ -4,6 +4,8 @@ from .benchmark import BenchmarkMixin
 
 class PlacaVideo(BenchmarkMixin, Peca):
     __tablename__ = "placa_video"
+    BENCHMARK_CAMPO = "benchmark_g3d"
+    BENCHMARK_TESTE = "PassMark G2D / G3D"
 
     memoria_gb = db.Column(db.Integer(), nullable=False)
     tipo_memoria = db.Column(db.String(20))

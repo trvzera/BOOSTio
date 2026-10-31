@@ -1837,3 +1837,86 @@ configurações e novos componentes. A página Sobre nós usa os mesmos cards co
 para a transparência e `--glass-blur` para o desfoque do fundo.
 
 Testes da lógica: `node --test frontend/tests/build.test.mjs`.
+
+### Prioridade da montagem
+
+O seletor de confirmação do formulário envia `prioridade_montagem` no JSON de `POST /build/`:
+`custo_beneficio` ou `desempenho`. O backend valida o campo antes de consultar o usuário
+ou chamar a IA e o inclui no pedido de geração, também nas tentativas de fallback.
+Valores diferentes, inclusive `null`, retornam erro de validação (HTTP 400).
+Clientes anteriores que omitem o campo usam `custo_beneficio`.
+A preferência orienta a seleção respeitando orçamento, peças próprias e compatibilidade;
+não representa uma classificação por benchmark nem uma promessa de desempenho.
+
+### Consulta do seletor inteligente por orçamento e benchmark
+
+Dentro do contexto Flask, `SeletorInteligenteService().executar(dados)` recomenda
+várias peças já cadastradas, sem gravar alterações. Exemplo:
+
+```python
+from services.build_service.seletor_inteligente_service import SeletorInteligenteService
+
+resultado = SeletorInteligenteService().executar({
+    "orcamento": 5000,
+    "percentual_perifericos": 20,             # opcional: reserva para periféricos
+    "prioridade_montagem": "custo_beneficio",  # ou desempenho
+    "categoria": "processador",             # opcional: qualquer categoria do catálogo
+    "limite": 12,                            # por categoria CPU/GPU, de 1 a 200
+})
+```
+
+O orçamento recebido é o **total da montagem**. O seletor reutiliza a validação de
+valor e centavos e a divisão de orçamento de `CriarBuildService`, valida os mínimos
+de PC/periféricos e usa a mesma margem do catálogo: `min(total / 2, max(800, total * 0.25))`.
+O teto de busca por peça é `min(total - margem, teto_pc)`, preservando a reserva dos
+periféricos. Com R$ 5.000 e reserva de 20%, o teto de busca é R$ 3.750.
+Sem `categoria`, retorna candidatos das categorias elegíveis na lista
+`componentes_selecionados`, com categoria e IDs no formato `categoria:id`.
+CPU usa CPU Mark e GPU usa G3D; os models expõem `listar_por_benchmark`,
+encapsulando filtros e ordenação SQL. O service não consulta o banco diretamente.
+Não há pontuação mínima: todas as peças elegíveis até o orçamento entram na ordenação,
+respeitando o limite de resultados. Não há comparação de CPU Mark com G3D.
+`preferencias` é aceito como alias do contrato inicial do service, incluindo a grafia
+`custo-beneficio`; o campo do formulário `prioridade_montagem` tem precedência.
+
+Desempenho ordena por pontuação decrescente; custo-benefício ordena por pontuação/preço.
+Empates usam menor preço e ID. Exclui peças esgotadas, preços não positivos,
+benchmarks ausentes/não positivos e dados de outros testes/versões. Usa os testes PassMark
+identificados pelo importador e versão NULL, pois o snapshot não informa versão.
+Essa seleção não monta uma build nem valida compatibilidade entre os candidatos.
+
+Para as demais peças, o seletor reutiliza `_gerar_catalogo` de `CriarBuildService`,
+preservando a amostragem por preço/especificações, filtros de painel de monitor,
+variantes de cor, destaques e referência de gabinete. Essas categorias seguem os limites
+nativos da montagem (amostra de 12 com possíveis adicionais de cor/gabinete).
+Periféricos entram somente quando há reserva e respeitam esse teto específico.
+`pecas_proprias`, `rede`, `aparencia` e `utilidade` têm o mesmo papel do pedido de geração:
+excluem peças reaproveitadas (incluindo alternativas de armazenamento/resfriamento),
+selecionam apenas acessórios de rede necessários e respeitam tipo/comprimento/velocidade.
+O fluxo está separado em preparação/validação, orçamento, exclusões, seleção por
+benchmark, demais peças, ajuste de rede e formatação. CPU/GPU são excluídas da consulta
+às demais categorias para não serem reintroduzidas sem benchmark nem reordenadas.
+
+#### Placas-mãe por socket das CPUs selecionadas
+
+No seletor experimental, CPU e GPU mantêm a consulta e ordenação por benchmark existentes.
+A seleção de placas-mãe ocorre depois: reúne sockets distintos normalizados das CPUs
+retornadas e consulta apenas placas desses grupos dentro do teto, com preço positivo e
+sem esgotamento. A consulta fica em `PlacaMae.listar_disponiveis_por_sockets`, sem SQL
+no service nem amostragem global que possa eliminar um socket antes do agrupamento.
+
+São até **24 placas-mãe no total**, distribuídas em rodadas entre os grupos disponíveis.
+Com dois grupos suficientemente abastecidos, são 12 por socket, independentemente da
+quantidade de CPUs de cada grupo. Se um tiver só duas placas, as vagas restantes podem
+ser usadas pelo outro. IDs não se repetem. Dentro de cada grupo, prioriza menor preço
+e ID; sockets têm ordem estável para desempatar a distribuição.
+
+CPU própria reconhecida usa seu socket; se o modelo não puder ser identificado ou não
+houver CPU elegível/socket conhecido, não são indicadas placas aleatórias. Ao pedir
+somente `categoria=placa_mae`, o seletor calcula CPUs candidatas como dependência sem
+incluí-las na resposta. Placa-mãe própria continua excluída das novas compras.
+
+Esta alteração não aumenta nem diversifica a lista inicial de CPUs: se nenhuma AM4
+for selecionada, ela não aparecerá por causa das cotas de placas-mãe. Socket igual não
+certifica suporte ao modelo/BIOS. A seleção de RAM permanece a atual; não foi implementada
+uma nova cota por DDR nesta etapa. O fluxo antigo de geração continua independente.

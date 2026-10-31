@@ -71,7 +71,8 @@ class CriarBuildService:
     validacao_campos(dados, ["nome", "descricao", "utilidade", "orcamento"])
     self._validar_textos_pedido(dados)
     aparencia = validar_aparencia(dados.get("aparencia"))
-    dados = {**dados, "aparencia": aparencia}
+    dados = {**dados, "aparencia": aparencia,
+             "prioridade_montagem": self._validar_prioridade_montagem(dados)}
     if not Usuario.buscar_por_id(usuario_id):
       raise ValueError("Usuario não encontrado")
     BuildSalva.verificar_espaco(usuario_id)
@@ -183,6 +184,13 @@ class CriarBuildService:
       valor = rede.get(campo)
       if valor is not None and (type(valor) not in (int, float) or not isfinite(valor) or not 0 < valor <= maximo):
         raise ValueError("Medida de rede inválida: " + campo)
+
+  @staticmethod
+  def _validar_prioridade_montagem(dados):
+    prioridade = dados.get("prioridade_montagem", "custo_beneficio")
+    if prioridade not in ("custo_beneficio", "desempenho"):
+      raise ValueError("A prioridade da montagem deve ser custo_beneficio ou desempenho")
+    return prioridade
 
   @staticmethod
   def _validar_textos_pedido(dados):
@@ -393,6 +401,7 @@ class CriarBuildService:
   @staticmethod
   def _criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None, plano_perifericos=None):
     pedido = {campo: dados[campo] for campo in ("nome", "descricao", "utilidade")}
+    pedido["prioridade_montagem"] = CriarBuildService._validar_prioridade_montagem(dados)
     pedido["rede"] = dados.get("rede") or {}
     pedido["aparencia"] = validar_aparencia(dados.get("aparencia"))
     proprias = proprias or {}
@@ -462,6 +471,12 @@ class CriarBuildService:
 
         "# PEDIDO\n"
         f"{json.dumps(pedido, ensure_ascii=False)}\n\n"
+        "# PRIORIDADE DA MONTAGEM\n"
+        "Respeite prioridade_montagem: custo_beneficio busca equilíbrio de preço e capacidade "
+        "para o uso informado, evitando pagar mais por ganhos pequenos; desempenho prioriza "
+        "a capacidade para esse uso dentro do orçamento disponível. Em ambos os casos preserve "
+        "compatibilidade, peças próprias e tetos de gasto. Não é obrigatório gastar todo o orçamento. "
+        "Preço maior não comprova desempenho; não invente benchmarks ou ganhos percentuais.\n\n"
 
         "# RESTRIÇÕES CALCULADAS PELO SERVIDOR\n"
         f"{json.dumps(restricoes, ensure_ascii=False)}\n"
