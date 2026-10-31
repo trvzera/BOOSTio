@@ -1,8 +1,9 @@
-from models import Processador, PlacaVideo, PlacaMae
+from models import Processador, PlacaVideo, PlacaMae, MemoriaRAM
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from utils.aparencia import validar_aparencia
 from utils.validacoes import validacao_campos
 from utils.sockets import normalizar_socket
+from utils.memorias import normalizar_ddr
 from .criar_build_service import CriarBuildService
 from .planejamento_geracao import validar_minimos
 from .planejar_rede_service import PlanejarRedeService
@@ -11,6 +12,7 @@ from .planejar_rede_service import PlanejarRedeService
 class SeletorInteligenteService:
     MODELOS_BENCHMARK = (Processador, PlacaVideo)
     LIMITE_PLACAS_MAE = 24
+    LIMITE_MEMORIAS = 24
 
     def executar(self, dados):
         contexto = self._preparar_contexto(dados)
@@ -112,15 +114,22 @@ class SeletorInteligenteService:
         
         catalogo = CriarBuildService._gerar_catalogo(
             contexto["teto_peca"], contexto["teto_perifericos"],
-            excluidas | {m.__tablename__ for m in self.MODELOS_BENCHMARK} | {"placa_mae"},
+            excluidas | {m.__tablename__ for m in self.MODELOS_BENCHMARK} | {"placa_mae", "memoria_ram"},
             aparencia["gabinete_id"] if "gabinete" not in excluidas else None,
             contexto["utilidade"], cor=aparencia["cor"], aparencia=aparencia, rede=rede,
         )
         
-        if "placa_mae" not in excluidas:
+        placas = []
+        precisa_placas = "placa_mae" not in excluidas
+        precisa_ddr = "memoria_ram" not in excluidas and "placa_mae" not in contexto["proprias"]
+        if precisa_placas or precisa_ddr:
             placas = self._selecionar_placas_mae(contexto, selecionados)
-            if placas:
-                catalogo["placa_mae"] = placas
+        if precisa_placas and placas:
+            catalogo["placa_mae"] = placas
+        if "memoria_ram" not in excluidas:
+            memorias = self._selecionar_memorias(contexto, placas)
+            if memorias:
+                catalogo["memoria_ram"] = memorias
         self._ajustar_acessorio_rede(catalogo, contexto, excluidas)
         
         return self._formatar_catalogo(catalogo)
@@ -132,13 +141,26 @@ class SeletorInteligenteService:
         escolhidas = self._distribuir_vagas(grupos, self.LIMITE_PLACAS_MAE)
         return [CriarBuildService._campos_pecas(peca) for peca in escolhidas]
 
+    def _selecionar_memorias(self, contexto, placas):
+        nome_proprio = contexto["proprias"].get("placa_mae")
+        if nome_proprio:
+            placa = PlacaMae.buscar_por_nome(nome_proprio)
+            valores = [placa.tipo_memoria] if placa else []
+        else:
+            valores = [placa.get("tipo_memoria") for placa in placas]
+        ddrs = sorted({ddr for valor in valores if (ddr := normalizar_ddr(valor))})
+        grupos = MemoriaRAM.listar_disponiveis_por_ddrs(
+            contexto["teto_peca"], ddrs, self.LIMITE_MEMORIAS)
+        escolhidas = self._distribuir_vagas(grupos, self.LIMITE_MEMORIAS)
+        return [CriarBuildService._campos_pecas(peca) for peca in escolhidas]
+
     @staticmethod
     def _sockets_processadores(contexto, selecionados):
         nome_proprio = contexto["proprias"].get("processador")
         if nome_proprio:
             cpu = Processador.buscar_por_nome(nome_proprio)
             valores = [cpu.soquete] if cpu else []
-        elif contexto["categoria"] == "placa_mae":
+        elif contexto["categoria"] in ("placa_mae", "memoria_ram"):
             # Seleciona CPUs como dependência, mas não as inclui na resposta desta categoria.
             cpus = Processador.listar_por_benchmark(
                 contexto["teto_peca"], contexto["prioridade"], contexto["limite"])
@@ -149,7 +171,7 @@ class SeletorInteligenteService:
 
     @staticmethod
     def _distribuir_vagas(grupos, limite):
-        # Rodadas por socket: cotas equilibradas e sobras redistribuídas automaticamente.
+        # Rodadas por grupo (socket ou DDR), com redistribuição automática de sobras.
         escolhidas, ids = [], set()
         ativos = [iter(grupos[socket]) for socket in sorted(grupos) if grupos[socket]]
         while ativos and len(escolhidas) < limite:

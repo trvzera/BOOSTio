@@ -136,15 +136,17 @@ def test_empate_custo_beneficio_prioriza_menor_preco_depois_id(banco, gpu):
 
 
 def salvar_modelo(classe, preco, **campos):
-    obj = classe(fabricante='Teste', modelo='Modelo', preco=preco, consumo_energia=10, **campos)
+    obj = classe(**{'fabricante': 'Teste', 'modelo': 'Modelo', 'preco': preco,
+                    'consumo_energia': 10, **campos})
     db.session.add(obj)
     db.session.commit()
     return f'{classe.__tablename__}:{obj.id}'
 
 
 def test_demais_categorias_reutilizam_amostragem_sem_substituir_benchmarks(banco):
-    from models import MemoriaRAM, Fonte
+    from models import MemoriaRAM, Fonte, PlacaMae
     cpu = inserir(500, 12000)
+    salvar_modelo(PlacaMae, 300, socket="AM4", tipo_memoria="DDR4")
     inserir(500, None)  # CPU sem benchmark não pode voltar pelo catálogo geral.
     for n in range(20):
         salvar_modelo(MemoriaRAM, 100 + n, capacidade_gb=16, ddr='DDR4', frequencia_mhz=3200,
@@ -153,7 +155,7 @@ def test_demais_categorias_reutilizam_amostragem_sem_substituir_benchmarks(banco
     salvar_modelo(Fonte, 4000, potencia_w=1000)
     resultado = ids(dict(orcamento=4000, prioridade_montagem='desempenho'))
     assert resultado[0] == cpu
-    assert sum(i.startswith('memoria_ram:') for i in resultado) == 12
+    assert sum(i.startswith('memoria_ram:') for i in resultado) == 20
     assert [i for i in resultado if i.startswith('fonte:')] == [fonte]
     assert sum(i.startswith('processador:') for i in resultado) == 1
 
@@ -250,4 +252,68 @@ def test_placa_mae_propria_nao_gera_novas_recomendacoes_de_placa(banco, mocker):
     resultado = ids(dict(orcamento=4000, prioridade_montagem='desempenho',
                          pecas_proprias={'placa_mae': 'Minha placa'}))
     assert all(not p.startswith('placa_mae:') for p in resultado)
+    consulta.assert_not_called()
+
+
+@pytest.mark.parametrize('quantidades,esperadas', [((20, 20), (12, 12)), ((2, 30), (2, 22)),
+                                                 ((30, 0), (24, 0)), ((4, 5), (4, 5))])
+def test_ram_distribui_vagas_por_ddr_das_placas_e_reaproveita_sobras(banco, quantidades, esperadas):
+    from collections import Counter
+    from models import PlacaMae, MemoriaRAM
+    from utils.memorias import normalizar_ddr
+    inserir(500, 10000, soquete='LGA1700')
+    # Mesmo socket com placas DDR diferentes: o padrão vem da placa, não da CPU.
+    for ddr in ('DDR4', 'DDR 5'):
+        salvar_modelo(PlacaMae, 300, socket='LGA1700', tipo_memoria=ddr)
+    for ddr, quantidade in zip(('ddr-4', 'DDR5'), quantidades):
+        for n in range(quantidade):
+            salvar_modelo(MemoriaRAM, 100 + n, ddr=ddr, capacidade_gb=16,
+                          frequencia_mhz=3200, quantidade_pentes=1)
+    for preco, ddr, extras in [(50, 'DDR3', {}), (4000, 'DDR4', {}),
+                               (50, 'DDR5', {'esgotado': True}), (0, 'DDR4', {})]:
+        salvar_modelo(MemoriaRAM, preco, ddr=ddr, capacidade_gb=16, frequencia_mhz=3200,
+                      quantidade_pentes=1, **extras)
+    dados = dict(orcamento=4000, prioridade_montagem='desempenho')
+    pecas = SeletorInteligenteService().executar(dados)['componentes_selecionados']
+    memorias = [p for p in pecas if p['categoria'] == 'memoria_ram']
+    contagens = Counter(normalizar_ddr(p['ddr']) for p in memorias)
+    assert (contagens['DDR4'], contagens['DDR5']) == esperadas
+    assert len(memorias) == len({m['id'] for m in memorias}) == sum(esperadas)
+    assert ids(dados) == [p['id'] for p in pecas]
+
+
+def test_ram_segue_apenas_placas_selecionadas_e_categoria_especifica(banco):
+    from models import PlacaMae, MemoriaRAM
+    inserir(500, 10000, soquete='AM4')
+    salvar_modelo(PlacaMae, 300, socket='AM4', tipo_memoria='DDR4')
+    salvar_modelo(PlacaMae, 300, socket='AM5', tipo_memoria='DDR5')
+    ram = salvar_modelo(MemoriaRAM, 100, ddr='DDR4', capacidade_gb=16,
+                       frequencia_mhz=3200, quantidade_pentes=1)
+    salvar_modelo(MemoriaRAM, 100, ddr='DDR5', capacidade_gb=16,
+                  frequencia_mhz=5200, quantidade_pentes=1)
+    dados = dict(orcamento=4000, prioridade_montagem='desempenho', categoria='memoria_ram')
+    assert ids(dados) == [ram]
+
+
+@pytest.mark.parametrize('tipo_memoria', [None, '', 'desconhecido', 'DDR4/DDR5'])
+def test_ddr_ausente_ou_ambiguo_nao_e_inferido_pelo_socket(banco, tipo_memoria):
+    from models import PlacaMae, MemoriaRAM
+    inserir(500, 10000, soquete='AM4')
+    salvar_modelo(PlacaMae, 300, socket='AM4', tipo_memoria=tipo_memoria)
+    salvar_modelo(MemoriaRAM, 100, ddr='DDR4', capacidade_gb=16,
+                  frequencia_mhz=3200, quantidade_pentes=1)
+    resultado = ids(dict(orcamento=4000, prioridade_montagem='desempenho'))
+    assert not any(p.startswith('memoria_ram:') for p in resultado)
+
+
+def test_ram_propria_nao_consulta_novas_memorias_e_placa_propria_define_ddr(banco, mocker):
+    from models import PlacaMae, MemoriaRAM
+    salvar_modelo(PlacaMae, 300, socket='AM4', tipo_memoria='DDR4', modelo='Placa propria')
+    ram = salvar_modelo(MemoriaRAM, 100, ddr='DDR4', capacidade_gb=16,
+                       frequencia_mhz=3200, quantidade_pentes=1)
+    dados = dict(orcamento=4000, prioridade_montagem='desempenho', categoria='memoria_ram')
+    assert ids({**dados, 'pecas_proprias': {'placa_mae': 'Placa propria'}}) == [ram]
+    assert ids({**dados, 'pecas_proprias': {'placa_mae': 'Placa desconhecida'}}) == []
+    consulta = mocker.spy(MemoriaRAM, 'listar_disponiveis_por_ddrs')
+    assert ids({**dados, 'pecas_proprias': {'memoria_ram': 'Minha RAM'}}) == []
     consulta.assert_not_called()

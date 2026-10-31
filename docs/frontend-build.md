@@ -1918,5 +1918,22 @@ incluí-las na resposta. Placa-mãe própria continua excluída das novas compra
 
 Esta alteração não aumenta nem diversifica a lista inicial de CPUs: se nenhuma AM4
 for selecionada, ela não aparecerá por causa das cotas de placas-mãe. Socket igual não
-certifica suporte ao modelo/BIOS. A seleção de RAM permanece a atual; não foi implementada
-uma nova cota por DDR nesta etapa. O fluxo antigo de geração continua independente.
+certifica suporte ao modelo/BIOS. O fluxo antigo de geração continua independente.
+
+
+#### Memória RAM por DDR das placas-mãe selecionadas
+
+Depois de selecionar as placas, o seletor reúne os padrões de `tipo_memoria` conhecidos
+e busca memórias somente desses DDRs, pela consulta de model
+`MemoriaRAM.listar_disponiveis_por_ddrs`. São até **24 opções no total**, distribuídas
+com a mesma função de cotas das placas: 12 por grupo quando há dois com opções suficientes,
+redistribuindo sobras e sem duplicatas. Ordenação dentro do grupo: preço e ID crescentes.
+O filtro de orçamento e disponibilidade permanece igual ao usado para as demais peças.
+
+O padrão vem das placas efetivamente selecionadas, nunca do socket. Grafias equivalentes
+como `DDR 4`, `ddr4` e `DDR-4` são normalizadas. Padrão ausente ou ambíguo não é adivinhado.
+RAM própria não gera novas sugestões; placa-mãe própria reconhecida fornece seu DDR.
+Uma consulta somente de RAM resolve as dependências CPU/placa antes de devolver apenas
+as memórias. Sem placa identificada/padrão conhecido, não devolve memórias aleatórias.
+As cotas por DDR não certificam slots, capacidade, frequência, formato, QVL ou BIOS;
+as verificações atuais da combinação final continuam necessárias.
