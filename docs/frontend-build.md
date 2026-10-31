@@ -1937,3 +1937,57 @@ Uma consulta somente de RAM resolve as dependências CPU/placa antes de devolver
 as memórias. Sem placa identificada/padrão conhecido, não devolve memórias aleatórias.
 As cotas por DDR não certificam slots, capacidade, frequência, formato, QVL ou BIOS;
 as verificações atuais da combinação final continuam necessárias.
+
+### Capacidade mínima de armazenamento em GB
+
+O backend de geração aceita `armazenamento_minimo_gb` como parâmetro opcional de
+`POST /build/`. Exemplo do pedido futuro do frontend:
+
+```json
+{
+  "nome": "PC para jogos",
+  "descricao": "Montagem para jogos",
+  "utilidade": "Jogos",
+  "orcamento": 8000,
+  "prioridade_montagem": "desempenho",
+  "armazenamento_minimo_gb": 1000
+}
+```
+
+O valor é um inteiro positivo de 1 a 1.000.000 GB. Campo ausente ou `null` não impõe
+um novo mínimo; não há default fixo de 500 GB. Valores inválidos são rejeitados antes
+de consultas ao usuário ou chamadas à IA. A interface ainda não ganhou um controle novo.
+
+O requisito é capacidade **total**, somando SSD e HD cadastrados, multiplicados pelas
+quantidades selecionadas. Capacidades confirmadas de peças próprias também contam,
+uma vez por peça própria informada. GB são usados conforme o catálogo, sem conversão
+implícita de TB/GiB, sem descontar espaço do sistema e sem presumir RAID.
+Nomes comerciais e capacidades declaradas na resposta da IA não são utilizados.
+
+A instrução é incluída no prompt e conferida após as validações e ajustes de aparência,
+antes de aceitar ou salvar uma build. Uma capacidade inferior provoca correção automática
+com o mínimo pedido e o total encontrado; se a correção falhar, não salva a montagem.
+Se o mínimo depender de uma peça sem capacidade conhecida, informa que não foi possível
+confirmá-lo. Um total conhecido que já alcance o mínimo não é invalidado por outra peça
+própria de capacidade desconhecida.
+
+O seletor experimental valida e devolve o mesmo parâmetro para a etapa de geração.
+Ele mantém candidatos de diferentes capacidades: não exige que cada unidade isolada
+atinja o mínimo, pois várias unidades podem somar a capacidade pedida. Na adaptação
+experimental para `_gerar_validada`, repasse `armazenamento_minimo_gb` explicitamente;
+o fluxo normal `CriarBuildService.executar` já faz isso automaticamente. Esta alteração
+não persiste uma nova preferência de perfil nem adiciona coluna no banco.
+
+### Correção automática da saída da IA
+
+`CriarBuildService._gerar_validada` reaproveita o pedido original e, se a validação
+falhar, chama `_criar_prompt_correcao`. O prompt inclui código e mensagem da falha,
+custos calculados pelo servidor, tetos total/PC/periféricos, armazenamento mínimo pedido
+e a resposta anterior identificada como dado não confiável. Solicita uma nova build
+completa e todas as regras são verificadas novamente antes de salvar.
+
+A correção é limitada a uma tentativa adicional no fluxo padrão; não há loop ilimitado.
+O fallback de transporte conserva sua configuração sem um novo ciclo de correções.
+Uma resposta incorreta não é salva. Uma build previamente válida pode ser preservada
+quando uma tentativa opcional de melhorar investimento falha, como já ocorria.
+Campos de diagnóstico são limitados individualmente para não cortar o JSON ao meio.

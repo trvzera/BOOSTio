@@ -940,3 +940,39 @@ def test_recusa_de_cor_vira_orientacao_publica_sem_dizer_que_faltou_orcamento(ap
     assert llm.call_count == 2
     with app_build.app_context():
         assert BuildSalva.query.count() == 0
+
+
+def test_requisito_armazenamento_aciona_correcao_antes_de_salvar(app_build, mocker):
+    tipos = ['processador', 'placa_mae', 'memoria_ram', 'fonte', 'gabinete', 'ssd']
+    primeira = {**PEDIDO, 'componentes': [{'tipo': tipo, 'id': 1, 'quantidade': 1} for tipo in tipos]}
+    segunda = deepcopy(primeira)
+    next(i for i in segunda['componentes'] if i['tipo'] == 'ssd')['id'] = 2
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+        ssd = MODELOS['ssd'].buscar_por_id(1)
+        ssd.capacidade_gb = 120
+        copia = {c.name: getattr(ssd, c.name) for c in ssd.__table__.columns if c.name != 'id'}
+        db.session.add(MODELOS['ssd'](**{**copia, 'capacidade_gb': 500}))
+        db.session.commit()
+        llm = mocker.patch('services.build_service.criar_build_service.LLMService.executar',
+                           side_effect=[primeira, segunda])
+        resultado = CriarBuildService().executar(1, {**PEDIDO, 'armazenamento_minimo_gb': 500})
+        assert resultado['estado']['componentes']['ssd'][0]['id'] == 2
+        assert BuildSalva.query.count() == 1
+        assert llm.call_count == 2
+        assert 'solicitado 500 GB, selecionado 120 GB' in llm.call_args.args[0]
+        assert '"armazenamento_minimo_gb": 500' in llm.call_args_list[0].args[0]
+
+
+def test_armazenamento_insuficiente_nunca_e_salvo(app_build, mocker):
+    from services.build_service.criar_build_service import ErroGeracaoBuild
+    tipos = ['processador', 'placa_mae', 'memoria_ram', 'fonte', 'gabinete', 'ssd']
+    resposta = {**PEDIDO, 'componentes': [{'tipo': tipo, 'id': 1, 'quantidade': 1} for tipo in tipos]}
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+        MODELOS['ssd'].buscar_por_id(1).capacidade_gb = 120
+        db.session.commit()
+        mocker.patch('services.build_service.criar_build_service.LLMService.executar', return_value=resposta)
+        with pytest.raises(ErroGeracaoBuild, match='armazenamento mínimo'):
+            CriarBuildService().executar(1, {**PEDIDO, 'armazenamento_minimo_gb': 500})
+        assert BuildSalva.query.count() == Build.query.count() == 0

@@ -6,6 +6,7 @@ from utils.sockets import normalizar_socket
 from utils.memorias import normalizar_ddr
 from .criar_build_service import CriarBuildService
 from .planejamento_geracao import validar_minimos
+from .requisitos_armazenamento_service import RequisitosArmazenamentoService
 from .planejar_rede_service import PlanejarRedeService
 
 
@@ -22,6 +23,7 @@ class SeletorInteligenteService:
         return {
             "mensagem": "Candidatos por peça selecionados dentro do teto informado.",
             "prioridade_montagem": contexto["prioridade"],
+            "armazenamento_minimo_gb": contexto["armazenamento_minimo_gb"],
             "componentes_selecionados": selecionados,
         }
 
@@ -30,6 +32,7 @@ class SeletorInteligenteService:
             raise ValueError("Informe um objeto com os dados da seleção")
         
         validacao_campos(dados, ["orcamento"])
+        armazenamento = RequisitosArmazenamentoService.validar_parametro(dados.get("armazenamento_minimo_gb"))
         prioridade = dados.get("prioridade_montagem", dados.get("preferencias"))
 
         if prioridade == "custo-beneficio":
@@ -60,7 +63,7 @@ class SeletorInteligenteService:
         return {"prioridade": prioridade, "limite": limite, "categoria": categoria,
                 "rede": rede, "aparencia": aparencia, "proprias": proprias,
                 "teto_peca": teto_peca, "teto_perifericos": teto_perifericos,
-                "utilidade": dados.get("utilidade", "")}
+                "utilidade": dados.get("utilidade", ""), "armazenamento_minimo_gb": armazenamento}
 
     @staticmethod
     def _planejar_orcamento(dados):

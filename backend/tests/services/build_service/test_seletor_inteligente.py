@@ -317,3 +317,10 @@ def test_ram_propria_nao_consulta_novas_memorias_e_placa_propria_define_ddr(banc
     consulta = mocker.spy(MemoriaRAM, 'listar_disponiveis_por_ddrs')
     assert ids({**dados, 'pecas_proprias': {'memoria_ram': 'Minha RAM'}}) == []
     consulta.assert_not_called()
+
+
+def test_seletor_preserva_requisito_de_armazenamento_para_etapa_de_geracao(banco):
+    dados = dict(orcamento=8000, prioridade_montagem='desempenho', armazenamento_minimo_gb=1000)
+    resultado = SeletorInteligenteService().executar(dados)
+    assert resultado['armazenamento_minimo_gb'] == 1000
+    assert SeletorInteligenteService().executar({**dados, 'armazenamento_minimo_gb': None})['armazenamento_minimo_gb'] is None

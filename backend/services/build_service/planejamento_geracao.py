@@ -44,7 +44,7 @@ def orientar_falha(erro, orcamento=None, percentual=0, custos=None):
         "orcamento" if any(p in texto for p in ("orçamento", "ultrapassou o limite", "limite destinado ao pc")) else
         "compatibilidade" if "incompatibil" in texto else
         "catalogo" if any(p in texto for p in ("indisponível", "id de peça", "fora do catálogo")) else
-        "pecas" if any(p in texto for p in ("obrigatórias", "ventilação", "fans", "periféricos solicitados")) else "resposta")
+        "pecas" if any(p in texto for p in ("obrigatórias", "ventilação", "fans", "periféricos solicitados", "armazenamento mínimo")) else "resposta")
     if "limite reservado para periféricos" in texto:
         motivo = "perifericos"
     descricoes = {
