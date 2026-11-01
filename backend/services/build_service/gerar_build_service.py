@@ -8,7 +8,7 @@ class GerarBuildService:
     def executar(self, usuario_id, dados):
         with BloquearGeracaoService().executar(usuario_id):
             try:
-                return CriarBuildService().executar(usuario_id, dados)
+                return CriarBuildService().executar(usuario_id, dados, selecao_inteligente=True)
             except HTTPError as erro:
                 if erro.response is None or erro.response.status_code not in (429, 500, 502, 503, 504):
                     raise
@@ -19,5 +19,5 @@ class GerarBuildService:
     @staticmethod
     def _fallback(usuario_id, dados):
         return CriarBuildService().executar(
-            usuario_id, dados, modelo="gemini-3.8-flash", tentativas_correcao=0,
+            usuario_id, dados, modelo="gemini-3.8-flash", tentativas_correcao=0, selecao_inteligente=True,
         )

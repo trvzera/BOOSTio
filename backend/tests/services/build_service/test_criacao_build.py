@@ -51,7 +51,11 @@ def cadastrar_pecas(tipos):
             if coluna.name not in dados and not coluna.nullable and not coluna.primary_key and not coluna.default and not coluna.server_default:
                 dados[coluna.name] = "Teste" if coluna.type.python_type is str else 1
         if tipo == "processador":
-            dados.update(videointegrado=True, cooler=True)
+            dados.update(videointegrado=True, cooler=True, soquete="AM4")
+        if tipo == "placa_mae":
+            dados.update(socket="AM4", tipo_memoria="DDR4")
+        if tipo == "memoria_ram":
+            dados["ddr"] = "DDR4"
         if tipo == "fonte":
             dados["potencia_w"] = 500
         if tipo == "gabinete":
@@ -328,10 +332,16 @@ def test_geracao_rejeita_transferencia_de_sobra_antes_de_salvar(app_build, mocke
     cliente = app_build.test_client()
     autenticar(cliente)
     resposta = cliente.post("/build/", json={**PEDIDO, "percentual_perifericos": 20})
-    assert resposta.status_code == 502
-    assert resposta.json["codigo"] == "geracao-invalida"
-    assert ("limite destinado ao PC" if excesso == "pc" else "limite reservado para periféricos") in llm.call_args.args[0]
-    assert llm.call_count == 2
+    if excesso == "pc":
+        # O seletor agora detecta a plataforma inviável antes de consumir IA.
+        assert resposta.status_code == 400
+        assert resposta.json["codigo"] == "planejamento-invalido"
+        llm.assert_not_called()
+    else:
+        assert resposta.status_code == 502
+        assert resposta.json["codigo"] == "geracao-invalida"
+        assert "limite reservado para periféricos" in llm.call_args.args[0]
+        assert llm.call_count == 2
     with app_build.app_context():
         assert Build.query.count() == BuildSalva.query.count() == 0
 
@@ -365,10 +375,15 @@ def test_geracao_completa_fans_omitidas_antes_de_persistir(app_build, mocker):
     tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "fan"]
     with app_build.app_context():
         cadastrar_pecas(tipos)
-        catalogo = CriarBuildService._gerar_catalogo(4200)
-        catalogo["gabinete"][0].update(fans_inclusos=0, quantidade_max_fans=3, tamanhos_fan_suportados_mm=[120])
-        catalogo["fan"][0].update(quantidade=1, tamanho_mm=120, preco=10)
-    mocker.patch("services.build_service.criar_build_service.CriarBuildService._gerar_catalogo", return_value=catalogo)
+        gabinete = MODELOS["gabinete"].buscar_por_id(1)
+        gabinete.fans_inclusos = 0
+        fan = MODELOS["fan"].buscar_por_id(1)
+        fan.preco = 10
+        db.session.commit()
+        ficha_gabinete = {**gabinete.to_catalogo(), "quantidade_max_fans": 3, "tamanhos_fan_suportados_mm": [120]}
+        ficha_fan = {**fan.to_catalogo(), "quantidade": 1, "tamanho_mm": 120}
+    mocker.patch.object(MODELOS["gabinete"], "to_catalogo", return_value=ficha_gabinete)
+    mocker.patch.object(MODELOS["fan"], "to_catalogo", return_value=ficha_fan)
     llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
         **PEDIDO, "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos if tipo != "fan"]})
     cliente = app_build.test_client()
@@ -446,10 +461,9 @@ def test_geracao_rejeita_conflito_antes_de_gravar_build(app_build, mocker):
     cliente = app_build.test_client()
     autenticar(cliente)
     resposta = cliente.post("/build/", json=PEDIDO)
-    assert resposta.status_code == 502
-    assert resposta.json["codigo"] == "geracao-invalida"
-    assert "incompatibilidades" in llm.call_args.args[0]
-    assert llm.call_count == 2
+    assert resposta.status_code == 400
+    assert resposta.json["codigo"] == "planejamento-invalido"
+    llm.assert_not_called()  # Nenhuma placa AM4 pode ser oferecida neste catálogo.
     with app_build.app_context():
         assert Build.query.count() == BuildSalva.query.count() == 0
 
@@ -978,7 +992,8 @@ def test_armazenamento_insuficiente_nunca_e_salvo(app_build, mocker):
         assert BuildSalva.query.count() == Build.query.count() == 0
 
 
-def test_geracao_experimental_repara_excesso_sem_pedir_nova_resposta_ia(app_build, mocker):
+@pytest.mark.parametrize("via_site", [False, True])
+def test_geracao_inteligente_repara_excesso_sem_pedir_nova_resposta_ia(app_build, mocker, via_site):
     from services.build_service.seletor_inteligente_service import SeletorInteligenteService
     tipos = ['processador','placa_mae','placa_video','memoria_ram','fonte','gabinete','ssd','fan']
     resposta = {**PEDIDO, 'componentes': [dict(tipo=t,id=1,quantidade=2 if t=='memoria_ram' else 5 if t=='fan' else 1) for t in tipos]}
@@ -1003,14 +1018,29 @@ def test_geracao_experimental_repara_excesso_sem_pedir_nova_resposta_ia(app_buil
             db.session.add(MODELOS[tipo](**{**copia,**extras}))
         db.session.commit()
         llm=mocker.patch('services.build_service.criar_build_service.LLMService.executar',return_value=resposta)
-        r=SeletorInteligenteService().gerar_build(1,{**PEDIDO,'orcamento':8000,'prioridade_montagem':'desempenho',
-                                                  'armazenamento_minimo_gb':500})
+        pedido={**PEDIDO,'orcamento':8000,'prioridade_montagem':'desempenho','armazenamento_minimo_gb':500}
+        antiga=mocker.spy(CriarBuildService, '_preparar_catalogo')
+        preparar=mocker.spy(SeletorInteligenteService, 'preparar_geracao')
+        salvar=mocker.spy(CriarBuildService, '_salvar_build')
+        if via_site:
+            cliente=app_build.test_client()
+            autenticar(cliente)
+            resposta_http=cliente.post('/build/',json=pedido)
+            assert resposta_http.status_code==201, resposta_http.json
+            assert resposta_http.json['build']['preco_total']==7950
+            assert BuildSalva.query.count()==Build.query.count()==1
+            r={'build': salvar.call_args.args[2]}
+        else:
+            r=SeletorInteligenteService().gerar_build(1,pedido)
+        preparar.assert_called_once()
+        antiga.assert_not_called()
         assert llm.call_count == 1
         assert r['build']['preco_total'] == 7950
         ajuste=r['build']['ajuste_orcamento']
         assert ajuste['total_anterior'] == 8300 and ajuste['economia'] == 350
         assert {i['tipo'] for i in ajuste['trocas']} == {'ssd','fan'}
-        assert BuildSalva.query.count() == Build.query.count() == 0
+        if not via_site:
+            assert BuildSalva.query.count() == Build.query.count() == 0
 
 
 def test_reparo_sem_alternativa_segura_ainda_usa_correcao_limitada(app_build, mocker):
@@ -1029,3 +1059,34 @@ def test_reparo_sem_alternativa_segura_ainda_usa_correcao_limitada(app_build, mo
                                                ajustar_orcamento=True,catalogo_reparo=catalogo)
         assert llm.call_count == 2
         assert BuildSalva.query.count() == 0
+
+
+@pytest.mark.parametrize('prioridade', ['desempenho', 'custo_beneficio'])
+def test_frontend_inteligente_preserva_prioridade_proprias_perifericos_e_rede(app_build, mocker, prioridade):
+    import json
+    from services.build_service.seletor_inteligente_service import SeletorInteligenteService
+    tipos=['processador','placa_mae','memoria_ram','fonte','gabinete','ssd','monitor','teclado','mouse','fone']
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+    resposta_ia={**PEDIDO,'componentes':[dict(tipo=t,id=1,quantidade=1) for t in tipos if t!='processador']}
+    llm=mocker.patch('services.build_service.criar_build_service.LLMService.executar',return_value=resposta_ia)
+    preparar=mocker.spy(SeletorInteligenteService,'preparar_geracao')
+    catalogo_antigo=mocker.spy(CriarBuildService,'_preparar_catalogo')
+    rede={'tipo':'cabo','possuiAcessorio':True}
+    cliente=app_build.test_client()
+    autenticar(cliente)
+    r=cliente.post('/build/',json={**PEDIDO,'prioridade_montagem':prioridade,'percentual_perifericos':20,
+                                  'pecas_proprias':{'processador':'Teste processador'},'rede':rede})
+    assert r.status_code==201,r.json
+    preparar.assert_called_once()
+    catalogo_antigo.assert_not_called()
+    estado=r.json['build']['estado']
+    assert estado['componentes']['processador']['proprio']=='Teste processador'
+    assert estado['percentualPerifericos']==20 and estado['incluirPerifericos'] is True
+    assert estado['rede']==rede
+    prompt=llm.call_args_list[0].args[0]
+    pedido=json.loads(prompt.split('# PEDIDO\n')[1].split('\n')[0])
+    assert pedido['prioridade_montagem']==prioridade
+    assert 'obrigatoriamente Ryzen' not in prompt
+    with app_build.app_context():
+        assert BuildSalva.query.count()==1 and Build.query.count()==0
