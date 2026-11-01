@@ -39,9 +39,8 @@ class EnviarEmailRecuperarService:
   @staticmethod
   def _monta_mensagem(msg:Message,link:str):
     msg.body = f'Para redefinir sua senha, acesse o link: {link}'
-    # O layout já é escuro: light only impede a conversão automática do Gmail,
-    # sem transformar o fundo autoral em branco.
-    # https://emailmarkup.org/en/blog/2026/gmail-app-dark-mode-update
+
+
     msg.html = f'''<!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light only"><title>Recuperar senha — BOOSTio</title></head>
 <body style="margin:0;padding:0;background-color:#000000;color:#e5e5ea;font-family:Arial,Helvetica,sans-serif;">

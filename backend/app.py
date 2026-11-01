@@ -16,6 +16,7 @@ from controllers.build_controller import build_bp
 from controllers.saude_controller import saude_bp
 from migrations.budget_usuario import registrar_migracao_budget
 from commands.banco import registrar_comandos_banco
+from commands.benchmarks import registrar_comandos_benchmarks
 from utils.csrf import configurar_csrf
 from utils.limite_requisicoes import configurar_limites
 
@@ -54,6 +55,7 @@ app.register_blueprint(saude_bp)
 registrar_migracao_budget(app, db)
 
 registrar_comandos_banco(app)
+registrar_comandos_benchmarks(app)
 registrar_comandos_precos(app)
 
 if __name__ == '__main__':

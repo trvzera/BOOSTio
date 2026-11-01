@@ -31,20 +31,10 @@ class _DadosEstruturados(HTMLParser):
 
 
 class BuscarPrecoKabumService:
-    """Lê somente a oferta estruturada do anúncio solicitado na KaBuM!."""
-
     def executar(self, url: str):
         ValidarLinkService().executar(url)
         codigo = re.match(r"/produto/(\d+)(?:/|$)", urlsplit(url).path).group(1)
-        parser = _DadosEstruturados()
-        parser.feed(BuscarPaginaKabumService().executar(url))
-        produtos = []
-        for script in parser.scripts:
-            try:
-                dados = json.loads(script)
-            except json.JSONDecodeError:
-                continue
-            produtos.extend(self._produtos(dados))
+        produtos = self._ler_produtos(url)
         for produto in produtos:
             identificador = produto.get("sku") or produto.get("productID")
             url_produto = produto.get("url")
@@ -60,23 +50,7 @@ class BuscarPrecoKabumService:
                 ofertas = ofertas[0] if len(ofertas) == 1 else None
             if not isinstance(ofertas, dict):
                 continue
-            disponibilidade = ofertas.get("availability")
-            if not isinstance(disponibilidade, str):
-                raise ValueError("Disponibilidade da KaBuM ausente ou desconhecida")
-            disponibilidade = disponibilidade.rsplit("/", 1)[-1]
-            if disponibilidade == "OutOfStock":
-                return {"preco": None, "esgotado": True}
-            if disponibilidade != "InStock":
-                raise ValueError("Disponibilidade da KaBuM ausente ou desconhecida")
-            if ofertas.get("priceCurrency") != "BRL":
-                raise ValueError("A oferta da KaBuM não informou preço em reais")
-            try:
-                preco = Decimal(str(ofertas.get("price")))
-            except InvalidOperation:
-                raise ValueError("Preço ausente ou inválido na KaBuM") from None
-            if not preco.is_finite() or preco <= 0:
-                raise ValueError("Preço ausente ou inválido na KaBuM")
-            return {"preco": preco, "esgotado": False}
+            return self._ler_oferta(ofertas)
         raise ValueError("Oferta estruturada do produto não encontrada na página da KaBuM")
 
     def _produtos(self, dados):
@@ -89,3 +63,35 @@ class BuscarPrecoKabumService:
                 yield dados
             if "@graph" in dados:
                 yield from self._produtos(dados["@graph"])
+
+    def _ler_produtos(self, url):
+        parser = _DadosEstruturados()
+        parser.feed(BuscarPaginaKabumService().executar(url))
+        produtos = []
+        for script in parser.scripts:
+            try:
+                dados = json.loads(script)
+            except json.JSONDecodeError:
+                continue
+            produtos.extend(self._produtos(dados))
+        return produtos
+
+    @staticmethod
+    def _ler_oferta(ofertas):
+        disponibilidade = ofertas.get("availability")
+        if not isinstance(disponibilidade, str):
+            raise ValueError("Disponibilidade da KaBuM ausente ou desconhecida")
+        disponibilidade = disponibilidade.rsplit("/", 1)[-1]
+        if disponibilidade == "OutOfStock":
+            return {"preco": None, "esgotado": True}
+        if disponibilidade != "InStock":
+            raise ValueError("Disponibilidade da KaBuM ausente ou desconhecida")
+        if ofertas.get("priceCurrency") != "BRL":
+            raise ValueError("A oferta da KaBuM não informou preço em reais")
+        try:
+            preco = Decimal(str(ofertas.get("price")))
+        except InvalidOperation:
+            raise ValueError("Preço ausente ou inválido na KaBuM") from None
+        if not preco.is_finite() or preco <= 0:
+            raise ValueError("Preço ausente ou inválido na KaBuM")
+        return {"preco": preco, "esgotado": False}

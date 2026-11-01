@@ -294,3 +294,59 @@ conclui login Google, obtém `/auth/me`, envia ações com CSRF e recebe links d
 recuperação apontando para o frontend publicado. Valide também o IP recebido pelo
 Flask e os limites entre clientes distintos. Testes locais não substituem essa
 validação na hospedagem escolhida.
+
+## Atualização de benchmarks em MySQL existente
+
+A atualização `benchmarks_mysql_v1` adiciona as 16 colunas opcionais de benchmark
+em `processador` e `placa_video`. Não recria tabelas, não cadastra peças e não
+altera contas. `banco-preparar` continua recusando MySQL existente.
+
+No checkout atualizado da VPS, com Docker Compose e `.env.production` já
+configurados, simule primeiro:
+
+```bash
+export BOOSTIO_BACKUP_DIR=/caminho/privado/fora-do-projeto/backups
+bash deploy/atualizar_banco_mysql.sh
+```
+
+A simulação constrói a nova imagem da API, consulta o esquema e mostra o SQL,
+sem parar a aplicação nem escrever no banco. Se houver outras tabelas/colunas
+faltando, interrompe e identifica as pendências; não tenta migrar versões antigas
+arbitrariamente. Colunas de benchmark existentes com tipo ou nulabilidade
+incompatível também bloqueiam a execução.
+
+Depois de conferir o plano, suspenda cron/jobs externos que gravam e execute:
+
+```bash
+bash deploy/atualizar_banco_mysql.sh --aplicar
+```
+
+A rotina repete a simulação, para `web` e `api`, executa o script existente de
+backup MySQL (dump comprimido com permissão privada e verificação gzip), aplica
+apenas as colunas ausentes, compara contagens de todas as tabelas antes/depois
+e verifica a presença das colunas. Em seguida inicia a API aguardando seu health
+check, e inicia o frontend. Não remove volumes nem importa o SQLite local.
+O dump contém dados pessoais: proteja-o e mantenha também uma cópia fora da VPS.
+A verificação gzip não substitui um teste de restauração do dump em outra base.
+
+Se falhar após parar a aplicação, a rotina tenta manter `web` e `api` paradas.
+Não há restauração automática. Guarde o caminho do backup mostrado na saída e
+investigue antes de reabrir o acesso. Alterações DDL de MySQL não são desfeitas
+como uma transação única; em falha parcial, a repetição adiciona somente o que
+falta. Um lock MySQL impede migrações simultâneas por este comando, mas não
+impede que outros programas gravem. Contagens iguais são uma conferência
+adicional, não prova de integridade completa: confira login e builds após subir.
+
+Para operação manual, dentro do container da API:
+
+```bash
+python -m flask --app app banco-atualizar-mysql
+# Somente com backup pronto e escritores parados:
+python -m flask --app app banco-atualizar-mysql --aplicar
+```
+
+O comando manual não faz backup; prefira o script coordenador. Teste o procedimento
+numa cópia restaurada antes do primeiro uso em produção. A importação dos CSVs
+permanece separada, conforme `docs/benchmarks-importacao.md`. Esta rotina atualiza
+o banco e a imagem da API; alterações de frontend exigem reconstrução do serviço
+`web` pelo procedimento normal de deploy.

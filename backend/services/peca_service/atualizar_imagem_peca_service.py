@@ -15,6 +15,9 @@ MANIFESTO = PASTA_COLETADOS / "imagens-produtos.json"
 
 class AtualizarImagemPecaService:
     def executar(self, peca):
+        if peca is None:
+            raise ValueError("Peça não encontrada")
+
         conteudo, extensao = BuscarImagemKabumService().executar(peca.kabum_external)
         PASTA_IMAGENS.mkdir(parents=True, exist_ok=True)
         nome = f"{peca.__tablename__}-{peca.id}.{extensao}"

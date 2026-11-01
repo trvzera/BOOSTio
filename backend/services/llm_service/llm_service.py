@@ -5,10 +5,15 @@ import requests
 from .reservar_chamada_service import ReservarChamadaService
 
 class RespostaLLMInvalida(ValueError):
-  """O provedor respondeu, mas não entregou uma saída completa para validar."""
+  pass
 
 class LLMService:
   def executar(self, prompt: str, modelo: str = "gemini-3.5-flash-lite"):
+    if not isinstance(prompt, str) or not prompt.strip():
+      raise ValueError("Informe o prompt para gerar a resposta")
+    if not isinstance(modelo, str) or not modelo.strip():
+      raise ValueError("Informe o modelo de IA")
+
     chave = os.getenv("GEMINI_API_KEY")
     if not chave:
       raise RuntimeError("GEMINI_API_KEY não configurada")
@@ -25,6 +30,10 @@ class LLMService:
       timeout=90,
     )
     resposta.raise_for_status()
+    return self._ler_resposta(resposta)
+
+  @staticmethod
+  def _ler_resposta(resposta):
     try:
       dados = resposta.json()
       candidatos = dados.get("candidates") if isinstance(dados, dict) else None

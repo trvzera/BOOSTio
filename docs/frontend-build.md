@@ -1837,3 +1837,180 @@ configurações e novos componentes. A página Sobre nós usa os mesmos cards co
 para a transparência e `--glass-blur` para o desfoque do fundo.
 
 Testes da lógica: `node --test frontend/tests/build.test.mjs`.
+
+### Prioridade da montagem
+
+O seletor de confirmação do formulário envia `prioridade_montagem` no JSON de `POST /build/`:
+`custo_beneficio` ou `desempenho`. O backend valida o campo antes de consultar o usuário
+ou chamar a IA e o inclui no pedido de geração, também nas tentativas de fallback.
+Valores diferentes, inclusive `null`, retornam erro de validação (HTTP 400).
+Clientes anteriores que omitem o campo usam `custo_beneficio`.
+A preferência orienta a seleção respeitando orçamento, peças próprias e compatibilidade;
+não representa uma classificação por benchmark nem uma promessa de desempenho.
+
+### Consulta do seletor inteligente por orçamento e benchmark
+
+Dentro do contexto Flask, `SeletorInteligenteService().executar(dados)` recomenda
+várias peças já cadastradas, sem gravar alterações. Exemplo:
+
+```python
+from services.build_service.seletor_inteligente_service import SeletorInteligenteService
+
+resultado = SeletorInteligenteService().executar({
+    "orcamento": 5000,
+    "percentual_perifericos": 20,             # opcional: reserva para periféricos
+    "prioridade_montagem": "custo_beneficio",  # ou desempenho
+    "categoria": "processador",             # opcional: qualquer categoria do catálogo
+    "limite": 12,                            # por categoria CPU/GPU, de 1 a 200
+})
+```
+
+O orçamento recebido é o **total da montagem**. O seletor reutiliza a validação de
+valor e centavos e a divisão de orçamento de `CriarBuildService`, valida os mínimos
+de PC/periféricos e usa a mesma margem do catálogo: `min(total / 2, max(800, total * 0.25))`.
+O teto de busca por peça é `min(total - margem, teto_pc)`, preservando a reserva dos
+periféricos. Com R$ 5.000 e reserva de 20%, o teto de busca é R$ 3.750.
+Sem `categoria`, retorna candidatos das categorias elegíveis na lista
+`componentes_selecionados`, com categoria e IDs no formato `categoria:id`.
+CPU usa CPU Mark e GPU usa G3D; os models expõem `listar_por_benchmark`,
+encapsulando filtros e ordenação SQL. O service não consulta o banco diretamente.
+Não há pontuação mínima: todas as peças elegíveis até o orçamento entram na ordenação,
+respeitando o limite de resultados. Não há comparação de CPU Mark com G3D.
+`preferencias` é aceito como alias do contrato inicial do service, incluindo a grafia
+`custo-beneficio`; o campo do formulário `prioridade_montagem` tem precedência.
+
+Desempenho ordena por pontuação decrescente; custo-benefício ordena por pontuação/preço.
+Empates usam menor preço e ID. Exclui peças esgotadas, preços não positivos,
+benchmarks ausentes/não positivos e dados de outros testes/versões. Usa os testes PassMark
+identificados pelo importador e versão NULL, pois o snapshot não informa versão.
+Essa seleção não monta uma build nem valida compatibilidade entre os candidatos.
+
+Para as demais peças, o seletor reutiliza `_gerar_catalogo` de `CriarBuildService`,
+preservando a amostragem por preço/especificações, filtros de painel de monitor,
+variantes de cor, destaques e referência de gabinete. Essas categorias seguem os limites
+nativos da montagem (amostra de 12 com possíveis adicionais de cor/gabinete).
+Periféricos entram somente quando há reserva e respeitam esse teto específico.
+`pecas_proprias`, `rede`, `aparencia` e `utilidade` têm o mesmo papel do pedido de geração:
+excluem peças reaproveitadas (incluindo alternativas de armazenamento/resfriamento),
+selecionam apenas acessórios de rede necessários e respeitam tipo/comprimento/velocidade.
+O fluxo está separado em preparação/validação, orçamento, exclusões, seleção por
+benchmark, demais peças, ajuste de rede e formatação. CPU/GPU são excluídas da consulta
+às demais categorias para não serem reintroduzidas sem benchmark nem reordenadas.
+
+#### Placas-mãe por socket das CPUs selecionadas
+
+No seletor experimental, CPU e GPU mantêm a consulta e ordenação por benchmark existentes.
+A seleção de placas-mãe ocorre depois: reúne sockets distintos normalizados das CPUs
+retornadas e consulta apenas placas desses grupos dentro do teto, com preço positivo e
+sem esgotamento. A consulta fica em `PlacaMae.listar_disponiveis_por_sockets`, sem SQL
+no service nem amostragem global que possa eliminar um socket antes do agrupamento.
+
+São até **24 placas-mãe no total**, distribuídas em rodadas entre os grupos disponíveis.
+Com dois grupos suficientemente abastecidos, são 12 por socket, independentemente da
+quantidade de CPUs de cada grupo. Se um tiver só duas placas, as vagas restantes podem
+ser usadas pelo outro. IDs não se repetem. Dentro de cada grupo, prioriza menor preço
+e ID; sockets têm ordem estável para desempatar a distribuição.
+
+CPU própria reconhecida usa seu socket; se o modelo não puder ser identificado ou não
+houver CPU elegível/socket conhecido, não são indicadas placas aleatórias. Ao pedir
+somente `categoria=placa_mae`, o seletor calcula CPUs candidatas como dependência sem
+incluí-las na resposta. Placa-mãe própria continua excluída das novas compras.
+
+Esta alteração não aumenta nem diversifica a lista inicial de CPUs: se nenhuma AM4
+for selecionada, ela não aparecerá por causa das cotas de placas-mãe. Socket igual não
+certifica suporte ao modelo/BIOS. O fluxo antigo de geração continua independente.
+
+
+#### Memória RAM por DDR das placas-mãe selecionadas
+
+Depois de selecionar as placas, o seletor reúne os padrões de `tipo_memoria` conhecidos
+e busca memórias somente desses DDRs, pela consulta de model
+`MemoriaRAM.listar_disponiveis_por_ddrs`. São até **24 opções no total**, distribuídas
+com a mesma função de cotas das placas: 12 por grupo quando há dois com opções suficientes,
+redistribuindo sobras e sem duplicatas. Ordenação dentro do grupo: preço e ID crescentes.
+O filtro de orçamento e disponibilidade permanece igual ao usado para as demais peças.
+
+O padrão vem das placas efetivamente selecionadas, nunca do socket. Grafias equivalentes
+como `DDR 4`, `ddr4` e `DDR-4` são normalizadas. Padrão ausente ou ambíguo não é adivinhado.
+RAM própria não gera novas sugestões; placa-mãe própria reconhecida fornece seu DDR.
+Uma consulta somente de RAM resolve as dependências CPU/placa antes de devolver apenas
+as memórias. Sem placa identificada/padrão conhecido, não devolve memórias aleatórias.
+As cotas por DDR não certificam slots, capacidade, frequência, formato, QVL ou BIOS;
+as verificações atuais da combinação final continuam necessárias.
+
+### Capacidade mínima de armazenamento em GB
+
+O backend de geração aceita `armazenamento_minimo_gb` como parâmetro opcional de
+`POST /build/`. Exemplo do pedido futuro do frontend:
+
+```json
+{
+  "nome": "PC para jogos",
+  "descricao": "Montagem para jogos",
+  "utilidade": "Jogos",
+  "orcamento": 8000,
+  "prioridade_montagem": "desempenho",
+  "armazenamento_minimo_gb": 1000
+}
+```
+
+O valor é um inteiro positivo de 1 a 1.000.000 GB. Campo ausente ou `null` não impõe
+um novo mínimo; não há default fixo de 500 GB. Valores inválidos são rejeitados antes
+de consultas ao usuário ou chamadas à IA. A interface ainda não ganhou um controle novo.
+
+O requisito é capacidade **total**, somando SSD e HD cadastrados, multiplicados pelas
+quantidades selecionadas. Capacidades confirmadas de peças próprias também contam,
+uma vez por peça própria informada. GB são usados conforme o catálogo, sem conversão
+implícita de TB/GiB, sem descontar espaço do sistema e sem presumir RAID.
+Nomes comerciais e capacidades declaradas na resposta da IA não são utilizados.
+
+A instrução é incluída no prompt e conferida após as validações e ajustes de aparência,
+antes de aceitar ou salvar uma build. Uma capacidade inferior provoca correção automática
+com o mínimo pedido e o total encontrado; se a correção falhar, não salva a montagem.
+Se o mínimo depender de uma peça sem capacidade conhecida, informa que não foi possível
+confirmá-lo. Um total conhecido que já alcance o mínimo não é invalidado por outra peça
+própria de capacidade desconhecida.
+
+O seletor experimental valida e devolve o mesmo parâmetro para a etapa de geração.
+Ele mantém candidatos de diferentes capacidades: não exige que cada unidade isolada
+atinja o mínimo, pois várias unidades podem somar a capacidade pedida. Na adaptação
+experimental para `_gerar_validada`, repasse `armazenamento_minimo_gb` explicitamente;
+o fluxo normal `CriarBuildService.executar` já faz isso automaticamente. Esta alteração
+não persiste uma nova preferência de perfil nem adiciona coluna no banco.
+
+### Correção automática da saída da IA
+
+`CriarBuildService._gerar_validada` reaproveita o pedido original e, se a validação
+falhar, chama `_criar_prompt_correcao`. O prompt inclui código e mensagem da falha,
+custos calculados pelo servidor, tetos total/PC/periféricos, armazenamento mínimo pedido
+e a resposta anterior identificada como dado não confiável. Solicita uma nova build
+completa e todas as regras são verificadas novamente antes de salvar.
+
+A correção é limitada a uma tentativa adicional no fluxo padrão; não há loop ilimitado.
+O fallback de transporte conserva sua configuração sem um novo ciclo de correções.
+Uma resposta incorreta não é salva. Uma build previamente válida pode ser preservada
+quando uma tentativa opcional de melhorar investimento falha, como já ocorria.
+Campos de diagnóstico são limitados individualmente para não cortar o JSON ao meio.
+
+### Etapa 3: orçamento dinâmico, Pareto e diversidade
+
+A preparação experimental evoluiu para planejar reservas e metas por uso/orçamento,
+carregar o pool antes de cortá-lo, remover dominados comparáveis e misturar faixas,
+plataformas e rankings. `SeletorInteligenteService.preparar_geracao` fornece o catálogo
+numérico e o prompt com planejamento e sem preferência artificial por Ryzen.
+O endpoint antigo continua independente. A seleção experimental aplica limites estritos,
+configuráveis com `limites_candidatos`; diagnósticos registram cortes e fallbacks.
+
+O guia completo de algoritmo, parâmetros, limitações e manutenção está em
+[Seleção inteligente — Etapa 3](selecao-inteligente-etapa-3.md). Ele substitui as descrições
+anteriores que diziam que o seletor somente ordenava CPU/GPU ou reutilizava integralmente
+`_gerar_catalogo`: agora os pools são carregados pelos models antes da amostragem.
+
+### Geração experimental com reparo automático de custo
+
+Use `SeletorInteligenteService.gerar_build(usuario_id, dados)` para o fluxo experimental
+completo, sem salvamento. Ele usa a seleção da Etapa 3 e tenta ajustar custos da resposta
+antes de consumir a correção adicional da IA. Quantidades e kits entram nos subtotais;
+CPU/GPU são preservadas no reparo. Os resultados incluem o diagnóstico `ajuste_orcamento`.
+Apenas selecionar candidatos com `executar` não executa esse pós-processamento.
+Veja a seção 10 do [guia da Etapa 3](selecao-inteligente-etapa-3.md).

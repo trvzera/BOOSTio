@@ -3,8 +3,6 @@ from .pecas_complementares import pecas_complementares
 
 
 class CadastrarComplementaresService:
-    """Acrescenta só o lote revisado, sem reescrever produtos ou consultar lojas."""
-
     def executar(self, simular=False):
         resumo = {"simulacao": simular, "inseridas": 0, "existentes": 0, "categorias": {}}
         for classe, itens in pecas_complementares().items():

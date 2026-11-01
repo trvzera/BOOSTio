@@ -2,7 +2,6 @@ from models import Processador, PlacaMae, MemoriaRAM, SSD
 
 
 def pecas_estudo_medio():
-    """Modelos com vídeo integrado e componentes de entrada para estudo e uso médio."""
     comum = {"preco": 0, "esgotado": True}
     return {
         Processador: [

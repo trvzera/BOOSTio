@@ -5,7 +5,6 @@ from .preferencias_perifericos_service import PreferenciasPerifericosService
 
 
 class PreferenciasProcessadorService:
-    """Preferência de plataforma para jogos, não um ranking de desempenho."""
 
     @staticmethod
     def ryzen(peca):
@@ -24,7 +23,7 @@ class PreferenciasProcessadorService:
             socket = normalizar_socket(peca.get("soquete"))
             if socket and socket not in escolhidas:
                 escolhidas[socket] = peca
-        # Opções em diferentes faixas; preço não é prova de desempenho.
+
         extras = [ryzen[0], ryzen[len(ryzen) // 2], ryzen[-1]]
         return list({p["id"]: p for p in [*escolhidas.values(), *extras]}.values())[:4]
 

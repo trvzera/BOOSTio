@@ -6,9 +6,10 @@ from .fpshq_service import ErroBenchmark
 
 
 class ConsultarRequisitosBuildService:
-    """Capacidades da conta ou de uma build pública, sempre com sessão; não prevê FPS."""
-
     def executar(self, dados, usuario_id):
+        if not isinstance(dados, dict):
+            raise ValueError("Informe dados como um objeto válido")
+
         identificador = dados.get("build_id")
         if not isinstance(identificador, str) or not re.fullmatch(r"(?:s-)?[1-9][0-9]{0,17}", identificador):
             raise ValueError("Selecione uma build salva para verificar os requisitos.")
@@ -19,7 +20,22 @@ class ConsultarRequisitosBuildService:
         if build is None:
             raise ErroBenchmark("Build não encontrada.", "build-nao-encontrada", 404)
 
-        selecao = build.estado.get("componentes", {}).get("memoria_ram", [])
+        capacidade, pentes, pendencias, completa = self._avaliar_ram(build.estado.get("componentes", {}))
+        resultado = ConsultarRequisitosService().executar({
+            "game": dados.get("game"), "ram_gb": str(capacidade) if completa else None,
+        }, usuario_id)
+        resultado["buildId"] = identificador
+        resultado["ram"].update({
+            "fonte": "build_publica" if publica else "build_salva", "completa": completa,
+            "conhecidaGb": capacidade, "pentesIdentificados": pentes,
+            "pendencias": list(dict.fromkeys(pendencias)),
+        })
+        self._capacidades_adicionais(resultado, build.estado.get("componentes", {}))
+        return resultado
+
+    @staticmethod
+    def _avaliar_ram(componentes):
+        selecao = componentes.get("memoria_ram", [])
         itens = selecao if isinstance(selecao, list) else [selecao]
         capacidade, pentes, pendencias = 0, 0, []
         if not itens:
@@ -36,24 +52,14 @@ class ConsultarRequisitosBuildService:
             if memoria is None or type(memoria.capacidade_gb) is not int or memoria.capacidade_gb <= 0:
                 pendencias.append("Falta a capacidade confirmada de uma das memórias.")
                 continue
-            # capacidade_gb é a capacidade por item/kit, não por pente do kit.
+
             capacidade += memoria.capacidade_gb * item.get("quantidade", 1)
             if type(memoria.quantidade_pentes) is int and memoria.quantidade_pentes > 0:
                 pentes += memoria.quantidade_pentes * item.get("quantidade", 1)
         if capacidade > 4096:
             pendencias.append("A capacidade está fora da faixa atendida por esta verificação.")
         completa = not pendencias and capacidade > 0
-        resultado = ConsultarRequisitosService().executar({
-            "game": dados.get("game"), "ram_gb": str(capacidade) if completa else None,
-        }, usuario_id)
-        resultado["buildId"] = identificador
-        resultado["ram"].update({
-            "fonte": "build_publica" if publica else "build_salva", "completa": completa,
-            "conhecidaGb": capacidade, "pentesIdentificados": pentes,
-            "pendencias": list(dict.fromkeys(pendencias)),
-        })
-        self._capacidades_adicionais(resultado, build.estado.get("componentes", {}))
-        return resultado
+        return capacidade, pentes, pendencias, completa
 
     @staticmethod
     def _identificar(componentes, tipo, modelo):
@@ -101,7 +107,7 @@ class ConsultarRequisitosBuildService:
         elegiveis = [gb for tipo, gb in discos if not exige_ssd or tipo == "ssd"]
         maior = max(elegiveis, default=0)
         minimo = minimos.get("armazenamentoGb")
-        # Não somar discos: a instalação não cabe automaticamente em volumes separados.
+
         capacidade_minima = True if minimo and maior >= minimo else False if minimo and identificados else None
         resultado["armazenamento"] = {"maiorUnidadeElegivelGb": maior or None, "minimaGb": minimo,
                                       "exigeSsd": exige_ssd, "completo": identificados,

@@ -3,7 +3,6 @@ from .preferencias_cores_service import PreferenciasCoresService
 
 
 class PreferenciasGabineteService:
-    """Lê referências visuais explícitas, sem deduzir encaixes por porte ou foto."""
 
     @classmethod
     def identificar(cls, peca):
@@ -28,7 +27,7 @@ class PreferenciasGabineteService:
         dados = cls.identificar(peca)
         preferencias = [(dados[c], aparencia.get(c)) for c in ("porte", "estilo")
                         if aparencia.get(c) not in (None, "sem-preferencia", "compacto")]
-        # Acertos explícitos primeiro; dado desconhecido não confirma a preferência.
+
         return (-sum(valor == pedido for valor, pedido in preferencias),
                 sum(valor is not None and valor != pedido for valor, pedido in preferencias),
                 PreferenciasCoresService.prioridade(peca, aparencia.get("cor")))

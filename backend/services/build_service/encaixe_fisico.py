@@ -1,8 +1,3 @@
-"""Regras puras de encaixe. Dados ausentes permanecem não verificados.
-
-As fans de fábrica são mantidas. Opções 120/140 mm na mesma posição são
-alternativas, não capacidades somáveis. Não simula espessura/interferência.
-"""
 import math
 from functools import lru_cache
 from .armazenamento import avaliar_baias
@@ -60,8 +55,8 @@ def distribuir_fans(grupos, demanda, water, inclusas, completas=True):
     if water is not None:
         water = {**water, "tamanho_fan_mm": n(water["tamanho_fan_mm"]),
                  "quantidade_fans": inteiro(water["quantidade_fans"], 1), "tamanho_radiador_mm": n(water["tamanho_radiador_mm"])}
-    # Mesmo uma lista parcial de arranjos tem limites superiores por diâmetro.
-    # Uma mistura não documentada, por outro lado, não é conflito confirmado.
+
+
     totais = dict(demanda)
     for grupo in grupos:
         for fan in grupo["fans_inclusas"]:
@@ -106,7 +101,6 @@ def distribuir_fans(grupos, demanda, water, inclusas, completas=True):
 
 
 def avaliar_fans(gabinete, fans, water=None, substituir=False):
-    """fans: pares (item selecionado, peça). Quantidade do produto = fans por kit."""
     grupos = posicoes(gabinete)
     maximo = inteiro(gabinete.get("quantidade_max_fans"))
     if grupos is not None:

@@ -9,14 +9,14 @@ from .fpshq_service import ErroBenchmark
 
 @lru_cache(maxsize=1)
 def catalogo_requisitos():
-    # Curadoria versionada; nunca usa uma URL/caminho fornecido pelo usuário.
     return json.loads(Path(__file__).with_name("requisitos_jogos.json").read_text(encoding="utf-8"))
 
 
 class ConsultarRequisitosService:
-    """Prévia parcial: capacidade de RAM, sem ranking por nome de CPU/GPU ou FPS."""
-
     def executar(self, dados, usuario_id):
+        if not isinstance(dados, dict):
+            raise ValueError("Informe dados como um objeto válido")
+
         jogo = dados.get("game")
         if not isinstance(jogo, str) or not SLUG.fullmatch(jogo):
             raise ValueError("Selecione um jogo identificado para consultar os requisitos.")

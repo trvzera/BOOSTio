@@ -16,6 +16,12 @@ class ConfigurarAcessoService:
         app.config["TRUSTED_HOSTS"] = [urlsplit(api).hostname]
     app.config["FRONTEND_URL"] = frontend
 
+    self._configurar_cors(app, frontend, producao)
+    self._configurar_proxy(app)
+    if app.config.get("SESSION_COOKIE_SAMESITE") not in ("Lax", "Strict", "None"):
+      raise ValueError("SESSION_COOKIE_SAMESITE deve ser Lax, Strict ou None")
+
+  def _configurar_cors(self, app, frontend, producao):
     origens = app.config.get("CORS_ORIGINS")
     if origens:
       origens = [self._validar_origem(item.strip(), producao) for item in origens.split(",")]
@@ -27,6 +33,8 @@ class ConfigurarAcessoService:
     CORS(app, supports_credentials=True, origins=origens, expose_headers=["Retry-After"],
          allow_headers=["Content-Type", "X-CSRF-Token"])
 
+  @staticmethod
+  def _configurar_proxy(app):
     hops = app.config.get("TRUSTED_PROXY_HOPS", 0)
     proto_hops = app.config.get("TRUSTED_PROXY_PROTO_HOPS", 0)
     if any(not isinstance(valor, int) or valor < 0 for valor in (hops, proto_hops)):
@@ -34,8 +42,6 @@ class ConfigurarAcessoService:
     if hops or proto_hops:
       app.wsgi_app = ProxyFix(app.wsgi_app, x_for=hops, x_proto=proto_hops,
                              x_host=0, x_port=0, x_prefix=0)
-    if app.config.get("SESSION_COOKIE_SAMESITE") not in ("Lax", "Strict", "None"):
-      raise ValueError("SESSION_COOKIE_SAMESITE deve ser Lax, Strict ou None")
 
   def _validar_url(self, valor, nome, producao):
     if not isinstance(valor, str) or not valor.strip():

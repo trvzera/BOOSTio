@@ -17,6 +17,9 @@ class ConsultarBenchmarkService:
         self.cliente = cliente or cliente_fpshq
 
     def executar(self, dados, usuario_id):
+        if not isinstance(dados, dict):
+            raise ValueError("Informe dados como um objeto válido")
+
         with self.cliente.travar("fps", dados):
             return self._consultar(dados, usuario_id)
 
@@ -28,7 +31,7 @@ class ConsultarBenchmarkService:
         if consulta["res"] not in RESOLUCOES or consulta["preset"] not in QUALIDADES:
             raise ValueError("Selecione uma resolução e uma qualidade válidas.")
         resposta = self.cliente.executar("fps", consulta, usuario_id)
-        # O cache contém somente o contrato normalizado, nunca uma resposta inválida.
+
 
         if resposta["cache"]:
             return resposta

@@ -3,8 +3,6 @@ from services.email_service.enviar_email_recuperar_service import EnviarEmailRec
 
 
 class SolicitarRecuperacaoSenhaService:
-    """Localiza a conta e solicita envio sem revelar se o e-mail existe."""
-
     def executar(self, dados):
         email = dados.get("email") if isinstance(dados, dict) else None
         if not isinstance(email, str) or len(email) > 150:

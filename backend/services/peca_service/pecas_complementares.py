@@ -1,10 +1,3 @@
-"""Cadastros identificados em fontes primárias, sem cotações inventadas.
-
-As especificações vivem no manifesto compartilhado com o frontend. Zero no preço
-é apenas o valor inicial exigido pelo schema; esgotado=True e data=None impedem
-que seja apresentado como oferta. Consumos desconhecidos também são explicitados
-como null pelo manifesto na leitura, em vez de afirmar consumo zero.
-"""
 from models import Fan, Fone, Gabinete, Mouse, Teclado
 from models.medidas_fisicas import completar_medidas
 

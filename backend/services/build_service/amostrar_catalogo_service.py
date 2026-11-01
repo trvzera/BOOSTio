@@ -5,8 +5,6 @@ from .preferencias_processador_service import PreferenciasProcessadorService
 
 
 class AmostrarCatalogoService:
-    """Preserva padrões incompatíveis e faixas de preço sem enviar o catálogo inteiro."""
-
     GRUPOS = {
         "processador": ("soquete",),
         "placa_mae": ("socket", "tipo_memoria"),
@@ -40,15 +38,20 @@ class AmostrarCatalogoService:
                 chave = tuple(str(peca.get(campo, "")).upper().replace(" ", "") for campo in campos)
                 grupos.setdefault(chave, peca)
                 primarios.setdefault(chave[0], peca)
-            # Guarda espaço para opções acima da entrada; preço não é nota de desempenho.
+
             for peca in [*primarios.values(), *grupos.values()]:
                 if len(escolhidas) >= max(1, limite - 4):
                     break
                 escolhidas[peca["id"]] = peca
-        # Sem excluir padrões técnicos, a entrada econômica ou a faixa de investimento.
+
         for peca in PreferenciasCoresService.destaques(ordenadas, cor, campos or ()):
             if len(escolhidas) < limite:
                 escolhidas[peca["id"]] = peca
+        self._completar_faixas_preco(ordenadas, escolhidas, limite)
+        return sorted(escolhidas.values(), key=lambda p: (p["preco"], p["id"]))
+
+    @staticmethod
+    def _completar_faixas_preco(ordenadas, escolhidas, limite):
         menor, maior = Decimal(str(ordenadas[0]["preco"])), Decimal(str(ordenadas[-1]["preco"]))
         vagas = limite - len(escolhidas)
         for indice in range(vagas):
@@ -58,4 +61,3 @@ class AmostrarCatalogoService:
                 break
             peca = min(disponiveis, key=lambda p: (abs(Decimal(str(p["preco"])) - alvo), p["preco"], p["id"]))
             escolhidas[peca["id"]] = peca
-        return sorted(escolhidas.values(), key=lambda p: (p["preco"], p["id"]))

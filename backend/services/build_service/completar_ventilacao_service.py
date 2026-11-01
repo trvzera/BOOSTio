@@ -7,8 +7,6 @@ from .preferencias_cores_service import PreferenciasCoresService
 
 
 class CompletarVentilacaoService:
-    """Completa uma omissão mecânica da IA só com encaixe e orçamento conhecidos."""
-
     def executar(self, build, catalogo, teto_pc, proprias=None, detalhes_proprias=None, cor="sem-preferencia"):
         proprias = proprias or {}
         if not isinstance(build, dict) or build.get("erro") or not isinstance(build.get("componentes"), list) or "fan" in proprias:
@@ -33,7 +31,7 @@ class CompletarVentilacaoService:
 
         gabinete = especificacoes("gabinete")
         water = especificacoes("water_cooler") if "water_cooler" in por_tipo or "water_cooler" in proprias else None
-        # Um AIO próprio não identificado não pode ser tratado como zero fans.
+
         if water == {}:
             return build
         atuais = [por_tipo["fan"]] if "fan" in por_tipo else []
@@ -47,6 +45,21 @@ class CompletarVentilacaoService:
             return build
         subtotal = sum((valor for tipo, valor in precos.items() if tipo not in {"fan", "monitor", "teclado", "mouse", "fone"}), Decimal(0))
         opcoes = [por_tipo["fan"][1]] if atuais else catalogo.get("fan", [])
+        candidatas = self._selecionar_fans(opcoes, faltantes, subtotal, teto_pc, gabinete, water, cor)
+        if not candidatas:
+            return build
+        candidata = min(candidatas, key=lambda item: item[:3])[3]
+        resultado = deepcopy(build)
+        resultado["componentes"] = [item for item in resultado["componentes"] if item["tipo"] != "fan"] + [candidata]
+        return resultado
+
+    @staticmethod
+    def _disponivel(peca):
+        return (isinstance(peca, dict) and type(peca.get("id")) is int and peca.get("esgotado") is not True
+                and type(peca.get("preco")) in (int, float, Decimal)
+                and isfinite(peca["preco"]) and peca["preco"] > 0)
+
+    def _selecionar_fans(self, opcoes, faltantes, subtotal, teto_pc, gabinete, water, cor):
         candidatas = []
         for fan in opcoes:
             kit = fan.get("quantidade")
@@ -60,19 +73,8 @@ class CompletarVentilacaoService:
             encaixe = avaliar_fans(gabinete, [(componente, fan)], water)
             if encaixe["total"] != encaixe["capacidade"] or encaixe["quantidade"] is not True or encaixe["tamanhos"] is not True:
                 continue
-            # Quando há arranjos cadastrados, eles precisam confirmar a distribuição.
+
             if encaixe["distribuicao"] is False or gabinete.get("posicoes_fans") and encaixe["distribuicao"] is not True:
                 continue
             candidatas.append((PreferenciasCoresService.prioridade(fan, cor), custo, fan["id"], componente))
-        if not candidatas:
-            return build
-        candidata = min(candidatas, key=lambda item: item[:3])[3]
-        resultado = deepcopy(build)
-        resultado["componentes"] = [item for item in resultado["componentes"] if item["tipo"] != "fan"] + [candidata]
-        return resultado
-
-    @staticmethod
-    def _disponivel(peca):
-        return (isinstance(peca, dict) and type(peca.get("id")) is int and peca.get("esgotado") is not True
-                and type(peca.get("preco")) in (int, float, Decimal)
-                and isfinite(peca["preco"]) and peca["preco"] > 0)
+        return candidatas

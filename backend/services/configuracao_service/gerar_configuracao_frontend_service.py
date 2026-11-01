@@ -8,10 +8,13 @@ from .configurar_acesso_service import ConfigurarAcessoService
 
 class GerarConfiguracaoFrontendService:
   def executar(self, configuracao, destino, producao=False):
+    if not isinstance(configuracao, dict):
+        raise ValueError("Informe configuracao como um objeto válido")
+
     app = Flask(__name__)
     app.config.update(configuracao)
     ConfigurarAcessoService().executar(app, producao=producao)
-    # Somente a URL pública é exportada. Nunca serializar o .env ou app.config.
+
     api = app.config.get("API_PUBLIC_URL") or ""
     Path(destino).write_text(
       "// Gerado a partir do endereço público no ambiente do backend.\n"

@@ -940,3 +940,92 @@ def test_recusa_de_cor_vira_orientacao_publica_sem_dizer_que_faltou_orcamento(ap
     assert llm.call_count == 2
     with app_build.app_context():
         assert BuildSalva.query.count() == 0
+
+
+def test_requisito_armazenamento_aciona_correcao_antes_de_salvar(app_build, mocker):
+    tipos = ['processador', 'placa_mae', 'memoria_ram', 'fonte', 'gabinete', 'ssd']
+    primeira = {**PEDIDO, 'componentes': [{'tipo': tipo, 'id': 1, 'quantidade': 1} for tipo in tipos]}
+    segunda = deepcopy(primeira)
+    next(i for i in segunda['componentes'] if i['tipo'] == 'ssd')['id'] = 2
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+        ssd = MODELOS['ssd'].buscar_por_id(1)
+        ssd.capacidade_gb = 120
+        copia = {c.name: getattr(ssd, c.name) for c in ssd.__table__.columns if c.name != 'id'}
+        db.session.add(MODELOS['ssd'](**{**copia, 'capacidade_gb': 500}))
+        db.session.commit()
+        llm = mocker.patch('services.build_service.criar_build_service.LLMService.executar',
+                           side_effect=[primeira, segunda])
+        resultado = CriarBuildService().executar(1, {**PEDIDO, 'armazenamento_minimo_gb': 500})
+        assert resultado['estado']['componentes']['ssd'][0]['id'] == 2
+        assert BuildSalva.query.count() == 1
+        assert llm.call_count == 2
+        assert 'solicitado 500 GB, selecionado 120 GB' in llm.call_args.args[0]
+        assert '"armazenamento_minimo_gb": 500' in llm.call_args_list[0].args[0]
+
+
+def test_armazenamento_insuficiente_nunca_e_salvo(app_build, mocker):
+    from services.build_service.criar_build_service import ErroGeracaoBuild
+    tipos = ['processador', 'placa_mae', 'memoria_ram', 'fonte', 'gabinete', 'ssd']
+    resposta = {**PEDIDO, 'componentes': [{'tipo': tipo, 'id': 1, 'quantidade': 1} for tipo in tipos]}
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+        MODELOS['ssd'].buscar_por_id(1).capacidade_gb = 120
+        db.session.commit()
+        mocker.patch('services.build_service.criar_build_service.LLMService.executar', return_value=resposta)
+        with pytest.raises(ErroGeracaoBuild, match='armazenamento mínimo'):
+            CriarBuildService().executar(1, {**PEDIDO, 'armazenamento_minimo_gb': 500})
+        assert BuildSalva.query.count() == Build.query.count() == 0
+
+
+def test_geracao_experimental_repara_excesso_sem_pedir_nova_resposta_ia(app_build, mocker):
+    from services.build_service.seletor_inteligente_service import SeletorInteligenteService
+    tipos = ['processador','placa_mae','placa_video','memoria_ram','fonte','gabinete','ssd','fan']
+    resposta = {**PEDIDO, 'componentes': [dict(tipo=t,id=1,quantidade=2 if t=='memoria_ram' else 5 if t=='fan' else 1) for t in tipos]}
+    precos = dict(processador=1500,placa_mae=500,placa_video=2300,memoria_ram=1000,fonte=500,gabinete=500,ssd=800,fan=40)
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+        for tipo, preco in precos.items():
+            MODELOS[tipo].buscar_por_id(1).preco = preco
+        cpu = MODELOS['processador'].buscar_por_id(1)
+        cpu.soquete='AM4'
+        placa = MODELOS['placa_mae'].buscar_por_id(1)
+        placa.socket='AM4';placa.tipo_memoria='DDR4'
+        ram = MODELOS['memoria_ram'].buscar_por_id(1)
+        ram.ddr='DDR4';ram.capacidade_gb=16;ram.quantidade_pentes=1;ram.frequencia_mhz=3200
+        ssd=MODELOS['ssd'].buscar_por_id(1)
+        ssd.capacidade_gb=500;ssd.interface='PCIe 4.0';ssd.formato='M.2'
+        fan=MODELOS['fan'].buscar_por_id(1)
+        fan.tamanho_mm=120;fan.quantidade=1
+        for tipo, extras in [('ssd',dict(preco=600)),('fan',dict(preco=10))]:
+            obj=MODELOS[tipo].buscar_por_id(1)
+            copia={c.name:getattr(obj,c.name) for c in obj.__table__.columns if c.name!='id'}
+            db.session.add(MODELOS[tipo](**{**copia,**extras}))
+        db.session.commit()
+        llm=mocker.patch('services.build_service.criar_build_service.LLMService.executar',return_value=resposta)
+        r=SeletorInteligenteService().gerar_build(1,{**PEDIDO,'orcamento':8000,'prioridade_montagem':'desempenho',
+                                                  'armazenamento_minimo_gb':500})
+        assert llm.call_count == 1
+        assert r['build']['preco_total'] == 7950
+        ajuste=r['build']['ajuste_orcamento']
+        assert ajuste['total_anterior'] == 8300 and ajuste['economia'] == 350
+        assert {i['tipo'] for i in ajuste['trocas']} == {'ssd','fan'}
+        assert BuildSalva.query.count() == Build.query.count() == 0
+
+
+def test_reparo_sem_alternativa_segura_ainda_usa_correcao_limitada(app_build, mocker):
+    from services.build_service.criar_build_service import ErroGeracaoBuild
+    tipos=['processador','placa_mae','memoria_ram','fonte','gabinete','ssd']
+    resposta={**PEDIDO,'componentes':[dict(tipo=t,id=1,quantidade=1) for t in tipos]}
+    with app_build.app_context():
+        cadastrar_pecas(tipos)
+        for tipo in tipos:
+            MODELOS[tipo].buscar_por_id(1).preco=1000
+        db.session.commit()
+        catalogo=CriarBuildService._gerar_catalogo(5000)
+        llm=mocker.patch('services.build_service.criar_build_service.LLMService.executar',return_value=resposta)
+        with pytest.raises(ErroGeracaoBuild):
+            CriarBuildService()._gerar_validada(1,'Pedido','teste',catalogo,5000,0,{}, {},{},
+                                               ajustar_orcamento=True,catalogo_reparo=catalogo)
+        assert llm.call_count == 2
+        assert BuildSalva.query.count() == 0

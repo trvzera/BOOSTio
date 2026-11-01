@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 class BlenderService:
-    """Consulta agregados públicos, nunca executa Blender ou mede o computador do usuário."""
     URL = "https://opendata.blender.org/benchmarks/query/"
     TTL = 3600
     MAX_CACHE = 128
@@ -32,6 +31,9 @@ class BlenderService:
         self.chaves = [RLock() for _ in range(32)]
 
     def executar(self, dados, usuario_id):
+        if not isinstance(dados, dict):
+            raise ValueError("Informe dados como um objeto válido")
+
         nome, tipo = dados.get("dispositivo"), dados.get("tipo")
         if not isinstance(nome, str) or not re.fullmatch(r"[A-Za-z0-9() +._/\-]{2,160}", nome) or tipo not in ("cpu", "gpu"):
             raise ValueError("Selecione um modelo identificado de CPU ou GPU para consultar o Blender.")
@@ -46,36 +48,7 @@ class BlenderService:
                     self.cache.move_to_end(chave)
                     return {**deepcopy(salvo[1]), "cache": True}
                 self._limitar(agora, usuario_id)
-            parametros = [("device_name", nome), ("group_by", "device_name"), ("group_by", "compute_type"),
-                          ("group_by", "blender_version"), ("response_type", "datatables")]
-            try:
-                resposta = self.buscar(self.URL, params=parametros, headers={"Accept": "application/json"},
-                                      timeout=(4, 10), allow_redirects=False)
-            except requests.Timeout as erro:
-                raise self._falha("O Blender Open Data não respondeu a tempo. Tente novamente mais tarde.", "timeout", 504, causa=erro) from erro
-            except requests.exceptions.SSLError as erro:
-                raise self._falha("O servidor da BOOSTio não conseguiu estabelecer uma conexão segura com o Blender Open Data. Tente novamente mais tarde.", "tls", 503, causa=erro) from erro
-            except requests.RequestException as erro:
-                raise self._falha("O servidor da BOOSTio não conseguiu se conectar ao Blender Open Data agora. Tente novamente mais tarde.", "rede", 503, causa=erro) from erro
-            if resposta.status_code == 429:
-                espera = FpshqService._espera(resposta.headers.get("Retry-After"))
-                with self.lock:
-                    self.bloqueado_ate = self.relogio() + espera
-                raise self._falha("A fonte solicitou uma pausa. Aguarde para consultar novamente.", "limite", 429, resposta, espera=espera)
-            if resposta.status_code in (401, 403):
-                raise self._falha("O Blender Open Data recusou a consulta feita pelo servidor da BOOSTio. Tente novamente mais tarde.", "acesso-provedor", 503, resposta)
-            if 300 <= resposta.status_code < 400:
-                raise self._falha("O endereço do Blender Open Data redirecionou a consulta. A integração precisa ser verificada.", "redirecionamento", 503, resposta)
-            if resposta.status_code != 200:
-                raise self._falha("O Blender Open Data está indisponível no momento.", "provedor", 503, resposta)
-            try:
-                bruto = resposta.json()
-            except ValueError as erro:
-                raise self._falha("O Blender retornou uma resposta que não pôde ser lida. Tente novamente mais tarde.", "resposta", 502, resposta, causa=erro) from erro
-            try:
-                resultado = self._normalizar(bruto, nome, tipo)
-            except ErroBenchmark as erro:
-                raise self._falha(str(erro), erro.codigo, erro.status, resposta) from erro
+            resultado = self._consultar(nome, tipo)
             resultado.update(consultadoEm=int(self.data_atual() * 1000), cache=False)
             with self.lock:
                 self.cache[chave] = (self.relogio(), deepcopy(resultado))
@@ -88,7 +61,7 @@ class BlenderService:
     def _falha(mensagem, codigo, status, resposta=None, *, espera=0, causa=None):
         meta = FpshqService._metadados(resposta) if resposta is not None else None
         erro = ErroBenchmark(mensagem, codigo, status, espera, meta)
-        # Sem cookies, chaves, conteúdo de terceiros ou dados da conta nos logs.
+
         logger.warning("Blender: %s; http_boostio=%s; http_provedor=%s; formato=%s; causa=%s",
                        codigo, status, erro.diagnostico.get("httpProvedor", "desconhecido"),
                        erro.diagnostico.get("tipoResposta", "desconhecido"),
@@ -120,7 +93,7 @@ class BlenderService:
             registros.append(registro)
         if not registros:
             raise ErroBenchmark("Não há resultados públicos para esse modelo. Não substituímos por uma peça parecida.", "sem-dados", 422)
-        # Versão mais recente disponível; nela, o método com mais resultados, não a maior pontuação.
+
         escolhido = max(registros, key=lambda r: (tuple(map(int, r["Blender Version"].split("."))), r["Number of Benchmarks"]))
         return {"dispositivo": escolhido["Device Name"], "tipo": tipo, "versao": escolhido["Blender Version"],
                 "metodo": escolhido["Compute Type"], "score": escolhido["Median Score"], "quantidade": escolhido["Number of Benchmarks"],
@@ -140,6 +113,40 @@ class BlenderService:
         self.chamadas.append(agora)
         while len(self.usuarios) > 1000:
             self.usuarios.popitem(last=False)
+
+
+    def _consultar(self, nome, tipo):
+        parametros = [("device_name", nome), ("group_by", "device_name"), ("group_by", "compute_type"),
+                      ("group_by", "blender_version"), ("response_type", "datatables")]
+        try:
+            resposta = self.buscar(self.URL, params=parametros, headers={"Accept": "application/json"},
+                                  timeout=(4, 10), allow_redirects=False)
+        except requests.Timeout as erro:
+            raise self._falha("O Blender Open Data não respondeu a tempo. Tente novamente mais tarde.", "timeout", 504, causa=erro) from erro
+        except requests.exceptions.SSLError as erro:
+            raise self._falha("O servidor da BOOSTio não conseguiu estabelecer uma conexão segura com o Blender Open Data. Tente novamente mais tarde.", "tls", 503, causa=erro) from erro
+        except requests.RequestException as erro:
+            raise self._falha("O servidor da BOOSTio não conseguiu se conectar ao Blender Open Data agora. Tente novamente mais tarde.", "rede", 503, causa=erro) from erro
+        if resposta.status_code == 429:
+            espera = FpshqService._espera(resposta.headers.get("Retry-After"))
+            with self.lock:
+                self.bloqueado_ate = self.relogio() + espera
+            raise self._falha("A fonte solicitou uma pausa. Aguarde para consultar novamente.", "limite", 429, resposta, espera=espera)
+        if resposta.status_code in (401, 403):
+            raise self._falha("O Blender Open Data recusou a consulta feita pelo servidor da BOOSTio. Tente novamente mais tarde.", "acesso-provedor", 503, resposta)
+        if 300 <= resposta.status_code < 400:
+            raise self._falha("O endereço do Blender Open Data redirecionou a consulta. A integração precisa ser verificada.", "redirecionamento", 503, resposta)
+        if resposta.status_code != 200:
+            raise self._falha("O Blender Open Data está indisponível no momento.", "provedor", 503, resposta)
+        try:
+            bruto = resposta.json()
+        except ValueError as erro:
+            raise self._falha("O Blender retornou uma resposta que não pôde ser lida. Tente novamente mais tarde.", "resposta", 502, resposta, causa=erro) from erro
+        try:
+            resultado = self._normalizar(bruto, nome, tipo)
+        except ErroBenchmark as erro:
+            raise self._falha(str(erro), erro.codigo, erro.status, resposta) from erro
+        return resultado
 
 
 cliente_blender = BlenderService()
