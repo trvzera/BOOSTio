@@ -1,9 +1,9 @@
 # Seleção inteligente — Etapa 3 e manutenção
 
-Este documento descreve a implementação experimental, suas políticas e seus limites.
-O fluxo antigo `CriarBuildService.executar` continua sendo a implementação do endpoint
-existente. O seletor não foi colocado automaticamente na rota e não chama IA nem salva
-builds por conta própria. A comparação entre estratégias continua possível.
+Este documento descreve a seleção inteligente, suas políticas e seus limites.
+O endpoint existente de geração usa o seletor inteligente para preparar candidatos
+e prompt, mantendo validação e salvamento no gerador. A estratégia antiga permanece
+disponível em chamadas internas explícitas para comparação.
 
 ## 1. Visão do fluxo
 
@@ -17,8 +17,9 @@ flowchart TD
     F --> G[Amostra por ranking, faixa e plataforma]
     G --> H[Placas por socket e RAM por DDR]
     H --> I[Catálogo e diagnóstico]
-    I --> J[Preparar prompt experimental neutro]
-    J --> K[Geração e validação final existentes]
+    I --> J[Preparar prompt neutro]
+    J --> K[Geração, validação e reparo de custo]
+    K --> L[Salvamento existente na conta]
 ```
 
 Há três decisões diferentes:
@@ -79,7 +80,7 @@ preparados, o mesmo pedido, seus tetos e `armazenamento_minimo_gb`. `_gerar_vali
 método interno que pode verificar espaço da conta numa correção; use o mesmo ambiente e
 procedimento isolado dos testes. Não é uma API pública nova nem um bypass de autenticação.
 
-O endpoint antigo não recebe um catálogo arbitrário do cliente. O planejamento experimental
+O endpoint não recebe um catálogo arbitrário do cliente. O planejamento inteligente
 é calculado no servidor e passado ao prompt pelo adaptador, não aceito como verdade de um campo do usuário.
 
 ## 4. Orçamento dinâmico
@@ -285,7 +286,8 @@ build = resultado["build"]
 
 Ela verifica a conta e seu limite de builds, usa a trava de geração existente, prepara
 catálogo/prompt e chama a geração com o reparo de custo habilitado. **Não salva uma nova
-build na conta.** A rota antiga continua independente. Não basta chamar `executar`:
+build na conta.** Essa entrada continua disponível para testes isolados. O endpoint
+principal usa `preparar_geracao` dentro do gerador com persistência (seção 11). Não basta chamar `executar`:
 essa chamada apenas seleciona candidatos. `preparar_geracao` prepara os dados, mas não chama a IA.
 
 ### Sequência automática
@@ -367,3 +369,40 @@ cd backend
   tests/services/build_service/test_criacao_build.py \
   tests/services/build_service/test_seletor_inteligente.py -q
 ```
+
+
+## 11. Integração com a geração do frontend
+
+A rota autenticada `POST /build/` mantém seu contrato e agora segue:
+
+```text
+BuildController → GerarBuildService (trava única)
+  → CriarBuildService.executar(selecao_inteligente=True)
+    → SeletorInteligenteService.preparar_geracao
+    → _gerar_validada (reparo de orçamento habilitado)
+    → _salvar_build (contrato e transação existentes)
+```
+
+A validação de usuário, vagas, prioridade (padrão `custo_beneficio` para clientes
+antigos), aparência, peças próprias, rede e reservas continua antes da geração.
+Não chamamos `SeletorInteligenteService.gerar_build` dentro da trava: essa entrada
+sem salvamento tem sua própria trava e causaria bloqueio duplicado. A preparação
+não chama IA e não salva; o serviço existente continua responsável pela persistência.
+
+O fallback por falha transitória do provedor também passa `selecao_inteligente=True`,
+com o limite de correções anterior. Não volta silenciosamente à estratégia antiga.
+O pool de reparo permanece interno; não é enviado integralmente à IA nem retornado
+pela rota pública. Peças sem benchmark continuam conforme a política original;
+nenhuma alteração do experimento de ampliação de cobertura foi reincorporada.
+
+Para comparação interna, `CriarBuildService.executar` mantém por padrão a estratégia
+antiga; o fluxo principal a substitui explicitamente pela inteligente. Testes isolados
+sem gravação podem continuar usando `SeletorInteligenteService.gerar_build`.
+
+Testes de integração cobrem a rota real com reparo de 8300 para 7950 antes de salvar,
+as duas prioridades, peças próprias, reserva de periféricos, rede, salvamento único,
+e rejeição antes da IA quando não existe plataforma compatível/viável. Os mocks
+substituem somente o provedor externo nesses cenários de geração.
+
+Esta conexão exige atualizar/reconstruir a API na VPS. Não requer migração adicional
+nem nova importação dos benchmarks já cadastrados. Não altera o frontend.

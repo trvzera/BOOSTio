@@ -18,7 +18,7 @@ def test_sucesso_usa_uma_chamada_e_a_trava_do_usuario(mocker):
     trava, criar = preparar(mocker, [{"id":"s-1"}])
     assert GerarBuildService().executar(7, {"nome":"Teste"}) == {"id":"s-1"}
     trava.assert_called_once_with(7)
-    criar.assert_called_once_with(7, {"nome":"Teste"})
+    criar.assert_called_once_with(7, {"nome":"Teste"}, selecao_inteligente=True)
 
 
 @pytest.mark.parametrize("status", [429,500,502,503,504])
@@ -27,7 +27,7 @@ def test_fallback_permitido_preserva_tentativa_unica_e_sem_novo_ciclo_de_correca
     trava, criar = preparar(mocker, [HTTPError(response=resposta), {"id":"s-2"}])
     assert GerarBuildService().executar(7, {}) == {"id":"s-2"}
     assert criar.call_count == 2
-    assert criar.call_args.kwargs == {"modelo":"gemini-3.8-flash","tentativas_correcao":0}
+    assert criar.call_args.kwargs == {"modelo":"gemini-3.8-flash","tentativas_correcao":0,"selecao_inteligente":True}
     trava.assert_called_once_with(7)
 
 

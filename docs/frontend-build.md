@@ -1918,7 +1918,7 @@ incluí-las na resposta. Placa-mãe própria continua excluída das novas compra
 
 Esta alteração não aumenta nem diversifica a lista inicial de CPUs: se nenhuma AM4
 for selecionada, ela não aparecerá por causa das cotas de placas-mãe. Socket igual não
-certifica suporte ao modelo/BIOS. O fluxo antigo de geração continua independente.
+certifica suporte ao modelo/BIOS. Essa integração inicial foi substituída pela conexão do fluxo principal descrita ao final deste documento.
 
 
 #### Memória RAM por DDR das placas-mãe selecionadas
@@ -1998,7 +1998,7 @@ A preparação experimental evoluiu para planejar reservas e metas por uso/orça
 carregar o pool antes de cortá-lo, remover dominados comparáveis e misturar faixas,
 plataformas e rankings. `SeletorInteligenteService.preparar_geracao` fornece o catálogo
 numérico e o prompt com planejamento e sem preferência artificial por Ryzen.
-O endpoint antigo continua independente. A seleção experimental aplica limites estritos,
+A geração do frontend agora usa a preparação inteligente (veja a seção ao final). A seleção aplica limites estritos,
 configuráveis com `limites_candidatos`; diagnósticos registram cortes e fallbacks.
 
 O guia completo de algoritmo, parâmetros, limitações e manutenção está em
@@ -2014,3 +2014,18 @@ antes de consumir a correção adicional da IA. Quantidades e kits entram nos su
 CPU/GPU são preservadas no reparo. Os resultados incluem o diagnóstico `ajuste_orcamento`.
 Apenas selecionar candidatos com `executar` não executa esse pós-processamento.
 Veja a seção 10 do [guia da Etapa 3](selecao-inteligente-etapa-3.md).
+
+
+### Geração do frontend conectada ao seletor inteligente
+
+O envio existente de `prioridade_montagem` em `POST /build/` agora usa a seleção
+inteligente no backend. Não há rota nova nem mudança no JSON de resposta.
+`GerarBuildService` mantém uma única trava por usuário e solicita a estratégia
+inteligente a `CriarBuildService`, inclusive no fallback de provedor. Este usa
+`SeletorInteligenteService.preparar_geracao`, valida/repara a resposta e salva
+pela mesma rotina que preserva peças próprias, rede, periféricos e aparência.
+
+O método `SeletorInteligenteService.gerar_build` continua sendo a entrada sem
+salvamento para testes; a rota não o chama para evitar uma segunda trava.
+A estratégia antiga permanece disponível para comparação interna. Detalhes e
+manutenção em `docs/selecao-inteligente-etapa-3.md`, seção 11.

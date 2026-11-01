@@ -69,7 +69,7 @@ class CriarBuildService:
     "porte_referencia", "estilo_referencia", "gpu_chip", "interface_memoria", "fonte_cor",
   )
 
-  def executar(self, usuario_id, dados, modelo="gemini-3.5-flash-lite", tentativas_correcao=1):
+  def executar(self, usuario_id, dados, modelo="gemini-3.5-flash-lite", tentativas_correcao=1, *, selecao_inteligente=False):
     validacao_campos(dados, ["nome", "descricao", "utilidade", "orcamento"])
     self._validar_textos_pedido(dados)
     armazenamento_minimo = RequisitosArmazenamentoService.validar_parametro(dados.get("armazenamento_minimo_gb"))
@@ -93,18 +93,28 @@ class CriarBuildService:
 
     teto_pc, teto_perifericos = self._dividir_orcamento(orcamento, percentual)
     validar_minimos(teto_pc, teto_perifericos, percentual)
-    catalogo = self._preparar_catalogo(dados, proprias, rede, aparencia, orcamento, margem, teto_pc, teto_perifericos)
-    self._validar_disponibilidade(catalogo, proprias, percentual)
-
-    plano_perifericos = self._planejar_perifericos(catalogo, teto_perifericos, proprias, dados["utilidade"], aparencia["cor"], percentual)
-    detalhes_proprias = self._detalhes_proprias(proprias)
     inicio_prompt = perf_counter()
-    prompt = self._criar_prompt(dados, orcamento, margem, catalogo, percentual, detalhes_proprias, plano_perifericos)
+    reparo = {}
+    if selecao_inteligente:
+      # Importação tardia: o seletor reutiliza validações e fichas deste gerador.
+      # Só prepara candidatos; a trava e o salvamento continuam no fluxo principal.
+      from .seletor_inteligente_service import SeletorInteligenteService
+      preparado = SeletorInteligenteService().preparar_geracao(dados)
+      catalogo = preparado["catalogo"]
+      detalhes_proprias = preparado["detalhes_proprias"]
+      prompt = preparado["prompt"]
+      reparo = {"ajustar_orcamento": True, "catalogo_reparo": preparado["catalogo_reparo"]}
+    else:
+      catalogo = self._preparar_catalogo(dados, proprias, rede, aparencia, orcamento, margem, teto_pc, teto_perifericos)
+      self._validar_disponibilidade(catalogo, proprias, percentual)
+      plano_perifericos = self._planejar_perifericos(catalogo, teto_perifericos, proprias, dados["utilidade"], aparencia["cor"], percentual)
+      detalhes_proprias = self._detalhes_proprias(proprias)
+      prompt = self._criar_prompt(dados, orcamento, margem, catalogo, percentual, detalhes_proprias, plano_perifericos)
     logger.info("Geração: etapa=prompt duracao_ms=%d caracteres=%d", (perf_counter()-inicio_prompt)*1000, len(prompt))
     dados_build = self._gerar_validada(usuario_id, prompt, modelo, catalogo, orcamento,
                                      percentual, proprias, detalhes_proprias, rede, tentativas_correcao,
                                      revisar_investimento=self._perfil_revisa_investimento(dados["utilidade"]), cor=aparencia["cor"], aparencia=aparencia,
-                                     armazenamento_minimo_gb=armazenamento_minimo)
+                                     armazenamento_minimo_gb=armazenamento_minimo, **reparo)
     return self._salvar_build(usuario_id, dados_build, proprias, rede, percentual, aparencia, orcamento)
 
   @staticmethod
