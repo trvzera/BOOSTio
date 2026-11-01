@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from models import Processador, PlacaVideo, PlacaMae, MemoriaRAM
+from models import Processador, PlacaVideo, PlacaMae, MemoriaRAM, BuildSalva
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from utils.aparencia import validar_aparencia
 from utils.validacoes import validacao_campos
@@ -16,6 +16,8 @@ from .amostra_inteligente_service import AmostraInteligenteService
 from .preferencias_cores_service import PreferenciasCoresService
 from .planejar_orcamento_componentes_service import PlanejarOrcamentoComponentesService
 from .planejar_armazenamento_service import PlanejarArmazenamentoService
+from .ajustar_orcamento_build_service import AjustarOrcamentoBuildService
+from services.llm_service.bloquear_geracao_service import BloquearGeracaoService
 
 
 class SeletorInteligenteService:
@@ -24,6 +26,9 @@ class SeletorInteligenteService:
     LIMITE_MEMORIAS = 24
 
     def executar(self, dados):
+        return self._executar(dados, incluir_reparo=False)
+
+    def _executar(self, dados, incluir_reparo):
         contexto = self._preparar_contexto(dados)
         contexto["detalhes_proprias"] = CriarBuildService._detalhes_proprias(contexto["proprias"])
         contexto["pools"] = self._carregar_pools(contexto)
@@ -44,7 +49,7 @@ class SeletorInteligenteService:
         faltantes = sorted({"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"} - presentes)
         if not {"ssd", "hd"} & presentes:
             faltantes.append("armazenamento")
-        return {
+        resultado = {
             "planejamento_orcamento": contexto["planejamento"],
             "amostragem": contexto["amostragem"], "categorias_pendentes": faltantes,
             "mensagem": "Candidatos por peça selecionados dentro do teto informado.",
@@ -53,13 +58,17 @@ class SeletorInteligenteService:
             "componentes_selecionados": selecionados,
         }
 
+        if incluir_reparo:
+            resultado["catalogo_reparo"] = self._catalogo_reparo(contexto, selecionados, excluidas)
+        return resultado
+
     def preparar_geracao(self, dados):
         """Adapta a seleção experimental ao gerador existente, sem chamar IA nem salvar."""
         if not isinstance(dados, dict):
             raise ValueError("Informe um objeto com os dados da geração")
         validacao_campos(dados, ["nome", "descricao", "utilidade", "orcamento"])
         CriarBuildService._validar_textos_pedido(dados)
-        resultado = self.executar(dados)
+        resultado = self._executar(dados, incluir_reparo=True)
         catalogo = {}
         for peca in resultado["componentes_selecionados"]:
             catalogo.setdefault(peca["categoria"], []).append(self._ficha(peca))
@@ -80,6 +89,36 @@ class SeletorInteligenteService:
                                       preferencia_neutra=True)
         return {**resultado, "catalogo": catalogo, "prompt": prompt, "proprias": proprias,
                 "detalhes_proprias": detalhes}
+
+    def gerar_build(self, usuario_id, dados, modelo="gemini-3.5-flash-lite", tentativas_correcao=1):
+        """Gera pela estratégia experimental e repara excesso de custo; não salva a build."""
+        with BloquearGeracaoService().executar(usuario_id):
+            BuildSalva.verificar_espaco(usuario_id)
+            preparado = self.preparar_geracao(dados)
+            aparencia = validar_aparencia(dados.get("aparencia"))
+            gerador = CriarBuildService()
+            build = gerador._gerar_validada(
+                usuario_id, preparado["prompt"], modelo, preparado["catalogo"],
+                gerador._validar_orcamento(dados["orcamento"]), dados.get("percentual_perifericos", 0),
+                preparado["proprias"], preparado["detalhes_proprias"], dados.get("rede") or {},
+                tentativas_correcao=tentativas_correcao,
+                revisar_investimento=gerador._perfil_revisa_investimento(dados["utilidade"]),
+                cor=aparencia["cor"], aparencia=aparencia,
+                armazenamento_minimo_gb=preparado["armazenamento_minimo_gb"],
+                ajustar_orcamento=True, catalogo_reparo=preparado["catalogo_reparo"])
+            return {**preparado, "build": build}
+
+    def _catalogo_reparo(self, contexto, selecionados, excluidas):
+        catalogo = {}
+        for peca in selecionados:
+            catalogo.setdefault(peca["categoria"], []).append(self._ficha(peca))
+        for tipo in AjustarOrcamentoBuildService.AJUSTAVEIS:
+            if tipo in excluidas:
+                continue
+            # Não enviar o pool inteiro à IA; usá-lo só para reparar a resposta concreta.
+            fichas = [self._ficha(p) for p in contexto["pools"].get(tipo, [])]
+            catalogo[tipo] = list({p["id"]: p for p in [*catalogo.get(tipo, []), *fichas]}.values())
+        return catalogo
 
     def _preparar_contexto(self, dados):
         if not isinstance(dados, dict):

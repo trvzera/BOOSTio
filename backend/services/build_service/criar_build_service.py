@@ -19,6 +19,7 @@ from .planejar_perifericos_service import PlanejarPerifericosService
 from .completar_ventilacao_service import CompletarVentilacaoService
 from .amostrar_catalogo_service import AmostrarCatalogoService
 from .requisitos_armazenamento_service import RequisitosArmazenamentoService
+from .ajustar_orcamento_build_service import AjustarOrcamentoBuildService
 from .preferencias_perifericos_service import PreferenciasPerifericosService
 from .preferencias_cores_service import PreferenciasCoresService
 from .planejar_rede_service import PlanejarRedeService
@@ -203,7 +204,7 @@ class CriarBuildService:
         raise ValueError(f"{campo} deve ser um texto de até {limite} caracteres")
 
   def _gerar_validada(self, usuario_id, prompt, modelo, catalogo, orcamento,
-                     percentual, proprias, detalhes_proprias, rede, tentativas_correcao=1, revisar_investimento=False, cor="sem-preferencia", aparencia=None, armazenamento_minimo_gb=None):
+                     percentual, proprias, detalhes_proprias, rede, tentativas_correcao=1, revisar_investimento=False, cor="sem-preferencia", aparencia=None, armazenamento_minimo_gb=None, ajustar_orcamento=False, catalogo_reparo=None):
     armazenamento_minimo_gb = RequisitosArmazenamentoService.validar_parametro(armazenamento_minimo_gb)
     limite = 1 if tentativas_correcao else 0
     instrucao = prompt
@@ -222,11 +223,28 @@ class CriarBuildService:
         build = PlanejarRedeService.completar(build, catalogo, rede, proprias)
         teto_pc, _ = self._dividir_orcamento(orcamento, percentual)
         build = CompletarVentilacaoService().executar(build, catalogo, teto_pc, proprias, detalhes_proprias, cor=cor)
-        validada = self._validar_build(build, catalogo, orcamento, percentual, proprias, detalhes_proprias, rede)
-        validada = self._ajustar_aparencia(validada, catalogo, orcamento, percentual, proprias,
-                                         detalhes_proprias, rede, aparencia or {"cor": cor})
-        RequisitosArmazenamentoService.validar_build(
-            validada, catalogo, armazenamento_minimo_gb, proprias, detalhes_proprias)
+        try:
+          validada = self._validar_candidata_completa(build, catalogo, orcamento, percentual, proprias,
+                                                      detalhes_proprias, rede, aparencia or {"cor": cor}, armazenamento_minimo_gb)
+        except ValueError as erro:
+          if not ajustar_orcamento or self._codigo_falha(erro) != "orcamento":
+            raise
+          pool_reparo = catalogo_reparo if catalogo_reparo is not None else catalogo
+          teto_pc, teto_perifericos = self._dividir_orcamento(orcamento, percentual)
+          def validar_reparo(candidata):
+            candidata = CompletarVentilacaoService().executar(
+                candidata, pool_reparo, teto_pc, proprias, detalhes_proprias, cor=cor)
+            return self._validar_candidata_completa(candidata, pool_reparo, orcamento, percentual, proprias,
+                                                   detalhes_proprias, rede, aparencia or {"cor": cor}, armazenamento_minimo_gb)
+          reparo = AjustarOrcamentoBuildService().executar(
+              build, pool_reparo, orcamento, teto_pc, teto_perifericos, validar_reparo, proprias, cor)
+          if reparo is None:
+            raise
+          catalogo = pool_reparo
+          validada = reparo["build"]
+          validada["ajuste_orcamento"] = reparo["diagnostico"]
+          logger.info("Geração: etapa=ajuste_orcamento economia=%.2f trocas=%d",
+                      reparo["diagnostico"]["economia"], len(reparo["diagnostico"]["trocas"]))
         resumo = self._resumo_custos(validada, catalogo)
 
         if tentativa < limite and revisar_investimento and self._ha_margem_para_melhorar(validada, catalogo, teto_pc, proprias):
@@ -254,6 +272,15 @@ class CriarBuildService:
         if primeira_valida is not None:
           return primeira_valida
         raise
+
+  def _validar_candidata_completa(self, build, catalogo, orcamento, percentual, proprias,
+                                 detalhes_proprias, rede, aparencia, armazenamento_minimo_gb):
+    validada = self._validar_build(build, catalogo, orcamento, percentual, proprias, detalhes_proprias, rede)
+    validada = self._ajustar_aparencia(validada, catalogo, orcamento, percentual, proprias,
+                                     detalhes_proprias, rede, aparencia)
+    RequisitosArmazenamentoService.validar_build(
+        validada, catalogo, armazenamento_minimo_gb, proprias, detalhes_proprias)
+    return validada
 
   @classmethod
   def _criar_prompt_correcao(cls, prompt, erro, resposta, build, catalogo, orcamento,

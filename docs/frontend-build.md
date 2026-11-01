@@ -2005,3 +2005,12 @@ O guia completo de algoritmo, parâmetros, limitações e manutenção está em
 [Seleção inteligente — Etapa 3](selecao-inteligente-etapa-3.md). Ele substitui as descrições
 anteriores que diziam que o seletor somente ordenava CPU/GPU ou reutilizava integralmente
 `_gerar_catalogo`: agora os pools são carregados pelos models antes da amostragem.
+
+### Geração experimental com reparo automático de custo
+
+Use `SeletorInteligenteService.gerar_build(usuario_id, dados)` para o fluxo experimental
+completo, sem salvamento. Ele usa a seleção da Etapa 3 e tenta ajustar custos da resposta
+antes de consumir a correção adicional da IA. Quantidades e kits entram nos subtotais;
+CPU/GPU são preservadas no reparo. Os resultados incluem o diagnóstico `ajuste_orcamento`.
+Apenas selecionar candidatos com `executar` não executa esse pós-processamento.
+Veja a seção 10 do [guia da Etapa 3](selecao-inteligente-etapa-3.md).

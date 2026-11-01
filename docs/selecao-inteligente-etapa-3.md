@@ -273,3 +273,97 @@ Verificação local desta etapa, sem chamada à IA: com R$ 8.000 para jogos, arm
 mínimo de 500 GB e as duas prioridades, o catálogo de teste preservou AM4, AM5 e LGA1700,
 faixas de preço distintas e os limites por categoria. Isso testa a seleção/preparação;
 não é uma nova medição de FPS nem uma garantia de qualidade da resposta futura da IA.
+
+## 10. Ajuste automático de orçamento após a resposta da IA
+
+A entrada completa do fluxo experimental agora é:
+
+```python
+resultado = SeletorInteligenteService().gerar_build(usuario_id, pedido)
+build = resultado["build"]
+```
+
+Ela verifica a conta e seu limite de builds, usa a trava de geração existente, prepara
+catálogo/prompt e chama a geração com o reparo de custo habilitado. **Não salva uma nova
+build na conta.** A rota antiga continua independente. Não basta chamar `executar`:
+essa chamada apenas seleciona candidatos. `preparar_geracao` prepara os dados, mas não chama a IA.
+
+### Sequência automática
+
+1. A IA responde e o gerador executa as validações já existentes.
+2. Se o motivo for orçamento, chama `AjustarOrcamentoBuildService` antes de pedir outra resposta.
+3. O reparador calcula subtotais pelo catálogo: `preco * quantidade`. Ignora os preços
+   e capacidades que a IA tenha escrito como texto ou campos extras.
+4. Busca substituições em RAM, SSD, HD e ventoinhas. CPU, GPU, placa-mãe, fonte, gabinete
+   e resfriador permanecem com os mesmos IDs e quantidades nesta primeira política de reparo.
+5. Toda proposta que couber nos tetos passa pela validação completa: compatibilidade,
+   peças obrigatórias, quantidades, ajustes de aparência e armazenamento mínimo.
+6. Se uma proposta for aprovada, devolve-a com diagnóstico. Caso contrário, continua
+   a correção pela IA, limitada como antes; uma build inválida nunca é aceita por esse fallback.
+
+O orçamento do PC e o de periféricos são independentes. Economia no PC não corrige um
+excesso na reserva dos periféricos. Peças próprias não são substituídas pelo reparador.
+
+### O que é preservado nas alternativas
+
+- RAM: capacidade total, DDR, quantidade total de pentes, frequência conhecida e latência
+  CAS não pior. Pinos/formato conhecidos também precisam coincidir.
+- Armazenamento: capacidade total por categoria e classe de interface. SSD PCIe/NVMe
+  não é trocado por SATA nem por HD. Formato conhecido precisa coincidir. A geração PCIe
+  e velocidades nominais podem mudar; essas diferenças são registradas, não declaradas equivalentes.
+- Ventoinhas: tamanho, quantidade física total, conectores/tensões conhecidos e valores
+  conhecidos de fluxo/pressão que não podem diminuir. Kits são convertidos em unidades
+  reais: cinco fans não são cinco kits. Direção de fluxo inferida do nome e velocidades
+  não exigidas pelo pedido podem mudar e aparecem no diagnóstico.
+- Cor: uma alternativa não pode piorar a prioridade da cor pedida.
+
+A configuração precisa continuar dentro das regras do validador; essa aprovação ainda
+não certifica recursos que não estejam cadastrados. O reparo não promete desempenho
+idêntico de SSD/fans e não estima perda de FPS. Ele registra diferenças nominais conhecidas.
+
+### Busca limitada e rastreável
+
+O service não usa nomes de modelos, fabricantes, preços fixos ou um orçamento fixo.
+Mantém até 12 opções por categoria ajustável e até 256 estados de combinações. Preserva
+opções econômicas e opções com menor redução nominal das taxas cadastradas de armazenamento.
+Propostas dentro do orçamento são priorizadas; entre elas, menos categorias alteradas,
+menor redução nominal e menor preço, com desempate determinístico.
+
+Essa é uma busca limitada, não uma prova de ótimo global. Se não encontrar reparo seguro,
+a IA ainda pode propor outra montagem respeitando o pedido. CPU/GPU são preservadas no
+reparo local, mas não se tornam exigências fixas do cliente nas respostas futuras da IA.
+
+O pool para reparo é montado junto com a seleção, no mesmo contexto, pelos métodos dos
+models. Ele pode conter alternativas que não entraram na amostra compacta enviada à IA.
+Isso evita depender de uma peça específica ter aparecido entre as doze sugestões.
+Não há SQL direto no reparador e não há alteração de preço ou de peça no banco.
+
+### Diagnóstico e manutenção
+
+A build corrigida contém `ajuste_orcamento`, com totais e subtotais antes/depois,
+IDs e quantidades de cada troca, economia e diferenças cadastradas de interface/velocidade/fluxo.
+O log também identifica a etapa de ajuste automático. A resposta original da IA pode
+continuar sendo registrada pelo rastreador do teste, sem confundir reparo local com nova geração.
+
+| Regra | Ponto de manutenção |
+| --- | --- |
+| Categorias que podem mudar | `AJUSTAVEIS` |
+| Capacidade, DDR, pentes, interface, tamanho e conectores | `_quantidade_equivalente` |
+| Comparação de subtotais com quantidades | `custos`, `_opcoes` |
+| Limite de exploração | `MAX_OPCOES`, `MAX_ESTADOS` |
+| Critério e desempates | `_ordem`, `_diferencas` |
+| Aprovação técnica | Callback que chama `_validar_candidata_completa` |
+| Preparação do pool sem aumentar o prompt | `_catalogo_reparo` |
+
+Verificação reproduzível desta implementação: a resposta anterior de R$ 8.297,23 foi
+reproduzida sem uma chamada externa à IA e passada pela entrada `gerar_build`. O próprio
+algoritmo reparou para R$ 7.956,34 com os preços do banco de teste, sem fixar modelos,
+sem alterar CPU/GPU ou capacidades e sem salvar a build. Isso é um teste da correção
+sobre uma resposta registrada, não uma nova resposta ao vivo nem pesquisa de ofertas.
+
+```bash
+cd backend
+../venv/bin/python -m pytest tests/services/build_service/test_ajustar_orcamento.py \
+  tests/services/build_service/test_criacao_build.py \
+  tests/services/build_service/test_seletor_inteligente.py -q
+```
