@@ -1,91 +1,170 @@
 # Importação de benchmarks de CPU e GPU
 
-## Arquitetura e esquema
+## Fonte principal: ehan03/passmark
 
-A implementação segue Flask/SQLAlchemy, services com `executar`, comandos Click e migrações incrementais explícitas já usados pelo projeto. Reutiliza `mostrar_pecas` para carregar o catálogo e a sessão `db` para confirmar lotes. Não há rota HTTP, criação de peças, download automático ou execução de scraper.
+O comando `benchmarks-importar` usa snapshots locais dos arquivos reais:
 
-`BenchmarkMixin` compartilha metadados apenas entre `Processador` e `PlacaVideo`. Todas as colunas novas permitem NULL e não têm default zero:
+- [data/raw/cpu/cpus.csv](https://github.com/ehan03/passmark/blob/main/data/raw/cpu/cpus.csv):
+  `id`, `name`, `multi_thread_rating` e `single_thread_rating` (mais atributos técnicos).
+- [data/raw/gpu/gpus.csv](https://github.com/ehan03/passmark/blob/main/data/raw/gpu/gpus.csv):
+  `id`, `name`, `g3d_mark` e `g2d_mark` (mais atributos técnicos).
 
-| Model | Campos de pontuação (`Numeric(14,2)`) |
-| --- | --- |
-| Processador | `benchmark_multi_core`, `benchmark_single_thread` |
-| PlacaVideo | `benchmark_g2d`, `benchmark_g3d` |
+No snapshot verificado: 5.149 CPUs e 2.702 GPUs. O leitor verifica o cabeçalho completo,
+IDs positivos, formato CSV, nome e pontuações antes de persistir. Não executa scraper,
+não baixa arquivos automaticamente, não cadastra novas peças e não estima FPS.
 
-Metadados: `benchmark_teste`, `benchmark_versao`, `benchmark_nome_fonte`, `benchmark_fonte`, `benchmark_atualizado_em` (UTC), `benchmark_referencia_em` (data). Versão e data de referência permanecem NULL porque os arquivos inspecionados não as informam. A data de importação só muda quando há alteração efetiva. O importador atualiza somente colunas de benchmark, preservando inclusive `atualizado_em` geral da peça.
+| Categoria | Campo da fonte | Campo do banco |
+|---|---|---|
+| CPU | `multi_thread_rating` | `benchmark_multi_core` |
+| CPU | `single_thread_rating` | `benchmark_single_thread` |
+| GPU | `g2d_mark` | `benchmark_g2d` |
+| GPU | `g3d_mark` | `benchmark_g3d` |
 
-## Fonte efetivamente inspecionada
+Os testes continuam identificados separadamente como `PassMark CPU Mark / Single Thread`
+e `PassMark G2D / G3D`, compatíveis com o seletor. Nome na fonte, URL do CSV e data UTC
+de atualização são preservados. Versão e data de referência ficam NULL: datas de
+lançamento, primeiro benchmark e preço não são data de coleta. Zero não significa
+ausência de medição. `NA`, `N/A` ou vazio significam métrica ausente; não apagam score
+existente. Uma pontuação inválida rejeita a entrada inteira. Métricas parciais não
+substituem um teste/versão diferente. Reexecuções iguais não mudam timestamps.
 
-Repositório: [Algerian-Laptop-Market](https://github.com/yassircherdouh/Algerian-Laptop-Market).
+## Associações e limites de interpretação
 
-| Arquivo | Cabeçalho real | Métricas importadas |
-| --- | --- | --- |
-| [data/cpu_passmark.csv](https://github.com/yassircherdouh/Algerian-Laptop-Market/blob/main/data/cpu_passmark.csv) | `name,cpumark,single_thread,cores,threads` | PassMark CPU Mark (multi-core) e Single Thread, separadamente |
-| [data/gpu_passmark.csv](https://github.com/yassircherdouh/Algerian-Laptop-Market/blob/main/data/gpu_passmark.csv) | `name,g2d,g3d` | PassMark G2D e G3D, separadamente |
+`backend/data/benchmarks/passmark_associacoes.json` contém associações explícitas
+revisadas por fabricante + nome comercial, ID e nome da referência na fonte, além
+da VRAM para GPUs. IDs locais do banco não são usados como chave. Isso permite
+usar a mesma referência de CPU/chip para ofertas comerciais diferentes, sem
+escolher arbitrariamente entre cadastros pelo nome abreviado.
 
-Inspeção em 30/10/2026: 6.255 linhas de CPU e 2.958 de GPU. O CSV de CPU tem 573 ocorrências adicionais de nomes repetidos. Isso exige detectar conflitos, não escolher a última linha. `cores` e `threads` não são pontuações e não alteram as especificações cadastradas. Não se inferem versão do PerformanceTest nem data de coleta a partir de commits, cabeçalhos HTTP ou datas locais. Não há cálculo de FPS, percentual ou comparação entre escalas.
+A importação exige que nome/ID da fonte e VRAM continuem coerentes com o mapa;
+confere identidade completa e sufixos (Ti, SUPER, XT, XTX, PRO, mobile e 2048SP).
+Nomes comerciais diferentes dos revisados não entram por busca aproximada.
+Cadastros duplicados para a mesma chave ou associações conflitantes ficam para
+revisão, assim como IDs duplicados com pontuação diferente na fonte. Mesmo nome
+em vários IDs da fonte também bloqueia a associação. Cópias equivalentes não
+sobrescrevem resultados em ordem arbitrária.
 
-Identificadores Git blob dos arquivos inspecionados:
+Sem associação explícita, admite apenas nome completo exato/normalizado único.
+Variantes não reconhecidas ficam pendentes, preservando os benchmarks anteriores.
+Para ampliar o catálogo, revise a peça e acrescente a associação ao JSON; não
+retire sufixos, PRO, capacidade ou indicadores de notebook para forçar um match.
 
-- CPU: `708b30581a1bc0941b8fbcc5dedc1387657f1fbc`
-- GPU: `6f497d0f917a8a77ae5d03dd04b7bbe36ffe6a9a`
+**GPU recebe a referência média do chip/variante da fonte, não uma medição exata
+daquele SKU ASUS/MSI/Gigabyte, OC, refrigeração ou configuração do comprador.**
+A capacidade máxima informada na fonte, sozinha, não comprova a variante medida.
+O mapa não modifica especificações do catálogo nem afirma desempenho idêntico
+entre placas do mesmo chip. A associação da referência deve ser reavaliada quando
+nome, variante ou VRAM do produto mudar. O relatório registra `referencia_chip_gpu`
+ou `modelo_cpu`, ID da fonte e hash do mapa para rastreabilidade.
 
-A disponibilidade dos arquivos no GitHub **não comprova autorização para uso comercial dos dados de terceiros**, incluindo os dados PassMark. Verifique os direitos e condições aplicáveis antes desse uso.
+Snapshots antigos de `Algerian-Laptop-Market` continuam reconhecidos pelo cabeçalho
+para reproduzir importações anteriores. Não misture formatos de fontes diferentes
+na mesma execução. O formato novo é o principal e substitui as referências da fonte
+anterior quando há associação válida; pendências não apagam dados antigos.
 
-## Execução administrativa
+## Execução em Docker na VPS
 
-Na raiz do projeto, selecione explicitamente o ambiente e a conexão desejados conforme a configuração já adotada (`APP_ENV` e `URL_DATABASE`). Confira a conexão antes de qualquer gravação. Os comandos abaixo usam o ambiente configurado; não são instruções para importar em produção nesta tarefa.
+Primeiro prepare o esquema. Para MySQL existente use a migração explícita descrita
+em `docs/configuracao-producao.md` (`banco-atualizar-mysql`), com backup; não use
+`banco-preparar` num MySQL existente. Se a migração dos benchmarks já foi aplicada,
+não há novas colunas nesta troca de fonte. Reconstrua a API para carregar o novo
+importador e o mapa de associações antes de executar.
 
-Prepare o esquema pelo mecanismo existente:
+Na raiz do projeto, obtenha e preserve os arquivos locais:
+
+```bash
+mkdir -p benchmarks
+curl -fL --retry 3 https://raw.githubusercontent.com/ehan03/passmark/main/data/raw/cpu/cpus.csv -o benchmarks/cpus.csv
+curl -fL --retry 3 https://raw.githubusercontent.com/ehan03/passmark/main/data/raw/gpu/gpus.csv -o benchmarks/gpus.csv
+```
+
+Simulação sem gravação:
+
+```bash
+docker compose --env-file .env.production run --rm --no-deps \
+  -v "$PWD/benchmarks:/benchmarks:ro" \
+  api python -m flask --app app benchmarks-importar \
+  --cpu /benchmarks/cpus.csv --gpu /benchmarks/gpus.csv --simular \
+  > benchmarks/simulacao.json
+```
+
+Após conferir o relatório e ter backup do banco:
+
+```bash
+docker compose --env-file .env.production run --rm --no-deps \
+  -v "$PWD/benchmarks:/benchmarks:ro" \
+  api python -m flask --app app benchmarks-importar \
+  --cpu /benchmarks/cpus.csv --gpu /benchmarks/gpus.csv --lote 100 \
+  > benchmarks/importacao.json
+```
+
+Permite apenas CPU ou apenas GPU. Não precisa de nova chamada à IA nem coletar preços.
+
+## Uso local e relatórios
+
+Com o ambiente e `URL_DATABASE` apontados explicitamente para o banco desejado,
+dentro de `backend`:
+
+```bash
+../venv/bin/python -m flask --app app benchmarks-importar \
+  --cpu /caminho/cpus.csv --gpu /caminho/gpus.csv --simular
+```
+
+Sem `--simular`, grava. O comando de importação não faz backup por conta própria;
+faça uma cópia consistente do SQLite/MySQL antes da primeira importação da nova
+fonte. Na atualização local desta tarefa, o backup foi criado antes das colunas e
+da importação; CSVs e relatórios foram preservados em `database/benchmarks/`.
+
+No formato novo, `atualizadas`, `propostas`, `inalteradas`, `nao_encontradas`,
+`ambiguas`, `invalidas` contam **peças do catálogo**, com resumo separado em
+`por_tipo.cpu` e `por_tipo.gpu`. Linhas inválidas na fonte, inclusive modelos não
+cadastrados, são contadas em `arquivos.<tipo>.linhas_invalidas`. `duplicadas` conta
+cópias equivalentes de linhas da fonte, sem multiplicar pelos SKUs associados.
+O formato legado mantém a contagem anterior por grupos de nomes/linhas.
+
+A leitura e validação estrutural de todos os arquivos ocorre antes de gravar.
+As confirmações acontecem em lotes transacionais; falha reverte o lote atual e
+informa quantas peças dos lotes anteriores já foram confirmadas. A reexecução
+com o mesmo snapshot retoma pendências sem atualizar dados iguais. Nenhum campo
+fora de benchmark é alterado, inclusive o `atualizado_em` geral da peça.
+
+Hashes dos snapshots revisados:
+
+| Arquivo | Git blob |
+|---|---|
+| CPU | `a51a35fa699c7c8d9a1f5b5e1e7a70ed83225308` |
+| GPU | `a42a2040672ecac6ecc7cd1e5220085af35a03c5` |
+
+O importador informa SHA-256 dos dois arquivos e do mapa. Preserve-os com o JSON
+para reprodução. Download da branch `main` pode mudar no futuro; para repetição
+exata use os snapshots guardados ou uma revisão Git fixa.
+
+## Direitos de uso e testes
+
+A disponibilidade no GitHub e a licença MIT do software desse repositório não
+comprovam autorização para uso comercial dos dados PassMark de terceiros.
+[PassMark oferece licenciamento de dados](https://www.passmark.com/services/market-analysis.php).
 
 ```bash
 cd backend
-../venv/bin/flask --app app banco-preparar
+../venv/bin/python -m pytest tests/services/benchmark_service -q
 ```
 
-Em SQLite em arquivo, `banco-preparar` faz backup antes das migrações. A migração `benchmarks_pecas` é incremental, idempotente e transacional, inclusive para DDL. Em banco novo, `create_all` já inclui as colunas. Conforme o padrão atual, `banco-preparar` recusa MySQL existente; esta migração não implementa atualização de MySQL existente.
+Os testes cobrem formato novo/legado, CLI, associação explícita, múltiplos SKUs,
+VRAM/sufixos/desktop-notebook, ambiguidades, fonte alterada, inválidos, métricas
+parciais, simulação, idempotência e reversão/retomada após falha no lote.
 
-Obtenha os dois CSVs como arquivos locais, sem executar os scripts do repositório. Preserve os snapshots usados (idealmente de uma revisão fixa) junto com o relatório JSON. O importador não acessa a rede e informa o SHA-256 de cada arquivo para reprodução.
+## Resultado da atualização local de 02/11/2026
 
-Simulação:
+Banco local de 100 CPUs e 100 GPUs: **190 peças atualizadas**, sendo **99 CPUs e
+91 GPUs**, com zero entradas de peças inválidas/ambíguas. Ficaram 10 cadastros
+sem associação segura (1 CPU e 9 GPUs), preservados. A cobertura final é 95%.
+O banco local ainda não tinha as colunas de benchmark antes desta execução; a
+preparação incremental foi aplicada após criar o backup. Isso é independente
+das 63 peças anteriormente importadas pelo usuário na VPS.
 
-```bash
-../venv/bin/flask --app app benchmarks-importar \
-  --cpu /caminho/cpu_passmark.csv \
-  --gpu /caminho/gpu_passmark.csv \
-  --simular > /tmp/benchmarks-simulacao.json
-```
-
-Importação autorizada para o banco escolhido:
-
-```bash
-../venv/bin/flask --app app benchmarks-importar \
-  --cpu /caminho/cpu_passmark.csv \
-  --gpu /caminho/gpu_passmark.csv \
-  --lote 100 > /tmp/benchmarks-importacao.json
-```
-
-É permitido fornecer somente `--cpu` ou somente `--gpu`. `--simular` não grava nem altera objetos da sessão. Exige esquema já preparado, como a execução normal.
-
-O JSON contém `atualizadas` (gravações confirmadas), `propostas`, `inalteradas`, `nao_encontradas`, `ambiguas`, `invalidas`, `duplicadas`, hashes e detalhes das propostas/pendências. Propostas mostram valores anteriores e novos; a data UTC será atribuída na gravação. Quantidades de atualizadas/propostas/inalteradas são por peça; não encontradas e ambíguas são por grupo de nome normalizado (ou colisão de destino); inválidas contam linhas do grupo rejeitado. `duplicadas` conta cópias equivalentes descartadas. Os totais não devem ser somados para inferir o número de linhas.
-
-## Associação e validação
-
-- Primeiro nome exato (`modelo` ou `fabricante + modelo`); depois nome normalizado. Múltiplos IDs são pendência para revisão, sem escolha automática.
-- Normalização trata caixa, espaços, marcas registradas, hífens entre palavras, grafia `i5-13400`/`i5 13400` e sufixos separados ou unidos como `4060 Ti`/`4060Ti`. Mantém geração, números, F/K/X/XT/XTX/Ti/SUPER e indicadores notebook/mobile/Laptop GPU. Não usa substring, distância textual nem extrai modelo de nomes comerciais extensos.
-- Duplicatas com pontuações diferentes bloqueiam o grupo inteiro, mesmo que uma linha seja exata. Duplicatas equivalentes usam nome de origem escolhido por ordem lexical, de forma estável. Grupos diferentes apontando à mesma peça também são bloqueados.
-- Aceita UTF-8 com ou sem BOM, CSV com aspas e ponto decimal, incluindo milhares com vírgula dentro de campo entre aspas. Rejeita formato inesperado, cabeçalhos duplicados, colunas faltantes/extras, números negativos, zero, NaN/infinito ou fora da precisão suportada.
-- Uma métrica ausente não apaga valor existente; linha sem nenhuma pontuação ou com qualquer pontuação inválida é rejeitada integralmente. Importação parcial sobre teste/versão existente diferente é rejeitada para evitar misturar escalas. Importação completa substitui o conjunto e seus metadados.
-- Cabeçalhos são estritos para detectar mudanças de contrato; novos formatos precisam de revisão do importador. Nomes com clock, descrições comerciais ou prefixos adicionais podem ficar sem associação propositalmente. A revisão pode corrigir o cadastro ou preparar um snapshot local revisado, mantendo a rastreabilidade documental.
-
-## Falhas, volume e validação
-
-Os arquivos completos e os índices do catálogo são carregados em memória (volume observado inferior a 10 mil linhas), permitindo detectar duplicatas antes de persistir. Todos os arquivos são lidos e seus formatos validados antes de gravar. As alterações são confirmadas em lotes configuráveis, cada um em uma transação. Uma falha de persistência reverte o lote atual e interrompe com erro e quantidade já confirmada; lotes anteriores permanecem. A reexecução idempotente com os mesmos arquivos retoma as pendências sem atualizar timestamps dos dados iguais. Erros de leitura/formato também produzem saída CLI não zero.
-
-Testes automatizados:
-
-```bash
-cd backend
-../venv/bin/python -m pytest tests/services/benchmark_service/test_importar_benchmarks.py -q
-```
-
-Cobrem correspondência exata/normalizada, sufixos e notebook, ambiguidades, duplicatas, números e arquivos inválidos, preservação de valores, simulação, idempotência, CLI, migração incremental/rollback e falhas por lote. Os CSVs reais também foram processados em um SQLite temporário em memória com duas peças de teste: simulação com duas propostas, importação com duas atualizações e reexecução com zero atualizações. Nenhuma importação com gravação foi realizada no banco de produção.
+Foi comparado o conteúdo de todas as 25 tabelas, ignorando somente as colunas de
+benchmark: nenhum outro dado foi alterado. A simulação posterior apresentou
+190 inalteradas, zero propostas. O resumo, caminho do backup e relatório das
+pendências estão em `database/benchmarks/ultima-importacao.json` (dados locais
+ignorados pelo Git). Nenhuma operação foi feita na VPS.

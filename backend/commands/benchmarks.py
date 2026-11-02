@@ -6,8 +6,8 @@ from services.benchmark_service.importar_benchmarks_service import ImportarBench
 
 def registrar_comandos_benchmarks(app):
     @app.cli.command("benchmarks-importar")
-    @click.option("--cpu", type=click.Path(exists=True, dir_okay=False), help="Snapshot cpu_passmark.csv local.")
-    @click.option("--gpu", type=click.Path(exists=True, dir_okay=False), help="Snapshot gpu_passmark.csv local.")
+    @click.option("--cpu", type=click.Path(exists=True, dir_okay=False), help="Snapshot local cpus.csv (ehan03/passmark).")
+    @click.option("--gpu", type=click.Path(exists=True, dir_okay=False), help="Snapshot local gpus.csv (ehan03/passmark).")
     @click.option("--simular", is_flag=True, help="Mostra propostas sem gravar.")
     @click.option("--lote", default=100, type=click.IntRange(min=1), show_default=True)
     def importar(cpu, gpu, simular, lote):
