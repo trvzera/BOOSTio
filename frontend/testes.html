@@ -8,6 +8,7 @@
   <script type="module" src="./js/pages/loading.js" defer></script>
   <script type="module" src="./js/pages/testes.js" defer></script>
   <script type="module" src="./js/pages/test-benchmark.js" defer></script>
+  <script type="module" src="./js/pages/test-price-history.js" defer></script>
   <link rel="icon" type="image/webp" href="./imgs/favicon.webp">
   <link rel="stylesheet" href="./styles/style.css">
   <noscript><link rel="stylesheet" href="./styles/componentes/no-script.css"></noscript>
@@ -42,6 +43,16 @@
     <span class="test-kicker font-1-xs">Laboratório BOOSTio</span>
     <h1 class="font-1-xxl">Experimente novos recursos</h1>
     <p class="font-2-s">Teste a aparência de novos recursos antes de levá-los ao site: desempenho, comparação de builds e budget no perfil. O menu hamburger permanece visível aqui mesmo sem login.</p>
+    <section class="test-feature" id="teste-historico-precos" aria-labelledby="test-price-history-title">
+      <div class="test-feature-head">
+        <span class="test-kicker font-1-xs">Experimento · preços demonstrativos</span>
+        <h2 class="font-1-l" id="test-price-history-title">AMD Ryzen 5 5600</h2>
+        <p class="font-2-xs">Preços fictícios para avaliar o visual. Experimente os filtros e abra os registros; nenhuma loja é consultada neste exemplo.</p>
+      </div>
+      <div id="test-price-history-preview"><p class="font-2-xs" role="status">Carregando exemplo de histórico…</p></div>
+      <noscript><p class="font-2-xs">Ative o JavaScript para visualizar o gráfico demonstrativo.</p></noscript>
+    </section>
+
     <div class="test-panels">
       <section class="test-panel glass-card"><h2 class="font-1-l">Editor da build</h2><p class="font-2-xs">Selecione as peças e confira o resumo da configuração.</p><a class="btn-secondary" href="./pages/configuracao-build.html" aria-label="Abrir editor da build">Abrir editor</a></section>
       <section class="test-panel glass-card"><h2 class="font-1-l">Componentes</h2><p class="font-2-xs">Veja o catálogo de peças e as informações técnicas.</p><a class="btn-ghost" href="./pages/pecas.html?categoria=processador" aria-label="Ver processadores no catálogo">Ver processadores</a></section>

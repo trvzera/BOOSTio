@@ -8,6 +8,10 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
 
 ### Histórico de preços da peça — 02/11/2026
 
+- Prévia disponível em `testes.html#teste-historico-precos`: exemplo do Ryzen 5
+  5600 com nove preços fictícios distribuídos em 120 dias. Reutiliza o componente
+  da página da peça, incluindo filtros e tabela, sem consultar lojas ou persistir
+  valores. O aviso de dados demonstrativos permanece junto ao exemplo.
 - A página individual da peça tem uma seção entre as lojas e a ficha técnica,
   com a identidade glass, Lexend/Poppins e azul principal do site.
 - Sem registros, mostra “Ainda não há histórico desta peça”. Não monta uma série
