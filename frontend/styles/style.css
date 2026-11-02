@@ -33,6 +33,7 @@
 @import "./conta/builds.css";
 @import "./build/editor.css";
 @import "./build/catalogo.css";
+@import "./build/price-history.css";
 
 /* Formulário */
 @import "./forms/forms.css";

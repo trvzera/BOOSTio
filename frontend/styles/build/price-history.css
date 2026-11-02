@@ -1,0 +1,32 @@
+.product-price-history { min-width: 0; margin-block: var(--espacamento-32); padding: var(--espacamento-32); border: 1px solid var(--glass-border); border-radius: 20px; color: var(--cor-6); font-family: var(--font-body); }
+.price-history-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--espacamento-16); margin-bottom: var(--espacamento-24); }
+.price-history-heading > div { min-width: 0; }
+.price-history-heading h2 { margin-bottom: var(--espacamento-12); overflow-wrap: anywhere; }
+.price-history-heading p, .price-history-note, .price-history-figure figcaption { color: var(--cor-4); font: 400 .8125rem/1.7 var(--font-body); }
+.price-history-store { flex: 0 0 auto; padding: 6px 12px; border: 1px solid var(--glass-border); border-radius: 999px; color: var(--cor-4); font: 500 .75rem/1.5 var(--font-heading); }
+.price-history-empty { display: grid; justify-items: center; align-content: center; gap: var(--espacamento-12); min-height: 180px; padding: var(--espacamento-24); border: 1px dashed var(--glass-border); border-radius: 16px; text-align: center; }
+.price-history-empty strong { font: 500 1rem/1.5 var(--font-heading); }
+.price-history-empty p { max-width: 54ch; color: var(--cor-4); font: 400 .8125rem/1.7 var(--font-body); }
+.price-history-note { margin-top: var(--espacamento-16); }
+.price-history-periods { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: var(--espacamento-24); }
+.price-history-periods button { min-height: 44px; padding: 10px 16px; border: 1px solid var(--glass-border); border-radius: 999px; background: transparent; color: var(--cor-4); font: 500 .8125rem/1.5 var(--font-body); cursor: pointer; transition: border-color var(--motion-fast) ease, color var(--motion-fast) ease, background var(--motion-fast) ease; }
+.price-history-periods button:hover { border-color: var(--cor-p1); color: var(--cor-6); }
+.price-history-periods button[aria-pressed="true"] { border-color: var(--cor-p1); background: rgba(0,123,255,.08); color: var(--text-accent); }
+.price-history-periods button:focus-visible, .price-history-records summary:focus-visible { outline: 2px solid var(--cor-p1); outline-offset: 4px; }
+.price-history-stats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--espacamento-20); margin-bottom: var(--espacamento-24); }
+.price-history-stats > div { min-width: 0; }
+.price-history-stats dt { margin-bottom: 6px; color: var(--cor-4); font: 400 .75rem/1.5 var(--font-body); }
+.price-history-stats dd { margin: 0; overflow-wrap: anywhere; font: 500 clamp(1rem,2vw,1.375rem)/1.5 var(--font-heading); font-variant-numeric: tabular-nums; }
+.price-history-figure { margin: 0; }
+.price-history-chart { display: block; width: 100%; height: 180px; overflow: visible; }
+.price-history-grid { fill: none; stroke: var(--glass-border); stroke-dasharray: 3 5; vector-effect: non-scaling-stroke; }
+.price-history-line { fill: none; stroke: var(--cor-p1); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.price-history-point { fill: var(--cor-p1); }
+.price-history-dates { display: flex; justify-content: space-between; gap: 12px; margin-block: 8px 16px; color: var(--cor-4); font: 400 .75rem/1.5 var(--font-body); }
+.price-history-figure figcaption { max-width: 75ch; }
+.price-history-records { margin-top: var(--espacamento-20); border-top: 1px solid var(--glass-border); }
+.price-history-records summary { display: list-item; min-height: 44px; padding-block: 14px; color: var(--text-accent); font: 500 .8125rem/1.5 var(--font-body); cursor: pointer; }
+.price-history-records table { width: 100%; border-collapse: collapse; text-align: left; font: 400 .8125rem/1.6 var(--font-body); }
+.price-history-records th, .price-history-records td { padding: 12px 8px; border-top: 1px solid var(--glass-border); overflow-wrap: anywhere; }
+.price-history-records th { color: var(--cor-4); font-weight: 500; }
+.price-history-records :is(th,td):last-child { text-align: right; font-variant-numeric: tabular-nums; }

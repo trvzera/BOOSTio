@@ -189,7 +189,7 @@ export const rotulosTecnicos = {
 };
 
 function entradasFichaTecnica(peca) {
-  const ignorados = new Set(["id", "categoria", "imagem", "preco", "preco_atualizado_em", "link", "part_number", "esgotado", "ofertas", "topologia_armazenamento_verificada", "conectores_alimentacao_completos", "configuracoes_baias_completas"]);
+  const ignorados = new Set(["id", "categoria", "imagem", "preco", "preco_atualizado_em", "historico_precos", "link", "part_number", "esgotado", "ofertas", "topologia_armazenamento_verificada", "conectores_alimentacao_completos", "configuracoes_baias_completas"]);
   // Medidas genéricas antigas não devem contradizer a ficha exata revisada.
   if (peca.modelo_ficha_tecnica && peca.baias_25 != null && peca.baias_35 != null) ignorados.add("bays_disco");
   if (peca.modelo_ficha_tecnica && [peca.comprimento_mm,peca.largura_mm,peca.altura_mm].every(v=>v!=null)) ignorados.add("dimensoes");
