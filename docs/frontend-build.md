@@ -8,6 +8,19 @@ dos requisitos está no README; a revisão de acessibilidade/performance está e
 
 ### Histórico de preços da peça — 02/11/2026
 
+- Prévia disponível em `testes.html#teste-historico-precos`: exemplo do Ryzen 5
+  5600 com nove preços fictícios distribuídos em 120 dias. Reutiliza o componente
+  da página da peça, incluindo filtros e tabela, sem consultar lojas ou persistir
+  valores. O aviso de dados demonstrativos permanece junto ao exemplo.
+- No Live Server deste projeto, abra
+  `http://127.0.0.1:5501/frontend/testes.html#teste-historico-precos`.
+  A página exige login, como as demais áreas privadas. Frontend e API devem usar
+  o mesmo hostname local para manter a sessão. O projeto fixa `127.0.0.1` no
+  Live Server: em 02/11, `localhost:5000` respondeu pelo AirPlay do macOS
+  (403/AirTunes), enquanto `127.0.0.1:5000/auth/me` respondeu pelo Flask (200).
+  Esse conflito provoca uma mensagem de conexão por falta dos cabeçalhos CORS
+  na resposta do AirPlay; não é falha do gráfico nem motivo para liberar acesso
+  sem autenticação. Nenhuma configuração do macOS foi alterada.
 - A página individual da peça tem uma seção entre as lojas e a ficha técnica,
   com a identidade glass, Lexend/Poppins e azul principal do site.
 - Sem registros, mostra “Ainda não há histórico desta peça”. Não monta uma série
