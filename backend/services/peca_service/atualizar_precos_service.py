@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 import requests
 
-from models import ConsultaPreco, ControleColeta
+from models import ConsultaPreco, ControleColeta, HistoricoPreco
 from .modelos_pecas import MODELOS_PECAS
 from services.preco_service.buscar_preco_kabum_service import BuscarPrecoKabumService
 from services.preco_service.reservar_consulta_service import ReservarConsultaService
@@ -18,9 +18,11 @@ class AtualizarPrecosService:
         if intervalo < 0:
             raise ValueError("O intervalo não pode ser negativo")
 
+        HistoricoPreco.verificar_esquema()
         ControleColeta.inicializar()
 
-        resumo = {"consultas": 0, "atualizadas": 0, "falhas": 0, "ignoradas": 0}
+        resumo = {"consultas": 0, "atualizadas": 0, "falhas": 0, "ignoradas": 0,
+                  "historicos": 0, "precos_alterados": 0, "estoques_alterados": 0, "inalteradas": 0}
 
         for classe, peca in self._selecionar_pecas():
             if limite is not None and resumo["consultas"] >= limite:
@@ -62,6 +64,8 @@ class AtualizarPrecosService:
         ))
 
     def _consultar(self, consulta, resumo):
+        if consulta.status != "reservada":
+            return True
         classe = next(c for c in MODELOS_PECAS if c.__tablename__ == consulta.tabela_peca)
         peca = classe.buscar_por_id(consulta.peca_id)
         if peca is None or peca.kabum_external != consulta.url:
@@ -69,6 +73,7 @@ class AtualizarPrecosService:
             resumo["ignoradas"] += 1
             return True
         continuar = True
+        alteracoes = None
         try:
             resultado = BuscarPrecoKabumService().executar(consulta.url)
             peca.recarregar()
@@ -76,10 +81,14 @@ class AtualizarPrecosService:
                 consulta.status = "ignorada"
                 resumo["ignoradas"] += 1
             else:
-                peca.aplicar_cotacao(resultado, datetime.now(timezone.utc).replace(tzinfo=None))
+                instante = datetime.now(timezone.utc).replace(tzinfo=None)
+                codigo = ValidarLinkService().codigo_produto(consulta.url)
+                observacao = HistoricoPreco.registrar_observacao(
+                    consulta, resultado, instante, loja="kabum", produto_id_loja=codigo)
+                alteracoes = peca.aplicar_cotacao(
+                    {"preco": observacao.preco, "esgotado": observacao.esgotado}, instante)
                 consulta.status = "concluida"
                 consulta.erro = None
-                resumo["atualizadas"] += 1
         except requests.HTTPError as erro:
             status = erro.response.status_code if erro.response is not None else 0
             consulta.status = "falha"
@@ -95,7 +104,14 @@ class AtualizarPrecosService:
             consulta.status = "falha"
             consulta.erro = str(erro)[:300]
             resumo["falhas"] += 1
+        # A peça, o histórico e o resultado da tentativa são confirmados juntos.
         consulta.confirmar()
+        if alteracoes is not None:
+            resumo["historicos"] += 1
+            resumo["precos_alterados"] += int(alteracoes["preco_alterado"])
+            resumo["estoques_alterados"] += int(alteracoes["estoque_alterado"])
+            chave = "atualizadas" if any(alteracoes.values()) else "inalteradas"
+            resumo[chave] += 1
         return continuar
 
     @staticmethod

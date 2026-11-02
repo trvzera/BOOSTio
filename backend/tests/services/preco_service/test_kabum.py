@@ -201,7 +201,9 @@ class ColetaKabumTest(unittest.TestCase):
                 '"offers":{"availability":"https://schema.org/OutOfStock"}}</script>')
         resposta = resposta_html(URL_1, html)
         with patch("services.preco_service.buscar_pagina_kabum_service.requests.get", return_value=resposta):
-            self.assertEqual(AtualizarPrecosService().executar()["atualizadas"], 1)
+            resumo = AtualizarPrecosService().executar()
+            self.assertEqual(resumo["historicos"], 1)
+            self.assertEqual(resumo["atualizadas"], 0)
         self.assertTrue(peca.esgotado)
         self.assertEqual(peca.preco, 500)
 

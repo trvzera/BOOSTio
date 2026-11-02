@@ -42,6 +42,7 @@ from .build import Build
 from .build_salva import BuildSalva
 from .token_recuperacao import TokenRecuperacao
 from .consulta_preco import ConsultaPreco, ControleColeta
+from .historico_preco import HistoricoPreco
 
 #Funcão obrigatória para o login buscar informações do usuario pelo id
 @lm.user_loader
@@ -55,5 +56,5 @@ __all__ = [
     'Processador','PlacaMae','PlacaVideo','MemoriaRAM','SSD','HD',
     'Gabinete','WaterCooler','AirCooler','Fan','Fone','Teclado','Mouse','Monitor',
     'PlacaRede','CaboRede',
-    'Setup','Codigo','TokenRecuperacao','Build','BuildSalva','ConsultaPreco','ControleColeta'
+    'Setup','Codigo','TokenRecuperacao','Build','BuildSalva','ConsultaPreco','ControleColeta','HistoricoPreco'
 ]

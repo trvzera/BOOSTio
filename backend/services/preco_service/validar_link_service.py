@@ -11,3 +11,7 @@ class ValidarLinkService:
         if not re.match(r"^/produto/\d+(?:/|$)", partes.path):
             raise ValueError("O link da KaBuM deve ser de produto, não de busca")
         return url
+
+    def codigo_produto(self, url: str) -> str:
+        self.executar(url)
+        return re.match(r"^/produto/(\d+)(?:/|$)", urlsplit(url).path)[1]

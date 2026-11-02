@@ -7,10 +7,19 @@ from sqlalchemy import inspect
 
 from services.configuracao_service.preparar_banco_service import PrepararBancoService
 from migrations.benchmarks_mysql import atualizar_benchmarks_mysql
+from migrations.historico_precos import preparar_historico_precos
 from models import db, PreferenciasUso
 
 
 def registrar_comandos_banco(app):
+    @app.cli.command("historico-precos-preparar")
+    def preparar_historico():
+        """Cria somente o histórico; faça backup antes em bancos existentes."""
+        try:
+            click.echo(json.dumps(preparar_historico_precos(), ensure_ascii=False))
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else "Falha ao preparar o histórico de preços.") from erro
+
     @app.cli.command("banco-atualizar-mysql")
     @click.option("--aplicar", is_flag=True, help="Aplica o plano; exige backup e escritores parados.")
     def atualizar_mysql(aplicar):
