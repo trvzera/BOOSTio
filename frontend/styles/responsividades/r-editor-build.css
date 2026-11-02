@@ -20,6 +20,16 @@
 .product-actions > .disabled-tip-anchor > button { width: 100%; }
 .product-detail-layout { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
 .product-detail-layout > *, .product-card-body, .store-card, .store-brand > * { min-width: 0; }
+.product-price-history { width: 100%; box-sizing: border-box; }
+@media (max-width: 600px) {
+  .product-price-history { padding: 20px; }
+  .price-history-heading { flex-wrap: wrap; }
+  .price-history-stats { grid-template-columns: minmax(0,1fr); gap: 14px; }
+  .price-history-stats > div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .price-history-stats dt { min-width: 0; margin: 0; }
+  .price-history-stats dd { flex: 0 1 auto; text-align: right; }
+  .price-history-empty { min-height: 160px; padding: 20px 14px; }
+}
 .store-logo { flex-shrink: 0; }
 .catalog-pagination { flex-wrap: wrap; }
 .catalog-pagination > .disabled-tip-anchor { padding: 0; }

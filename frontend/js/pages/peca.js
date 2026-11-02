@@ -10,6 +10,7 @@ import { avisoCompraHtml, abrirCompraBuild } from "../build/acoes-build.js";
 import { salvarAlteracaoLocal } from "../build/autosalvar.js";
 import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta } from "../build/conta.js";
 import { ajudaCategorias } from "../build/uso-formulario.js";
+import { historicoPrecosHtml, iniciarHistoricoPrecos } from "../build/price-history.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const main = document.querySelector("#product-main");
@@ -45,6 +46,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       '<p class="font-2-xs">' +
       (oferta.esgotado ? "Último preço cadastrado · produto indisponível" : oferta.preco != null ? "Preço cadastrado, sem frete · confirme na loja" : oferta.direta ? "Página do produto cadastrada" : "Busca pelo modelo · anúncio não cadastrado") + '</p><a class="btn-ghost" href="' + h(oferta.url) +
       '" target="_blank" rel="noopener noreferrer" aria-label="' + (oferta.direta ? "Comprar na loja" : "Buscar na loja") + ' ' + h(oferta.loja) + ' em uma nova aba">' + iconeAnimado("cart") + (oferta.direta ? "Comprar na loja" : "Buscar na loja") + '</a></article>').join("") + '</div></section>' +
+      historicoPrecosHtml(peca) +
       '<section class="product-specifications glass-card" aria-labelledby="spec-title"><h2 class="font-1-l" id="spec-title">Informações técnicas</h2>' +
       '<p class="font-2-xs summary-note product-specifications-note">Estas são as informações cadastradas deste modelo. Usamos esses dados para verificar sua montagem. Se uma informação estiver faltando, não podemos confirmar que as peças combinam nesse ponto. O consumo de energia é uma estimativa, não uma medição do computador ligado.</p>' +
       gruposTecnicos.map((grupo, indice) => '<section class="product-specification-group" aria-labelledby="spec-group-' + indice + '"><h3 class="font-1-m-b" id="spec-group-' + indice + '">' + h(grupo.titulo) + '</h3><dl>' +
@@ -58,6 +60,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       catch(erro) { avisar(erro.message); }
     })));
     iniciarIcones(main);
+    iniciarHistoricoPrecos(main, peca);
     main.querySelector("#add-product").onclick = async () => {
       try {
         build = selecionarPecaCompativel(build, peca, catalogo);

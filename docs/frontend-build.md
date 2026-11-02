@@ -6,6 +6,32 @@ O texto abaixo também documenta modos legados e etapas anteriores. O estado atu
 dos requisitos está no README; a revisão de acessibilidade/performance está em
 [qualidade-frontend.md](qualidade-frontend.md).
 
+### Histórico de preços da peça — 02/11/2026
+
+- A página individual da peça tem uma seção entre as lojas e a ficha técnica,
+  com a identidade glass, Lexend/Poppins e azul principal do site.
+- Sem registros, mostra “Ainda não há histórico desta peça”. Não monta uma série
+  a partir do preço atual, do catálogo demonstrativo ou de visitas ao navegador.
+- Quando o catálogo fornecer `historico_precos`, exibe gráfico, último/menor/maior
+  preço no período, filtros de 30/90 dias ou todo o período e tabela acessível.
+  Os filtros não fazem novas requisições nem movem o foco; anunciam o resultado.
+- Contrato preparado no frontend: `historico_precos` é um array de objetos com
+  `data` (ISO `YYYY-MM-DD` ou data/hora com fuso), `preco` (número positivo em
+  reais) e `loja` (`kabum` ou `KaBuM!`). `esgotado: true` exclui a observação.
+  Datas inválidas/futuras, preços inválidos e outras lojas são ignorados para
+  não misturar séries. Instantes repetidos usam a última entrada recebida.
+- Datas e limites diários do gráfico são apresentados em UTC. Um único registro
+  mostra o ponto e informa que ainda não há tendência. Dias sem consulta não são
+  tratados como novas observações. Valores não incluem frete.
+- **Pendente no backend:** armazenar snapshots de preço/disponibilidade por peça,
+  loja e data, e fornecer a série real. `ConsultaPreco` atualmente registra tentativas
+  e falhas de coleta, sem o valor histórico; `Peca` mantém o preço mais recente.
+  Não houve alteração de modelo, migração, coleta ou endpoint nesta entrega.
+- Validação: 744 testes JS passaram. No Chrome, foram conferidos estado vazio,
+  gráfico, filtros, período sem registros e observação única em 320/390/768/844/1440 px.
+  O novo bloco passou pelo axe WCAG A/AA, teclado e texto a 200%, com dados
+  simulados apenas no servidor de teste e sem gravações reais.
+
 ### Ajuda, glossário e histórico — 27/10/2026
 
 - No formulário, pergunta e ajuda ficam no painel direito; respostas ficam à
