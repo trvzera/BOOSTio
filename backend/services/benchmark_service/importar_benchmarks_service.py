@@ -51,6 +51,18 @@ class ImportarBenchmarksService:
             raise ValueError("Informe ao menos um CSV de CPU ou GPU")
         if type(lote) is not int or lote < 1:
             raise ValueError("O lote deve ser positivo")
+        # Formato novo é o padrão documentado; snapshots antigos seguem reproduzíveis.
+        formatos = []
+        for caminho in (cpu, gpu):
+            if caminho:
+                with Path(caminho).open(encoding="utf-8-sig", newline="") as arquivo:
+                    campos = next(csv.reader(arquivo), [])
+                formatos.append("id" in campos and "name" in campos)
+        if any(formatos):
+            if not all(formatos):
+                raise ValueError("Não misture formatos de fontes diferentes na mesma importação")
+            from .importar_referencias_passmark_service import ImportarReferenciasPassmarkService
+            return ImportarReferenciasPassmarkService().executar(cpu, gpu, simular, lote)
         # Ler e validar os dois arquivos antes de qualquer persistência.
         fontes = [(tipo, *self._ler(caminho, tipo)) for tipo, caminho in (("cpu", cpu), ("gpu", gpu)) if caminho]
         resumo = {"simulacao": simular, "atualizadas": 0, "propostas": 0, "inalteradas": 0,
@@ -129,6 +141,10 @@ class ImportarBenchmarksService:
                 planos.append((classe, ident, alteracoes))
         if simular:
             return resumo
+        return self._persistir(planos, resumo, lote)
+
+    @staticmethod
+    def _persistir(planos, resumo, lote):
         # Um commit por lote; falha reverte o lote atual, lotes anteriores permanecem.
         for inicio in range(0, len(planos), lote):
             batch = planos[inicio:inicio + lote]
@@ -141,6 +157,10 @@ class ImportarBenchmarksService:
                 db.session.commit()
                 db.session.expire_all()
                 resumo["atualizadas"] += len(batch)
+                if "por_tipo" in resumo:
+                    for classe, _, _ in batch:
+                        tipo = "cpu" if classe is Processador else "gpu"
+                        resumo["por_tipo"][tipo]["atualizadas"] += 1
             except SQLAlchemyError as erro:
                 db.session.rollback()
                 raise RuntimeError(f"Falha ao persistir lote; {resumo['atualizadas']} peças já confirmadas. "

@@ -1,0 +1,1618 @@
+{
+  "versao": 1,
+  "fonte": "https://github.com/ehan03/passmark",
+  "observacao": "Associações explícitas de referências de modelo. GPU representa média do chip/variante da fonte, não teste do SKU comercial ou OC. Nenhuma busca aproximada em tempo de execução. Nomes/VRAM diferentes exigem revisão.",
+  "associacoes": [
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 7 9800X3D",
+      "fonte_id": 6344,
+      "fonte_nome": "AMD Ryzen 7 9800X3D",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 7 5700X",
+      "fonte_id": 4814,
+      "fonte_nome": "AMD Ryzen 7 5700X",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 5 7600",
+      "fonte_id": 5172,
+      "fonte_nome": "AMD Ryzen 5 7600",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 7 7700X",
+      "fonte_id": 5036,
+      "fonte_nome": "AMD Ryzen 7 7700X",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 9 7900X",
+      "fonte_id": 5027,
+      "fonte_nome": "AMD Ryzen 9 7900X",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i3-12100F",
+      "fonte_id": 4670,
+      "fonte_nome": "Intel Core i3-12100F",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-12400F",
+      "fonte_id": 4681,
+      "fonte_nome": "Intel Core i5-12400F",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-13400F",
+      "fonte_id": 5166,
+      "fonte_nome": "Intel Core i5-13400F",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i7-13700K",
+      "fonte_id": 5060,
+      "fonte_nome": "Intel Core i7-13700K",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i9-14900K",
+      "fonte_id": 5717,
+      "fonte_nome": "Intel Core i9-14900K",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 3 4100",
+      "fonte_id": 4832,
+      "fonte_nome": "AMD Ryzen 3 4100",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 5 5500",
+      "fonte_id": 4807,
+      "fonte_nome": "AMD Ryzen 5 5500",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 7 5800X3D",
+      "fonte_id": 4823,
+      "fonte_nome": "AMD Ryzen 7 5800X3D",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core Ultra 5 245KF",
+      "fonte_id": 6336,
+      "fonte_nome": "Intel Core Ultra 5 245KF",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 9 9950X3D",
+      "fonte_id": 6549,
+      "fonte_nome": "AMD Ryzen 9 9950X3D",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 7 7800X3D",
+      "fonte_id": 5299,
+      "fonte_nome": "AMD Ryzen 7 7800X3D",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 9 7950X",
+      "fonte_id": 5031,
+      "fonte_nome": "AMD Ryzen 9 7950X",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 5 8500G",
+      "fonte_id": 5841,
+      "fonte_nome": "AMD Ryzen 5 8500G",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i3-10100F",
+      "fonte_id": 3863,
+      "fonte_nome": "Intel Core i3-10100F @ 3.60GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-10400F",
+      "fonte_id": 3767,
+      "fonte_nome": "Intel Core i5-10400F @ 2.90GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-11400F",
+      "fonte_id": 4226,
+      "fonte_nome": "Intel Core i5-11400F @ 2.60GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 9 5900XT",
+      "fonte_id": 6187,
+      "fonte_nome": "AMD Ryzen 9 5900XT",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i7-12700F",
+      "fonte_id": 4692,
+      "fonte_nome": "Intel Core i7-12700F",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i7-14700KF",
+      "fonte_id": 5723,
+      "fonte_nome": "Intel Core i7-14700KF",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i3-13100F",
+      "fonte_id": 5156,
+      "fonte_nome": "Intel Core i3-13100F",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 3 3200G",
+      "fonte_id": 3497,
+      "fonte_nome": "AMD Ryzen 3 3200G",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Athlon 3000G",
+      "fonte_id": 3614,
+      "fonte_nome": "AMD Athlon 3000G",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i3-14100F",
+      "fonte_id": 5853,
+      "fonte_nome": "Intel Core i3-14100F",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 5 4500",
+      "fonte_id": 4816,
+      "fonte_nome": "AMD Ryzen 5 4500",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-14400F",
+      "fonte_id": 5837,
+      "fonte_nome": "Intel Core i5-14400F",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i7-14700K",
+      "fonte_id": 5719,
+      "fonte_nome": "Intel Core i7-14700K",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i7-14700F",
+      "fonte_id": 5834,
+      "fonte_nome": "Intel Core i7-14700F",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 9 9900X",
+      "fonte_id": 6171,
+      "fonte_nome": "AMD Ryzen 9 9900X",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 7 9700X",
+      "fonte_id": 6205,
+      "fonte_nome": "AMD Ryzen 7 9700X",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 5 9600X",
+      "fonte_id": 6199,
+      "fonte_nome": "AMD Ryzen 5 9600X",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-12400",
+      "fonte_id": 4677,
+      "fonte_nome": "Intel Core i5-12400",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i3-12100",
+      "fonte_id": 4687,
+      "fonte_nome": "Intel Core i3-12100",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core Ultra 5 245K",
+      "fonte_id": 6324,
+      "fonte_nome": "Intel Core Ultra 5 245K",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core Ultra 5 225F",
+      "fonte_id": 6457,
+      "fonte_nome": "Intel Core Ultra 5 225F",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 7 5700G",
+      "fonte_id": 4323,
+      "fonte_nome": "AMD Ryzen 7 5700G",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 7 5800XT",
+      "fonte_id": 6307,
+      "fonte_nome": "AMD Ryzen 7 5800XT",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i3-9100F",
+      "fonte_id": 3461,
+      "fonte_nome": "Intel Core i3-9100F @ 3.60GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 9 9950X",
+      "fonte_id": 6211,
+      "fonte_nome": "AMD Ryzen 9 9950X",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i9-12900K",
+      "fonte_id": 4597,
+      "fonte_nome": "Intel Core i9-12900K",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 7 8700F",
+      "fonte_id": 6104,
+      "fonte_nome": "AMD Ryzen 7 8700F",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 7 8700G",
+      "fonte_id": 5836,
+      "fonte_nome": "AMD Ryzen 7 8700G",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-14600K",
+      "fonte_id": 5720,
+      "fonte_nome": "Intel Core i5-14600K",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 5 8600G",
+      "fonte_id": 5842,
+      "fonte_nome": "AMD Ryzen 5 8600G",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i9-14900KF",
+      "fonte_id": 5684,
+      "fonte_nome": "Intel Core i9-14900KF",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 5 7600X",
+      "fonte_id": 5033,
+      "fonte_nome": "AMD Ryzen 5 7600X",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 5 4600G",
+      "fonte_id": 3807,
+      "fonte_nome": "AMD Ryzen 5 4600G",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-13400",
+      "fonte_id": 4994,
+      "fonte_nome": "Intel Core i5-13400",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-3330, 3.00 Ghz (turbo Até 3.20 Ghz), 4 Núcleos, 6 Mb Cache, Tdp 77w, LGA  1155, 3ª Geração, Oem",
+      "fonte_id": 1475,
+      "fonte_nome": "Intel Core i5-3330 @ 3.00GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-3550, 3.30ghz (até 3.70ghz), Cache 6m 77w Quad-core, LGA  1155",
+      "fonte_id": 825,
+      "fonte_nome": "Intel Core i5-3550 @ 3.30GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i3-9100 3.6ghz Turbo 4.2ghz 6mbcache 4nucleos 4threads LGA 1151 S/ Cooler Cm8068403377319",
+      "fonte_id": 3479,
+      "fonte_nome": "Intel Core i3-9100 @ 3.60GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i3-9100 3.6ghz (4.2ghz Turbo Max), Socket LGA 1151, Ddr4, 6mb Cache, Uhd Graphics 630 - Oem",
+      "fonte_id": 3479,
+      "fonte_nome": "Intel Core i3-9100 @ 3.60GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i3-9100t 3.1ghz Turbo 3.7ghz 6mbcache 4nucleos 4threads LGA 1151 S/ Cooler Cm8068403377425",
+      "fonte_id": 3488,
+      "fonte_nome": "Intel Core i3-9100T @ 3.10GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i7-6700 3.4ghz (4.0ghz Turbo Max), Socket LGA 1151, Ddr4, 8mb Cache, Hd Graphics 530 - Oem",
+      "fonte_id": 2598,
+      "fonte_nome": "Intel Core i7-6700 @ 3.40GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i7-4770 3.4ghz (3.9ghz Turbo Max), Socket LGA 1150, Ddr3/DDR3l, 8mb Cache, Hd Graphics 4600 - Oem",
+      "fonte_id": 1907,
+      "fonte_nome": "Intel Core i7-4770 @ 3.40GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i7-4770s 3.1ghz (3.9ghz Turbo Max), Socket LGA 1150, Ddr3/DDR3l, 8mb Cache, Hd Graphics 4600 - Oem",
+      "fonte_id": 1884,
+      "fonte_nome": "Intel Core i7-4770S @ 3.10GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-6400, 2.70 Ghz (turbo Até 3.30 Ghz), 4 Núcleos, 6 Mb Cache, Tdp 65w, LGA 1151, 6ª Geração, Oem",
+      "fonte_id": 2578,
+      "fonte_nome": "Intel Core i5-6400 @ 2.70GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-8500, LGA 1151, 3.0GHz (4.1GHz), 9MB, 6 Núcleos, 6 Threads, S/ Cooler",
+      "fonte_id": 3223,
+      "fonte_nome": "Intel Core i5-8500 @ 3.00GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 3 3200g 3.6ghz (4.0ghz Turbo) 4mb Cache 4 Nucleos 4 Threads Am4 Sem Cooler Yd320bc5m4mfh",
+      "fonte_id": 3497,
+      "fonte_nome": "AMD Ryzen 3 3200G",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 5 3400g, 3.7ghz (4.2ghz Max Boost), Socket Am4, Ddr4, 6mb Cache, Radeon Vega 11 - Oem",
+      "fonte_id": 3498,
+      "fonte_nome": "AMD Ryzen 5 3400G",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-8400 2.8ghz (4.0ghz Turbo) 9mb Cache 6nucleos 6threads LGA  1151 Sem Cooler Cm8068403358811",
+      "fonte_id": 3097,
+      "fonte_nome": "Intel Core i5-8400 @ 2.80GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i3-10100t 3.0ghz (3.8ghz Turbo), Cache 6mb, Socket LGA 1200, Uhd Graphics 630, Tdp 35w - Oem",
+      "fonte_id": 3796,
+      "fonte_nome": "Intel Core i3-10100T @ 3.00GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i7-2600k, 3.40 Ghz (turbo Até 3.80 Ghz), 4 Núcleos, 8 Mb Cache, Tdp 95w, LGA 1155, 2ª Geração, Oem",
+      "fonte_id": 868,
+      "fonte_nome": "Intel Core i7-2600K @ 3.40GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i7-7700 3.6ghz Turbo 4.2ghz 8mb Cache 4 Nucleos 8threads LGA  1151 S/ Cooler Cm8067702868314",
+      "fonte_id": 2905,
+      "fonte_nome": "Intel Core i7-7700 @ 3.60GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i7-6700 3.4ghz Turbo 4.0ghz 8mb Cache 4 Nucleos 8threads LGA  1151 S/ Cooler | Cm8066201920103",
+      "fonte_id": 2598,
+      "fonte_nome": "Intel Core i7-6700 @ 3.40GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i3-10100f 3.6ghz Turbo 4.3ghz 6mbcache 4nucleos 8threads LGA 1200 S/ Cooler Cm8070104291318",
+      "fonte_id": 3863,
+      "fonte_nome": "Intel Core i3-10100F @ 3.60GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 5 3400g 3.7ghz (4.2ghz Turbo) 6mb Cache 4 Nucleos 8 Threads Am4 Sem Cooler Yd340bc5m4mfh",
+      "fonte_id": 3498,
+      "fonte_nome": "AMD Ryzen 5 3400G",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i7-8700, 3.2ghz (turbo Boost 4.6ghz), Socket LGA 1151, Cache 12mb, Ddr4, Uhd Graphics 630 - Oem",
+      "fonte_id": 3099,
+      "fonte_nome": "Intel Core i7-8700 @ 3.20GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 5 4500, 3.6GHz (4.1GHz Max Turbo), Cache 11MB, 6 Núcleos, 12 Threads, AM4, Sem video Integrado - 100-100",
+      "fonte_id": 4816,
+      "fonte_nome": "AMD Ryzen 5 4500",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 5 8400f Am5 4.2ghz, 4.7ghz Max, 6 Cores, 12 Threads 22mb, Cache, Sem Vídeo, Sem Cooler - 100-100001591bo",
+      "fonte_id": 6056,
+      "fonte_nome": "AMD Ryzen 5 8400F",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i7-6700 3.4ghz Turbo 4.0ghz 8mb Cache 4 Nucleos 8threads LGA  1151 S/ Cooler Cm8066201920103",
+      "fonte_id": 2598,
+      "fonte_nome": "Intel Core i7-6700 @ 3.40GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-9400 Cache De 9 M, 2.90ghz Base Até 4,10 Ghz (oem) S/cooler",
+      "fonte_id": 3414,
+      "fonte_nome": "Intel Core i5-9400 @ 2.90GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i3-12100t, 2.2ghz (4.1ghz Turbo), Cache 12mb, LGA 1700, Uhd Graphics 730, Tdp 35w - Oem",
+      "fonte_id": 4802,
+      "fonte_nome": "Intel Core i3-12100T",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5 10500 - Oem\n\nProcessador Intel Core i5-10500, 6 Núcleos, 12 Threads, 3.1ghz (4.5ghz Turbo), LGA 1200, ",
+      "fonte_id": 3749,
+      "fonte_nome": "Intel Core i5-10500 @ 3.10GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-9500, 3.00 Ghz (turbo Até 4.40 Ghz), 6 Núcleos, 9 Mb Cache, Tdp 65w, LGA  1151, 9ª Geração, Oem",
+      "fonte_id": 3444,
+      "fonte_nome": "Intel Core i5-9500 @ 3.00GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i7-9700 3.0ghz (4.7ghz Turbo Max), Socket LGA 1151, Ddr4, 12mb Cache, Uhd Graphics 630 - Oem",
+      "fonte_id": 3477,
+      "fonte_nome": "Intel Core i7-9700 @ 3.00GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core Ultra 5 225f, 3.3 Ghz (4.9ghz Turbo), Série 2, 10-cores 10-threads, LGA  1851, Bx80768225f",
+      "fonte_id": 6457,
+      "fonte_nome": "Intel Core Ultra 5 225F",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 7 5700, 3.7ghz (4.6ghz Turbo), 8-cores 16-threads, Am4, Com Cooler Amd Wraith Stealth, 100-100000743sbx",
+      "fonte_id": 4968,
+      "fonte_nome": "AMD Ryzen 7 5700",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core I5 14400f 14ª Geração, 3.5 Ghz (4.7 Ghz Turbo), Cache 20mb, 10 Núcleos, 16 Threads, Lga1700, S/ Vídeo Int",
+      "fonte_id": 5837,
+      "fonte_nome": "Intel Core i5-14400F",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-10400f, 2.9ghz (4.3ghz Max Turbo), LGA  1200, 6 Núcleos, 12 Threads, Cache 12mb- S/box",
+      "fonte_id": 3767,
+      "fonte_nome": "Intel Core i5-10400F @ 2.90GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i3-10100 3.6ghz Turbo 4.3ghz 6mbcache 4nucleos 8threads LGA 1200 S/ Cooler Cm8070104291317",
+      "fonte_id": 3717,
+      "fonte_nome": "Intel Core i3-10100 @ 3.60GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 7 5700, 3.7 GHz (4.6GHz Max Turbo), Cache 20MB, 8 Núcleos, 16 Threads, AM4, Sem Vídeo Integrado - 100-10",
+      "fonte_id": 4968,
+      "fonte_nome": "AMD Ryzen 7 5700",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 5 5500 3.6ghz Cache 16mb Am4 4.2ghz Max Turbo Sem Vídeo",
+      "fonte_id": 4807,
+      "fonte_nome": "AMD Ryzen 5 5500",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 5 8400f, 4.2ghz (4.7ghz Turbo), 6-cores 12-threads, Am5, Com Cooler Amd Wraith Stealth, 100-100001591box",
+      "fonte_id": 6056,
+      "fonte_nome": "AMD Ryzen 5 8400F",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 5 8400F, 4.2 GHz (4.7 GHz Max Turbo), Cache 22MB, 6 Núcleos, 12 Threads, AM5, Sem Vídeo Integrado - 100-",
+      "fonte_id": 6056,
+      "fonte_nome": "AMD Ryzen 5 8400F",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i3-10105 3.7ghz Turbo 4.4ghz 6mbcache 4nucleos 8threads LGA 1200 S/ Cooler Cm8070104291321",
+      "fonte_id": 4259,
+      "fonte_nome": "Intel Core i3-10105 @ 3.70GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core I3 - 14100, 3.5 GHz, (4.7GHz Turbo), Cache 12MB, 8 Threads, LGA 1700 - Bx8071514100",
+      "fonte_id": 5831,
+      "fonte_nome": "Intel Core i3-14100",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i3-14100, 3.5GHz (4.70 GHz Max Turbo), Cache 12MB, 4 Núcleos, 8 Threads, LGA 1700, Com Vídeo Integrado - ",
+      "fonte_id": 5831,
+      "fonte_nome": "Intel Core i3-14100",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i3-10320 3.8ghz Turbo 4.6ghz 8mbcache 4nucleos 8threads LGA 1200 S/ Cooler Cm8070104291009",
+      "fonte_id": 3890,
+      "fonte_nome": "Intel Core i3-10320 @ 3.80GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core I5-10400, 2.90GHz (4.3GHz Turbo), Hexa Core, Cache 12MB, LGA 1200 - BX8070110400",
+      "fonte_id": 3737,
+      "fonte_nome": "Intel Core i5-10400 @ 2.90GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 5 8600g, 4.3GHZ (5.0GHZ MAX), AM5, Cache 22MB, Sem Cooler - 100-100001237box",
+      "fonte_id": 5842,
+      "fonte_nome": "AMD Ryzen 5 8600G",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "AMD",
+      "modelo": "Ryzen 7 5700G, 3.8GHz (4.6GHz Max Turbo), Cache 20MB, Octa Core, AM4, Ví­deo Integrado - 100-100000263BOX",
+      "fonte_id": 4323,
+      "fonte_nome": "AMD Ryzen 7 5700G",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-12400, 2.5GHz (4.4GHz Max Turbo), Cache 18MB, 6 Núcleos, 12 Threads, LGA 1700, Com Vídeo Integrado - B",
+      "fonte_id": 4677,
+      "fonte_nome": "Intel Core i5-12400",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5 14400f Tray LGA  1700 3.5 Ghz (4.7 Ghz Turbo) 10 Cores 16 Threads 20mb S/ Cooler S/ Vídeo",
+      "fonte_id": 5837,
+      "fonte_nome": "Intel Core i5-14400F",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "cpu",
+      "fabricante": "Intel",
+      "modelo": "Core i5-10600, 3.3ghz (4.8ghz Turbo), LGA 1200, 12mb Cache, 10ª Geração - Oem",
+      "fonte_id": 3750,
+      "fonte_nome": "Intel Core i5-10600 @ 3.30GHz",
+      "escopo": "modelo_cpu"
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "NVIDIA",
+      "modelo": "GeForce GTX 1660 Super",
+      "fonte_id": 4159,
+      "fonte_nome": "GeForce GTX 1660 SUPER",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "NVIDIA",
+      "modelo": "GeForce RTX 3060",
+      "fonte_id": 4345,
+      "fonte_nome": "GeForce RTX 3060 12GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 12
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "NVIDIA",
+      "modelo": "GeForce RTX 3060 Ti",
+      "fonte_id": 4318,
+      "fonte_nome": "GeForce RTX 3060 Ti",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "NVIDIA",
+      "modelo": "GeForce RTX 4060",
+      "fonte_id": 4850,
+      "fonte_nome": "GeForce RTX 4060",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "ASRock",
+      "modelo": "RX 7600 Challenger Radeon",
+      "fonte_id": 4832,
+      "fonte_nome": "Radeon RX 7600",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "MSI",
+      "modelo": "RTX 5060 Shadow 2X OC GeForce",
+      "fonte_id": 5602,
+      "fonte_nome": "GeForce RTX 5060",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "XFX",
+      "modelo": "Swift RX 9070 XT TRIPLE FAN",
+      "fonte_id": 5956,
+      "fonte_nome": "Radeon RX 9070 XT",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 16
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "ASUS",
+      "modelo": "RTX 5060 TI DUAL O8G GeForce",
+      "fonte_id": 6441,
+      "fonte_nome": "GeForce RTX 5060 Ti 8GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Husky",
+      "modelo": "Alpha RX 580",
+      "fonte_id": 3736,
+      "fonte_nome": "Radeon RX 580",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "PCYES",
+      "modelo": "Geforce Rtx 3050 6Gb Gddr6",
+      "fonte_id": 5069,
+      "fonte_nome": "GeForce RTX 3050 6GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "NVIDIA",
+      "modelo": "GeForce GT 1030",
+      "fonte_id": 3757,
+      "fonte_nome": "GeForce GT 1030",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 2
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "MSI",
+      "modelo": "GeForce RTX 5060 Ti 8G SHADOW",
+      "fonte_id": 6441,
+      "fonte_nome": "GeForce RTX 5060 Ti 8GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "NVIDIA",
+      "modelo": "GeForce GTX 1660",
+      "fonte_id": 4062,
+      "fonte_nome": "GeForce GTX 1660",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Gigabyte",
+      "modelo": "RTX 5060 AERO OC 8G GeForce",
+      "fonte_id": 5602,
+      "fonte_nome": "GeForce RTX 5060",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Gigabyte",
+      "modelo": "RTX 5060 Ti GAMING OC 8G",
+      "fonte_id": 6441,
+      "fonte_nome": "GeForce RTX 5060 Ti 8GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Gigabyte",
+      "modelo": "RTX 5070 EAGLE OC SFF 12G",
+      "fonte_id": 5940,
+      "fonte_nome": "GeForce RTX 5070",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 12
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Gigabyte",
+      "modelo": "RTX 5060 EAGLE MAX OC 8GB",
+      "fonte_id": 5602,
+      "fonte_nome": "GeForce RTX 5060",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "ASUS",
+      "modelo": "Dual Geforce RTX 5060 Ti Oc",
+      "fonte_id": 6441,
+      "fonte_nome": "GeForce RTX 5060 Ti 8GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "MSI",
+      "modelo": "RTX 3050 LP OC Geforce",
+      "fonte_id": 5069,
+      "fonte_nome": "GeForce RTX 3050 6GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "AMD",
+      "modelo": "Radeon RX 550",
+      "fonte_id": 3761,
+      "fonte_nome": "Radeon RX 550",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Husky",
+      "modelo": "Alpha RTX 3060",
+      "fonte_id": 4345,
+      "fonte_nome": "GeForce RTX 3060 12GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 12
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "ASUS",
+      "modelo": "DUAL RTX 5060 TI O16G GeForce",
+      "fonte_id": 6160,
+      "fonte_nome": "GeForce RTX 5060 Ti 16GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 16
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "AMD",
+      "modelo": "Radeon RX 6750 XT",
+      "fonte_id": 4543,
+      "fonte_nome": "Radeon RX 6750 XT",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 12
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Gigabyte",
+      "modelo": "RTX 5060 Ti AERO OC 8G GeForce",
+      "fonte_id": 6441,
+      "fonte_nome": "GeForce RTX 5060 Ti 8GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "XFX",
+      "modelo": "Swift RX 9070 XT WHITE TRIPLE",
+      "fonte_id": 5956,
+      "fonte_nome": "Radeon RX 9070 XT",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 16
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "ASUS",
+      "modelo": "RTX 3050 6G Dual OC GeForce",
+      "fonte_id": 5069,
+      "fonte_nome": "GeForce RTX 3050 6GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "MSI",
+      "modelo": "GeForce RTX 3050 Ventus OC 2X",
+      "fonte_id": 5069,
+      "fonte_nome": "GeForce RTX 3050 6GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "NVIDIA",
+      "modelo": "GeForce RTX 5070",
+      "fonte_id": 5940,
+      "fonte_nome": "GeForce RTX 5070",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 12
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "NVIDIA",
+      "modelo": "GeForce RTX 5080",
+      "fonte_id": 5721,
+      "fonte_nome": "GeForce RTX 5080",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 16
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "MSI",
+      "modelo": "GeForce RTX 5070 12G VENTUS",
+      "fonte_id": 5940,
+      "fonte_nome": "GeForce RTX 5070",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 12
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "NVIDIA",
+      "modelo": "GeForce RTX 5060",
+      "fonte_id": 5602,
+      "fonte_nome": "GeForce RTX 5060",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "NVIDIA",
+      "modelo": "GeForce RTX 5060 Ti",
+      "fonte_id": 6160,
+      "fonte_nome": "GeForce RTX 5060 Ti 16GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 16
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "NVIDIA",
+      "modelo": "GeForce GTX 1050 Ti",
+      "fonte_id": 3595,
+      "fonte_nome": "GeForce GTX 1050 Ti",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "MSI",
+      "modelo": "RTX 3050 Geforce",
+      "fonte_id": 5069,
+      "fonte_nome": "GeForce RTX 3050 6GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "NVIDIA",
+      "modelo": "GeForce GTX 1630",
+      "fonte_id": 4571,
+      "fonte_nome": "GeForce GTX 1630",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Galax",
+      "modelo": "GeForce RTX 3050 EX V2",
+      "fonte_id": 5069,
+      "fonte_nome": "GeForce RTX 3050 6GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "MSI",
+      "modelo": "RTX 5060 Ventus 2x Oc 8GB",
+      "fonte_id": 5602,
+      "fonte_nome": "GeForce RTX 5060",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "AMD",
+      "modelo": "Radeon RX 7900 GRE",
+      "fonte_id": 4906,
+      "fonte_nome": "Radeon RX 7900 GRE",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 16
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "MSI",
+      "modelo": "RTX 5060 8G VENTUS 2X OC",
+      "fonte_id": 5602,
+      "fonte_nome": "GeForce RTX 5060",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "MSI",
+      "modelo": "RTX 3050 Ventus 2X OC GeForce",
+      "fonte_id": 5069,
+      "fonte_nome": "GeForce RTX 3050 6GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "PCYES",
+      "modelo": "Gpu Rx 550",
+      "fonte_id": 3761,
+      "fonte_nome": "Radeon RX 550",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Gigabyte",
+      "modelo": "RTX 5070 AERO 12G GeForce",
+      "fonte_id": 5940,
+      "fonte_nome": "GeForce RTX 5070",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 12
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Intel",
+      "modelo": "Arc A750",
+      "fonte_id": 4612,
+      "fonte_nome": "Intel Arc A750",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "MSI",
+      "modelo": "RTX 5060 Ti Ventus 2x Oc Plus",
+      "fonte_id": 6160,
+      "fonte_nome": "GeForce RTX 5060 Ti 16GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 16
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "ASUS",
+      "modelo": "PRIME-RTX 5060 TI O16G GeForce",
+      "fonte_id": 6160,
+      "fonte_nome": "GeForce RTX 5060 Ti 16GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 16
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "MSI",
+      "modelo": "RTX 3050 Ventus 2X OC",
+      "fonte_id": 5069,
+      "fonte_nome": "GeForce RTX 3050 6GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "NVIDIA",
+      "modelo": "GeForce GT 730",
+      "fonte_id": 2906,
+      "fonte_nome": "GeForce GT 730",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 2
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "PALIT",
+      "modelo": "GeForce RTX 5070 Ti 16GB",
+      "fonte_id": 5878,
+      "fonte_nome": "GeForce RTX 5070 Ti",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 16
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Afox",
+      "modelo": "AMD Radeon R5 230, 1GB DDR3, Low Profile - AFR5230-1024D3L4",
+      "fonte_id": 3885,
+      "fonte_nome": "Radeon R5 230",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 1
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Aitek",
+      "modelo": "Rx550 Aitek Radeon AMD, 4GB, GDDR5, 128 Bits, HDMI/VGA/DVI - Delta-Rx550",
+      "fonte_id": 3761,
+      "fonte_nome": "Radeon RX 550",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Outros",
+      "modelo": "Leadertech Geforce Gtx 750 Ti 4gb GDDR5 128 Bits - Pv-lt-gtx750ti-4g-d5",
+      "fonte_id": 2815,
+      "fonte_nome": "GeForce GTX 750 Ti",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Aitek",
+      "modelo": "Gamer Amd Radeon Rx 560, 4gb GDDR5 128bit, Clock 1300mhz Aitek - Delta-rx560",
+      "fonte_id": 3708,
+      "fonte_nome": "Radeon RX 560",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Vxpro",
+      "modelo": "Nvidia Geforce Gtx 750 Ti 4gb GDDR5 128 Bits - Gtx750ti-4gd5",
+      "fonte_id": 2815,
+      "fonte_nome": "GeForce GTX 750 Ti",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Outros",
+      "modelo": "Revenger RX 550 AMD Radeon 4GB, GDDR5, 128Bits",
+      "fonte_id": 3761,
+      "fonte_nome": "Radeon RX 550",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Aitek",
+      "modelo": "GTX 750 Ti 4GB GDDR5 | HDMI DVI VGA | PCI Express | PC Gamer",
+      "fonte_id": 2815,
+      "fonte_nome": "GeForce GTX 750 Ti",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Outros",
+      "modelo": "Nvidia Geforce Gtx 750ti Revenger 4gb GDDR5",
+      "fonte_id": 2815,
+      "fonte_nome": "GeForce GTX 750 Ti",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Clanm",
+      "modelo": "Amd Radeon Rx 560 4gb 128bits GDDR5 HDMI Gamer",
+      "fonte_id": 3708,
+      "fonte_nome": "Radeon RX 560",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Vxpro",
+      "modelo": "Amd Radeon Rx550 4gb Ddr5 128bit Vxpro Vx-rx550-4gd5",
+      "fonte_id": 3761,
+      "fonte_nome": "Radeon RX 550",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Vxpro",
+      "modelo": "Radeon Rx 550, 4gb GDDR5 - Vxrx550",
+      "fonte_id": 3761,
+      "fonte_nome": "Radeon RX 550",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Biostar",
+      "modelo": "Amd Radeon Rx 580 2048sp, 8GB, GDDR5, 256 Bit, Va5815rq82",
+      "fonte_id": 4049,
+      "fonte_nome": "Radeon RX 580 2048SP",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Outros",
+      "modelo": "Kinology Radeon Rx 580 2048sp-d5 8GB GDDR5",
+      "fonte_id": 4049,
+      "fonte_nome": "Radeon RX 580 2048SP",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Abit",
+      "modelo": "Radeon Rx580 8GB GDDR5 - Bp580d-6a45b",
+      "fonte_id": 3736,
+      "fonte_nome": "Radeon RX 580",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Aitek",
+      "modelo": "Rx 580 8GB GDDR5 RGB Aitek Amd Radeon Full Hd Gamer",
+      "fonte_id": 3736,
+      "fonte_nome": "Radeon RX 580",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "PCWINMAX",
+      "modelo": "Rx580 8GB Radeon GDDR5",
+      "fonte_id": 3736,
+      "fonte_nome": "Radeon RX 580",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Vinik",
+      "modelo": "Amd Radeon Rx 580, 8GB, GDDR5, 256 Bits, Gpuvk580v28GB2f",
+      "fonte_id": 3736,
+      "fonte_nome": "Radeon RX 580",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "PCYES",
+      "modelo": "GTX 750 Ti NVIDIA GeForce, GDDR5 2GB, 128bits, Dual Fan - Pj750tir5df 3568",
+      "fonte_id": 2815,
+      "fonte_nome": "GeForce GTX 750 Ti",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 2
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Outros",
+      "modelo": "Gamer Nvidia Gtx 1050 Ti 4gb GDDR5 128bits HDMI - Preto",
+      "fonte_id": 3595,
+      "fonte_nome": "GeForce GTX 1050 Ti",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Aitek",
+      "modelo": "Amd Radeon Rx560 4gb GDDR5 128 Bits HDMI Displayport Dvi PCie 3.0 X8 Gamer Aitek",
+      "fonte_id": 3708,
+      "fonte_nome": "Radeon RX 560",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Abit",
+      "modelo": "4gb Gtx 1050ti Ddr5 128bit Dp/hdmi/dvi",
+      "fonte_id": 3595,
+      "fonte_nome": "GeForce GTX 1050 Ti",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Vxpro",
+      "modelo": "Vx Pro Amd Radeon Rx580, 8GB, 256bits, Rx580-8gd5 Vx Pro",
+      "fonte_id": 3736,
+      "fonte_nome": "Radeon RX 580",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Duex",
+      "modelo": "Radeon, AMD, 8GB, DDR5 - Rx580-8gd5",
+      "fonte_id": 3736,
+      "fonte_nome": "Radeon RX 580",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Afox",
+      "modelo": "Gpu 4gb GDDR5 Gtx 1050ti  128bits Afox Af1050ti-4096d5h5-v8",
+      "fonte_id": 3595,
+      "fonte_nome": "GeForce GTX 1050 Ti",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Afox",
+      "modelo": "Geforce Gtx 1050 Ti Atx Dual Fan 4gb GDDR5 128 Bits - Af1050ti-4096d5h5-v8",
+      "fonte_id": 3595,
+      "fonte_nome": "GeForce GTX 1050 Ti",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Outros",
+      "modelo": "Revenger Rx 550 Radeon 4gb GDDR5 128 Bits",
+      "fonte_id": 3761,
+      "fonte_nome": "Radeon RX 550",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "PCYES",
+      "modelo": "NVIDIA GeForce GTX 750, 2GB GDDR5, 128 Bits, Dual-FAN",
+      "fonte_id": 2825,
+      "fonte_nome": "GeForce GTX 750",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 2
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Outros",
+      "modelo": "Rx 6500 Xt 4gb Gddr6 64bits Kinology",
+      "fonte_id": 4488,
+      "fonte_nome": "Radeon RX 6500 XT",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Outros",
+      "modelo": "AMD Radeon Rx 580, 8GB, GDDR5, 256bits - Rx580-8gd5",
+      "fonte_id": 3736,
+      "fonte_nome": "Radeon RX 580",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Outros",
+      "modelo": "Haoqing Blizzards Radeon Rx 580, 8GB, GDDR5, White, 256 Bits, Hq26162558",
+      "fonte_id": 3736,
+      "fonte_nome": "Radeon RX 580",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Outros",
+      "modelo": "Nvidia Revenger Gtx 1050ti 4gb Ram Ddr5",
+      "fonte_id": 3595,
+      "fonte_nome": "GeForce GTX 1050 Ti",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Inno3d",
+      "modelo": "Geforce RTX 3050 Twin X2 V2 6gb Gddr6 96 Bits - N30502-06d6-1880va60",
+      "fonte_id": 5069,
+      "fonte_nome": "GeForce RTX 3050 6GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Afox",
+      "modelo": "Gpu 4gb Gtx 1650 Dual Fan Gddr6 128 Bits  Afox- Af1650-4096d6h7-v2",
+      "fonte_id": 4078,
+      "fonte_nome": "GeForce GTX 1650",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Power",
+      "modelo": "Gpu Powercolor Amd Radeon Rx 6500xt 4gb Gddr6 64bits 4gbd6-dhv3",
+      "fonte_id": 4488,
+      "fonte_nome": "Radeon RX 6500 XT",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Outros",
+      "modelo": "VGA PCI EXP. 6GB/192BITS GTX 1660 SUPER PELADN",
+      "fonte_id": 4159,
+      "fonte_nome": "GeForce GTX 1660 SUPER",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "PCYES",
+      "modelo": "Nvidia Geforce Gtx 1050 Ti, 4 GB Gddr5, 128bits, Dual Fan, Graffiti Series",
+      "fonte_id": 3595,
+      "fonte_nome": "GeForce GTX 1050 Ti",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Biostar",
+      "modelo": "Radeon RX 580 2048SP White, 8GB GDDR5, PCie 3.0, 256 Bit, HDMI, DVI, Displayport",
+      "fonte_id": 4049,
+      "fonte_nome": "Radeon RX 580 2048SP",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 8
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Afox",
+      "modelo": "Geforce Gtx 1650 Dual Fan 4gb Gddr6 128 Bits - Af1650-4096d6h7-v2",
+      "fonte_id": 4078,
+      "fonte_nome": "GeForce GTX 1650",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 4
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "PCYES",
+      "modelo": "RTX 3050 Projeto Edge 6gb Gddr6 96 Bits - PvRTX30506blpe",
+      "fonte_id": 5069,
+      "fonte_nome": "GeForce RTX 3050 6GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Zotac",
+      "modelo": "RTX 3050 Twin Edge 6gb Oc Gddr6 128bits - Zt-30510h-10l",
+      "fonte_id": 5069,
+      "fonte_nome": "GeForce RTX 3050 6GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Vinik",
+      "modelo": "Amd Radeon Rx 5600, 6gb, Gddr6, Gpuvk56006gb2f",
+      "fonte_id": 4205,
+      "fonte_nome": "Radeon RX 5600",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "Zotac",
+      "modelo": "RTX 3050 6gb Twin Edge Oc Gddr6 96 Bits Zotac",
+      "fonte_id": 5069,
+      "fonte_nome": "GeForce RTX 3050 6GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    },
+    {
+      "tipo": "gpu",
+      "fabricante": "ASUS",
+      "modelo": "RTX 3050 OC Dual NVIDIA GeForce 6GB, GDDR6, 96 Bits - DUAL-RTX3050-6G",
+      "fonte_id": 5069,
+      "fonte_nome": "GeForce RTX 3050 6GB",
+      "escopo": "referencia_chip_gpu",
+      "memoria_gb": 6
+    }
+  ]
+}

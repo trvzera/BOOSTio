@@ -42,3 +42,6 @@ instance/
 testes.html
 !frontend/testes.html
 /docs/pendencias-produto.md
+
+# Snapshots, relatórios e dados locais de importação de benchmarks.
+/database/benchmarks/
