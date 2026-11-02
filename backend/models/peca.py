@@ -1,4 +1,5 @@
 from datetime import timezone
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from math import isfinite
 import re
 from urllib.parse import urlsplit
@@ -96,10 +97,21 @@ class Peca(ModeloBase):
     db.session.commit()
 
   def aplicar_cotacao(self, resultado, atualizado_em):
+    preco_alterado = False
     if resultado["preco"] is not None:
-      self.preco = float(resultado["preco"])
-      self.preco_atualizado_em = atualizado_em
-    self.esgotado = resultado["esgotado"]
+      novo = Decimal(str(resultado["preco"])).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+      try:
+        atual = Decimal(str(self.preco)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+      except InvalidOperation:
+        atual = None
+      if novo != atual:
+        self.preco = float(novo)
+        self.preco_atualizado_em = atualizado_em
+        preco_alterado = True
+    estoque_alterado = self.esgotado != resultado["esgotado"]
+    if estoque_alterado:
+      self.esgotado = resultado["esgotado"]
+    return {"preco_alterado": preco_alterado, "estoque_alterado": estoque_alterado}
 
   @classmethod
   def cadastrar_ausentes(cls, itens):

@@ -3,6 +3,7 @@ import time
 
 import click
 import requests
+from sqlalchemy.exc import SQLAlchemyError
 
 from services.peca_service.migrar_links_service import MigrarLinksService
 from services.peca_service.popular_pecas_service import PopularPecasService
@@ -61,7 +62,12 @@ def registrar_comandos_precos(app):
     @click.option("--intervalo", default=1.0, type=click.FloatRange(min=0), show_default=True,
                   help="Segundos entre requisições à KaBuM.")
     def atualizar(limite, intervalo):
-        click.echo(json.dumps(AtualizarPrecosService().executar(limite, intervalo), ensure_ascii=False))
+        try:
+            click.echo(json.dumps(AtualizarPrecosService().executar(limite, intervalo), ensure_ascii=False))
+        except ValueError as erro:
+            raise click.ClickException(str(erro)) from erro
+        except SQLAlchemyError as erro:
+            raise click.ClickException("Não foi possível atualizar preços no banco.") from erro
 
     @app.cli.command("pecas-imagens")
     @click.option("--limite", type=click.IntRange(min=1), help="Quantidade máxima de anúncios; omitido, percorre todas as peças sem foto.")
