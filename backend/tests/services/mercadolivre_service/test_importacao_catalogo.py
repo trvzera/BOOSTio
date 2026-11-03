@@ -74,8 +74,9 @@ def test_existente_recebe_oferta_sem_alterar_peca_ou_desativar_outras(banco):
 
 def test_ambiguidades_e_incompletos_nao_publicam(banco):
     local();local()
-    with pytest.raises(ValueError,match='Vários candidatos'):
-        service().executar(banco.id,simular=False,permitir_novos=True)
+    resultado=service().executar(banco.id,simular=False,permitir_novos=True)
+    assert resultado['acao']=='revisao' and 'Vários candidatos' in resultado['motivo']
+    assert banco.status=='em_revisao'
     assert Oferta.query.count()==0
 
 

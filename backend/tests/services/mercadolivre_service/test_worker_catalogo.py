@@ -112,3 +112,19 @@ def test_trava_libera_quando_etapa_lanca_erro(banco):
             assert adquirido
             raise ValueError('teste')
     with RepositorioControleCatalogo().bloquear() as adquirido:assert adquirido
+
+
+def test_ambiguidade_nao_bloqueia_importacao_do_lote(banco,tmp_path):
+    trabalhos=plano(tmp_path)
+    for _ in range(2):
+        db.session.add(HD(fabricante='Seagate',modelo='Exos 8TB',part_number='ST8000NM017B',preco=100,consumo_energia=7,capacidade_gb=8000,status_validacao='aprovado'))
+    db.session.commit()
+    with patch.object(BuscarOfertasMercadoLivreService,'_requisitar',api),patch.object(TokenMercadoLivreService,'executar',return_value='teste'):
+        for fase in ('descoberta','classificacao','enriquecimento','importacao'):
+            r=ProcessarCatalogoService().executar(trabalhos,simular=False,permitir_novos=True)
+            assert r['status']=='concluido' and r['fase']==fase,r
+            if fase!='importacao':liberar_agenda()
+    assert r['resumo']['revisao']==1 and r['resumo']['falhas']==0
+    assert EstadoCatalogo.query.one().fase=='descoberta'
+    assert ProdutoPendente.query.one().status=='em_revisao'
+    assert Oferta.query.count()==0 and HD.query.count()==2

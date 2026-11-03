@@ -54,8 +54,8 @@ class RepositorioImportacaoCatalogo:
                 origem='mercado_livre',catalogo_id=ficha['produto']['id'],coletado_em=agora.isoformat(),resultado=propostas)}
 
 
-    def registrar_revisao(self, pendencia, ficha):
+    def registrar_revisao(self, pendencia, ficha, motivo=None):
         import json
         pendencia.evidencias={**(pendencia.evidencias or {}),'enriquecimento':json.loads(json.dumps(ficha,default=str))}
         pendencia.status='em_revisao'
-        pendencia.motivo='Novo componente não autorizado, ficha incompleta ou conflitante'
+        pendencia.motivo=motivo or 'Novo componente não autorizado, ficha incompleta ou conflitante'

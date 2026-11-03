@@ -54,14 +54,19 @@ class ImportarProdutoService:
             pool=modelos[categoria].pool_para_matching(2001)
             decisao=CompararProdutosService().selecionar(pool[:2000],produto,
                 identidades=IdentidadeFabricante.para_matching(pool[:2000]),completo=len(pool)<=2000)
-            if decisao['classificacao']=='ambigua':raise ValueError('Vários candidatos ou evidências insuficientes; revisão necessária')
+            if decisao['classificacao']=='ambigua':
+                motivo='Vários candidatos ou evidências insuficientes; revisão necessária'
+                if not simular:self.repositorio.registrar_revisao(atual,ficha,motivo)
+                return dict(acao='revisao',pendencia_id=atual.id,motivo=motivo)
             novo=decisao['classificacao']!='confirmada'
             if novo and (not permitir_novos or not ficha['pronto']):
                 if not simular:self.repositorio.registrar_revisao(atual,ficha)
                 return dict(acao='revisao',pendencia_id=atual.id,campos_pendentes=ficha['campos_pendentes'],conflitos=ficha['conflitos'])
             peca=next((a for a in pool if f'{a.__tablename__}:{a.id}'==decisao['peca']),None)
             if not novo and (not peca.publicavel or CompararProdutosService().avaliar(peca,{**produto,'name':entrada.get('title',produto.get('name'))},identidade=IdentidadeFabricante.para_matching([peca]).get(peca.id))['classificacao']!='confirmada'):
-                raise ValueError('Ficha local não publicada ou título divergente')
+                motivo='Ficha local não publicada ou título divergente'
+                if not simular:self.repositorio.registrar_revisao(atual,ficha,motivo)
+                return dict(acao='revisao',pendencia_id=atual.id,motivo=motivo)
             if simular:
                 return dict(acao='proposta',novo_componente=novo,pendencia_id=atual.id,peca=None if novo else decisao['peca'],preco=str(anuncio['preco']))
             if novo:peca=self.repositorio.criar_componente(modelos[categoria],ficha)
