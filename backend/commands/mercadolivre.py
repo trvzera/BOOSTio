@@ -8,6 +8,26 @@ from services.mercadolivre_service.atualizar_ofertas_service import AtualizarOfe
 
 
 def registrar_comandos_mercadolivre(app):
+    @app.cli.command('mercadolivre-enriquecer')
+    @click.option('--limite', default=20, type=click.IntRange(1, 200))
+    @click.option('--depois-id', default=0, type=click.IntRange(min=0))
+    @click.option('--max-requisicoes', default=30, type=click.IntRange(min=1))
+    @click.option('--intervalo', default=1.0, type=click.FloatRange(min=0.1))
+    @click.option('--benchmark-cpu', type=click.Path(exists=True,dir_okay=False))
+    @click.option('--benchmark-gpu', type=click.Path(exists=True,dir_okay=False))
+    @click.option('--aplicar', is_flag=True)
+    def enriquecer(benchmark_cpu, benchmark_gpu, aplicar, **opcoes):
+        from services.mercadolivre_service.enriquecer_produto_service import EnriquecerProdutoService
+        from services.mercadolivre_service.enriquecer_pendencias_service import EnriquecerPendenciasService
+        from services.mercadolivre_service.consultar_benchmark_catalogo_service import ConsultarBenchmarkCatalogoService
+        try:
+            service=EnriquecerPendenciasService(enriquecedor=EnriquecerProdutoService(ConsultarBenchmarkCatalogoService(benchmark_cpu,benchmark_gpu)))
+            resumo=service.executar(simular=not aplicar,**opcoes)
+            click.echo(json.dumps(resumo,ensure_ascii=False))
+            if resumo['interrompido'] or resumo['falhas']:raise click.ClickException('Há falhas de enriquecimento; consulte o resumo')
+        except (ValueError,OSError,SQLAlchemyError):
+            raise click.ClickException('Falha ao enriquecer; confira esquema, fontes e snapshots') from None
+
     @app.cli.command('mercadolivre-classificar')
     @click.option('--limite', default=20, type=click.IntRange(1, 200))
     @click.option('--depois-id', default=0, type=click.IntRange(min=0))

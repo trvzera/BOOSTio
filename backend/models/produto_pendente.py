@@ -92,3 +92,31 @@ class ProdutoPendente(ModeloBase):
             raise
         finally:
             db.session.rollback()
+
+
+    @classmethod
+    def registrar_enriquecimento(cls, identificador, resultado, assinatura_original, *, simular=True):
+        import json
+        from decimal import Decimal
+        from utils.identidade_peca import assinatura_documento
+        try:
+            registro = cls.query.filter_by(id=identificador).with_for_update().first()
+            if registro is None or registro.status not in ('pendente','em_revisao'):
+                raise ValueError('Pendência ausente ou encerrada')
+            if assinatura_documento(registro.dados_originais) != assinatura_original:
+                raise ValueError('Anúncio mudou durante o enriquecimento')
+            def serializar(valor):
+                if isinstance(valor, Decimal):
+                    return str(valor)
+                raise ValueError('Tipo não suportado nas evidências')
+            dados = json.loads(json.dumps(resultado, default=serializar, allow_nan=False))
+            if not simular:
+                registro.evidencias = {**(registro.evidencias or {}), 'enriquecimento':dados}
+                registro.status = 'em_revisao'
+                registro.motivo = 'Ficha completa aguardando importação' if dados['pronto'] else 'Ficha incompleta ou conflitante; revisar evidências'
+                db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
+        finally:
+            db.session.rollback()
