@@ -30,45 +30,41 @@ class AssociarCatalogoService:
             if not isinstance(produto, dict):
                 raise ValueError('Candidato de catálogo inválido')
             cliente._validar_id(produto.get('id'), 'catálogo')
-            if self.comprova_mpn(peca, produto):
+            if self.comprova_identidade(peca, produto):
                 cliente._validar_id(produto.get('id'), 'catálogo')
                 ids.append(produto['id'])
-        candidatos_revisao = [{'catalogo_id': p.get('id'), 'nome': p.get('name')} for p in candidatos[:5]]
+        candidatos_revisao = [{'catalogo_id': p.get('id'), 'nome': p.get('name'), 'comparacao': self.comparar(peca, p)} for p in candidatos[:5]]
+        if len(ids) == 1 and not self._unica_local(peca, next(p for p in candidatos if p['id'] == ids[0])):
+            ids = []
         if len(ids) == 1 and total == len(candidatos) and len(set(p.get('id') for p in candidatos)) == len(candidatos):
-            return {'status': 'encontrada', 'catalogo_id': ids[0], 'assinatura': assinatura, 'criterio': 'mpn'}
+            return {'status': 'encontrada', 'catalogo_id': ids[0], 'assinatura': assinatura, 'criterio': self.comparar(peca, next(p for p in candidatos if p['id'] == ids[0]))['evidencias'][0]}
         return {'status': 'nao_encontrada' if total == 0 else 'revisao',
                 'motivo': 'Sem correspondência única comprovada por MPN e fabricante',
                 'candidatos': candidatos_revisao}
 
     @staticmethod
-    def comprova_mpn(peca, produto):
-        if not AssociarCatalogoService._mpn(peca) or produto.get('status') != 'active':
-            return False
-        if peca.__tablename__ in ('processador', 'placa_video'):
-            nome = normalizar(produto.get('name'))
-            if re.search(r'\b(kit|combo|upgrade|notebook|laptop)\b', nome):
-                return False
-            if peca.__tablename__ == 'processador' and produto.get('domain_id') != 'MLB-COMPUTER_PROCESSORS':
-                return False
-            if str(AssociarCatalogoService._mpn(peca)).upper().endswith('BOX') and re.search(r'\b(oem|tray)\b', nome):
-                return False
-        atributos = produto.get('attributes')
-        if not isinstance(atributos, list):
-            return False
-        marcas, codigos = set(), set()
-        for atributo in atributos:
-            if not isinstance(atributo, dict):
-                continue
-            valores = [atributo.get('value_name')]
-            extras = atributo.get('values')
-            if isinstance(extras, list):
-                valores += [v.get('name') for v in extras if isinstance(v, dict)]
-            if atributo.get('id') == 'BRAND':
-                marcas.update(normalizar(v) for v in valores if v)
-            if atributo.get('id') in ('MPN', 'MANUFACTURER_PART_NUMBER', 'PART_NUMBER'):
-                codigos.update(normalizar(v) for v in valores if v)
-        return normalizar(peca.fabricante) in marcas and normalizar(AssociarCatalogoService._mpn(peca)) in codigos
+    def _unica_local(peca, produto):
+        from .comparar_produtos_service import CompararProdutosService
+        pecas = type(peca).pool_para_matching(2001)
+        decisao = CompararProdutosService().selecionar(pecas[:2000], produto,
+            identidades=IdentidadeFabricante.para_matching(pecas[:2000]), completo=len(pecas) <= 2000)
+        return decisao['classificacao'] == 'confirmada' and decisao['peca'] == f'{peca.__tablename__}:{peca.id}'
 
+    @staticmethod
+    def comparar(peca, produto):
+        from .comparar_produtos_service import CompararProdutosService
+        verificada = IdentidadeFabricante.buscar(peca)
+        identidade = {'mpn': verificada.mpn, 'gtin': verificada.gtin} if verificada else None
+        return CompararProdutosService().avaliar(peca, produto, identidade=identidade)
+
+    @staticmethod
+    def comprova_mpn(peca, produto):
+        resultado = AssociarCatalogoService.comparar(peca, produto)
+        return resultado['classificacao'] == 'confirmada' and 'mpn' in resultado['evidencias']
+
+    @staticmethod
+    def comprova_identidade(peca, produto):
+        return AssociarCatalogoService.comparar(peca, produto)['classificacao'] == 'confirmada'
 
     @staticmethod
     def _mpn(peca):
@@ -76,4 +72,4 @@ class AssociarCatalogoService:
         verificada = IdentidadeFabricante.buscar(peca) if has_app_context() else None
         codigo = verificada.mpn if verificada else str(peca.part_number or '').strip()
         # Identificadores internos da seed não são códigos do fabricante.
-        return None if not codigo or re.match(r'^(SEED|DEMO|BOOSTIO|REDE)[-_]', codigo, re.I) else codigo
+        return None if not codigo or re.match(r'^(SEED|DEMO|BOOSTIO|REDE|KABUM)[-_]', codigo, re.I) else codigo

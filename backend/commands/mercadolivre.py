@@ -8,6 +8,20 @@ from services.mercadolivre_service.atualizar_ofertas_service import AtualizarOfe
 
 
 def registrar_comandos_mercadolivre(app):
+    @app.cli.command('mercadolivre-classificar')
+    @click.option('--limite', default=20, type=click.IntRange(1, 200))
+    @click.option('--depois-id', default=0, type=click.IntRange(min=0))
+    @click.option('--aplicar', is_flag=True)
+    def classificar(limite, depois_id, aplicar):
+        from services.mercadolivre_service.classificar_pendencias_service import ClassificarPendenciasService
+        try:
+            resumo = ClassificarPendenciasService().executar(limite=limite, depois_id=depois_id, simular=not aplicar)
+            click.echo(json.dumps(resumo, ensure_ascii=False))
+            if resumo['falhas']:
+                raise click.ClickException('Há falhas de classificação; consulte o resumo')
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else 'Prepare o banco antes de classificar') from None
+
     @app.cli.command('mercadolivre-descobrir')
     @click.option('--categoria', required=True)
     @click.option('--consulta', required=True, help='Palavras-chave; exemplo: memória DDR4 Kingston.')
@@ -20,9 +34,9 @@ def registrar_comandos_mercadolivre(app):
     @click.option('--intervalo', default=1.0, type=click.FloatRange(min=0.1), show_default=True)
     @click.option('--aplicar', is_flag=True, help='Grava somente a fila de pendências e a auditoria. Padrão: simulação.')
     def descobrir(aplicar, **parametros):
-        from services.mercadolivre_service.product_discovery_service import ProductDiscoveryService
+        from services.mercadolivre_service.descobrir_produtos_service import DescobrirProdutosService
         try:
-            resumo = ProductDiscoveryService().executar(simular=not aplicar, **parametros)
+            resumo = DescobrirProdutosService().executar(simular=not aplicar, **parametros)
             click.echo(json.dumps(resumo, ensure_ascii=False))
             if resumo['interrompido']:
                 raise click.ClickException('Descoberta interrompida; consulte o resumo antes de repetir')

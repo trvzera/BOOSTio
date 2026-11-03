@@ -40,7 +40,7 @@ def test_simulacao_importacao_idempotencia_e_associacao(contexto):
     assert service.executar(arquivo, simular=False)['inalteradas'] == 1
     assert p.part_number == 'SEED-RAM-01' and MemoriaRAM.query.count() == 1
     assert AssociarCatalogoService._mpn(p) == 'KF432C16BB/8'
-    produto = dict(status='active', attributes=[dict(id='BRAND', value_name='Kingston'),
+    produto = dict(id='MLB123', name='Kingston Fury Beast 8GB', domain_id='MLB-RAM_MEMORY_MODULES', status='active', attributes=[dict(id='BRAND', value_name='Kingston'),
                     dict(id='MPN', value_name='KF432C16BB/8')])
     assert AssociarCatalogoService.comprova_mpn(p, produto)
     produto['attributes'][1]['value_name'] = 'KF432C16BB/16'

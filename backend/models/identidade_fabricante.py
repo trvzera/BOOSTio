@@ -11,6 +11,7 @@ class IdentidadeFabricante(ModeloBase):
     peca_id = db.Column(db.Integer, nullable=False)
     assinatura_peca = db.Column(db.String(64), nullable=False)
     mpn = db.Column(db.String(255), nullable=False)
+    gtin = db.Column(db.String(14), nullable=True)
     fonte = db.Column(db.Text, nullable=False)
     especificacoes = db.Column(db.JSON, nullable=False)
     __table_args__ = (db.UniqueConstraint('tabela_peca', 'peca_id', name='uq_identidade_fabricante_peca'),)
@@ -28,14 +29,14 @@ class IdentidadeFabricante(ModeloBase):
         return obj
 
     @classmethod
-    def registrar(cls, peca, mpn, fonte, especificacoes, *, simular=True):
+    def registrar(cls, peca, mpn, fonte, especificacoes, *, simular=True, gtin=None):
         try:
             # Releitura bloqueada protege contra mudança da peça durante a importação.
             db.session.refresh(peca, with_for_update=True)
             if not cls._conferem(peca, especificacoes):
                 raise ValueError('Especificações locais divergem da fonte revisada')
             atual = cls.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id).with_for_update().first()
-            dados = dict(assinatura_peca=assinatura_peca(peca), mpn=mpn, fonte=fonte, especificacoes=especificacoes)
+            dados = dict(assinatura_peca=assinatura_peca(peca), mpn=mpn, fonte=fonte, especificacoes=especificacoes, gtin=gtin)
             if atual:
                 if any(getattr(atual, k) != v for k, v in dados.items()):
                     raise ValueError('Identidade existente diverge; exige revisão manual')
@@ -65,3 +66,14 @@ class IdentidadeFabricante(ModeloBase):
             elif atual != esperado:
                 return False
         return True
+
+
+    @classmethod
+    def para_matching(cls, pecas):
+        if not pecas or not inspect(db.engine).has_table(cls.__tablename__):
+            return {}
+        tabela = pecas[0].__tablename__
+        locais = {p.id: p for p in pecas}
+        registros = cls.query.filter(cls.tabela_peca == tabela, cls.peca_id.in_(locais)).all()
+        return {r.peca_id: {'mpn': r.mpn, 'gtin': r.gtin} for r in registros
+                if r.assinatura_peca == assinatura_peca(locais[r.peca_id]) and cls._conferem(locais[r.peca_id], r.especificacoes)}

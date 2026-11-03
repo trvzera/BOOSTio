@@ -42,7 +42,7 @@ class AtualizarOfertasMercadoLivreService:
                 else:
                     produto = cliente._consultar(f"/products/{vinculo['catalogo_id']}", token)
                     assinatura = assinatura_catalogo(produto)
-                    if vinculo['criterio'] == 'mpn' and not AssociarCatalogoService.comprova_mpn(peca, produto):
+                    if vinculo['criterio'] in ('mpn', 'gtin') and not AssociarCatalogoService.comprova_identidade(peca, produto):
                         raise ValueError('MPN/fabricante divergiram no detalhe do catálogo')
                     if vinculo.get('assinatura_catalogo') and vinculo['assinatura_catalogo'] != assinatura:
                         raise ValueError('Ficha do catálogo mudou; revisão necessária')

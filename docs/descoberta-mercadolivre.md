@@ -1,6 +1,6 @@
 # Catálogo automatizado — etapa 2: descoberta
 
-`ProductDiscoveryService` vive na pasta `services/mercadolivre_service`, reaproveita o transporte validado de `BuscarOfertasMercadoLivreService`, a renovação existente de tokens e `ControleRequisicoesService`. A descoberta não faz matching, enriquecimento ou importação de componentes. Só registra anúncios em `produto_pendente`, inicialmente pendentes. Não altera ofertas, preços de peças ou históricos.
+`DescobrirProdutosService` vive na pasta `services/mercadolivre_service`, reaproveita o transporte validado de `BuscarOfertasMercadoLivreService`, a renovação existente de tokens e `ControleRequisicoesService`. A descoberta não faz matching, enriquecimento ou importação de componentes. Só registra anúncios em `produto_pendente`, inicialmente pendentes. Não altera ofertas, preços de peças ou históricos.
 
 ## Endpoints e limites de acesso
 

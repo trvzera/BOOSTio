@@ -18,7 +18,7 @@ class LimitePaginas(ValueError):
     pass
 
 
-class ProductDiscoveryService:
+class DescobrirProdutosService:
     def __init__(self, cliente=None, controle=None, tokens=None):
         self.controle = controle
         self.cliente = cliente

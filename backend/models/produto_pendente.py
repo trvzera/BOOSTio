@@ -69,3 +69,26 @@ class ProdutoPendente(ModeloBase):
         except Exception:
             db.session.rollback()
             raise
+
+
+    @classmethod
+    def registrar_matching(cls, identificador, decisao, assinatura_original, *, simular=True):
+        from utils.identidade_peca import assinatura_documento
+        try:
+            registro = cls.query.filter_by(id=identificador).with_for_update().first()
+            if registro is None or registro.status not in ('pendente', 'em_revisao'):
+                raise ValueError('Pendência ausente ou já encerrada')
+            if assinatura_documento(registro.dados_originais) != assinatura_original:
+                raise ValueError('Anúncio mudou durante a análise')
+            evidencias = {**(registro.evidencias or {}), 'matching': decisao}
+            if not simular and registro.evidencias != evidencias:
+                registro.evidencias = evidencias
+                registro.candidatos = decisao['candidatos']
+                registro.status = 'em_revisao'
+                registro.motivo = 'Matching ' + decisao['classificacao']
+                db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
+        finally:
+            db.session.rollback()

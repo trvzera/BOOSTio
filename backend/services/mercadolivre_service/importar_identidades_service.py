@@ -28,6 +28,9 @@ class ImportarIdentidadesService:
                 raise ValueError('Identidade incompleta')
             if item['categoria'] not in modelos or len(item['mpn']) > 255:
                 raise ValueError('Categoria ou MPN inválido')
+            from .identidade_produto import gtin
+            if item.get('gtin') is not None and gtin(item['gtin']) is None:
+                raise ValueError('GTIN inválido; não foi inferido ou corrigido')
             url = urlsplit(item['fonte'])
             if url.scheme != 'https' or not url.hostname or url.username or url.password:
                 raise ValueError('Fonte deve ser uma URL HTTPS pública')
@@ -49,7 +52,7 @@ class ImportarIdentidadesService:
                 peca = pecas[0]
                 if ValidarLinkService().codigo_produto(peca.kabum_external) != ValidarLinkService().codigo_produto(item['url_peca']):
                     raise ValueError('Produto da loja diverge do registro revisado')
-                acao = IdentidadeFabricante.registrar(peca, item['mpn'], item['fonte'], item['especificacoes'], simular=simular)
+                acao = IdentidadeFabricante.registrar(peca, item['mpn'], item['fonte'], item['especificacoes'], simular=simular, gtin=item.get('gtin'))
                 resumo[{'proposta': 'propostas', 'cadastrada': 'cadastradas', 'inalterada': 'inalteradas'}[acao]] += 1
                 detalhe['status'] = acao
             except ValueError as erro:

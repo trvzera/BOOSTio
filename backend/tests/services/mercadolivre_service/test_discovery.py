@@ -5,7 +5,7 @@ import pytest
 from flask import Flask
 from sqlalchemy.exc import OperationalError
 from models import db, ProdutoPendente, Oferta, ExecucaoDescoberta, Processador
-from services.mercadolivre_service.product_discovery_service import ProductDiscoveryService
+from services.mercadolivre_service.descobrir_produtos_service import DescobrirProdutosService
 from services.mercadolivre_service.buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
 from services.mercadolivre_service.controle_requisicoes_service import ControleRequisicoesService, ErroMercadoLivre
 
@@ -37,7 +37,7 @@ def service(respostas, limite=30):
     cliente._requisitar = Mock(side_effect=respostas)
     tokens = Mock()
     tokens.executar.return_value = 'segredo-nao-exibir'
-    return ProductDiscoveryService(cliente, controle, tokens), cliente
+    return DescobrirProdutosService(cliente, controle, tokens), cliente
 
 
 def executar(s, **extras):
@@ -150,7 +150,7 @@ def test_opcoes_invalidas_antes_de_chamar_api(banco, extras):
 def test_comando_simula_por_padrao(banco):
     from commands.mercadolivre import registrar_comandos_mercadolivre
     registrar_comandos_mercadolivre(banco)
-    with patch.object(ProductDiscoveryService, 'executar', return_value={'interrompido':False}) as chamada:
+    with patch.object(DescobrirProdutosService, 'executar', return_value={'interrompido':False}) as chamada:
         resultado = banco.test_cli_runner().invoke(args=['mercadolivre-descobrir','--categoria','memoria_ram','--consulta','Kingston DDR4'])
     assert resultado.exit_code == 0
     assert chamada.call_args.kwargs['simular'] is True

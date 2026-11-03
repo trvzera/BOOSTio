@@ -81,6 +81,10 @@ class Peca(ModeloBase):
     return cls.consulta_publicavel().filter_by(id=peca_id).first()
 
   @classmethod
+  def pool_para_matching(cls, limite=2001):
+    return cls.query.order_by(cls.id).limit(limite).all()
+
+  @classmethod
   def lote_para_ofertas(cls, depois_id=0, limite=50):
     return cls.query.filter(cls.id > depois_id).order_by(cls.id).limit(limite).all()
 

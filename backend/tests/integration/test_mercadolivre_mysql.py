@@ -213,7 +213,7 @@ def test_catalogo_aditivo_preserva_legado_e_define_novos_como_pendentes(banco):
 def test_descoberta_mysql_grava_fila_e_auditoria_sem_publicar(banco):
     from models import ProdutoPendente, ExecucaoDescoberta
     from migrations.catalogo_automatizado import preparar_catalogo_automatizado
-    from services.mercadolivre_service.product_discovery_service import ProductDiscoveryService
+    from services.mercadolivre_service.descobrir_produtos_service import DescobrirProdutosService
     from services.mercadolivre_service.buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
     preparar_catalogo_automatizado(simular=False)
     cliente = BuscarOfertasMercadoLivreService()
@@ -223,7 +223,7 @@ def test_descoberta_mysql_grava_fila_e_auditoria_sem_publicar(banco):
     tokens = Mock();tokens.executar.return_value = 'teste'
     for chave in ('novos', 'ja_coletados'):
         cliente._consultar = Mock(side_effect=respostas)
-        r = ProductDiscoveryService(cliente=cliente, tokens=tokens).executar(
+        r = DescobrirProdutosService(cliente=cliente, tokens=tokens).executar(
             categoria='memoria_ram', consulta='Kingston DDR4', simular=False)
         assert r[chave] == 1 and not r['interrompido']
     assert ProdutoPendente.query.count() == 1 and ExecucaoDescoberta.query.count() == 2
