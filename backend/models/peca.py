@@ -43,6 +43,10 @@ class Peca(ModeloBase):
   imagem_url = db.Column(db.Text, nullable=True)
 
   @classmethod
+  def lote_para_ofertas(cls, depois_id=0, limite=50):
+    return cls.query.filter(cls.id > depois_id).order_by(cls.id).limit(limite).all()
+
+  @classmethod
   def com_link_kabum(cls):
     return cls.query.filter(cls.kabum_external.isnot(None), cls.kabum_external != "").all()
 

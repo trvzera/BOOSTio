@@ -79,3 +79,10 @@ class HistoricoPreco(ModeloBase):
         from sqlalchemy import inspect
         if not inspect(db.engine).has_table(cls.__tablename__):
             raise ValueError("Execute historico-precos-preparar antes de atualizar preços")
+
+    @classmethod
+    def listar_por_peca_anuncio(cls, tabela_peca, peca_id, loja, produto_id_loja, *, limite=1000):
+        """Últimas observações do mesmo anúncio, com desempate determinístico."""
+        return cls.query.filter_by(tabela_peca=tabela_peca, peca_id=peca_id, loja=loja,
+                                   produto_id_loja=produto_id_loja).order_by(
+            cls.coletado_em.desc(), cls.id.desc()).limit(limite + 1).all()

@@ -10,6 +10,8 @@ import { avisoCompraHtml, abrirCompraBuild } from "../build/acoes-build.js";
 import { salvarAlteracaoLocal } from "../build/autosalvar.js";
 import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta } from "../build/conta.js";
 import { ajudaCategorias } from "../build/uso-formulario.js";
+import { cartoesOfertasHtml } from "../build/ofertas-peca.js";
+import { obterHistoricoDaPeca } from "../build/carregar-historico-precos.js";
 import { historicoPrecosHtml, iniciarHistoricoPrecos } from "../build/price-history.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -26,6 +28,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const destaques = destaquesFichaTecnica(peca);
     const gruposTecnicos = gruposFichaTecnica(peca);
     const preco = informacoesPreco(peca,conta);
+    if (conta && ofertasPeca(peca).some(o => o.codigo === "mercado_livre")) {
+      preco.rotulo = "Preço de referência da peça";
+      preco.nota += " As ofertas das lojas podem ter valores diferentes.";
+    }
     let motivo = "";
     try { selecionarPecaCompativel(build,peca,catalogo); } catch (erro) { motivo = erro.message; }
     document.title = nomePeca(peca) + " — BOOSTio";
@@ -40,12 +46,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       '<button type="button" id="add-product" class="btn-primary" aria-label="Adicionar à build: ' + h(nomePeca(peca)) + '" ' + (motivo ? 'disabled data-disabled-reason="' + h(motivo) + '"' : "") + '>' + iconeAnimado("plus") + 'Adicionar à build</button>' +
       '<p class="font-2-xs summary-note">' + h(motivo || "Não encontramos novos problemas com as peças escolhidas nas verificações disponíveis. Quando faltar informação, confira com o fabricante.") + '</p></div></section>' +
       '<section class="product-stores" aria-labelledby="stores-title"><h2 class="font-1-l" id="stores-title">Onde comprar</h2><p class="font-2-xs summary-note">Confira preço, estoque e o modelo exato na loja. As buscas não representam ofertas confirmadas.</p><div class="store-grid">' +
-      ofertasPeca(peca).map((oferta) => '<article class="store-card glass-card"><a class="store-brand" href="' + h(oferta.url) + '" target="_blank" rel="noopener noreferrer" aria-label="Abrir ' + h(oferta.loja) + ' em uma nova aba"><img class="store-logo" src="' + h(oferta.logo) +
-      '" alt="' + oferta.loja + '"><span class="store-name font-1-m-b" hidden>' + oferta.loja + '</span></a>' +
-      (oferta.preco != null ? '<strong class="store-price">' + moeda(oferta.preco) + '</strong>' : '<span class="store-price-unavailable">Preço ainda não cadastrado</span>') +
-      '<p class="font-2-xs">' +
-      (oferta.esgotado ? "Último preço cadastrado · produto indisponível" : oferta.preco != null ? "Preço cadastrado, sem frete · confirme na loja" : oferta.direta ? "Página do produto cadastrada" : "Busca pelo modelo · anúncio não cadastrado") + '</p><a class="btn-ghost" href="' + h(oferta.url) +
-      '" target="_blank" rel="noopener noreferrer" aria-label="' + (oferta.direta ? "Comprar na loja" : "Buscar na loja") + ' ' + h(oferta.loja) + ' em uma nova aba">' + iconeAnimado("cart") + (oferta.direta ? "Comprar na loja" : "Buscar na loja") + '</a></article>').join("") + '</div></section>' +
+      cartoesOfertasHtml(peca) + '</div></section>' +
       historicoPrecosHtml(peca) +
       '<section class="product-specifications glass-card" aria-labelledby="spec-title"><h2 class="font-1-l" id="spec-title">Informações técnicas</h2>' +
       '<p class="font-2-xs summary-note product-specifications-note">Estas são as informações cadastradas deste modelo. Usamos esses dados para verificar sua montagem. Se uma informação estiver faltando, não podemos confirmar que as peças combinam nesse ponto. O consumo de energia é uma estimativa, não uma medição do computador ligado.</p>' +
@@ -55,12 +56,42 @@ document.addEventListener("DOMContentLoaded", async () => {
     main.querySelector(".product-stores > p").insertAdjacentHTML("afterend",avisoCompraHtml());
     main.querySelectorAll(".store-logo").forEach(img => img.addEventListener("error",() => { img.hidden = true; img.nextElementSibling.hidden = false; },{once:true}));
     main.querySelectorAll('.store-card').forEach((card,indice)=>card.querySelectorAll('a').forEach(link=>link.addEventListener('click',evento=>{
+      if (ofertasPeca(peca)[indice].codigo === "mercado_livre") return;
       evento.preventDefault();
       try { abrirCompraBuild({...build,componentes:{[peca.categoria]:{id:peca.id,quantidade:1}}},catalogo,{loja:ofertasPeca(peca)[indice].codigo}); }
       catch(erro) { avisar(erro.message); }
     })));
     iniciarIcones(main);
     iniciarHistoricoPrecos(main, peca);
+    if (conta) {
+      const ofertasMercado = ofertasPeca(peca).filter(o => o.codigo === "mercado_livre");
+      let seletor = null, consultaHistorico = 0;
+      if (ofertasMercado.length) {
+        main.querySelector("[data-price-history]").insertAdjacentHTML("beforebegin", '<div class="planning-help planning-field"><label for="history-offer">Histórico por loja e vendedor</label><select id="history-offer" class="input-text"><option value="kabum">KaBuM!</option>' +
+          ofertasMercado.map(o => '<option value="' + o.id + '">Mercado Livre · ' + h(o.vendedor) + ' · anúncio ' + h(o.produto_id_loja) + '</option>').join("") + '</select></div>');
+        seletor = main.querySelector("#history-offer");
+      }
+      const carregarHistorico = async () => {
+        const consultaAtual = ++consultaHistorico;
+        const ofertaId = seletor && seletor.value !== "kabum" ? Number(seletor.value) : null;
+        const secao = main.querySelector("[data-price-history]");
+        secao.querySelectorAll("[data-history-period]").forEach(botao => { botao.disabled = true; });
+        secao.querySelector(".price-history-store").textContent = ofertaId ? "Mercado Livre" : "KaBuM!";
+        secao.querySelector("[data-history-content]").innerHTML = '<p role="status">Carregando histórico de preços…</p>';
+        try {
+          const dados = await obterHistoricoDaPeca(peca, {conta:true, ofertaId});
+          if (consultaAtual !== consultaHistorico) return;
+          secao.outerHTML = historicoPrecosHtml({...peca, ...dados});
+          iniciarHistoricoPrecos(main, {...peca, ...dados});
+        } catch (erro) {
+          if (consultaAtual !== consultaHistorico) return;
+          secao.querySelector("[data-history-content]").innerHTML = '<p role="status">' + h(erro.message || "Não foi possível carregar o histórico.") + '</p><button type="button" class="btn-secondary" data-history-retry aria-label="Tentar carregar o histórico novamente">Tentar novamente</button>';
+          secao.querySelector("[data-history-retry]").onclick = carregarHistorico;
+        }
+      };
+      if (seletor) seletor.onchange = carregarHistorico;
+      carregarHistorico();
+    }
     main.querySelector("#add-product").onclick = async () => {
       try {
         build = selecionarPecaCompativel(build, peca, catalogo);

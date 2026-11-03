@@ -17,6 +17,38 @@ from services.peca_service.cadastrar_complementares_service import CadastrarComp
 
 
 def registrar_comandos_precos(app):
+    @app.cli.command("mercadolivre-tokens-configurar")
+    @click.option("--validade-segundos", default=0, type=click.IntRange(min=0),
+                  help="Validade restante do access token; zero renova na próxima consulta.")
+    def configurar_tokens_mercado_livre(validade_segundos):
+        """Registra o par OAuth obtido em autorização, sem exibir credenciais."""
+        from services.mercadolivre_service.token_mercado_livre_service import TokenMercadoLivreService
+        service = TokenMercadoLivreService()
+        access = click.prompt("Access token", hide_input=True)
+        refresh = click.prompt("Refresh token", hide_input=True)
+        try:
+            dados = {"access_token": service._credencial(access),
+                     "refresh_token": service._credencial(refresh),
+                     "expires_at": time.time() + validade_segundos,
+                     "renovacao_pendente": False}
+            with service.repository.bloquear():
+                service.repository.ler()
+                service.repository.salvar(dados)
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else "Falha ao registrar credenciais no banco") from None
+        click.echo("Credenciais OAuth registradas com segurança.")
+
+    @app.cli.command("mercadolivre-tokens-transferir")
+    @click.option("--arquivo", required=True, type=click.Path(exists=True, dir_okay=False))
+    @click.option("--remover-arquivo", is_flag=True, help="Remove o arquivo após verificar os tokens no banco.")
+    def transferir_tokens_mercado_livre(arquivo, remover_arquivo):
+        from services.mercadolivre_service.transferir_tokens_mercado_livre_service import TransferirTokensMercadoLivreService
+        try:
+            resultado = TransferirTokensMercadoLivreService().executar(arquivo, remover_arquivo=remover_arquivo)
+            click.echo(json.dumps(resultado, ensure_ascii=False))
+        except (ValueError, SQLAlchemyError, OSError):
+            raise click.ClickException("Transferência interrompida; confira esquema, chave, identidade e arquivo. A origem não é usada automaticamente.") from None
+
     @app.cli.command("pecas-complementares")
     @click.option("--simular", is_flag=True, help="Lista o lote sem gravar dados nem consultar lojas.")
     def complementares(simular):

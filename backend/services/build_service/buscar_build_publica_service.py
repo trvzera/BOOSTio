@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from models import BuildSalva
+from models import BuildSalva, Oferta
 from models.build_salva import MODELOS
 from .avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
@@ -23,5 +23,5 @@ class BuscarBuildPublicaService:
                 if peca:
                     ficha = peca.to_catalogo()
                     pecas[ficha["id"]] = ficha
-        dados["pecas"] = list(pecas.values())
+        dados["pecas"] = Oferta.anexar_a_catalogo(list(pecas.values()))
         return dados

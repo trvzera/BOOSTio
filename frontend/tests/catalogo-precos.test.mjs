@@ -41,3 +41,16 @@ test("oferta enviada pelo catálogo mostra preço e indisponibilidade só na loj
   assert.equal(kabum.atualizadoEm,"2026-10-23T12:00:00Z");
   assert.equal(pichau.preco,null);assert.equal(pichau.direta,false);
 });
+
+test("ofertas do Mercado Livre preservam vendedores, consulta e estoque desconhecido",()=>{
+  const base={id:7,loja:"mercado_livre",produto_id_loja:"MLB123",vendedor_id:"42",url:"https://produto.mercadolivre.com.br/MLB-123-_JM",preco:500,esgotado:null,atualizadoEm:"2026-11-02T12:00:00Z"};
+  const itens=ofertasPeca({fabricante:"AMD",modelo:"CPU",ofertas:[base,{...base,id:8,vendedor_id:"43",preco:550}]}).filter(o=>o.codigo==="mercado_livre");
+  assert.equal(itens.length,2);assert.equal(itens[0].preco,500);assert.equal(itens[0].estoqueConfirmado,false);
+  assert.equal(itens[1].vendedor,"Vendedor 43");
+});
+
+test("ofertas malformadas ou com URL externa não viram links de compra",()=>{
+  const base={id:7,loja:"mercado_livre",produto_id_loja:"MLB123",vendedor_id:"42",url:"https://produto.mercadolivre.com.br/MLB-123-_JM",preco:500,atualizadoEm:"2026-11-02T12:00:00Z"};
+  for(const alteracao of [{url:"javascript:alert(1)"},{url:"https://mercadolivre.com.br.evil.test"},{url:"https://user:pass@mercadolivre.com.br"},{preco:0},{preco:"500"},{atualizadoEm:"invalid"}])
+    assert.equal(ofertasPeca({ofertas:[{...base,...alteracao}]}).filter(o=>o.codigo==="mercado_livre").length,0);
+});

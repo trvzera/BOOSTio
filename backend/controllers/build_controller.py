@@ -1,3 +1,4 @@
+from services.peca_service.consultar_historico_precos_service import ConsultarHistoricoPrecosService
 from flask import Blueprint,request,jsonify
 from flask_login import login_required,current_user
 from utils.limite_requisicoes import limiter, chave_usuario
@@ -107,6 +108,43 @@ class BuildController:
       except Exception:
         return jsonify({"erro": "Erro ao gerar a build"}),500
 
+
+    @staticmethod
+    @build_bp.get("/catalogo/<categoria>/<int:peca_id>/ofertas/<int:oferta_id>/historico-precos")
+    @login_required
+    def historico_precos_oferta(categoria, peca_id, oferta_id):
+      try:
+        if request.args:
+          raise ValueError("Esta consulta não aceita parâmetros adicionais")
+        resposta = jsonify(ConsultarHistoricoPrecosService().executar(categoria, peca_id, oferta_id))
+        resposta.headers["Cache-Control"] = "no-store"
+        return resposta, 200
+      except ValueError as erro:
+        return jsonify({"erro": str(erro), "codigo": "entrada"}), 400
+      except LookupError:
+        return jsonify({"erro": "Oferta não encontrada", "codigo": "nao-encontrada"}), 404
+      except SQLAlchemyError:
+        db.session.rollback()
+        return jsonify({"erro": "Histórico de ofertas indisponível", "codigo": "indisponivel"}), 503
+
+    @staticmethod
+    @build_bp.get("/catalogo/<categoria>/<int:peca_id>/historico-precos")
+    @login_required
+    def historico_precos_peca(categoria, peca_id):
+      try:
+        if request.args:
+          raise ValueError("Esta consulta não aceita parâmetros adicionais")
+        dados = ConsultarHistoricoPrecosService().executar(categoria, peca_id)
+        resposta = jsonify(dados)
+        resposta.headers["Cache-Control"] = "no-store"
+        return resposta, 200
+      except ValueError as erro:
+        return jsonify({"erro": str(erro), "codigo": "entrada"}), 400
+      except LookupError:
+        return jsonify({"erro": "Peça não encontrada", "codigo": "nao-encontrada"}), 404
+      except SQLAlchemyError:
+        db.session.rollback()
+        return jsonify({"erro": "Histórico de preços indisponível no momento", "codigo": "indisponivel"}), 503
 
     @staticmethod
     @build_bp.get("/catalogo")
