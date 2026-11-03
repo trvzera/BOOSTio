@@ -96,8 +96,9 @@ o service exige reautorização, sem repetir um refresh token que pode ter sido
 consumido. Erro 403 de consulta não dispara renovação. Esse estado conservador
 pode exigir intervenção mesmo em erros transitórios.
 
-Os testes exercitam SQLite, inclusive concorrência com duas conexões. Ainda é
-necessário validar no MySQL real antes de publicar. A transferência local cria a
+Os testes exercitam SQLite e há testes de integração em MySQL 8.4 local real,
+incluindo concorrência com duas conexões. A validação da configuração da VPS
+continua sendo necessária após o deploy. A transferência local cria a
 tabela e preserva as demais; não executa coleta nem salva builds.
 
 ## Transporte e limites
@@ -115,3 +116,9 @@ cobertura de todo o banco.
 
 Referências: [catálogo](https://developers.mercadolivre.com.br/buscador-de-produtos),
 [OAuth](https://developers.mercadolivre.com.br/autenticacao-e-autorizacao).
+
+## Descoberta e persistência de ofertas
+
+O algoritmo administrativo de busca, revisão e atualização está documentado em
+[ofertas-mercado-livre.md](ofertas-mercado-livre.md). O coletor isolado continua
+somente leitura; o orquestrador grava pelo model, com transação por peça.

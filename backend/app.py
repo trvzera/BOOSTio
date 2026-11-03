@@ -6,6 +6,7 @@ from services.configuracao_service.configurar_acesso_service import ConfigurarAc
 from services.configuracao_service.validar_producao_service import ValidarProducaoService
 from models import db,lm,mail 
 from commands.precos import registrar_comandos_precos
+from commands.mercadolivre import registrar_comandos_mercadolivre
 import os
 
 from controllers.usuario_controller import usuario_bp
@@ -57,6 +58,7 @@ registrar_migracao_budget(app, db)
 registrar_comandos_banco(app)
 registrar_comandos_benchmarks(app)
 registrar_comandos_precos(app)
+registrar_comandos_mercadolivre(app)
 
 if __name__ == '__main__':
     if ambiente == 'producao':

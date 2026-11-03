@@ -5,6 +5,7 @@ from decimal import Decimal, InvalidOperation
 
 import requests
 from .token_mercado_livre_service import TokenMercadoLivreService
+from .controle_requisicoes_service import ErroMercadoLivre
 
 
 class BuscarOfertasMercadoLivreService:
@@ -13,13 +14,16 @@ class BuscarOfertasMercadoLivreService:
     TAMANHO_PAGINA = 100
     MAX_OFERTAS = 1000
 
-    def executar(self, catalogo_id: str, *, access_token: str | None = None):
+    def __init__(self, controle=None):
+        self.controle = controle
+
+    def executar(self, catalogo_id: str, *, access_token: str | None = None, produto=None):
         self._validar_id(catalogo_id, "produto de catálogo")
         token = access_token if access_token is not None else TokenMercadoLivreService().executar()
         if not isinstance(token, str) or not token.strip() or any(c in token for c in "\r\n"):
             raise ValueError("Token OAuth fornecido está ausente ou inválido")
         token = token.strip()
-        produto = self._consultar(f"/products/{catalogo_id}", token)
+        produto = produto if produto is not None else self._consultar(f"/products/{catalogo_id}", token)
         if produto.get("id") != catalogo_id or not isinstance(produto.get("name"), str) or not produto["name"].strip():
             raise ValueError("Identificação do produto de catálogo inválida no Mercado Livre")
         if produto.get("status") != "active":
@@ -56,6 +60,10 @@ class BuscarOfertasMercadoLivreService:
                 "ofertas": list(ofertas.values())}
 
     def _consultar(self, caminho, token, params=None):
+        chamada = lambda: self._requisitar(caminho, token, params)
+        return self.controle.executar(chamada) if self.controle else chamada()
+
+    def _requisitar(self, caminho, token, params=None):
         try:
             resposta = requests.get(
                 self.BASE_URL + caminho, params=params,
@@ -64,7 +72,7 @@ class BuscarOfertasMercadoLivreService:
             )
             try:
                 if resposta.status_code != 200:
-                    raise ValueError(f"Mercado Livre HTTP {resposta.status_code}; consulta não concluída")
+                    raise ErroMercadoLivre(resposta.status_code, resposta.headers.get("Retry-After"))
                 if resposta.headers.get("Content-Type", "").split(";", 1)[0].strip().lower() != "application/json":
                     raise ValueError("Mercado Livre não retornou JSON")
                 partes, tamanho = [], 0

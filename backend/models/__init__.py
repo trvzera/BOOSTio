@@ -44,6 +44,8 @@ from .token_recuperacao import TokenRecuperacao
 from .consulta_preco import ConsultaPreco, ControleColeta
 from .historico_preco import HistoricoPreco
 from .oferta import Oferta
+from .vinculo_mercado_livre import VinculoMercadoLivre
+from .historico_oferta import HistoricoOferta
 from .token_integracao import TokenIntegracao
 
 #Funcão obrigatória para o login buscar informações do usuario pelo id
@@ -58,5 +60,5 @@ __all__ = [
     'Processador','PlacaMae','PlacaVideo','MemoriaRAM','SSD','HD',
     'Gabinete','WaterCooler','AirCooler','Fan','Fone','Teclado','Mouse','Monitor',
     'PlacaRede','CaboRede',
-    'Setup','Codigo','TokenRecuperacao','Build','BuildSalva','ConsultaPreco','ControleColeta','HistoricoPreco','Oferta','TokenIntegracao'
+    'Setup','Codigo','TokenRecuperacao','Build','BuildSalva','ConsultaPreco','ControleColeta','HistoricoPreco','Oferta','TokenIntegracao','VinculoMercadoLivre','HistoricoOferta'
 ]
