@@ -68,3 +68,10 @@ test("série histórica não aparece como especificação técnica da peça", ()
   const campos = fichaTecnica({categoria:"memoria_ram",capacidade:16,historico_precos:[registro("2026-11-01", 500)]});
   assert.ok(!campos.some(([rotulo]) => /historico|histórico/i.test(rotulo)));
 });
+
+test("histórico do Mercado Livre é escolhido explicitamente e não mistura lojas",()=>{
+  const dados=[registro("2026-11-01",100),registro("2026-11-02",200,{loja:"mercado_livre",esgotado:null})];
+  assert.deepEqual(normalizarHistoricoPrecos(dados,agora,"mercado_livre"),[{instante:Date.parse("2026-11-02"),preco:200}]);
+  const html=historicoPrecosHtml({historico_loja:"mercado_livre",historico_precos:dados},agora);
+  assert.match(html,/Mercado Livre/);assert.doesNotMatch(html,/KaBuM/);assert.match(html,/200,00/);
+});

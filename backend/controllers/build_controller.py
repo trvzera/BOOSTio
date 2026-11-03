@@ -110,6 +110,24 @@ class BuildController:
 
 
     @staticmethod
+    @build_bp.get("/catalogo/<categoria>/<int:peca_id>/ofertas/<int:oferta_id>/historico-precos")
+    @login_required
+    def historico_precos_oferta(categoria, peca_id, oferta_id):
+      try:
+        if request.args:
+          raise ValueError("Esta consulta não aceita parâmetros adicionais")
+        resposta = jsonify(ConsultarHistoricoPrecosService().executar(categoria, peca_id, oferta_id))
+        resposta.headers["Cache-Control"] = "no-store"
+        return resposta, 200
+      except ValueError as erro:
+        return jsonify({"erro": str(erro), "codigo": "entrada"}), 400
+      except LookupError:
+        return jsonify({"erro": "Oferta não encontrada", "codigo": "nao-encontrada"}), 404
+      except SQLAlchemyError:
+        db.session.rollback()
+        return jsonify({"erro": "Histórico de ofertas indisponível", "codigo": "indisponivel"}), 503
+
+    @staticmethod
     @build_bp.get("/catalogo/<categoria>/<int:peca_id>/historico-precos")
     @login_required
     def historico_precos_peca(categoria, peca_id):

@@ -130,3 +130,31 @@ def test_duas_escritas_concorrentes_nao_duplicam_oferta_ou_historico(banco):
     # A sessão principal estava no snapshot anterior às gravações dos workers.
     db.session.rollback()
     assert Oferta.query.count()==HistoricoOferta.query.count()==VinculoMercadoLivre.query.count()==1
+
+
+def test_ofertas_para_catalogo_no_mysql(banco):
+    _,p=banco;preparar();aplicar(p,100)
+    dados=Oferta.anexar_a_catalogo([p.to_catalogo()])[0]
+    assert dados['preco']==600
+    oferta=dados['ofertas'][0]
+    assert oferta['loja']=='mercado_livre' and oferta['preco']==100 and oferta['esgotado'] is None
+    assert oferta['atualizadoEm'].endswith('+00:00') and oferta['vendedor_id']=='5'
+
+
+def test_identidade_fabricante_preserva_referencia_e_valida_especificacoes(banco):
+    from models import IdentidadeFabricante
+    from migrations.identidades_fabricante import preparar_identidades_fabricante
+    _, p = banco
+    original = p.part_number
+    assert preparar_identidades_fabricante()['criadas'] == ['identidade_fabricante']
+    assert preparar_identidades_fabricante()['criadas'] == []
+    # A CLI executa migração e importação em processos separados.
+    db.session.rollback()
+    specs = {'soquete': 'AM4', 'nucleo': 6}
+    assert IdentidadeFabricante.registrar(p, original, 'https://www.amd.com/', specs, simular=True) == 'proposta'
+    assert IdentidadeFabricante.query.count() == 0
+    assert IdentidadeFabricante.registrar(p, original, 'https://www.amd.com/', specs, simular=False) == 'cadastrada'
+    assert IdentidadeFabricante.registrar(p, original, 'https://www.amd.com/', specs, simular=False) == 'inalterada'
+    assert p.part_number == original and IdentidadeFabricante.buscar(p).mpn == original
+    p.soquete = 'AM5'; db.session.commit()
+    assert IdentidadeFabricante.buscar(p) is None

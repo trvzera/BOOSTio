@@ -11,7 +11,11 @@ def normalizar_identidade(valor):
 
 
 def assinatura_peca(peca):
-    campos = [peca.__tablename__, peca.id, peca.fabricante, peca.modelo, peca.part_number]
+    return assinatura_campos(peca.__tablename__, peca.id, peca.fabricante, peca.modelo, peca.part_number)
+
+
+def assinatura_campos(tabela, identificador, fabricante, modelo, part_number):
+    campos = [tabela, identificador, fabricante, modelo, part_number]
     return hashlib.sha256(json.dumps(campos, ensure_ascii=False).encode()).hexdigest()
 
 

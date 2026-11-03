@@ -97,7 +97,7 @@ export function ofertasPeca(peca) {
     { codigo: "pichau", loja: "Pichau", url: "https://www.pichau.com.br/search?q=" + busca, direta: false },
   ];
   const logos = {kabum:"kabum-logo.svg",pichau:"pichau.png"};
-  return lojas.map(loja => {
+  const tradicionais = lojas.map(loja => {
     const oferta = Array.isArray(peca.ofertas) ? peca.ofertas.find(o => o.loja === loja.codigo) : null;
     let url = loja.url, direta = loja.direta;
     if (oferta?.url) {
@@ -114,6 +114,23 @@ export function ofertasPeca(peca) {
     return {...loja,url,direta,preco,atualizadoEm:oferta?.atualizadoEm || null,esgotado:oferta?.esgotado === true,
       logo:new URL("../../svgs/" + logos[loja.codigo],import.meta.url).href};
   });
+  const vistas = new Set();
+  const mercado = (Array.isArray(peca.ofertas) ? peca.ofertas : []).filter(o => o?.loja === "mercado_livre").flatMap(oferta => {
+    if (!Number.isSafeInteger(oferta.id) || oferta.id <= 0 || vistas.has(oferta.id)
+        || typeof oferta.preco !== "number" || !Number.isFinite(oferta.preco) || oferta.preco <= 0
+        || typeof oferta.vendedor_id !== "string" || !/^\d+$/.test(oferta.vendedor_id)
+        || typeof oferta.atualizadoEm !== "string" || !Number.isFinite(Date.parse(oferta.atualizadoEm))) return [];
+    try {
+      const url = new URL(oferta.url);
+      if (url.protocol !== "https:" || url.username || url.password || (url.port && url.port !== "443")
+          || !["mercadolivre.com.br","www.mercadolivre.com.br","produto.mercadolivre.com.br"].includes(url.hostname)) return [];
+      vistas.add(oferta.id);
+      return [{codigo:"mercado_livre",loja:"Mercado Livre",url:url.href,direta:true,logo:null,
+        id:oferta.id,produto_id_loja:oferta.produto_id_loja,vendedor:oferta.vendedor_nome || "Vendedor " + oferta.vendedor_id,
+        preco:oferta.preco,atualizadoEm:oferta.atualizadoEm,esgotado:oferta.esgotado === true,estoqueConfirmado:oferta.esgotado === false}];
+    } catch { return []; }
+  });
+  return [...tradicionais, ...mercado];
 }
 
 export const rotulosTecnicos = {

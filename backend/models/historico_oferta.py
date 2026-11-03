@@ -19,3 +19,8 @@ class HistoricoOferta(ModeloBase):
         if bloquear:
             consulta = consulta.populate_existing().with_for_update()
         return consulta.first()
+
+    @classmethod
+    def listar(cls, oferta_id, limite=1000):
+        return cls.query.filter_by(oferta_id=oferta_id).order_by(
+            cls.coletado_em.desc(), cls.id.desc()).limit(limite + 1).all()

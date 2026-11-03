@@ -36,3 +36,12 @@ O log `Blender:` inclui categoria, HTTP da BOOSTio, HTTP da fonte e formato da
 resposta. Não registra cookies, credenciais ou conteúdo retornado por terceiros.
 Se falhar na VPS, guarde a referência exibida e o modelo consultado antes de
 alterar a integração. Nenhuma pontuação é inventada para substituir uma falha.
+
+
+## Ofertas do Mercado Livre
+
+Use `bash deploy/atualizar_ofertas_mercadolivre.sh` para simular. A gravação exige
+`--aplicar`. O wrapper verifica a integração e impede jobs simultâneos no mesmo
+host com `flock`. Ele adiciona ofertas a componentes existentes; não cria peças.
+A preparação de tabelas e tokens é explícita. Veja
+[execução e publicação](../docs/ofertas-mercado-livre.md#execução-na-vps).

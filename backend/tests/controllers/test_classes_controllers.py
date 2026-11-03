@@ -54,6 +54,7 @@ def test_contrato_de_urls_metodos_e_endpoints_preservado():
         ("/build/", "GET", "build.mostrar_builds"),
         ("/build/", "POST", "build.criar_build"),
         ("/build/catalogo", "GET", "build.catalogo_build"),
+        ("/build/catalogo/<categoria>/<int:peca_id>/ofertas/<int:oferta_id>/historico-precos", "GET", "build.historico_precos_oferta"),
         ("/build/catalogo/<categoria>/<int:peca_id>/historico-precos", "GET", "build.historico_precos_peca"),
         ("/build/manual", "POST", "build.criar_build_manual"),
         ("/build/<build_id>", "GET", "build.buscar_build"),

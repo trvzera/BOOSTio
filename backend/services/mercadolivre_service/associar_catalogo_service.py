@@ -1,6 +1,6 @@
 import re
 from utils.identidade_peca import normalizar_identidade as normalizar, assinatura_peca
-from models import VinculoMercadoLivre
+from models import VinculoMercadoLivre, IdentidadeFabricante
 
 
 class AssociarCatalogoService:
@@ -50,7 +50,7 @@ class AssociarCatalogoService:
                 return False
             if peca.__tablename__ == 'processador' and produto.get('domain_id') != 'MLB-COMPUTER_PROCESSORS':
                 return False
-            if str(peca.part_number).upper().endswith('BOX') and re.search(r'\b(oem|tray)\b', nome):
+            if str(AssociarCatalogoService._mpn(peca)).upper().endswith('BOX') and re.search(r'\b(oem|tray)\b', nome):
                 return False
         atributos = produto.get('attributes')
         if not isinstance(atributos, list):
@@ -67,11 +67,13 @@ class AssociarCatalogoService:
                 marcas.update(normalizar(v) for v in valores if v)
             if atributo.get('id') in ('MPN', 'MANUFACTURER_PART_NUMBER', 'PART_NUMBER'):
                 codigos.update(normalizar(v) for v in valores if v)
-        return normalizar(peca.fabricante) in marcas and normalizar(peca.part_number) in codigos
+        return normalizar(peca.fabricante) in marcas and normalizar(AssociarCatalogoService._mpn(peca)) in codigos
 
 
     @staticmethod
     def _mpn(peca):
-        codigo = str(peca.part_number or '').strip()
+        from flask import has_app_context
+        verificada = IdentidadeFabricante.buscar(peca) if has_app_context() else None
+        codigo = verificada.mpn if verificada else str(peca.part_number or '').strip()
         # Identificadores internos da seed não são códigos do fabricante.
-        return None if not codigo or re.match(r'^(SEED|DEMO|BOOSTIO)[-_]', codigo, re.I) else codigo
+        return None if not codigo or re.match(r'^(SEED|DEMO|BOOSTIO|REDE)[-_]', codigo, re.I) else codigo

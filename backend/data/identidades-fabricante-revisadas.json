@@ -1,0 +1,37 @@
+[
+  {
+    "categoria": "memoria_ram",
+    "referencia": "SEED-RAM-01",
+    "fabricante": "Kingston",
+    "modelo": "Fury Beast 8GB",
+    "mpn": "KF432C16BB/8",
+    "fonte": "https://www.kingston.com/datasheets/kf432c16bb_8.pdf",
+    "url_peca": "https://www.kabum.com.br/produto/172365/memoria-ram-kingston-fury-beast-8gb-3200mhz-ddr4-cl16-preto-kf432c16bb-8",
+    "especificacoes": {
+      "capacidade_gb": 8,
+      "ddr": "DDR4",
+      "frequencia_mhz": 3200,
+      "latencia": "CL16",
+      "quantidade_pentes": 1,
+      "iluminacao": 0
+    }
+  },
+  {
+    "categoria": "processador",
+    "referencia": "SEED-CPU-02",
+    "fabricante": "AMD",
+    "modelo": "Ryzen 7 5700X",
+    "mpn": "100-100000926WOF",
+    "fonte": "https://www.amd.com/en/support/downloads/drivers.html/processors/ryzen/ryzen-5000-series/amd-ryzen-7-5700x.html",
+    "url_peca": "https://www.kabum.com.br/produto/320797/processador-amd-ryzen-7-5700x-3-4ghz-4-6ghz-max-turbo-cache-36mb-8-nucleos-16-threads-am4-sem-video-integrado-100-100000926wof",
+    "especificacoes": {
+      "soquete": "AM4",
+      "nucleo": 8,
+      "thread": 16,
+      "clockbase": 3.4,
+      "clockmax": 4.6,
+      "videointegrado": 0,
+      "cooler": 0
+    }
+  }
+]

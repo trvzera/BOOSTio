@@ -32,3 +32,10 @@ test("recorte do backend é indicado no gráfico",()=>{
   const html=historicoPrecosHtml({historico_precos:[{data:"2026-11-02",preco:100,loja:"kabum"}],historico_precos_incompleto:true},Date.parse("2026-11-03"));
   assert.match(html,/1.000 registros mais recentes/);assert.match(html,/Todos os registros carregados/);
 });
+
+test("consulta histórico do anúncio escolhido e rejeita resposta de outro vendedor/anúncio",async()=>{
+  const consultarOferta=async(cat,id,ofertaId)=>({peca_id:peca.id,oferta_id:ofertaId,loja:"mercado_livre",historico_precos:[],tem_mais:false});
+  const r=await obterHistoricoDaPeca(peca,{conta:true,ofertaId:7,consultarOferta});
+  assert.equal(r.historico_loja,"mercado_livre");
+  await assert.rejects(obterHistoricoDaPeca(peca,{conta:true,ofertaId:7,consultarOferta:async()=>({peca_id:peca.id,oferta_id:8,loja:"mercado_livre",historico_precos:[],tem_mais:false})}));
+});

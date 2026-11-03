@@ -8,6 +8,36 @@ from services.mercadolivre_service.atualizar_ofertas_service import AtualizarOfe
 
 
 def registrar_comandos_mercadolivre(app):
+    @app.cli.command('mercadolivre-identidades-preparar')
+    def preparar_identidades():
+        """Migração aditiva do cadastro de MPNs revisados."""
+        from migrations.identidades_fabricante import preparar_identidades_fabricante
+        try:
+            click.echo(json.dumps(preparar_identidades_fabricante(), ensure_ascii=False))
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else 'Falha ao preparar identidades') from None
+
+    @app.cli.command('mercadolivre-identidades-importar')
+    @click.option('--arquivo', type=click.Path(exists=True, dir_okay=False),
+                  default='data/identidades-fabricante-revisadas.json', show_default=True)
+    @click.option('--aplicar', is_flag=True, help='Grava MPNs do manifesto revisado. Padrão: simulação.')
+    def importar_identidades(arquivo, aplicar):
+        """Preenche códigos reais sem trocar referências internas ou criar peças."""
+        from services.mercadolivre_service.importar_identidades_service import ImportarIdentidadesService
+        try:
+            click.echo(json.dumps(ImportarIdentidadesService().executar(arquivo, simular=not aplicar), ensure_ascii=False))
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else 'Falha no banco; execute mercadolivre-identidades-preparar') from None
+
+    @app.cli.command('mercadolivre-validar')
+    def validar():
+        """Confere configuração, schema e tokens sem rede ou gravação."""
+        from services.mercadolivre_service.validar_integracao_service import ValidarIntegracaoMercadoLivreService
+        try:
+            click.echo(json.dumps(ValidarIntegracaoMercadoLivreService().executar(), ensure_ascii=False))
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else 'Banco indisponível para validar Mercado Livre') from None
+
     @app.cli.command('mercadolivre-ofertas-preparar')
     def preparar():
         """Cria tabelas de ofertas; faça backup antes em bancos existentes."""

@@ -117,6 +117,18 @@ usam `Cache-Control: no-store`. A página mostra carregamento e permite tentar
 novamente após falha, sem converter erro em histórico vazio.
 
 O modo demonstrativo e o exemplo do laboratório não consultam IDs do banco. O
-Mercado Livre ainda não grava no histórico e não é misturado à curva da KaBuM.
+Mercado Livre usa `HistoricoOferta`, com séries separadas por anúncio/vendedor,
+sem misturar sua curva à KaBuM.
 Esta conexão não exige nova migration; a tabela existente deve estar preparada
 com `historico-precos-preparar` nos ambientes que ainda não a possuem.
+
+
+## Mercado Livre no histórico da página
+
+O seletor da página da peça permite escolher entre KaBuM e cada oferta ativa do
+Mercado Livre. A rota autenticada
+`GET /build/catalogo/<categoria>/<peca_id>/ofertas/<oferta_id>/historico-precos`
+consulta `HistoricoOferta` somente após validar a peça e o vínculo vigente.
+A resposta identifica a oferta, loja e anúncio, mantendo preço e estoque
+separados dos demais vendedores. Não há curva combinada nem novos registros
+criados durante a navegação.
