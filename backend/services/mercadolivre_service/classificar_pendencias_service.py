@@ -7,13 +7,13 @@ from .comparar_produtos_service import CompararProdutosService
 
 
 class ClassificarPendenciasService:
-    def executar(self, *, limite=20, depois_id=0, simular=True):
+    def executar(self, *, limite=20, depois_id=0, categoria=None, simular=True):
         if type(limite) is not int or not 1 <= limite <= 200:
             raise ValueError('Limite entre 1 e 200 pendências')
         modelos = {c.__tablename__:c for c in MODELOS_PECAS}
         pools = {}
         resumo = dict(simulacao=simular, confirmadas=0, ambiguas=0, rejeitadas=0, falhas=0, detalhes=[])
-        for pendencia in ProdutoPendente.listar_para_revisao(depois_id, limite):
+        for pendencia in ProdutoPendente.listar_para_revisao(depois_id, limite, categoria):
             try:
                 categoria = pendencia.categoria_sugerida
                 if categoria not in modelos:

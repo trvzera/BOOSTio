@@ -13,11 +13,12 @@ from .controle_requisicoes_service import ControleRequisicoesService, ErroMercad
 
 
 class ImportarProdutoService:
-    def __init__(self, cliente=None, tokens=None, controle=None, enriquecedor=None, repositorio=None):
+    def __init__(self, cliente=None, tokens=None, controle=None, enriquecedor=None, repositorio=None, verificar_execucao=None):
         self.controle=controle or ControleRequisicoesService(50,1.0)
         self.cliente=cliente or BuscarOfertasMercadoLivreService(self.controle)
         self.tokens=tokens;self.enriquecedor=enriquecedor or EnriquecerProdutoService()
         self.repositorio=repositorio or RepositorioImportacaoCatalogo()
+        self.verificar_execucao=verificar_execucao or (lambda: None)
 
     def executar(self, pendencia_id, *, simular=True, permitir_novos=False):
         if type(pendencia_id) is not int or pendencia_id<1 or type(simular) is not bool or type(permitir_novos) is not bool:
@@ -45,6 +46,7 @@ class ImportarProdutoService:
         if (bruto.get('anuncio') or {}).get('title'):entrada['title']=bruto['anuncio']['title']
         ficha=self.enriquecedor.executar(categoria,produto,entrada)
         agora=datetime.now(timezone.utc).replace(tzinfo=None)
+        self.verificar_execucao()
         with self.repositorio.transacao(pendencia_id,simular=simular) as atual:
             if atual.status=='importado':return dict(acao='inalterada',pendencia_id=atual.id,oferta_id=atual.oferta_id)
             if atual.categoria_sugerida!=categoria or assinatura_documento(atual.dados_originais)!=assinatura:
@@ -69,8 +71,8 @@ class ImportarProdutoService:
             self.repositorio.concluir(atual,peca,ficha,anuncio,propostas,agora)
             return dict(acao='importada',novo_componente=novo,pendencia_id=atual.id,peca=f'{peca.__tablename__}:{peca.id}',ofertas=propostas)
 
-    def executar_lote(self, *, limite=20, depois_id=0, simular=True, permitir_novos=False):
-        ids=[p.id for p in ProdutoPendente.listar_para_revisao(depois_id,limite)]
+    def executar_lote(self, *, limite=20, depois_id=0, categoria=None, simular=True, permitir_novos=False):
+        ids=[p.id for p in ProdutoPendente.listar_para_revisao(depois_id,limite,categoria)]
         resumo=dict(simulacao=simular,importadas=0,propostas=0,inalteradas=0,revisao=0,falhas=0,interrompido=False,detalhes=[])
         for identificador in ids:
             try:

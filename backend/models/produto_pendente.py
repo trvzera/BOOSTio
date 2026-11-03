@@ -37,11 +37,12 @@ class ProdutoPendente(ModeloBase):
         return cls.query.filter_by(loja=loja, produto_id_loja=produto_id_loja).first()
 
     @classmethod
-    def listar_para_revisao(cls, depois_id=0, limite=50):
+    def listar_para_revisao(cls, depois_id=0, limite=50, categoria=None):
         if type(limite) is not int or not 1 <= limite <= 200 or type(depois_id) is not int or depois_id < 0:
             raise ValueError('Paginação de pendências inválida')
-        return (cls.query.filter(cls.id > depois_id, cls.status.in_(('pendente', 'em_revisao')))
-                .order_by(cls.id).limit(limite).all())
+        consulta=cls.query.filter(cls.id > depois_id, cls.status.in_(('pendente','em_revisao')))
+        if categoria is not None:consulta=consulta.filter(cls.categoria_sugerida==categoria)
+        return consulta.order_by(cls.id).limit(limite).all()
 
 
     @classmethod

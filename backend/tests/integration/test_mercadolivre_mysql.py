@@ -229,3 +229,51 @@ def test_descoberta_mysql_grava_fila_e_auditoria_sem_publicar(banco):
     assert ProdutoPendente.query.count() == 1 and ExecucaoDescoberta.query.count() == 2
     assert ProdutoPendente.query.one().status == 'pendente'
     assert Oferta.query.count() == 0
+
+def test_trava_worker_e_checkpoint_mysql(banco):
+    from repositories.controle_catalogo_repository import RepositorioControleCatalogo
+    from models import EstadoCatalogo
+    from migrations.catalogo_automatizado import preparar_catalogo_automatizado
+    preparar_catalogo_automatizado(simular=False)
+    um,dois=RepositorioControleCatalogo(),RepositorioControleCatalogo()
+    with um.bloquear() as ok:
+        assert ok
+        with dois.bloquear() as outro:assert not outro
+        um.verificar()
+    with dois.bloquear() as ok:assert ok
+    plano={'nome':'teste','categoria':'processador','consulta':'AMD Ryzen'}
+    e=EstadoCatalogo.obter(plano);e.registrar_progresso(cursor_descoberta={'origem':'catalogo','offset':20})
+    db.session.remove()
+    assert EstadoCatalogo.obter(plano).cursor_descoberta['offset']==20
+
+
+def test_importacao_concorrente_nao_duplica_componente_mysql(banco):
+    from threading import Barrier
+    from models import HD, ProdutoPendente, IdentidadeFabricante
+    from migrations.catalogo_automatizado import preparar_catalogo_automatizado
+    from migrations.identidades_fabricante import preparar_identidades_fabricante
+    from services.mercadolivre_service.importar_produto_service import ImportarProdutoService
+    from services.mercadolivre_service.buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
+    app,_=banco;preparar();preparar_catalogo_automatizado(simular=False);preparar_identidades_fabricante()
+    HD.__table__.create(db.engine)
+    produto=dict(id='MLB99',name='Seagate Exos 8TB',status='active',domain_id='MLB-HARD_DRIVES_AND_SSDS',attributes=[
+        dict(id=k,value_name=v) for k,v in [('BRAND','Seagate'),('MODEL','ST8000NM017B'),('MPN','ST8000NM017B'),('CAPACITY','8 TB'),('DRIVE_STORAGE_TYPE','HDD'),('HARD_DRIVE_AND_SSD_POWER_CONSUMPTION','7 W')]])
+    ids=[]
+    for num in (10,11):
+        p=ProdutoPendente(loja='mercado_livre',produto_id_loja='MLB'+str(num),vendedor_id='7',titulo='Seagate',url='https://example.test',categoria_sugerida='hd',
+            dados_originais={'catalogo':{'id':'MLB99'},'anuncio':{}},coletado_em=datetime(2026,11,3))
+        db.session.add(p);db.session.flush();ids.append(p.id)
+    db.session.commit();barreira=Barrier(2)
+    def executar(item):
+        pid,num=item
+        with app.app_context():
+            c=BuscarOfertasMercadoLivreService();c._consultar=Mock(return_value=produto)
+            anuncio=c._normalizar(dict(item_id='MLB'+str(num),seller_id=7,site_id='MLB',currency_id='BRL',price=100,condition='new',available_quantity=3),'MLB99')
+            def consultar(*a,**kw):barreira.wait(timeout=10);return {'ofertas':[anuncio]}
+            c.executar=consultar;t=Mock();t.executar.return_value='teste'
+            return ImportarProdutoService(cliente=c,tokens=t).executar(pid,simular=False,permitir_novos=True)['acao']
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        assert list(executor.map(executar,zip(ids,(10,11))))==['importada','importada']
+    db.session.remove()
+    assert HD.query.count()==IdentidadeFabricante.query.count()==1
+    assert Oferta.query.count()==HistoricoOferta.query.count()==2

@@ -171,3 +171,28 @@ def test_limite_exato_nao_consulta_pagina_extra(banco):
     r = executar(s, max_anuncios=1)
     assert r['novos'] == 1 and r['limitado']
     assert cliente._requisitar.call_count == 2
+
+
+def test_checkpoint_catalogo_retoma_proximo_produto_sem_repetir_busca(banco):
+    s, _ = service([pagina([dict(id='MLB20',name='RAM A'),dict(id='MLB21',name='RAM B')]),pagina([anuncio()])])
+    primeiro=executar(s,max_paginas=2,simular=False)
+    assert primeiro['limitado'] and primeiro['cursor']['indice']==1
+    s, cliente=service([pagina([anuncio(2)])])
+    segundo=executar(s,cursor=primeiro['cursor'],simular=False)
+    assert segundo['concluido'] and segundo['novos']==1
+    assert cliente._requisitar.call_args.args[0]=='/products/MLB21/items'
+    assert ProdutoPendente.query.count()==2
+
+
+def test_checkpoint_dentro_da_pagina_e_nao_avanca_em_falha_de_gravacao(banco):
+    s,_=service(catalogo([anuncio(),anuncio(2)]))
+    r=executar(s,max_anuncios=1,simular=False)
+    assert r['cursor']['ofertas_offset']==1 and not r['concluido']
+    s,c=service([pagina([anuncio(2)],2,1)])
+    r2=executar(s,cursor=r['cursor'],simular=False)
+    assert r2['concluido'] and r2['novos']==1
+    assert c._requisitar.call_args.args[2]['offset']==1
+    s,_=service(catalogo())
+    with patch.object(ProdutoPendente,'registrar_descobertos',side_effect=OperationalError('falha',{},None)):
+        erro=executar(s)
+    assert erro['interrompido'] and erro['cursor']['ofertas_offset']==0

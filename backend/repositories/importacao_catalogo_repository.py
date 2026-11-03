@@ -10,6 +10,8 @@ class RepositorioImportacaoCatalogo:
     @contextmanager
     def transacao(self, pendencia_id, *, simular):
         try:
+            # Encerra o snapshot de leitura anterior à rede (REPEATABLE READ no MySQL).
+            db.session.rollback()
             if not ControleColeta.bloquear():
                 raise ValueError('Prepare o controle de coleta antes de importar')
             p = ProdutoPendente.query.filter_by(id=pendencia_id).populate_existing().with_for_update().first()

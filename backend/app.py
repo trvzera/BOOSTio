@@ -17,6 +17,7 @@ from controllers.benchmark_controller import benchmark_bp
 from controllers.build_controller import build_bp
 from controllers.saude_controller import saude_bp
 from migrations.budget_usuario import registrar_migracao_budget
+from commands.catalogo import registrar_comandos_catalogo
 from commands.banco import registrar_comandos_banco
 from commands.benchmarks import registrar_comandos_benchmarks
 from utils.csrf import configurar_csrf
@@ -58,6 +59,7 @@ app.register_blueprint(saude_bp)
 registrar_migracao_budget(app, db)
 
 registrar_comandos_banco(app)
+registrar_comandos_catalogo(app)
 registrar_comandos_benchmarks(app)
 registrar_comandos_precos(app)
 registrar_comandos_mercadolivre(app)

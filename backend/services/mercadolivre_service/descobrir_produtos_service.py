@@ -1,5 +1,6 @@
 """Descobre anúncios oficiais e os envia à fila, sem matching ou publicação."""
 import json
+from copy import deepcopy
 import logging
 import re
 from datetime import datetime, timezone
@@ -25,7 +26,7 @@ class DescobrirProdutosService:
         self.tokens = tokens
 
     def executar(self, *, categoria, consulta, origem='catalogo', categoria_ml=None, dominio=None,
-                 max_paginas=5, max_anuncios=100, max_requisicoes=30, intervalo=1.0, simular=True):
+                 max_paginas=5, max_anuncios=100, max_requisicoes=30, intervalo=1.0, simular=True, cursor=None):
         categorias = {c.__tablename__ for c in MODELOS_PECAS}
         if not isinstance(categoria, str) or categoria not in categorias or origem not in ('catalogo', 'anuncios'):
             raise ValueError('Categoria ou origem de descoberta inválida')
@@ -39,6 +40,14 @@ class DescobrirProdutosService:
             raise ValueError('Limites: 1–100 páginas e 1–5000 anúncios')
         if type(simular) is not bool:
             raise ValueError('Simulação inválida')
+        if cursor is not None:
+            if not isinstance(cursor,dict) or cursor.get('origem')!=origem or type(cursor.get('offset')) is not int or not 0<=cursor['offset']<=1000:
+                raise ValueError('Cursor de descoberta inválido')
+            if origem=='catalogo':
+                if not isinstance(cursor.get('produtos'),list) or len(cursor['produtos'])>20 or any(not isinstance(p,dict) or not isinstance(p.get('id'),str) or not re.fullmatch(r'MLB[0-9]+',p['id']) or not isinstance(p.get('name'),str) for p in cursor['produtos']):
+                    raise ValueError('Produtos no cursor inválidos')
+                if any(type(cursor.get(k)) is not int or cursor[k]<0 for k in ('indice','ofertas_offset','total_busca')) or cursor['indice']>len(cursor['produtos']) or cursor['ofertas_offset']>1000:
+                    raise ValueError('Paginação do cursor inválida')
         controle = self.controle or ControleRequisicoesService(max_requisicoes, intervalo)
         cliente = self.cliente or BuscarOfertasMercadoLivreService(controle)
         parametros = dict(categoria=categoria, consulta=consulta.strip(), origem=origem,
@@ -46,18 +55,21 @@ class DescobrirProdutosService:
                           max_anuncios=max_anuncios, max_requisicoes=max_requisicoes, intervalo=intervalo)
         resumo = dict(simulacao=simular, execucao_id=None, paginas=0, encontrados=0,
                       novos=0, ja_coletados=0, ja_associados=0, invalidos=0, repetidos=0,
-                      requisicoes=0, interrompido=False, limitado=False, falhas=[])
+                      requisicoes=0, interrompido=False, limitado=False, falhas=[],
+                      janela_limitada=False, cursor=deepcopy(cursor) if cursor else dict(origem=origem,offset=0,produtos=[],indice=0,ofertas_offset=0,total_busca=0), concluido=False)
         vistos = set()
         try:
             if not simular:
                 resumo['execucao_id'] = ExecucaoDescoberta.iniciar(parametros)
             for linhas in self._paginas(cliente, parametros, resumo, max_paginas):
                 lote = []
+                consumidas = 0
                 for linha, produto in linhas:
                     if resumo['encontrados'] >= max_anuncios:
                         resumo['limitado'] = True
                         break
                     resumo['encontrados'] += 1
+                    consumidas += 1
                     try:
                         dados = self._normalizar(cliente, linha, produto, categoria, origem)
                     except ValueError:
@@ -70,6 +82,7 @@ class DescobrirProdutosService:
                     vistos.add(chave)
                     lote.append(dados)
                 contagens = ProdutoPendente.registrar_descobertos(lote, simular=simular)
+                self._avancar_cursor(resumo,consumidas,len(linhas))
                 for chave, valor in contagens.items():
                     resumo[chave] += valor
                 if resumo['encontrados'] >= max_anuncios:
@@ -99,43 +112,64 @@ class DescobrirProdutosService:
                 db.session.rollback()
                 resumo['interrompido'] = True
                 resumo['falhas'].append('Não foi possível finalizar o registro da execução; revise a execução em aberto')
-        log.info('Descoberta Mercado Livre: %s', json.dumps(resumo, ensure_ascii=False))
+        resumo.pop('_pagina',None)
+        log.info('Descoberta Mercado Livre: %s', json.dumps({k:v for k,v in resumo.items() if k!='cursor'}, ensure_ascii=False))
         return resumo
 
     def _paginas(self, cliente, parametros, resumo, max_paginas):
-        def consultar(caminho, params, tamanho):
-            offset = 0
-            while True:
-                if resumo['paginas'] >= max_paginas or offset >= 1000:
-                    raise LimitePaginas()
-                # Reutiliza a renovação existente entre páginas, sem manter token por horas.
-                token = (self.tokens or TokenMercadoLivreService()).executar()
-                dados = cliente._consultar(caminho, token, params={**params, 'offset': offset, 'limit': tamanho})
-                linhas, total = self._validar_pagina(dados, offset, tamanho)
-                resumo['paginas'] += 1
-                yield linhas
-                offset += len(linhas)
-                if offset >= total:
-                    break
-        if parametros['origem'] == 'anuncios':
-            params = {'q': parametros['consulta']}
-            if parametros['categoria_ml']:
-                params['category'] = parametros['categoria_ml']
-            for linhas in consultar('/sites/MLB/search', params, 50):
-                yield [(linha, None) for linha in linhas]
+        def consultar(caminho, params, offset, tamanho):
+            if resumo['paginas']>=max_paginas or offset>=1000:
+                raise LimitePaginas()
+            token=(self.tokens or TokenMercadoLivreService()).executar()
+            dados=cliente._consultar(caminho,token,params={**params,'offset':offset,'limit':tamanho})
+            linhas,total=self._validar_pagina(dados,offset,tamanho)
+            resumo['paginas']+=1
+            return linhas,total
+        while not resumo['concluido']:
+            estado=resumo['cursor']
+            if parametros['origem']=='anuncios':
+                params={'q':parametros['consulta']}
+                if parametros['categoria_ml']:params['category']=parametros['categoria_ml']
+                linhas,total=consultar('/sites/MLB/search',params,estado['offset'],50)
+                resumo['_pagina']={'total':total}
+                yield [(linha,None) for linha in linhas]
+            else:
+                if not estado['produtos']:
+                    params={'site_id':'MLB','status':'active','q':parametros['consulta']}
+                    if parametros['dominio']:params['domain_id']=parametros['dominio']
+                    produtos,total=consultar('/products/search',params,estado['offset'],20)
+                    for p in produtos:
+                        if not isinstance(p,dict):raise ValueError('Produto inválido')
+                        cliente._validar_id(p.get('id'),'catálogo')
+                        if not isinstance(p.get('name'),str) or not p['name'].strip():raise ValueError('Nome ausente')
+                    # Checkpoint pequeno: fichas completas serão consultadas novamente no enriquecimento.
+                    estado['produtos']=json.loads(json.dumps([{k:p[k] for k in ('id','name','status','domain_id','attributes') if k in p} for p in produtos],default=str))
+                    estado['total_busca']=total;estado['indice']=0;estado['ofertas_offset']=0
+                    if not produtos:
+                        resumo['concluido']=True;return
+                if estado['indice']>=len(estado['produtos']):raise ValueError('Cursor inconsistente')
+                produto=estado['produtos'][estado['indice']]
+                linhas,total=consultar('/products/'+produto['id']+'/items',{},estado['ofertas_offset'],100)
+                resumo['_pagina']={'total':total}
+                yield [(linha,produto) for linha in linhas]
+
+    @staticmethod
+    def _avancar_cursor(resumo, consumidas, tamanho):
+        estado=resumo['cursor'];total=resumo['_pagina']['total']
+        if estado['origem']=='anuncios':
+            estado['offset']+=consumidas
+            resumo['concluido']=estado['offset']>=total or estado['offset']>=1000
+            if estado['offset']>=1000 and estado['offset']<total:
+                resumo['janela_limitada']=True;resumo['limitado']=True
         else:
-            params = {'site_id': 'MLB', 'status': 'active', 'q': parametros['consulta']}
-            if parametros['dominio']:
-                params['domain_id'] = parametros['dominio']
-            for produtos in consultar('/products/search', params, 20):
-                for produto in produtos:
-                    if not isinstance(produto, dict):
-                        raise ValueError('Produto inválido')
-                    cliente._validar_id(produto.get('id'), 'catálogo')
-                    if not isinstance(produto.get('name'), str) or not produto['name'].strip():
-                        raise ValueError('Nome de catálogo ausente')
-                    for linhas in consultar(f"/products/{produto['id']}/items", {}, 100):
-                        yield [(linha, produto) for linha in linhas]
+            estado['ofertas_offset']+=consumidas
+            if estado['ofertas_offset']>=total or estado['ofertas_offset']>=1000:
+                if estado['ofertas_offset']<total:
+                    resumo['janela_limitada']=True;resumo['limitado']=True
+                estado['indice']+=1;estado['ofertas_offset']=0
+                if estado['indice']>=len(estado['produtos']):
+                    estado['offset']+=len(estado['produtos']);estado['produtos']=[];estado['indice']=0
+                    resumo['concluido']=estado['offset']>=estado['total_busca']
 
     @staticmethod
     def _validar_pagina(dados, offset, tamanho):

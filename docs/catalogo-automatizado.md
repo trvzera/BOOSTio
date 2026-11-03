@@ -52,3 +52,4 @@ MySQL faz commit implícito de alterações de estrutura: não existe rollback g
 Os testes exercitam preservação de dados, simulação, repetição, duplicatas, status de publicação, exclusão de pendências da seleção e identidade do anúncio independente do vendedor. O teste MySQL usa exclusivamente uma base descartável local chamada `boostio_ml_teste`, configurada em `BOOSTIO_MYSQL_TEST_URI`. Nunca aponte os testes para a VPS.
 
 A etapa 2 está documentada em [descoberta-mercadolivre.md](descoberta-mercadolivre.md). A mesma preparação agora inclui a tabela aditiva de auditoria `execucao_descoberta`.
+A preparação também inclui `estado_catalogo` na etapa 6; consulte [worker-catalogo.md](worker-catalogo.md) antes de ativar o processo opcional.
