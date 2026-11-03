@@ -38,3 +38,34 @@ class ProdutoPendente(ModeloBase):
             raise ValueError('Paginação de pendências inválida')
         return (cls.query.filter(cls.id > depois_id, cls.status.in_(('pendente', 'em_revisao')))
                 .order_by(cls.id).limit(limite).all())
+
+
+    @classmethod
+    def registrar_descobertos(cls, linhas, *, simular=True):
+        """Transação por página. Nunca reabre pendência revisada ou altera oferta."""
+        from . import Oferta
+        contagens = {'novos': 0, 'ja_coletados': 0, 'ja_associados': 0}
+        vistos = set()
+        try:
+            for dados in linhas:
+                chave = (dados['loja'], dados['produto_id_loja'])
+                if chave in vistos:
+                    contagens['ja_coletados'] += 1
+                    continue
+                vistos.add(chave)
+                if Oferta.query.filter_by(loja=chave[0], produto_id_loja=chave[1]).first():
+                    contagens['ja_associados'] += 1
+                elif cls.buscar_por_anuncio(*chave):
+                    contagens['ja_coletados'] += 1
+                elif simular:
+                    contagens['novos'] += 1
+                else:
+                    db.session.add(cls(**dados))
+                    db.session.flush()
+                    contagens['novos'] += 1
+            if not simular:
+                db.session.commit()
+            return contagens
+        except Exception:
+            db.session.rollback()
+            raise

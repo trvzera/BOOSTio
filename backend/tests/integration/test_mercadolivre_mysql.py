@@ -209,3 +209,23 @@ def test_catalogo_aditivo_preserva_legado_e_define_novos_como_pendentes(banco):
     db.session.remove()  # Encerra o snapshot REPEATABLE READ anterior à inserção externa.
     assert Processador.query.order_by(Processador.id.desc()).first().status_validacao == 'pendente'
     assert len(Processador.listar_publicadas()) == 1
+
+def test_descoberta_mysql_grava_fila_e_auditoria_sem_publicar(banco):
+    from models import ProdutoPendente, ExecucaoDescoberta
+    from migrations.catalogo_automatizado import preparar_catalogo_automatizado
+    from services.mercadolivre_service.product_discovery_service import ProductDiscoveryService
+    from services.mercadolivre_service.buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
+    preparar_catalogo_automatizado(simular=False)
+    cliente = BuscarOfertasMercadoLivreService()
+    pagina = lambda linhas: {'results':linhas, 'paging':{'offset':0, 'total':len(linhas)}}
+    respostas = [pagina([{'id':'MLB20','name':'Kingston DDR4'}]), pagina([{
+        'item_id':'MLB1','seller_id':7,'site_id':'MLB','currency_id':'BRL','price':100,'condition':'new'}])]
+    tokens = Mock();tokens.executar.return_value = 'teste'
+    for chave in ('novos', 'ja_coletados'):
+        cliente._consultar = Mock(side_effect=respostas)
+        r = ProductDiscoveryService(cliente=cliente, tokens=tokens).executar(
+            categoria='memoria_ram', consulta='Kingston DDR4', simular=False)
+        assert r[chave] == 1 and not r['interrompido']
+    assert ProdutoPendente.query.count() == 1 and ExecucaoDescoberta.query.count() == 2
+    assert ProdutoPendente.query.one().status == 'pendente'
+    assert Oferta.query.count() == 0

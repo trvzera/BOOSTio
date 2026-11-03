@@ -1,7 +1,7 @@
 """Etapa 1: estrutura aditiva, sem descobrir/importar anúncios ou excluir peças."""
 from sqlalchemy import inspect, text
 from sqlalchemy.schema import CreateIndex
-from models import db, Oferta, ProdutoPendente
+from models import db, Oferta, ProdutoPendente, ExecucaoDescoberta
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 
 CAMPOS = {'status_validacao', 'validacao_motivo', 'validado_em'}
@@ -14,7 +14,7 @@ def preparar_catalogo_automatizado(*, simular=True):
         raise ValueError('Banco não suportado para catálogo automatizado')
     insp = inspect(db.engine)
     # Toda a verificação precede o primeiro DDL, inclusive a detecção de duplicatas.
-    for modelo in (Oferta, ProdutoPendente):
+    for modelo in (Oferta, ProdutoPendente, ExecucaoDescoberta):
         tabela = modelo.__table__
         if insp.has_table(tabela.name):
             if {c['name'] for c in insp.get_columns(tabela.name)} != set(tabela.columns.keys()):
@@ -39,7 +39,7 @@ def preparar_catalogo_automatizado(*, simular=True):
             raise ValueError(f'Tabela {nome} incompatível; migração de catálogo não corrige outras alterações')
         existentes.append((modelo, cols))
     plano = []
-    for modelo in (Oferta, ProdutoPendente):
+    for modelo in (Oferta, ProdutoPendente, ExecucaoDescoberta):
         if not insp.has_table(modelo.__tablename__):
             plano.append({'acao': 'criar_tabela', 'tabela': modelo.__tablename__})
     for modelo, cols in existentes:

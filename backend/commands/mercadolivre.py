@@ -8,6 +8,27 @@ from services.mercadolivre_service.atualizar_ofertas_service import AtualizarOfe
 
 
 def registrar_comandos_mercadolivre(app):
+    @app.cli.command('mercadolivre-descobrir')
+    @click.option('--categoria', required=True)
+    @click.option('--consulta', required=True, help='Palavras-chave; exemplo: memória DDR4 Kingston.')
+    @click.option('--origem', type=click.Choice(['catalogo', 'anuncios']), default='catalogo', show_default=True)
+    @click.option('--categoria-ml', default=None, help='ID MLB oficial, somente para origem anuncios.')
+    @click.option('--dominio', default=None, help='Domínio MLB oficial, somente para origem catalogo.')
+    @click.option('--max-paginas', default=5, type=click.IntRange(1, 100), show_default=True)
+    @click.option('--max-anuncios', default=100, type=click.IntRange(1, 5000), show_default=True)
+    @click.option('--max-requisicoes', default=30, type=click.IntRange(min=1), show_default=True)
+    @click.option('--intervalo', default=1.0, type=click.FloatRange(min=0.1), show_default=True)
+    @click.option('--aplicar', is_flag=True, help='Grava somente a fila de pendências e a auditoria. Padrão: simulação.')
+    def descobrir(aplicar, **parametros):
+        from services.mercadolivre_service.product_discovery_service import ProductDiscoveryService
+        try:
+            resumo = ProductDiscoveryService().executar(simular=not aplicar, **parametros)
+            click.echo(json.dumps(resumo, ensure_ascii=False))
+            if resumo['interrompido']:
+                raise click.ClickException('Descoberta interrompida; consulte o resumo antes de repetir')
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else 'Prepare o esquema com catalogo-preparar antes da descoberta') from None
+
     @app.cli.command('mercadolivre-autorizacao-preparar')
     def preparar_autorizacao():
         from migrations.autorizacao_mercado_livre import preparar_autorizacao_mercado_livre
