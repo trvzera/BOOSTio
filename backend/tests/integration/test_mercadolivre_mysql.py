@@ -158,3 +158,24 @@ def test_identidade_fabricante_preserva_referencia_e_valida_especificacoes(banco
     assert p.part_number == original and IdentidadeFabricante.buscar(p).mpn == original
     p.soquete = 'AM5'; db.session.commit()
     assert IdentidadeFabricante.buscar(p) is None
+
+
+def test_autorizacao_oauth_convite_consumido_uma_vez_no_mysql(banco):
+    from models import AutorizacaoMercadoLivre
+    from migrations.autorizacao_mercado_livre import preparar_autorizacao_mercado_livre
+    from services.mercadolivre_service.autorizar_conta_service import AutorizarContaMercadoLivreService as Service
+    app,_=banco
+    assert preparar_autorizacao_mercado_livre()['criadas']==['autorizacao_mercado_livre']
+    assert preparar_autorizacao_mercado_livre()['criadas']==[]
+    db.session.rollback()
+    config=('123','42','https://api.example.test/auth/mercadolivre/callback')
+    AutorizacaoMercadoLivre.criar(Service.hash('s'*32),'estado',*config,navegador_hash=Service.hash('n'*32),verificador='v'*64)
+    def consumir():
+        with app.app_context():
+            try:
+                return AutorizacaoMercadoLivre.consumir(Service.hash('s'*32),'estado',*config,navegador_hash=Service.hash('n'*32))
+            except ValueError:
+                return 'recusado'
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        resultados=list(executor.map(lambda _:consumir(),range(2)))
+    assert sorted(resultados)==sorted(['v'*64,'recusado'])

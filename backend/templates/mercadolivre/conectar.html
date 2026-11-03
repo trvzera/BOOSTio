@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Conectar Mercado Livre — BOOSTio</title>
+<main><h1>Conectar Mercado Livre</h1>
+<p>Autorize a conta configurada para consultar ofertas. Os tokens serão guardados no servidor.</p>
+<button id="conectar" type="button">Conectar Mercado Livre</button>
+<p id="mensagem" role="status"></p></main>
+<script nonce="{{ nonce }}">
+const convite = new URLSearchParams(location.hash.slice(1)).get('convite');
+history.replaceState(null, '', location.pathname);
+const botao = document.getElementById('conectar');
+const mensagem = document.getElementById('mensagem');
+if (!convite) { botao.disabled = true; mensagem.textContent = 'Abra o link gerado pelo comando mercadolivre-conectar no terminal.'; }
+botao.addEventListener('click', async () => {
+  botao.disabled = true;
+  try {
+    const respostaCsrf = await fetch('/auth/csrf', {credentials:'same-origin', cache:'no-store'});
+    if (!respostaCsrf.ok) throw new Error('Não foi possível iniciar a sessão.');
+    const csrf = await respostaCsrf.json();
+    const resposta = await fetch('/auth/mercadolivre/conectar', {method:'POST', credentials:'same-origin',
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf.csrf_token},body:JSON.stringify({convite})});
+    const dados = await resposta.json();
+    if (!resposta.ok) throw new Error(dados.erro || 'Não foi possível iniciar a autorização.');
+    location.assign(dados.url);
+  } catch (erro) { mensagem.textContent = erro.message; }
+});
+</script></html>

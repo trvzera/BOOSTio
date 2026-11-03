@@ -45,3 +45,8 @@ Use `bash deploy/atualizar_ofertas_mercadolivre.sh` para simular. A gravação e
 host com `flock`. Ele adiciona ofertas a componentes existentes; não cria peças.
 A preparação de tabelas e tokens é explícita. Veja
 [execução e publicação](../docs/ofertas-mercado-livre.md#execução-na-vps).
+
+Para autorizar o Mercado Livre diretamente no servidor, use
+`mercadolivre-autorizacao-preparar` e depois `mercadolivre-conectar`.
+O link administrativo expira em dez minutos e não deve ser compartilhado.
+Instruções e configuração do callback em `docs/ofertas-mercado-livre.md`.
