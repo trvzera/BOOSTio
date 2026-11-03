@@ -8,6 +8,23 @@ from services.mercadolivre_service.atualizar_ofertas_service import AtualizarOfe
 
 
 def registrar_comandos_mercadolivre(app):
+    @app.cli.command('mercadolivre-importar-pendencias')
+    @click.option('--limite', default=20, type=click.IntRange(1, 200))
+    @click.option('--depois-id', default=0, type=click.IntRange(min=0))
+    @click.option('--max-requisicoes', default=50, type=click.IntRange(min=1))
+    @click.option('--intervalo', default=1.0, type=click.FloatRange(min=0.1))
+    @click.option('--permitir-novos', is_flag=True, help='Permite criar componentes com identidade e ficha completas.')
+    @click.option('--aplicar', is_flag=True)
+    def importar_pendencias(max_requisicoes, intervalo, aplicar, **opcoes):
+        from services.mercadolivre_service.importar_produto_service import ImportarProdutoService
+        from services.mercadolivre_service.controle_requisicoes_service import ControleRequisicoesService
+        try:
+            resumo=ImportarProdutoService(controle=ControleRequisicoesService(max_requisicoes,intervalo)).executar_lote(simular=not aplicar,**opcoes)
+            click.echo(json.dumps(resumo,ensure_ascii=False))
+            if resumo['falhas']:raise click.ClickException('Há importações não confirmadas; consulte o resumo')
+        except (ValueError,SQLAlchemyError):
+            raise click.ClickException('Falha ao importar pendências; confira o resumo e a preparação do banco') from None
+
     @app.cli.command('mercadolivre-enriquecer')
     @click.option('--limite', default=20, type=click.IntRange(1, 200))
     @click.option('--depois-id', default=0, type=click.IntRange(min=0))

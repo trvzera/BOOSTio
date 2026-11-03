@@ -39,7 +39,7 @@ class Oferta(ModeloBase):
     )
 
     @classmethod
-    def aplicar_lote_mercado_livre(cls, peca, catalogo_id, assinatura, assinatura_catalogo, criterio, ofertas, agora, *, simular):
+    def aplicar_lote_mercado_livre(cls, peca, catalogo_id, assinatura, assinatura_catalogo, criterio, ofertas, agora, *, simular, confirmar=True, desativar_ausentes=True):
         """Uma transação por peça; nunca altera preço/estoque da peça da KaBuM."""
         from . import VinculoMercadoLivre, HistoricoOferta, ControleColeta
         from utils.identidade_peca import assinatura_peca
@@ -75,9 +75,9 @@ class Oferta(ModeloBase):
                 if registro and (registro.tabela_peca, registro.peca_id) != (peca.__tablename__, peca.id):
                     raise ValueError('Anúncio já vinculado a outra peça')
                 acao = 'criada' if registro is None else 'atualizada' if (
-                    registro.preco != dados['preco'] or not registro.ativa or registro.url != dados['url']) else 'inalterada'
+                    registro.preco != dados['preco'] or registro.esgotado != dados.get('esgotado') or not registro.ativa or registro.url != dados['url']) else 'inalterada'
                 ultimo = HistoricoOferta.ultimo(registro.id, bloquear=not simular) if registro else None
-                registrar_historico = ultimo is None or ultimo.preco != dados['preco'] or ultimo.esgotado is not None or ultimo.coletado_em.date() != agora.date()
+                registrar_historico = ultimo is None or ultimo.preco != dados['preco'] or ultimo.esgotado != dados.get('esgotado') or ultimo.coletado_em.date() != agora.date()
                 propostas.append({'anuncio': anuncio, 'vendedor': vendedor, 'preco': str(dados['preco']), 'acao': acao, 'historico': registrar_historico})
                 if simular:
                     continue
@@ -88,7 +88,7 @@ class Oferta(ModeloBase):
                 mudou = registro.preco != dados['preco']
                 registro.preco = dados['preco']
                 registro.url = dados['url']
-                registro.esgotado = None
+                registro.esgotado = dados.get('esgotado')
                 registro.ativa = True
                 registro.consultado_em = agora
                 if mudou:
@@ -96,14 +96,14 @@ class Oferta(ModeloBase):
                 # url_afiliado e nome do vendedor cadastrados manualmente são preservados.
                 db.session.flush()
                 if registrar_historico:
-                    db.session.add(HistoricoOferta(oferta_id=registro.id, preco=registro.preco, esgotado=None, coletado_em=agora))
+                    db.session.add(HistoricoOferta(oferta_id=registro.id, preco=registro.preco, esgotado=dados.get('esgotado'), coletado_em=agora))
             # Fora das cinco selecionadas não significa esgotado; apenas sai da seleção ativa.
             for registro in existentes:
-                if registro.ativa and (registro.produto_id_loja, registro.vendedor_id) not in selecionadas:
+                if desativar_ausentes and registro.ativa and (registro.produto_id_loja, registro.vendedor_id) not in selecionadas:
                     propostas.append({'anuncio': registro.produto_id_loja, 'acao': 'desativada'})
                     if not simular:
                         registro.ativa = False
-            if not simular:
+            if not simular and confirmar:
                 db.session.commit()
             return propostas
         except Exception:

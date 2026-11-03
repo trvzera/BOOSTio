@@ -118,7 +118,8 @@ class BuscarOfertasMercadoLivreService:
         return {"loja": "mercado_livre", "catalogo_id": catalogo_id,
                 "produto_id_loja": anuncio, "vendedor_id": str(vendedor),
                 "preco": preco, "preco_original": original, "moeda": "BRL",
-                "condicao": condicao, "esgotado": None, "condicao_pagamento": None,
+                "condicao": condicao, "esgotado": (linha["available_quantity"] == 0 if type(linha.get("available_quantity")) is int and linha["available_quantity"] >= 0 else None),
+                "quantidade_disponivel": (linha["available_quantity"] if type(linha.get("available_quantity")) is int and linha["available_quantity"] >= 0 else None), "condicao_pagamento": None,
                 "url": f"https://produto.mercadolivre.com.br/MLB-{anuncio[3:]}-_JM",
                 "url_afiliado": None}
 

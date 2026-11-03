@@ -29,6 +29,10 @@ class ProdutoPendente(ModeloBase):
     )
 
     @classmethod
+    def buscar_por_id(cls, identificador):
+        return db.session.get(cls, identificador)
+
+    @classmethod
     def buscar_por_anuncio(cls, loja, produto_id_loja):
         return cls.query.filter_by(loja=loja, produto_id_loja=produto_id_loja).first()
 
@@ -120,3 +124,18 @@ class ProdutoPendente(ModeloBase):
             raise
         finally:
             db.session.rollback()
+
+
+    @classmethod
+    def registrar_falha_importacao(cls, identificador, *, simular):
+        if simular:return
+        try:
+            registro=cls.query.filter_by(id=identificador).with_for_update().first()
+            if registro is not None and registro.status in ('pendente','em_revisao'):
+                registro.status='em_revisao'
+                registro.motivo='Importação não confirmada; revisão necessária'
+                registro.evidencias={**(registro.evidencias or {}),'ultima_importacao':{'resultado':'falha','origem':'mercado_livre'}}
+                db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
