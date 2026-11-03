@@ -179,3 +179,33 @@ def test_autorizacao_oauth_convite_consumido_uma_vez_no_mysql(banco):
     with ThreadPoolExecutor(max_workers=2) as executor:
         resultados=list(executor.map(lambda _:consumir(),range(2)))
     assert sorted(resultados)==sorted(['v'*64,'recusado'])
+
+def test_catalogo_aditivo_preserva_legado_e_define_novos_como_pendentes(banco):
+    from migrations.catalogo_automatizado import preparar_catalogo_automatizado
+    from models import ProdutoPendente
+    _, p = banco
+    preparar()
+    aplicar(p, 100)
+    antes_usuario = list(db.session.execute(text('SELECT * FROM usuario')))
+    antes_oferta = list(db.session.execute(text('SELECT * FROM oferta')))
+    antes_historico = list(db.session.execute(text('SELECT * FROM historico_oferta')))
+    db.session.remove()
+    with db.engine.begin() as conn:
+        conn.execute(text('ALTER TABLE processador DROP CHECK ck_processador_validacao'))
+        conn.execute(text('DROP INDEX ix_processador_publicacao ON processador'))
+        for campo in ('status_validacao', 'validacao_motivo', 'validado_em'):
+            conn.execute(text(f'ALTER TABLE processador DROP COLUMN {campo}'))
+    assert preparar_catalogo_automatizado()['alteracoes']
+    preparar_catalogo_automatizado(simular=False)
+    assert preparar_catalogo_automatizado()['alteracoes'] == []
+    assert Processador.query.one().status_validacao is None
+    assert Processador.listar_publicadas()
+    assert list(db.session.execute(text('SELECT * FROM usuario'))) == antes_usuario
+    assert list(db.session.execute(text('SELECT * FROM oferta'))) == antes_oferta
+    assert list(db.session.execute(text('SELECT * FROM historico_oferta'))) == antes_historico
+    assert ProdutoPendente.query.count() == 0
+    with db.engine.begin() as conn:
+        conn.execute(text("INSERT INTO processador (fabricante, modelo, soquete, nucleo, thread, clockbase, clockmax, consumo_energia, preco, esgotado, criado_em, atualizado_em) VALUES ('Teste','Novo','AM4',6,12,3,4,65,100,0,NOW(),NOW())"))
+    db.session.remove()  # Encerra o snapshot REPEATABLE READ anterior à inserção externa.
+    assert Processador.query.order_by(Processador.id.desc()).first().status_validacao == 'pendente'
+    assert len(Processador.listar_publicadas()) == 1

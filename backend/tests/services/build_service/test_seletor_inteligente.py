@@ -21,7 +21,7 @@ def banco(tmp_path):
 
 def inserir(preco, score, gpu=False, **extras):
     classe = PlacaVideo if gpu else Processador
-    dados = dict(fabricante='Teste', modelo='Modelo', preco=preco, consumo_energia=65,
+    dados = dict(status_validacao='aprovado', fabricante='Teste', modelo='Modelo', preco=preco, consumo_energia=65,
                  benchmark_teste='PassMark G2D / G3D' if gpu else 'PassMark CPU Mark / Single Thread')
     dados.update(dict(memoria_gb=8, benchmark_g3d=score) if gpu else dict(
         soquete='AM4', nucleo=6, thread=12, clockbase=3, clockmax=4, benchmark_multi_core=score))
@@ -136,7 +136,7 @@ def test_empate_custo_beneficio_prioriza_menor_preco_depois_id(banco, gpu):
 
 
 def salvar_modelo(classe, preco, **campos):
-    obj = classe(**{'fabricante': 'Teste', 'modelo': 'Modelo', 'preco': preco,
+    obj = classe(**{'status_validacao': 'aprovado', 'fabricante': 'Teste', 'modelo': 'Modelo', 'preco': preco,
                     'consumo_energia': 10, **campos})
     db.session.add(obj)
     db.session.commit()
@@ -461,3 +461,12 @@ def test_fallback_sem_benchmark_nao_aceita_score_invalido_ou_outra_escala(banco)
     r = SeletorInteligenteService().executar(dict(orcamento=4000, prioridade_montagem='desempenho'))
     assert not any(p['categoria']=='processador' for p in r['componentes_selecionados'])
     assert 'processador' in r['categorias_pendentes']
+
+
+@pytest.mark.parametrize('gpu', [False, True])
+def test_benchmark_nao_publica_candidato_pendente(banco, gpu):
+    aprovado = inserir(500, 10000, gpu)
+    inserir(400, 50000, gpu, status_validacao='pendente')
+    classe = PlacaVideo if gpu else Processador
+    candidatos = classe.listar_por_benchmark(1000, 'desempenho')
+    assert [f'{classe.__tablename__}:{p.id}' for p in candidatos] == [aprovado]

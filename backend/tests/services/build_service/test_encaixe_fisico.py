@@ -169,7 +169,7 @@ def test_estado_preserva_substituicao_e_normaliza_default():
 
 def test_estado_aceita_fans_de_modelos_diferentes_e_preserva_quantidade(monkeypatch):
     from models import BuildSalva, Fan
-    monkeypatch.setattr(Fan, "buscar_por_id", lambda identificador: Fan(id=identificador, modelo="Fan"))
+    monkeypatch.setattr(Fan, "buscar_publicada_por_id", lambda identificador: Fan(id=identificador, modelo="Fan"))
     estado = BuildSalva.validar_estado({"titulo": "QA", "substituirFansWaterCooler": True,
                                       "componentes": {"fan": [{"id": 1, "quantidade": 3}, {"id": 2, "quantidade": 2}]}})
     assert estado["componentes"]["fan"] == [{"id": 1, "quantidade": 3}, {"id": 2, "quantidade": 2}]

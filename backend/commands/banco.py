@@ -13,6 +13,15 @@ from models import db, PreferenciasUso
 
 
 def registrar_comandos_banco(app):
+    @app.cli.command("catalogo-preparar")
+    @click.option("--aplicar", is_flag=True, help="Aplica a migração aditiva. Padrão: simulação.")
+    def preparar_catalogo(aplicar):
+        from migrations.catalogo_automatizado import preparar_catalogo_automatizado
+        try:
+            click.echo(json.dumps(preparar_catalogo_automatizado(simular=not aplicar), ensure_ascii=False))
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else "Falha ao preparar catálogo; não reinicie antes de conferir o esquema") from None
+
     @app.cli.command("integracoes-tokens-preparar")
     def preparar_tokens():
         """Cria somente a tabela de tokens; faça backup antes em bancos existentes."""

@@ -19,7 +19,7 @@ class PlacaMae(Peca):
         grupos = {socket: [] for valor in sockets if (socket := normalizar_socket(valor))}
         if not grupos:
             return grupos
-        pecas = (cls.query.filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
+        pecas = (cls.consulta_publicavel().filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
                  .order_by(cls.preco.asc(), cls.id.asc()).yield_per(200))
         for peca in pecas:
             socket = normalizar_socket(peca.socket)

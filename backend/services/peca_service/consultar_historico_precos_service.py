@@ -11,7 +11,7 @@ class ConsultarHistoricoPrecosService:
         classe = next((c for c in MODELOS_PECAS if c.__tablename__ == categoria), None)
         if classe is None or type(peca_id) is not int or peca_id <= 0:
             raise ValueError('Identificação da peça inválida')
-        peca = classe.buscar_por_id(peca_id)
+        peca = classe.buscar_publicada_por_id(peca_id)
         if peca is None:
             raise LookupError('Peça não encontrada')
         if oferta_id is not None:

@@ -20,7 +20,7 @@ def banco():
     app.register_blueprint(build_bp)
     with app.app_context():
         db.create_all()
-        p=PlacaVideo(fabricante='Teste',modelo='GPU',memoria_gb=8,consumo_energia=65,preco=100,esgotado=False,kabum_external='https://www.kabum.com.br/produto/123/gpu')
+        p=PlacaVideo(status_validacao='aprovado', fabricante='Teste',modelo='GPU',memoria_gb=8,consumo_energia=65,preco=100,esgotado=False,kabum_external='https://www.kabum.com.br/produto/123/gpu')
         db.session.add(p); db.session.commit()
         client=app.test_client()
         with client.session_transaction() as sessao: sessao['_user_id']='1'; sessao['_fresh']=True

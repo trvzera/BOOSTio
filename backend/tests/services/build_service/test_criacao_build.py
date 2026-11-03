@@ -46,7 +46,7 @@ def autenticar(cliente):
 def cadastrar_pecas(tipos):
     for tipo in tipos:
         modelo = MODELOS[tipo]
-        dados = {"fabricante": "Teste", "modelo": tipo, "preco": 100, "consumo_energia": 1}
+        dados = {"status_validacao": "aprovado", "fabricante": "Teste", "modelo": tipo, "preco": 100, "consumo_energia": 1}
         for coluna in modelo.__table__.columns:
             if coluna.name not in dados and not coluna.nullable and not coluna.primary_key and not coluna.default and not coluna.server_default:
                 dados[coluna.name] = "Teste" if coluna.type.python_type is str else 1
@@ -319,7 +319,7 @@ def test_geracao_rejeita_transferencia_de_sobra_antes_de_salvar(app_build, mocke
         if excesso == "perifericos":
             MODELOS["monitor"].buscar_por_id(1).preco = 750
             # Existe uma alternativa viável; a saída da IA escolhe a que excede o conjunto.
-            db.session.add(MODELOS["monitor"](fabricante="Teste", modelo="Alternativa", preco=400,
+            db.session.add(MODELOS["monitor"](status_validacao="aprovado", fabricante="Teste", modelo="Alternativa", preco=400,
                 consumo_energia=1, tamanho_polegadas=24, resolucao="1920x1080", taxa_atualizacao_hz=60, conexao="HDMI",tipo_painel="IPS"))
         else:
             # Cada peça cabe no filtro individual, mas o subtotal do PC excede R$ 4.000.

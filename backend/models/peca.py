@@ -5,6 +5,7 @@ import re
 from urllib.parse import urlsplit
 
 from . import db
+from sqlalchemy.orm import declared_attr, validates
 from . import ModeloBase
 from .medidas_fisicas import completar_medidas
 from .imagens_referencia import imagem_referencia
@@ -41,6 +42,43 @@ class Peca(ModeloBase):
   preco_atualizado_em = db.Column(db.DateTime, nullable=True)
   esgotado = db.Column(db.Boolean(), nullable=False, default=False)
   imagem_url = db.Column(db.Text, nullable=True)
+
+  # NULL identifica exclusivamente os registros anteriores à migração.
+  # Legado preserva publicação sem afirmar que a ficha já foi auditada.
+  status_validacao = db.Column(db.String(20), nullable=True, default='pendente', server_default='pendente')
+  validacao_motivo = db.Column(db.Text, nullable=True)
+  validado_em = db.Column(db.DateTime, nullable=True)
+
+  @declared_attr
+  def __table_args__(cls):
+    return (
+      db.CheckConstraint("status_validacao IS NULL OR status_validacao IN ('pendente','em_revisao','aprovado','rejeitado','legado')", name=f'ck_{cls.__tablename__}_validacao'),
+      db.Index(f'ix_{cls.__tablename__}_publicacao', 'status_validacao', 'esgotado', 'preco'),
+      db.Index(f'ix_{cls.__tablename__}_nome', 'fabricante', 'modelo'),
+      db.Index(f'ix_{cls.__tablename__}_part_number', 'part_number'),
+    )
+
+  @validates('status_validacao')
+  def validar_status(self, chave, valor):
+    if valor not in (None, 'pendente', 'em_revisao', 'aprovado', 'rejeitado', 'legado'):
+      raise ValueError('Status de validação inválido')
+    return valor
+
+  @property
+  def publicavel(self):
+    return self.status_validacao in ('aprovado', 'legado') or (self.status_validacao is None and self.id is not None)
+
+  @classmethod
+  def consulta_publicavel(cls):
+    return cls.query.filter(db.or_(cls.status_validacao.is_(None), cls.status_validacao.in_(('aprovado', 'legado'))))
+
+  @classmethod
+  def listar_publicadas(cls):
+    return cls.consulta_publicavel().all()
+
+  @classmethod
+  def buscar_publicada_por_id(cls, peca_id):
+    return cls.consulta_publicavel().filter_by(id=peca_id).first()
 
   @classmethod
   def lote_para_ofertas(cls, depois_id=0, limite=50):
@@ -81,7 +119,7 @@ class Peca(ModeloBase):
 
   def to_catalogo(self):
     dados = {coluna.name: getattr(self, coluna.name) for coluna in self.__table__.columns
-             if coluna.name not in ("preco_atualizado_em", "criado_em", "atualizado_em")}
+             if coluna.name not in ("preco_atualizado_em", "criado_em", "atualizado_em", "status_validacao", "validacao_motivo", "validado_em")}
     dados["id"] = f"{self.__tablename__}:{self.id}"
     if self.__tablename__ == "cabo_rede":
       dados["categoria_cabo"] = dados.get("categoria")
@@ -124,7 +162,7 @@ class Peca(ModeloBase):
       row.part_number
       for row in cls.query.filter(cls.part_number.in_(part_numbers)).all()
     }
-    novos = [cls(**item) for item in itens if item["part_number"] not in existentes]
+    novos = [cls(**{"status_validacao": "legado", **item}) for item in itens if item["part_number"] not in existentes]
     try:
       db.session.add_all(novos)
       db.session.commit()
@@ -160,5 +198,5 @@ class Peca(ModeloBase):
   @classmethod
   def listar_candidatos_disponiveis(cls, preco_maximo):
     """Pool completo para planejamento; não aplica corte/amostragem prematuros."""
-    return (cls.query.filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
+    return (cls.consulta_publicavel().filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
             .order_by(cls.preco.asc(), cls.id.asc()).all())

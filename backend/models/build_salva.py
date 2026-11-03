@@ -169,7 +169,7 @@ class BuildSalva(ModeloBase):
                         peca_id = int(str(item["id"]).split(":")[-1])
                     except ValueError:
                         raise ValueError("ID de peça inválido") from None
-                    if MODELOS[tipo].buscar_por_id(peca_id) is None:
+                    if MODELOS[tipo].buscar_publicada_por_id(peca_id) is None:
                         raise ValueError("Peça não encontrada no catálogo")
                     tratados.append({"id": peca_id, "quantidade": quantidade})
                 elif isinstance(item.get("proprio"), str) and 0 < len(item["proprio"].strip()) <= 120:

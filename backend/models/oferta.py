@@ -11,7 +11,7 @@ class Oferta(ModeloBase):
     loja = db.Column(db.String(20), nullable=False)
     produto_id_loja = db.Column(db.String(80), nullable=False)
     # Vazio identifica venda direta. Em marketplace, informar o ID do vendedor.
-    # Não usar NULL na identidade: índices únicos permitem vários NULLs.
+    # Metadado: a identidade única do anúncio é loja + produto_id_loja.
     vendedor_id = db.Column(db.String(80), nullable=False, default="")
     vendedor_nome = db.Column(db.String(120), nullable=True)
     # Endereço original do anúncio para consultar preço e disponibilidade.
@@ -29,10 +29,11 @@ class Oferta(ModeloBase):
     consultado_em = db.Column(db.DateTime, nullable=True)
 
     __table_args__ = (
-        db.UniqueConstraint("loja", "produto_id_loja", "vendedor_id", name="uq_oferta_loja_produto_vendedor"),
+        db.UniqueConstraint("loja", "produto_id_loja", name="uq_oferta_loja_produto"),
         db.CheckConstraint("peca_id > 0", name="ck_oferta_peca_positiva"),
         db.CheckConstraint("preco IS NULL OR preco > 0", name="ck_oferta_preco_positivo"),
         db.CheckConstraint("esgotado IS NULL OR esgotado = 1 OR preco IS NOT NULL", name="ck_oferta_disponivel_com_preco"),
+        db.Index("ix_oferta_publicacao", "tabela_peca", "peca_id", "ativa", "preco"),
         db.Index("ix_oferta_peca", "tabela_peca", "peca_id"),
         db.Index("ix_oferta_coleta", "loja", "ativa", "consultado_em"),
     )
@@ -67,8 +68,10 @@ class Oferta(ModeloBase):
                 anuncio, vendedor = dados['produto_id_loja'], dados['vendedor_id']
                 identidade = (anuncio, vendedor)
                 selecionadas.add(identidade)
-                consulta_anuncio = cls.query.filter_by(loja='mercado_livre', produto_id_loja=anuncio, vendedor_id=vendedor)
+                consulta_anuncio = cls.query.filter_by(loja='mercado_livre', produto_id_loja=anuncio)
                 registro = (consulta_anuncio.populate_existing().with_for_update() if not simular else consulta_anuncio).first()
+                if registro and registro.vendedor_id != vendedor:
+                    raise ValueError('Vendedor do anúncio mudou; revisão necessária')
                 if registro and (registro.tabela_peca, registro.peca_id) != (peca.__tablename__, peca.id):
                     raise ValueError('Anúncio já vinculado a outra peça')
                 acao = 'criada' if registro is None else 'atualizada' if (

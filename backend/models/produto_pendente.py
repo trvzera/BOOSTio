@@ -1,0 +1,40 @@
+"""Anúncios descobertos aguardando identificação; nunca entram no catálogo público."""
+from . import db, ModeloBase
+
+
+class ProdutoPendente(ModeloBase):
+    __tablename__ = 'produto_pendente'
+
+    loja = db.Column(db.String(20), nullable=False)
+    produto_id_loja = db.Column(db.String(80), nullable=False)
+    vendedor_id = db.Column(db.String(80), nullable=True)
+    titulo = db.Column(db.String(255), nullable=False)
+    url = db.Column(db.Text, nullable=False)
+    categoria_sugerida = db.Column(db.String(40), nullable=True)
+    dados_originais = db.Column(db.JSON, nullable=False)
+    evidencias = db.Column(db.JSON, nullable=True)
+    candidatos = db.Column(db.JSON, nullable=True)
+    status = db.Column(db.String(20), nullable=False, default='pendente', server_default='pendente')
+    motivo = db.Column(db.Text, nullable=True)
+    coletado_em = db.Column(db.DateTime, nullable=False)
+    revisado_em = db.Column(db.DateTime, nullable=True)
+    oferta_id = db.Column(db.Integer, db.ForeignKey('oferta.id', ondelete='SET NULL'), nullable=True)
+
+    __table_args__ = (
+        db.UniqueConstraint('loja', 'produto_id_loja', name='uq_pendente_loja_produto'),
+        db.CheckConstraint("length(trim(loja)) > 0 AND length(trim(produto_id_loja)) > 0", name='ck_pendente_identidade'),
+        db.CheckConstraint("status IN ('pendente','em_revisao','rejeitado','importado')", name='ck_pendente_status'),
+        db.Index('ix_pendente_revisao', 'status', 'categoria_sugerida', 'id'),
+        db.Index('ix_pendente_coleta', 'loja', 'coletado_em'),
+    )
+
+    @classmethod
+    def buscar_por_anuncio(cls, loja, produto_id_loja):
+        return cls.query.filter_by(loja=loja, produto_id_loja=produto_id_loja).first()
+
+    @classmethod
+    def listar_para_revisao(cls, depois_id=0, limite=50):
+        if type(limite) is not int or not 1 <= limite <= 200 or type(depois_id) is not int or depois_id < 0:
+            raise ValueError('Paginação de pendências inválida')
+        return (cls.query.filter(cls.id > depois_id, cls.status.in_(('pendente', 'em_revisao')))
+                .order_by(cls.id).limit(limite).all())

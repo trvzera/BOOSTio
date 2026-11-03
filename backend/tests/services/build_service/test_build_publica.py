@@ -26,8 +26,8 @@ def app_publica(tmp_path):
             Usuario(nome="Dono", email="dono@example.test", verificado=True),
             Usuario(nome="Visitante", email="visitante@example.test", verificado=True, budget=3500, usar_budget=True),
             Usuario(nome="Não verificado", email="pendente@example.test", verificado=False),
-            Processador(id=1, fabricante="Teste", modelo="CPU", preco=500, consumo_energia=65, soquete="AM4", nucleo=4, thread=8, clockbase=3, clockmax=4, videointegrado=True, cooler=True),
-            MemoriaRAM(id=1, fabricante="Teste", modelo="Kit 16 GB", preco=200, consumo_energia=6, capacidade_gb=16, ddr="DDR4", frequencia_mhz=3200, quantidade_pentes=2),
+            Processador(status_validacao="aprovado", id=1, fabricante="Teste", modelo="CPU", preco=500, consumo_energia=65, soquete="AM4", nucleo=4, thread=8, clockbase=3, clockmax=4, videointegrado=True, cooler=True),
+            MemoriaRAM(status_validacao="aprovado", id=1, fabricante="Teste", modelo="Kit 16 GB", preco=200, consumo_energia=6, capacidade_gb=16, ddr="DDR4", frequencia_mhz=3200, quantidade_pentes=2),
         ])
         db.session.flush()
         estado = {
