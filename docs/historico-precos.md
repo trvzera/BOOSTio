@@ -87,3 +87,36 @@ Cobrem histórico em preço igual, ausência de UPDATE da peça, mudança de pre
 estoque independente, indisponibilidade, dias distintos/reexecução, centavos,
 entrada inválida, falha de rede, link trocado, rollback e preparação repetível.
 A validação em um MySQL real continua sendo uma etapa de implantação.
+
+## Consulta pelo frontend
+
+A página `peca.html` das builds da conta carrega o gráfico pela rota autenticada:
+
+```http
+GET /build/catalogo/<categoria>/<peca_id>/historico-precos
+```
+
+`categoria` deve ser uma tabela de peça conhecida; o ID deve ser positivo. A rota
+usa a mesma autenticação do catálogo da conta e não aceita parâmetros adicionais.
+Retorna `peca_id` (ex.: `placa_video:12`), `loja`, `produto_id_loja` quando houver
+anúncio válido, `historico_precos`, `limite` e `tem_mais`. Cada observação contém
+`data` ISO UTC com milissegundos, `preco` numérico ou null, `esgotado`, `loja` e
+`produto_id_loja`. Não expõe tentativas, erros internos ou credenciais.
+
+O model consulta apenas a peça, loja KaBuM e anúncio atualmente vinculado à peça.
+Trocas de anúncio não misturam séries antigas no gráfico. Registros anteriores
+continuam no banco. A consulta retorna os últimos 1.000 registros, ordenados do
+mais antigo ao mais recente, com desempate por ID; `tem_mais` indica recorte.
+O frontend sinaliza esse limite e mantém filtros locais de 30/90 dias e registros
+carregados. Datas sem observação não são preenchidas. Cotações esgotadas ficam no
+contrato para rastreabilidade, mas não entram na curva de preços disponíveis.
+
+Peça existente sem histórico retorna lista vazia; peça inexistente, 404;
+identificação inválida, 400; banco/tabela indisponível, 503. As respostas de sucesso
+usam `Cache-Control: no-store`. A página mostra carregamento e permite tentar
+novamente após falha, sem converter erro em histórico vazio.
+
+O modo demonstrativo e o exemplo do laboratório não consultam IDs do banco. O
+Mercado Livre ainda não grava no histórico e não é misturado à curva da KaBuM.
+Esta conexão não exige nova migration; a tabela existente deve estar preparada
+com `historico-precos-preparar` nos ambientes que ainda não a possuem.

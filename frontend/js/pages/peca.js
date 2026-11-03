@@ -10,6 +10,7 @@ import { avisoCompraHtml, abrirCompraBuild } from "../build/acoes-build.js";
 import { salvarAlteracaoLocal } from "../build/autosalvar.js";
 import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta } from "../build/conta.js";
 import { ajudaCategorias } from "../build/uso-formulario.js";
+import { obterHistoricoDaPeca } from "../build/carregar-historico-precos.js";
 import { historicoPrecosHtml, iniciarHistoricoPrecos } from "../build/price-history.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -61,6 +62,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     })));
     iniciarIcones(main);
     iniciarHistoricoPrecos(main, peca);
+    if (conta) {
+      const carregarHistorico = async () => {
+        const secao = main.querySelector("[data-price-history]");
+        secao.querySelector("[data-history-content]").innerHTML = '<p role="status">Carregando histórico de preços…</p>';
+        try {
+          const dados = await obterHistoricoDaPeca(peca, {conta:true});
+          secao.outerHTML = historicoPrecosHtml({...peca, ...dados});
+          iniciarHistoricoPrecos(main, {...peca, ...dados});
+        } catch (erro) {
+          secao.querySelector("[data-history-content]").innerHTML = '<p role="status">' + h(erro.message || "Não foi possível carregar o histórico.") + '</p><button type="button" class="btn-secondary" data-history-retry>Tentar novamente</button>';
+          secao.querySelector("[data-history-retry]").onclick = carregarHistorico;
+        }
+      };
+      carregarHistorico();
+    }
     main.querySelector("#add-product").onclick = async () => {
       try {
         build = selecionarPecaCompativel(build, peca, catalogo);

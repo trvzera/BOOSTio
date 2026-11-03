@@ -12,7 +12,7 @@ function instanteRegistro(valor) {
   return Date.parse(valor.length === 10 ? valor + "T00:00:00Z" : valor);
 }
 
-// Contrato futuro do catálogo: histórico explícito da loja, nunca visitas locais
+// Usa cotações explícitas da loja recebidas do backend, nunca visitas locais
 // ou cópias do preço atual apresentadas como se fossem cotações anteriores.
 export function normalizarHistoricoPrecos(registros, agora = Date.now()) {
   if (!Array.isArray(registros)) return [];
@@ -68,7 +68,8 @@ export function historicoPrecosHtml(peca, agora = Date.now()) {
   const registros = normalizarHistoricoPrecos(peca?.historico_precos, agora);
   return '<section class="product-price-history glass-card" data-price-history aria-labelledby="price-history-title"><div class="price-history-heading"><div><h2 class="font-1-l" id="price-history-title">Histórico de preços</h2>' +
     '<p>Veja como o preço desta peça mudou ao longo do tempo.</p></div><span class="price-history-store">KaBuM!</span></div>' +
-    (registros.length ? '<div class="price-history-periods" role="group" aria-label="Período do histórico de preços">' + periodos.map(([valor, rotulo]) => '<button type="button" data-history-period="' + valor + '" aria-label="Mostrar histórico: ' + h(rotulo) + '" aria-pressed="' + (valor === "todos") + '">' + rotulo + '</button>').join("") + '</div>' : '') +
+    (registros.length ? '<div class="price-history-periods" role="group" aria-label="Período do histórico de preços">' + periodos.map(([valor, rotulo]) => '<button type="button" data-history-period="' + valor + '" aria-label="Mostrar histórico: ' + h(rotulo) + '" aria-pressed="' + (valor === "todos") + '">' + h(valor === 'todos' && peca?.historico_precos_incompleto ? 'Todos os registros carregados' : rotulo) + '</button>').join("") + '</div>' : '') +
+    (peca?.historico_precos_incompleto ? '<p class="price-history-note">Exibindo somente os 1.000 registros mais recentes deste anúncio.</p>' : '') +
     '<div data-history-content>' + conteudoHistorico(registros, registros.length > 0) + '</div>' +
     '<p class="price-history-note">Valores registrados, sem frete. O preço e a disponibilidade atuais devem ser confirmados na loja.</p><p class="sr-only" data-history-status role="status" aria-atomic="true"></p></section>';
 }
