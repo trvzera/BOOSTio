@@ -8,6 +8,23 @@ from services.mercadolivre_service.atualizar_ofertas_service import AtualizarOfe
 
 
 def registrar_comandos_mercadolivre(app):
+    @app.cli.command('mercadolivre-autorizacao-preparar')
+    def preparar_autorizacao():
+        from migrations.autorizacao_mercado_livre import preparar_autorizacao_mercado_livre
+        try:
+            click.echo(json.dumps(preparar_autorizacao_mercado_livre(), ensure_ascii=False))
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else 'Falha ao preparar autorização') from None
+
+    @app.cli.command('mercadolivre-conectar')
+    def conectar():
+        """Gera link administrativo de uso único, válido por dez minutos. Não compartilhe."""
+        from services.mercadolivre_service.autorizar_conta_service import AutorizarContaMercadoLivreService
+        try:
+            click.echo(AutorizarContaMercadoLivreService().convite())
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else 'Prepare a tabela com mercadolivre-autorizacao-preparar') from None
+
     @app.cli.command('mercadolivre-identidades-preparar')
     def preparar_identidades():
         """Migração aditiva do cadastro de MPNs revisados."""

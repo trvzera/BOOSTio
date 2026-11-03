@@ -307,3 +307,43 @@ Validação desta etapa: dois MPNs gravados apenas em cópia SQLite, segunda exe
 com dois inalterados; testes de divergências e associação por MPN; migração e
 idempotência também verificadas em MySQL 8.4 descartável. Nenhuma coleta foi
 aplicada na VPS e nenhuma oferta foi criada no banco original por esta validação.
+
+## Conectar a conta diretamente na VPS (Authorization Code + PKCE)
+
+Cadastre no aplicativo Mercado Livre a URI
+`https://api.boostio.com.br/auth/mercadolivre/callback`, preservando Authorization
+Code, Refresh Token e PKCE. No `.env.production`, configure
+`MERCADO_LIVRE_REDIRECT_URI` com esse valor, além das quatro variáveis já existentes.
+O callback fica na API, não no frontend. Usa os mesmos escopos configurados no
+aplicativo; não solicita escopos adicionais.
+
+Depois de backup e reconstrução da API:
+
+```sh
+docker compose --env-file .env.production run --rm --no-deps -T api \
+  python -m flask --app app mercadolivre-autorizacao-preparar
+docker compose --env-file .env.production up -d --force-recreate api
+docker compose --env-file .env.production run --rm --no-deps -T api \
+  python -m flask --app app mercadolivre-conectar
+```
+
+O último comando gera um link administrativo sensível, de uso único e validade
+de dez minutos. Abra-o no navegador e clique em Conectar Mercado Livre. Não
+compartilhe o link. O convite fica no fragmento, que é removido do endereço e não
+é enviado em logs HTTP. O início requer POST com CSRF e convite válido, emitido
+somente pelo terminal; usuários comuns não podem gerar convites pela API.
+
+O retorno valida state, navegador, validade, uso único, aplicação e conta
+`MERCADO_LIVRE_CONTA_ID`. O verificador PKCE fica cifrado no banco; a sessão do
+navegador guarda somente um identificador aleatório. State é consumido antes da
+rede para impedir repetição do código. A resposta nunca exibe tokens. O par novo
+substitui o antigo por CAS, de forma atômica, e limpa o bloqueio de renovação
+inconclusiva. Conta divergente ou erro preserva o par anterior. Se houver falha
+após a troca do código, gere outro convite; nunca repita o código de autorização.
+Os registros expirados deixam de funcionar automaticamente; esta versão não
+inclui expurgo automático dos registros de autorização.
+
+Não renovar a mesma família de refresh tokens no local e na VPS. Cada ambiente
+deve manter sua própria autorização e seu banco como fonte de credenciais.
+
+Referência: [autorização oficial Mercado Livre](https://developers.mercadolivre.com.br/autenticacao-e-autorizacao).
