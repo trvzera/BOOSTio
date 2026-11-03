@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 import pytest
 import requests
 from flask import Flask
-from services.preco_service.buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService as Service
+from services.mercadolivre_service.buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService as Service
 
 CAT = 'MLB47814270'
 def oferta():
@@ -48,7 +48,7 @@ def test_id_sem_rede(id):
 
 def test_token_do_service():
     s=Service()
-    with patch('services.preco_service.buscar_ofertas_mercado_livre_service.TokenMercadoLivreService') as token, patch.object(s,'_consultar',side_effect=[{'id':CAT,'name':'CPU','status':'active'},pagina([])]) as c:
+    with patch('services.mercadolivre_service.buscar_ofertas_mercado_livre_service.TokenMercadoLivreService') as token, patch.object(s,'_consultar',side_effect=[{'id':CAT,'name':'CPU','status':'active'},pagina([])]) as c:
         token.return_value.executar.return_value='configurado'
         s.executar(CAT); assert c.call_args.args[1]=='configurado'
 

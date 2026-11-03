@@ -1,5 +1,8 @@
 # Mercado Livre: catálogo e OAuth no banco
 
+Os services ficam no pacote `backend/services/mercadolivre_service`; seus testes
+ficam em `backend/tests/services/mercadolivre_service`.
+
 O coletor `BuscarOfertasMercadoLivreService.executar(catalogo_id)` consulta
 `/products/{id}` e `/products/{id}/items`, com paginação, preços Decimal em BRL,
 identidade de anúncio/vendedor e condição. Não grava peças, ofertas ou histórico.
@@ -10,7 +13,7 @@ convertidos em novos. Associe peças ao catálogo por especificações revisadas
 No contexto Flask:
 
 ```python
-from services.preco_service.buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
+from services.mercadolivre_service.buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
 resultado = BuscarOfertasMercadoLivreService().executar("MLB47814270")
 ```
 

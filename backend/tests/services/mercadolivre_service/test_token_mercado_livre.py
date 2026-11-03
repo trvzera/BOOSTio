@@ -9,7 +9,7 @@ import requests
 from flask import Flask
 
 from repositories.mercado_livre_token_repository import MercadoLivreTokenRepository
-from services.preco_service.token_mercado_livre_service import TokenMercadoLivreService
+from services.mercadolivre_service.token_mercado_livre_service import TokenMercadoLivreService
 
 @pytest.fixture
 def contexto(tmp_path):

@@ -6,7 +6,7 @@ from cryptography.fernet import Fernet
 from flask import Flask
 
 from models import db, TokenIntegracao
-from services.preco_service.transferir_tokens_mercado_livre_service import TransferirTokensMercadoLivreService
+from services.mercadolivre_service.transferir_tokens_mercado_livre_service import TransferirTokensMercadoLivreService
 
 @pytest.fixture
 def origem(tmp_path):

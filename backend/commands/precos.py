@@ -22,7 +22,7 @@ def registrar_comandos_precos(app):
                   help="Validade restante do access token; zero renova na próxima consulta.")
     def configurar_tokens_mercado_livre(validade_segundos):
         """Registra o par OAuth obtido em autorização, sem exibir credenciais."""
-        from services.preco_service.token_mercado_livre_service import TokenMercadoLivreService
+        from services.mercadolivre_service.token_mercado_livre_service import TokenMercadoLivreService
         service = TokenMercadoLivreService()
         access = click.prompt("Access token", hide_input=True)
         refresh = click.prompt("Refresh token", hide_input=True)
@@ -42,7 +42,7 @@ def registrar_comandos_precos(app):
     @click.option("--arquivo", required=True, type=click.Path(exists=True, dir_okay=False))
     @click.option("--remover-arquivo", is_flag=True, help="Remove o arquivo após verificar os tokens no banco.")
     def transferir_tokens_mercado_livre(arquivo, remover_arquivo):
-        from services.preco_service.transferir_tokens_mercado_livre_service import TransferirTokensMercadoLivreService
+        from services.mercadolivre_service.transferir_tokens_mercado_livre_service import TransferirTokensMercadoLivreService
         try:
             resultado = TransferirTokensMercadoLivreService().executar(arquivo, remover_arquivo=remover_arquivo)
             click.echo(json.dumps(resultado, ensure_ascii=False))
