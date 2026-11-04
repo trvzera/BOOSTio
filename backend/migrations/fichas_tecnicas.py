@@ -1,11 +1,11 @@
 """Fila técnica aditiva, sem alterar peças, usuários ou builds."""
-from sqlalchemy import inspect
-from models import db, FichaTecnicaCatalogo, RevisaoFichaTecnica
+from sqlalchemy import inspect, select
+from models import db, FichaTecnicaCatalogo, RevisaoFichaTecnica, ControleColeta
 
 
 def preparar_fichas_tecnicas(*, simular=True):
     if db.engine.dialect.name not in ('sqlite','mysql'):raise ValueError('Banco não suportado')
-    insp=inspect(db.engine);tabelas=(FichaTecnicaCatalogo,RevisaoFichaTecnica)
+    insp=inspect(db.engine);tabelas=(ControleColeta,FichaTecnicaCatalogo,RevisaoFichaTecnica)
     for modelo in tabelas:
         if insp.has_table(modelo.__tablename__) and {c['name'] for c in insp.get_columns(modelo.__tablename__)}!=set(modelo.__table__.columns.keys()):
             raise ValueError('Esquema de fichas técnicas incompatível')
@@ -13,4 +13,6 @@ def preparar_fichas_tecnicas(*, simular=True):
     if not simular:
         with db.engine.begin() as conn:
             for modelo in faltantes:modelo.__table__.create(conn)
+            if conn.execute(select(ControleColeta.id).where(ControleColeta.id==1)).first() is None:
+                conn.execute(ControleColeta.__table__.insert().values(id=1,versao=0))
     return dict(simulacao=simular,criadas=[m.__tablename__ for m in faltantes])

@@ -88,6 +88,25 @@ class Peca(ModeloBase):
   def publicavel(self):
     return self.status_validacao in ('aprovado', 'legado') or (self.status_validacao is None and self.id is not None)
 
+  def pendencias_para_montagem(self):
+    from services.catalogo_service.conferir_especificacoes_service import ESSENCIAIS, converter
+    campos = ESSENCIAIS.get(self.__tablename__, ())
+    aliases = {'tipo_fone':'tipo','categoria_cabo':'categoria','formato_ram':'formato'}
+    faltantes = [campo for campo in campos if converter(campo,getattr(self,aliases.get(campo,campo),None)) is None]
+    if self.__tablename__ == 'processador':
+      faltantes.extend(c for c in ('videointegrado','cooler') if getattr(self,c) is None)
+    externos = {'fonte','monitor','teclado','mouse','fone','cabo_rede','adaptador_wifi'}
+    if self.__tablename__ not in externos and self.consumo_energia is None:
+      faltantes.append('consumo_energia')
+    return sorted(set(faltantes))
+
+  def situacao_catalogo(self):
+    if not self.publicavel:return 'pendente_validacao'
+    if self.ficha_montagem_validada is False:return 'ficha_incompleta_para_montagem'
+    if self.preco is None:return 'sem_preco'
+    if self.esgotado is None:return 'disponibilidade_desconhecida'
+    return 'indisponivel' if self.esgotado else 'disponivel'
+
   @classmethod
   def consulta_publicavel(cls):
     return cls.query.filter(db.or_(cls.status_validacao.is_(None), cls.status_validacao.in_(('aprovado', 'legado'))))

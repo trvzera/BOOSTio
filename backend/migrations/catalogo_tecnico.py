@@ -1,5 +1,5 @@
 """Permite ausência de cotação e consumo, preservando linhas, índices e FKs."""
-from sqlalchemy import inspect, MetaData, Table
+from sqlalchemy import inspect, MetaData, Table, select
 from sqlalchemy.schema import CreateTable, CreateColumn
 from models import db
 from services.peca_service.modelos_pecas import MODELOS_PECAS
@@ -66,8 +66,10 @@ def preparar_catalogo_tecnico(*, simular=True):
                 conn.exec_driver_sql(f'DROP TABLE {quote(nome)}')
                 conn.exec_driver_sql(f'ALTER TABLE {quote(temporaria.name)} RENAME TO {quote(nome)}')
                 for ddl in extras:conn.exec_driver_sql(ddl)
-            from models import FichaTecnicaCatalogo, RevisaoFichaTecnica
-            for modelo in (FichaTecnicaCatalogo,RevisaoFichaTecnica):modelo.__table__.create(conn,checkfirst=True)
+            from models import FichaTecnicaCatalogo, RevisaoFichaTecnica, ControleColeta
+            for modelo in (ControleColeta,FichaTecnicaCatalogo,RevisaoFichaTecnica):modelo.__table__.create(conn,checkfirst=True)
+            if conn.execute(select(ControleColeta.id).where(ControleColeta.id==1)).first() is None:
+                conn.execute(ControleColeta.__table__.insert().values(id=1,versao=0))
             if conn.exec_driver_sql('PRAGMA foreign_key_check').first():raise ValueError('Referências divergentes após migração')
             conn.commit()
         except Exception:

@@ -19,7 +19,7 @@ class IdentidadeFabricante(ModeloBase):
     @classmethod
     def buscar(cls, peca):
         # Compatível com instalações que ainda não fizeram esta migração.
-        if not inspect(db.engine).has_table(cls.__tablename__):
+        if not inspect(db.session.connection()).has_table(cls.__tablename__):
             return None
         obj = cls.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id).first()
         if not obj or obj.assinatura_peca != assinatura_peca(peca):
@@ -84,10 +84,22 @@ class IdentidadeFabricante(ModeloBase):
 
     @classmethod
     def para_matching(cls, pecas):
-        if not pecas or not inspect(db.engine).has_table(cls.__tablename__):
-            return {}
-        tabela = pecas[0].__tablename__
-        locais = {p.id: p for p in pecas}
-        registros = cls.query.filter(cls.tabela_peca == tabela, cls.peca_id.in_(locais)).all()
-        return {r.peca_id: {'mpn': r.mpn, 'gtin': r.gtin} for r in registros
-                if r.assinatura_peca == assinatura_peca(locais[r.peca_id]) and cls._conferem(locais[r.peca_id], r.especificacoes)}
+        if not pecas:return {}
+        tabela=pecas[0].__tablename__;locais={p.id:p for p in pecas}
+        registros=[]
+        if inspect(db.session.connection()).has_table(cls.__tablename__):
+            registros=cls.query.filter(cls.tabela_peca==tabela,cls.peca_id.in_(locais)).all()
+        resultado={r.peca_id:{'mpn':r.mpn,'gtin':r.gtin} for r in registros
+            if r.assinatura_peca==assinatura_peca(locais[r.peca_id]) and cls._conferem(locais[r.peca_id],r.especificacoes)}
+        from utils.identidade_peca import assinatura_tecnica
+        from services.catalogo_service.normalizar_produto import gtin, codigo
+        for p in pecas:
+            prova=(p.fontes_especificacoes or {}).get('_identidade_tecnica',{})
+            if (not p.publicavel or prova.get('assinatura_peca')!=assinatura_peca(p)
+                    or prova.get('assinatura_tecnica')!=assinatura_tecnica(p)):continue
+            mpn=p.part_number or prova.get('mpn');ean=prova.get('gtin')
+            if ean is not None and gtin(ean) is None:continue
+            anterior=resultado.get(p.id,{})
+            if any(anterior.get(k) and v and codigo(anterior[k])!=codigo(v) for k,v in [('mpn',mpn),('gtin',ean)]):continue
+            resultado[p.id]={'mpn':anterior.get('mpn') or mpn,'gtin':anterior.get('gtin') or ean}
+        return resultado

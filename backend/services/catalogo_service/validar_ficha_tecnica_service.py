@@ -4,12 +4,15 @@ from .associacao_inteligente_service import AssociacaoInteligenteService
 
 
 class ValidarFichaTecnicaService:
-    def executar(self,categoria,dados,produto,identidade=None,fontes=None):
+    def executar(self,categoria,dados,produto,identidade=None,fontes=None,*,finalidade="comercial"):
         classe=next((m for m in MODELOS_PECAS if m.__tablename__==categoria),None)
         if classe is None:raise ValueError('Categoria inválida')
         ignorados={'id','criado_em','atualizado_em','status_validacao'}
         obrigatorios={c.name for c in classe.__table__.columns if not c.nullable and c.name not in ignorados}
-        if categoria=='processador':obrigatorios|={'videointegrado','cooler'}
+        if finalidade not in ('comercial','catalogo'):raise ValueError('Finalidade inválida')
+        if finalidade=='comercial':
+            obrigatorios|={'preco','esgotado','consumo_energia'}
+            if categoria=='processador':obrigatorios|={'videointegrado','cooler'}
         ausentes=sorted(k for k in obrigatorios if dados.get(k) is None)
         conflitos=[]
         if fontes is not None:
@@ -20,8 +23,8 @@ class ValidarFichaTecnicaService:
                 if url.scheme!='https' or not url.hostname or url.username or url.password:
                     ausentes.append('fonte:'+campo)
         from decimal import Decimal,InvalidOperation
-        from sqlalchemy import Integer,Numeric,Float,Boolean
-        protegidos={'id','criado_em','atualizado_em','status_validacao','validado_em','validacao_motivo','part_number','kabum_external'}
+        from sqlalchemy import Integer,Numeric,Float,Boolean,String
+        protegidos={'id','criado_em','atualizado_em','status_validacao','validado_em','validacao_motivo','part_number','kabum_external','ficha_montagem_validada','fontes_especificacoes'}
         for campo,valor in dados.items():
             if campo in protegidos or campo.startswith('benchmark_'):
                 conflitos.append('campo_protegido:'+campo)
@@ -36,6 +39,7 @@ class ValidarFichaTecnicaService:
                     if type(valor) is bool or not n.is_finite() or n<0 or (campo in {'preco','capacidade_gb','memoria_gb','nucleo','thread','clockbase','clockmax','frequencia_mhz','quantidade_pentes','potencia_w','dpi_max'} and n==0) or (isinstance(tipo,Integer) and n!=int(n)):
                         conflitos.append('numero_invalido:'+campo)
                 except (InvalidOperation,ValueError,OverflowError):conflitos.append('numero_invalido:'+campo)
+            if isinstance(tipo,String) and valor is not None and not isinstance(valor,str):conflitos.append('texto_invalido:'+campo)
             tam=getattr(tipo,'length',None)
             if isinstance(valor,str) and (not valor.strip() or (tam and len(valor)>tam)):conflitos.append('valor_invalido:'+campo)
         proxy=SimpleNamespace(__tablename__=categoria,id=0,part_number=(identidade or {}).get('mpn'),
