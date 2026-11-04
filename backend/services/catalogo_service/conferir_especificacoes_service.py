@@ -91,6 +91,21 @@ def converter(campo, valor):
     return re.sub(r'\s+','',s) or None
 
 
+def consolidar_interfaces(observados):
+    """Combina descrições genéricas e específicas sem fundir gerações ou lanes."""
+    resultado = set(observados)
+    for familia in ('sata', 'pcie'):
+        padrao = familia + r'[1-5](?:\.0)?(?:x(?:1|2|4|8|16))?'
+        if any(isinstance(v,str) and re.fullmatch(padrao,v) for v in observados):
+            resultado.discard(familia)
+    for valor in observados:
+        if not isinstance(valor,str) or not re.fullmatch(r'pcie[1-5]\.0',valor):
+            continue
+        if any(isinstance(v,str) and re.fullmatch(re.escape(valor)+r'x(?:1|2|4|8|16)',v) for v in observados):
+            resultado.discard(valor)
+    return resultado
+
+
 def extrair_titulo(categoria,titulo):
     texto=nome(titulo);dados={}
     def unico(campo, padrao, montar=lambda m:m[0]):
@@ -143,6 +158,8 @@ class ConferirEspecificacoesService:
             if campo == 'tipo_fone' and local != 'headset' and dados.get('formato_fone'):
                 bruto = valores(dados['formato_fone'])
             observados={converter(campo,v) for v in bruto}
+            if campo == 'interface':
+                observados = consolidar_interfaces(observados)
             if campo in CONJUNTOS:
                 agregado = agregar(observados)
                 observados = {agregado}

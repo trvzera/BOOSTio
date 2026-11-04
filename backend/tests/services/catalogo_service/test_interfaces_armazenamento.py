@@ -63,3 +63,11 @@ def test_reprocessa_normalizacao_antiga_e_cache_com_fonte_alterada():
         ficha['normalizacao_versao']=NormalizarProdutoService.VERSAO
         ficha['assinatura_catalogo']='0'*64
         assert ClassificarPendenciasService.normalizar(pendente)[0].especificacoes['interface']==['pcie 4.0 x4']
+
+
+def test_interface_generica_e_especifica_da_mesma_geracao_nao_conflitam():
+    p=SimpleNamespace(__tablename__='ssd',capacidade_gb=500,tipo='NVMe',interface='PCIe 4.0')
+    r=ConferirEspecificacoesService().executar(p,produto('PCIe 4.0','PCIe 4, NVMe PCIe 4.0 x4'))
+    assert r['completa'] and not r['conflitos']
+    r=ConferirEspecificacoesService().executar(p,produto('PCIe 4.0 x2, PCIe 4.0 x4, NVMe'))
+    assert 'especificacao_divergente:interface' in r['conflitos']
