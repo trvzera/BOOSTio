@@ -136,6 +136,7 @@ export function ofertasPeca(peca) {
 export const rotulosTecnicos = {
   categoria_cabo: "Padrão do cabo",
   fabricante: "Fabricante", modelo: "Modelo", part_number: "Part number do fabricante", consumo_energia: "Consumo estimado (W)",
+  codigo_modelo_fabricante: "Código do modelo comercial", fabricante_chip: "Fabricante do chip", modelo_referencia: "Modelo de referência",
   soquete: "Socket", socket: "Socket", sockets_suporte_condicional: "Sockets que exigem confirmar a versão/kit de montagem", nucleo: "Núcleos", thread: "Threads",
   conectores_alimentacao:"Conectores de alimentação", cabos_pcie_independentes:"Cabos separados para a placa de vídeo",
   conectores_alimentacao_completos:"Dados dos conectores completos", topologia_armazenamento_verificada:"Conexões de armazenamento revisadas",
