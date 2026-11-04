@@ -453,7 +453,7 @@ class CriarBuildService:
                 amostra.append(destaque)
     if referencia_gabinete is not None and "gabinete" not in excluidas:
       referencia = MODELOS["gabinete"].buscar_por_id(referencia_gabinete)
-      if referencia:
+      if referencia and referencia.publicavel and referencia.ficha_montagem_validada is not False:
         peca = cls._campos_pecas(referencia)
         preco = peca.get("preco")
         if peca.get("esgotado") is False and type(preco) in (int, float) and isfinite(preco) and 0 < preco <= preco_maximo:

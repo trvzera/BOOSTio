@@ -91,6 +91,10 @@ def test_referencia_gabinete_so_enriquece_amostra_se_disponivel_dentro_do_teto(a
         assert CriarBuildService._gerar_catalogo(200,referencia_gabinete=gabinete.id)["gabinete"][0]["id"] == gabinete.id
         assert not CriarBuildService._gerar_catalogo(50,referencia_gabinete=gabinete.id)
         assert not CriarBuildService._gerar_catalogo(200,excluidas={"gabinete"},referencia_gabinete=gabinete.id)
+        gabinete.ficha_montagem_validada=False
+        db.session.commit()
+        assert not CriarBuildService._gerar_catalogo(200,referencia_gabinete=gabinete.id)
+        gabinete.ficha_montagem_validada=None
         gabinete.esgotado=True
         db.session.commit()
         assert not CriarBuildService._gerar_catalogo(200,referencia_gabinete=gabinete.id)
