@@ -163,3 +163,13 @@ def test_serial_ata_iii_da_ficha_real_preserva_geracao():
     assert ficha['dados']['interface'] == 'SATA III'
     from services.catalogo_service.conferir_especificacoes_service import converter
     assert converter('interface', ficha['dados']['interface']) == converter('interface','SATA rev. 3.0 (6Gb/s)')
+
+
+def test_embalagem_de_20_discos_nao_vira_componente_unitario(banco,base):
+    xml = xml_ficha().replace(b'</Product>', b'<ProductFeature Presentation_Value="20 pc(s)"><Feature>'
+        b'<Name Value="Quantity per pack"/></Feature></ProductFeature></Product>')
+    base.fichas.executar.return_value = xml
+    resultado = importar(base).executar(banco.id,simular=False,permitir_novos=True)
+    assert resultado['acao']=='revisao'
+    assert 'icecat_embalagem_com_varias_unidades' in resultado['icecat']['candidatos'][0]['conflitos']
+    assert HD.query.count()==Oferta.query.count()==0

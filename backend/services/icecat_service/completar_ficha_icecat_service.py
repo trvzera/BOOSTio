@@ -49,6 +49,9 @@ class CompletarFichaIcecatService:
             local = SimpleNamespace(__tablename__=produto.categoria, id=0,
                                     part_number=tecnica['identidade']['mpn'], **tecnica['dados'])
             decisao = AssociacaoInteligenteService().avaliar(local, produto, identidade=tecnica['identidade'])
+            if 'icecat_embalagem_com_varias_unidades' in tecnica['conflitos']:
+                decisao = {**decisao, 'classificacao':'rejeitada',
+                           'conflitos':sorted(set(decisao['conflitos'] + tecnica['conflitos']))}
             diagnosticos.append(dict(id=referencia['id'], classificacao=decisao['classificacao'],
                                      conflitos=decisao['conflitos'], pendencias=decisao['pendencias']))
             if decisao['classificacao'] == 'confirmada' and not tecnica['conflitos']:

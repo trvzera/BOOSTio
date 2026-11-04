@@ -129,6 +129,10 @@ class NormalizarFichaIcecatService:
             rotulo = atributo.find('./Feature/Name')
             if rotulo is None:
                 continue
+            if categoria in ('hd', 'ssd') and rotulo.get('Value') == 'Quantity per pack':
+                quantidade = re.fullmatch(r'(\d+)\s*(?:pc\(s\)|pcs?|units?)?', atributo.get('Presentation_Value', '').strip(), re.I)
+                if quantidade and int(quantidade[1]) > 1:
+                    conflitos.append('icecat_embalagem_com_varias_unidades')
             mapeamento = CAMPOS.get(categoria, {}).get(rotulo.get('Value'))
             if mapeamento is None:
                 continue
