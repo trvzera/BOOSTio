@@ -4,10 +4,11 @@ from .produto_normalizado import ProdutoNormalizado
 from .normalizar_produto import nome,codigo,gtin,variante
 from .comparar_nomes_service import CompararNomesService,marca,cpu
 from .conferir_especificacoes_service import ConferirEspecificacoesService,valores,converter as converter_valor
+from .comparar_codigo_modelo_service import CompararCodigoModeloService
 
 
 class AssociacaoInteligenteService:
-    VERSAO='associacao_v5'
+    VERSAO='associacao_v6'
 
     @staticmethod
     def classificar_percentual(percentual):
@@ -69,7 +70,6 @@ class AssociacaoInteligenteService:
     def comparar_nome_modelo(self,peca,produto):
         resultado = CompararNomesService().executar(peca,produto)
         if not resultado['exato']:
-            from .comparar_codigo_modelo_service import CompararCodigoModeloService
             comum = CompararCodigoModeloService().executar(peca,produto)
             if comum:
                 resultado.update(exato=True, pontos=35, codigo_modelo=comum)
@@ -85,6 +85,9 @@ class AssociacaoInteligenteService:
         titulo=self.comparar_titulo(peca,produto);e=self.comparar_especificacoes(peca,produto)
         conflitos=identificadores['conflitos']+m['conflitos']+titulo['conflitos']+e['conflitos']
         pendencias=identificadores['pendencias']+m.get('pendencias',[])+titulo['pendencias']
+        armazenamento = CompararCodigoModeloService.variantes_armazenamento(peca,produto)
+        conflitos.extend(armazenamento['conflitos'])
+        pendencias.extend(armazenamento['pendencias'])
         if produto.categoria and produto.categoria!=peca.__tablename__:conflitos.append('categoria_incompativel')
         if produto.contexto.get('dominio_divergente'):conflitos.append('categoria_incompativel')
         if not produto.categoria_confirmada:pendencias.append('categoria_nao_comprovada')
