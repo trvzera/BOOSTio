@@ -6,7 +6,7 @@ from .normalizar_produto import nome
 
 
 def marca(valor):
-    s=nome(valor);return {'wd':'western digital'}.get(s,s)
+    s=nome(valor);return {'wd':'western digital', 'logitech g':'logitech', 'kingston fury':'kingston'}.get(s,s)
 
 
 def cpu(texto):
@@ -33,7 +33,9 @@ def chave(valor,categoria,fabricante):
         s=re.sub(r'\b\d+\s*[x×]\s*\d+\s*gb\b',' ',s)
         s=re.sub(r'\b\d+(?:[.,]\d+)?\s*(?:gb|tb|mhz)\b',' ',s)
     if categoria=='memoria_ram':s=re.sub(r'\bddr\s*[345]\b|\bcl\s*\d+\b|\b(?:so[ -]?)?dimm\b|\bdesktop\b|\bnotebook\b',' ',s)
-    if categoria=='placa_video':s=re.sub(r'\bgddr\s*[567]x?\b',' ',s)
+    if categoria=='placa_video':
+        s=re.sub(r'\bgddr\s*[567]x?\b',' ',s)
+        s=re.sub(r'\b(?:nvidia|amd|intel|geforce|radeon)\b',' ',s)
     if categoria=='fonte':s=re.sub(r'\b\d+\s*w\b',' ',s)
     return ''.join(re.findall(r'[a-z0-9]+|[+/]',s))
 
@@ -60,7 +62,7 @@ class CompararNomesService:
             exato=exato or bool(lc and lc==rc)
         if categoria=='placa_video':
             # Chip e VRAM não distinguem edições comerciais da mesma montadora.
-            generico=re.fullmatch(r'(?:(?:geforce|radeon|nvidia|amd))*?(?:rtx|gtx|rx|arc)\d{3,4}(?:ti|super|xt|xtx)*',local)
+            generico=re.fullmatch(r'(?:(?:geforce|radeon|nvidia|amd))*?(?:rtx|gtx|rx|arc)[a-z]?\d{3,4}(?:ti|super|xt|xtx)*',local)
             if generico:exato=False
         similaridade=similaridade_chaves(local,chaves)
         titulo_chave=chave(produto.titulo,categoria,peca.fabricante)

@@ -28,7 +28,35 @@ def complementar(produto, atributos, categoria, specs):
         if dados:
             specs[campo] = dados
     titulo = nome(produto.get('name',''))
+    rgb = valores('WITH_RGB_LIGHTING')
+    if rgb:
+        specs['rgb'] = rgb
+    iluminacao = valores('WITH_LIGHTS') if categoria == 'mouse' else valores('WITH_RETROILLUMINATION') if categoria == 'teclado' else []
+    cores = valores('LED_COLOR', 'BACKLIGHTING_COLOR', 'KEYBOARD_BACKLIGHTING_COLOR')
+    if rgb == ['sim'] or any(re.fullmatch(r'(?:led\s*)?a?rgb', v) for v in cores):
+        iluminacao.append('sim')
+        specs['rgb'] = sorted(set([*rgb, 'sim']))
+    if any(v in {'azul','vermelho','verde','branco','multicolor','multicolorido','rainbow'} for v in cores):
+        iluminacao.append('sim')
+    if iluminacao:
+        specs['iluminacao'] = sorted(set(iluminacao))
+    if categoria in ('mouse', 'teclado'):
+        conexao = list(specs.get('conexao', []))
+        if valores('WITH_WIRE') == ['sim'] or valores('IS_WIRELESS') == ['nao']:
+            conexao.append('wired')
+        if valores('IS_WIRELESS') == ['sim']:
+            conexao.append('wireless')
+        if valores('WITH_BLUETOOTH') == ['sim']:
+            conexao.append('bluetooth')
+        # USB só quando aparece explicitamente; ter fio não comprova USB.
+        texto_conexao = titulo + ' ' + ' '.join(valores('WIRELESS_TECHNOLOGY'))
+        if re.search(r'\busb(?:[ -]?c)?\b', texto_conexao):
+            conexao.append('usb-c' if re.search(r'\busb[ -]?c\b', texto_conexao) else 'usb')
+        if conexao:
+            specs['conexao'] = sorted(set(conexao))
     if categoria == 'fone':
+        if specs.get('tipo_fone'):
+            specs['formato_fone'] = list(specs['tipo_fone'])
         sem_fio = valores('IS_WIRELESS')
         if sem_fio == ['nao']:
             specs['conexao'] = ['wired', *valores('CONNECTOR_TYPES')]
@@ -53,10 +81,15 @@ def complementar(produto, atributos, categoria, specs):
 def tipo_refrigeracao(atributos):
     tipo = atributos.get('PRODUCT_TYPE',set())
     refrigeracao = atributos.get('REFRIGERATION_TYPE',set())
+    agua = bool(refrigeracao & {'agua','liquida','liquido','resfriamento a agua','water cooling'})
+    ar = bool(refrigeracao & {'ar','air cooling'})
+    liquido = bool(tipo & {'cooler liquido aio','cooler liquido custom loop'})
+    if (agua and ar) or (liquido and ar):
+        return None
+    if agua or liquido:
+        return 'water_cooler'
+    if ar and any(re.search(r'\b(?:intel|amd|lga\s*\d|am[2345])',v) for v in atributos.get('CPU_SOCKETS',set())):
+        return 'air_cooler'
     if tipo == {'ventoinha'}:
         return 'fan'
-    if refrigeracao & {'agua','liquida','liquido'}:
-        return 'water_cooler'
-    if refrigeracao == {'ar'} and any(re.search(r'\b(?:intel|amd|lga|am[2345])',v) for v in atributos.get('CPU_SOCKETS',set())):
-        return 'air_cooler'
     return None

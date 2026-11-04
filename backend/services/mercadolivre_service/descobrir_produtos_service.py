@@ -112,6 +112,8 @@ class DescobrirProdutosService:
             # Não incluir corpo de resposta, URL OAuth nem detalhes de SQL nos logs.
             if isinstance(erro, ErroMercadoLivre):
                 motivo = f'Mercado Livre HTTP {erro.status}; verifique acesso ou limite antes de repetir'
+                resumo['http_status'] = erro.status
+                resumo['aguardar_segundos'] = erro.espera
             elif isinstance(erro, OrcamentoRequisicoesEsgotado):
                 motivo = 'Limite de requisições atingido'
             elif isinstance(erro, SQLAlchemyError):

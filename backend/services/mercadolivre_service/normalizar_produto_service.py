@@ -23,7 +23,7 @@ CAMPOS = {
  'quantidade_pentes':('RAM_MEMORY_MODULES',),'formato':('FORM_FACTOR','HARD_DRIVE_AND_SSD_FORM_FACTOR','RAM_MEMORY_FORMAT'),
  'tipo':('DRIVE_STORAGE_TYPE',),'interface':('INTERFACES',),'velocidade_rpm':('ROTATION_SPEED',),
  'memoria_cache_mb':('DATA_CACHE',),'potencia_w':('POWER_OUTPUT',),'dpi_max':('SENSOR_RESOLUTION',),
- 'wifi':('WITH_WIFI',),'conexao':('CONNECTIVITY',),'chipset':('CHIPSET',),'iluminacao':('WITH_RGB_LIGHTING',),
+ 'wifi':('WITH_WIFI',),'conexao':('CONNECTIVITY',),'chipset':('CHIPSET',),
 }
 
 

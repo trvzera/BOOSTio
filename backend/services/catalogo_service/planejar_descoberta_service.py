@@ -41,6 +41,39 @@ class PlanejarDescobertaService:
             raise ValueError('Nenhuma peça no lote solicitado')
         return dict(versao=1, trabalhos=trabalhos)
 
+    def alternativas(self, peca, *, resultados=30):
+        """Consultas curtas sem apagar sufixos. Nenhuma busca comprova associação."""
+        from utils.codigos_peca import codigo_interno
+        from .comparar_codigo_modelo_service import CompararCodigoModeloService
+        categoria = peca.__tablename__
+        if categoria not in self.TERMOS or type(resultados) is not int or not 1 <= resultados <= 100:
+            raise ValueError('Categoria ou limite inválido')
+        consultas = []
+        for valor in (getattr(peca, 'part_number', None), getattr(peca, 'codigo_modelo_fabricante', None)):
+            if valor and not codigo_interno(valor):
+                consultas.append(f'{peca.fabricante} {valor}')
+        codigos = sorted(CompararCodigoModeloService.extrair(peca.modelo, categoria))
+        if len(codigos) == 1:
+            consultas.append(f'{peca.fabricante} {codigos[0]}')
+        comercial = peca.modelo.split(',')[0].strip()
+        if comercial:
+            consultas.append(f'{peca.fabricante} {comercial}')
+        vistos = set(); trabalhos = []
+        for consulta in consultas:
+            consulta = ' '.join(consulta.split())
+            chave = consulta.casefold()
+            if chave in vistos:
+                continue
+            if not 2 <= len(consulta) <= 150 or any(ord(c) < 32 for c in consulta):
+                continue
+            vistos.add(chave)
+            sufixo = hashlib.sha256(chave.encode()).hexdigest()[:8]
+            trabalhos.append(dict(nome=f'{categoria}-{peca.id}-alternativa-{sufixo}', categoria=categoria,
+                consulta=consulta, origem='catalogo', marca=peca.fabricante,
+                max_produtos=resultados,max_anuncios=resultados,max_ofertas_por_produto=1,
+                max_paginas=20,max_requisicoes=40,intervalo=1.0,limite_fila=20,periodo_segundos=86400))
+        return trabalhos
+
     def executar(self, *, limite=100, modelos=None, marcas_por_categoria=5):
         if type(limite) is not int or not 1 <= limite <= 100:
             raise ValueError('Informe entre 1 e 100 produtos por categoria/marca')

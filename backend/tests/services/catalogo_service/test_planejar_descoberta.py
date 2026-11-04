@@ -58,3 +58,11 @@ def test_busca_por_peca_preserva_codigo_e_nao_pesquisa_id_interno(tmp_path):
     arquivo = tmp_path / 'plano.json'
     arquivo.write_text(json.dumps(plano))
     assert len(ProcessarCatalogoService.ler_plano(arquivo)) == 2
+
+
+def test_alternativas_preservam_sufixo_e_nao_usam_codigo_interno():
+    p=SimpleNamespace(__tablename__='memoria_ram',id=8,fabricante='Kingston',modelo='Fury Beast RGB, 8GB, DDR4',
+        part_number='KABUM-123',codigo_modelo_fabricante='KF432C16BBA/8')
+    grupos=PlanejarDescobertaService().alternativas(p)
+    assert [g['consulta'] for g in grupos]==['Kingston KF432C16BBA/8','Kingston Fury Beast RGB']
+    assert all(g['max_produtos']==30 for g in grupos)

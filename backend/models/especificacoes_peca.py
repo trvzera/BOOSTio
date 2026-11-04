@@ -15,12 +15,17 @@ def preencher_especificacoes(peca, proposta, assinatura, *, simular=True):
             raise ValueError('Peça mudou durante a consulta; repita a validação')
         if codigo_interno(peca.part_number):
             raise ValueError('Execute catalogo-identificadores-separar antes do enriquecimento')
+        if proposta.get('criterio') == 'anuncio_original_e_especificacoes_compativeis':
+            from .oferta import Oferta
+            origem = proposta.get('origem') or {}
+            if not Oferta.corresponde_origem(peca, origem.get('loja'), origem.get('id_externo'), bloquear=True):
+                raise ValueError('Oferta original mudou; repita a validação')
         vinculos, anterior = _vinculos(peca), peca.part_number
         fontes = dict(peca.fontes_especificacoes or {})
         agora = datetime.now(timezone.utc).isoformat()
         dados = proposta['dados']
         permitidos = {EnriquecerPecaExistenteService.ALIASES.get(c, c) for c in (
-            *ESSENCIAIS.get(peca.__tablename__, ()), *OPCIONAIS.get(peca.__tablename__, ()))} | {'part_number'}
+            *ESSENCIAIS.get(peca.__tablename__, ()), *OPCIONAIS.get(peca.__tablename__, ()))} | {'part_number', 'codigo_modelo_fabricante'}
         for campo, valor in dados.items():
             if campo not in permitidos or campo in EnriquecerPecaExistenteService.CAMPOS_PROTEGIDOS - {'part_number'} or campo not in peca.__table__.columns:
                 raise ValueError('Campo protegido ou desconhecido')
@@ -32,6 +37,8 @@ def preencher_especificacoes(peca, proposta, assinatura, *, simular=True):
             fontes[campo] = {**proposta['fontes'][campo], 'valor':valor, 'codigo':proposta['codigo'],
                 'consultado_em':agora, 'sha256_especificacoes':proposta['sha256'], 'criterio':proposta['criterio']}
         peca.fontes_especificacoes = fontes
+        for campo in dados:
+            fontes[campo]['assinatura_peca'] = assinatura_peca(peca)
         reassinar_vinculos(peca,vinculos,assinatura,anterior,campos_preenchidos=dados)
         if simular:
             db.session.rollback()

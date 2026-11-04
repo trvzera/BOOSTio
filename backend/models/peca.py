@@ -39,6 +39,7 @@ class Peca(ModeloBase):
   preco = db.Column(db.Float(),nullable = False)
   part_number = db.Column(db.String(100), nullable=True)
   referencia_interna = db.Column(db.String(100), nullable=True)
+  codigo_modelo_fabricante = db.Column(db.String(150), nullable=True)
   fontes_especificacoes = db.Column(db.JSON, nullable=True)
   kabum_external = db.Column(db.Text, nullable=True)
   preco_atualizado_em = db.Column(db.DateTime, nullable=True)

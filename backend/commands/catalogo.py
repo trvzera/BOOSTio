@@ -9,6 +9,33 @@ from services.mercadolivre_service.processar_catalogo_service import ProcessarCa
 
 
 def registrar_comandos_catalogo(app):
+    @app.cli.command('catalogo-gpus-converter-referencias')
+    @click.option('--pasta', required=True, type=click.Path(exists=True, file_okay=False))
+    @click.option('--aplicar', is_flag=True)
+    def converter_referencias_gpu(pasta, aplicar):
+        """Revisa GPUs genéricas pela oferta original; simula por padrão."""
+        from services.especificacoes_service.converter_referencias_gpu_service import ConverterReferenciasGpuService
+        try:
+            resumo = ConverterReferenciasGpuService().executar(pasta, simular=not aplicar)
+            click.echo(json.dumps(resumo, ensure_ascii=False))
+        except (ValueError, SQLAlchemyError):
+            raise click.ClickException('Confira as fichas e prepare o esquema com catalogo-preparar') from None
+
+    @app.cli.command('catalogo-fichas-originais')
+    @click.option('--pasta', required=True, type=click.Path(exists=True, file_okay=False))
+    @click.option('--categoria')
+    @click.option('--aplicar', is_flag=True)
+    def fichas_originais(pasta, categoria, aplicar):
+        """Confere fichas locais contra a oferta original. Simula por padrão."""
+        from services.especificacoes_service.preencher_fichas_originais_service import PreencherFichasOriginaisService
+        try:
+            resumo = PreencherFichasOriginaisService().executar(pasta, categoria=categoria, simular=not aplicar)
+            click.echo(json.dumps(resumo, ensure_ascii=False))
+            if resumo['falhas']:
+                raise click.ClickException('Lote contém falhas; confira o resumo antes de repetir')
+        except (ValueError, SQLAlchemyError):
+            raise click.ClickException('Confira a pasta e prepare o esquema com catalogo-preparar') from None
+
     @app.cli.command('catalogo-planejar-pecas')
     @click.option('--categoria', required=True)
     @click.option('--limite', default=100, type=click.IntRange(1, 500))

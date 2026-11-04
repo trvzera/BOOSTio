@@ -56,16 +56,19 @@ def converter_adicional(campo, valor):
     if campo == 'layout':
         return s if s in {'abnt', 'abnt2', 'ansi', 'iso'} else None
     if campo == 'tipo_fone':
+        s = {'intra-auricular':'in-ear','intra auricular':'in-ear','circumaural':'over-ear','supra-auricular':'on-ear'}.get(s,s)
         return s if s in {'headset', 'in-ear', 'over-ear', 'on-ear'} else None
     if campo == 'switch':
-        return re.sub(r'\s+', '', s) if s not in {'nao', 'n/a', 'nao identificado'} else None
+        return re.sub(r'[\s()\[\]-]+', '', s) if s not in {'nao', 'n/a', 'nao identificado'} else None
     if campo == 'padrao_wifi':
         m = re.fullmatch(r'(?:wi[ -]?fi)\s*([4567])\s*(e)?', s)
         return 'wifi' + m[1] + (m[2] or '') if m else None
     if campo == 'conexao':
         s = s.replace('sem fio', 'wireless').replace('com fio', 'wired')
-        s = s.replace('3,5', '3.5').replace('3.5 mm', 'p2').replace('3.5mm', 'p2')
+        s = re.sub(r'\b3[.,]5\s*mm\b', 'jack3.5mm', s)
         s = s.replace('cabo ', '').replace('usb tipo c', 'usb-c').replace('usb type c', 'usb-c')
+        s = re.sub(r'\bdisplay\s*port\b|\bdp\b', 'displayport', s)
+        s = re.sub(r'(?<!\S)\d+\s+(?=(?:usb|hdmi|displayport|vga)\b)', '', s)
         partes = re.split(r'[,;/+|]|\s+e\s+', s)
         tokens = {re.sub(r'[\s-]', '', p) for p in partes if p.strip()}
         if not tokens or any(t in {'naoidentificado', 'na', 'semconexao'} for t in tokens):
@@ -76,7 +79,8 @@ def converter_adicional(campo, valor):
         formatos = set(re.findall(r'\b(?:e[ -]?atx|matx|atx|itx)\b', s))
         return '|'.join(sorted(v.replace('-', '').replace(' ', '') for v in formatos)) if formatos else None
     if campo == 'compatibilidade':
-        sockets = set(re.findall(r'\b(?:lga\s*\d{3,5}|am[2345]\+?|fm[12]\+?|tr4|strx4|str5)\b', s))
+        from utils.sockets import listar_sockets
+        sockets = {v.casefold() for v in listar_sockets(s)}
         partes = {re.sub(r'\s+', '', v) for v in sockets}
         if 'intel' in s or any(v.startswith('lga') for v in partes):
             partes.add('familia:intel')
@@ -90,3 +94,28 @@ def agregar(valores_convertidos):
     if not valores_convertidos or any(v is None for v in valores_convertidos):
         return None
     return '|'.join(sorted({p for v in valores_convertidos for p in v.split('|')}))
+
+
+def comparar_conexoes(local, remoto):
+    """True: todas as conexões locais comprovadas; None: faltam dados; False: contradição."""
+    a, b = set(local.split('|')), set(remoto.split('|'))
+    if a <= b:
+        return True
+    meios = {'wired', 'wireless'}
+    if a & meios and b & meios and not (a & b & meios):
+        return False
+    analogicos = {'p2', 'p3'}
+    if a & analogicos and b & analogicos and not a & b & analogicos:
+        return False
+    if ('usba' in a and 'usbc' in b or 'usbc' in a and 'usba' in b) and not a & b & {'usba','usbc'}:
+        return False
+    faltantes = a - b
+    for item in tuple(faltantes):
+        if item in {'hdmi','displayport','usb'} and any(re.fullmatch(item + r'\d+(?:\.\d+)*', v) for v in b):
+            faltantes.remove(item)
+        elif item.startswith(('hdmi','displayport')):
+            base = 'hdmi' if item.startswith('hdmi') else 'displayport'
+            especificos = {v for v in b if v.startswith(base) and v != base}
+            if especificos and item not in especificos:
+                return False
+    return None if faltantes else True

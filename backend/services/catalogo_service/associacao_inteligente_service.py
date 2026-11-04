@@ -7,7 +7,7 @@ from .conferir_especificacoes_service import ConferirEspecificacoesService,valor
 
 
 class AssociacaoInteligenteService:
-    VERSAO='associacao_v3'
+    VERSAO='associacao_v4'
 
     @staticmethod
     def classificar_percentual(percentual):
@@ -43,8 +43,10 @@ class AssociacaoInteligenteService:
     def comparar_titulo(self,peca,produto):
         texto=nome(produto.titulo);local=nome(peca.modelo);cat=peca.__tablename__;conflitos=[]
         if re.search(r'\b(combo|upgrade|sucata|defeito)\b|somente (?:a )?(?:caixa|embalagem)',texto):conflitos.append('produto_composto_ou_inadequado')
+        if cat not in ('cabo_rede', 'adaptador_wifi') and re.search(r'^(?:kit\s+de\s+)?(?:cabo|suporte|almofadas?|earpads?|case|estojo|carcaca|pelicula|adaptador)\s+(?:para|de reposicao)', texto):
+            conflitos.append('acessorio_para_outro_produto')
         kit=bool(re.search(r'\bkit\b|\d+\s*[x×]\s*\d+\s*gb',texto))
-        if kit and cat!='memoria_ram':conflitos.append('kit_nao_suportado')
+        if kit and cat not in ('memoria_ram', 'fan'):conflitos.append('kit_nao_suportado')
         if cat in ('processador','placa_video'):
             notebook=lambda t:bool(re.search(r'\b(notebook|laptop|mobile)\b',t))
             if notebook(texto)!=notebook(local):conflitos.append('desktop_notebook_divergentes')
@@ -103,21 +105,48 @@ class AssociacaoInteligenteService:
         if mpn and str(mpn).upper().endswith('BOX') and (re.search(r'\b(oem|tray)\b',nome(produto.titulo)) or produto.contexto.get('oem')):
             conflitos.append('embalagem_box_oem_divergente')
         provas=list(identificadores['evidencias'])
+        versoes = lambda texto: set(re.findall(r'\bv[1-9]\b|\brev\.?\s*[0-9.]+', nome(texto)))
+        versao_local = versoes(peca.modelo)
+        versao_remota = versoes(' '.join([produto.titulo, produto.modelo or '']))
+        if versao_local and versao_remota and versao_local != versao_remota:
+            conflitos.append('revisao_divergente')
+        codigo_fabricante = getattr(peca, 'codigo_modelo_fabricante', None)
+        comprovacao = (getattr(peca, 'fontes_especificacoes', None) or {}).get('codigo_modelo_fabricante', {})
+        titulo_origem = ''
+        codigos_remotos = [produto.modelo or '', *produto.modelos_alternativos, *valores(produto.identificadores.get('mpn'))]
+        codigo_no_titulo = bool(codigo_fabricante and re.search(r'(?<![a-z0-9/_.-])' + re.escape(codigo(codigo_fabricante)) + r'(?![a-z0-9/_.-])', nome(produto.titulo)))
+        if codigo_fabricante and (codigo_no_titulo or any(codigo(codigo_fabricante) == codigo(v) for v in codigos_remotos)):
+            from utils.identidade_peca import assinatura_peca
+            from models.medidas_fisicas import produto_kabum
+            origem_local = produto_kabum(getattr(peca, 'kabum_external', None))
+            if (comprovacao.get('criterio') == 'anuncio_original_e_especificacoes_compativeis'
+                    and comprovacao.get('valor') == codigo_fabricante
+                    and comprovacao.get('assinatura_peca') == assinatura_peca(peca)
+                    and origem_local and produto_kabum(comprovacao.get('url')) == origem_local
+                    and isinstance(comprovacao.get('titulo_origem'), str) and comprovacao['titulo_origem'].strip()
+                    and re.fullmatch(r'[a-f0-9]{64}', comprovacao.get('sha256_especificacoes', ''))):
+                provas.append('codigo_fabricante')
+                titulo_origem = comprovacao.get('titulo_origem', '')
+        rgb_remoto = {converter_valor('iluminacao', v) for v in valores(produto.especificacoes.get('rgb'))}
+        if True in rgb_remoto and False in rgb_remoto:
+            pendencias.append('rgb_nao_comprovado')
+        if rgb_remoto == {False} and re.search(r'\ba?rgb\b', nome(peca.modelo)):
+            conflitos.append('rgb_divergente')
         cores = {'preto':'preto','black':'preto','branco':'branco','white':'branco',
                  'rosa':'rosa','pink':'rosa','vermelho':'vermelho','red':'vermelho','azul':'azul','blue':'azul'}
         def extrair_cores(texto):
             texto = re.sub(r'\b(?:switch|outemu|gateron|cherry(?: mx)?|gx)\s+(?:red|blue|brown|black|white)\b', '', nome(texto))
             return {cores[v] for v in re.findall(r'\b(?:'+ '|'.join(cores) + r')\b', texto)}
-        cores_locais = extrair_cores(peca.modelo) if peca.__tablename__ not in ('ssd','hd','processador') else set()
+        nome_local_completo = ' '.join([peca.modelo, titulo_origem])
+        cores_locais = extrair_cores(nome_local_completo) if peca.__tablename__ not in ('ssd','hd','processador') else set()
         cores_remotas = extrair_cores(' '.join(valores(produto.especificacoes.get('cor')))) or extrair_cores(produto.titulo)
         if cores_locais and cores_remotas and not cores_locais <= cores_remotas:
             conflitos.append('cor_divergente')
-        if not provas:
+        if not (set(provas) & {'mpn','gtin'}):
             if cores_locais and not cores_remotas:
                 pendencias.append('cor_nao_comprovada')
-            local=nome(peca.modelo);remoto=nome(' '.join([produto.titulo,produto.modelo or '',*produto.modelos_alternativos]))
-            if getattr(peca,'iluminacao',None) is True:local += ' rgb'
-            if any(converter_valor('iluminacao', v) is True for v in valores(produto.especificacoes.get('iluminacao'))):remoto += ' rgb'
+            local=nome(nome_local_completo);remoto=nome(' '.join([produto.titulo,produto.modelo or '',*produto.modelos_alternativos]))
+            if any(converter_valor('iluminacao', v) is True for v in valores(produto.especificacoes.get('rgb'))):remoto += ' rgb'
             for flag,padrao in (('wifi',r'\bwi.?fi\b'),('rgb',r'\b(?:a?rgb)\b'),('oc',r'\boc\b'),('2048sp',r'\b2048\s*sp\b'),('airflow',r'\bairflow\b'),('mesh',r'\bmesh\b')):
                 if bool(re.search(padrao,local))!=bool(re.search(padrao,remoto)):
                     pendencias.append('variante_nao_comprovada:'+flag)
@@ -130,10 +159,14 @@ class AssociacaoInteligenteService:
             if not n['exato']:pendencias.append('modelo_exato_nao_comprovado')
             pendencias.extend('especificacao_essencial_ausente:'+c for c in e['ausentes'])
         else:provas.append('modelo_especificacoes')
+        if 'codigo_fabricante' in provas and not (set(provas) & {'mpn','gtin'}) and peca.__tablename__ in ('memoria_ram','fan'):
+            quantidade = 'quantidade_pentes' if peca.__tablename__ == 'memoria_ram' else 'quantidade'
+            if quantidade in e['ausentes']:
+                pendencias.append('quantidade_nao_comprovada')
         if pendencias:pontos=min(pontos,80)
         if conflitos:pontos=0
         classificacao=self.classificar_percentual(pontos)
-        criterio=next((c for c in ('mpn','gtin','modelo_especificacoes') if c in provas),None)
+        criterio=next((c for c in ('mpn','gtin','codigo_fabricante','modelo_especificacoes') if c in provas),None)
         return dict(classificacao=classificacao,percentual=pontos,criterio=criterio,versao=self.VERSAO,
             codigo_modelo=n.get('codigo_modelo'),
             avisos=identificadores['avisos'],
@@ -146,7 +179,7 @@ class AssociacaoInteligenteService:
         ordenados=sorted(resultados,key=lambda r:(-r['percentual'],r['peca']))
         melhor=ordenados[0] if ordenados else None
         auto=[r for r in ordenados if r['percentual']>80]
-        conflito_identidade=any(r['conflitos'] and set(r['evidencias']) & {'mpn','gtin'} for r in ordenados)
+        conflito_identidade=any(r['conflitos'] and set(r['evidencias']) & {'mpn','gtin','codigo_fabricante'} for r in ordenados)
         unico=bool(not conflito_identidade and completo and len(auto)==1 and (len(ordenados)<2 or auto[0]['percentual']-ordenados[1]['percentual']>=10))
         percentual=melhor['percentual'] if melhor else 0
         if not unico and (auto or not completo or conflito_identidade):percentual=min(80,max(60,percentual))

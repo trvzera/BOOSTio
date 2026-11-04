@@ -2,7 +2,7 @@ import re
 from decimal import Decimal
 from .normalizar_produto import nome, numero
 from utils.sockets import normalizar_socket
-from .normalizar_especificacoes import converter_adicional, agregar, CONJUNTOS
+from .normalizar_especificacoes import converter_adicional, agregar, CONJUNTOS, comparar_conexoes
 
 ESSENCIAIS={
  'processador':('soquete','nucleo','thread'),
@@ -78,7 +78,7 @@ def converter(campo, valor):
         return {'udimm':'dimm'}.get(s,s) if s in ('dimm','udimm','sodimm','rdimm','lrdimm') else None
     if campo=='formato':
         s=s.replace('\"','').replace('″','').strip()
-        return {'microatx':'matx','micro-atx':'matx','mini-itx':'itx','miniitx':'itx'}.get(s.replace(' ',''),s.replace(' ',''))
+        return {'microatx':'matx','micro-atx':'matx','m-atx':'matx','mini-itx':'itx','miniitx':'itx','mini-atx':'miniatx'}.get(s.replace(' ',''),s.replace(' ',''))
     return re.sub(r'\s+','',s) or None
 
 
@@ -109,6 +109,9 @@ def extrair_titulo(categoria,titulo):
     if categoria=='ssd':
         unico('tipo',r'\b(nvme|sata)\b',lambda m:m)
     if categoria=='fonte':unico('potencia_w',r'\b(\d+)\s*(w)\b',lambda m:''.join(m))
+    if categoria=='fan':
+        unico('quantidade',r'\b(\d+)\s*(?:fans|ventoinhas)\b',lambda m:m)
+        unico('tamanho_mm',r'\b(\d+)\s*(mm)\b',lambda m:''.join(m))
     return dados
 
 
@@ -128,6 +131,8 @@ class ConferirEspecificacoesService:
                     valor_local='sodimm' if re.search(r'so.?dimm|notebook|laptop',t) else 'dimm' if re.search(r'\bdimm\b|desktop',t) else None
             local=converter(campo,valor_local)
             bruto=valores(dados.get(campo)) or valores(titulo.get(campo))
+            if campo == 'tipo_fone' and local != 'headset' and dados.get('formato_fone'):
+                bruto = valores(dados['formato_fone'])
             observados={converter(campo,v) for v in bruto}
             if campo in CONJUNTOS:
                 agregado = agregar(observados)
@@ -135,8 +140,17 @@ class ConferirEspecificacoesService:
             if not bruto or local is None or None in observados:
                 if campo in campos:ausentes.append(campo)
                 continue
-            if campo in ('compatibilidade', 'conexao') and len(observados) == 1:
+            if campo in ('compatibilidade', 'conexao', 'formatos_placa_mae') and len(observados) == 1:
                 remoto = next(iter(observados))
+                if campo == 'conexao':
+                    conexoes = comparar_conexoes(local, remoto)
+                    if conexoes is True:
+                        conferidos.append(campo)
+                    elif conexoes is False:
+                        conflitos.append('especificacao_divergente:conexao')
+                    elif campo in campos:
+                        ausentes.append(campo)
+                    continue
                 if set(local.split('|')) <= set(remoto.split('|')):
                     conferidos.append(campo)
                     continue

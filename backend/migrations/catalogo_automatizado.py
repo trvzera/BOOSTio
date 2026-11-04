@@ -1,11 +1,12 @@
 """Etapa 1: estrutura aditiva, sem descobrir/importar anúncios ou excluir peças."""
 from sqlalchemy import inspect, text
 from sqlalchemy.schema import CreateIndex
-from models import db, Oferta, ProdutoPendente, ExecucaoDescoberta, EstadoCatalogo
+from models import db, Oferta, ProdutoPendente, ExecucaoDescoberta, EstadoCatalogo, RevisaoIdentidadePeca
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 
 CAMPOS = {'status_validacao', 'validacao_motivo', 'validado_em'}
 ESTADOS = "'pendente','em_revisao','aprovado','rejeitado','legado'"
+TABELAS = (Oferta, ProdutoPendente, ExecucaoDescoberta, EstadoCatalogo, RevisaoIdentidadePeca)
 
 
 def preparar_catalogo_automatizado(*, simular=True):
@@ -14,7 +15,7 @@ def preparar_catalogo_automatizado(*, simular=True):
         raise ValueError('Banco não suportado para catálogo automatizado')
     insp = inspect(db.engine)
     # Toda a verificação precede o primeiro DDL, inclusive a detecção de duplicatas.
-    for modelo in (Oferta, ProdutoPendente, ExecucaoDescoberta, EstadoCatalogo):
+    for modelo in TABELAS:
         tabela = modelo.__table__
         if insp.has_table(tabela.name):
             if {c['name'] for c in insp.get_columns(tabela.name)} != set(tabela.columns.keys()):
@@ -35,18 +36,20 @@ def preparar_catalogo_automatizado(*, simular=True):
             continue  # A criação inicial de componentes continua no comando já existente.
         cols = {c['name'] for c in insp.get_columns(nome)}
         esperadas = set(modelo.__table__.columns.keys())
-        novos = CAMPOS | {'referencia_interna','fontes_especificacoes'} | ({'formato'} if nome=='memoria_ram' else set())
+        novos = CAMPOS | {'referencia_interna','fontes_especificacoes','codigo_modelo_fabricante'} | ({'formato'} if nome=='memoria_ram' else set())
+        if nome == 'placa_video':novos |= {'fabricante_chip','modelo_referencia'}
         if not esperadas - novos <= cols or not cols <= esperadas:
             raise ValueError(f'Tabela {nome} incompatível; migração de catálogo não corrige outras alterações')
         existentes.append((modelo, cols))
     plano = []
-    for modelo in (Oferta, ProdutoPendente, ExecucaoDescoberta, EstadoCatalogo):
+    for modelo in TABELAS:
         if not insp.has_table(modelo.__tablename__):
             plano.append({'acao': 'criar_tabela', 'tabela': modelo.__tablename__})
     for modelo, cols in existentes:
         nome = modelo.__tablename__
-        campos=[('status_validacao','VARCHAR(20)'),('validacao_motivo','TEXT'),('validado_em','DATETIME'),('referencia_interna','VARCHAR(100)'),('fontes_especificacoes','JSON')]
+        campos=[('status_validacao','VARCHAR(20)'),('validacao_motivo','TEXT'),('validado_em','DATETIME'),('referencia_interna','VARCHAR(100)'),('fontes_especificacoes','JSON'),('codigo_modelo_fabricante','VARCHAR(150)')]
         if nome=='memoria_ram':campos.append(('formato','VARCHAR(20)'))
+        if nome=='placa_video':campos.extend([('fabricante_chip','VARCHAR(30)'),('modelo_referencia','VARCHAR(120)')])
         for campo, tipo in campos:
             if campo not in cols:
                 # Sem DEFAULT nesta adição: registros antigos permanecem NULL (legado).

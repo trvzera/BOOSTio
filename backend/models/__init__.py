@@ -52,6 +52,7 @@ from .historico_oferta import HistoricoOferta
 from .token_integracao import TokenIntegracao
 from .autorizacao_mercado_livre import AutorizacaoMercadoLivre
 from .identidade_fabricante import IdentidadeFabricante
+from .revisao_identidade_peca import RevisaoIdentidadePeca
 
 #Funcão obrigatória para o login buscar informações do usuario pelo id
 @lm.user_loader
@@ -64,6 +65,6 @@ __all__ = [
     'lm','db','Peca','Periferico','Usuario','PreferenciasUso','ModeloBase','Fonte',
     'Processador','PlacaMae','PlacaVideo','MemoriaRAM','SSD','HD',
     'Gabinete','WaterCooler','AirCooler','Fan','Fone','Teclado','Mouse','Monitor',
-    'PlacaRede','CaboRede',
+    'PlacaRede','CaboRede','RevisaoIdentidadePeca',
     'Setup','Codigo','TokenRecuperacao','Build','BuildSalva','ConsultaPreco','ControleColeta','HistoricoPreco','Oferta','ProdutoPendente','ExecucaoDescoberta','EstadoCatalogo','TokenIntegracao','VinculoMercadoLivre','HistoricoOferta','IdentidadeFabricante','AutorizacaoMercadoLivre'
 ]

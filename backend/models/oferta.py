@@ -39,6 +39,12 @@ class Oferta(ModeloBase):
     )
 
     @classmethod
+    def corresponde_origem(cls, peca, loja, identificador, *, bloquear=False):
+        consulta = cls.query.filter_by(loja=loja, produto_id_loja=identificador)
+        registro = (consulta.with_for_update() if bloquear else consulta).first()
+        return bool(registro and (registro.tabela_peca, registro.peca_id) == (peca.__tablename__, peca.id))
+
+    @classmethod
     def identidades_kabum_ambiguas(cls):
         from sqlalchemy import inspect
         from collections import defaultdict
