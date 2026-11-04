@@ -68,7 +68,7 @@ class DescobrirProdutosService:
                           max_produtos=max_produtos, max_ofertas_por_produto=max_ofertas_por_produto, marca=marca)
         resumo = dict(simulacao=simular, execucao_id=None, paginas=0, encontrados=0,
                       novos=0, ja_coletados=0, ja_associados=0, invalidos=0, repetidos=0,
-                      catalogos_indisponiveis=0,
+                      catalogos_indisponiveis=0, catalogos_incompletos=0, leituras_pendentes=[],
                       fora_da_marca=0, marca_nao_confirmada=0, fora_do_dominio=0,
                       requisicoes=0, interrompido=False, limitado=False, falhas=[],
                       janela_limitada=False, cursor=deepcopy(cursor) if cursor else dict(origem=origem,offset=0,produtos=[],indice=0,ofertas_offset=0,total_busca=0), concluido=False)
@@ -182,11 +182,17 @@ class DescobrirProdutosService:
                 try:
                     linhas,total=consultar('/products/'+produto['id']+'/items',{},estado['ofertas_offset'],100)
                 except ErroMercadoLivre as erro:
-                    if erro.status != 404:
+                    if erro.status not in (404, 206):
                         raise
-                    # O produto pode desaparecer entre a pesquisa e a leitura das ofertas.
+                    # Catálogos removidos ou respostas parciais não fornecem ofertas
+                    # confiáveis. Registrar a lacuna sem aceitar o conteúdo parcial.
                     # 401/403/429 continuam interrompendo, sem contornar restrições.
-                    resumo['catalogos_indisponiveis'] += 1
+                    if erro.status == 206:
+                        resumo['catalogos_incompletos'] += 1
+                        resumo['leituras_pendentes'].append({'catalogo_id':produto['id'], 'http':206,
+                            'offset':estado['ofertas_offset']})
+                    else:
+                        resumo['catalogos_indisponiveis'] += 1
                     resumo['paginas'] += 1
                     linhas, total = [], 0
                 teto = parametros['max_ofertas_por_produto']

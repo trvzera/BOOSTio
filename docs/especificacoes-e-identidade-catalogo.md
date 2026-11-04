@@ -25,3 +25,5 @@ Prepare o esquema com `catalogo-preparar`, seguindo os procedimentos de backup e
 Mantenha o conjunto original de peças como denominador. Separe anúncios encontrados, peças distintas reconhecidas, ofertas importadas e componentes novos criados. Uma proposta confirmada na cópia não é uma oferta publicada. Respostas antigas permitem reproduzir o matching, mas não comprovam preços e disponibilidade atuais.
 
 HTTP 403 não autoriza contornar restrições. HTTP 429 interrompe a coleta; o resumo informa o status e a espera solicitada pelo servidor, quando disponível. Retome pelo checkpoint depois da espera, sem repetir grupos concluídos.
+
+HTTP 206 ao ler ofertas de um catálogo não é aceito como resposta completa: o catálogo aparece em `leituras_pendentes`, com ID e offset, e incrementa `catalogos_incompletos`. Seus dados parciais não são importados; os demais catálogos continuam. Uma resposta parcial na própria pesquisa interrompe a execução sem avançar o cursor. As lacunas precisam ser reconsultadas antes de considerar a coleta completa.

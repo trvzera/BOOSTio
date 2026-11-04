@@ -279,3 +279,19 @@ def test_categoria_sem_dominio_nao_captura_memoria_e_ssd_nao_captura_hd(banco):
     s, cliente = service([pagina(produtos)])
     r = s.executar(categoria='ssd', consulta='SSD WD', marca='WD', max_produtos=100)
     assert r['fora_do_dominio'] == 1 and r['novos'] == 0 and cliente._requisitar.call_count == 1
+
+
+def test_resposta_parcial_nas_ofertas_registra_pendencia_sem_importar(banco):
+    produtos=[dict(id='MLB20',name='Kingston DDR4'),dict(id='MLB21',name='Kingston DDR4')]
+    s,_=service([pagina(produtos),ErroMercadoLivre(206),pagina([anuncio()])])
+    r=executar(s,max_produtos=2,max_ofertas_por_produto=1)
+    assert r['concluido'] and not r['interrompido'] and r['novos']==1
+    assert r['catalogos_incompletos']==1 and r['catalogos_indisponiveis']==0
+    assert r['leituras_pendentes']==[{'catalogo_id':'MLB20','http':206,'offset':0}]
+
+
+def test_pesquisa_parcial_interrompe_sem_avancar_cursor(banco):
+    s,_=service([ErroMercadoLivre(206)])
+    r=executar(s,max_produtos=2,max_ofertas_por_produto=1)
+    assert r['interrompido'] and r['http_status']==206 and r['novos']==0
+    assert r['cursor']['offset']==0 and r['cursor']['indice']==0
