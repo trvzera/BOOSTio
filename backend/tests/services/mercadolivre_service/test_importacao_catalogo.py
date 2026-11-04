@@ -98,3 +98,13 @@ def test_falha_no_historico_reverte_componente_identidade_vinculo_e_oferta(banco
     finally:event.remove(db.engine,'before_cursor_execute',falhar)
     assert HD.query.count()==Oferta.query.count()==HistoricoOferta.query.count()==IdentidadeFabricante.query.count()==VinculoMercadoLivre.query.count()==0
     assert ProdutoPendente.query.one().status=='pendente'
+
+
+def test_ficha_comercial_completa_nao_libera_identidade_em_revisao_no_icecat(banco):
+    importador = service()
+    importador.base_icecat = Mock()
+    importador.base_icecat.executar.side_effect = lambda produto, ficha: (
+        produto, {**ficha, 'icecat': {'status': 'ambigua'}})
+    resultado = importador.executar(banco.id, simular=False, permitir_novos=True)
+    assert resultado['acao'] == 'revisao'
+    assert HD.query.count() == Oferta.query.count() == HistoricoOferta.query.count() == 0
