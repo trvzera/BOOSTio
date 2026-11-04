@@ -90,20 +90,27 @@ class NormalizarFichaKabumService:
         parser = _TextoFicha(); parser.feed(html)
         linhas = parser.linhas()
         pares = {}
+        rotulos_categoria = {
+            'memoria_gb': {'memoria', 'memoria de video', 'tamanho da memoria', 'capacidade de memoria', 'quantidade de memoria'},
+            'tipo_memoria': {'tipo de memoria', 'tipo memoria', 'tipo da memoria'},
+        } if categoria == 'placa_video' else {}
+        rotulos_validos = {'modelo', 'part number', 'mpn', 'tipo de conexao', 'conexoes'}
+        rotulos_validos.update(set().union(*self.ROTULOS.values(), *rotulos_categoria.values()))
         for i, linha in enumerate(linhas):
             rotulo, sep, valor = linha.partition(':')
             chave = nome(rotulo).strip().rstrip('*')
-            if not sep and chave not in {'modelo', 'part number', 'mpn'}:
+            if not sep and chave not in rotulos_validos:
                 continue
             if not valor.strip() and i + 1 < len(linhas) and ':' not in linhas[i + 1]:
                 valor = linhas[i + 1]
             if valor.strip():
                 pares.setdefault(chave, []).append(valor.strip())
         specs = extrair_titulo(categoria, titulo)
-        for campo, aliases in self.ROTULOS.items():
+        for campo, aliases in {**self.ROTULOS, **rotulos_categoria}.items():
             encontrados = [v for k, vs in pares.items() if k in aliases for v in vs]
             if encontrados:
-                specs[campo] = sorted(set(encontrados))
+                anteriores = specs.get(campo, []) if campo in rotulos_categoria else []
+                specs[campo] = sorted(set([*anteriores, *encontrados]))
         if categoria == 'monitor' and pares.get('resolucao'):
             specs['resolucao'] = pares['resolucao']
         if categoria == 'processador' and specs.get('socket'):

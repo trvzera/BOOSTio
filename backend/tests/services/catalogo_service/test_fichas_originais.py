@@ -76,3 +76,31 @@ def test_revalida_oferta_original_antes_de_persistir(banco):
     with pytest.raises(ValueError,match='Oferta original mudou'):
         preencher_especificacoes(p,proposta,assinatura,simular=False)
     assert p.formato is None and p.part_number is None
+
+
+def test_rotulos_em_linhas_separadas_sem_dois_pontos():
+    dados=ficha(title='Monitor Marca Modelo27',manufacturer={'name':'Marca'},category='Periféricos/Monitores',
+        technicalInformation={'text':'<p>Resolução</p><p>1920x1080</p><p>Tamanho da Tela</p><p>27 polegadas</p><p>Taxa de atualização</p><p>144 Hz</p><p>Tipo de painel</p><p>IPS</p>'})
+    d=NormalizarFichaKabumService().executar(dados,'monitor',codigo_esperado='123')
+    assert d.especificacoes['resolucao']==['1920x1080']
+    assert d.especificacoes['taxa_atualizacao_hz']==['144 Hz']
+    assert d.especificacoes['tamanho_polegadas']==['27 polegadas']
+
+
+def test_gpu_le_memoria_da_ficha_sem_confundir_ddr_com_gddr():
+    dados=ficha(title='Placa de Vídeo Marca RTX 4060 - ABC4060',manufacturer={'name':'Marca'},category='Hardware/Placa de Vídeo',
+        technicalInformation={'text':'<p>Memória de vídeo</p><p>8 GB</p><p>Tipo de memória</p><p>GDDR6</p>'})
+    d=NormalizarFichaKabumService().executar(dados,'placa_video',codigo_esperado='123')
+    assert d.especificacoes['memoria_gb']==['8 GB'] and d.especificacoes['tipo_memoria']==['GDDR6']
+    dados['technicalInformation']['text']='Memória de vídeo: não informado<br>Tipo de memória: DDR5'
+    d=NormalizarFichaKabumService().executar(dados,'placa_video',codigo_esperado='123')
+    assert d.especificacoes['memoria_gb']==['não informado']
+    assert d.especificacoes['tipo_memoria']==['DDR5']
+
+
+def test_memoria_de_gpu_contraditoria_nao_e_ocultada_pela_ficha():
+    from services.catalogo_service.conferir_especificacoes_service import converter
+    dados=ficha(title='Placa de Vídeo Marca RTX 4060 8GB GDDR6',manufacturer={'name':'Marca'},category='Hardware/Placa de Vídeo',technicalInformation={'text':'Memória de vídeo: 16 GB<br>Tipo de memória: DDR5'})
+    d=NormalizarFichaKabumService().executar(dados,'placa_video',codigo_esperado='123')
+    assert {converter('memoria_gb',v) for v in d.especificacoes['memoria_gb']}=={8,16}
+    assert {converter('tipo_memoria',v) for v in d.especificacoes['tipo_memoria']}=={'ddr5','gddr6'}
