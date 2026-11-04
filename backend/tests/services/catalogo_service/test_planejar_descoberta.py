@@ -74,3 +74,11 @@ def test_pesquisa_corrige_grafia_comprovada_sem_alterar_modelo():
     assert plano[0]['consulta']=='c3tech ps-600bk'
     assert plano[0]['marca']=='C3Techtech'
     assert p.fabricante=='C3Techtech'
+
+
+def test_alternativa_pesquisa_edicao_do_titulo_original_sem_autorizar_match():
+    p=SimpleNamespace(__tablename__='placa_video',id=1,fabricante='MSI',modelo='RTX 4060 912-V516-001',part_number=None,codigo_modelo_fabricante='912-V516-001',fontes_especificacoes={'codigo_modelo_fabricante':{'criterio':'anuncio_original_e_especificacoes_compativeis','titulo_origem':'Placa de Vídeo MSI RTX 4060 Ventus 2X OC, 8GB GDDR6'}})
+    trabalhos=PlanejarDescobertaService().alternativas(p)
+    assert trabalhos[-1]['consulta']=='Placa de Vídeo MSI RTX 4060 Ventus 2X OC'
+    assert all('peca' not in t for t in trabalhos)
+    assert p.modelo=='RTX 4060 912-V516-001'

@@ -63,6 +63,14 @@ class PlanejarDescobertaService:
         comercial = peca.modelo.split(',')[0].strip()
         if comercial:
             consultas.append(f'{fabricante} {comercial}')
+        # O título original pode conter a edição comercial que o código de
+        # fábrica não encontra na loja. Serve apenas como consulta, nunca prova.
+        origens = getattr(peca, 'fontes_especificacoes', None) or {}
+        origem = origens.get('codigo_modelo_fabricante', {})
+        if origem.get('criterio') == 'anuncio_original_e_especificacoes_compativeis':
+            titulo = origem.get('titulo_origem')
+            if isinstance(titulo, str) and titulo.strip():
+                consultas.append(titulo.split(',')[0].strip())
         vistos = set(); trabalhos = []
         for consulta in consultas:
             consulta = ' '.join(consulta.split())
