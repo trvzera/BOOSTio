@@ -1,0 +1,13 @@
+[Unit]
+Description=BOOSTio - atualizar precos das pecas
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+ConditionPathExists=/opt/BOOSTio/.env.production
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/BOOSTio
+ExecStart=/usr/bin/bash /opt/BOOSTio/deploy/atualizar_precos.sh
+TimeoutStartSec=3h
+Nice=10
