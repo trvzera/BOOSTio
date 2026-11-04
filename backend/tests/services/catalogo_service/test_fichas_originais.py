@@ -104,3 +104,20 @@ def test_memoria_de_gpu_contraditoria_nao_e_ocultada_pela_ficha():
     d=NormalizarFichaKabumService().executar(dados,'placa_video',codigo_esperado='123')
     assert {converter('memoria_gb',v) for v in d.especificacoes['memoria_gb']}=={8,16}
     assert {converter('tipo_memoria',v) for v in d.especificacoes['tipo_memoria']}=={'ddr5','gddr6'}
+
+
+@pytest.mark.parametrize('declaracao',['8GB GDDR6','GDDR6 8 GB','14 Gbps, 8gb Gddr6, 128-bit'])
+def test_gpu_separa_capacidade_e_tipo_explicitamente_declarados(declaracao):
+    from services.catalogo_service.conferir_especificacoes_service import converter
+    dados=ficha(title='Placa de Vídeo Marca RTX 4060',manufacturer={'name':'Marca'},category='Hardware/Placa de Vídeo',technicalInformation={'text':'Memória de vídeo: '+declaracao})
+    d=NormalizarFichaKabumService().executar(dados,'placa_video',codigo_esperado='123')
+    assert {converter('memoria_gb',v) for v in d.especificacoes['memoria_gb']}=={8}
+    assert {converter('tipo_memoria',v) for v in d.especificacoes['tipo_memoria']}=={'gddr6'}
+
+
+@pytest.mark.parametrize('declaracao',['1500MHz','4G.','até 8GB','8 a 16GB','4 GB (4096MB)','-8GB','- 8GB'])
+def test_gpu_nao_inventa_capacidade_de_valor_ambiguo(declaracao):
+    from services.catalogo_service.conferir_especificacoes_service import converter
+    dados=ficha(title='Placa de Vídeo Marca RTX 4060',manufacturer={'name':'Marca'},category='Hardware/Placa de Vídeo',technicalInformation={'text':'Memória de vídeo: '+declaracao})
+    d=NormalizarFichaKabumService().executar(dados,'placa_video',codigo_esperado='123')
+    assert converter('memoria_gb',d.especificacoes['memoria_gb'][0]) is None

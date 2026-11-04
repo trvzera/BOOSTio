@@ -3,7 +3,7 @@ import re
 from html.parser import HTMLParser
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
 from services.catalogo_service.normalizar_produto import nome
-from services.catalogo_service.conferir_especificacoes_service import extrair_titulo
+from services.catalogo_service.conferir_especificacoes_service import extrair_titulo, converter
 
 
 class _TextoFicha(HTMLParser):
@@ -34,6 +34,25 @@ class _TextoFicha(HTMLParser):
 
 
 class NormalizarFichaKabumService:
+    @staticmethod
+    def _separar_memoria_gpu(specs):
+        capacidades=[];tipos=list(specs.get('tipo_memoria', []))
+        for valor in specs.get('memoria_gb', []):
+            texto=nome(str(valor))
+            tipos.extend(re.findall(r'\b(?:gddr\s*[567]x?|ddr\s*[345])\b',texto))
+            ambiguo = (re.search(r'\bate\b|\bup to\b|compartilh|\b\d+\s*mb\b',texto)
+                or re.search(r'\d+\s*(?:-|a)\s*\d+\s*gb',texto)
+                or re.search(r'(?<!\w)[+-]\s*\d',texto)
+                    and not re.fullmatch(r'gddr\s*[567]x?\s*-\s*\d+\s*gb',texto))
+            if converter('memoria_gb',valor) is not None:
+                capacidades.append(valor)
+            elif not ambiguo:
+                capacidades.extend(extrair_titulo('placa_video',texto).get('memoria_gb') or [valor])
+            else:
+                capacidades.append(valor)
+        if capacidades:specs['memoria_gb']=sorted(set(capacidades))
+        if tipos:specs['tipo_memoria']=sorted(set(tipos))
+
     CATEGORIAS = {
         'processador': r'processador', 'placa_mae': r'placas?[ -]?mae',
         'placa_video': r'placa de video', 'memoria_ram': r'memoria ram',
@@ -113,6 +132,8 @@ class NormalizarFichaKabumService:
                 specs[campo] = sorted(set([*anteriores, *encontrados]))
         if categoria == 'monitor' and pares.get('resolucao'):
             specs['resolucao'] = pares['resolucao']
+        if categoria == 'placa_video':
+            self._separar_memoria_gpu(specs)
         if categoria == 'processador' and specs.get('socket'):
             specs['soquete'] = specs.pop('socket')
         if categoria in ('fone', 'mouse', 'teclado'):
