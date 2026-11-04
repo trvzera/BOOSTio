@@ -1,13 +1,13 @@
 """Ficha técnica extraída de atributos oficiais, mantendo lacunas explícitas."""
 import re
 from datetime import datetime, timezone
-from types import SimpleNamespace
+from dataclasses import asdict
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_catalogo
-from .identidade_produto import atributos, numero, gtin
+from services.catalogo_service.normalizar_produto import atributos, numero, gtin
 from .comparar_produtos_service import CompararProdutosService, DOMINIOS
 from .buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
-from .consultar_benchmark_catalogo_service import ConsultarBenchmarkCatalogoService
+from services.catalogo_service.consultar_benchmark_catalogo_service import ConsultarBenchmarkCatalogoService
 
 # IDs efetivamente observados nas respostas oficiais preservadas.
 ATRIBUTOS = {
@@ -17,7 +17,7 @@ ATRIBUTOS = {
  'placa_video': {'memoria_gb':('MEMORY_SIZE','gb'),'tipo_memoria':('GRAPHICS_MEMORY_TYPE',None),
     'consumo_energia':('TOTAL_GRAPHICS_POWER','w')},
  'memoria_ram': {'capacidade_gb':('RAM_MEMORY_MODULE_TOTAL_CAPACITY','gb'),
-    'ddr':('RAM_MEMORY_MODULE_TYPE','ddr'),'frequencia_mhz':('RAM_MEMORY_MODULE_SPEED','mhz')},
+    'ddr':('RAM_MEMORY_MODULE_TYPE','ddr'),'formato':('RAM_MEMORY_FORMAT',None),'frequencia_mhz':('RAM_MEMORY_MODULE_SPEED','mhz')},
  'placa_mae': {'socket':('SOCKET',None),'tipo_memoria':('SUPPORTED_RAM_MEMORY_TYPE','ddr'),
     'quantidade_slots_ram':('RAM_MEMORY_SLOTS','inteiro'),'memoria_maxima_gb':('MAX_SUPPORTED_RAM_MEMORY_CAPACITY','gb')},
  'ssd': {'capacidade_gb':('CAPACITY','gb'),'interface':('INTERFACES',None),'tipo':('INTERFACES',None),
@@ -28,8 +28,10 @@ IGNORADOS = {'id','criado_em','atualizado_em','status_validacao'}
 
 
 class EnriquecerProdutoService:
-    def __init__(self, benchmarks=None):
+    def __init__(self, benchmarks=None, base_hardware=None):
         self.benchmarks = benchmarks or ConsultarBenchmarkCatalogoService()
+        from services.catalogo_service.consultar_base_hardware_service import ConsultarBaseHardwareService
+        self.base_hardware=base_hardware or ConsultarBaseHardwareService()
 
     def executar(self, categoria, produto, anuncio):
         modelos = {m.__tablename__:m for m in MODELOS_PECAS}
@@ -82,28 +84,25 @@ class EnriquecerProdutoService:
         if mpn and not re.fullmatch(r'[a-z0-9][a-z0-9./_-]{2,254}',mpn):mpn=None
         gtins={gtin(v) for v in a.get('GTIN',set())};gtins.discard(None)
         identidade={'mpn':mpn,'gtin':next(iter(gtins)) if len(gtins)==1 else None}
-        necessarios = {c.name for c in modelo.__table__.columns if not c.nullable and c.name not in IGNORADOS}
-        if categoria=='processador':necessarios |= {'videointegrado','cooler'}
-        pendentes=sorted(necessarios-set(dados))
-        for campo,valor in dados.items():
-            coluna=modelo.__table__.columns[campo]
-            tamanho=getattr(coluna.type,'length',None)
-            if isinstance(valor,str) and (not valor.strip() or (tamanho and len(valor)>tamanho)):
-                conflitos.append('valor_invalido:'+campo)
-        proxy=SimpleNamespace(__tablename__=categoria,id=0,part_number=mpn,**{
-            'fabricante':dados.get('fabricante',''),'modelo':dados.get('modelo',''),
-            **{k:v for k,v in dados.items() if k not in ('fabricante','modelo')}})
-        comparacao=CompararProdutosService().avaliar(proxy,produto,identidade=identidade)
-        conflitos += comparacao['conflitos']
+        from services.catalogo_service.validar_ficha_tecnica_service import ValidarFichaTecnicaService
+        from services.catalogo_service.consultar_base_hardware_service import ConsultarBaseHardwareService
+        from .normalizar_produto_service import NormalizarProdutoService
+        normalizado=NormalizarProdutoService().executar(produto,categoria)
+        consulta=self.base_hardware.executar(normalizado)
+        normalizado=consulta['produto']
+        for campo,valor in consulta['dados'].items():
+            if campo in modelo.__table__.columns and campo not in dados:dados[campo]=valor
+        validacao=ValidarFichaTecnicaService().executar(categoria,dados,normalizado,identidade)
+        conflitos+=validacao['conflitos'];pendentes=validacao['campos_pendentes']
         if anuncio.get('title'):
-            titulo=CompararProdutosService().avaliar(proxy,{**produto,'name':anuncio['title']},identidade=identidade)
-            conflitos += titulo['conflitos']
-            if titulo['classificacao']!='confirmada':avisos.append('Título individual requer revisão')
-        if not mpn:pendentes.append('mpn')
+            from dataclasses import replace
+            titulo=ValidarFichaTecnicaService().executar(categoria,dados,replace(normalizado,titulo=anuncio['title']),identidade)
+            conflitos+=titulo['conflitos']
+            if not titulo['pronto']:avisos.append('Título individual requer revisão')
         benchmark=self.benchmarks.executar(categoria,dados.get('fabricante',''),dados.get('modelo',''))
-        pronto=not pendentes and not conflitos and comparacao['classificacao']=='confirmada' and 'Título individual requer revisão' not in avisos
+        pronto=not pendentes and not conflitos and validacao['pronto'] and 'Título individual requer revisão' not in avisos
         return dict(categoria=categoria,pronto=pronto,dados=dados,identidade=identidade,
             campos_pendentes=sorted(set(pendentes)),conflitos=sorted(set(conflitos)),avisos=avisos,
-            fontes={k:dict(url=f"https://api.mercadolibre.com/products/{produto.get('id')}"+("/items" if v.startswith("anuncio.") else ""),atributo=v) for k,v in origens.items()},
-            benchmark=benchmark,assinatura_catalogo=assinatura_catalogo(produto),produto=produto,
+            fontes={**consulta['fontes'], **{k:dict(url=f"https://api.mercadolibre.com/products/{produto.get('id')}"+("/items" if v.startswith("anuncio.") else ""),atributo=v) for k,v in origens.items()}},
+            benchmark=benchmark,normalizado=asdict(normalizado),loja='mercado_livre',fonte_identidade=normalizado.fonte,base_hardware=consulta['status'],assinatura_catalogo=assinatura_catalogo(produto),produto=produto,
             coletado_em=datetime.now(timezone.utc).isoformat())

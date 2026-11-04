@@ -277,3 +277,26 @@ def test_importacao_concorrente_nao_duplica_componente_mysql(banco):
     db.session.remove()
     assert HD.query.count()==IdentidadeFabricante.query.count()==1
     assert Oferta.query.count()==HistoricoOferta.query.count()==2
+
+def test_ram_formato_nulo_migracao_e_importacao_sem_mpn_mysql(banco):
+    from models import MemoriaRAM,ProdutoPendente
+    from migrations.catalogo_automatizado import preparar_catalogo_automatizado
+    from migrations.identidades_fabricante import preparar_identidades_fabricante
+    from services.catalogo_service.produto_normalizado import ProdutoNormalizado
+    from services.catalogo_service.importar_catalogo_service import ImportarCatalogoService
+    from utils.identidade_peca import assinatura_documento
+    app,p=banco;preparar();preparar_identidades_fabricante()
+    MemoriaRAM.__table__.create(db.engine)
+    db.session.add(MemoriaRAM(fabricante='Teste',modelo='RAM',preco=100,consumo_energia=5,capacidade_gb=8,ddr='DDR4',frequencia_mhz=3200,quantidade_pentes=1));db.session.commit();db.session.remove()
+    with db.engine.begin() as conn:conn.execute(text('ALTER TABLE memoria_ram DROP COLUMN formato'))
+    preparar_catalogo_automatizado(simular=False)
+    assert MemoriaRAM.query.one().formato is None
+    p=Processador.query.one();p.part_number='SEED-CPU-1';p.status_validacao='aprovado';db.session.commit()
+    dto=ProdutoNormalizado(loja='outra_loja',id_externo='cpu',categoria='processador',categoria_confirmada=True,titulo='AMD Ryzen 5 5500',modelo='Ryzen 5 5500',marca='AMD',ativo=True,especificacoes={'soquete':'AM4','nucleo':6,'thread':12})
+    bruto={'teste':'multiloja'}
+    pend=ProdutoPendente(loja='outra_loja',produto_id_loja='1',titulo=dto.titulo,url='https://loja.example/cpu',categoria_sugerida='processador',dados_originais=bruto,coletado_em=datetime(2026,11,3));db.session.add(pend);db.session.commit()
+    ficha={'dados':{},'identidade':{},'pronto':False,'conflitos':[],'produto':{'id':'cpu'}}
+    anuncio={'produto_id_loja':'1','url':'https://loja.example/cpu','preco':'500.00','esgotado':False}
+    r=ImportarCatalogoService().executar(pend.id,dto,ficha,anuncio,assinatura_documento(bruto),simular=False)
+    assert r['acao']=='importada' and r['criterio']=='modelo_especificacoes'
+    assert Oferta.query.count()==HistoricoOferta.query.count()==1

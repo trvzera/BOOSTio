@@ -37,9 +37,9 @@ class AssociarCatalogoService:
         if len(ids) == 1 and not self._unica_local(peca, next(p for p in candidatos if p['id'] == ids[0])):
             ids = []
         if len(ids) == 1 and total == len(candidatos) and len(set(p.get('id') for p in candidatos)) == len(candidatos):
-            return {'status': 'encontrada', 'catalogo_id': ids[0], 'assinatura': assinatura, 'criterio': self.comparar(peca, next(p for p in candidatos if p['id'] == ids[0]))['evidencias'][0]}
+            return {'status': 'encontrada', 'catalogo_id': ids[0], 'assinatura': assinatura, 'criterio': self.comparar(peca, next(p for p in candidatos if p['id'] == ids[0]))['criterio']}
         return {'status': 'nao_encontrada' if total == 0 else 'revisao',
-                'motivo': 'Sem correspondência única comprovada por MPN e fabricante',
+                'motivo': 'Sem correspondência única acima de 80 por identificador ou título, modelo e especificações',
                 'candidatos': candidatos_revisao}
 
     @staticmethod

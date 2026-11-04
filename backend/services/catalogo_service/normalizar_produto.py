@@ -10,7 +10,7 @@ def nome(valor):
     valor = unicodedata.normalize('NFKD', valor.replace('®', '').replace('™', '')).casefold()
     valor = ''.join(c for c in valor if not unicodedata.combining(c))
     valor = re.sub(r'\b(ddr|rtx|gtx|rx)\s*-?\s*(\d)', r'\1 \2', valor)
-    valor = re.sub(r'(\d{3,5})\s+(x3d|kf|ks|ge|hx|hs|x|g|f|k|t|u|h|p)\b', r'\1\2', valor)
+    valor = re.sub(r'(\d{3,5})\s+(x3d[0-9]*|kf|ks|ge|hx|hs|x|g|f|k|t|u|h|p)\b', r'\1\2', valor)
     return re.sub(r'\s+', ' ', valor).strip()
 
 
@@ -61,7 +61,7 @@ def numero(valor, unidade=None):
 def variante(categoria, valor):
     texto = nome(valor)
     if categoria == 'processador':
-        m = re.search(r'\b(?:ryzen\s*[3579]|(?:core\s*)?i[3579]|core\s*ultra\s*[3579])\s*-?\s*(\d{3,5}(?:x3d|[a-z]{1,3})?)\b', texto)
+        m = re.search(r'\b(?:ryzen\s*[3579]|(?:core\s*)?i[3579]|core\s*ultra\s*[3579])\s*-?\s*(\d{3,5}[a-z0-9]*)\b', texto)
         return m[1] if m else None
     if categoria == 'placa_video':
         m = re.search(r'\b(rtx|gtx|rx|arc)\s*([a-z]?\d{3,4})\s*(ti|super|xtx|xt)?\s*(super)?\b', texto)

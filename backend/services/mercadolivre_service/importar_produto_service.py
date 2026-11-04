@@ -45,36 +45,15 @@ class ImportarProdutoService:
         entrada={'price':anuncio['preco'],'available_quantity':anuncio.get('quantidade_disponivel')}
         if (bruto.get('anuncio') or {}).get('title'):entrada['title']=bruto['anuncio']['title']
         ficha=self.enriquecedor.executar(categoria,produto,entrada)
-        agora=datetime.now(timezone.utc).replace(tzinfo=None)
-        self.verificar_execucao()
-        with self.repositorio.transacao(pendencia_id,simular=simular) as atual:
-            if atual.status=='importado':return dict(acao='inalterada',pendencia_id=atual.id,oferta_id=atual.oferta_id)
-            if atual.categoria_sugerida!=categoria or assinatura_documento(atual.dados_originais)!=assinatura:
-                raise ValueError('Pendência mudou durante a consulta')
-            pool=modelos[categoria].pool_para_matching(2001)
-            decisao=CompararProdutosService().selecionar(pool[:2000],produto,
-                identidades=IdentidadeFabricante.para_matching(pool[:2000]),completo=len(pool)<=2000)
-            if decisao['classificacao']=='ambigua':
-                motivo='Vários candidatos ou evidências insuficientes; revisão necessária'
-                if not simular:self.repositorio.registrar_revisao(atual,ficha,motivo)
-                return dict(acao='revisao',pendencia_id=atual.id,motivo=motivo)
-            novo=decisao['classificacao']!='confirmada'
-            if novo and (not permitir_novos or not ficha['pronto']):
-                if not simular:self.repositorio.registrar_revisao(atual,ficha)
-                return dict(acao='revisao',pendencia_id=atual.id,campos_pendentes=ficha['campos_pendentes'],conflitos=ficha['conflitos'])
-            peca=next((a for a in pool if f'{a.__tablename__}:{a.id}'==decisao['peca']),None)
-            if not novo and (not peca.publicavel or CompararProdutosService().avaliar(peca,{**produto,'name':entrada.get('title',produto.get('name'))},identidade=IdentidadeFabricante.para_matching([peca]).get(peca.id))['classificacao']!='confirmada'):
-                motivo='Ficha local não publicada ou título divergente'
-                if not simular:self.repositorio.registrar_revisao(atual,ficha,motivo)
-                return dict(acao='revisao',pendencia_id=atual.id,motivo=motivo)
-            if simular:
-                return dict(acao='proposta',novo_componente=novo,pendencia_id=atual.id,peca=None if novo else decisao['peca'],preco=str(anuncio['preco']))
-            if novo:peca=self.repositorio.criar_componente(modelos[categoria],ficha)
-            propostas=Oferta.aplicar_lote_mercado_livre(peca,catalogo,assinatura_peca(peca),assinatura_catalogo(produto),
-                'mpn' if 'mpn' in CompararProdutosService().avaliar(peca,produto,identidade=ficha['identidade'])['evidencias'] else 'gtin',
-                [anuncio],agora,simular=False,confirmar=False,desativar_ausentes=False)
-            self.repositorio.concluir(atual,peca,ficha,anuncio,propostas,agora)
-            return dict(acao='importada',novo_componente=novo,pendencia_id=atual.id,peca=f'{peca.__tablename__}:{peca.id}',ofertas=propostas)
+        from services.catalogo_service.importar_catalogo_service import ImportarCatalogoService
+        from .normalizar_produto_service import NormalizarProdutoService
+        from services.catalogo_service.produto_normalizado import ProdutoNormalizado
+        normalizado=ProdutoNormalizado(**ficha['normalizado']) if ficha.get('normalizado') else NormalizarProdutoService().executar(produto,categoria)
+        if entrada.get('title'):
+            from dataclasses import replace
+            normalizado=replace(normalizado,titulo=entrada['title'])
+        return ImportarCatalogoService(self.repositorio,self.verificar_execucao).executar(
+            pendencia_id,normalizado,ficha,anuncio,assinatura,simular=simular,permitir_novos=permitir_novos)
 
     def executar_lote(self, *, limite=20, depois_id=0, categoria=None, simular=True, permitir_novos=False):
         ids=[p.id for p in ProdutoPendente.listar_para_revisao(depois_id,limite,categoria)]

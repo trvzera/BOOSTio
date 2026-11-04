@@ -7,6 +7,7 @@ class MemoriaRAM(Peca):
     capacidade_gb = db.Column(db.Integer(), nullable=False)
     ddr = db.Column(db.String(20), nullable=False)  
     frequencia_mhz = db.Column(db.Integer(), nullable=False)
+    formato = db.Column(db.String(20), nullable=True)
     latencia = db.Column(db.String(20))  
     quantidade_pentes = db.Column(db.Integer(), nullable=False)
     iluminacao = db.Column(db.Boolean(), default=False)

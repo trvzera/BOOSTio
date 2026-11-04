@@ -3,7 +3,7 @@ from unittest.mock import Mock
 from copy import deepcopy
 
 from services.mercadolivre_service.enriquecer_produto_service import EnriquecerProdutoService
-from services.mercadolivre_service.consultar_benchmark_catalogo_service import ConsultarBenchmarkCatalogoService
+from services.catalogo_service.consultar_benchmark_catalogo_service import ConsultarBenchmarkCatalogoService
 from services.benchmark_service.importar_referencias_passmark_service import COLUNAS
 
 

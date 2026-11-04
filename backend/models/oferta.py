@@ -186,3 +186,38 @@ class Oferta(ModeloBase):
                 'vendedor_id': self.vendedor_id, 'vendedor_nome': self.vendedor_nome,
                 'url': url_compra, 'preco': float(self.preco), 'esgotado': self.esgotado,
                 'atualizadoEm': self.consultado_em.replace(tzinfo=timezone.utc).isoformat(timespec='seconds')}
+
+    @classmethod
+    def aplicar_ofertas_loja(cls,peca,loja,ofertas,agora):
+        """Parte genérica da unidade de trabalho. O chamador confirma a transação."""
+        from decimal import Decimal,InvalidOperation
+        from urllib.parse import urlsplit
+        from . import HistoricoOferta
+        propostas=[]
+        for dados in ofertas:
+            try:
+                preco=Decimal(str(dados['preco']))
+                if not preco.is_finite() or preco<=0 or preco>Decimal('999999999999.99') or preco.quantize(Decimal('.01'))!=preco:raise ValueError('Preço inválido')
+            except (InvalidOperation,KeyError):raise ValueError('Preço inválido') from None
+            url=urlsplit(dados['url'])
+            if url.scheme!='https' or not url.hostname or url.username or url.password:raise ValueError('URL da oferta inválida')
+            chave=str(dados['produto_id_loja'])
+            if not loja or len(loja)>20 or not chave or len(chave)>80:raise ValueError('Identidade de anúncio inválida')
+            registro=cls.query.filter_by(loja=loja,produto_id_loja=chave).with_for_update().first()
+            if registro and (registro.tabela_peca!=peca.__tablename__ or registro.peca_id!=peca.id):raise ValueError('Anúncio já pertence a outra peça')
+            if registro and registro.vendedor_id!=str(dados.get('vendedor_id') or ''):raise ValueError('Vendedor mudou; avaliar')
+            novo=registro is None
+            if novo:
+                registro=cls(loja=loja,produto_id_loja=chave,tabela_peca=peca.__tablename__,peca_id=peca.id,
+                    vendedor_id=str(dados.get('vendedor_id') or ''),url=dados['url'])
+                db.session.add(registro)
+            mudou=novo or registro.preco!=preco or registro.esgotado!=dados.get('esgotado') or registro.url!=dados['url'] or not registro.ativa
+            if mudou:
+                registro.preco=preco;registro.esgotado=dados.get('esgotado');registro.url=dados['url'];registro.ativa=True
+                registro.consultado_em=agora;registro.preco_atualizado_em=agora
+            db.session.flush()
+            ultimo=HistoricoOferta.ultimo(registro.id,bloquear=True)
+            historico=ultimo is None or ultimo.preco!=preco or ultimo.esgotado!=registro.esgotado
+            if historico:db.session.add(HistoricoOferta(oferta_id=registro.id,preco=preco,esgotado=registro.esgotado,coletado_em=agora))
+            propostas.append(dict(anuncio=chave,acao='criada' if novo else 'atualizada' if mudou else 'inalterada',historico=historico))
+        return propostas

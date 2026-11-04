@@ -16,3 +16,5 @@ python -m flask --app app mercadolivre-enriquecer --limite 20 --aplicar
 ```
 
 O padrão é simulação. `--benchmark-cpu CAMINHO` e `--benchmark-gpu CAMINHO` recebem arquivos locais; use volumes somente leitura no Docker. `--depois-id`, `--max-requisicoes` e `--intervalo` limitam a execução. A aplicação grava apenas evidências em `produto_pendente`, mantendo status de revisão. Falhas HTTP, limite de chamadas e falhas de persistência interrompem com resumo; fichas incompletas são contabilizadas como revisão. Nenhuma peça, oferta ou benchmark existente é alterado nesta etapa.
+
+A validação, benchmarks e consulta complementar agora são compartilhados entre lojas. MPN não é obrigatório quando o modelo e as especificações comprovam a identidade. Há um snapshot técnico local licenciado; consulte [associacao-inteligente.md](associacao-inteligente.md) para campos, limites e proveniência. Os adaptadores não inventam preço/estoque a partir da ficha de hardware.

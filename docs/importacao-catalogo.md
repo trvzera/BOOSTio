@@ -18,3 +18,5 @@ python -m flask --app app mercadolivre-importar-pendencias --limite 20 --aplicar
 ```
 
 `--permitir-novos` habilita a criação validada; use primeiro sem `--aplicar` para revisar propostas. `--depois-id`, `--max-requisicoes` e `--intervalo` mantêm a execução limitada. O comando imprime resumo, e retorna erro se houver falhas. Não executamos importação na VPS nesta implementação.
+
+A decisão/transação foi extraída para `services/catalogo_service/ImportarCatalogoService`, com contrato normalizado para qualquer loja. A integração Mercado Livre apenas consulta/converte os dados e chama esse núcleo. A política percentual e os requisitos sem MPN estão em [associacao-inteligente.md](associacao-inteligente.md).

@@ -5,7 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 from services.mercadolivre_service.comparar_produtos_service import CompararProdutosService
-from services.mercadolivre_service.identidade_produto import nome, gtin
+from services.catalogo_service.normalizar_produto import nome, gtin
 
 
 def peca(categoria='processador', **extras):

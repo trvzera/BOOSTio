@@ -28,7 +28,7 @@ class ImportarIdentidadesService:
                 raise ValueError('Identidade incompleta')
             if item['categoria'] not in modelos or len(item['mpn']) > 255:
                 raise ValueError('Categoria ou MPN inválido')
-            from .identidade_produto import gtin
+            from services.catalogo_service.normalizar_produto import gtin
             if item.get('gtin') is not None and gtin(item['gtin']) is None:
                 raise ValueError('GTIN inválido; não foi inferido ou corrigido')
             url = urlsplit(item['fonte'])

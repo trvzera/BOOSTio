@@ -36,7 +36,7 @@ def registrar_comandos_mercadolivre(app):
     def enriquecer(benchmark_cpu, benchmark_gpu, aplicar, **opcoes):
         from services.mercadolivre_service.enriquecer_produto_service import EnriquecerProdutoService
         from services.mercadolivre_service.enriquecer_pendencias_service import EnriquecerPendenciasService
-        from services.mercadolivre_service.consultar_benchmark_catalogo_service import ConsultarBenchmarkCatalogoService
+        from services.catalogo_service.consultar_benchmark_catalogo_service import ConsultarBenchmarkCatalogoService
         try:
             service=EnriquecerPendenciasService(enriquecedor=EnriquecerProdutoService(ConsultarBenchmarkCatalogoService(benchmark_cpu,benchmark_gpu)))
             resumo=service.executar(simular=not aplicar,**opcoes)

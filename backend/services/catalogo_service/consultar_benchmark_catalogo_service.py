@@ -1,6 +1,5 @@
 """Consulta somente snapshots locais já suportados; nunca estima pontuações."""
 from pathlib import Path
-from .identidade_produto import nome
 from services.benchmark_service.importar_referencias_passmark_service import ImportarReferenciasPassmarkService
 from services.benchmark_service.importar_benchmarks_service import normalizar_nome, CONFIG
 

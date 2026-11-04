@@ -126,3 +126,15 @@ def test_status_e_identidade_invalidos_rejeitados_no_banco(banco):
     for limite in (0, 201, True):
         with pytest.raises(ValueError):
             ProdutoPendente.listar_para_revisao(limite=limite)
+
+
+def test_migracao_formato_ram_preserva_dados_e_nao_inventa_dimm(banco):
+    from models import MemoriaRAM
+    MemoriaRAM.__table__.create(db.engine)
+    db.session.add(MemoriaRAM(fabricante='Teste',modelo='Memória',capacidade_gb=8,ddr='DDR4',frequencia_mhz=3200,quantidade_pentes=1,consumo_energia=5,preco=100))
+    db.session.commit();db.session.remove()
+    with db.engine.begin() as c:c.execute(text('ALTER TABLE memoria_ram DROP COLUMN formato'))
+    assert any('`formato`' in p.get('sql','') for p in preparar_catalogo_automatizado()['alteracoes'])
+    preparar_catalogo_automatizado(simular=False)
+    assert MemoriaRAM.query.one().formato is None and MemoriaRAM.query.count()==1
+    assert preparar_catalogo_automatizado()['alteracoes']==[]

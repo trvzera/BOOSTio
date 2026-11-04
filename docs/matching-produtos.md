@@ -27,3 +27,7 @@ Use o mesmo prefixo Docker Compose dos comandos anteriores na VPS. O padrão é 
 A fixture `matching_catalogos_reais.json` contém nove snapshots oficiais já coletados, com fontes e a revisão existente, cujo MPN também consta na URL da peça de origem. Os testes verificam os pares positivos e cruzam modelos distintos da mesma categoria como negativos. Essa amostra permite medir falsos positivos nesses pares; não comprova a precisão de todo o marketplace. Os testes adicionais são explicitamente sintéticos e cobrem variantes semelhantes, códigos divergentes, kits, GTIN, buscas incompletas, duplicatas locais e persistência da fila.
 
 Os nomes dos services e classes novos ficam em português. O service da etapa 2 foi renomeado para `DescobrirProdutosService`, com imports e documentação atualizados.
+
+## Atualização: núcleo compartilhado e pontuação
+
+A política acima descreve a primeira implementação. Ela foi substituída pelo núcleo reutilizável com as faixas solicitadas (>80 automático; 60–80 avaliação; <60 sem associação), com proteção contra contradições. MPN/GTIN não são mais obrigatórios: marca, modelo comercial exato e especificações essenciais também podem comprovar a associação. A arquitetura atual e a migração do formato de RAM estão em [associacao-inteligente.md](associacao-inteligente.md).
