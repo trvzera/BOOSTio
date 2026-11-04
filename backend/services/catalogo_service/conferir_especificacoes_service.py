@@ -2,6 +2,7 @@ import re
 from decimal import Decimal
 from .normalizar_produto import nome, numero
 from utils.sockets import normalizar_socket
+from .normalizar_especificacoes import converter_adicional, agregar, CONJUNTOS
 
 ESSENCIAIS={
  'processador':('soquete','nucleo','thread'),
@@ -12,10 +13,21 @@ ESSENCIAIS={
  'hd':('capacidade_gb','interface','velocidade_rpm'),
  'fonte':('potencia_w','formato'),
  'mouse':('dpi_max','conexao'),
+ 'monitor':('tamanho_polegadas','resolucao','taxa_atualizacao_hz','tipo_painel','conexao'),
+ 'fone':('tipo_fone','microfone','conexao'),
+ 'teclado':('layout','mecanico','conexao'),
+ 'fan':('tamanho_mm','quantidade','iluminacao'),
+ 'gabinete':('formatos_placa_mae',),
+ 'air_cooler':('compatibilidade','iluminacao'),
+ 'water_cooler':('compatibilidade','tamanho_radiador_mm','iluminacao'),
+ 'adaptador_wifi':('interface','padrao_wifi','velocidade_mbps','bluetooth'),
+ 'cabo_rede':('categoria_cabo','comprimento_m','conector'),
 }
 OPCIONAIS={
  'memoria_ram':('iluminacao',),
  'placa_mae':('chipset',), 'ssd':('formato',), 'hd':('memoria_cache_mb',),
+ 'gabinete':('tamanho_max_gpu_mm','tamanho_max_cooler_mm'),
+ 'teclado':('switch',),
 }
 
 
@@ -25,6 +37,9 @@ def valores(valor):
 
 def converter(campo, valor):
     if valor is None:return None
+    adicional = converter_adicional(campo, valor)
+    if adicional is not NotImplemented:
+        return adicional
     s=nome(str(valor))
     if campo in ('soquete','socket'):return normalizar_socket(s)
     if campo in ('ddr','tipo_memoria'):
@@ -60,7 +75,7 @@ def converter(campo, valor):
         return re.sub(r'[^a-z0-9./+]','',s) if s else None
     if campo=='formato_ram':
         s=s.replace('-','').replace(' ','')
-        return s if s in ('dimm','sodimm') else None
+        return {'udimm':'dimm'}.get(s,s) if s in ('dimm','udimm','sodimm','rdimm','lrdimm') else None
     if campo=='formato':
         s=s.replace('\"','').replace('″','').strip()
         return {'microatx':'matx','micro-atx':'matx','mini-itx':'itx','miniitx':'itx'}.get(s.replace(' ',''),s.replace(' ',''))
@@ -100,10 +115,12 @@ def extrair_titulo(categoria,titulo):
 class ConferirEspecificacoesService:
     def executar(self, peca, produto):
         campos=ESSENCIAIS.get(peca.__tablename__,())
+        if peca.__tablename__ == 'teclado' and getattr(peca, 'mecanico', False) is True:
+            campos = (*campos, 'switch')
         dados=dict(produto.especificacoes);titulo=extrair_titulo(peca.__tablename__,produto.titulo)
         conflitos=[];ausentes=[];conferidos=[]
-        for campo in (*campos,*OPCIONAIS.get(peca.__tablename__,())):
-            valor_local=getattr(peca,campo,None)
+        for campo in dict.fromkeys((*campos,*OPCIONAIS.get(peca.__tablename__,()))):
+            valor_local=getattr(peca, {'tipo_fone':'tipo','categoria_cabo':'categoria'}.get(campo,campo),None)
             if campo=='formato_ram':
                 valor_local=getattr(peca,'formato',None) or valor_local
                 if valor_local is None:
@@ -112,9 +129,21 @@ class ConferirEspecificacoesService:
             local=converter(campo,valor_local)
             bruto=valores(dados.get(campo)) or valores(titulo.get(campo))
             observados={converter(campo,v) for v in bruto}
+            if campo in CONJUNTOS:
+                agregado = agregar(observados)
+                observados = {agregado}
             if not bruto or local is None or None in observados:
                 if campo in campos:ausentes.append(campo)
                 continue
+            if campo in ('compatibilidade', 'conexao') and len(observados) == 1:
+                remoto = next(iter(observados))
+                if set(local.split('|')) <= set(remoto.split('|')):
+                    conferidos.append(campo)
+                    continue
+                if campo == 'conexao' and ('wireless' in remoto or 'usb' in remoto) and any(
+                        v.startswith(('bluetooth', 'usb')) for v in local.split('|')):
+                    if campo in campos:ausentes.append(campo)
+                    continue
             if campo=='interface' and any(v in ('sata','pcie','nvme') and str(local).startswith(v) for v in observados):
                 if campo in campos:ausentes.append(campo)
                 continue

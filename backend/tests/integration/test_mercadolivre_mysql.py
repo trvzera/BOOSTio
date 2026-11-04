@@ -323,3 +323,30 @@ def test_separacao_identificadores_aditiva_preserva_usuario_e_cotacao_mysql(banc
     assert p.id == ident and p.preco == preco and Usuario.query.count() == 1
     assert not p.separar_identificadores(simular=False)['alterada']
     assert Oferta.query.count() == 1
+
+
+def test_especificacoes_json_migracao_aditiva_e_idempotencia_mysql(banco):
+    from models import MemoriaRAM
+    from migrations.catalogo_automatizado import preparar_catalogo_automatizado
+    from services.catalogo_service.produto_normalizado import ProdutoNormalizado
+    from services.catalogo_service.enriquecer_peca_existente_service import EnriquecerPecaExistenteService
+    MemoriaRAM.__table__.create(db.engine)
+    with db.engine.begin() as conn:
+        conn.execute(text('ALTER TABLE memoria_ram DROP COLUMN fontes_especificacoes'))
+    assert any('fontes_especificacoes' in item.get('sql','') for item in preparar_catalogo_automatizado()['alteracoes'])
+    preparar_catalogo_automatizado(simular=False)
+    assert preparar_catalogo_automatizado()['alteracoes'] == []
+    p = MemoriaRAM(fabricante='Crucial',modelo='CT8G4DFRA32A',consumo_energia=5,preco=123,
+        capacidade_gb=8,ddr='DDR4',frequencia_mhz=3200,quantidade_pentes=1,latencia='CL22')
+    db.session.add(p); db.session.commit()
+    dto = ProdutoNormalizado(loja='outra_loja',id_externo='memoria-1',categoria='memoria_ram',
+        categoria_confirmada=True,titulo='Crucial CT8G4DFRA32A',modelo='CT8G4DFRA32A',marca='Crucial',
+        ativo=True,fonte='https://loja.example/1',especificacoes={'capacidade_gb':'8 GB','ddr':'DDR4',
+        'frequencia_mhz':'3200 MHz','quantidade_pentes':1,'latencia':'CL22','formato_ram':'UDIMM'})
+    s = EnriquecerPecaExistenteService()
+    assert s.executar(p,dto)['status'] == 'proposta'
+    assert p.formato is None
+    assert s.executar(p,dto,simular=False)['status'] == 'atualizada'
+    assert p.fontes_especificacoes['formato']['valor'] == 'DIMM'
+    assert s.executar(p,dto,simular=False)['status'] == 'inalterada'
+    assert p.preco == 123 and Usuario.query.one().nome == 'Preservado'

@@ -3,18 +3,18 @@ import re
 from .produto_normalizado import ProdutoNormalizado
 from .normalizar_produto import nome,codigo,gtin,variante
 from .comparar_nomes_service import CompararNomesService,marca,cpu
-from .conferir_especificacoes_service import ConferirEspecificacoesService,valores
+from .conferir_especificacoes_service import ConferirEspecificacoesService,valores,converter as converter_valor
 
 
 class AssociacaoInteligenteService:
-    VERSAO='associacao_v2'
+    VERSAO='associacao_v3'
 
     @staticmethod
     def classificar_percentual(percentual):
         return 'confirmada' if percentual>80 else 'ambigua' if percentual>=60 else 'rejeitada'
 
     def comparar_identificadores(self,peca,produto,identidade=None):
-        local=identidade or {};conflitos=[];pendencias=[];provas=[]
+        local=identidade or {};conflitos=[];pendencias=[];provas=[];avisos=[]
         mpn=local.get('mpn',getattr(peca,'part_number',None))
         if mpn and re.match(r'^(SEED|DEMO|BOOSTIO|REDE|KABUM)[-_]',str(mpn),re.I):mpn=None
         remotos={codigo(v) for v in valores(produto.identificadores.get('mpn')) if v}
@@ -23,14 +23,14 @@ class AssociacaoInteligenteService:
             if codigo(mpn) not in remotos:conflitos.append('mpn_divergente')
             elif len(remotos)==1:provas.append('mpn')
         gl=local.get('gtin',getattr(peca,'gtin',None));gr={gtin(v) for v in valores(produto.identificadores.get('gtin'))}
-        if None in gr:pendencias.append('gtin_remoto_invalido');gr.discard(None)
-        if len(gr)>1:pendencias.append('gtins_multiplos')
+        if None in gr:avisos.append('gtin_remoto_invalido');gr.discard(None)
+        if len(gr)>1:avisos.append('gtins_multiplos_sem_prova_univoca')
         if gl:
             g=gtin(gl)
-            if g is None:pendencias.append('gtin_local_invalido')
+            if g is None:avisos.append('gtin_local_invalido')
             elif gr and g not in gr:conflitos.append('gtin_divergente')
             elif gr=={g}:provas.append('gtin')
-        return dict(conflitos=conflitos,pendencias=pendencias,evidencias=provas,mpn_local=mpn)
+        return dict(conflitos=conflitos,pendencias=pendencias,evidencias=provas,mpn_local=mpn,avisos=avisos)
 
     def comparar_marca(self,peca,produto):
         esperada=marca(peca.fabricante)
@@ -65,7 +65,13 @@ class AssociacaoInteligenteService:
         return dict(conflitos=conflitos,pendencias=[])
 
     def comparar_nome_modelo(self,peca,produto):
-        return CompararNomesService().executar(peca,produto)
+        resultado = CompararNomesService().executar(peca,produto)
+        if not resultado['exato']:
+            from .comparar_codigo_modelo_service import CompararCodigoModeloService
+            comum = CompararCodigoModeloService().executar(peca,produto)
+            if comum:
+                resultado.update(exato=True, pontos=35, codigo_modelo=comum)
+        return resultado
 
     def comparar_especificacoes(self,peca,produto):
         return ConferirEspecificacoesService().executar(peca,produto)
@@ -97,9 +103,22 @@ class AssociacaoInteligenteService:
         if mpn and str(mpn).upper().endswith('BOX') and (re.search(r'\b(oem|tray)\b',nome(produto.titulo)) or produto.contexto.get('oem')):
             conflitos.append('embalagem_box_oem_divergente')
         provas=list(identificadores['evidencias'])
+        cores = {'preto':'preto','black':'preto','branco':'branco','white':'branco',
+                 'rosa':'rosa','pink':'rosa','vermelho':'vermelho','red':'vermelho','azul':'azul','blue':'azul'}
+        def extrair_cores(texto):
+            texto = re.sub(r'\b(?:switch|outemu|gateron|cherry(?: mx)?|gx)\s+(?:red|blue|brown|black|white)\b', '', nome(texto))
+            return {cores[v] for v in re.findall(r'\b(?:'+ '|'.join(cores) + r')\b', texto)}
+        cores_locais = extrair_cores(peca.modelo) if peca.__tablename__ not in ('ssd','hd','processador') else set()
+        cores_remotas = extrair_cores(' '.join(valores(produto.especificacoes.get('cor')))) or extrair_cores(produto.titulo)
+        if cores_locais and cores_remotas and not cores_locais <= cores_remotas:
+            conflitos.append('cor_divergente')
         if not provas:
+            if cores_locais and not cores_remotas:
+                pendencias.append('cor_nao_comprovada')
             local=nome(peca.modelo);remoto=nome(' '.join([produto.titulo,produto.modelo or '',*produto.modelos_alternativos]))
-            for flag,padrao in (('wifi',r'\bwi.?fi\b'),('rgb',r'\b(?:a?rgb)\b'),('oc',r'\boc\b'),('2048sp',r'\b2048\s*sp\b')):
+            if getattr(peca,'iluminacao',None) is True:local += ' rgb'
+            if any(converter_valor('iluminacao', v) is True for v in valores(produto.especificacoes.get('iluminacao'))):remoto += ' rgb'
+            for flag,padrao in (('wifi',r'\bwi.?fi\b'),('rgb',r'\b(?:a?rgb)\b'),('oc',r'\boc\b'),('2048sp',r'\b2048\s*sp\b'),('airflow',r'\bairflow\b'),('mesh',r'\bmesh\b')):
                 if bool(re.search(padrao,local))!=bool(re.search(padrao,remoto)):
                     pendencias.append('variante_nao_comprovada:'+flag)
             versao=lambda t:set(re.findall(r'\bv[1-9]\b|\brev\.?\s*[0-9.]+|\b20(?:1|2)[0-9]\b',t))
@@ -116,6 +135,8 @@ class AssociacaoInteligenteService:
         classificacao=self.classificar_percentual(pontos)
         criterio=next((c for c in ('mpn','gtin','modelo_especificacoes') if c in provas),None)
         return dict(classificacao=classificacao,percentual=pontos,criterio=criterio,versao=self.VERSAO,
+            codigo_modelo=n.get('codigo_modelo'),
+            avisos=identificadores['avisos'],
             conflitos=sorted(set(conflitos)),pendencias=sorted(set(pendencias)),evidencias=sorted(provas),
             parcelas=dict(marca=m['pontos'],modelo=n['pontos'],titulo=n['titulo'],especificacoes=e['pontos'],identificador_conclusivo=bool(identificadores['evidencias'])),
             especificacoes_conferidas=e['conferidos'])

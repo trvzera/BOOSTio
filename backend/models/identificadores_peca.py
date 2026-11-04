@@ -20,9 +20,9 @@ def _vinculos(peca):
     return resultado
 
 
-def reassinar_vinculos(peca, vinculos, antiga, numero):
+def reassinar_vinculos(peca, vinculos, antiga, numero, campos_preenchidos=()):
     nova = assinatura_peca(peca)
-    if nova == antiga:
+    if nova == antiga and not campos_preenchidos:
         return
     for tabela, registro in vinculos:
         if registro['assinatura_peca'] != antiga:
@@ -30,6 +30,9 @@ def reassinar_vinculos(peca, vinculos, antiga, numero):
         valores = {'assinatura_peca': nova}
         for campo in ('especificacoes', 'especificacoes_revisadas'):
             specs = registro.get(campo)
+            if isinstance(specs,dict) and any(k in specs and specs[k] is None for k in campos_preenchidos):
+                specs = {k:v for k,v in specs.items() if not (k in campos_preenchidos and v is None)}
+                valores[campo] = specs
             if isinstance(specs, dict) and codigo_interno(numero) and specs.get('part_number') == numero:
                 specs = {k:v for k,v in specs.items() if k != 'part_number'}
                 valores[campo] = {**specs, 'referencia_interna': numero}

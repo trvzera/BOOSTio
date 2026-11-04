@@ -46,3 +46,15 @@ def test_fabricantes_ordenados_por_quantidade_apenas_de_pecas_publicaveis():
         assert Processador.fabricantes_para_descoberta() == ['Intel', 'AMD']
         db.session.remove()
         db.engine.dispose()
+
+
+def test_busca_por_peca_preserva_codigo_e_nao_pesquisa_id_interno(tmp_path):
+    pecas = [SimpleNamespace(id=1, fabricante='Kingston', modelo='Fury Beast 8GB', part_number='KF432C16BB/8'),
+             SimpleNamespace(id=2, fabricante='Kingston', modelo='Fury Beast 16GB', part_number='KABUM-123')]
+    modelo = SimpleNamespace(__tablename__='memoria_ram', lote_para_identificadores=lambda cursor, limite:pecas)
+    plano = PlanejarDescobertaService().por_peca(categoria='memoria_ram', modelos=[modelo])
+    assert [t['consulta'] for t in plano['trabalhos']] == ['memoria RAM Kingston KF432C16BB/8', 'memoria RAM Kingston Fury Beast 16GB']
+    assert all(t['max_produtos'] == 10 for t in plano['trabalhos'])
+    arquivo = tmp_path / 'plano.json'
+    arquivo.write_text(json.dumps(plano))
+    assert len(ProcessarCatalogoService.ler_plano(arquivo)) == 2

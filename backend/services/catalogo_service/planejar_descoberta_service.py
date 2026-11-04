@@ -17,6 +17,30 @@ class PlanejarDescobertaService:
         'adaptador_wifi': 'adaptador wifi', 'cabo_rede': 'cabo de rede',
     }
 
+    def por_peca(self, *, categoria, limite=100, depois_id=0, resultados=10, modelos=None):
+        """Pesquisa modelo/MPN completos; encontrar um anúncio não comprova associação."""
+        from utils.codigos_peca import codigo_interno
+        if type(limite) is not int or not 1 <= limite <= 500 or type(resultados) is not int or not 1 <= resultados <= 100:
+            raise ValueError('Limites inválidos')
+        if type(depois_id) is not int or depois_id < 0:
+            raise ValueError('Cursor inválido')
+        modelo = next((m for m in (MODELOS_PECAS if modelos is None else modelos) if m.__tablename__ == categoria), None)
+        if modelo is None or categoria not in self.TERMOS:
+            raise ValueError('Categoria desconhecida')
+        trabalhos = []
+        for peca in modelo.lote_para_identificadores(depois_id, limite):
+            identidade = peca.part_number if peca.part_number and not codigo_interno(peca.part_number) else peca.modelo
+            consulta = ' '.join(f'{self.TERMOS[categoria]} {peca.fabricante} {identidade}'.split())
+            if not identidade or len(consulta) > 150 or any(ord(c) < 32 for c in consulta):
+                raise ValueError(f'Nome ou MPN inválido para pesquisa: {categoria}:{peca.id}')
+            trabalhos.append(dict(nome=f'{categoria}-peca-{peca.id}', categoria=categoria,
+                consulta=consulta, origem='catalogo', marca=peca.fabricante,
+                max_produtos=resultados, max_anuncios=resultados, max_ofertas_por_produto=1,
+                max_paginas=20, max_requisicoes=30, intervalo=1.0, limite_fila=20, periodo_segundos=86400))
+        if not trabalhos:
+            raise ValueError('Nenhuma peça no lote solicitado')
+        return dict(versao=1, trabalhos=trabalhos)
+
     def executar(self, *, limite=100, modelos=None, marcas_por_categoria=5):
         if type(limite) is not int or not 1 <= limite <= 100:
             raise ValueError('Informe entre 1 e 100 produtos por categoria/marca')

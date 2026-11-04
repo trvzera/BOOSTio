@@ -39,6 +39,7 @@ class Peca(ModeloBase):
   preco = db.Column(db.Float(),nullable = False)
   part_number = db.Column(db.String(100), nullable=True)
   referencia_interna = db.Column(db.String(100), nullable=True)
+  fontes_especificacoes = db.Column(db.JSON, nullable=True)
   kabum_external = db.Column(db.Text, nullable=True)
   preco_atualizado_em = db.Column(db.DateTime, nullable=True)
   esgotado = db.Column(db.Boolean(), nullable=False, default=False)
@@ -116,6 +117,10 @@ class Peca(ModeloBase):
     from .identificadores_peca import separar_identificadores
     return separar_identificadores(self, simular=simular, ids_ambiguos=ids_ambiguos)
 
+  def preencher_especificacoes(self, proposta, assinatura, *, simular=True):
+    from .especificacoes_peca import preencher_especificacoes
+    return preencher_especificacoes(self, proposta, assinatura, simular=simular)
+
   @classmethod
   def lote_para_ofertas(cls, depois_id=0, limite=50):
     return cls.query.filter(cls.id > depois_id).order_by(cls.id).limit(limite).all()
@@ -155,7 +160,7 @@ class Peca(ModeloBase):
 
   def to_catalogo(self):
     dados = {coluna.name: getattr(self, coluna.name) for coluna in self.__table__.columns
-             if coluna.name not in ("preco_atualizado_em", "criado_em", "atualizado_em", "status_validacao", "validacao_motivo", "validado_em")}
+             if coluna.name not in ("preco_atualizado_em", "criado_em", "atualizado_em", "status_validacao", "validacao_motivo", "validado_em", "fontes_especificacoes")}
     dados["id"] = f"{self.__tablename__}:{self.id}"
     if self.__tablename__ == "cabo_rede":
       dados["categoria_cabo"] = dados.get("categoria")

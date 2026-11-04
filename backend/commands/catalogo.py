@@ -9,6 +9,38 @@ from services.mercadolivre_service.processar_catalogo_service import ProcessarCa
 
 
 def registrar_comandos_catalogo(app):
+    @app.cli.command('catalogo-planejar-pecas')
+    @click.option('--categoria', required=True)
+    @click.option('--limite', default=100, type=click.IntRange(1, 500))
+    @click.option('--depois-id', default=0, type=click.IntRange(min=0))
+    @click.option('--resultados', default=10, type=click.IntRange(1, 100))
+    def planejar_pecas(categoria, limite, depois_id, resultados):
+        """Gera pesquisas específicas por peça, sem chamadas externas."""
+        from services.catalogo_service.planejar_descoberta_service import PlanejarDescobertaService
+        try:
+            click.echo(json.dumps(PlanejarDescobertaService().por_peca(categoria=categoria,
+                limite=limite, depois_id=depois_id, resultados=resultados), ensure_ascii=False, indent=2))
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else 'Confira o esquema do catálogo') from None
+
+    @app.cli.command('catalogo-especificacoes-preencher')
+    @click.option('--limite', default=100, type=click.IntRange(1, 200))
+    @click.option('--depois-id', default=0, type=click.IntRange(min=0))
+    @click.option('--categoria')
+    @click.option('--aplicar', is_flag=True)
+    def preencher_especificacoes(limite, depois_id, categoria, aplicar):
+        """Usa fichas já coletadas. Não cria peças, ofertas nem faz chamadas externas."""
+        from services.catalogo_service.preencher_especificacoes_service import PreencherEspecificacoesService
+        from services.mercadolivre_service.classificar_pendencias_service import ClassificarPendenciasService
+        try:
+            resumo = PreencherEspecificacoesService(ClassificarPendenciasService.normalizar).executar(
+                limite=limite, depois_id=depois_id, categoria=categoria, simular=not aplicar)
+            click.echo(json.dumps(resumo, ensure_ascii=False))
+            if resumo['falhas']:
+                raise click.ClickException('Lote contém falhas; consulte o resumo antes de continuar')
+        except (ValueError, SQLAlchemyError):
+            raise click.ClickException('Confira os dados e execute catalogo-preparar antes de preencher') from None
+
     @app.cli.command('catalogo-identificadores-separar')
     @click.option('--aplicar', is_flag=True)
     def separar_identificadores(aplicar):
