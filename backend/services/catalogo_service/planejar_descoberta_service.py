@@ -45,19 +45,24 @@ class PlanejarDescobertaService:
         """Consultas curtas sem apagar sufixos. Nenhuma busca comprova associação."""
         from utils.codigos_peca import codigo_interno
         from .comparar_codigo_modelo_service import CompararCodigoModeloService
+        from .comparar_nomes_service import marca as normalizar_marca
+        from .normalizar_produto import nome
         categoria = peca.__tablename__
         if categoria not in self.TERMOS or type(resultados) is not int or not 1 <= resultados <= 100:
             raise ValueError('Categoria ou limite inválido')
         consultas = []
+        fabricante = peca.fabricante
+        if normalizar_marca(fabricante) != nome(fabricante):
+            fabricante = normalizar_marca(fabricante)
         for valor in (getattr(peca, 'part_number', None), getattr(peca, 'codigo_modelo_fabricante', None)):
             if valor and not codigo_interno(valor):
-                consultas.append(f'{peca.fabricante} {valor}')
+                consultas.append(f'{fabricante} {valor}')
         codigos = sorted(CompararCodigoModeloService.extrair(peca.modelo, categoria))
         if len(codigos) == 1:
-            consultas.append(f'{peca.fabricante} {codigos[0]}')
+            consultas.append(f'{fabricante} {codigos[0]}')
         comercial = peca.modelo.split(',')[0].strip()
         if comercial:
-            consultas.append(f'{peca.fabricante} {comercial}')
+            consultas.append(f'{fabricante} {comercial}')
         vistos = set(); trabalhos = []
         for consulta in consultas:
             consulta = ' '.join(consulta.split())

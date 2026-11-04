@@ -69,3 +69,12 @@ def test_codigo_no_titulo_preserva_sufixo_e_rejeita_acessorio():
     assert s.avaliar(p,d)['classificacao']=='confirmada'
     assert s.avaliar(p,replace(d,titulo='Crucial CT8G4DFRA32A-US 8GB DDR4'))['classificacao']!='confirmada'
     assert s.avaliar(p,replace(d,titulo='Suporte para Crucial CT8G4DFRA32A'))['classificacao']=='rejeitada'
+
+
+def test_aliases_de_marca_preservam_empresas_distintas():
+    from services.catalogo_service.comparar_nomes_service import marca
+    assert marca('C3Techtech')==marca('C3Tech')
+    assert marca('AERO COOL')==marca('Aerocool')
+    assert marca('Master Drive')==marca('Masterdrive')
+    assert marca('Cooler Master')!=marca('Master Drive')
+    assert marca('C3Tech Pro')!=marca('C3Tech')

@@ -66,3 +66,11 @@ def test_alternativas_preservam_sufixo_e_nao_usam_codigo_interno():
     grupos=PlanejarDescobertaService().alternativas(p)
     assert [g['consulta'] for g in grupos]==['Kingston KF432C16BBA/8','Kingston Fury Beast RGB']
     assert all(g['max_produtos']==30 for g in grupos)
+
+
+def test_pesquisa_corrige_grafia_comprovada_sem_alterar_modelo():
+    p=SimpleNamespace(__tablename__='fonte',id=1,fabricante='C3Techtech',modelo='PS-600BK',part_number=None,codigo_modelo_fabricante=None)
+    plano=PlanejarDescobertaService().alternativas(p)
+    assert plano[0]['consulta']=='c3tech ps-600bk'
+    assert plano[0]['marca']=='C3Techtech'
+    assert p.fabricante=='C3Techtech'
