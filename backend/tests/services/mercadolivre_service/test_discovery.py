@@ -196,3 +196,86 @@ def test_checkpoint_dentro_da_pagina_e_nao_avanca_em_falha_de_gravacao(banco):
     with patch.object(ProdutoPendente,'registrar_descobertos',side_effect=OperationalError('falha',{},None)):
         erro=executar(s)
     assert erro['interrompido'] and erro['cursor']['ofertas_offset']==0
+
+
+@pytest.mark.parametrize('categoria,consulta', [('processador', 'processador Intel'), ('processador', 'processador AMD Ryzen'), ('ssd', 'SSD Kingston')])
+def test_100_produtos_por_busca_sem_concentrar_nos_vendedores_e_retoma(banco, categoria, consulta):
+    controle = ControleRequisicoesService(500, .1, dormir=lambda _: None)
+    cliente = BuscarOfertasMercadoLivreService(controle)
+    consultados = []
+
+    def api(caminho, token, params):
+        offset = params['offset']
+        if caminho == '/products/search':
+            produtos = [dict(id=f'MLB{1000+i}', name=f'Kingston modelo {i}') for i in range(120)]
+            return pagina(produtos[offset:offset+20], 120, offset)
+        numero = int(caminho.split('/')[2][3:])
+        consultados.append(numero)
+        return pagina([anuncio(numero*100+i) for i in range(100)], 100, offset)
+
+    cliente._requisitar = api
+    s = DescobrirProdutosService(cliente, controle, Mock(executar=Mock(return_value='teste')))
+    cursor = None
+    for _ in range(20):
+        r = s.executar(categoria=categoria, consulta=consulta, max_produtos=100, max_ofertas_por_produto=1, max_paginas=20,
+                     max_anuncios=100, cursor=cursor, simular=False)
+        assert not r['interrompido'], r
+        cursor = r['cursor']
+        if r['concluido']:
+            break
+    assert r['concluido'] and r['produtos_percorridos'] == 100
+    assert len(consultados) == len(set(consultados)) == ProdutoPendente.query.count() == 100
+    # Outra consulta que encontra os mesmos produtos não cria pendências duplicadas.
+    antes = ProdutoPendente.query.count()
+    r = s.executar(categoria=categoria, consulta=consulta+' outro termo', max_produtos=3,
+                   max_ofertas_por_produto=1, max_paginas=20, simular=False)
+    assert r['ja_coletados'] == 3 and ProdutoPendente.query.count() == antes
+
+
+def test_limite_de_produtos_conta_tambem_catalogos_sem_ofertas(banco):
+    produtos = [dict(id=f'MLB{i+20}', name='Kingston DDR4') for i in range(3)]
+    s, cliente = service([pagina(produtos), pagina([]), pagina([])])
+    r = executar(s, max_produtos=2, max_ofertas_por_produto=1)
+    assert r['concluido'] and r['produtos_percorridos'] == 2 and r['encontrados'] == 0
+    assert cliente._requisitar.call_count == 3
+
+
+def test_catalogo_404_nao_impede_proximo_produto_mas_403_interrompe(banco):
+    produtos = [dict(id='MLB20', name='Intel Core'), dict(id='MLB21', name='Intel Core 2')]
+    for status in [404, 403]:
+        s, _ = service([pagina(produtos), ErroMercadoLivre(status), pagina([anuncio()])])
+        r = executar(s, max_produtos=2, max_ofertas_por_produto=1)
+        assert r['interrompido'] == (status == 403)
+        assert r['catalogos_indisponiveis'] == (1 if status == 404 else 0)
+        assert r['novos'] == (1 if status == 404 else 0)
+
+
+def test_pesquisa_direcionada_usa_dominio_oficial_da_categoria(banco):
+    s, cliente = service(catalogo())
+    executar(s, max_produtos=100, max_ofertas_por_produto=1)
+    params = cliente._requisitar.call_args_list[0].args[2]
+    assert params['domain_id'] == 'MLB-RAM_MEMORY_MODULES'
+    assert params['q'] == 'Kingston DDR4'
+
+
+def test_busca_nao_confia_em_marca_ou_dominio_dos_resultados(banco):
+    produtos = [dict(id='MLB20', name='RAM Kingston', domain_id='MLB-RAM_MEMORY_MODULES', attributes=[dict(id='BRAND',value_name='Corsair')]),
+                dict(id='MLB21', name='Kingston', domain_id='MLB-HARD_DRIVES_AND_SSDS'),
+                dict(id='MLB22', name='RAM sem marca', domain_id='MLB-RAM_MEMORY_MODULES'),
+                dict(id='MLB23', name='RAM Kingston', domain_id='MLB-RAM_MEMORY_MODULES', attributes=[dict(id='BRAND',value_name='Kingston')])]
+    s, cliente = service([pagina(produtos), pagina([anuncio()])])
+    r = executar(s, marca='Kingston', max_produtos=100, max_ofertas_por_produto=1)
+    assert r['concluido'] and r['produtos_percorridos'] == 4
+    assert r['fora_da_marca'] == r['fora_do_dominio'] == r['marca_nao_confirmada'] == 1
+    assert r['novos'] == 1 and cliente._requisitar.call_count == 2
+
+
+def test_categoria_sem_dominio_nao_captura_memoria_e_ssd_nao_captura_hd(banco):
+    produtos = [dict(id='MLB20', name='Kingston', domain_id='MLB-RAM_MEMORY_MODULES')]
+    s, cliente = service([pagina(produtos)])
+    r = s.executar(categoria='fone', consulta='headset Kingston', marca='Kingston', max_produtos=100)
+    assert r['fora_do_dominio'] == 1 and r['novos'] == 0 and cliente._requisitar.call_count == 1
+    produtos = [dict(id='MLB21', name='WD', domain_id='MLB-HARD_DRIVES_AND_SSDS', attributes=[dict(id='DRIVE_STORAGE_TYPE',value_name='HDD')])]
+    s, cliente = service([pagina(produtos)])
+    r = s.executar(categoria='ssd', consulta='SSD WD', marca='WD', max_produtos=100)
+    assert r['fora_do_dominio'] == 1 and r['novos'] == 0 and cliente._requisitar.call_count == 1

@@ -81,6 +81,14 @@ class Peca(ModeloBase):
     return cls.consulta_publicavel().filter_by(id=peca_id).first()
 
   @classmethod
+  def fabricantes_para_descoberta(cls):
+    """Marcas por presença no catálogo publicável, com desempate estável."""
+    from sqlalchemy import func
+    return [linha[0] for linha in cls.consulta_publicavel().with_entities(
+      cls.fabricante).group_by(cls.fabricante).order_by(
+      func.count(cls.id).desc(), cls.fabricante).all() if linha[0] and linha[0].strip()]
+
+  @classmethod
   def pool_para_matching(cls, limite=2001):
     return cls.query.order_by(cls.id).limit(limite).all()
 

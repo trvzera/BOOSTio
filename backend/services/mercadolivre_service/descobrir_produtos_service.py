@@ -11,6 +11,9 @@ from services.peca_service.modelos_pecas import MODELOS_PECAS
 from .buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
 from .controle_requisicoes_service import ControleRequisicoesService, OrcamentoRequisicoesEsgotado, ErroMercadoLivre
 from .token_mercado_livre_service import TokenMercadoLivreService
+from .normalizar_produto_service import DOMINIOS
+from services.catalogo_service.normalizar_produto import atributos
+from services.catalogo_service.comparar_nomes_service import marca as normalizar_marca
 
 log = logging.getLogger(__name__)
 
@@ -26,7 +29,8 @@ class DescobrirProdutosService:
         self.tokens = tokens
 
     def executar(self, *, categoria, consulta, origem='catalogo', categoria_ml=None, dominio=None,
-                 max_paginas=5, max_anuncios=100, max_requisicoes=30, intervalo=1.0, simular=True, cursor=None):
+                 max_paginas=5, max_anuncios=100, max_requisicoes=30, intervalo=1.0, simular=True, cursor=None,
+                 max_produtos=None, max_ofertas_por_produto=None, marca=None):
         categorias = {c.__tablename__ for c in MODELOS_PECAS}
         if not isinstance(categoria, str) or categoria not in categorias or origem not in ('catalogo', 'anuncios'):
             raise ValueError('Categoria ou origem de descoberta inválida')
@@ -38,6 +42,14 @@ class DescobrirProdutosService:
             raise ValueError('Domínio MLB só é aceito na busca de catálogo')
         if type(max_paginas) is not int or not 1 <= max_paginas <= 100 or type(max_anuncios) is not int or not 1 <= max_anuncios <= 5000:
             raise ValueError('Limites: 1–100 páginas e 1–5000 anúncios')
+        for campo, valor in (('max_produtos', max_produtos), ('max_ofertas_por_produto', max_ofertas_por_produto)):
+            if valor is not None and (origem != 'catalogo' or type(valor) is not int or not 1 <= valor <= 1000):
+                raise ValueError(campo + ' exige origem catalogo e valor entre 1 e 1000')
+        if origem == 'catalogo' and max_produtos is not None and dominio is None:
+            dominio = DOMINIOS.get(categoria)
+        if marca is not None and (origem != 'catalogo' or not isinstance(marca, str)
+                or not 1 <= len(marca.strip()) <= 80 or any(ord(c) < 32 for c in marca)):
+            raise ValueError('Marca de pesquisa inválida')
         if type(simular) is not bool:
             raise ValueError('Simulação inválida')
         if cursor is not None:
@@ -52,9 +64,12 @@ class DescobrirProdutosService:
         cliente = self.cliente or BuscarOfertasMercadoLivreService(controle)
         parametros = dict(categoria=categoria, consulta=consulta.strip(), origem=origem,
                           categoria_ml=categoria_ml, dominio=dominio, max_paginas=max_paginas,
-                          max_anuncios=max_anuncios, max_requisicoes=max_requisicoes, intervalo=intervalo)
+                          max_anuncios=max_anuncios, max_requisicoes=max_requisicoes, intervalo=intervalo,
+                          max_produtos=max_produtos, max_ofertas_por_produto=max_ofertas_por_produto, marca=marca)
         resumo = dict(simulacao=simular, execucao_id=None, paginas=0, encontrados=0,
                       novos=0, ja_coletados=0, ja_associados=0, invalidos=0, repetidos=0,
+                      catalogos_indisponiveis=0,
+                      fora_da_marca=0, marca_nao_confirmada=0, fora_do_dominio=0,
                       requisicoes=0, interrompido=False, limitado=False, falhas=[],
                       janela_limitada=False, cursor=deepcopy(cursor) if cursor else dict(origem=origem,offset=0,produtos=[],indice=0,ofertas_offset=0,total_busca=0), concluido=False)
         vistos = set()
@@ -104,6 +119,8 @@ class DescobrirProdutosService:
             else:
                 motivo = 'Falha de leitura, autorização ou formato; consulta interrompida'
             resumo['falhas'].append(motivo)
+        estado = resumo['cursor']
+        resumo['produtos_percorridos'] = estado['offset'] + estado['indice'] if origem == 'catalogo' else 0
         resumo['requisicoes'] = controle.total
         if resumo['execucao_id'] is not None:
             try:
@@ -127,6 +144,11 @@ class DescobrirProdutosService:
             return linhas,total
         while not resumo['concluido']:
             estado=resumo['cursor']
+            if parametros['origem'] == 'catalogo' and parametros['max_produtos'] is not None:
+                if estado['offset'] + estado['indice'] >= parametros['max_produtos']:
+                    resumo['concluido'] = True
+                    resumo['limitado'] = True
+                    return
             if parametros['origem']=='anuncios':
                 params={'q':parametros['consulta']}
                 if parametros['categoria_ml']:params['category']=parametros['categoria_ml']
@@ -149,9 +171,52 @@ class DescobrirProdutosService:
                         resumo['concluido']=True;return
                 if estado['indice']>=len(estado['produtos']):raise ValueError('Cursor inconsistente')
                 produto=estado['produtos'][estado['indice']]
-                linhas,total=consultar('/products/'+produto['id']+'/items',{},estado['ofertas_offset'],100)
+                motivo = self._fora_do_grupo(produto, parametros)
+                if motivo:
+                    resumo[motivo] += 1
+                    resumo['_pagina'] = {'total': 0}
+                    yield []
+                    continue
+                try:
+                    linhas,total=consultar('/products/'+produto['id']+'/items',{},estado['ofertas_offset'],100)
+                except ErroMercadoLivre as erro:
+                    if erro.status != 404:
+                        raise
+                    # O produto pode desaparecer entre a pesquisa e a leitura das ofertas.
+                    # 401/403/429 continuam interrompendo, sem contornar restrições.
+                    resumo['catalogos_indisponiveis'] += 1
+                    resumo['paginas'] += 1
+                    linhas, total = [], 0
+                teto = parametros['max_ofertas_por_produto']
+                if teto is not None:
+                    total = min(total, teto)
+                    linhas = linhas[:max(0, total - estado['ofertas_offset'])]
                 resumo['_pagina']={'total':total}
                 yield [(linha,produto) for linha in linhas]
+
+    @staticmethod
+    def _fora_do_grupo(produto, parametros):
+        """A pesquisa textual não comprova marca nem categoria dos resultados."""
+        if parametros['max_produtos'] is not None:
+            categorias = {categoria for categoria, dominio in DOMINIOS.items() if dominio == produto.get('domain_id')}
+            if categorias and parametros['categoria'] not in categorias:
+                return 'fora_do_dominio'
+            tipos = atributos(produto).get('DRIVE_STORAGE_TYPE', set())
+            if (parametros['categoria'] == 'ssd' and 'hdd' in tipos
+                    or parametros['categoria'] == 'hd' and 'ssd' in tipos):
+                return 'fora_do_dominio'
+        if parametros['dominio'] and produto.get('domain_id') and produto['domain_id'] != parametros['dominio']:
+            return 'fora_do_dominio'
+        if parametros['marca'] is None:
+            return None
+        esperada = normalizar_marca(parametros['marca'])
+        marcas = {normalizar_marca(v) for v in atributos(produto).get('BRAND', set())}
+        if marcas:
+            return None if marcas == {esperada} else 'fora_da_marca'
+        titulo = normalizar_marca(produto.get('name', ''))
+        if not re.search(r'(?<!\w)' + re.escape(esperada) + r'(?!\w)', titulo):
+            return 'marca_nao_confirmada'
+        return None
 
     @staticmethod
     def _avancar_cursor(resumo, consumidas, tamanho):

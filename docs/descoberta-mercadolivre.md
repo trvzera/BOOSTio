@@ -60,3 +60,29 @@ Com `--aplicar`, `execucao_id` aponta para `execucao_descoberta`, com parâmetro
 Sem `--aplicar`, salve o resumo do terminal se quiser manter o diagnóstico: não existe registro da simulação no banco. Uma interrupção abrupta do processo pode deixar uma execução `executando`; agendamento, exclusão mútua e retomada persistente pertencem à etapa 6. Até lá execute uma descoberta de cada vez e repita buscas limitadas quando necessário; a deduplicação evita inserir novamente o que já foi coletado.
 
 A etapa 6 acrescenta checkpoints persistentes e retomada por página/produto, descritos em [worker-catalogo.md](worker-catalogo.md). O resumo agora inclui `cursor`, `concluido` e `janela_limitada`. A janela até offset 1000 é uma varredura limitada, não todo o marketplace.
+
+## Pesquisa direcionada por categoria e marca
+
+`catalogo-planejar` gera um plano com até cinco fabricantes por categoria, priorizando os que têm mais peças publicáveis no banco e usando nome como desempate. Assim, “principais” significa presença no seu catálogo, não uma preferência fixa por marca. Rótulos sem identidade de fabricante, como Outros, Importado e Sem marca, são ignorados. Não existe uma lista fixa de marcas favorecidas: marcas repetidas por caixa/espaços são agrupadas. Cada combinação tem uma pesquisa própria, por exemplo `processador Intel`, `processador AMD Ryzen` e `SSD Kingston`. A consulta AMD prioriza o termo Ryzen; adicione consultas específicas para outras famílias, como Athlon. O texto da pesquisa não garante a família retornada pela API; o matching ainda confere o modelo completo.
+
+```bash
+# Dentro de backend, no ambiente configurado para o banco desejado:
+python -m flask --app app catalogo-planejar --limite 100 --marcas-por-categoria 5 > data/catalogo/plano-direcionado.json
+python -m flask --app app catalogo-worker --plano data/catalogo/plano-direcionado.json --uma-vez
+# Após revisar a simulação e preparar o esquema:
+python -m flask --app app catalogo-worker --plano data/catalogo/plano-direcionado.json --aplicar
+```
+
+O limite é de até **100 produtos de catálogo por pesquisa**, e não 100 vendedores do mesmo modelo. `max_produtos` limita o percurso inteiro, inclusive após retomadas, e `max_ofertas_por_produto: 1` coleta a primeira oferta retornada pela API para cada produto. Não garante menor preço nem que a oferta passará pela associação. Produtos sem ofertas também contam no percurso. O resumo distingue `produtos_percorridos`, anúncios encontrados e pendências novas.
+
+Cada ciclo mantém o orçamento de requisições e checkpoint anteriores. São permitidos até 1.000 grupos em um plano de até 512 KB; isso não aumenta a concorrência nem o orçamento por ciclo. O worker pode alternar grupos para respeitar a agenda. Consultas sobrepostas compartilham a restrição loja/ID externo, sem duplicar anúncios. Categorias ainda sem perfil técnico suficiente continuam sujeitas à revisão existente.
+
+Um HTTP 404 na leitura de ofertas é registrado como catálogo indisponível nessa consulta, sem assumir que não exista oferta no site. HTTP 401/403/429 e falhas de formato interrompem a execução com o diagnóstico. Uma pesquisa que retorna menos de 100 produtos não é artificialmente completada. Para repetir um teste real, use uma cópia do banco; `--aplicar` no worker grava e pode importar ofertas aprovadas. Não copie refresh tokens para renovar em dois bancos independentes: a renovação deve usar o armazenamento oficial da integração.
+
+Nas pesquisas direcionadas, o adaptador aplica automaticamente o domínio oficial da categoria quando ele já está mapeado e nenhum domínio explícito foi informado. Não inventa IDs para as categorias ainda não mapeadas: nelas o termo é textual, e a associação posterior deve conferir a categoria retornada.
+
+O plano também registra `marca`. Antes de consultar ofertas, a descoberta confere BRAND contra a marca esperada (incluindo a equivalência WD/Western Digital). Na ausência do atributo, exige a marca explícita no título; sem isso registra `marca_nao_confirmada`. Resultados de outra marca ou domínio são contabilizados e ignorados nessa busca. Continuam contando nos 100 resultados percorridos: o algoritmo não amplia a janela para inventar 100 resultados pertinentes quando a API não os retorna.
+
+Para incluir todas as marcas válidas em um lote posterior, gere outro plano com `catalogo-planejar --limite 100 --todas-as-marcas`. O limite de produtos continua independente por grupo. Regenerar um plano que altere um trabalho com checkpoint exige a revisão/reinicialização já prevista pelo worker; não reaproveite cursores de outra consulta.
+
+Mesmo em categorias sem domínio mapeado, um domínio conhecido de outra categoria é descartado antes de registrar a pendência. Isso impede, por exemplo, que uma busca de headset capture RAM e reserve o anúncio sob a categoria errada. SSD e HD compartilham o domínio da API; quando `DRIVE_STORAGE_TYPE` informa explicitamente o tipo contrário, o resultado também é descartado. Categorias que compartilham domínio ou carecem de atributos suficientes continuam sujeitas à validação posterior; o texto da consulta não comprova compatibilidade.

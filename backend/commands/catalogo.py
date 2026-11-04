@@ -9,6 +9,18 @@ from services.mercadolivre_service.processar_catalogo_service import ProcessarCa
 
 
 def registrar_comandos_catalogo(app):
+    @app.cli.command('catalogo-planejar')
+    @click.option('--limite', default=100, type=click.IntRange(1, 100), show_default=True)
+    @click.option('--marcas-por-categoria', default=5, type=click.IntRange(1, 50), show_default=True)
+    @click.option('--todas-as-marcas', is_flag=True, help='Inclui todas as marcas válidas do banco.')
+    def planejar(limite, marcas_por_categoria, todas_as_marcas):
+        """Gera JSON de pesquisas por categoria/marca, sem chamadas externas."""
+        from services.catalogo_service.planejar_descoberta_service import PlanejarDescobertaService
+        try:
+            click.echo(json.dumps(PlanejarDescobertaService().executar(limite=limite, marcas_por_categoria=None if todas_as_marcas else marcas_por_categoria), ensure_ascii=False, indent=2))
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException('Não foi possível gerar o plano; confira o catálogo e o esquema') from erro
+
     @app.cli.command('catalogo-worker')
     @click.option('--plano', required=True, type=click.Path(exists=True,dir_okay=False))
     @click.option('--uma-vez', is_flag=True, help='Processa uma etapa limitada e encerra.')

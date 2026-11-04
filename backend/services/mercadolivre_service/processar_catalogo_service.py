@@ -40,15 +40,15 @@ class ProcessarCatalogoService:
     def ler_plano(caminho):
         try:
             p=Path(caminho)
-            if p.stat().st_size>65536:raise ValueError('Plano excede 64 KB')
+            if p.stat().st_size>524288:raise ValueError('Plano excede 512 KB')
             plano=json.loads(p.read_text())
         except (OSError,UnicodeError,json.JSONDecodeError):raise ValueError('Não foi possível ler o plano de catálogo') from None
-        if not isinstance(plano,dict) or plano.get('versao')!=1 or not isinstance(plano.get('trabalhos'),list) or not 1<=len(plano['trabalhos'])<=20:
-            raise ValueError('Plano deve ter versão 1 e entre 1 e 20 trabalhos')
+        if not isinstance(plano,dict) or plano.get('versao')!=1 or not isinstance(plano.get('trabalhos'),list) or not 1<=len(plano['trabalhos'])<=1000:
+            raise ValueError('Plano deve ter versão 1 e entre 1 e 1000 trabalhos')
         nomes=set();categorias={m.__tablename__ for m in MODELOS_PECAS}
         for trabalho in plano['trabalhos']:
             if not isinstance(trabalho,dict):raise ValueError('Trabalho inválido')
-            permitidos={'nome','categoria','consulta','origem','categoria_ml','dominio','periodo_segundos','max_paginas','max_anuncios','limite_fila','max_requisicoes','intervalo'}
+            permitidos={'nome','categoria','consulta','origem','categoria_ml','dominio','periodo_segundos','max_paginas','max_anuncios','limite_fila','max_requisicoes','intervalo','max_produtos','max_ofertas_por_produto','marca'}
             if set(trabalho)-permitidos:raise ValueError('Parâmetro desconhecido no plano')
             if not isinstance(trabalho.get('nome'),str) or not 1<=len(trabalho['nome'])<=80 or trabalho['nome'] in nomes:raise ValueError('Nome de trabalho ausente ou duplicado')
             if not re.fullmatch(r'[a-z0-9][a-z0-9_-]{0,79}',trabalho['nome']):raise ValueError('Nome de trabalho deve usar letras minúsculas, números, hífen e sublinhado')
@@ -63,6 +63,13 @@ class ProcessarCatalogoService:
                 valor=trabalho.get(campo,padrao)
                 if type(valor) is not int or not minimo<=valor<=maximo:raise ValueError('Limite inválido no plano: '+campo)
                 trabalho[campo]=valor
+            marca = trabalho.get('marca')
+            if marca is not None and (origem != 'catalogo' or not isinstance(marca, str) or not 1 <= len(marca.strip()) <= 80 or any(ord(c) < 32 for c in marca)):
+                raise ValueError('Marca de pesquisa inválida')
+            for campo in ('max_produtos', 'max_ofertas_por_produto'):
+                valor = trabalho.get(campo)
+                if valor is not None and (origem != 'catalogo' or type(valor) is not int or not 1 <= valor <= 1000):
+                    raise ValueError('Limite de catálogo inválido: ' + campo)
             intervalo=trabalho.get('intervalo',1.0)
             if type(intervalo) not in (int,float) or not math.isfinite(intervalo) or intervalo<0.1:raise ValueError('Intervalo inválido')
             trabalho['intervalo']=intervalo
@@ -83,7 +90,7 @@ class ProcessarCatalogoService:
             campos={};resumo={};falhou=False
             try:
                 if fase=='descoberta':
-                    opcoes={k:trabalho[k] for k in ('categoria','consulta','origem','categoria_ml','dominio','max_paginas','max_anuncios','max_requisicoes','intervalo') if k in trabalho}
+                    opcoes={k:trabalho[k] for k in ('categoria','consulta','origem','categoria_ml','dominio','max_paginas','max_anuncios','max_requisicoes','intervalo','max_produtos','max_ofertas_por_produto','marca') if k in trabalho}
                     resumo=DescobrirProdutosService(controle=controle).executar(**opcoes,simular=simular,cursor=estado.cursor_descoberta)
                     campos['cursor_descoberta']=resumo['cursor']
                     terminou=resumo['concluido']
