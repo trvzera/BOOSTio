@@ -63,6 +63,8 @@ class ImportarBaseTecnicaService:
         if ean is not None and gtin(ean) is None:conflitos.append('gtin_invalido')
         for campo in ('mpn','gtin'):
             if identidade.get(campo) and campo not in fontes:faltantes.append('fonte:'+campo)
+        for campo,valor in spec.items():
+            if valor is not None and campo not in fontes:faltantes.append('fonte:'+campo)
         dados={k:v for k,v in identidade.items() if k in ('fabricante','modelo')};dados.update(spec)
         produto=ProdutoNormalizado(loja='fonte_tecnica',id_externo=documento['id_externo'],categoria=documento['categoria'],
             titulo=' '.join(str(identidade.get(c) or '') for c in ('fabricante','modelo')),marca=identidade.get('fabricante'),
