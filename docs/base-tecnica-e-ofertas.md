@@ -9,7 +9,7 @@ Fontes consultadas:
 - https://iceclog.com/manual-for-icecat-json-product-requests/
 - https://iceclog.com/open-catalog-interface-oci-open-icecat-xml-and-full-icecat-xml-repositories/
 
-A fonte está selecionada para avaliação, não homologada como cobertura suficiente do BOOSTio. A integração autenticada e a importação de componentes a partir dela ainda não foram implementadas. O acesso do usuário é necessário para medir cobertura e campos disponíveis.
+A consulta autenticada, o índice local e o enriquecimento de anúncios desconhecidos foram implementados. Uma ficha real de RAM foi consultada e validada. A cobertura suficiente do catálogo completo ainda precisa ser medida por categoria. Comandos e limites estão em [Icecat e Mercado Livre](icecat-mercadolivre.md).
 
 ## Avaliação antes da importação
 

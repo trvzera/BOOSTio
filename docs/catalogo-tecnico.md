@@ -3,7 +3,8 @@
 O cadastro técnico e a oferta são processos separados. Uma ficha validada pode
 criar um componente sem preço ou estoque; isso não cria uma oferta nem confirma
 que há produto à venda. Valores desconhecidos são NULL, nunca zero ou disponível
-por suposição. Nenhuma integração com Icecat foi implementada nesta etapa.
+por suposição. A integração autenticada com Icecat para anúncios desconhecidos está descrita
+em [Icecat e Mercado Livre](icecat-mercadolivre.md).
 
 ## Migração
 
@@ -120,7 +121,7 @@ URLs HTTPS são validadas estruturalmente; o importador local não baixa nem
 comprova o conteúdo das páginas. O arquivo deve vir de um operador ou adaptador
 confiável. Não exponha este comando como endpoint público para conteúdo livre.
 
-Ainda faltam: adapter autenticado da fonte escolhida, medição real de cobertura,
+Ainda faltam medição de cobertura das fichas completas,
 sincronização incremental periódica e promoção comercial de peças técnicas a
 partir de ofertas verificadas de várias lojas. Os coletores e o matching de
 ofertas existentes continuam separados. Não há promessa de 70% de cobertura.
