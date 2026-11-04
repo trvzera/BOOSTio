@@ -104,5 +104,5 @@ class EnriquecerProdutoService:
         return dict(categoria=categoria,pronto=pronto,dados=dados,identidade=identidade,
             campos_pendentes=sorted(set(pendentes)),conflitos=sorted(set(conflitos)),avisos=avisos,
             fontes={**consulta['fontes'], **{k:dict(url=f"https://api.mercadolibre.com/products/{produto.get('id')}"+("/items" if v.startswith("anuncio.") else ""),atributo=v) for k,v in origens.items()}},
-            benchmark=benchmark,normalizado=asdict(normalizado),loja='mercado_livre',fonte_identidade=normalizado.fonte,base_hardware=consulta['status'],assinatura_catalogo=assinatura_catalogo(produto),produto=produto,
+            benchmark=benchmark,normalizado=asdict(normalizado),normalizacao_versao=NormalizarProdutoService.VERSAO,loja='mercado_livre',fonte_identidade=normalizado.fonte,base_hardware=consulta['status'],assinatura_catalogo=assinatura_catalogo(produto),produto=produto,
             coletado_em=datetime.now(timezone.utc).isoformat())

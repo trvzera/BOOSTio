@@ -28,6 +28,8 @@ CAMPOS = {
 
 
 class NormalizarProdutoService:
+    VERSAO = 'mercadolivre_normalizacao_v2'
+
     def executar(self, produto, categoria=None):
         if not isinstance(produto,dict):raise ValueError('Produto do Mercado Livre inválido')
         a=atributos(produto);dominio=produto.get('domain_id')
@@ -59,9 +61,15 @@ class NormalizarProdutoService:
         if categoria=='memoria_ram':specs['formato_ram']=specs.pop('formato',[])
         if categoria in ('ssd','hd'):
             specs['tecnologia_armazenamento']=valores(('DRIVE_STORAGE_TYPE',))
+            # INTERFACES pode misturar protocolo (NVMe), barramento e formato.
+            # CONNECTIVITY também contém interfaces explícitas nos dados reais.
+            armazenamento = sorted({parte.strip() for v in valores(('INTERFACES','CONNECTIVITY'))
+                for parte in re.split(r'[,;]\s*(?=[a-z])', v) if parte.strip()})
+            specs['interface'] = [v for v in armazenamento
+                if re.search(r'\b(?:sata|pcie|pci[ -]?(?:e|express)|usb|sas)', v)]
         if categoria=='ssd':
             # SSD/SATA/NVMe são conceitos distintos. O tipo interno vem da interface explícita.
-            interfaces=specs.get('interface',[])
+            interfaces=armazenamento
             specs['tecnologia_armazenamento']=specs.pop('tipo',[])
             specs['tipo']=[v for v in interfaces if 'nvme' in v or 'sata' in v]
         complementar(produto,a,categoria,specs)

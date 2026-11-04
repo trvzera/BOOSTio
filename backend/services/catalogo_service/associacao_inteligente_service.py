@@ -7,7 +7,7 @@ from .conferir_especificacoes_service import ConferirEspecificacoesService,valor
 
 
 class AssociacaoInteligenteService:
-    VERSAO='associacao_v4'
+    VERSAO='associacao_v5'
 
     @staticmethod
     def classificar_percentual(percentual):

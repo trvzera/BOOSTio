@@ -14,6 +14,16 @@ class ClassificarPendenciasService(ClassificarCatalogoService):
         produto=(pendencia.evidencias or {}).get('enriquecimento',{}).get('produto') or bruto.get('catalogo') or bruto.get('anuncio') or {}
         ficha=(pendencia.evidencias or {}).get('enriquecimento',{})
         from services.catalogo_service.produto_normalizado import ProdutoNormalizado
-        p=ProdutoNormalizado(**ficha['normalizado']) if ficha.get('normalizado') else NormalizarProdutoService().executar(produto,pendencia.categoria_sugerida)
+        from utils.identidade_peca import assinatura_catalogo
+        cache_valido = (ficha.get('normalizado')
+            and ficha.get('normalizacao_versao') == NormalizarProdutoService.VERSAO
+            and ficha.get('assinatura_catalogo') == assinatura_catalogo(produto))
+        if cache_valido:
+            p = ProdutoNormalizado(**ficha['normalizado'])
+        else:
+            p = NormalizarProdutoService().executar(produto,pendencia.categoria_sugerida)
+            if ficha.get('normalizado'):
+                from services.catalogo_service.consultar_base_hardware_service import ConsultarBaseHardwareService
+                p = ConsultarBaseHardwareService().executar(p)['produto']
         titulo=(bruto.get('anuncio') or {}).get('title')
         return (p,replace(p,titulo=titulo)) if titulo else (p,)

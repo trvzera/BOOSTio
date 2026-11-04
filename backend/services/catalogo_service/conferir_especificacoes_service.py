@@ -70,7 +70,16 @@ def converter(campo, valor):
     if campo=='tipo':
         return 'nvme' if 'nvme' in s else 'sata' if 'sata' in s else None
     if campo=='interface':
-        s=s.replace('pci express','pcie').replace('pci-e','pcie')
+        s=re.sub(r'\bpci\s*express\b','pcie',s).replace('pci-e','pcie')
+        sata = re.fullmatch(r'sata\s*(?:rev(?:ision)?\.?\s*)?(iii|ii|i|[123](?:\.0)?)\s*(?:\(?\s*(1[.,]5|3|6)\s*g(?:b/s|bps|bit/s)\s*\)?)?', s)
+        if sata:
+            geracao = {'i':1,'ii':2,'iii':3}.get(sata[1], None)
+            if geracao is None:geracao = int(float(sata[1]))
+            if not sata[2] or float(sata[2].replace(',','.')) == {1:1.5,2:3,3:6}[geracao]:
+                return f'sata{geracao}'
+        pcie = re.fullmatch(r'(?:nvme\s*)?pcie\s*(?:gen\s*)?([1-5])(?:\.0)?(?:\s*x\s*(1|2|4|8|16))?(?:\s*nvme)?', s)
+        if pcie:
+            return f'pcie{pcie[1]}.0' + ('x'+pcie[2] if pcie[2] else '')
         s=re.sub(r'\bsata\s*(iii|3)(?:\.0)?\b','sata3',s)
         return re.sub(r'[^a-z0-9./+]','',s) if s else None
     if campo=='formato_ram':
