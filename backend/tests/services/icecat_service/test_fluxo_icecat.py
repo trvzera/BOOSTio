@@ -154,3 +154,12 @@ def test_ram_representacoes_gb_mb_observadas_na_ficha_real():
     r=NormalizarFichaIcecatService().executar(corpo,dict(id='14532212',categoria='911',atualizado='20261104000000'),'memoria_ram')
     assert r['dados']['capacidade_gb']==8 and r['dados']['quantidade_pentes']==1
     assert r['dados']['frequencia_mhz']==1600 and r['conflitos']==[]
+
+
+def test_serial_ata_iii_da_ficha_real_preserva_geracao():
+    ref = dict(id='123',categoria='175',atualizado='20261104000000')
+    xml = xml_ficha().replace(b'SATA III', b'Serial ATA III')
+    ficha = NormalizarFichaIcecatService().executar(xml,ref,'hd')
+    assert ficha['dados']['interface'] == 'SATA III'
+    from services.catalogo_service.conferir_especificacoes_service import converter
+    assert converter('interface', ficha['dados']['interface']) == converter('interface','SATA rev. 3.0 (6Gb/s)')

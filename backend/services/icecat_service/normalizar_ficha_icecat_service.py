@@ -42,12 +42,12 @@ CAMPOS = {
         'Number of memory slots': ('quantidade_slots_ram', 'int'), 'Maximum internal memory': ('memoria_maxima_gb', 'gb'),
     },
     'ssd': {
-        'SSD capacity': ('capacidade_gb', 'gb'), 'Interface': ('interface', None),
+        'SSD capacity': ('capacidade_gb', 'gb'), 'Interface': ('interface', 'interface'),
         'SSD form factor': ('formato', None), 'Read speed': ('velocidade_leitura_mbps', 'mbps'),
         'Write speed': ('velocidade_gravacao_mbps', 'mbps'), 'NVMe': ('tipo', 'nvme'),
     },
     'hd': {
-        'HDD capacity': ('capacidade_gb', 'gb'), 'Interface': ('interface', None),
+        'HDD capacity': ('capacidade_gb', 'gb'), 'Interface': ('interface', 'interface'),
         'HDD speed': ('velocidade_rpm', 'rpm'), 'Storage drive buffer size': ('memoria_cache_mb', 'mb'),
     },
     'fonte': {'Total power': ('potencia_w', 'w'), 'Power supply unit (PSU) form factor': ('formato', None)},
@@ -58,12 +58,14 @@ CAMPOS = {
                 'Maximum refresh rate': ('taxa_atualizacao_hz', 'hz'), 'Panel type': ('tipo_painel', None)},
     'fone': {'Product type': ('tipo', None), 'Microphone type': ('microfone', 'microfone')},
     'cabo_rede': {'Cable standard': ('categoria', None), 'Cable length': ('comprimento_m', 'm')},
-    'adaptador_wifi': {'Host interface': ('interface', None), 'Wi-Fi standards': ('padrao_wifi', None),
+    'adaptador_wifi': {'Host interface': ('interface', 'interface'), 'Wi-Fi standards': ('padrao_wifi', None),
                        'Maximum data transfer rate': ('velocidade_mbps', 'mbps')},
 }
 
 
 def converter(valor, tipo):
+    if tipo == 'interface':
+        return re.sub(r'^Serial ATA(?=\s|$)', 'SATA', valor.strip(), flags=re.I)
     if tipo is None:
         return valor.strip() or None
     texto = nome(valor)
