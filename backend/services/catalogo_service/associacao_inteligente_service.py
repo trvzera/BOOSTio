@@ -1,5 +1,6 @@
 """Pontuação explicável e independente de loja. Percentual não é probabilidade."""
 import re
+from heapq import nsmallest
 from .produto_normalizado import ProdutoNormalizado
 from .normalizar_produto import nome,codigo,gtin,variante
 from .comparar_nomes_service import CompararNomesService,marca,cpu
@@ -178,15 +179,28 @@ class AssociacaoInteligenteService:
             especificacoes_conferidas=e['conferidos'])
 
     def selecionar(self,pecas,produto,*,identidades=None,completo=True):
-        resultados=[dict(peca=f'{p.__tablename__}:{p.id}',**self.avaliar(p,produto,identidade=(identidades or {}).get(p.id))) for p in pecas]
-        ordenados=sorted(resultados,key=lambda r:(-r['percentual'],r['peca']))
-        melhor=ordenados[0] if ordenados else None
-        auto=[r for r in ordenados if r['percentual']>80]
-        conflito_identidade=any(r['conflitos'] and set(r['evidencias']) & {'mpn','gtin','codigo_fabricante'} for r in ordenados)
-        unico=bool(not conflito_identidade and completo and len(auto)==1 and (len(ordenados)<2 or auto[0]['percentual']-ordenados[1]['percentual']>=10))
-        percentual=melhor['percentual'] if melhor else 0
-        if not unico and (auto or not completo or conflito_identidade):percentual=min(80,max(60,percentual))
+        identidades = identidades or {}
+        total = 0
+        conflito_identidade = False
+
+        def avaliar_candidatos():
+            nonlocal total, conflito_identidade
+            for peca in pecas:
+                resultado = self.avaliar(peca, produto, identidade=identidades.get(peca.id))
+                total += 1
+                if resultado['conflitos'] and {'mpn', 'gtin', 'codigo_fabricante'}.intersection(resultado['evidencias']):
+                    conflito_identidade = True
+                yield dict(peca=f'{peca.__tablename__}:{peca.id}', **resultado)
+
+        ordenados = nsmallest(10, avaliar_candidatos(), key=lambda r: (-r['percentual'], r['peca']))
+        melhor = ordenados[0] if ordenados else None
+        percentual = melhor['percentual'] if melhor else 0
+        segundo = ordenados[1]['percentual'] if len(ordenados) > 1 else None
+        unico = completo and not conflito_identidade and percentual > 80 and (
+            segundo is None or segundo <= 80 and percentual - segundo >= 10)
+        if not unico and (percentual > 80 or not completo or conflito_identidade):
+            percentual = min(80, max(60, percentual))
         classificacao='confirmada' if unico else self.classificar_percentual(min(percentual,80))
         return dict(classificacao=classificacao,percentual=percentual,criterio=melhor['criterio'] if unico else None,
-            peca=melhor['peca'] if unico else None,busca_completa=completo,candidatos=ordenados[:10],total_candidatos_avaliados=len(ordenados),candidatos_omitidos=max(0,len(ordenados)-10),
+            peca=melhor['peca'] if unico else None,busca_completa=completo,candidatos=ordenados[:10],total_candidatos_avaliados=total,candidatos_omitidos=max(0,total-10),
             motivo='Correspondência única acima de 80' if unico else 'Avaliar candidatos' if classificacao=='ambigua' else 'Sem correspondência; avaliar cadastro ou enriquecimento')

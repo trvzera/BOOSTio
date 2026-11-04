@@ -26,4 +26,4 @@ class ClassificarPendenciasService(ClassificarCatalogoService):
                 from services.catalogo_service.consultar_base_hardware_service import ConsultarBaseHardwareService
                 p = ConsultarBaseHardwareService().executar(p)['produto']
         titulo=(bruto.get('anuncio') or {}).get('title')
-        return (p,replace(p,titulo=titulo)) if titulo else (p,)
+        return (p,replace(p,titulo=titulo)) if titulo and titulo != p.titulo else (p,)

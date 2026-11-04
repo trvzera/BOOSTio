@@ -95,7 +95,7 @@ class IdentidadeFabricante(ModeloBase):
         from services.catalogo_service.normalizar_produto import gtin, codigo
         for p in pecas:
             prova=(p.fontes_especificacoes or {}).get('_identidade_tecnica',{})
-            if (not p.publicavel or prova.get('assinatura_peca')!=assinatura_peca(p)
+            if (not prova or not p.publicavel or prova.get('assinatura_peca')!=assinatura_peca(p)
                     or prova.get('assinatura_tecnica')!=assinatura_tecnica(p)):continue
             mpn=p.part_number or prova.get('mpn');ean=prova.get('gtin')
             if ean is not None and gtin(ean) is None:continue

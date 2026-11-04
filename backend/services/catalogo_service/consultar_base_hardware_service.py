@@ -1,11 +1,11 @@
 """Enriquecimento reproduzível por nome exato em snapshot licenciado, sem HTTP."""
 import hashlib,json,re
-from dataclasses import replace
+from dataclasses import asdict, replace
 from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
 from urllib.parse import urlsplit
-from .comparar_nomes_service import CompararNomesService
+from .comparar_nomes_service import CompararNomesService, marca as normalizar_marca
 from .associacao_inteligente_service import AssociacaoInteligenteService
 from .conferir_especificacoes_service import ConferirEspecificacoesService
 
@@ -28,13 +28,20 @@ class ConsultarBaseHardwareService:
         self.base=json.loads(bruto);self.sha=hashlib.sha256(bruto).hexdigest()
         if self.base.get('_meta',{}).get('license')!='CC BY 4.0':raise ValueError('Licença inesperada na base técnica')
         self.atribuicao=self.base['_meta']['attribution_required']
+        self.por_marca = {}
+        for grupo in set(GRUPOS.values()):
+            for linha in self.base.get(grupo, []):
+                chave = (grupo, normalizar_marca(linha['vendor']))
+                self.por_marca.setdefault(chave, []).append(linha)
 
     def executar(self,produto):
         self._ler()
-        chave=json.dumps([produto.categoria,produto.marca,produto.modelo,produto.titulo,produto.especificacoes],sort_keys=True,default=str)
+        chave=json.dumps(asdict(produto),sort_keys=True,default=str)
         if chave in self.cache:return self.cache[chave]
         candidatos=[]
-        for row in self.base.get(GRUPOS.get(produto.categoria,''),[]):
+        grupo = GRUPOS.get(produto.categoria, '')
+        linhas = self.por_marca.get((grupo, normalizar_marca(produto.marca)), []) if produto.marca else self.base.get(grupo, [])
+        for row in linhas:
             fonte=row.get('source');u=urlsplit(fonte or '')
             if u.scheme!='https' or not u.hostname or u.username or u.password:continue
             try:
@@ -62,5 +69,7 @@ class ConsultarBaseHardwareService:
             resultado=dict(status='encontrada',produto=replace(produto,especificacoes=specs),dados=preenchidos,
                 fontes={k:dict(url=row['source'],base='TechFuelHQ',licenca='CC BY 4.0',sha256=self.sha,
                               referencia=row['id'],referencia_em=row['last_verified'],atribuicao=self.atribuicao) for k in preenchidos})
+        if len(self.cache) >= 256:
+            self.cache.pop(next(iter(self.cache)))
         self.cache[chave]=resultado
         return resultado
