@@ -21,7 +21,8 @@ Em Docker na VPS, substitua o prefixo Python por
 `docker compose --env-file .env.production run --rm --no-deps -T api python`.
 Arquivos locais devem ser montados no container para importação. Não aplique
 migrações na produção antes de testar numa cópia do MySQL. Esta etapa foi testada
-em SQLite; a alteração MySQL ainda precisa dessa validação real. DDL no MySQL
+em SQLite e em MySQL 8.4 descartável local. Isso não substitui testar uma cópia
+do esquema real da VPS. DDL no MySQL
 pode confirmar alterações parcialmente; a migração permite reexecução, mas backup
 continua necessário.
 
