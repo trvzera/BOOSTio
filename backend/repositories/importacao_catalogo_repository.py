@@ -35,7 +35,14 @@ class RepositorioImportacaoCatalogo:
         dados.update(ficha.get('benchmark',{}).get('dados',{}))
         if ficha.get('benchmark',{}).get('dados'):
             dados['benchmark_atualizado_em']=datetime.now(timezone.utc).replace(tzinfo=None)
-        peca=modelo(**dados);db.session.add(peca);db.session.flush()
+        dados['fontes_especificacoes']=ficha.get('fontes',{})
+        peca=modelo(**dados);db.session.add(peca);db.session.flush();db.session.refresh(peca)
+        peca.ficha_montagem_validada=not peca.pendencias_para_montagem()
+        if ficha.get('icecat',{}).get('status')=='encontrada':
+            from utils.identidade_peca import assinatura_tecnica
+            peca.fontes_especificacoes={**(peca.fontes_especificacoes or {}), '_identidade_tecnica':dict(
+                **ficha['identidade'],assinatura_peca=assinatura_peca(peca),assinatura_tecnica=assinatura_tecnica(peca),
+                provedor='Icecat',id_externo=ficha['referencia_icecat'])}
         if ficha.get('identidade',{}).get('mpn'):
             db.session.add(IdentidadeFabricante(tabela_peca=modelo.__tablename__,peca_id=peca.id,
                 assinatura_peca=assinatura_peca(peca),mpn=ficha['identidade']['mpn'],gtin=ficha['identidade'].get('gtin'),

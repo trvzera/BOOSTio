@@ -1,4 +1,5 @@
 """Consulta antes da transação; revalida duplicados sob bloqueio e importa atomicamente."""
+from services.icecat_service.obter_ficha_icecat_service import ErroConsultaIcecat
 from datetime import datetime, timezone
 from sqlalchemy.exc import SQLAlchemyError
 from models import ProdutoPendente, IdentidadeFabricante, Oferta
@@ -13,10 +14,12 @@ from .controle_requisicoes_service import ControleRequisicoesService, ErroMercad
 
 
 class ImportarProdutoService:
-    def __init__(self, cliente=None, tokens=None, controle=None, enriquecedor=None, repositorio=None, verificar_execucao=None):
+    def __init__(self, cliente=None, tokens=None, controle=None, enriquecedor=None, repositorio=None, verificar_execucao=None, base_icecat=None):
         self.controle=controle or ControleRequisicoesService(50,1.0)
         self.cliente=cliente or BuscarOfertasMercadoLivreService(self.controle)
         self.tokens=tokens;self.enriquecedor=enriquecedor or EnriquecerProdutoService()
+        from services.icecat_service.completar_ficha_icecat_service import CompletarFichaIcecatService
+        self.base_icecat=base_icecat if base_icecat is not None else CompletarFichaIcecatService.configurado()
         self.repositorio=repositorio or RepositorioImportacaoCatalogo()
         self.verificar_execucao=verificar_execucao or (lambda: None)
 
@@ -52,8 +55,19 @@ class ImportarProdutoService:
         if entrada.get('title'):
             from dataclasses import replace
             normalizado=replace(normalizado,titulo=entrada['title'])
-        return ImportarCatalogoService(self.repositorio,self.verificar_execucao).executar(
+        if permitir_novos and self.base_icecat is not None:
+            from services.catalogo_service.associacao_inteligente_service import AssociacaoInteligenteService
+            pool=modelos[categoria].pool_para_matching(2001)
+            identidades=IdentidadeFabricante.para_matching(pool[:2000])
+            decisao=AssociacaoInteligenteService().selecionar(pool[:2000],normalizado,
+                identidades=identidades,completo=len(pool)<=2000)
+            if decisao['classificacao']=='rejeitada':
+                normalizado,ficha=self.base_icecat.executar(normalizado,ficha)
+        resultado_importacao=ImportarCatalogoService(self.repositorio,self.verificar_execucao).executar(
             pendencia_id,normalizado,ficha,anuncio,assinatura,simular=simular,permitir_novos=permitir_novos)
+        if ficha.get('icecat'):
+            resultado_importacao['icecat']=ficha['icecat']
+        return resultado_importacao
 
     def executar_lote(self, *, limite=20, depois_id=0, categoria=None, simular=True, permitir_novos=False):
         ids=[p.id for p in ProdutoPendente.listar_para_revisao(depois_id,limite,categoria)]
@@ -63,12 +77,15 @@ class ImportarProdutoService:
                 r=self.executar(identificador,simular=simular,permitir_novos=permitir_novos)
                 resumo[{'importada':'importadas','proposta':'propostas','inalterada':'inalteradas','revisao':'revisao'}[r['acao']]]+=1
                 resumo['detalhes'].append(r)
-            except (ValueError,SQLAlchemyError) as erro:
+            except (ValueError,OSError,SQLAlchemyError) as erro:
                 resumo['falhas']+=1
                 try:ProdutoPendente.registrar_falha_importacao(identificador,simular=simular)
                 except SQLAlchemyError:resumo['interrompido']=True
-                resumo['detalhes'].append(dict(pendencia_id=identificador,erro='Importação não confirmada; revise identidade, ficha ou persistência',http=erro.status if isinstance(erro,ErroMercadoLivre) else None))
-                if isinstance(erro,(ErroMercadoLivre,OrcamentoRequisicoesEsgotado,SQLAlchemyError)):
+                resumo['detalhes'].append(dict(pendencia_id=identificador,erro='Importação não confirmada; revise identidade, ficha ou persistência',http=erro.status if isinstance(erro,(ErroMercadoLivre,ErroConsultaIcecat)) else None,
+                    origem='icecat' if isinstance(erro,ErroConsultaIcecat) else 'importacao'))
+                if isinstance(erro,(ErroMercadoLivre,OrcamentoRequisicoesEsgotado,SQLAlchemyError,ErroConsultaIcecat)):
                     resumo['interrompido']=True;break
         resumo['requisicoes']=self.controle.total
+        if self.base_icecat is not None:
+            resumo['requisicoes_icecat']=self.base_icecat.fichas.requisicoes
         return resumo

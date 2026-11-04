@@ -31,7 +31,12 @@ class ImportarCatalogoService:
                 if not simular:self.repositorio.registrar_revisao(atual,ficha,'Fontes técnicas contraditórias; avaliar')
                 return dict(acao='revisao',pendencia_id=atual.id,percentual=decisao['percentual'],conflitos=ficha['conflitos'])
             novo=decisao['classificacao']=='rejeitada'
-            validacao=ValidarFichaTecnicaService().executar(categoria,ficha['dados'],produto,ficha.get('identidade'),fontes=ficha.get('fontes',{}))
+            if novo and any(motor.comparar_identificadores(p,produto,identidades.get(p.id))['evidencias'] for p in pool[:2000]):
+                motivo='Identificador já existente com dados divergentes; revisar antes de criar outra peça'
+                if not simular:self.repositorio.registrar_revisao(atual,ficha,motivo)
+                return dict(acao='revisao',pendencia_id=atual.id,percentual=decisao['percentual'],motivo=motivo)
+            validacao=ValidarFichaTecnicaService().executar(categoria,ficha['dados'],produto,ficha.get('identidade'),fontes=ficha.get('fontes',{}),
+                finalidade='catalogo' if ficha.get('icecat',{}).get('status')=='encontrada' else 'comercial')
             if novo and (not permitir_novos or not ficha.get('pronto') or not validacao['pronto']):
                 if not simular:self.repositorio.registrar_revisao(atual,ficha,'Abaixo de 60: sem associação; ficha insuficiente para novo cadastro')
                 return dict(acao='revisao',pendencia_id=atual.id,percentual=decisao['percentual'],campos_pendentes=validacao['campos_pendentes'],conflitos=validacao['conflitos'])

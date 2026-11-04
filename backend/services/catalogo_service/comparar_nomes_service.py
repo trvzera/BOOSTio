@@ -6,7 +6,7 @@ from .normalizar_produto import nome
 
 
 def marca(valor):
-    s=nome(valor);return {'wd':'western digital', 'logitech g':'logitech', 'kingston fury':'kingston',
+    s=nome(valor);return {'wd':'western digital', 'logitech g':'logitech', 'kingston fury':'kingston', 'kingston technology':'kingston',
         'c3techtech':'c3tech', 'aero cool':'aerocool', 'master drive':'masterdrive'}.get(s,s)
 
 

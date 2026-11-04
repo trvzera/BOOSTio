@@ -45,3 +45,7 @@ testes.html
 
 # Snapshots, relatórios e dados locais de importação de benchmarks.
 /database/benchmarks/
+
+# Índice e fichas Icecat baixados localmente.
+/files.index.xml.gz
+/database/icecat/
