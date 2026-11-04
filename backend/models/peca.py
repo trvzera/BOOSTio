@@ -35,16 +35,18 @@ class Peca(ModeloBase):
   
   fabricante = db.Column(db.String(30),nullable = False)
   modelo = db.Column(db.String(120),nullable = False)
-  consumo_energia = db.Column(db.Float(),nullable = False)
-  preco = db.Column(db.Float(),nullable = False)
+  consumo_energia = db.Column(db.Float(),nullable = True)
+  preco = db.Column(db.Float(),nullable = True)
   part_number = db.Column(db.String(100), nullable=True)
   referencia_interna = db.Column(db.String(100), nullable=True)
   codigo_modelo_fabricante = db.Column(db.String(150), nullable=True)
   fontes_especificacoes = db.Column(db.JSON, nullable=True)
   kabum_external = db.Column(db.Text, nullable=True)
   preco_atualizado_em = db.Column(db.DateTime, nullable=True)
-  esgotado = db.Column(db.Boolean(), nullable=False, default=False)
+  esgotado = db.Column(db.Boolean(), nullable=True, default=False)
   imagem_url = db.Column(db.Text, nullable=True)
+
+  ficha_montagem_validada = db.Column(db.Boolean(), nullable=True)
 
   # NULL identifica exclusivamente os registros anteriores à migração.
   # Legado preserva publicação sem afirmar que a ficha já foi auditada.
@@ -89,6 +91,10 @@ class Peca(ModeloBase):
   @classmethod
   def consulta_publicavel(cls):
     return cls.query.filter(db.or_(cls.status_validacao.is_(None), cls.status_validacao.in_(('aprovado', 'legado'))))
+
+  @classmethod
+  def consulta_para_montagem(cls):
+    return cls.consulta_publicavel().filter(cls.ficha_montagem_validada.is_not(False))
 
   @classmethod
   def listar_publicadas(cls):
@@ -161,7 +167,7 @@ class Peca(ModeloBase):
 
   def to_catalogo(self):
     dados = {coluna.name: getattr(self, coluna.name) for coluna in self.__table__.columns
-             if coluna.name not in ("preco_atualizado_em", "criado_em", "atualizado_em", "status_validacao", "validacao_motivo", "validado_em", "fontes_especificacoes")}
+             if coluna.name not in ("preco_atualizado_em", "criado_em", "atualizado_em", "status_validacao", "validacao_motivo", "validado_em", "fontes_especificacoes", "ficha_montagem_validada")}
     dados["id"] = f"{self.__tablename__}:{self.id}"
     if self.__tablename__ == "cabo_rede":
       dados["categoria_cabo"] = dados.get("categoria")
@@ -249,5 +255,5 @@ class Peca(ModeloBase):
   @classmethod
   def listar_candidatos_disponiveis(cls, preco_maximo):
     """Pool completo para planejamento; não aplica corte/amostragem prematuros."""
-    return (cls.consulta_publicavel().filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
+    return (cls.consulta_para_montagem().filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
             .order_by(cls.preco.asc(), cls.id.asc()).all())

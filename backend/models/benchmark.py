@@ -26,7 +26,7 @@ class BenchmarkMixin:
     @classmethod
     def _consulta_benchmark(cls, preco_maximo):
         pontuacao = getattr(cls, cls.BENCHMARK_CAMPO)
-        return cls.consulta_publicavel().filter(
+        return cls.consulta_para_montagem().filter(
             cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False),
             pontuacao.isnot(None), pontuacao > 0,
             cls.benchmark_teste == cls.BENCHMARK_TESTE, cls.benchmark_versao.is_(None),

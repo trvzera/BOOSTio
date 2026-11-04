@@ -19,7 +19,7 @@ class MemoriaRAM(Peca):
         grupos = {ddr: [] for valor in ddrs if (ddr := normalizar_ddr(valor))}
         if not grupos:
             return grupos
-        pecas = (cls.consulta_publicavel().filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
+        pecas = (cls.consulta_para_montagem().filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
                  .order_by(cls.preco.asc(), cls.id.asc()).yield_per(200))
         for peca in pecas:
             ddr = normalizar_ddr(peca.ddr)
