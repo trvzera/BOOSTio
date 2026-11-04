@@ -35,7 +35,7 @@ def preparar_catalogo_automatizado(*, simular=True):
             continue  # A criação inicial de componentes continua no comando já existente.
         cols = {c['name'] for c in insp.get_columns(nome)}
         esperadas = set(modelo.__table__.columns.keys())
-        novos = CAMPOS | ({'formato'} if nome=='memoria_ram' else set())
+        novos = CAMPOS | {'referencia_interna'} | ({'formato'} if nome=='memoria_ram' else set())
         if not esperadas - novos <= cols or not cols <= esperadas:
             raise ValueError(f'Tabela {nome} incompatível; migração de catálogo não corrige outras alterações')
         existentes.append((modelo, cols))
@@ -45,7 +45,7 @@ def preparar_catalogo_automatizado(*, simular=True):
             plano.append({'acao': 'criar_tabela', 'tabela': modelo.__tablename__})
     for modelo, cols in existentes:
         nome = modelo.__tablename__
-        campos=[('status_validacao','VARCHAR(20)'),('validacao_motivo','TEXT'),('validado_em','DATETIME')]
+        campos=[('status_validacao','VARCHAR(20)'),('validacao_motivo','TEXT'),('validado_em','DATETIME'),('referencia_interna','VARCHAR(100)')]
         if nome=='memoria_ram':campos.append(('formato','VARCHAR(20)'))
         for campo, tipo in campos:
             if campo not in cols:

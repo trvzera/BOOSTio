@@ -1,3 +1,4 @@
+import { referenciasPeca } from './codigos-pecas.js';
 // Mesmas regras de models/medidas_fisicas.py. Sem scraping ou escrita no catálogo.
 function produtoKabum(link) {
   if (typeof link !== "string" || /[\s\\]/.test(link)
@@ -15,8 +16,9 @@ function produtoKabum(link) {
 function corresponde(peca,ficha) {
   if (peca.categoria !== ficha.categoria) return false;
   const nomes = ref => ["fabricante","modelo"].every(k => String(peca[k] || "").toLowerCase() === ref[k].toLowerCase());
-  if (nomes(ficha) && ficha.part_numbers.includes(peca.part_number)) return true;
-  return (ficha.aliases_catalogo || []).some(alias => nomes(alias) && peca.part_number === alias.part_number
+  const referencias = referenciasPeca(peca);
+  if (nomes(ficha) && ficha.part_numbers.some(codigo => referencias.includes(codigo))) return true;
+  return (ficha.aliases_catalogo || []).some(alias => nomes(alias) && referencias.includes(alias.part_number)
     && produtoKabum(peca.link) === alias.produto_kabum);
 }
 

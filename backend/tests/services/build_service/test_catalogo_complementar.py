@@ -82,6 +82,6 @@ def test_cli_idempotente_simula_sem_gravar_e_preserva_anuncio_existente(tmp_path
         assert resumo["inseridas"] == 6 and resumo["existentes"] == 1
         assert CadastrarComplementaresService().executar()["inseridas"] == 0
         assert antiga.preco == 123 and antiga.esgotado is False
-        assert antiga.part_number == "KABUM-464964" and antiga.modelo == "Nome interno"
+        assert antiga.part_number is None and antiga.referencia_interna == "KABUM-464964" and antiga.modelo == "Nome interno"
         db.session.remove()
         db.engine.dispose()

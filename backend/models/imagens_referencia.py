@@ -11,7 +11,8 @@ def referencias():
 
 
 def imagem_referencia(dados):
-    ficha = referencias().get(dados.get("part_number"))
-    if not ficha or any(dados.get(campo) != ficha.get(campo) for campo in ("categoria", "fabricante", "modelo")):
-        return None
-    return ficha["imagem"]
+    for codigo in (dados.get('referencia_interna'), dados.get('part_number')):
+        ficha = referencias().get(codigo)
+        if ficha and all(dados.get(campo) == ficha.get(campo) for campo in ('categoria', 'fabricante', 'modelo')):
+            return ficha['imagem']
+    return None

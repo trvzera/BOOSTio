@@ -39,6 +39,58 @@ class Oferta(ModeloBase):
     )
 
     @classmethod
+    def identidades_kabum_ambiguas(cls):
+        from sqlalchemy import inspect
+        from collections import defaultdict
+        from services.peca_service.modelos_pecas import MODELOS_PECAS
+        from .medidas_fisicas import produto_kabum
+        import re
+        encontrados = defaultdict(set)
+        inspetor = inspect(db.engine)
+        if not inspetor.has_table(cls.__tablename__) or not set(cls.__table__.columns.keys()) <= {
+                c['name'] for c in inspetor.get_columns(cls.__tablename__)}:
+            raise ValueError('Prepare as tabelas com catalogo-preparar antes de separar identificadores')
+        for modelo in MODELOS_PECAS:
+            if not inspetor.has_table(modelo.__tablename__):
+                continue
+            for ident, link, referencia, numero in modelo.query.with_entities(
+                    modelo.id, modelo.kabum_external, modelo.referencia_interna, modelo.part_number).all():
+                legado = re.fullmatch(r'KABUM-([1-9][0-9]*)', referencia or numero or '', re.I)
+                codigo = produto_kabum(link) or (legado[1] if legado else None)
+                if codigo:
+                    encontrados[codigo].add((modelo.__tablename__, ident))
+        return {codigo for codigo, pecas in encontrados.items() if len(pecas) > 1}
+
+    @classmethod
+    def registrar_identidade_kabum(cls, peca, *, simular=False, ids_ambiguos=None):
+        """Registra o ID real do anúncio. Não inventa cotação nem estoque da seed."""
+        from .medidas_fisicas import produto_kabum
+        import re
+        referencia = peca.referencia_interna or peca.part_number or ''
+        legado = re.fullmatch(r'KABUM-([1-9][0-9]*)', referencia, re.I)
+        identificador = produto_kabum(peca.kabum_external)
+        if legado and identificador and legado[1] != identificador:
+            raise ValueError('ID KaBuM diverge do link; exige revisão')
+        identificador = identificador or (legado[1] if legado else None)
+        if identificador is None:
+            return 'sem_anuncio'
+        atual = cls.query.filter_by(loja='kabum', produto_id_loja=identificador).with_for_update().first()
+        if atual:
+            if (atual.tabela_peca, atual.peca_id) != (peca.__tablename__, peca.id):
+                raise ValueError('Anúncio KaBuM já pertence a outra peça')
+            return 'inalterada'
+        if ids_ambiguos is not None and identificador in ids_ambiguos:
+            raise ValueError('Mais de uma peça referencia o mesmo anúncio KaBuM; revisar duplicidade')
+        if simular:
+            return 'criada'
+        cls_url = peca.kabum_external if produto_kabum(peca.kabum_external) else f'https://www.kabum.com.br/produto/{identificador}'
+        db.session.add(cls(tabela_peca=peca.__tablename__, peca_id=peca.id, loja='kabum',
+            produto_id_loja=identificador, vendedor_id='', url=cls_url,
+            preco=None, esgotado=None, preco_atualizado_em=None, consultado_em=None))
+        db.session.flush()
+        return 'criada'
+
+    @classmethod
     def aplicar_lote_mercado_livre(cls, peca, catalogo_id, assinatura, assinatura_catalogo, criterio, ofertas, agora, *, simular, confirmar=True, desativar_ausentes=True):
         """Uma transação por peça; nunca altera preço/estoque da peça da KaBuM."""
         from . import VinculoMercadoLivre, HistoricoOferta, ControleColeta

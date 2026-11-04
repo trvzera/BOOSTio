@@ -22,7 +22,7 @@ def contexto(tmp_path):
                       preco=100, consumo_energia=5, capacidade_gb=8, ddr='DDR4', frequencia_mhz=3200, quantidade_pentes=1,
                       kabum_external='https://www.kabum.com.br/produto/172365/teste')
         db.session.add(p); db.session.commit()
-        manifesto = [dict(categoria='memoria_ram', referencia=p.part_number, fabricante=p.fabricante,
+        manifesto = [dict(categoria='memoria_ram', referencia=p.referencia_interna or p.part_number, fabricante=p.fabricante,
                          modelo=p.modelo, mpn='KF432C16BB/8', fonte='https://www.kingston.com/datasheets/kf432c16bb_8.pdf',
                          url_peca=p.kabum_external, especificacoes=dict(capacidade_gb=8, ddr='DDR4', quantidade_pentes=1, iluminacao=0))]
         arquivo = tmp_path / 'revisadas.json'
@@ -38,7 +38,7 @@ def test_simulacao_importacao_idempotencia_e_associacao(contexto):
     assert IdentidadeFabricante.query.count() == 0
     assert service.executar(arquivo, simular=False)['cadastradas'] == 1
     assert service.executar(arquivo, simular=False)['inalteradas'] == 1
-    assert p.part_number == 'SEED-RAM-01' and MemoriaRAM.query.count() == 1
+    assert p.referencia_interna == 'SEED-RAM-01' and p.part_number == 'KF432C16BB/8' and MemoriaRAM.query.count() == 1
     assert AssociarCatalogoService._mpn(p) == 'KF432C16BB/8'
     produto = dict(id='MLB123', name='Kingston Fury Beast 8GB', domain_id='MLB-RAM_MEMORY_MODULES', status='active', attributes=[dict(id='BRAND', value_name='Kingston'),
                     dict(id='MPN', value_name='KF432C16BB/8')])

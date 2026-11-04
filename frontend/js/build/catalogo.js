@@ -135,7 +135,7 @@ export function ofertasPeca(peca) {
 
 export const rotulosTecnicos = {
   categoria_cabo: "Padrão do cabo",
-  fabricante: "Fabricante", modelo: "Modelo", part_number: "Referência do catálogo / part number", consumo_energia: "Consumo estimado (W)",
+  fabricante: "Fabricante", modelo: "Modelo", part_number: "Part number do fabricante", consumo_energia: "Consumo estimado (W)",
   soquete: "Socket", socket: "Socket", sockets_suporte_condicional: "Sockets que exigem confirmar a versão/kit de montagem", nucleo: "Núcleos", thread: "Threads",
   conectores_alimentacao:"Conectores de alimentação", cabos_pcie_independentes:"Cabos separados para a placa de vídeo",
   conectores_alimentacao_completos:"Dados dos conectores completos", topologia_armazenamento_verificada:"Conexões de armazenamento revisadas",
@@ -206,7 +206,7 @@ export const rotulosTecnicos = {
 };
 
 function entradasFichaTecnica(peca) {
-  const ignorados = new Set(["id", "categoria", "imagem", "preco", "preco_atualizado_em", "historico_precos", "link", "part_number", "esgotado", "ofertas", "topologia_armazenamento_verificada", "conectores_alimentacao_completos", "configuracoes_baias_completas"]);
+  const ignorados = new Set(["id", "categoria", "imagem", "preco", "preco_atualizado_em", "historico_precos", "link", "part_number", "referencia_interna", "esgotado", "ofertas", "topologia_armazenamento_verificada", "conectores_alimentacao_completos", "configuracoes_baias_completas"]);
   // Medidas genéricas antigas não devem contradizer a ficha exata revisada.
   if (peca.modelo_ficha_tecnica && peca.baias_25 != null && peca.baias_35 != null) ignorados.add("bays_disco");
   if (peca.modelo_ficha_tecnica && [peca.comprimento_mm,peca.largura_mm,peca.altura_mm].every(v=>v!=null)) ignorados.add("dimensoes");

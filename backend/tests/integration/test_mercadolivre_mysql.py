@@ -300,3 +300,26 @@ def test_ram_formato_nulo_migracao_e_importacao_sem_mpn_mysql(banco):
     r=ImportarCatalogoService().executar(pend.id,dto,ficha,anuncio,assinatura_documento(bruto),simular=False)
     assert r['acao']=='importada' and r['criterio']=='modelo_especificacoes'
     assert Oferta.query.count()==HistoricoOferta.query.count()==1
+
+
+def test_separacao_identificadores_aditiva_preserva_usuario_e_cotacao_mysql(banco):
+    from migrations.catalogo_automatizado import preparar_catalogo_automatizado
+    p = Processador.query.one()
+    ident, preco = p.id, p.preco
+    db.session.execute(text("UPDATE processador SET part_number='KABUM-999', kabum_external='https://www.kabum.com.br/produto/999/teste' WHERE id=:id"), {'id': ident})
+    db.session.commit()
+    with db.engine.begin() as conn:
+        conn.execute(text('DROP INDEX ix_processador_referencia ON processador'))
+        conn.execute(text('ALTER TABLE processador DROP COLUMN referencia_interna'))
+    db.session.expire_all()
+    assert any('referencia_interna' in i.get('sql', '') for i in preparar_catalogo_automatizado()['alteracoes'])
+    preparar_catalogo_automatizado(simular=False)
+    p = Processador.query.one()
+    assert p.separar_identificadores()['alterada']
+    assert p.part_number == 'KABUM-999' and Oferta.query.count() == 0
+    p.separar_identificadores(simular=False)
+    assert p.part_number is None and p.referencia_interna == 'KABUM-999'
+    assert Oferta.query.one().produto_id_loja == '999'
+    assert p.id == ident and p.preco == preco and Usuario.query.count() == 1
+    assert not p.separar_identificadores(simular=False)['alterada']
+    assert Oferta.query.count() == 1

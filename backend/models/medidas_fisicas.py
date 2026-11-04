@@ -40,9 +40,10 @@ def corresponde(dados, ficha):
     nomes = lambda referencia: all(
         str(dados.get(campo, "")).casefold() == referencia[campo].casefold()
         for campo in ("fabricante", "modelo"))
-    if nomes(ficha) and dados.get("part_number") in ficha["part_numbers"]:
+    referencias = {dados.get('part_number'), dados.get('referencia_interna')} - {None}
+    if nomes(ficha) and referencias.intersection(ficha["part_numbers"]):
         return True
-    return any(nomes(alias) and dados.get("part_number") == alias["part_number"]
+    return any(nomes(alias) and alias["part_number"] in referencias
                and produto_kabum(dados.get("link")) == alias["produto_kabum"]
                for alias in ficha.get("aliases_catalogo", []))
 

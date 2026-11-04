@@ -72,7 +72,8 @@ class PopularPecasService:
       dados[modelo].extend(itens)
     for modelo, itens in pecas_complementares().items():
       dados[modelo].extend(itens)
-    return dados
+    from utils.codigos_peca import separar_codigos
+    return {classe: [separar_codigos(item) for item in itens] for classe, itens in dados.items()}
 
   @staticmethod
   def _placas_rede() -> list[dict]:

@@ -1,4 +1,5 @@
 import { categoriasMultiplas, normalizarBuild } from "./estado.js";
+import { referenciasPeca } from './codigos-pecas.js';
 
 // Referências estáveis do catálogo existente. O total sempre vem dos preços carregados.
 // Não são metas de FPS nem ofertas garantidas; todos os modelos são sem periféricos.
@@ -94,8 +95,8 @@ export function modelosProntos(catalogo,{referencias = catalogo} = {}) {
   return MODELOS.map(modelo => {
     const componentes = {}, pendentes = [];
     for (const [referencia,quantidade] of modelo.pecas) {
-      const original = referencias.find(p => p.id === referencia || p.part_number === referencia);
-      const peca = catalogo.find(p => p.id === referencia || p.part_number === referencia) ||
+      const original = referencias.find(p => p.id === referencia || referenciasPeca(p).includes(referencia));
+      const peca = catalogo.find(p => p.id === referencia || referenciasPeca(p).includes(referencia)) ||
         (original && catalogo.find(p => p.categoria === original.categoria && p.fabricante === original.fabricante && p.modelo === original.modelo));
       if (!peca) { pendentes.push(original ? original.fabricante + " " + original.modelo : referencia); continue; }
       if (peca.esgotado) pendentes.push(peca.fabricante + " " + peca.modelo + " (indisponível)");

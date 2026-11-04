@@ -38,6 +38,7 @@ class Peca(ModeloBase):
   consumo_energia = db.Column(db.Float(),nullable = False)
   preco = db.Column(db.Float(),nullable = False)
   part_number = db.Column(db.String(100), nullable=True)
+  referencia_interna = db.Column(db.String(100), nullable=True)
   kabum_external = db.Column(db.Text, nullable=True)
   preco_atualizado_em = db.Column(db.DateTime, nullable=True)
   esgotado = db.Column(db.Boolean(), nullable=False, default=False)
@@ -56,6 +57,7 @@ class Peca(ModeloBase):
       db.Index(f'ix_{cls.__tablename__}_publicacao', 'status_validacao', 'esgotado', 'preco'),
       db.Index(f'ix_{cls.__tablename__}_nome', 'fabricante', 'modelo'),
       db.Index(f'ix_{cls.__tablename__}_part_number', 'part_number'),
+      db.Index(f'ix_{cls.__tablename__}_referencia', 'referencia_interna'),
     )
 
   @validates('status_validacao')
@@ -63,6 +65,20 @@ class Peca(ModeloBase):
     if valor not in (None, 'pendente', 'em_revisao', 'aprovado', 'rejeitado', 'legado'):
       raise ValueError('Status de validação inválido')
     return valor
+
+  def __init__(self, **dados):
+    from utils.codigos_peca import separar_codigos
+    super().__init__(**separar_codigos(dados))
+
+  @validates('part_number')
+  def validar_part_number(self, chave, valor):
+    from utils.codigos_peca import codigo_interno
+    if codigo_interno(valor):
+      if self.referencia_interna and self.referencia_interna != valor:
+        raise ValueError('Referências internas divergentes')
+      self.referencia_interna = valor
+      return None
+    return valor.strip() if isinstance(valor, str) and valor.strip() else None
 
   @property
   def publicavel(self):
@@ -93,6 +109,14 @@ class Peca(ModeloBase):
     return cls.query.order_by(cls.id).limit(limite).all()
 
   @classmethod
+  def lote_para_identificadores(cls, depois_id=0, limite=100):
+    return cls.query.filter(cls.id > depois_id).order_by(cls.id).limit(limite).all()
+
+  def separar_identificadores(self, *, simular=True, ids_ambiguos=None):
+    from .identificadores_peca import separar_identificadores
+    return separar_identificadores(self, simular=simular, ids_ambiguos=ids_ambiguos)
+
+  @classmethod
   def lote_para_ofertas(cls, depois_id=0, limite=50):
     return cls.query.filter(cls.id > depois_id).order_by(cls.id).limit(limite).all()
 
@@ -106,11 +130,11 @@ class Peca(ModeloBase):
 
   @classmethod
   def restaurar_links_ausentes(cls, links):
-    pecas = cls.query.filter(cls.part_number.in_(links)).all()
+    pecas = cls.query.filter(db.or_(cls.part_number.in_(links), cls.referencia_interna.in_(links))).all()
     atualizadas = 0
     for peca in pecas:
       if not peca.kabum_external:
-        peca.kabum_external = links[peca.part_number]
+        peca.kabum_external = links.get(peca.referencia_interna) or links.get(peca.part_number)
         atualizadas += 1
     db.session.commit()
     return atualizadas
@@ -169,14 +193,23 @@ class Peca(ModeloBase):
 
   @classmethod
   def cadastrar_ausentes(cls, itens):
-    part_numbers = [item["part_number"] for item in itens]
-    existentes = {
-      row.part_number
-      for row in cls.query.filter(cls.part_number.in_(part_numbers)).all()
-    }
-    novos = [cls(**{"status_validacao": "legado", **item}) for item in itens if item["part_number"] not in existentes]
+    from utils.codigos_peca import separar_codigos
+    novos = []
     try:
-      db.session.add_all(novos)
+      for original in itens:
+        item = separar_codigos(original)
+        referencia, numero = item.get('referencia_interna'), item.get('part_number')
+        if referencia:
+          existente = cls.query.filter(db.or_(cls.referencia_interna == referencia, cls.part_number == referencia)).first()
+        elif numero:
+          existente = cls.query.filter_by(part_number=numero, fabricante=item['fabricante']).first()
+        else:
+          raise ValueError('Cadastro sem identificador estável')
+        if existente is None:
+          existente = cls(status_validacao='legado', **{k:v for k,v in item.items() if k != 'status_validacao'})
+          db.session.add(existente)
+          db.session.flush()
+          novos.append(existente)
       db.session.commit()
     except Exception:
       db.session.rollback()

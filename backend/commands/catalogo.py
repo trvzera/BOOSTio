@@ -9,6 +9,16 @@ from services.mercadolivre_service.processar_catalogo_service import ProcessarCa
 
 
 def registrar_comandos_catalogo(app):
+    @app.cli.command('catalogo-identificadores-separar')
+    @click.option('--aplicar', is_flag=True)
+    def separar_identificadores(aplicar):
+        """Separa MPN, referência do catálogo e ID da loja. Simula por padrão."""
+        from services.catalogo_service.separar_identificadores_service import SepararIdentificadoresService
+        try:
+            click.echo(json.dumps(SepararIdentificadoresService().executar(simular=not aplicar), ensure_ascii=False))
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else 'Prepare o esquema com catalogo-preparar') from None
+
     @app.cli.command('catalogo-planejar')
     @click.option('--limite', default=100, type=click.IntRange(1, 100), show_default=True)
     @click.option('--marcas-por-categoria', default=5, type=click.IntRange(1, 50), show_default=True)
