@@ -31,7 +31,11 @@ class ImportarCatalogoService:
                 if not simular:self.repositorio.registrar_revisao(atual,ficha,'Fontes técnicas contraditórias; avaliar')
                 return dict(acao='revisao',pendencia_id=atual.id,percentual=decisao['percentual'],conflitos=ficha['conflitos'])
             novo=decisao['classificacao']=='rejeitada'
-            if novo and ficha.get('icecat', {}).get('status') in ('ambigua', 'revisao'):
+            if novo and ficha.get('fabricante_oficial',{}).get('status') in ('pendente','revisao'):
+                if not simular:self.repositorio.registrar_revisao(atual,ficha,'Fonte oficial pendente ou conflitante')
+                return dict(acao='revisao',pendencia_id=atual.id,motivo='Fonte oficial pendente ou conflitante')
+            if (novo and ficha.get('icecat', {}).get('status') in ('ambigua', 'revisao')
+                    and ficha.get('fabricante_oficial',{}).get('status')!='encontrada'):
                 motivo = 'Ficha Icecat ambígua ou divergente; revisar antes de criar a peça'
                 if not simular:
                     self.repositorio.registrar_revisao(atual, ficha, motivo)
@@ -39,7 +43,7 @@ class ImportarCatalogoService:
             if novo:
                 validacao = ValidarFichaTecnicaService().executar(
                     categoria, ficha['dados'], produto, ficha.get('identidade'), fontes=ficha.get('fontes', {}),
-                    finalidade='catalogo' if ficha.get('icecat', {}).get('status')=='encontrada' else 'comercial')
+                    finalidade='catalogo' if (ficha.get('icecat', {}).get('status')=='encontrada' or ficha.get('fabricante_oficial',{}).get('status')=='encontrada') else 'comercial')
             if novo and (not permitir_novos or not ficha.get('pronto') or not validacao['pronto']):
                 if not simular:self.repositorio.registrar_revisao(atual,ficha,'Abaixo de 60: sem associação; ficha insuficiente para novo cadastro')
                 return dict(acao='revisao',pendencia_id=atual.id,percentual=decisao['percentual'],campos_pendentes=validacao['campos_pendentes'],conflitos=validacao['conflitos'])

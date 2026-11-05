@@ -14,11 +14,13 @@ from .controle_requisicoes_service import ControleRequisicoesService, ErroMercad
 
 
 class ImportarProdutoService:
-    def __init__(self, cliente=None, tokens=None, controle=None, enriquecedor=None, repositorio=None, verificar_execucao=None, base_icecat=None):
+    def __init__(self, cliente=None, tokens=None, controle=None, enriquecedor=None, repositorio=None, verificar_execucao=None, base_icecat=None, fabricantes=None):
         self.controle=controle or ControleRequisicoesService(50,1.0)
         self.cliente=cliente or BuscarOfertasMercadoLivreService(self.controle)
         self.tokens=tokens;self.enriquecedor=enriquecedor or EnriquecerProdutoService()
         from services.icecat_service.completar_ficha_icecat_service import CompletarFichaIcecatService
+        from services.fabricante_service.completar_ficha_service import CompletarFichaFabricanteService
+        self.fabricantes=fabricantes if fabricantes is not None else CompletarFichaFabricanteService.configurado()
         self.base_icecat=base_icecat if base_icecat is not None else CompletarFichaIcecatService.configurado()
         self.repositorio=repositorio or RepositorioImportacaoCatalogo()
         self.verificar_execucao=verificar_execucao or (lambda: None)
@@ -55,18 +57,23 @@ class ImportarProdutoService:
         if entrada.get('title'):
             from dataclasses import replace
             normalizado=replace(normalizado,titulo=entrada['title'])
-        if permitir_novos and self.base_icecat is not None:
+        if permitir_novos and (self.base_icecat is not None or self.fabricantes is not None):
             from services.catalogo_service.associacao_inteligente_service import AssociacaoInteligenteService
             pool=modelos[categoria].pool_para_matching(2001)
             identidades=IdentidadeFabricante.para_matching(pool[:2000])
             decisao=AssociacaoInteligenteService().selecionar(pool[:2000],normalizado,
                 identidades=identidades,completo=len(pool)<=2000)
             if decisao['classificacao']=='rejeitada':
-                normalizado,ficha=self.base_icecat.executar(normalizado,ficha)
+                if self.base_icecat is not None:
+                    normalizado,ficha=self.base_icecat.executar(normalizado,ficha)
+                if self.fabricantes is not None and not ficha.get('pronto'):
+                    normalizado,ficha=self.fabricantes.executar(normalizado,ficha)
         resultado_importacao=ImportarCatalogoService(self.repositorio,self.verificar_execucao).executar(
             pendencia_id,normalizado,ficha,anuncio,assinatura,simular=simular,permitir_novos=permitir_novos)
         if ficha.get('icecat'):
             resultado_importacao['icecat']=ficha['icecat']
+        if ficha.get('fabricante_oficial'):
+            resultado_importacao['fabricante_oficial']=ficha['fabricante_oficial']
         return resultado_importacao
 
     def executar_lote(self, *, limite=20, depois_id=0, categoria=None, simular=True, permitir_novos=False):
@@ -88,4 +95,6 @@ class ImportarProdutoService:
         resumo['requisicoes']=self.controle.total
         if self.base_icecat is not None:
             resumo['requisicoes_icecat']=self.base_icecat.fichas.requisicoes
+        if self.fabricantes is not None:
+            resumo['requisicoes_fabricantes']=self.fabricantes.paginas.requisicoes
         return resumo
