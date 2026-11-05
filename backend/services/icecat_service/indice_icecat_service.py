@@ -102,3 +102,35 @@ class IndiceIcecatService:
             if not modelo or not produto.marca:
                 return []
             return [dict(r) for r in banco.execute('SELECT * FROM produto WHERE modelo=? LIMIT 21', (modelo,))]
+
+    def sugerir_para_revisao(self, produto):
+        """Localiza códigos regionais e nomes alternativos, sem autorizar cadastro."""
+        import re
+        chaves = [*valores(produto.identificadores.get('mpn')), produto.modelo,
+                  *produto.modelos_alternativos]
+        # Códigos no título são candidatos, nunca evidência de identidade.
+        chaves.extend(re.findall(r'[A-Za-z0-9][A-Za-z0-9/_.-]{5,99}', produto.titulo))
+        chaves = sorted({codigo(v) for v in chaves if v and len(codigo(v)) >= 6
+                         and re.search(r'[a-z]', codigo(v)) and re.search(r'\d', codigo(v))})
+        encontrados = {}
+        with sqlite3.connect(self.caminho.resolve().as_uri()+'?mode=ro', uri=True) as banco:
+            banco.row_factory = sqlite3.Row
+            for chave in chaves[:12]:
+                linhas = banco.execute(
+                    "SELECT * FROM produto WHERE mpn=? OR modelo=? OR (mpn>=? AND mpn<?) LIMIT 21",
+                    (chave, nome(chave), chave+'-', chave+'.'))
+                for linha in linhas:
+                    encontrados[linha['id']] = {**dict(linha), 'criterio':'codigo_ou_variante_para_revisao'}
+                    if len(encontrados) >= 20:
+                        return list(encontrados.values())
+        return list(encontrados.values())
+
+    def diagnosticar_ausencia(self, produto):
+        sugestoes = self.sugerir_para_revisao(produto)
+        identificadores = {k:valores(produto.identificadores.get(k)) for k in ('mpn','gtin')}
+        return dict(
+            motivo='candidatos_alternativos_exigem_revisao' if sugestoes else 'sem_candidato_nas_buscas_realizadas',
+            identificadores_consultados=identificadores,
+            modelo_consultado=produto.modelo,
+            candidatos_para_revisao=sugestoes,
+            proxima_etapa='conferir_ficha_fabricante' if not sugestoes else 'conferir_variante_e_identificadores')

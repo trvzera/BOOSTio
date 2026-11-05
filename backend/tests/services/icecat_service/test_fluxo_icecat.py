@@ -173,3 +173,28 @@ def test_embalagem_de_20_discos_nao_vira_componente_unitario(banco,base):
     assert resultado['acao']=='revisao'
     assert 'icecat_embalagem_com_varias_unidades' in resultado['icecat']['candidatos'][0]['conflitos']
     assert HD.query.count()==Oferta.query.count()==0
+
+
+def test_codigo_regional_e_somente_sugestao_para_revisao(tmp_path):
+    arquivo=tmp_path/'indice.xml'
+    indice_xml(arquivo,registro(mpn='CT500BX500SSD1-IN'))
+    indice=IndiceIcecatService(tmp_path/'indice.db');indice.preparar(arquivo)
+    p=ProdutoNormalizado(loja='loja',id_externo='1',categoria='ssd',titulo='Crucial CT500BX500SSD1',
+        marca='Crucial',modelo='CT500BX500SSD1',identificadores={'mpn':'CT500BX500SSD1'})
+    assert indice.buscar(p)==[]
+    diagnostico=indice.diagnosticar_ausencia(p)
+    assert diagnostico['motivo']=='candidatos_alternativos_exigem_revisao'
+    assert diagnostico['candidatos_para_revisao'][0]['mpn']=='ct500bx500ssd1-in'
+
+
+def test_codigo_parecido_de_outro_fabricante_fica_rejeitado(banco,base,tmp_path):
+    arquivo=tmp_path/'outro-indice.xml'
+    indice_xml(arquivo,registro(mpn='ST8000NM017B-IN'))
+    base.indice.preparar(arquivo)
+    base.fichas.executar.return_value=xml_ficha().replace(b'ST8000NM017B',b'ST8000NM017B-IN').replace(b'Seagate',b'Outro fabricante')
+    produto=ProdutoNormalizado(loja='mercado_livre',id_externo='MLB99',categoria='hd',categoria_confirmada=True,
+        ativo=True,marca='Seagate',modelo='Exos 8TB',titulo='Seagate Exos 8TB',identificadores={'mpn':'ST8000NM017B'})
+    _,ficha=base.executar(produto,dict(dados={},conflitos=[],fontes={}))
+    d=ficha['icecat']['avaliacoes_alternativas'][0]
+    assert d['classificacao']=='rejeitada' and 'marca_divergente' in d['conflitos']
+    assert HD.query.count()==0

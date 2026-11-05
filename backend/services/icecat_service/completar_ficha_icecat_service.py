@@ -30,7 +30,20 @@ class CompletarFichaIcecatService:
     def executar(self, produto, ficha):
         referencias = self.indice.buscar(produto)
         if not referencias:
-            return produto, {**ficha, 'icecat': {'status':'nao_encontrada'}}
+            diagnostico = self.indice.diagnosticar_ausencia(produto)
+            avaliacoes = []
+            for referencia in diagnostico['candidatos_para_revisao'][:3]:
+                tecnica = NormalizarFichaIcecatService().executar(
+                    self.fichas.executar(referencia), referencia, produto.categoria)
+                local = SimpleNamespace(__tablename__=produto.categoria, id=0,
+                    part_number=tecnica['identidade']['mpn'], **tecnica['dados'])
+                comparacao = AssociacaoInteligenteService().avaliar(
+                    local, produto, identidade=tecnica['identidade'])
+                avaliacoes.append(dict(id=referencia['id'], fabricante=tecnica['dados']['fabricante'],
+                    mpn=tecnica['identidade']['mpn'], classificacao=comparacao['classificacao'],
+                    conflitos=sorted(set(comparacao['conflitos'] + tecnica['conflitos']))))
+            diagnostico['avaliacoes_alternativas'] = avaliacoes
+            return produto, {**ficha, 'icecat': {'status':'nao_encontrada', **diagnostico}}
         if len(referencias) > 3:
             return produto, {**ficha, 'icecat': {'status':'ambigua', 'candidatos':len(referencias)}}
         candidatos = []
