@@ -49,3 +49,4 @@ testes.html
 # Índice e fichas Icecat baixados localmente.
 /files.index.xml.gz
 /database/icecat/
+/database/fabricantes/
