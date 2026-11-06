@@ -1,3 +1,4 @@
+from services.build_service.prompt_build_service import criar_prompt
 """Referência anterior à reorganização: prompts, seed e esquema persistente."""
 import hashlib
 import json
@@ -22,7 +23,7 @@ def contratos():
         for percentual in (0, 20):
             pedido = dict(nome='PC', descricao='Teste', utilidade='Jogos', orcamento=8000,
                           prioridade_montagem=prioridade, armazenamento_minimo_gb=500)
-            prompt = CriarBuildService._criar_prompt(pedido, 8000, 2000, {}, percentual,
+            prompt = criar_prompt(pedido, 8000, 2000, {}, percentual,
                 plano_perifericos={'viavel': True, 'combinacoes': []}, preferencia_neutra=True)
             resultado[f'prompt:{prioridade}:{percentual}'] = _hash(prompt)
     dados = PopularPecasService()._dados_seed()

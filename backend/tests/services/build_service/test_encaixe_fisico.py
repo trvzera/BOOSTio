@@ -1,3 +1,5 @@
+from services.build_service.catalogo_geracao_service import campos_pecas
+from services.build_service.constantes_build import CAMPOS_PECAS
 from services.validacoes_service.validar_estado_build_service import validar_estado
 import json
 from pathlib import Path
@@ -60,7 +62,7 @@ def test_catalogo_real_expoe_complemento_sem_migracao_e_sem_mutar_db():
     dados = gabinete.to_catalogo()
     assert dados["quantidade_max_fans"] == 6 and dados["tamanho_max_cooler_mm"] == 159
     assert len(dados["posicoes_fans"]) == 4 and dados["fonte_medidas"].startswith("https://www.coolermaster.com/")
-    enviado = CriarBuildService._campos_pecas(gabinete)
+    enviado = campos_pecas(gabinete)
     assert enviado["id"] == 1 and enviado["quantidade_max_fans"] == 6
     assert len(enviado["posicoes_fans"]) == 4
     assert gabinete.tamanho_max_cooler_mm == 160
@@ -85,7 +87,7 @@ def test_limites_fisicos_aparecem_no_diagnostico_python_e_catalogo_llm():
     for codigo in ("placa_video-medida", "air_cooler-medida", "fonte-medida", "fonte-formato", "fans-posicoes"):
         assert regra(resultado, codigo)["status"] == "incompativel"
     assert resultado["fans"]["selecionadas"] == 3
-    assert set(("comprimento_mm", "altura_mm", "posicoes_fans", "quantidade", "tamanho_mm", "quantidade_fans", "tamanho_fan_mm", "baias_25")) <= set(CriarBuildService.CAMPOS_PECAS)
+    assert set(("comprimento_mm", "altura_mm", "posicoes_fans", "quantidade", "tamanho_mm", "quantidade_fans", "tamanho_fan_mm", "baias_25")) <= set(CAMPOS_PECAS)
     componentes = {p["categoria"]: {"id": p["id"], "quantidade": 1} for p in pecas}
     componentes["ssd"]["quantidade"] = 2
     assert regra(avaliar(pecas, componentes), "baias-baias_25")["status"] == "incompativel"

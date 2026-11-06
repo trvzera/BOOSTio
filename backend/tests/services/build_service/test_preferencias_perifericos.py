@@ -1,3 +1,5 @@
+from services.build_service.catalogo_geracao_service import gerar_catalogo
+from services.build_service.prompt_build_service import criar_prompt
 from copy import deepcopy
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -30,8 +32,8 @@ def test_gamer_prioriza_hz_e_edicao_resolucao_sem_pontuacao_de_qualidade():
 def test_catalogo_filtra_monitor_antes_de_amostrar_sem_excluir_outros_produtos():
     monitores=[Monitor(id=i,fabricante="Teste",modelo=str(i),preco=100+i,tipo_painel=p,tamanho_polegadas=24,resolucao="1920x1080",taxa_atualizacao_hz=144) for i,p in enumerate(["IPS","VA","TN","OLED",None],1)]
     modelo=SimpleNamespace(__tablename__="monitor",listar_disponiveis_ate=lambda *a,**k:monitores)
-    with patch("services.build_service.criar_build_service.MODELOS_PECAS",(modelo,)):
-        catalogo=CriarBuildService._gerar_catalogo(200,500,utilidade="Jogos")
+    with patch("services.build_service.catalogo_geracao_service.MODELOS_PECAS",(modelo,)):
+        catalogo=gerar_catalogo(200,500,utilidade="Jogos")
     assert {p["id"] for p in catalogo["monitor"]} == {1,2,3,4,5}
 
 
@@ -62,7 +64,7 @@ def test_planejamento_inclui_mecanico_viavel_sem_aumentar_teto_e_preserva_opcao_
 
 
 def test_prompt_explica_paineis_mecanicos_orcamento_e_preferencias():
-    prompt=CriarBuildService._criar_prompt({"nome":"PC","descricao":"Teste","utilidade":"Jogos"},5000,800,{})
+    prompt=criar_prompt({"nome":"PC","descricao":"Teste","utilidade":"Jogos"},5000,800,{})
     for termo in ("144 Hz", "27 polegadas", "QHD/4K", "painel confirmado IPS ou VA", "modelo de switch identificado", "sRGB", "Mini Tower, Mid Tower e Full Tower", "Não inclua produtos do AliExpress"):
         assert termo in prompt
     assert "não invente" in prompt.lower()

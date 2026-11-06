@@ -1,3 +1,4 @@
+from services.build_service.prompt_build_service import criar_prompt
 from copy import deepcopy
 from unittest.mock import patch
 
@@ -20,7 +21,7 @@ def test_vinte_metros_sem_cabo_adequado_vira_pendencia_sem_alterar_pedido():
     antes = deepcopy(PEDIDO)
     assert Rede.executar(CATALOGO, PEDIDO) == {"tipo": "cabo_rede", "ids_permitidos": [], "pendente": True}
     assert PEDIDO == antes
-    prompt = CriarBuildService._criar_prompt({"nome": "PC", "descricao": "Jogos", "utilidade": "Jogos", "rede": PEDIDO}, 8000, 2000, CATALOGO, 10)
+    prompt = criar_prompt({"nome": "PC", "descricao": "Jogos", "utilidade": "Jogos", "rede": PEDIDO}, 8000, 2000, CATALOGO, 10)
     assert '"acessorio_rede_obrigatorio": null' in prompt
     assert '"categorias_rede_proibidas": ["adaptador_wifi", "cabo_rede"]' in prompt
     assert "Isso não inviabiliza" in prompt

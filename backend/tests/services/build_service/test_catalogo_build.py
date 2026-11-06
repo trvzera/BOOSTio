@@ -1,3 +1,4 @@
+from services.build_service.catalogo_geracao_service import campos_pecas
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -12,7 +13,7 @@ def test_catalogo_preserva_cat6_sem_sobrescrever_a_categoria_do_editor():
     assert ficha["categoria"] == "cabo_rede"
     assert ficha["categoria_cabo"] == "CAT6"
     assert cabo.categoria == "CAT6"
-    assert CriarBuildService._campos_pecas(cabo)["categoria_cabo"] == "CAT6"
+    assert campos_pecas(cabo)["categoria_cabo"] == "CAT6"
 
 
 @pytest.mark.parametrize("data", [datetime(2026, 10, 20, 15, 30),

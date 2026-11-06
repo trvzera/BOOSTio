@@ -1,3 +1,8 @@
+import services.build_service.criar_build_service as criacao_module
+from services.build_service.custos_build_service import dividir_orcamento
+from services.build_service.catalogo_geracao_service import gerar_catalogo
+from services.build_service.prompt_build_service import criar_prompt
+from services.build_service.constantes_build import PERIFERICOS
 from services.build_service.atualizar_build_service import atualizar_estado
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
@@ -90,17 +95,17 @@ def test_referencia_gabinete_so_enriquece_amostra_se_disponivel_dentro_do_teto(a
         gabinete.esgotado=False
         db.session.commit()
         # Força a referência a ficar de fora da amostra normal.
-        mocker.patch("services.build_service.criar_build_service.MODELOS_PECAS",())
-        assert CriarBuildService._gerar_catalogo(200,referencia_gabinete=gabinete.id)["gabinete"][0]["id"] == gabinete.id
-        assert not CriarBuildService._gerar_catalogo(50,referencia_gabinete=gabinete.id)
-        assert not CriarBuildService._gerar_catalogo(200,excluidas={"gabinete"},referencia_gabinete=gabinete.id)
+        mocker.patch("services.build_service.catalogo_geracao_service.MODELOS_PECAS",())
+        assert gerar_catalogo(200,referencia_gabinete=gabinete.id)["gabinete"][0]["id"] == gabinete.id
+        assert not gerar_catalogo(50,referencia_gabinete=gabinete.id)
+        assert not gerar_catalogo(200,excluidas={"gabinete"},referencia_gabinete=gabinete.id)
         gabinete.ficha_montagem_validada=False
         db.session.commit()
-        assert not CriarBuildService._gerar_catalogo(200,referencia_gabinete=gabinete.id)
+        assert not gerar_catalogo(200,referencia_gabinete=gabinete.id)
         gabinete.ficha_montagem_validada=None
         gabinete.esgotado=True
         db.session.commit()
-        assert not CriarBuildService._gerar_catalogo(200,referencia_gabinete=gabinete.id)
+        assert not gerar_catalogo(200,referencia_gabinete=gabinete.id)
 
 
 def test_limite_em_manual_importacao_duplicacao_e_llm(app_build, mocker):
@@ -172,8 +177,8 @@ def test_reserva_preservada_ao_salvar_duplicar(app_build):
 
 
 def test_divisao_exata_do_orcamento_e_prompt():
-    assert CriarBuildService._dividir_orcamento(1234.56, 20) == (Decimal("987.65"), Decimal("246.91"))
-    prompt = CriarBuildService._criar_prompt(PEDIDO, 5000, 800, {}, 20)
+    assert dividir_orcamento(1234.56, 20) == (Decimal("987.65"), Decimal("246.91"))
+    prompt = criar_prompt(PEDIDO, 5000, 800, {}, 20)
     assert "R$ 4000.00" in prompt and "R$ 1000.00 (20%)" in prompt
     assert "Teto para periféricos" in prompt
     assert "saldo de periféricos NÃO aumenta o teto do PC" in prompt
@@ -182,7 +187,7 @@ def test_divisao_exata_do_orcamento_e_prompt():
 
 def test_revisao_do_investimento_alto_e_limitada_e_usa_custos_calculados(mocker):
     primeira, catalogo = resposta_com_perifericos()
-    primeira["componentes"] = [i for i in primeira["componentes"] if i["tipo"] not in CriarBuildService.PERIFERICOS]
+    primeira["componentes"] = [i for i in primeira["componentes"] if i["tipo"] not in PERIFERICOS]
     catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": 18000})
     segunda = deepcopy(primeira)
     segunda["componentes"][0]["id"] = 2
@@ -200,7 +205,7 @@ def test_revisao_do_investimento_alto_e_limitada_e_usa_custos_calculados(mocker)
 @pytest.mark.parametrize("erro", [ValueError("JSON inválido"), Timeout("Timeout")])
 def test_revisao_de_investimento_nao_descarta_primeira_build_valida(mocker, erro):
     primeira, catalogo = resposta_com_perifericos()
-    primeira["componentes"] = [i for i in primeira["componentes"] if i["tipo"] not in CriarBuildService.PERIFERICOS]
+    primeira["componentes"] = [i for i in primeira["componentes"] if i["tipo"] not in PERIFERICOS]
     catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": 18000})
     llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=[primeira, erro])
     mocker.patch("services.build_service.criar_build_service.BuildSalva.verificar_espaco")
@@ -211,7 +216,7 @@ def test_revisao_de_investimento_nao_descarta_primeira_build_valida(mocker, erro
 
 def test_preco_alto_disponivel_nao_forca_escritorio_a_gastar_o_orcamento(mocker):
     build, catalogo = resposta_com_perifericos()
-    build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in CriarBuildService.PERIFERICOS]
+    build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in PERIFERICOS]
     catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": 18000})
     llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value=build)
     resultado = CriarBuildService()._gerar_validada(1, "Escritório", "teste", catalogo, 20000, 0, {}, {}, {})
@@ -275,7 +280,7 @@ def resposta_com_perifericos():
     itens = [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in
              ("processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "monitor", "teclado", "mouse", "fone")]
     catalogo = {item["tipo"]: [{"id": 1, "fabricante": "Teste", "modelo": item["tipo"],
-                "preco": 800 if item["tipo"] == "processador" else 50 if item["tipo"] in CriarBuildService.PERIFERICOS else 20}] for item in itens}
+                "preco": 800 if item["tipo"] == "processador" else 50 if item["tipo"] in PERIFERICOS else 20}] for item in itens}
     catalogo["gabinete"][0]["fans_inclusos"] = 1
     catalogo["processador"][0].update(videointegrado=True,cooler=True,consumo_energia=65)
     catalogo["fonte"][0]["potencia_w"] = 500
@@ -313,7 +318,7 @@ def test_teto_percentual_preserva_centavos_sem_arredondar_para_cima():
 
 
 def test_reserva_nao_pode_reduzir_pc_abaixo_do_minimo_antes_do_catalogo_e_llm(app_build, mocker):
-    gerar_catalogo = mocker.patch("services.build_service.criar_build_service.CriarBuildService._gerar_catalogo", return_value={})
+    gerar_catalogo = mocker.patch("services.build_service.catalogo_geracao_service.gerar_catalogo", return_value={})
     llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
     with app_build.app_context(), pytest.raises(ValueError, match="pelo menos R\$ 2000"):
         CriarBuildService().executar(1, {**PEDIDO, "percentual_perifericos": 90})
@@ -765,7 +770,7 @@ def test_menu_setup_atual_alterna_e_operacoes_respeitam_proprietario(app_build):
 def test_8000_um_pouco_de_tudo_revisa_pc_de_4000_e_salva_so_a_melhorada(app_build, mocker, percentual, preco_gpu, esperado):
     precos = {"processador": 800, "placa_mae": 600, "memoria_ram": 300, "fonte": 400,
               "gabinete": 400, "ssd": 500, "placa_video": 1000}
-    tipos = [*precos, *(CriarBuildService.PERIFERICOS if percentual else [])]
+    tipos = [*precos, *(PERIFERICOS if percentual else [])]
     with app_build.app_context():
         cadastrar_pecas(tipos)
         for tipo, preco in precos.items():
@@ -804,7 +809,7 @@ def test_revisao_de_investimento_distingue_perfil_misto_de_escritorio(perfil, es
 @pytest.mark.parametrize("esgotado,preco", [(True, 2000), (False, 9000)])
 def test_nao_consume_revisao_por_peca_esgotada_ou_acima_do_teto(mocker, esgotado, preco):
     build, catalogo = resposta_com_perifericos()
-    build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in CriarBuildService.PERIFERICOS]
+    build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in PERIFERICOS]
     catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": preco, "esgotado": esgotado})
     llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value=build)
     resultado = CriarBuildService()._gerar_validada(1, "Pedido", "teste", catalogo, 8000, 0, {}, {}, {}, revisar_investimento=True)
@@ -823,7 +828,7 @@ def test_revisao_do_pc_nao_usa_a_verba_reservada_para_perifericos(mocker):
 
 def test_revisao_considera_preco_por_quantidade_dos_pentes(mocker):
     build, catalogo = resposta_com_perifericos()
-    build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in CriarBuildService.PERIFERICOS]
+    build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in PERIFERICOS]
     next(i for i in build["componentes"] if i["tipo"] == "memoria_ram")["quantidade"] = 2
     catalogo["memoria_ram"].append({**catalogo["memoria_ram"][0], "id": 2, "preco": 2000})
     llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value=build)
@@ -835,7 +840,7 @@ def test_revisao_considera_preco_por_quantidade_dos_pentes(mocker):
 @pytest.mark.parametrize("erro", [CotaGlobalIAError(60), ControleIAIndisponivelError("Indisponível")])
 def test_fim_da_cota_na_revisao_preserva_build_que_ja_era_valida(mocker, erro):
     build, catalogo = resposta_com_perifericos()
-    build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in CriarBuildService.PERIFERICOS]
+    build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in PERIFERICOS]
     catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": 2000})
     llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=[build, erro])
     mocker.patch("services.build_service.criar_build_service.BuildSalva.verificar_espaco")
@@ -853,7 +858,7 @@ def test_sem_build_valida_a_cota_continua_bloqueando_a_geracao(mocker):
 def test_uso_misto_com_gpu_propria_e_perifericos_melhora_so_as_compras_pendentes(app_build, mocker):
     precos = {"processador": 1800, "placa_mae": 600, "memoria_ram": 300, "fonte": 400,
               "gabinete": 400, "ssd": 500}
-    tipos = [*precos, *CriarBuildService.PERIFERICOS]
+    tipos = [*precos, *PERIFERICOS]
     with app_build.app_context():
         cadastrar_pecas([*tipos, "placa_video"])
         for tipo, preco in precos.items():
@@ -883,7 +888,7 @@ def test_uso_misto_com_gpu_propria_e_perifericos_melhora_so_as_compras_pendentes
 
 def test_gpu_disponivel_nao_dispara_nova_compra_quando_gpu_ja_e_propria(mocker):
     build, catalogo = resposta_com_perifericos()
-    build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in CriarBuildService.PERIFERICOS]
+    build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in PERIFERICOS]
     catalogo["placa_video"] = [{"id": 1, "fabricante": "Teste", "modelo": "Outra GPU", "preco": 3000}]
     llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value=build)
     resultado = CriarBuildService()._gerar_validada(1, "Pedido", "teste", catalogo, 8000, 0,
@@ -894,7 +899,7 @@ def test_gpu_disponivel_nao_dispara_nova_compra_quando_gpu_ja_e_propria(mocker):
 
 def test_gpu_pode_ser_avaliada_quando_cpu_com_video_integrado_deixa_margem(mocker):
     build, catalogo = resposta_com_perifericos()
-    build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in CriarBuildService.PERIFERICOS]
+    build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in PERIFERICOS]
     catalogo["processador"][0]["videointegrado"] = True
     catalogo["placa_video"] = [{"id": 1, "fabricante": "Teste", "modelo": "GPU dedicada", "preco": 3000, "consumo_energia": 150}]
     segunda = deepcopy(build)
@@ -908,7 +913,7 @@ def test_gpu_pode_ser_avaliada_quando_cpu_com_video_integrado_deixa_margem(mocke
 
 def test_fallback_sem_revisoes_nao_gasta_uma_chamada_extra(mocker):
     build, catalogo = resposta_com_perifericos()
-    build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in CriarBuildService.PERIFERICOS]
+    build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in PERIFERICOS]
     catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": 2000})
     llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value=build)
     resultado = CriarBuildService()._gerar_validada(1, "Pedido", "teste", catalogo, 8000, 0, {}, {}, {},
@@ -921,7 +926,7 @@ def test_fallback_sem_revisoes_nao_gasta_uma_chamada_extra(mocker):
     (2000, 20, "orcamento"), (5000, 1, "perifericos")])
 def test_api_rejeita_limites_minimos_sem_chamar_ia_ou_salvar(app_build, mocker, total, percentual, motivo):
     llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
-    catalogo = mocker.patch.object(CriarBuildService, "_gerar_catalogo")
+    catalogo = mocker.patch("services.build_service.catalogo_geracao_service.gerar_catalogo")
     cliente = app_build.test_client()
     autenticar(cliente)
     resposta = cliente.post("/build/", json={**PEDIDO, "orcamento": total, "percentual_perifericos": percentual})
@@ -1029,7 +1034,7 @@ def test_geracao_inteligente_repara_excesso_sem_pedir_nova_resposta_ia(app_build
         db.session.commit()
         llm=mocker.patch('services.build_service.criar_build_service.LLMService.executar',return_value=resposta)
         pedido={**PEDIDO,'orcamento':8000,'prioridade_montagem':'desempenho','armazenamento_minimo_gb':500}
-        antiga=mocker.spy(CriarBuildService, '_preparar_catalogo')
+        antiga=mocker.spy(criacao_module, 'preparar_catalogo')
         preparar=mocker.spy(SeletorInteligenteService, 'preparar_geracao')
         salvar=mocker.spy(CriarBuildService, '_salvar_build')
         if via_site:
@@ -1062,7 +1067,7 @@ def test_reparo_sem_alternativa_segura_ainda_usa_correcao_limitada(app_build, mo
         for tipo in tipos:
             MODELOS[tipo].buscar_por_id(1).preco=1000
         db.session.commit()
-        catalogo=CriarBuildService._gerar_catalogo(5000)
+        catalogo=gerar_catalogo(5000)
         llm=mocker.patch('services.build_service.criar_build_service.LLMService.executar',return_value=resposta)
         with pytest.raises(ErroGeracaoBuild):
             CriarBuildService()._gerar_validada(1,'Pedido','teste',catalogo,5000,0,{}, {},{},
@@ -1081,7 +1086,7 @@ def test_frontend_inteligente_preserva_prioridade_proprias_perifericos_e_rede(ap
     resposta_ia={**PEDIDO,'componentes':[dict(tipo=t,id=1,quantidade=1) for t in tipos if t!='processador']}
     llm=mocker.patch('services.build_service.criar_build_service.LLMService.executar',return_value=resposta_ia)
     preparar=mocker.spy(SeletorInteligenteService,'preparar_geracao')
-    catalogo_antigo=mocker.spy(CriarBuildService,'_preparar_catalogo')
+    catalogo_antigo=mocker.spy(criacao_module,'preparar_catalogo')
     rede={'tipo':'cabo','possuiAcessorio':True}
     cliente=app_build.test_client()
     autenticar(cliente)

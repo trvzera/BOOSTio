@@ -1,3 +1,4 @@
+from services.build_service.catalogo_geracao_service import campos_pecas
 """Fichas compartilhadas com JS; sem rede, escrita ou migração do banco real."""
 import json
 from pathlib import Path
@@ -61,7 +62,7 @@ def test_fabrica_vagas_e_excesso(caso):
 def test_api_e_prompt_recebem_contagens_sem_alterar_modelo(caso):
     obj = Gabinete(id=1, fabricante=caso["fabricante"], modelo=caso["modelo"], part_number=caso["part_number"],
                    kabum_external=base(caso)["link"], fans_inclusos=None)
-    for dados in (obj.to_catalogo(), CriarBuildService._campos_pecas(obj)):
+    for dados in (obj.to_catalogo(), campos_pecas(obj)):
         for k in ("fans_inclusos", "quantidade_max_fans", "tamanhos_fan_suportados_mm"):
             assert dados[k] == caso["esperado"][k]
         assert dados["fonte_medidas"].startswith("https://")

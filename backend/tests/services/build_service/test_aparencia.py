@@ -1,3 +1,4 @@
+from services.build_service.prompt_build_service import criar_prompt
 from services.validacoes_service.validar_estado_build_service import validar_estado
 import json
 from unittest.mock import patch
@@ -18,7 +19,7 @@ def test_preferencia_opcional_persistida_sem_exigir_peca():
     assert validar_aparencia() == {"estilo":"sem-preferencia","porte":"sem-preferencia","cor":"sem-preferencia","gabinete_id":None}
     assert validar_estado({"titulo":"PC","aparencia":preferencia})["aparencia"] == validar_aparencia(preferencia)
     dados={"nome":"PC","descricao":"Teste","utilidade":"Estudos","aparencia":preferencia}
-    prompt=CriarBuildService._criar_prompt(dados,5000,800,{})
+    prompt=criar_prompt(dados,5000,800,{})
     pedido=json.loads(prompt.split("# PEDIDO\n")[1].split("\n")[0])
     assert pedido["aparencia"] == validar_aparencia(preferencia)
     assert "referência visual, não uma obrigação" in prompt
@@ -39,7 +40,7 @@ def test_estilo_e_tamanho_independentes_persistidos_e_enviados_no_prompt(porte, 
     preferencia = {"estilo": estilo, "porte": porte, "cor": "preto", "gabinete_id": None}
     assert validar_aparencia(preferencia) == preferencia
     assert validar_estado({"titulo": "PC", "aparencia": preferencia})["aparencia"] == preferencia
-    prompt = CriarBuildService._criar_prompt({"nome": "PC", "descricao": "Teste", "utilidade": "Jogos", "aparencia": preferencia}, 5000, 800, {})
+    prompt = criar_prompt({"nome": "PC", "descricao": "Teste", "utilidade": "Jogos", "aparencia": preferencia}, 5000, 800, {})
     pedido = json.loads(prompt.split("# PEDIDO\n")[1].split("\n")[0])
     assert pedido["aparencia"] == preferencia
     assert "panoramico-3-faces indica vidro na frente, lateral e teto" in prompt

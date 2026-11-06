@@ -1,3 +1,9 @@
+from services.validacoes_service.validar_pedido_build_service import validar_orcamento, validar_rede, validar_textos_pedido, pecas_proprias
+from services.build_service.custos_build_service import dividir_orcamento
+from services.build_service.contexto_build_service import obter_detalhes_proprias
+from services.build_service.catalogo_geracao_service import campos_catalogo, validar_disponibilidade, planejar_perifericos
+from services.build_service.prompt_build_service import criar_prompt
+from services.build_service.constantes_build import PERIFERICOS
 from decimal import Decimal
 
 from models import Processador, PlacaVideo, PlacaMae, MemoriaRAM, BuildSalva
@@ -30,7 +36,7 @@ class SeletorInteligenteService:
 
     def _executar(self, dados, incluir_reparo):
         contexto = self._preparar_contexto(dados)
-        contexto["detalhes_proprias"] = CriarBuildService._detalhes_proprias(contexto["proprias"])
+        contexto["detalhes_proprias"] = obter_detalhes_proprias(contexto["proprias"])
         contexto["pools"] = self._carregar_pools(contexto)
         contexto["planejamento"] = PlanejarOrcamentoComponentesService().executar(contexto, contexto["pools"])
         contexto["amostragem"] = {}
@@ -67,24 +73,24 @@ class SeletorInteligenteService:
         if not isinstance(dados, dict):
             raise ValueError("Informe um objeto com os dados da geração")
         validacao_campos(dados, ["nome", "descricao", "utilidade", "orcamento"])
-        CriarBuildService._validar_textos_pedido(dados)
+        validar_textos_pedido(dados)
         resultado = self._executar(dados, incluir_reparo=True)
         catalogo = {}
         for peca in resultado["componentes_selecionados"]:
             catalogo.setdefault(peca["categoria"], []).append(self._ficha(peca))
         gerador = CriarBuildService()
-        proprias = gerador._pecas_proprias(dados.get("pecas_proprias", {}))
-        detalhes = gerador._detalhes_proprias(proprias)
+        proprias = pecas_proprias(dados.get("pecas_proprias", {}))
+        detalhes = obter_detalhes_proprias(proprias)
         percentual = dados.get("percentual_perifericos", 0)
-        orcamento = gerador._validar_orcamento(dados["orcamento"])
-        _, teto_perifericos = gerador._dividir_orcamento(orcamento, percentual)
+        orcamento = validar_orcamento(dados["orcamento"])
+        _, teto_perifericos = dividir_orcamento(orcamento, percentual)
         aparencia = validar_aparencia(dados.get("aparencia"))
-        gerador._validar_disponibilidade(catalogo, proprias, percentual)
-        perifericos = gerador._planejar_perifericos(catalogo, teto_perifericos, proprias,
+        validar_disponibilidade(catalogo, proprias, percentual)
+        perifericos = planejar_perifericos(catalogo, teto_perifericos, proprias,
                                                    dados["utilidade"], aparencia["cor"], percentual)
         margem = min(orcamento / 2, max(800, orcamento * 0.25))
         pedido = {**dados, "prioridade_montagem": resultado["prioridade_montagem"]}
-        prompt = gerador._criar_prompt(pedido, orcamento, margem, catalogo, percentual, detalhes,
+        prompt = criar_prompt(pedido, orcamento, margem, catalogo, percentual, detalhes,
                                       perifericos, planejamento_componentes=resultado["planejamento_orcamento"],
                                       preferencia_neutra=True)
         return {**resultado, "catalogo": catalogo, "prompt": prompt, "proprias": proprias,
@@ -99,7 +105,7 @@ class SeletorInteligenteService:
             gerador = CriarBuildService()
             build = gerador._gerar_validada(
                 usuario_id, preparado["prompt"], modelo, preparado["catalogo"],
-                gerador._validar_orcamento(dados["orcamento"]), dados.get("percentual_perifericos", 0),
+                validar_orcamento(dados["orcamento"]), dados.get("percentual_perifericos", 0),
                 preparado["proprias"], preparado["detalhes_proprias"], dados.get("rede") or {},
                 tentativas_correcao=tentativas_correcao,
                 revisar_investimento=gerador._perfil_revisa_investimento(dados["utilidade"]),
@@ -155,30 +161,30 @@ class SeletorInteligenteService:
         rede = dados.get("rede")
         rede = {} if rede is None else rede
         
-        CriarBuildService._validar_rede(rede)
+        validar_rede(rede)
         aparencia = validar_aparencia(dados.get("aparencia"))
         
-        proprias = CriarBuildService._pecas_proprias(dados.get("pecas_proprias", {}))
+        proprias = pecas_proprias(dados.get("pecas_proprias", {}))
         teto_peca, teto_perifericos = self._planejar_orcamento(dados)
         
         return {"prioridade": prioridade, "limite": limite, "categoria": categoria,
                 "rede": rede, "aparencia": aparencia, "proprias": proprias,
                 "teto_peca": teto_peca, "teto_perifericos": teto_perifericos,
                 "utilidade": utilidade, "armazenamento_minimo_gb": armazenamento,
-                "teto_pc": float(CriarBuildService._dividir_orcamento(dados["orcamento"], dados.get("percentual_perifericos", 0))[0]),
+                "teto_pc": float(dividir_orcamento(dados["orcamento"], dados.get("percentual_perifericos", 0))[0]),
                 "limites": {m.__tablename__: limites.get(m.__tablename__, limite if m in self.MODELOS_BENCHMARK
                             else self.LIMITE_PLACAS_MAE if m.__tablename__ == "placa_mae"
                             else self.LIMITE_MEMORIAS if m.__tablename__ == "memoria_ram" else 12) for m in MODELOS_PECAS}}
 
     @staticmethod
     def _planejar_orcamento(dados):
-        orcamento = CriarBuildService._validar_orcamento(dados["orcamento"])
+        orcamento = validar_orcamento(dados["orcamento"])
         percentual = dados.get("percentual_perifericos", 0)
         
         if type(percentual) is not int or not 0 <= percentual <= 99:
             raise ValueError("A porcentagem para periféricos deve ser de 0 a 99")
         
-        teto_pc, teto_perifericos = CriarBuildService._dividir_orcamento(orcamento, percentual)
+        teto_pc, teto_perifericos = dividir_orcamento(orcamento, percentual)
         
         validar_minimos(teto_pc, teto_perifericos, percentual)
         
@@ -210,7 +216,7 @@ class SeletorInteligenteService:
         pools = {}
         contexto["fallbacks_benchmark"] = set()
         for modelo in MODELOS_PECAS:
-            periferico = modelo.__tablename__ in CriarBuildService.PERIFERICOS
+            periferico = modelo.__tablename__ in PERIFERICOS
             teto = contexto["teto_perifericos"] if periferico else contexto["teto_peca"]
             if not teto:
                 continue
@@ -285,7 +291,7 @@ class SeletorInteligenteService:
 
     @staticmethod
     def _aplicar_teto(contexto, tipo, pecas):
-        absoluto = contexto["teto_perifericos"] if tipo in CriarBuildService.PERIFERICOS else contexto["teto_peca"]
+        absoluto = contexto["teto_perifericos"] if tipo in PERIFERICOS else contexto["teto_peca"]
         teto = contexto["planejamento"]["tetos_sugeridos"].get(tipo, absoluto)
         dentro = [p for p in pecas if Decimal(str(p["preco"])) <= Decimal(str(teto))]
         if dentro:
@@ -306,7 +312,7 @@ class SeletorInteligenteService:
 
     @staticmethod
     def _ficha(peca):
-        ficha = CriarBuildService._campos_catalogo({**peca, "id": SeletorInteligenteService._id_numerico(peca["id"])})
+        ficha = campos_catalogo({**peca, "id": SeletorInteligenteService._id_numerico(peca["id"])})
         for campo in ("benchmark_multi_core", "benchmark_single_thread", "benchmark_g3d", "benchmark_g2d",
                       "benchmark_teste", "benchmark_versao"):
             valor = peca.get(campo)

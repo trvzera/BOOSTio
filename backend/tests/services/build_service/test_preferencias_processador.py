@@ -1,3 +1,4 @@
+from services.build_service.prompt_build_service import criar_prompt
 import json
 from copy import deepcopy
 
@@ -57,7 +58,7 @@ def test_amostra_mantem_ryzen_em_faixas_distintas_sem_excluir_intel():
 
 def test_prompt_informa_prioridade_e_excecoes_sem_afirmar_superioridade_universal():
     dados = {"nome": "PC", "descricao": "Teste", "utilidade": "Jogos"}
-    prompt = CriarBuildService._criar_prompt(dados, 8000, 2000, CATALOGO)
+    prompt = criar_prompt(dados, 8000, 2000, CATALOGO)
     restricoes = json.loads(prompt.split("# RESTRIÇÕES CALCULADAS PELO SERVIDOR\n")[1].split("\n")[0])
     assert restricoes["processadores_ryzen_prioritarios"] == [2]
     regra = prompt.split("# PREFERÊNCIA DE PROCESSADOR\n")[1].split("\n\n")[0]
@@ -66,5 +67,5 @@ def test_prompt_informa_prioridade_e_excecoes_sem_afirmar_superioridade_universa
     assert "não recompre cpu própria" in regra.casefold()
     assert "nem prova de que todo Ryzen supera todo Intel" in regra
     dados["utilidade"] = "Estudos"
-    prompt = CriarBuildService._criar_prompt(dados, 8000, 2000, CATALOGO)
+    prompt = criar_prompt(dados, 8000, 2000, CATALOGO)
     assert '"processadores_ryzen_prioritarios": []' in prompt

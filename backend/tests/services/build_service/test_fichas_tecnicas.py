@@ -1,3 +1,4 @@
+from services.build_service.catalogo_geracao_service import campos_pecas
 """Mesma identidade/medidas do demo JS, sem tocar o banco real ou fazer rede."""
 import json
 from pathlib import Path
@@ -117,7 +118,7 @@ def test_to_catalogo_e_prompt_recebem_novas_medidas_sem_update_no_modelo():
                     kabum_external="https://www.kabum.com.br/produto/509115/gabinete", slots_expansao=4)
     assert case.to_catalogo()["slots_expansao"] == 7
     assert case.slots_expansao == 4
-    dados = CriarBuildService._campos_pecas(case)
+    dados = campos_pecas(case)
     assert dados["quantidade_max_fans"] == 7
     assert dados["modelo_ficha_tecnica"] == "MasterBox TD500 Mesh V2 White"
     assert dados["fonte_medidas"].startswith("https://www.coolermaster.com/")
@@ -126,12 +127,12 @@ def test_to_catalogo_e_prompt_recebem_novas_medidas_sem_update_no_modelo():
     assert "quantidade_max_fans" not in case.to_catalogo()
     placa = PlacaMae(id=17, fabricante="ASRock", modelo="A620AM Pro RS", part_number="SEED-MB-17",
                      kabum_external="https://www.kabum.com.br/produto/938417/placa-mae", quantidade_slots_m2=1)
-    assert CriarBuildService._campos_pecas(placa)["quantidade_slots_m2"] == 3
-    assert CriarBuildService._campos_pecas(placa)["quantidade_slots_m2_sata"] == 0
+    assert campos_pecas(placa)["quantidade_slots_m2"] == 3
+    assert campos_pecas(placa)["quantidade_slots_m2_sata"] == 0
     assert placa.quantidade_slots_m2 == 1
     water = WaterCooler(id=11, fabricante="MSI", modelo="MAG Coreliquid A13", part_number="SEED-WCOOL-11",
                        kabum_external="https://www.kabum.com.br/produto/679305/water-cooler")
-    assert CriarBuildService._campos_pecas(water)["comprimento_radiador_mm"] == 277
+    assert campos_pecas(water)["comprimento_radiador_mm"] == 277
 
 
 def test_novos_limites_sao_usados_na_compatibilidade_sem_aprovar_folgas_desconhecidas():

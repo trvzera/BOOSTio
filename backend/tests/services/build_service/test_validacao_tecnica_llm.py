@@ -1,3 +1,5 @@
+from services.build_service.catalogo_geracao_service import campos_pecas
+from services.build_service.prompt_build_service import criar_prompt
 from copy import deepcopy
 
 import pytest
@@ -70,7 +72,7 @@ def test_geracao_sem_slots_reais_limita_dois_pentes_e_prompt_nao_inventa_especif
     ram["quantidade"] = 3
     with pytest.raises(ValueError, match="Limite provisório de RAM"):
         validar(sugestao)
-    prompt = CriarBuildService._criar_prompt({"nome": "QA", "descricao": "QA", "utilidade": "Estudos"}, 5000, 800, {})
+    prompt = criar_prompt({"nome": "QA", "descricao": "QA", "utilidade": "Estudos"}, 5000, 800, {})
     assert "limite provisoriamente" in prompt and "não uma especificação confirmada" in prompt
     assert "dois pentes (próprios + novos, incluindo todos os kits)" in prompt
 
@@ -138,12 +140,12 @@ def test_nao_aceita_peca_esgotada_ou_especificacoes_inventadas_pela_ia(sugestao)
 def test_prompt_recebe_os_dados_tecnicos_que_a_validacao_usa():
     from models import PlacaMae, AirCooler, Gabinete
 
-    dados = CriarBuildService._campos_pecas(PlacaMae(id=1, quantidade_slots_ram=4, quantidade_slots_m2=2))
+    dados = campos_pecas(PlacaMae(id=1, quantidade_slots_ram=4, quantidade_slots_m2=2))
     assert dados["quantidade_slots_ram"] == 4
     assert dados["quantidade_slots_m2"] == 2
-    dados = CriarBuildService._campos_pecas(AirCooler(id=2, compatibilidade="AM4, AM5"))
+    dados = campos_pecas(AirCooler(id=2, compatibilidade="AM4, AM5"))
     assert dados["compatibilidade"] == "AM4, AM5"
-    dados = CriarBuildService._campos_pecas(Gabinete(id=3, tamanho_max_gpu_mm=320, tamanho_max_cooler_mm=160))
+    dados = campos_pecas(Gabinete(id=3, tamanho_max_gpu_mm=320, tamanho_max_cooler_mm=160))
     assert dados["tamanho_max_gpu_mm"] == 320
     assert dados["tamanho_max_cooler_mm"] == 160
 
@@ -175,7 +177,7 @@ def test_geracao_nao_omite_fans_quando_so_gabinete_foi_selecionado(sugestao):
 
 
 def test_prompt_descreve_ventilacao_sem_inferir_tamanho_do_gabinete_ou_folga():
-    prompt = CriarBuildService._criar_prompt({"nome": "QA", "descricao": "QA", "utilidade": "Jogos"}, 5000, 800, {})
+    prompt = criar_prompt({"nome": "QA", "descricao": "QA", "utilidade": "Jogos"}, 5000, 800, {})
     assert "sete posições" in prompt and "cinco fans" in prompt
     assert "Não planeje substituir fans originais" in prompt
     assert "Não some uma folga genérica" in prompt
