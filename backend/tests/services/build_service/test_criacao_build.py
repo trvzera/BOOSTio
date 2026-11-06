@@ -1,3 +1,6 @@
+from services.build_service.gerar_candidata_service import gerar_candidata
+from services.build_service.gerar_candidata_service import perfil_revisa_investimento
+from services.build_service.erros_build import ErroGeracaoBuild
 from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
 import services.build_service.criar_build_service as criacao_module
 from services.build_service.custos_build_service import dividir_orcamento
@@ -110,7 +113,7 @@ def test_referencia_gabinete_so_enriquece_amostra_se_disponivel_dentro_do_teto(a
 
 
 def test_limite_em_manual_importacao_duplicacao_e_llm(app_build, mocker):
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar")
     cliente = app_build.test_client()
     autenticar(cliente)
     for _ in range(3):
@@ -161,7 +164,7 @@ def test_reverifica_limite_depois_da_llm_e_rollback_sem_orfa(app_build):
 
 @pytest.mark.parametrize("percentual", [-1, 100, 20.5, True, "20", None])
 def test_rejeita_percentual_invalido_antes_da_llm(app_build, mocker, percentual):
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar")
     with app_build.app_context(), pytest.raises(ValueError, match="porcentagem"):
         CriarBuildService().executar(1, {**PEDIDO, "percentual_perifericos": percentual})
     llm.assert_not_called()
@@ -192,9 +195,9 @@ def test_revisao_do_investimento_alto_e_limitada_e_usa_custos_calculados(mocker)
     catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": 18000})
     segunda = deepcopy(primeira)
     segunda["componentes"][0]["id"] = 2
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=[primeira, segunda])
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=[primeira, segunda])
     mocker.patch("services.build_service.criar_build_service.BuildSalva.verificar_espaco")
-    resultado = CriarBuildService()._gerar_validada(1, "Pedido", "teste", catalogo, 20000, 0, {}, {}, {}, revisar_investimento=True)
+    resultado = gerar_candidata(1, "Pedido", "teste", catalogo, 20000, 0, {}, {}, {}, revisar_investimento=True)
     assert resultado["preco_total"] == 18100
     assert llm.call_count == 2
     revisao = llm.call_args.args[0]
@@ -208,9 +211,9 @@ def test_revisao_de_investimento_nao_descarta_primeira_build_valida(mocker, erro
     primeira, catalogo = resposta_com_perifericos()
     primeira["componentes"] = [i for i in primeira["componentes"] if i["tipo"] not in PERIFERICOS]
     catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": 18000})
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=[primeira, erro])
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=[primeira, erro])
     mocker.patch("services.build_service.criar_build_service.BuildSalva.verificar_espaco")
-    resultado = CriarBuildService()._gerar_validada(1, "Pedido", "teste", catalogo, 20000, 0, {}, {}, {}, revisar_investimento=True)
+    resultado = gerar_candidata(1, "Pedido", "teste", catalogo, 20000, 0, {}, {}, {}, revisar_investimento=True)
     assert resultado["preco_total"] == 900
     assert llm.call_count == 2
 
@@ -219,8 +222,8 @@ def test_preco_alto_disponivel_nao_forca_escritorio_a_gastar_o_orcamento(mocker)
     build, catalogo = resposta_com_perifericos()
     build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in PERIFERICOS]
     catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": 18000})
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value=build)
-    resultado = CriarBuildService()._gerar_validada(1, "Escritório", "teste", catalogo, 20000, 0, {}, {}, {})
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value=build)
+    resultado = gerar_candidata(1, "Escritório", "teste", catalogo, 20000, 0, {}, {}, {})
     assert resultado["preco_total"] == 900
     llm.assert_called_once()
 
@@ -320,7 +323,7 @@ def test_teto_percentual_preserva_centavos_sem_arredondar_para_cima():
 
 def test_reserva_nao_pode_reduzir_pc_abaixo_do_minimo_antes_do_catalogo_e_llm(app_build, mocker):
     gerar_catalogo = mocker.patch("services.build_service.catalogo_geracao_service.gerar_catalogo", return_value={})
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar")
     with app_build.app_context(), pytest.raises(ValueError, match="pelo menos R\$ 2000"):
         CriarBuildService().executar(1, {**PEDIDO, "percentual_perifericos": 90})
     gerar_catalogo.assert_not_called()
@@ -342,7 +345,7 @@ def test_geracao_rejeita_transferencia_de_sobra_antes_de_salvar(app_build, mocke
             MODELOS["processador"].buscar_por_id(1).preco = 3000
             MODELOS["placa_mae"].buscar_por_id(1).preco = 700
         db.session.commit()
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value={
         **PEDIDO, "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos],
     })
     cliente = app_build.test_client()
@@ -375,7 +378,7 @@ def test_conjunto_de_perifericos_inviavel_nao_consume_llm_nem_salva(app_build, m
         cadastrar_pecas(tipos)
         MODELOS["monitor"].buscar_por_id(1).preco = 900
         db.session.commit()
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar")
     cliente = app_build.test_client()
     autenticar(cliente)
     resposta = cliente.post("/build/", json={**PEDIDO, "percentual_perifericos": 20})
@@ -400,7 +403,7 @@ def test_geracao_completa_fans_omitidas_antes_de_persistir(app_build, mocker):
         ficha_fan = {**fan.to_catalogo(), "quantidade": 1, "tamanho_mm": 120}
     mocker.patch.object(MODELOS["gabinete"], "to_catalogo", return_value=ficha_gabinete)
     mocker.patch.object(MODELOS["fan"], "to_catalogo", return_value=ficha_fan)
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value={
         **PEDIDO, "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos if tipo != "fan"]})
     cliente = app_build.test_client()
     autenticar(cliente)
@@ -417,7 +420,7 @@ def test_geracao_persiste_original_e_estado_em_uma_transacao(app_build, mocker, 
     tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "monitor", "teclado", "mouse", "fone"]
     with app_build.app_context():
         cadastrar_pecas(tipos)
-        llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
+        llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value={
             "nome": "PC gerado", "descricao": "Com periféricos", "utilidade": "Jogos",
             "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos],
         })
@@ -443,7 +446,7 @@ def test_geracao_8000_perifericos_10_rede_pendente_ou_comprada(app_build, mocker
         cadastrar_pecas(tipos)
         MODELOS["cabo_rede"].buscar_por_id(1).comprimento_m = 10
         db.session.commit()
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value={
         "nome": "PC gerado", "descricao": "Completo", "utilidade": "Jogos",
         "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos],
     })
@@ -471,7 +474,7 @@ def test_geracao_rejeita_conflito_antes_de_gravar_build(app_build, mocker):
         MODELOS["processador"].buscar_por_id(1).soquete = "AM4"
         MODELOS["placa_mae"].buscar_por_id(1).socket = "AM5"
         db.session.commit()
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value={
         **PEDIDO, "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos],
     })
     cliente = app_build.test_client()
@@ -499,7 +502,7 @@ def test_geracao_de_rede_preserva_opcao_sem_perifericos_e_criacao_limitada(app_b
     rede = {"tipo": "cabo", "possuiAcessorio": False, "comprimentoMetros": 2}
     with app_build.app_context():
         cadastrar_pecas(tipos)
-        llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
+        llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value={
             **PEDIDO, "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos],
         })
         resposta = CriarBuildService().executar(1, {**PEDIDO, "rede": rede})
@@ -513,7 +516,7 @@ def test_geracao_de_rede_preserva_opcao_sem_perifericos_e_criacao_limitada(app_b
 
 
 def test_orcamento_nao_aceita_fracao_de_centavo(app_build, mocker):
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar")
     with app_build.app_context(), pytest.raises(ValueError, match="casas decimais"):
         CriarBuildService().executar(1, {**PEDIDO, "orcamento": 5000.001})
     llm.assert_not_called()
@@ -528,7 +531,7 @@ def test_geracao_com_pecas_proprias_preserva_reserva_rede_e_extras(app_build, mo
     rede = {"tipo": "cabo", "possuiAcessorio": True}
     with app_build.app_context():
         cadastrar_pecas(base + perifericos)
-        llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
+        llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value={
             **PEDIDO, "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in novas],
         })
         resultado = CriarBuildService().executar(1, {**PEDIDO, "pecas_proprias": proprias, "rede": rede,
@@ -563,7 +566,7 @@ def test_pecas_proprias_reverificam_quota_apos_llm(app_build, mocker):
             CriarBuildManualService().executar(1, ESTADO)
             return {**PEDIDO, "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos[1:]]}
 
-        llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=ocupar_ultima_vaga)
+        llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=ocupar_ultima_vaga)
         with pytest.raises(LimiteBuildsError):
             CriarBuildService().executar(1, {**PEDIDO, "pecas_proprias": {"processador": "Minha CPU"}})
         llm.assert_called_once()
@@ -577,7 +580,7 @@ def test_email_nao_verificado_bloqueia_todas_as_criacoes_sem_chamar_llm(app_buil
     with app_build.app_context():
         db.session.get(Usuario,1).verificado = False
         db.session.commit()
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar")
     for rota,dados in [("/build/manual",ESTADO),("/build/",PEDIDO),(f"/build/{existente}/duplicar",None)]:
         resposta = cliente.post(rota,json=dados)
         assert resposta.status_code == 403
@@ -612,7 +615,7 @@ def test_ia_corrige_saida_invalida_antes_de_persistir(app_build, mocker, falha):
         invalida["componentes"][5]["quantidade"] = 60
     else:
         invalida["componentes"].append({"tipo": "cabo_rede", "id": 1})
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=[invalida, correta])
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=[invalida, correta])
     cliente = app_build.test_client()
     autenticar(cliente)
     resposta = cliente.post("/build/", json=PEDIDO)
@@ -633,7 +636,7 @@ def test_ia_revisa_omissao_de_fans_antes_de_salvar(app_build, mocker):
         db.session.commit()
     sem_fans = {**PEDIDO, "componentes": [{"tipo": t, "id": 1, "quantidade": 1} for t in tipos if t != "fan"]}
     com_fans = {**PEDIDO, "componentes": [{"tipo": t, "id": 1, "quantidade": 1} for t in tipos]}
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=[sem_fans, com_fans])
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=[sem_fans, com_fans])
     cliente = app_build.test_client()
     autenticar(cliente)
     resposta = cliente.post("/build/", json=PEDIDO)
@@ -645,7 +648,7 @@ def test_ia_revisa_omissao_de_fans_antes_de_salvar(app_build, mocker):
 def test_ia_invalida_duas_vezes_nao_persiste_nem_repete_sem_limite(app_build, mocker):
     with app_build.app_context():
         cadastrar_pecas(["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd"])
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value="JSON inválido")
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value="JSON inválido")
     cliente = app_build.test_client()
     autenticar(cliente)
     resposta = cliente.post("/build/", json=PEDIDO)
@@ -664,7 +667,7 @@ def test_revisao_reverifica_vaga_antes_de_gastar_outra_consulta(app_build, mocke
     def ocupar(*_args):
         CriarBuildManualService().executar(1, ESTADO)
         return "JSON inválido"
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=ocupar)
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=ocupar)
     cliente = app_build.test_client()
     autenticar(cliente)
     resposta = cliente.post("/build/", json=PEDIDO)
@@ -678,7 +681,7 @@ def test_fallback_de_transporte_nao_inicia_outro_ciclo_de_correcao(app_build, mo
     from requests.exceptions import Timeout
     with app_build.app_context():
         cadastrar_pecas(["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd"])
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=["JSON inválido", Timeout(), "JSON inválido"])
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=["JSON inválido", Timeout(), "JSON inválido"])
     cliente = app_build.test_client()
     autenticar(cliente)
     resposta = cliente.post("/build/", json=PEDIDO)
@@ -698,7 +701,7 @@ def test_falha_do_provedor_nao_e_tratada_como_erro_do_usuario(app_build, mocker,
     resposta_provedor.status_code = 429 if falha == "limite" else 503
     resposta_provedor.headers["Retry-After"] = "45"
     erro = Timeout() if falha == "timeout" else ConnectionError() if falha == "conexao" else HTTPError(response=resposta_provedor)
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=erro)
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=erro)
     cliente = app_build.test_client()
     autenticar(cliente)
     resposta = cliente.post("/build/", json=PEDIDO)
@@ -712,7 +715,7 @@ def test_falha_do_provedor_nao_e_tratada_como_erro_do_usuario(app_build, mocker,
 
 @pytest.mark.parametrize("valor", [{"valor": 5000}, [], "sem valor", 10**400])
 def test_orcamento_malformado_nao_gasta_consulta(app_build, mocker, valor):
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar")
     cliente = app_build.test_client()
     autenticar(cliente)
     resposta = cliente.post("/build/", json={**PEDIDO,"orcamento":valor})
@@ -784,7 +787,7 @@ def test_8000_um_pouco_de_tudo_revisa_pc_de_4000_e_salva_so_a_melhorada(app_buil
                 "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos]}
     segunda = deepcopy(primeira)
     next(i for i in segunda["componentes"] if i["tipo"] == "placa_video")["id"] = 2
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=[primeira, segunda])
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=[primeira, segunda])
     with app_build.app_context():
         resposta = CriarBuildService().executar(1, {**primeira, "orcamento": 8000, "percentual_perifericos": percentual})
         assert resposta["preco_total"] == esperado
@@ -804,7 +807,7 @@ def test_8000_um_pouco_de_tudo_revisa_pc_de_4000_e_salva_so_a_melhorada(app_buil
                                           ("Trabalho pesado", True), ("Renderização 3D", True),
                                           ("Estudos", False), ("Trabalho casual", False), ("Servidor NAS", False)])
 def test_revisao_de_investimento_distingue_perfil_misto_de_escritorio(perfil, esperado):
-    assert CriarBuildService._perfil_revisa_investimento(perfil) is esperado
+    assert perfil_revisa_investimento(perfil) is esperado
 
 
 @pytest.mark.parametrize("esgotado,preco", [(True, 2000), (False, 9000)])
@@ -812,8 +815,8 @@ def test_nao_consume_revisao_por_peca_esgotada_ou_acima_do_teto(mocker, esgotado
     build, catalogo = resposta_com_perifericos()
     build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in PERIFERICOS]
     catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": preco, "esgotado": esgotado})
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value=build)
-    resultado = CriarBuildService()._gerar_validada(1, "Pedido", "teste", catalogo, 8000, 0, {}, {}, {}, revisar_investimento=True)
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value=build)
+    resultado = gerar_candidata(1, "Pedido", "teste", catalogo, 8000, 0, {}, {}, {}, revisar_investimento=True)
     assert resultado["preco_total"] == 900
     llm.assert_called_once()
 
@@ -821,8 +824,8 @@ def test_nao_consume_revisao_por_peca_esgotada_ou_acima_do_teto(mocker, esgotado
 def test_revisao_do_pc_nao_usa_a_verba_reservada_para_perifericos(mocker):
     build, catalogo = resposta_com_perifericos()
     catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": 2000})
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value=build)
-    resultado = CriarBuildService()._gerar_validada(1, "Pedido", "teste", catalogo, 8000, 80, {}, {}, {}, revisar_investimento=True)
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value=build)
+    resultado = gerar_candidata(1, "Pedido", "teste", catalogo, 8000, 80, {}, {}, {}, revisar_investimento=True)
     assert resultado["preco_total"] == 1100
     llm.assert_called_once()  # A alternativa caberia no total, mas não no teto de R$ 1.600 do PC.
 
@@ -832,8 +835,8 @@ def test_revisao_considera_preco_por_quantidade_dos_pentes(mocker):
     build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in PERIFERICOS]
     next(i for i in build["componentes"] if i["tipo"] == "memoria_ram")["quantidade"] = 2
     catalogo["memoria_ram"].append({**catalogo["memoria_ram"][0], "id": 2, "preco": 2000})
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value=build)
-    resultado = CriarBuildService()._gerar_validada(1, "Pedido", "teste", catalogo, 3000, 0, {}, {}, {}, revisar_investimento=True)
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value=build)
+    resultado = gerar_candidata(1, "Pedido", "teste", catalogo, 3000, 0, {}, {}, {}, revisar_investimento=True)
     assert resultado["preco_total"] == 920
     llm.assert_called_once()
 
@@ -843,16 +846,16 @@ def test_fim_da_cota_na_revisao_preserva_build_que_ja_era_valida(mocker, erro):
     build, catalogo = resposta_com_perifericos()
     build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in PERIFERICOS]
     catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": 2000})
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=[build, erro])
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=[build, erro])
     mocker.patch("services.build_service.criar_build_service.BuildSalva.verificar_espaco")
-    resultado = CriarBuildService()._gerar_validada(1, "Pedido", "teste", catalogo, 8000, 0, {}, {}, {}, revisar_investimento=True)
+    resultado = gerar_candidata(1, "Pedido", "teste", catalogo, 8000, 0, {}, {}, {}, revisar_investimento=True)
     assert resultado["preco_total"] == 900 and llm.call_count == 2
 
 
 def test_sem_build_valida_a_cota_continua_bloqueando_a_geracao(mocker):
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=CotaGlobalIAError(60))
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=CotaGlobalIAError(60))
     with pytest.raises(CotaGlobalIAError):
-        CriarBuildService()._gerar_validada(1, "Pedido", "teste", {}, 8000, 0, {}, {}, {}, revisar_investimento=True)
+        gerar_candidata(1, "Pedido", "teste", {}, 8000, 0, {}, {}, {}, revisar_investimento=True)
     llm.assert_called_once()
 
 
@@ -872,7 +875,7 @@ def test_uso_misto_com_gpu_propria_e_perifericos_melhora_so_as_compras_pendentes
                 "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos]}
     segunda = deepcopy(primeira)
     next(i for i in segunda["componentes"] if i["tipo"] == "processador")["id"] = 2
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=[primeira, segunda])
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=[primeira, segunda])
     with app_build.app_context():
         resposta = CriarBuildService().executar(1, {**primeira, "orcamento": 8000, "percentual_perifericos": 20,
                                                    "pecas_proprias": {"placa_video": "placa_video"}})
@@ -891,8 +894,8 @@ def test_gpu_disponivel_nao_dispara_nova_compra_quando_gpu_ja_e_propria(mocker):
     build, catalogo = resposta_com_perifericos()
     build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in PERIFERICOS]
     catalogo["placa_video"] = [{"id": 1, "fabricante": "Teste", "modelo": "Outra GPU", "preco": 3000}]
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value=build)
-    resultado = CriarBuildService()._gerar_validada(1, "Pedido", "teste", catalogo, 8000, 0,
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value=build)
+    resultado = gerar_candidata(1, "Pedido", "teste", catalogo, 8000, 0,
                                                  {"placa_video": "GPU já comprada"}, {"placa_video":{"especificacoes_confirmadas":{"consumo_energia":150}}}, {}, revisar_investimento=True)
     assert resultado["preco_total"] == 900 and not any(i["tipo"] == "placa_video" for i in resultado["componentes"])
     llm.assert_called_once()
@@ -905,9 +908,9 @@ def test_gpu_pode_ser_avaliada_quando_cpu_com_video_integrado_deixa_margem(mocke
     catalogo["placa_video"] = [{"id": 1, "fabricante": "Teste", "modelo": "GPU dedicada", "preco": 3000, "consumo_energia": 150}]
     segunda = deepcopy(build)
     segunda["componentes"].append({"tipo": "placa_video", "id": 1, "quantidade": 1})
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=[build, segunda])
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=[build, segunda])
     mocker.patch("services.build_service.criar_build_service.BuildSalva.verificar_espaco")
-    resultado = CriarBuildService()._gerar_validada(1, "Pedido", "teste", catalogo, 8000, 0, {}, {}, {}, revisar_investimento=True)
+    resultado = gerar_candidata(1, "Pedido", "teste", catalogo, 8000, 0, {}, {}, {}, revisar_investimento=True)
     assert resultado["preco_total"] == 3900 and llm.call_count == 2
     assert any(i["tipo"] == "placa_video" for i in resultado["componentes"])
 
@@ -916,8 +919,8 @@ def test_fallback_sem_revisoes_nao_gasta_uma_chamada_extra(mocker):
     build, catalogo = resposta_com_perifericos()
     build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in PERIFERICOS]
     catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": 2000})
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value=build)
-    resultado = CriarBuildService()._gerar_validada(1, "Pedido", "teste", catalogo, 8000, 0, {}, {}, {},
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value=build)
+    resultado = gerar_candidata(1, "Pedido", "teste", catalogo, 8000, 0, {}, {}, {},
                                                  tentativas_correcao=0, revisar_investimento=True)
     assert resultado["preco_total"] == 900
     llm.assert_called_once()
@@ -926,7 +929,7 @@ def test_fallback_sem_revisoes_nao_gasta_uma_chamada_extra(mocker):
 @pytest.mark.parametrize("total,percentual,motivo", [(1, 0, "orcamento"), (1999.99, 0, "orcamento"),
     (2000, 20, "orcamento"), (5000, 1, "perifericos")])
 def test_api_rejeita_limites_minimos_sem_chamar_ia_ou_salvar(app_build, mocker, total, percentual, motivo):
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar")
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar")
     catalogo = mocker.patch("services.build_service.catalogo_geracao_service.gerar_catalogo")
     cliente = app_build.test_client()
     autenticar(cliente)
@@ -945,7 +948,7 @@ def test_api_aceita_pc_2000_perifericos_500_como_tetos_sem_impor_gasto(app_build
     tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "monitor", "teclado", "mouse", "fone"]
     with app_build.app_context():
         cadastrar_pecas(tipos)
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value={
         **PEDIDO, "componentes": [{"tipo": t, "id": 1, "quantidade": 1} for t in tipos]})
     cliente = app_build.test_client()
     autenticar(cliente)
@@ -958,7 +961,7 @@ def test_api_aceita_pc_2000_perifericos_500_como_tetos_sem_impor_gasto(app_build
 def test_recusa_de_cor_vira_orientacao_publica_sem_dizer_que_faltou_orcamento(app_build, mocker):
     with app_build.app_context():
         cadastrar_pecas(["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd"])
-    llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={"erro": "texto bruto SEGREDO", "motivo": "cor", "componentes": []})
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value={"erro": "texto bruto SEGREDO", "motivo": "cor", "componentes": []})
     cliente = app_build.test_client()
     autenticar(cliente)
     resposta = cliente.post("/build/", json={**PEDIDO, "aparencia": {"cor": "branco"}})
@@ -984,7 +987,7 @@ def test_requisito_armazenamento_aciona_correcao_antes_de_salvar(app_build, mock
         copia = {c.name: getattr(ssd, c.name) for c in ssd.__table__.columns if c.name != 'id'}
         db.session.add(MODELOS['ssd'](**{**copia, 'capacidade_gb': 500}))
         db.session.commit()
-        llm = mocker.patch('services.build_service.criar_build_service.LLMService.executar',
+        llm = mocker.patch('services.build_service.gerar_candidata_service.LLMService.executar',
                            side_effect=[primeira, segunda])
         resultado = CriarBuildService().executar(1, {**PEDIDO, 'armazenamento_minimo_gb': 500})
         assert resultado['estado']['componentes']['ssd'][0]['id'] == 2
@@ -995,14 +998,14 @@ def test_requisito_armazenamento_aciona_correcao_antes_de_salvar(app_build, mock
 
 
 def test_armazenamento_insuficiente_nunca_e_salvo(app_build, mocker):
-    from services.build_service.criar_build_service import ErroGeracaoBuild
+    from services.build_service.erros_build import ErroGeracaoBuild
     tipos = ['processador', 'placa_mae', 'memoria_ram', 'fonte', 'gabinete', 'ssd']
     resposta = {**PEDIDO, 'componentes': [{'tipo': tipo, 'id': 1, 'quantidade': 1} for tipo in tipos]}
     with app_build.app_context():
         cadastrar_pecas(tipos)
         MODELOS['ssd'].buscar_por_id(1).capacidade_gb = 120
         db.session.commit()
-        mocker.patch('services.build_service.criar_build_service.LLMService.executar', return_value=resposta)
+        mocker.patch('services.build_service.gerar_candidata_service.LLMService.executar', return_value=resposta)
         with pytest.raises(ErroGeracaoBuild, match='armazenamento mínimo'):
             CriarBuildService().executar(1, {**PEDIDO, 'armazenamento_minimo_gb': 500})
         assert BuildSalva.query.count() == Build.query.count() == 0
@@ -1033,11 +1036,11 @@ def test_geracao_inteligente_repara_excesso_sem_pedir_nova_resposta_ia(app_build
             copia={c.name:getattr(obj,c.name) for c in obj.__table__.columns if c.name!='id'}
             db.session.add(MODELOS[tipo](**{**copia,**extras}))
         db.session.commit()
-        llm=mocker.patch('services.build_service.criar_build_service.LLMService.executar',return_value=resposta)
+        llm=mocker.patch('services.build_service.gerar_candidata_service.LLMService.executar',return_value=resposta)
         pedido={**PEDIDO,'orcamento':8000,'prioridade_montagem':'desempenho','armazenamento_minimo_gb':500}
         antiga=mocker.spy(criacao_module, 'preparar_catalogo')
         preparar=mocker.spy(SeletorInteligenteService, 'preparar_geracao')
-        salvar=mocker.spy(CriarBuildService, '_salvar_build')
+        salvar=mocker.spy(criacao_module, 'salvar_build')
         if via_site:
             cliente=app_build.test_client()
             autenticar(cliente)
@@ -1045,7 +1048,7 @@ def test_geracao_inteligente_repara_excesso_sem_pedir_nova_resposta_ia(app_build
             assert resposta_http.status_code==201, resposta_http.json
             assert resposta_http.json['build']['preco_total']==7950
             assert BuildSalva.query.count()==Build.query.count()==1
-            r={'build': salvar.call_args.args[2]}
+            r={'build': salvar.call_args.args[1]}
         else:
             r=SeletorInteligenteService().gerar_build(1,pedido)
         preparar.assert_called_once()
@@ -1060,7 +1063,7 @@ def test_geracao_inteligente_repara_excesso_sem_pedir_nova_resposta_ia(app_build
 
 
 def test_reparo_sem_alternativa_segura_ainda_usa_correcao_limitada(app_build, mocker):
-    from services.build_service.criar_build_service import ErroGeracaoBuild
+    from services.build_service.erros_build import ErroGeracaoBuild
     tipos=['processador','placa_mae','memoria_ram','fonte','gabinete','ssd']
     resposta={**PEDIDO,'componentes':[dict(tipo=t,id=1,quantidade=1) for t in tipos]}
     with app_build.app_context():
@@ -1069,9 +1072,9 @@ def test_reparo_sem_alternativa_segura_ainda_usa_correcao_limitada(app_build, mo
             MODELOS[tipo].buscar_por_id(1).preco=1000
         db.session.commit()
         catalogo=gerar_catalogo(5000)
-        llm=mocker.patch('services.build_service.criar_build_service.LLMService.executar',return_value=resposta)
+        llm=mocker.patch('services.build_service.gerar_candidata_service.LLMService.executar',return_value=resposta)
         with pytest.raises(ErroGeracaoBuild):
-            CriarBuildService()._gerar_validada(1,'Pedido','teste',catalogo,5000,0,{}, {},{},
+            gerar_candidata(1,'Pedido','teste',catalogo,5000,0,{}, {},{},
                                                ajustar_orcamento=True,catalogo_reparo=catalogo)
         assert llm.call_count == 2
         assert BuildSalva.query.count() == 0
@@ -1085,7 +1088,7 @@ def test_frontend_inteligente_preserva_prioridade_proprias_perifericos_e_rede(ap
     with app_build.app_context():
         cadastrar_pecas(tipos)
     resposta_ia={**PEDIDO,'componentes':[dict(tipo=t,id=1,quantidade=1) for t in tipos if t!='processador']}
-    llm=mocker.patch('services.build_service.criar_build_service.LLMService.executar',return_value=resposta_ia)
+    llm=mocker.patch('services.build_service.gerar_candidata_service.LLMService.executar',return_value=resposta_ia)
     preparar=mocker.spy(SeletorInteligenteService,'preparar_geracao')
     catalogo_antigo=mocker.spy(criacao_module,'preparar_catalogo')
     rede={'tipo':'cabo','possuiAcessorio':True}

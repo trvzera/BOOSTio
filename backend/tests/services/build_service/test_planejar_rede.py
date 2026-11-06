@@ -1,3 +1,5 @@
+import services.build_service.gerar_candidata_service as validacao_module
+from services.build_service.gerar_candidata_service import gerar_candidata
 from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
 import services.build_service.criar_build_service as criacao_module
 from services.build_service.prompt_build_service import criar_prompt
@@ -97,9 +99,9 @@ def test_diagnostico_preserva_pendencia_no_editor_sem_bloquear_pc():
 
 def test_recuperacao_rede_usa_mesma_chamada_e_nao_modifica_flag_de_posse():
     resposta = {"componentes": [{"tipo": "cabo_rede", "id": 1}]}
-    with patch("services.build_service.criar_build_service.LLMService.executar", return_value=resposta) as llm, \
-         patch("services.build_service.criar_build_service.CompletarVentilacaoService.executar", side_effect=lambda b,*a,**k:b), \
-         patch.object(criacao_module, "validar_build_gerada", side_effect=lambda b,*a,**k:b):
-        resultado = CriarBuildService()._gerar_validada(1, "Prompt", "teste", CATALOGO, 8000, 10, {}, {}, PEDIDO, tentativas_correcao=0)
+    with patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value=resposta) as llm, \
+         patch("services.build_service.gerar_candidata_service.CompletarVentilacaoService.executar", side_effect=lambda b,*a,**k:b), \
+         patch.object(validacao_module, "validar_build_gerada", side_effect=lambda b,*a,**k:b):
+        resultado = gerar_candidata(1, "Prompt", "teste", CATALOGO, 8000, 10, {}, {}, PEDIDO, tentativas_correcao=0)
     assert resultado["componentes"] == [] and PEDIDO["possuiAcessorio"] is False
     llm.assert_called_once()

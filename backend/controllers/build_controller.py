@@ -8,7 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from requests.exceptions import RequestException, HTTPError, Timeout, ConnectionError
 
 from services.build_service.listar_builds_service import ListarBuildService
-from services.build_service.criar_build_service import ErroGeracaoBuild
+from services.build_service.erros_build import ErroGeracaoBuild
 from services.build_service.planejamento_geracao import ErroPlanejamentoBuild
 from services.build_service.gerar_build_service import GerarBuildService
 from services.build_service.buscar_build_service import BuscarBuildService

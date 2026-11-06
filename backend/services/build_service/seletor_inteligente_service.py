@@ -1,3 +1,5 @@
+from services.build_service.gerar_candidata_service import gerar_candidata
+from services.build_service.gerar_candidata_service import perfil_revisa_investimento
 from .selecionar_plataforma_service import selecionar_placas_mae, selecionar_memorias, aplicar_teto, ficha_catalogo, id_numerico
 from services.validacoes_service.validar_pedido_build_service import validar_orcamento, validar_rede, validar_textos_pedido, pecas_proprias
 from services.build_service.custos_build_service import dividir_orcamento
@@ -13,7 +15,6 @@ from utils.aparencia import validar_aparencia
 from utils.validacoes import validacao_campos
 from utils.sockets import normalizar_socket
 from utils.memorias import normalizar_ddr
-from .criar_build_service import CriarBuildService
 from .planejamento_geracao import validar_minimos
 from services.validacoes_service.requisitos_armazenamento_service import RequisitosArmazenamentoService
 from .planejar_rede_service import PlanejarRedeService
@@ -102,13 +103,12 @@ class SeletorInteligenteService:
             BuildSalva.verificar_espaco(usuario_id)
             preparado = self.preparar_geracao(dados)
             aparencia = validar_aparencia(dados.get("aparencia"))
-            gerador = CriarBuildService()
-            build = gerador._gerar_validada(
+            build = gerar_candidata(
                 usuario_id, preparado["prompt"], modelo, preparado["catalogo"],
                 validar_orcamento(dados["orcamento"]), dados.get("percentual_perifericos", 0),
                 preparado["proprias"], preparado["detalhes_proprias"], dados.get("rede") or {},
                 tentativas_correcao=tentativas_correcao,
-                revisar_investimento=gerador._perfil_revisa_investimento(dados["utilidade"]),
+                revisar_investimento=perfil_revisa_investimento(dados["utilidade"]),
                 cor=aparencia["cor"], aparencia=aparencia,
                 armazenamento_minimo_gb=preparado["armazenamento_minimo_gb"],
                 ajustar_orcamento=True, catalogo_reparo=preparado["catalogo_reparo"])
