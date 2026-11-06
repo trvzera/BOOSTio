@@ -1,3 +1,4 @@
+from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 """Importação transacional do OpenDB; consultas e deduplicação ficam no repositório."""
 from collections import defaultdict
 from types import SimpleNamespace
@@ -183,7 +184,7 @@ class RepositorioImportacaoBuildcores:
                 atual=db.session.get(m,p['id'])
                 for k,v in alteracoes.items():setattr(atual,k,v)
                 atual.fontes_especificacoes=novas_fontes
-                atual.ficha_montagem_validada=not atual.pendencias_para_montagem()
+                atual.ficha_montagem_validada=not pendencias_para_montagem(atual)
                 db.session.flush()
             p['dados'].update(alteracoes);p['fontes']=novas_fontes;self._indexar(p)
             return dict(acao='existente',categoria=cat,id_externo=origem['id_externo'],campos=len(alteracoes))
@@ -204,9 +205,9 @@ class RepositorioImportacaoBuildcores:
             objeto=m(**limpos);objeto.id=-(len(self.registros)+1)
         else:
             objeto=m(**valores);db.session.add(objeto);db.session.flush();db.session.refresh(objeto)
-        objeto.ficha_montagem_validada=not objeto.pendencias_para_montagem()
+        objeto.ficha_montagem_validada=not pendencias_para_montagem(objeto)
         p=self._dados(objeto,cat);p['fontes']=valores['fontes_especificacoes'];self._indexar(p)
-        return dict(acao='proposta' if simular else 'criada',categoria=cat,id_externo=origem['id_externo'],minimos_atendidos=objeto.ficha_montagem_validada,pendencias=objeto.pendencias_para_montagem())
+        return dict(acao='proposta' if simular else 'criada',categoria=cat,id_externo=origem['id_externo'],minimos_atendidos=objeto.ficha_montagem_validada,pendencias=pendencias_para_montagem(objeto))
 
     @staticmethod
     def _evidencia(r):

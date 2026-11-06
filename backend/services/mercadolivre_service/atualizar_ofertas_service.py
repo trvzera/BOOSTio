@@ -1,3 +1,4 @@
+from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 from datetime import datetime, timezone
 
 from sqlalchemy.exc import SQLAlchemyError
@@ -156,7 +157,7 @@ class AtualizarOfertasMercadoLivreService:
                 if peca is None:
                     raise ValueError('Peça não encontrada')
                 if not somente_vinculadas or VinculoMercadoLivre.buscar(classe.__tablename__, peca.id):
-                    if not somente_com_minimos or not peca.pendencias_para_montagem():yield peca
+                    if not somente_com_minimos or not pendencias_para_montagem(peca):yield peca
                     elif resumo is not None:resumo['ignoradas_sem_minimos'] += 1
                 return
             depois = max(depois_id, (resumo or {}).get('cursores', {}).get(classe.__tablename__, 0))
@@ -166,7 +167,7 @@ class AtualizarOfertasMercadoLivreService:
                     break
                 for peca in lote:
                     depois = peca.id
-                    if somente_com_minimos and peca.pendencias_para_montagem():
+                    if somente_com_minimos and pendencias_para_montagem(peca):
                         if resumo is not None:
                             resumo['ignoradas_sem_minimos'] += 1
                             resumo['cursores'][classe.__tablename__] = peca.id

@@ -1,3 +1,4 @@
+from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 """Acesso ao catálogo e atualizações condicionais, sem criar componentes/ofertas."""
 from models import db, ControleColeta
 from services.peca_service.modelos_pecas import MODELOS_PECAS
@@ -38,10 +39,10 @@ class RepositorioEnriquecimentoBuildcores:
                     setattr(p,campo,valor);fontes[campo]=proposta['fontes'][campo];alterados.append(campo)
                 if alterados:
                     p.fontes_especificacoes=fontes
-                    p.ficha_montagem_validada=not p.pendencias_para_montagem()
+                    p.ficha_montagem_validada=not pendencias_para_montagem(p)
                     db.session.flush()
                 resultados.append(dict(peca=f"{proposta['categoria']}:{p.id}",acao='proposta' if simular else 'atualizada' if alterados else 'inalterada',campos=alterados,
-                  pendencias_montagem=p.pendencias_para_montagem()))
+                  pendencias_montagem=pendencias_para_montagem(p)))
             if simular:db.session.rollback()
             else:db.session.commit()
             return resultados

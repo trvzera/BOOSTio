@@ -1,3 +1,4 @@
+from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 """Unidade de trabalho por anúncio, reaproveitando o bloqueio de coleta."""
 from contextlib import contextmanager
 from datetime import datetime, timezone
@@ -37,7 +38,7 @@ class RepositorioImportacaoCatalogo:
             dados['benchmark_atualizado_em']=datetime.now(timezone.utc).replace(tzinfo=None)
         dados['fontes_especificacoes']=ficha.get('fontes',{})
         peca=modelo(**dados);db.session.add(peca);db.session.flush();db.session.refresh(peca)
-        peca.ficha_montagem_validada=not peca.pendencias_para_montagem()
+        peca.ficha_montagem_validada=not pendencias_para_montagem(peca)
         if ficha.get('icecat',{}).get('status')=='encontrada':
             from utils.identidade_peca import assinatura_tecnica
             peca.fontes_especificacoes={**(peca.fontes_especificacoes or {}), '_identidade_tecnica':dict(

@@ -1,3 +1,4 @@
+from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 """Recalcula apenas o indicador técnico das peças importadas, sem aprová-las."""
 from collections import Counter
 from models import db,ControleColeta
@@ -18,7 +19,7 @@ class RepositorioReavaliacaoMontagem:
             contagem=Counter()
             for p in pecas:
                 if '_pc_part_dataset' not in (p.fontes_especificacoes or {}):continue
-                faltantes=p.pendencias_para_montagem();apta=not faltantes
+                faltantes=pendencias_para_montagem(p);apta=not faltantes
                 r['analisadas']+=1;r['minimos_atendidos' if apta else 'pendentes']+=1
                 contagem.update(faltantes)
                 if p.ficha_montagem_validada is not apta:

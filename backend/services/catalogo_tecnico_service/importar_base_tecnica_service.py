@@ -1,3 +1,4 @@
+from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 """Recebe o contrato técnico interno; adaptadores externos não pertencem a este núcleo."""
 import re
 import json
@@ -137,10 +138,10 @@ class ImportarBaseTecnicaService:
                 for campo,valor in documento['especificacoes'].items():
                     if getattr(alvo,campo) is None or getattr(alvo,campo)=='':setattr(alvo,campo,valor)
                 db.session.flush();db.session.refresh(alvo)
-                if alvo.ficha_montagem_validada is not None:alvo.ficha_montagem_validada=not alvo.pendencias_para_montagem()
+                if alvo.ficha_montagem_validada is not None:alvo.ficha_montagem_validada=not pendencias_para_montagem(alvo)
                 self.repositorio.registrar_fontes(alvo,documento['fontes'],identidade,ficha)
             ficha.peca_id=alvo.id
-            ficha.diagnostico={'assinatura_tecnica':assinatura_tecnica(alvo),'pendencias_montagem':alvo.pendencias_para_montagem()}
+            ficha.diagnostico={'assinatura_tecnica':assinatura_tecnica(alvo),'pendencias_montagem':pendencias_para_montagem(alvo)}
             ficha.transicionar('importada',motivo='Componente cadastrado' if nova else 'Origem associada à peça existente',responsavel=responsavel)
             db.session.flush()
             return dict(acao='proposta' if simular else 'criada' if nova else 'associada',nova_peca=nova,

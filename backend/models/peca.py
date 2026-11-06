@@ -1,8 +1,7 @@
+from utils.ofertas_catalogo import ofertas_catalogo
 from datetime import timezone
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from math import isfinite
-import re
-from urllib.parse import urlsplit
 
 from . import db
 from sqlalchemy.orm import declared_attr, validates
@@ -11,23 +10,6 @@ from .medidas_fisicas import completar_medidas
 from .imagens_referencia import imagem_referencia
 
 
-def ofertas_catalogo(dados):
-  """Expõe a última cotação coletada, nunca o preço inicial da seed como oferta."""
-  link, preco = dados.get("link"), dados.get("preco")
-  if not isinstance(link, str) or not dados.get("preco_atualizado_em"):
-    return []
-  if type(preco) not in (int, float) or not isfinite(preco) or preco <= 0:
-    return []
-  try:
-    partes = urlsplit(link)
-    if (partes.scheme != "https" or partes.hostname not in {"kabum.com.br", "www.kabum.com.br"}
-        or partes.username or partes.password or partes.port not in (None, 443)
-        or not re.match(r"^/produto/\d+(?:/|$)", partes.path)):
-      return []
-  except ValueError:
-    return []
-  return [{"loja": "kabum", "url": link, "preco": preco,
-           "atualizadoEm": dados["preco_atualizado_em"], "esgotado": bool(dados.get("esgotado"))}]
 
 
 class Peca(ModeloBase):
@@ -88,18 +70,6 @@ class Peca(ModeloBase):
   def publicavel(self):
     return self.status_validacao in ('aprovado', 'legado') or (self.status_validacao is None and self.id is not None)
 
-  def pendencias_para_montagem(self):
-    from services.catalogo_service.conferir_especificacoes_service import converter
-    from services.catalogo_service.requisitos_montagem import MINIMOS, CONSUMO_CONFIRMADO
-    campos = MINIMOS.get(self.__tablename__, ())
-    aliases = {'tipo_fone':'tipo','categoria_cabo':'categoria','formato_ram':'formato'}
-    faltantes = [campo for campo in campos if converter(campo,getattr(self,aliases.get(campo,campo),None)) is None]
-    if self.__tablename__ in CONSUMO_CONFIRMADO:
-      consumo=self.consumo_energia
-      try: valido=not isinstance(consumo,bool) and consumo is not None and isfinite(float(consumo)) and float(consumo)>0
-      except (TypeError,ValueError,OverflowError): valido=False
-      if not valido:faltantes.append('consumo_energia')
-    return sorted(set(faltantes))
 
   def situacao_catalogo(self):
     if not self.publicavel:return 'pendente_validacao'

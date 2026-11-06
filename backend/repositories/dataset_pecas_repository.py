@@ -1,3 +1,4 @@
+from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 """Persistência do catálogo em lotes protegidos pelo bloqueio já existente."""
 from collections import defaultdict
 from sqlalchemy import null
@@ -64,7 +65,7 @@ class RepositorioDatasetPecas:
             self.virtuais[p.id]=p
         else:
             p=modelo(**valores);db.session.add(p);db.session.flush()
-            p.ficha_montagem_validada=not p.pendencias_para_montagem()
+            p.ficha_montagem_validada=not pendencias_para_montagem(p)
         self.origens[(cat,r['identidade'])]=p.id
         self.indice[chave].append(p.id)
         return dict(acao='proposta' if simular else 'criada',categoria=cat)

@@ -1,3 +1,4 @@
+from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 from copy import deepcopy
 import pytest
 from flask import Flask
@@ -47,15 +48,15 @@ def test_fonte_com_reserva_insuficiente_e_barrada():
 
 def test_campos_opcionais_nao_bloqueiam_minimos_mas_identidade_continua_separada():
     ram=MemoriaRAM(fabricante='Teste',modelo='RAM',capacidade_gb=16,ddr='DDR4',frequencia_mhz=3200,quantidade_pentes=2,formato='DIMM')
-    assert ram.pendencias_para_montagem()==[]
-    ram.formato='SO-DIMM';assert ram.pendencias_para_montagem()==[]  # Formato conhecido; a build ainda deve confrontar o slot.
-    ram.quantidade_pentes=None;assert 'quantidade_pentes' in ram.pendencias_para_montagem()
+    assert pendencias_para_montagem(ram)==[]
+    ram.formato='SO-DIMM';assert pendencias_para_montagem(ram)==[]  # Formato conhecido; a build ainda deve confrontar o slot.
+    ram.quantidade_pentes=None;assert 'quantidade_pentes' in pendencias_para_montagem(ram)
     hd=HD(fabricante='Teste',modelo='HD',capacidade_gb=500,interface='SATA')
-    assert hd.pendencias_para_montagem()==[]
+    assert pendencias_para_montagem(hd)==[]
     fan=Fan(fabricante='Teste',modelo='Fan',tamanho_mm=120,quantidade=3)
-    assert fan.pendencias_para_montagem()==[]
+    assert pendencias_para_montagem(fan)==[]
     monitor=Monitor(fabricante='Teste',modelo='Monitor',tamanho_polegadas=24,resolucao='1920x1080',taxa_atualizacao_hz=60,conexao='HDMI')
-    assert monitor.pendencias_para_montagem()==[]
+    assert pendencias_para_montagem(monitor)==[]
 
 
 def test_reavaliacao_nao_aprova_identidade_e_e_idempotente():

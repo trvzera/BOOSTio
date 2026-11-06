@@ -1,3 +1,4 @@
+from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from sqlalchemy import null
@@ -42,7 +43,7 @@ class RepositorioCatalogoTecnico:
             if c.nullable and c.default is not None and c.name not in valores:valores[c.name]=null()
         valores.update(preco=null(),esgotado=null())
         p=modelo(**valores);db.session.add(p);db.session.flush();db.session.refresh(p)
-        p.ficha_montagem_validada=not p.pendencias_para_montagem()
+        p.ficha_montagem_validada=not pendencias_para_montagem(p)
         RepositorioCatalogoTecnico.registrar_fontes(p,fontes,identidade,ficha)
         return p
 
