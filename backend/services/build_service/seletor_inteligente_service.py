@@ -1,3 +1,4 @@
+from .selecionar_plataforma_service import selecionar_placas_mae, selecionar_memorias, aplicar_teto, ficha_catalogo, id_numerico
 from services.validacoes_service.validar_pedido_build_service import validar_orcamento, validar_rede, validar_textos_pedido, pecas_proprias
 from services.build_service.custos_build_service import dividir_orcamento
 from services.build_service.contexto_build_service import obter_detalhes_proprias
@@ -77,8 +78,7 @@ class SeletorInteligenteService:
         resultado = self._executar(dados, incluir_reparo=True)
         catalogo = {}
         for peca in resultado["componentes_selecionados"]:
-            catalogo.setdefault(peca["categoria"], []).append(self._ficha(peca))
-        gerador = CriarBuildService()
+            catalogo.setdefault(peca["categoria"], []).append(ficha_catalogo(peca))
         proprias = pecas_proprias(dados.get("pecas_proprias", {}))
         detalhes = obter_detalhes_proprias(proprias)
         percentual = dados.get("percentual_perifericos", 0)
@@ -117,12 +117,12 @@ class SeletorInteligenteService:
     def _catalogo_reparo(self, contexto, selecionados, excluidas):
         catalogo = {}
         for peca in selecionados:
-            catalogo.setdefault(peca["categoria"], []).append(self._ficha(peca))
+            catalogo.setdefault(peca["categoria"], []).append(ficha_catalogo(peca))
         for tipo in AjustarOrcamentoBuildService.AJUSTAVEIS:
             if tipo in excluidas:
                 continue
             # Não enviar o pool inteiro à IA; usá-lo só para reparar a resposta concreta.
-            fichas = [self._ficha(p) for p in contexto["pools"].get(tipo, [])]
+            fichas = [ficha_catalogo(p) for p in contexto["pools"].get(tipo, [])]
             catalogo[tipo] = list({p["id"]: p for p in [*catalogo.get(tipo, []), *fichas]}.values())
         return catalogo
 
@@ -245,7 +245,7 @@ class SeletorInteligenteService:
             pecas = contexto["pools"].get(tipo, [])
             if tipo == "processador":
                 pecas = self._filtrar_plataformas(contexto, pecas)
-            pecas = self._aplicar_teto(contexto, tipo, pecas)
+            pecas = aplicar_teto(contexto, tipo, pecas)
             if tipo == "placa_video":
                 estimativas = contexto["planejamento"]["estimativas_cpu"]
                 cpus = contexto.get("cpus_candidatas", [])
@@ -266,9 +266,6 @@ class SeletorInteligenteService:
                 selecionados.extend(amostra)
         return selecionados
 
-    @staticmethod
-    def _id_numerico(identificador):
-        return int(str(identificador).split(":")[-1])
 
     def _filtrar_plataformas(self, contexto, pecas):
         propria = contexto["detalhes_proprias"].get("placa_mae", {}).get("especificacoes_confirmadas", {})
@@ -289,36 +286,6 @@ class SeletorInteligenteService:
             return [p for p in pecas if estimativas.get(p["id"]) is None]
         return pecas  # Dados incompletos: preservar alternativas, sem afirmar viabilidade.
 
-    @staticmethod
-    def _aplicar_teto(contexto, tipo, pecas):
-        absoluto = contexto["teto_perifericos"] if tipo in PERIFERICOS else contexto["teto_peca"]
-        teto = contexto["planejamento"]["tetos_sugeridos"].get(tipo, absoluto)
-        dentro = [p for p in pecas if Decimal(str(p["preco"])) <= Decimal(str(teto))]
-        if dentro:
-            cor = contexto["aparencia"]["cor"]
-            if cor != "sem-preferencia" and not any(PreferenciasCoresService.prioridade(p, cor) <= 1 for p in dentro):
-                preferidas = [p for p in pecas if PreferenciasCoresService.prioridade(p, cor) <= 1]
-                if preferidas:
-                    dentro = [*dentro, min(preferidas, key=lambda p: (p["preco"], p["id"]))]
-                    contexto["planejamento"]["flexibilizacoes"].append(
-                        f"{tipo}: preservada alternativa da cor pedida fora da meta, dentro do teto absoluto.")
-            return dentro
-        if not pecas:
-            return []
-        menor = min(Decimal(str(p["preco"])) for p in pecas)
-        contexto["planejamento"]["flexibilizacoes"].append(
-            f"{tipo}: teto de busca {teto} insuficiente; preservadas opções de menor preço {menor}.")
-        return [p for p in pecas if Decimal(str(p["preco"])) == menor]
-
-    @staticmethod
-    def _ficha(peca):
-        ficha = campos_catalogo({**peca, "id": SeletorInteligenteService._id_numerico(peca["id"])})
-        for campo in ("benchmark_multi_core", "benchmark_single_thread", "benchmark_g3d", "benchmark_g2d",
-                      "benchmark_teste", "benchmark_versao"):
-            valor = peca.get(campo)
-            if valor is not None:
-                ficha[campo] = float(valor) if isinstance(valor, Decimal) else valor
-        return ficha
 
     def _selecionar_demais_pecas(self, contexto, excluidas, selecionados):
         aparencia, rede = contexto["aparencia"], contexto["rede"]
@@ -330,7 +297,7 @@ class SeletorInteligenteService:
                 continue
             if tipo == "monitor":
                 pecas = [p for p in pecas if PreferenciasPerifericosService.painel_permitido(p)]
-            fichas = [self._ficha(p) for p in self._aplicar_teto(contexto, tipo, pecas)]
+            fichas = [ficha_catalogo(p) for p in aplicar_teto(contexto, tipo, pecas)]
             if fichas:
                 catalogo[tipo] = AmostrarCatalogoService().executar(
                     tipo, fichas, contexto["limites"][tipo], contexto["utilidade"], cor=aparencia["cor"])[:contexto["limites"][tipo]]
@@ -341,11 +308,11 @@ class SeletorInteligenteService:
         precisa_placas = "placa_mae" not in excluidas
         precisa_ddr = "memoria_ram" not in excluidas and "placa_mae" not in contexto["proprias"]
         if precisa_placas or precisa_ddr:
-            placas = self._selecionar_placas_mae(contexto, selecionados)
+            placas = selecionar_placas_mae(contexto, selecionados)
         if precisa_placas and placas:
             catalogo["placa_mae"] = placas
         if "memoria_ram" not in excluidas:
-            memorias = self._selecionar_memorias(contexto, placas)
+            memorias = selecionar_memorias(contexto, placas)
             if memorias:
                 catalogo["memoria_ram"] = memorias
         self._ajustar_acessorio_rede(catalogo, contexto, excluidas)
@@ -353,43 +320,6 @@ class SeletorInteligenteService:
             catalogo[tipo] = list({p["id"]: p for p in itens}.values())[:contexto["limites"][tipo]]
         return self._formatar_catalogo(catalogo)
 
-    def _selecionar_placas_mae(self, contexto, selecionados):
-        sockets = self._sockets_processadores(contexto, selecionados)
-        grupos = {s: [] for s in sockets}
-        propria_ram = contexto["detalhes_proprias"].get("memoria_ram", {}).get("especificacoes_confirmadas", {})
-        ddr_proprio = normalizar_ddr(propria_ram.get("ddr"))
-        for p in contexto["pools"].get("placa_mae", []):
-            if ddr_proprio and normalizar_ddr(p.get("tipo_memoria")) != ddr_proprio:
-                continue
-            socket = normalizar_socket(p.get("socket"))
-            if socket in grupos:
-                grupos[socket].append(p)
-        return self._amostrar_grupos(contexto, "placa_mae", grupos)
-
-    def _selecionar_memorias(self, contexto, placas):
-        nome_proprio = contexto["proprias"].get("placa_mae")
-        if nome_proprio:
-            placa = PlacaMae.buscar_por_nome(nome_proprio)
-            valores = [placa.tipo_memoria] if placa else []
-        else:
-            valores = [placa.get("tipo_memoria") for placa in placas]
-        ddrs = sorted({ddr for valor in valores if (ddr := normalizar_ddr(valor))})
-        grupos = {ddr: [] for ddr in ddrs}
-        for p in contexto["pools"].get("memoria_ram", []):
-            ddr = normalizar_ddr(p.get("ddr"))
-            if ddr in grupos:
-                grupos[ddr].append(p)
-        return self._amostrar_grupos(contexto, "memoria_ram", grupos)
-
-    def _amostrar_grupos(self, contexto, tipo, grupos):
-        for grupo, pecas in grupos.items():
-            pecas = self._aplicar_teto(contexto, tipo, pecas)
-            # Preservar alternativas de cor dentro das cotas, sem ultrapassá-las.
-            pecas.sort(key=lambda p: (PreferenciasCoresService.prioridade(p, contexto["aparencia"]["cor"]),
-                                      p["preco"], self._id_numerico(p["id"])))
-            grupos[grupo] = pecas
-        escolhidas = self._distribuir_vagas(grupos, contexto["limites"][tipo])
-        return [self._ficha(p) for p in escolhidas]
 
     def _preservar_armazenamento(self, contexto, excluidas, catalogo):
         minimo = contexto["armazenamento_minimo_gb"]
@@ -404,11 +334,11 @@ class SeletorInteligenteService:
         for item in referencia["itens"]:
             tipo, peca = item["tipo"], item["peca"]
             amostra = catalogo.setdefault(tipo, [])
-            ident = self._id_numerico(peca["id"])
+            ident = id_numerico(peca["id"])
             if not any(p["id"] == ident for p in amostra):
                 if len(amostra) >= contexto["limites"][tipo]:
                     amostra.pop()
-                amostra.append(self._ficha(peca))
+                amostra.append(ficha_catalogo(peca))
             itens.append({"tipo": tipo, "id": ident, "quantidade": item["quantidade"]})
         contexto["planejamento"]["armazenamento_referencia"] = {
             "itens": itens, "capacidade_total_gb": referencia["capacidade_total_gb"], "custo": referencia["custo"]}
@@ -417,47 +347,14 @@ class SeletorInteligenteService:
         referencia = contexto["aparencia"]["gabinete_id"]
         if referencia is None or "gabinete" in excluidas:
             return
-        peca = next((p for p in contexto["pools"].get("gabinete", []) if self._id_numerico(p["id"]) == referencia), None)
+        peca = next((p for p in contexto["pools"].get("gabinete", []) if id_numerico(p["id"]) == referencia), None)
         if peca:
             amostra = catalogo.setdefault("gabinete", [])
             if not any(p["id"] == referencia for p in amostra):
                 if len(amostra) >= contexto["limites"]["gabinete"]:
                     amostra.pop()
-                amostra.append(self._ficha(peca))
+                amostra.append(ficha_catalogo(peca))
 
-    @staticmethod
-    def _sockets_processadores(contexto, selecionados):
-        nome_proprio = contexto["proprias"].get("processador")
-        if nome_proprio:
-            cpu = Processador.buscar_por_nome(nome_proprio)
-            valores = [cpu.soquete] if cpu else []
-        elif contexto["categoria"] in ("placa_mae", "memoria_ram"):
-            # Seleciona CPUs como dependência, mas não as inclui na resposta desta categoria.
-            valores = [cpu.get("soquete") for cpu in contexto.get("cpus_candidatas", [])]
-        else:
-            valores = [p.get("soquete") for p in selecionados if p["categoria"] == "processador"]
-        return sorted({socket for valor in valores if (socket := normalizar_socket(valor))})
-
-    @staticmethod
-    def _distribuir_vagas(grupos, limite):
-        # Rodadas por grupo (socket ou DDR), com redistribuição automática de sobras.
-        escolhidas, ids = [], set()
-        ativos = [iter(grupos[socket]) for socket in sorted(grupos) if grupos[socket]]
-        while ativos and len(escolhidas) < limite:
-            proximos = []
-            for grupo in ativos:
-                peca = next(grupo, None)
-                if peca is None:
-                    continue
-                proximos.append(grupo)
-                ident = peca["id"] if isinstance(peca, dict) else peca.id
-                if ident not in ids:
-                    escolhidas.append(peca)
-                    ids.add(ident)
-                if len(escolhidas) == limite:
-                    break
-            ativos = proximos
-        return escolhidas
 
     @staticmethod
     def _ajustar_acessorio_rede(catalogo, contexto, excluidas):
