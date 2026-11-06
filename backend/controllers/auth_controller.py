@@ -1,3 +1,4 @@
+from services.usuario_service.validar_retorno_google_service import validar_vinculo, validar_confirmacao
 import time
 from urllib.parse import parse_qs, urlsplit, urlencode
 from flask import session
@@ -138,10 +139,7 @@ def callback_google():
 
         vinculo = session.pop("vinculo_google_pendente", None)
         if vinculo:
-            if (not current_user.is_authenticated or current_user.get_id() != vinculo.get("sessao")
-                or current_user.email != vinculo.get("email") or request.args.get("state") != vinculo.get("state")
-                or not 0 <= time.time() - vinculo.get("instante", 0) <= 300):
-                raise ValueError("A vinculação expirou ou a conta mudou. Inicie novamente pelo perfil.")
+            validar_vinculo(current_user, vinculo, request.args.get("state"), time.time())
             usuario = VincularGoogleService().executar(current_user._get_current_object(), dados_usuario)
             login_user(usuario)
             base_url = current_app.config['FRONTEND_URL'].rstrip('/')
@@ -149,12 +147,7 @@ def callback_google():
 
         pendente = session.pop("confirmacao_google_pendente", None)
         if pendente:
-            if (not current_user.is_authenticated or current_user.get_id() != pendente["sessao"]
-                or request.args.get("state") != pendente["state"]
-                or not 0 <= time.time() - pendente["instante"] <= 300
-                or not dados_usuario or dados_usuario.get("sub") != pendente["sub"]
-                or dados_usuario.get("email_verified") is not True):
-                raise ValueError("Confirme com a mesma conta Google. A solicitação pode ter expirado.")
+            validar_confirmacao(current_user, pendente, dados_usuario, request.args.get("state"), time.time())
             session["confirmacao_google"] = {
                 "sessao": current_user.get_id(), "sub": pendente["sub"], "instante": time.time(),
             }
