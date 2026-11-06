@@ -1,13 +1,8 @@
 """Uma etapa limitada por ciclo, com agenda, exclusão mútua e checkpoint no banco."""
-import json
-import math
-import re
 from datetime import datetime, timezone, timedelta
-from pathlib import Path
 from threading import Event
 from models import db, EstadoCatalogo, ProdutoPendente
 from repositories.controle_catalogo_repository import RepositorioControleCatalogo
-from services.peca_service.modelos_pecas import MODELOS_PECAS
 from .controle_requisicoes_service import ControleRequisicoesService, OrcamentoRequisicoesEsgotado
 from .descobrir_produtos_service import DescobrirProdutosService
 from .classificar_pendencias_service import ClassificarPendenciasService

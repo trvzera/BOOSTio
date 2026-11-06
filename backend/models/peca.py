@@ -232,12 +232,6 @@ class Peca(ModeloBase):
       raise
     return len(novos)
   
-  def atualizar_preco(self, preco: float) -> None:
-    if preco < 0:
-      raise Exception("O preço não pode ser negativo")
-
-    self.preco = preco
-    db.session.commit()
 
   @classmethod
   def mostrar_pecas(cls):
@@ -252,9 +246,6 @@ class Peca(ModeloBase):
     return [pecas[indice * (len(pecas) - 1) // (limite - 1)] for indice in range(limite)]
 
 
-  @classmethod
-  def buscar_mais_barata_por_part_number(cls, part_number: str) -> "Peca | None":
-    return cls.query.filter_by(part_number=part_number).order_by(cls.preco.asc()).first()
 
   @classmethod
   def listar_candidatos_disponiveis(cls, preco_maximo):

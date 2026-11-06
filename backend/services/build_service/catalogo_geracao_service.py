@@ -17,7 +17,6 @@ from services.build_service.planejamento_geracao import ErroPlanejamentoBuild, s
 logger = logging.getLogger("services.build_service.criar_build_service")
 
 
-
 def preparar_catalogo(dados, proprias, rede, aparencia, orcamento, margem, teto_pc, teto_perifericos):
   excluidas = set(proprias)
   if {"ssd", "hd"} & excluidas:

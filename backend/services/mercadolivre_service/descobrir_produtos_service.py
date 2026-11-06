@@ -11,14 +11,9 @@ from models import db, ProdutoPendente, ExecucaoDescoberta
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from .buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
 from .controle_requisicoes_service import ControleRequisicoesService, OrcamentoRequisicoesEsgotado, ErroMercadoLivre
-from .token_mercado_livre_service import TokenMercadoLivreService
 from .normalizar_produto_service import DOMINIOS
-from services.catalogo_service.normalizar_produto import atributos
-from services.catalogo_service.comparar_nomes_service import marca as normalizar_marca
 
 log = logging.getLogger(__name__)
-
-
 
 
 class DescobrirProdutosService:
@@ -135,9 +130,6 @@ class DescobrirProdutosService:
         return resumo
 
 
-
-
-
     @staticmethod
     def _normalizar(cliente, linha, produto, categoria, origem):
         if not isinstance(linha, dict):
@@ -153,12 +145,12 @@ class DescobrirProdutosService:
         if not isinstance(titulo, str) or not 1 <= len(titulo.strip()) <= 255:
             raise ValueError('Título inválido')
         # JSON monetário permanece decimal exato em texto, sem conversão para float.
-        def decimal_json(valor):
+        def _decimal_json(valor):
             if isinstance(valor, Decimal):
                 return str(valor)
             raise ValueError('JSON inválido')
         bruto = json.loads(json.dumps({'origem': origem, 'catalogo': produto, 'anuncio': linha},
-                                    default=decimal_json, allow_nan=False))
+                                    default=_decimal_json, allow_nan=False))
         return dict(loja='mercado_livre', produto_id_loja=normal['produto_id_loja'],
                     vendedor_id=normal['vendedor_id'], titulo=titulo.strip(), url=normal['url'],
                     categoria_sugerida=categoria, dados_originais=bruto,

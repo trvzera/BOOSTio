@@ -16,7 +16,6 @@ from services.build_service.preferencias_processador_service import Preferencias
 logger = logging.getLogger(__name__)
 
 
-
 def criar_prompt_correcao(prompt, erro, resposta, build, catalogo, orcamento,
                           percentual=0, armazenamento_minimo_gb=None):
   teto_pc, teto_perifericos = dividir_orcamento(orcamento, percentual)

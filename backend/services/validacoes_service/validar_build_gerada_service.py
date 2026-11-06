@@ -115,4 +115,3 @@ def validar_build_gerada(build, catalogo, orcamento, percentual=0, proprias=None
   build["orcamento"] = orcamento
   build["preco_total"] = float(round(total, 2))
   return build
-

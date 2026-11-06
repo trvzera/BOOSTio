@@ -42,4 +42,3 @@ def ler_plano(caminho):
         if type(intervalo) not in (int,float) or not math.isfinite(intervalo) or intervalo<0.1:raise ValueError('Intervalo inválido')
         trabalho['intervalo']=intervalo
     return plano['trabalhos']
-

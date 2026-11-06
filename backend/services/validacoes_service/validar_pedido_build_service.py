@@ -8,7 +8,6 @@ from models.build_salva import MODELOS
 logger = logging.getLogger(__name__)
 
 
-
 def validar_orcamento(valor):
   if isinstance(valor, bool):
     raise ValueError("O orçamento deve ser um número positivo")

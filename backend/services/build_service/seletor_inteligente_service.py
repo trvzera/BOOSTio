@@ -4,24 +4,21 @@ from .selecionar_plataforma_service import selecionar_placas_mae, selecionar_mem
 from services.validacoes_service.validar_pedido_build_service import validar_orcamento, validar_rede, validar_textos_pedido, pecas_proprias
 from services.build_service.custos_build_service import dividir_orcamento
 from services.build_service.contexto_build_service import obter_detalhes_proprias
-from services.build_service.catalogo_geracao_service import campos_catalogo, validar_disponibilidade, planejar_perifericos
+from services.build_service.catalogo_geracao_service import validar_disponibilidade, planejar_perifericos
 from services.build_service.prompt_build_service import criar_prompt
 from services.build_service.constantes_build import PERIFERICOS
-from decimal import Decimal
 
-from models import Processador, PlacaVideo, PlacaMae, MemoriaRAM, BuildSalva
+from models import Processador, PlacaVideo, BuildSalva
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from utils.aparencia import validar_aparencia
 from utils.validacoes import validacao_campos
 from utils.sockets import normalizar_socket
-from utils.memorias import normalizar_ddr
 from .planejamento_geracao import validar_minimos
 from services.validacoes_service.requisitos_armazenamento_service import RequisitosArmazenamentoService
 from .planejar_rede_service import PlanejarRedeService
 from .amostrar_catalogo_service import AmostrarCatalogoService
 from .preferencias_perifericos_service import PreferenciasPerifericosService
 from .amostra_inteligente_service import AmostraInteligenteService
-from .preferencias_cores_service import PreferenciasCoresService
 from .planejar_orcamento_componentes_service import PlanejarOrcamentoComponentesService
 from .planejar_armazenamento_service import PlanejarArmazenamentoService
 from .ajustar_orcamento_build_service import AjustarOrcamentoBuildService

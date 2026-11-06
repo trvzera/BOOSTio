@@ -1,28 +1,7 @@
 from .dados_seed import dados_seed
-from models import (
-  Processador,
-  PlacaMae,
-  PlacaVideo,
-  MemoriaRAM,
-  SSD,
-  HD,
-  Fonte,
-  Gabinete,
-  WaterCooler,
-  AirCooler,
-  Fan,
-  Fone,
-  Teclado,
-  Mouse,
-  Monitor,
-  PlacaRede,
-  CaboRede,
-)
+from models import PlacaRede
 from .atualizar_precos_service import AtualizarPrecosService
 from .restaurar_links_kabum_service import RestaurarLinksKabumService
-from .pecas_estudo_medio import pecas_estudo_medio
-from .pecas_basicas_medias import pecas_basicas_medias
-from .pecas_complementares import pecas_complementares
 
 
 class PopularPecasService:

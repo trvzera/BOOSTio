@@ -11,7 +11,6 @@ def id_numerico(identificador):
     return int(str(identificador).split(":")[-1])
 
 
-
 def aplicar_teto(contexto, tipo, pecas):
     absoluto = contexto["teto_perifericos"] if tipo in PERIFERICOS else contexto["teto_peca"]
     teto = contexto["planejamento"]["tetos_sugeridos"].get(tipo, absoluto)
@@ -33,7 +32,6 @@ def aplicar_teto(contexto, tipo, pecas):
     return [p for p in pecas if Decimal(str(p["preco"])) == menor]
 
 
-
 def ficha_catalogo(peca):
     ficha = campos_catalogo({**peca, "id": id_numerico(peca["id"])})
     for campo in ("benchmark_multi_core", "benchmark_single_thread", "benchmark_g3d", "benchmark_g2d",
@@ -42,7 +40,6 @@ def ficha_catalogo(peca):
         if valor is not None:
             ficha[campo] = float(valor) if isinstance(valor, Decimal) else valor
     return ficha
-
 
 
 def selecionar_placas_mae(contexto, selecionados):
@@ -57,7 +54,6 @@ def selecionar_placas_mae(contexto, selecionados):
         if socket in grupos:
             grupos[socket].append(p)
     return _amostrar_grupos(contexto, "placa_mae", grupos)
-
 
 
 def selecionar_memorias(contexto, placas):
@@ -76,7 +72,6 @@ def selecionar_memorias(contexto, placas):
     return _amostrar_grupos(contexto, "memoria_ram", grupos)
 
 
-
 def _amostrar_grupos(contexto, tipo, grupos):
     for grupo, pecas in grupos.items():
         pecas = aplicar_teto(contexto, tipo, pecas)
@@ -86,7 +81,6 @@ def _amostrar_grupos(contexto, tipo, grupos):
         grupos[grupo] = pecas
     escolhidas = _distribuir_vagas(grupos, contexto["limites"][tipo])
     return [ficha_catalogo(p) for p in escolhidas]
-
 
 
 def _sockets_processadores(contexto, selecionados):
@@ -100,7 +94,6 @@ def _sockets_processadores(contexto, selecionados):
     else:
         valores = [p.get("soquete") for p in selecionados if p["categoria"] == "processador"]
     return sorted({socket for valor in valores if (socket := normalizar_socket(valor))})
-
 
 
 def _distribuir_vagas(grupos, limite):
@@ -122,4 +115,3 @@ def _distribuir_vagas(grupos, limite):
                 break
         ativos = proximos
     return escolhidas
-

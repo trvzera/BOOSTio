@@ -3,7 +3,6 @@ from services.catalogo_service.pendencias_montagem_service import pendencias_par
 import re
 import json
 from datetime import datetime
-from decimal import Decimal
 from models import db
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado

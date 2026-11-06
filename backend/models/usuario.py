@@ -106,12 +106,7 @@ class Usuario(ModeloBase,UserMixin):
 
     return usuario
 
-  @staticmethod
-  def listar_todos() -> list["Usuario"]:
-    return Usuario.query.all()
 
   @staticmethod
   def buscar_por_id(id: int | str) -> "Usuario | None":
     return Usuario.query.get(id)
-
-

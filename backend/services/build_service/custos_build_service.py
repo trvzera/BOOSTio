@@ -7,7 +7,6 @@ from math import isfinite
 logger = logging.getLogger(__name__)
 
 
-
 def dividir_orcamento(orcamento, percentual):
   total = Decimal(str(orcamento)).quantize(Decimal("0.01"), rounding=ROUND_DOWN)
   perifericos = (total * percentual / 100).quantize(Decimal("0.01"), rounding=ROUND_DOWN)

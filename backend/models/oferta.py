@@ -177,4 +177,3 @@ class Oferta(ModeloBase):
                 'vendedor_id': self.vendedor_id, 'vendedor_nome': self.vendedor_nome,
                 'url': url_compra, 'preco': float(self.preco), 'esgotado': self.esgotado,
                 'atualizadoEm': self.consultado_em.replace(tzinfo=timezone.utc).isoformat(timespec='seconds')}
-

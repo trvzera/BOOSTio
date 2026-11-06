@@ -17,8 +17,6 @@ from models import (
   PlacaRede,
   CaboRede,
 )
-from services.peca_service.atualizar_precos_service import AtualizarPrecosService
-from services.peca_service.restaurar_links_kabum_service import RestaurarLinksKabumService
 from services.peca_service.pecas_estudo_medio import pecas_estudo_medio
 from services.peca_service.pecas_basicas_medias import pecas_basicas_medias
 from services.peca_service.pecas_complementares import pecas_complementares
@@ -54,7 +52,6 @@ def dados_seed() -> dict:
   return {classe: [separar_codigos(item) for item in itens] for classe, itens in dados.items()}
 
 
-
 def _placas_rede() -> list[dict]:
   modelos = [
     ("Archer T2U Plus", "USB 2.0", "Wi-Fi 5", 600, False,
@@ -76,7 +73,6 @@ def _placas_rede() -> list[dict]:
           for nome, interface, padrao, velocidade, bluetooth, link in modelos]
 
 
-
 def _cabos_rede() -> list[dict]:
   modelos = (
     (1, "https://www.kabum.com.br/produto/674612/cabo-de-rede-rj45-ugreen-cat6-utp-macho-1-metro-preto-"),
@@ -91,7 +87,6 @@ def _cabos_rede() -> list[dict]:
            "kabum_external": link, "esgotado": True,
            "categoria": "CAT6", "comprimento_m": tamanho, "conector": "RJ45"}
           for tamanho, link in modelos]
-
 
 
 def _processadores() -> list[dict]:
@@ -176,7 +171,6 @@ def _processadores() -> list[dict]:
   ]
 
 
-
 def _placas_mae() -> list[dict]:
   base = [
     ("ASUS", "Prime A520M-K", "AM4", "A520", "mATX", "DDR4", 2, 64, 1),
@@ -256,7 +250,6 @@ def _placas_mae() -> list[dict]:
   ]
 
 
-
 def _placas_video() -> list[dict]:
   base = [
     ("NVIDIA", "GeForce GTX 1660 Super", 6, "GDDR6", "192-bit", 125, 1),
@@ -332,7 +325,6 @@ def _placas_video() -> list[dict]:
     ) in enumerate(base, start=1)
     for part_number in [f"SEED-GPU-{indice:02d}"]
   ]
-
 
 
 def _memorias_ram() -> list[dict]:
@@ -412,7 +404,6 @@ def _memorias_ram() -> list[dict]:
   ]
 
 
-
 def _ssds() -> list[dict]:
   base = [
     ("Kingston", "NV2 500GB", 500, "NVMe", "PCIe 4.0", "M.2", 3500, 2100),
@@ -490,7 +481,6 @@ def _ssds() -> list[dict]:
   ]
 
 
-
 def _hds() -> list[dict]:
   base = [
     ("Seagate", "Barracuda 1TB", 1000, 7200, "SATA III", 64),
@@ -566,7 +556,6 @@ def _hds() -> list[dict]:
   ]
 
 
-
 def _fontes() -> list[dict]:
   base = [
     ("MSI", "MAG A650BN", 650, "ATX", 82.0),
@@ -638,7 +627,6 @@ def _fontes() -> list[dict]:
     ) in enumerate(base, start=1)
     for part_number in [f"SEED-PSU-{indice:02d}"]
   ]
-
 
 
 def _gabinetes() -> list[dict]:
@@ -722,7 +710,6 @@ def _gabinetes() -> list[dict]:
   ]
 
 
-
 def _water_coolers() -> list[dict]:
   base = [
     ("Husky", "Glacier", "Intel/AMD", 240, 2, True),
@@ -796,7 +783,6 @@ def _water_coolers() -> list[dict]:
     ) in enumerate(base, start=1)
     for part_number in [f"SEED-WCOOL-{indice:02d}"]
   ]
-
 
 
 def _air_coolers() -> list[dict]:
@@ -873,7 +859,6 @@ def _air_coolers() -> list[dict]:
   ]
 
 
-
 def _fans() -> list[dict]:
   base = [
     ("Rise Mode", "120mm", 120, 1, False),
@@ -946,7 +931,6 @@ def _fans() -> list[dict]:
     ) in enumerate(base, start=1)
     for part_number in [f"SEED-FAN-{indice:02d}"]
   ]
-
 
 
 def _fones() -> list[dict]:
@@ -1026,7 +1010,6 @@ def _fones() -> list[dict]:
   ]
 
 
-
 def _teclados() -> list[dict]:
   base = [
     ("Redragon", "Kumara K552", "ABNT2", "Outemu Blue", True, "Padrão"),
@@ -1104,7 +1087,6 @@ def _teclados() -> list[dict]:
   ]
 
 
-
 def _mouses() -> list[dict]:
   base = [
     ("Logitech", "G203", 8000, 6, "Óptico"),
@@ -1179,7 +1161,6 @@ def _mouses() -> list[dict]:
     ) in enumerate(base, start=1)
     for part_number in [f"SEED-MOUSE-{indice:02d}"]
   ]
-
 
 
 def _monitores() -> list[dict]:
@@ -1262,7 +1243,5 @@ def _monitores() -> list[dict]:
   ]
 
 
-
 def _preco(indice: int, base: float, passo: float) -> float:
   return 0.0
-

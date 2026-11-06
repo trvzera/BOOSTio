@@ -6,7 +6,6 @@ from models.build_salva import MODELOS
 logger = logging.getLogger(__name__)
 
 
-
 def obter_detalhes_proprias(proprias):
   detalhes = {}
   for tipo, nome in proprias.items():

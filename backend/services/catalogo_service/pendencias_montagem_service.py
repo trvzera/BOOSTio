@@ -13,4 +13,3 @@ def pendencias_para_montagem(peca):
     except (TypeError,ValueError,OverflowError): valido=False
     if not valido:faltantes.append('consumo_energia')
   return sorted(set(faltantes))
-

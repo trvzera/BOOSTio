@@ -12,7 +12,7 @@ class LimitePaginas(ValueError):
 
 
 def iterar_paginas(cliente, parametros, resumo, max_paginas, tokens=None):
-    def consultar(caminho, params, offset, tamanho):
+    def _consultar(caminho, params, offset, tamanho):
         if resumo['paginas']>=max_paginas or offset>=1000:
             raise LimitePaginas()
         token=(tokens or TokenMercadoLivreService()).executar()
@@ -30,14 +30,14 @@ def iterar_paginas(cliente, parametros, resumo, max_paginas, tokens=None):
         if parametros['origem']=='anuncios':
             params={'q':parametros['consulta']}
             if parametros['categoria_ml']:params['category']=parametros['categoria_ml']
-            linhas,total=consultar('/sites/MLB/search',params,estado['offset'],50)
+            linhas,total=_consultar('/sites/MLB/search',params,estado['offset'],50)
             resumo['_pagina']={'total':total}
             yield [(linha,None) for linha in linhas]
         else:
             if not estado['produtos']:
                 params={'site_id':'MLB','status':'active','q':parametros['consulta']}
                 if parametros['dominio']:params['domain_id']=parametros['dominio']
-                produtos,total=consultar('/products/search',params,estado['offset'],20)
+                produtos,total=_consultar('/products/search',params,estado['offset'],20)
                 for p in produtos:
                     if not isinstance(p,dict):raise ValueError('Produto inválido')
                     cliente._validar_id(p.get('id'),'catálogo')
@@ -56,7 +56,7 @@ def iterar_paginas(cliente, parametros, resumo, max_paginas, tokens=None):
                 yield []
                 continue
             try:
-                linhas,total=consultar('/products/'+produto['id']+'/items',{},estado['ofertas_offset'],100)
+                linhas,total=_consultar('/products/'+produto['id']+'/items',{},estado['ofertas_offset'],100)
             except ErroMercadoLivre as erro:
                 if erro.status not in (404, 206):
                     raise
@@ -77,7 +77,6 @@ def iterar_paginas(cliente, parametros, resumo, max_paginas, tokens=None):
                 linhas = linhas[:max(0, total - estado['ofertas_offset'])]
             resumo['_pagina']={'total':total}
             yield [(linha,produto) for linha in linhas]
-
 
 
 def _fora_do_grupo(produto, parametros):
@@ -104,7 +103,6 @@ def _fora_do_grupo(produto, parametros):
     return None
 
 
-
 def avancar_cursor(resumo, consumidas, tamanho):
     estado=resumo['cursor'];total=resumo['_pagina']['total']
     if estado['origem']=='anuncios':
@@ -123,7 +121,6 @@ def avancar_cursor(resumo, consumidas, tamanho):
                 resumo['concluido']=estado['offset']>=estado['total_busca']
 
 
-
 def _validar_pagina(dados, offset, tamanho):
     paging, linhas = dados.get('paging'), dados.get('results')
     if not isinstance(paging, dict) or not isinstance(linhas, list):
@@ -134,4 +131,3 @@ def _validar_pagina(dados, offset, tamanho):
     if len(linhas) > tamanho or offset + len(linhas) > total or (not linhas and offset < total):
         raise ValueError('Página incompleta')
     return linhas, total
-
