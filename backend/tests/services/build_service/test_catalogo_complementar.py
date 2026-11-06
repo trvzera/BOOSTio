@@ -9,7 +9,7 @@ from models.medidas_fisicas import completar_medidas
 from commands.precos import registrar_comandos_precos
 from services.peca_service.pecas_complementares import pecas_complementares
 from services.peca_service.cadastrar_complementares_service import CadastrarComplementaresService
-from services.build_service.encaixe_fisico import avaliar_fans, encaixe_radiador
+from services.validacoes_service.encaixe_fisico import avaliar_fans, encaixe_radiador
 
 
 CASOS = json.loads((Path(__file__).resolve().parents[4] /

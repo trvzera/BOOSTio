@@ -5,7 +5,7 @@ import pytest
 
 from models import Usuario
 from services.build_service.criar_build_service import CriarBuildService
-from services.build_service.requisitos_armazenamento_service import RequisitosArmazenamentoService as Requisitos
+from services.validacoes_service.requisitos_armazenamento_service import RequisitosArmazenamentoService as Requisitos
 from services.build_service.seletor_inteligente_service import SeletorInteligenteService
 
 

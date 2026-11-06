@@ -1,3 +1,4 @@
+from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
 from services.build_service.catalogo_geracao_service import campos_pecas
 from services.build_service.prompt_build_service import criar_prompt
 from copy import deepcopy
@@ -28,7 +29,7 @@ def sugestao():
 
 def validar(sugestao, **opcoes):
     build, catalogo = deepcopy(sugestao)
-    return CriarBuildService._validar_build(build, catalogo, 5000, **opcoes)
+    return validar_build_gerada(build, catalogo, 5000, **opcoes)
 
 
 def adicionar(sugestao, tipo, **campos):

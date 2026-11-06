@@ -1,3 +1,5 @@
+from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
+import services.build_service.criar_build_service as criacao_module
 from services.build_service.catalogo_geracao_service import campos_pecas, gerar_catalogo
 from services.build_service.prompt_build_service import criar_prompt
 from copy import deepcopy
@@ -112,7 +114,7 @@ def test_cor_e_origem_da_referencia_chegam_ao_prompt_sem_mudar_cor_cadastrada():
 def test_cor_propagada_para_complemento_de_fans_sem_chamar_llm_real(mocker):
     mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={"componentes": []})
     completar = mocker.patch("services.build_service.criar_build_service.CompletarVentilacaoService.executar", return_value={"componentes": []})
-    mocker.patch.object(CriarBuildService, "_validar_build", return_value={"componentes": []})
+    mocker.patch.object(criacao_module, "validar_build_gerada", return_value={"componentes": []})
     CriarBuildService()._gerar_validada(1, "Prompt", "teste", {}, 1000, 0, {}, {}, {}, tentativas_correcao=0, cor="branco")
     assert completar.call_args.kwargs == {"cor": "branco"}
 

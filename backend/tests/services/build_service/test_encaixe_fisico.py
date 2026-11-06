@@ -1,3 +1,4 @@
+from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
 from services.build_service.catalogo_geracao_service import campos_pecas
 from services.build_service.constantes_build import CAMPOS_PECAS
 from services.validacoes_service.validar_estado_build_service import validar_estado
@@ -8,9 +9,9 @@ import pytest
 
 from models import Gabinete, AirCooler
 from models.medidas_fisicas import completar_medidas
-from services.build_service.encaixe_fisico import avaliar_fans, encaixe_radiador
+from services.validacoes_service.encaixe_fisico import avaliar_fans, encaixe_radiador
 from services.build_service.criar_build_service import CriarBuildService
-from services.build_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
+from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
 
 def test_estimativa_visual_nao_substitui_limites_fisicos_confirmados():
@@ -132,7 +133,7 @@ def test_geracao_nao_salva_configuracao_com_fans_que_nao_cabem():
     build = {"nome": "Teste", "descricao": "Montagem", "utilidade": "Estudos",
              "componentes": [{"tipo": tipo, "id": i} for i, tipo in enumerate(tipos, 1)]}
     with pytest.raises(ValueError, match="Posições das fans"):
-        CriarBuildService._validar_build(build, catalogo, 5000)
+        validar_build_gerada(build, catalogo, 5000)
 
 
 def test_diagnostico_resolve_medidas_do_catalogo_persistido_em_banco_isolado():

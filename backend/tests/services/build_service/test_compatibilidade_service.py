@@ -2,7 +2,7 @@ from copy import deepcopy
 
 import pytest
 
-from services.build_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService, numero
+from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService, numero
 
 
 def avaliar(pecas, componentes=None):

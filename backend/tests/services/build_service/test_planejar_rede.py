@@ -1,3 +1,5 @@
+from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
+import services.build_service.criar_build_service as criacao_module
 from services.build_service.prompt_build_service import criar_prompt
 from copy import deepcopy
 from unittest.mock import patch
@@ -6,7 +8,7 @@ import pytest
 
 from services.build_service.planejar_rede_service import PlanejarRedeService as Rede
 from services.build_service.criar_build_service import CriarBuildService
-from services.build_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
+from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
 
 PEDIDO = {"tipo": "cabo", "possuiAcessorio": False, "comprimentoCaboM": 20, "velocidadeMbps": 500}
@@ -82,7 +84,7 @@ def test_complemento_inclui_opcao_adequada_mas_total_ainda_e_validado():
     assert Rede.completar(build, catalogo, PEDIDO)["componentes"] == [{"tipo": "cabo_rede", "id": 4, "quantidade": 1}]
     assert Rede.completar({"componentes": []}, catalogo, PEDIDO)["componentes"][0]["id"] == 4
     with pytest.raises(ValueError, match="orçamento"):
-        CriarBuildService._validar_build({"nome": "PC", "descricao": "Teste", "utilidade": "Jogos",
+        validar_build_gerada({"nome": "PC", "descricao": "Teste", "utilidade": "Jogos",
             **Rede.completar({"componentes": []}, catalogo, PEDIDO)}, catalogo, 50, rede=PEDIDO)
 
 
@@ -97,7 +99,7 @@ def test_recuperacao_rede_usa_mesma_chamada_e_nao_modifica_flag_de_posse():
     resposta = {"componentes": [{"tipo": "cabo_rede", "id": 1}]}
     with patch("services.build_service.criar_build_service.LLMService.executar", return_value=resposta) as llm, \
          patch("services.build_service.criar_build_service.CompletarVentilacaoService.executar", side_effect=lambda b,*a,**k:b), \
-         patch.object(CriarBuildService, "_validar_build", side_effect=lambda b,*a,**k:b):
+         patch.object(criacao_module, "validar_build_gerada", side_effect=lambda b,*a,**k:b):
         resultado = CriarBuildService()._gerar_validada(1, "Prompt", "teste", CATALOGO, 8000, 10, {}, {}, PEDIDO, tentativas_correcao=0)
     assert resultado["componentes"] == [] and PEDIDO["possuiAcessorio"] is False
     llm.assert_called_once()

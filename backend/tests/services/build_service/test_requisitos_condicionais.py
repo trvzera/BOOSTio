@@ -4,7 +4,7 @@ from flask import Flask
 from sqlalchemy import null
 from models import db,ControleColeta,MemoriaRAM,Processador,HD,Fan,Monitor
 from services.build_service.planejar_potencia_service import PlanejarPotenciaService
-from services.build_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
+from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 from services.build_service.criar_build_service import CriarBuildService
 from services.catalogo_service.reavaliar_montagem_service import ReavaliarMontagemService
 

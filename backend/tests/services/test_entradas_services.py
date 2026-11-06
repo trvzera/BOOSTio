@@ -10,7 +10,7 @@ import pytest
     ("benchmark_service.consultar_requisitos_build_service", "ConsultarRequisitosBuildService", (None, 1)),
     ("benchmark_service.consultar_requisitos_service", "ConsultarRequisitosService", (None, 1)),
     ("benchmark_service.fpshq_service", "FpshqService", ("fps", None, 1)),
-    ("build_service.avaliar_compatibilidade_service", "AvaliarCompatibilidadeService", (None,)),
+    ("validacoes_service.avaliar_compatibilidade_service", "AvaliarCompatibilidadeService", (None,)),
     ("build_service.planejar_perifericos_service", "PlanejarPerifericosService", (None, 100)),
     ("build_service.planejar_rede_service", "PlanejarRedeService", (None,)),
     ("build_service.criar_build_manual_service", "CriarBuildManualService", (1, None)),

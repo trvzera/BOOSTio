@@ -1,3 +1,4 @@
+from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
 import services.build_service.criar_build_service as criacao_module
 from services.build_service.custos_build_service import dividir_orcamento
 from services.build_service.catalogo_geracao_service import gerar_catalogo
@@ -291,30 +292,30 @@ def resposta_com_perifericos():
 
 def test_tetos_independentes_permitem_gastar_menos_sem_transferir_a_sobra():
     build, catalogo = resposta_com_perifericos()
-    assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1100
+    assert validar_build_gerada(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1100
     catalogo["processador"][0]["preco"] = 1100
-    assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1400
+    assert validar_build_gerada(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1400
     catalogo["processador"][0]["preco"] = 1100.01
     with pytest.raises(ValueError, match="limite destinado ao PC"):
-        CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)
+        validar_build_gerada(deepcopy(build), catalogo, 1500, 20)
     catalogo["processador"][0]["preco"] = 800
     catalogo["monitor"][0]["preco"] = 150
-    assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1200
+    assert validar_build_gerada(deepcopy(build), catalogo, 1500, 20)["preco_total"] == 1200
     catalogo["monitor"][0]["preco"] = 150.01
     with pytest.raises(ValueError, match="limite reservado para periféricos"):
-        CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)
+        validar_build_gerada(deepcopy(build), catalogo, 1500, 20)
     catalogo["processador"][0]["preco"] = 1500
     with pytest.raises(ValueError, match="Não foi possível gerar uma configuração dentro do orçamento"):
-        CriarBuildService._validar_build(deepcopy(build), catalogo, 1500, 20)
+        validar_build_gerada(deepcopy(build), catalogo, 1500, 20)
 
 
 def test_teto_percentual_preserva_centavos_sem_arredondar_para_cima():
     build, catalogo = resposta_com_perifericos()
     catalogo["monitor"][0]["preco"] = 96.91
-    assert CriarBuildService._validar_build(deepcopy(build), catalogo, 1234.56, 20)["preco_total"] == 1146.91
+    assert validar_build_gerada(deepcopy(build), catalogo, 1234.56, 20)["preco_total"] == 1146.91
     catalogo["monitor"][0]["preco"] = 96.92
     with pytest.raises(ValueError, match="limite reservado para periféricos"):
-        CriarBuildService._validar_build(deepcopy(build), catalogo, 1234.56, 20)
+        validar_build_gerada(deepcopy(build), catalogo, 1234.56, 20)
 
 
 def test_reserva_nao_pode_reduzir_pc_abaixo_do_minimo_antes_do_catalogo_e_llm(app_build, mocker):
@@ -365,7 +366,7 @@ def test_faltam_perifericos_na_resposta():
     build, catalogo = resposta_com_perifericos()
     build["componentes"].pop()
     with pytest.raises(ValueError, match="não incluiu"):
-        CriarBuildService._validar_build(build, catalogo, 1500, 20)
+        validar_build_gerada(build, catalogo, 1500, 20)
 
 
 def test_conjunto_de_perifericos_inviavel_nao_consume_llm_nem_salva(app_build, mocker):

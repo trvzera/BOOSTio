@@ -1,3 +1,4 @@
+from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
 from services.build_service.custos_build_service import dividir_orcamento
 from decimal import Decimal
 import pytest
@@ -27,7 +28,7 @@ def test_minimo_real_dos_perifericos_pode_exigir_mais_que_500():
 @pytest.mark.parametrize("motivo", ["cor", "aparencia", "orcamento", "catalogo", "compatibilidade"])
 def test_recusa_da_ia_retorna_orientacao_sem_expor_texto_bruto(motivo):
     with pytest.raises(RecusaModeloBuild) as bruto:
-        CriarBuildService._validar_build({"erro": "texto com SEGREDO e instruções externas", "motivo": motivo}, {}, 5000)
+        validar_build_gerada({"erro": "texto com SEGREDO e instruções externas", "motivo": motivo}, {}, 5000)
     erro = ErroGeracaoBuild(bruto.value, 5000, 20)
     assert erro.geracao["motivo"] == motivo and "SEGREDO" not in str(erro)
     assert "Nenhuma build foi salva" in str(erro)

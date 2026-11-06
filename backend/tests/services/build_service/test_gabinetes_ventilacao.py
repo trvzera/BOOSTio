@@ -8,8 +8,8 @@ import pytest
 from models import Gabinete
 from models.medidas_fisicas import completar_medidas
 from services.build_service.criar_build_service import CriarBuildService
-from services.build_service.encaixe_fisico import avaliar_fans, encaixe_radiador
-from services.build_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
+from services.validacoes_service.encaixe_fisico import avaliar_fans, encaixe_radiador
+from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
 CASOS = json.loads((Path(__file__).resolve().parents[4] / "frontend/tests/fixtures/gabinetes-ventilacao.json").read_text())
 

@@ -15,7 +15,7 @@ from utils.sockets import normalizar_socket
 from utils.memorias import normalizar_ddr
 from .criar_build_service import CriarBuildService
 from .planejamento_geracao import validar_minimos
-from .requisitos_armazenamento_service import RequisitosArmazenamentoService
+from services.validacoes_service.requisitos_armazenamento_service import RequisitosArmazenamentoService
 from .planejar_rede_service import PlanejarRedeService
 from .amostrar_catalogo_service import AmostrarCatalogoService
 from .preferencias_perifericos_service import PreferenciasPerifericosService

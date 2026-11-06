@@ -1,5 +1,5 @@
 from models import BuildSalva,Usuario
-from .avaliar_compatibilidade_service import AvaliarCompatibilidadeService
+from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
 class ListarBuildService:
   def executar(self, usuario_id: int):

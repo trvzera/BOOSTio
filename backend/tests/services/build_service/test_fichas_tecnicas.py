@@ -8,8 +8,8 @@ import pytest
 from models import Gabinete, PlacaMae, WaterCooler
 from models.medidas_fisicas import completar_medidas, manifesto
 from services.build_service.criar_build_service import CriarBuildService
-from services.build_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
-from services.build_service.encaixe_fisico import avaliar_fans, encaixe_radiador, encaixe_cooler_placa
+from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
+from services.validacoes_service.encaixe_fisico import avaliar_fans, encaixe_radiador, encaixe_cooler_placa
 
 
 FIXTURE = json.loads((Path(__file__).resolve().parents[4] / "frontend/tests/fixtures/fichas-tecnicas.json").read_text())

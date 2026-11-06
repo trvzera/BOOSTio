@@ -6,7 +6,7 @@ from utils.sockets import normalizar_socket, suporte_socket_cooler
 from .encaixe_fisico import avaliar_medidas
 from .armazenamento import avaliar_armazenamento
 from .conectores import avaliar_conectores
-from .preferencias_gabinete_service import PreferenciasGabineteService
+from services.build_service.preferencias_gabinete_service import PreferenciasGabineteService
 
 
 def numero(valor):
@@ -196,7 +196,7 @@ class AvaliarCompatibilidadeService:
     @staticmethod
     def _avaliar_fonte(_possui_peca, itens, fonte, _registrar):
         if _possui_peca("fonte"):
-            from .planejar_potencia_service import PlanejarPotenciaService
+            from services.build_service.planejar_potencia_service import PlanejarPotenciaService
             plano = PlanejarPotenciaService().executar(itens)
             potencia = numero(fonte.get("potencia_w")) or None
             minimo_conhecido = plano['consumo_conhecido_w']

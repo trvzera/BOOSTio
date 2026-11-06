@@ -7,7 +7,7 @@ from decimal import Decimal
 from utils.aparencia import validar_aparencia
 from utils.sockets import normalizar_socket
 from services.build_service.planejar_perifericos_service import PlanejarPerifericosService
-from services.build_service.requisitos_armazenamento_service import RequisitosArmazenamentoService
+from services.validacoes_service.requisitos_armazenamento_service import RequisitosArmazenamentoService
 from services.build_service.preferencias_cores_service import PreferenciasCoresService
 from services.build_service.planejar_rede_service import PlanejarRedeService
 from services.build_service.preferencias_gabinete_service import PreferenciasGabineteService

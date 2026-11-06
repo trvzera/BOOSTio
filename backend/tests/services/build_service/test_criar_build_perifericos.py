@@ -1,3 +1,4 @@
+from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
 from services.validacoes_service.validar_pedido_build_service import validar_rede
 from services.build_service.catalogo_geracao_service import campos_pecas, gerar_catalogo
 from services.build_service.prompt_build_service import criar_prompt
@@ -41,13 +42,13 @@ class CriarBuildPerifericosTest(unittest.TestCase):
                     item.copy() for item in self.build["componentes"] if item["tipo"] != tipo
                 ]}
                 with self.assertRaisesRegex(ValueError, "não incluiu"):
-                    CriarBuildService._validar_build(build, self.catalogo, 2000, percentual=20)
+                    validar_build_gerada(build, self.catalogo, 2000, percentual=20)
 
     def test_peca_propria_satisfaz_categoria_sem_custo(self):
         build = {**self.build, "componentes": [
             item.copy() for item in self.build["componentes"] if item["tipo"] != "monitor"
         ]}
-        validada = CriarBuildService._validar_build(build, self.catalogo, 2000, percentual=20, proprias={"monitor": "Meu monitor"})
+        validada = validar_build_gerada(build, self.catalogo, 2000, percentual=20, proprias={"monitor": "Meu monitor"})
         self.assertEqual(validada["preco_total"], 900)
 
     def test_catalogo_envia_dados_do_monitor_em_json(self):
@@ -77,33 +78,33 @@ class CriarBuildPerifericosTest(unittest.TestCase):
     def test_sem_reserva_nao_exige_perifericos(self):
         build = {**self.build, "componentes": [item.copy() for item in self.build["componentes"]
                                                 if item["tipo"] not in PERIFERICOS]}
-        self.assertEqual(CriarBuildService._validar_build(build, self.catalogo, 2000)["preco_total"], 600)
+        self.assertEqual(validar_build_gerada(build, self.catalogo, 2000)["preco_total"], 600)
 
     def test_sem_reserva_nao_permite_comprar_perifericos(self):
         with self.assertRaisesRegex(ValueError, "limite reservado para periféricos"):
-            CriarBuildService._validar_build(self.build, self.catalogo, 2000)
+            validar_build_gerada(self.build, self.catalogo, 2000)
 
     def test_precos_de_perifericos_vem_do_catalogo_nao_da_resposta(self):
         self.catalogo["monitor"][0]["preco"] = 100.01
         for item in self.build["componentes"]:
             item["preco"] = 0
         with self.assertRaisesRegex(ValueError, "limite reservado para periféricos"):
-            CriarBuildService._validar_build(self.build, self.catalogo, 2000, percentual=20)
+            validar_build_gerada(self.build, self.catalogo, 2000, percentual=20)
 
     def test_monitor_novo_permite_painel_opcional(self):
         for painel in ("TN", "OLED", None):
             with self.subTest(painel=painel):
                 self.catalogo["monitor"][0]["tipo_painel"] = painel
-                assert CriarBuildService._validar_build(self.build, self.catalogo, 2000, percentual=20)["preco_total"] == 1000
+                assert validar_build_gerada(self.build, self.catalogo, 2000, percentual=20)["preco_total"] == 1000
 
     def test_monitor_proprio_e_preservado_mesmo_sem_painel_confirmado(self):
         build = {**self.build,"componentes":[i.copy() for i in self.build["componentes"] if i["tipo"]!="monitor"]}
         self.catalogo["monitor"][0]["tipo_painel"] = "OLED"
-        assert CriarBuildService._validar_build(build,self.catalogo,2000,percentual=20,proprias={"monitor":"Meu OLED"})["preco_total"] == 900
+        assert validar_build_gerada(build,self.catalogo,2000,percentual=20,proprias={"monitor":"Meu OLED"})["preco_total"] == 900
 
     def test_nao_compra_novamente_uma_categoria_propria(self):
         with self.assertRaisesRegex(ValueError, "repetiu"):
-            CriarBuildService._validar_build(self.build, self.catalogo, 2000, percentual=20,
+            validar_build_gerada(self.build, self.catalogo, 2000, percentual=20,
                                             proprias={"monitor": "Meu monitor"})
 
     def test_rede_exige_somente_o_acessorio_escolhido(self):
@@ -113,13 +114,13 @@ class CriarBuildPerifericosTest(unittest.TestCase):
         build = {**self.build, "componentes": [*self.build["componentes"],
             {"tipo": "adaptador_wifi", "id": 20, "quantidade": 1}]}
         rede = {"tipo": "wifi", "possuiAcessorio": False}
-        self.assertEqual(CriarBuildService._validar_build(build, catalogo, 2000, percentual=20, rede=rede)["preco_total"], 1100)
+        self.assertEqual(validar_build_gerada(build, catalogo, 2000, percentual=20, rede=rede)["preco_total"], 1100)
         with self.assertRaisesRegex(ValueError, "conexão"):
-            CriarBuildService._validar_build(build, catalogo, 2000, percentual=20, rede={"tipo": "cabo", "possuiAcessorio": False})
+            validar_build_gerada(build, catalogo, 2000, percentual=20, rede={"tipo": "cabo", "possuiAcessorio": False})
 
     def test_acessorio_de_rede_proprio_nao_precisa_ser_comprado(self):
         build = {**self.build, "componentes": [item.copy() for item in self.build["componentes"]]}
-        validada = CriarBuildService._validar_build(
+        validada = validar_build_gerada(
             build, self.catalogo, 2000, percentual=20,
             proprias={"adaptador_wifi": "Meu adaptador"},
             rede={"tipo": "wifi", "possuiAcessorio": True},
@@ -138,7 +139,7 @@ class CriarBuildPerifericosTest(unittest.TestCase):
         catalogo = {**self.catalogo, "cabo_rede": [{"id": 21, "fabricante": "Teste", "modelo": "CAT6 1m", "preco": 30, "comprimento_m": 1}]}
         build = {**self.build, "componentes": [*self.build["componentes"], {"tipo": "cabo_rede", "id": 21, "quantidade": 1}]}
         with self.assertRaisesRegex(ValueError, "menor que o comprimento"):
-            CriarBuildService._validar_build(build, catalogo, 2000, percentual=20,
+            validar_build_gerada(build, catalogo, 2000, percentual=20,
                 rede={"tipo": "cabo", "possuiAcessorio": False, "comprimentoCaboM": 10})
 
     def test_prompt_explicita_pares_por_socket_e_rede_sem_certificar_bios(self):
