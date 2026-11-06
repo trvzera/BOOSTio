@@ -7,14 +7,15 @@ from models import db
 
 
 class RepositorioControleCatalogo:
-    def __init__(self):
+    def __init__(self, escopo="catalogo"):
         self.conexao=None;self.arquivo=None;self.nome=None
+        self.escopo=escopo
 
     @contextmanager
     def bloquear(self):
         dialecto=db.engine.dialect.name
         if dialecto=='mysql':
-            self.nome='boostio:catalogo:'+hashlib.sha256(str(db.engine.url.database).encode()).hexdigest()[:16]
+            self.nome='boostio:'+self.escopo+':'+hashlib.sha256(str(db.engine.url.database).encode()).hexdigest()[:16]
             with db.engine.connect() as conexao:
                 self.conexao=conexao
                 resultado=conexao.execute(text('SELECT GET_LOCK(:nome,0)'),{'nome':self.nome}).scalar()
@@ -30,7 +31,7 @@ class RepositorioControleCatalogo:
             import fcntl
             caminho=db.engine.url.database
             if not caminho or caminho==':memory:':raise ValueError('Worker SQLite requer arquivo persistente')
-            arquivo=Path(caminho).resolve().with_suffix('.catalogo.lock')
+            arquivo=Path(caminho).resolve().with_suffix('.'+self.escopo+'.lock')
             with arquivo.open('a') as trava:
                 try:fcntl.flock(trava,fcntl.LOCK_EX|fcntl.LOCK_NB);adquirido=True
                 except BlockingIOError:adquirido=False

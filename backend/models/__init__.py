@@ -55,6 +55,8 @@ from .identidade_fabricante import IdentidadeFabricante
 from .revisao_identidade_peca import RevisaoIdentidadePeca
 from .ficha_tecnica_catalogo import FichaTecnicaCatalogo, RevisaoFichaTecnica
 
+from .tarefa_marketplace import TarefaMarketplace, LimiteMarketplace
+
 #Funcão obrigatória para o login buscar informações do usuario pelo id
 @lm.user_loader
 def user_loader(id: str) -> Usuario | None:

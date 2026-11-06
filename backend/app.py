@@ -5,6 +5,7 @@ from werkzeug.exceptions import RequestEntityTooLarge
 from services.configuracao_service.configurar_acesso_service import ConfigurarAcessoService
 from services.configuracao_service.validar_producao_service import ValidarProducaoService
 from models import db,lm,mail 
+from commands.marketplaces import registrar_comandos_marketplaces
 from commands.precos import registrar_comandos_precos
 from commands.mercadolivre import registrar_comandos_mercadolivre
 import os
@@ -64,6 +65,7 @@ app.register_blueprint(build_bp)
 app.register_blueprint(saude_bp)
 registrar_migracao_budget(app, db)
 
+registrar_comandos_marketplaces(app)
 registrar_comandos_banco(app)
 registrar_comandos_catalogo(app)
 registrar_comandos_catalogo_tecnico(app)

@@ -1,3 +1,5 @@
+from services.marketplace_service.controle_requisicoes_service import executar_requisicao, controle_em_execucao
+from services.marketplace_service.erros import FalhaMarketplace
 """Consulta de ofertas do catálogo oficial; não persiste nem associa peças por nome."""
 import json
 import re
@@ -61,7 +63,7 @@ class BuscarOfertasMercadoLivreService:
                 "ofertas": list(ofertas.values())}
 
     def _consultar(self, caminho, token, params=None):
-        chamada = lambda: self._requisitar(caminho, token, params)
+        chamada = lambda: executar_requisicao(lambda: self._requisitar(caminho, token, params))
         return self.controle.executar(chamada) if self.controle else chamada()
 
     def _requisitar(self, caminho, token, params=None):
@@ -92,6 +94,8 @@ class BuscarOfertasMercadoLivreService:
             finally:
                 resposta.close()
         except requests.RequestException:
+            if controle_em_execucao.get() is not None:
+                raise FalhaMarketplace(temporaria=True) from None
             # Não propagar objetos de request, cabeçalhos ou credenciais para logs.
             raise ValueError("Falha de rede na consulta ao Mercado Livre") from None
 

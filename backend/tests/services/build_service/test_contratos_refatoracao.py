@@ -32,6 +32,9 @@ def contratos():
     for nome, dialect in [('sqlite', sqlite.dialect()), ('mysql', mysql.dialect())]:
         ddl = []
         for tabela in sorted(db.metadata.tables.values(), key=lambda t:t.name):
+            # Migração aditiva posterior à refatoração, testada em test_fila.py.
+            if tabela.name in {"tarefa_marketplace", "limite_marketplace"}:
+                continue
             ddl.append(str(CreateTable(tabela).compile(dialect=dialect)))
             ddl.extend(sorted(str(CreateIndex(i).compile(dialect=dialect)) for i in tabela.indexes))
         resultado['esquema:' + nome] = _hash('\n'.join(ddl))

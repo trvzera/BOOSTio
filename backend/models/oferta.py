@@ -144,12 +144,30 @@ class Oferta(ModeloBase):
                 por_peca.setdefault((registro.tabela_peca, registro.peca_id), []).append(dados)
         for peca, referencia in zip(pecas, referencias):
             peca['ofertas'] = [*peca.get('ofertas', []), *por_peca.get(referencia, [])]
+        from services.peca_service.modelos_pecas import MODELOS_PECAS
+        modelos = {m.__tablename__: m for m in MODELOS_PECAS}
+        for oferta in cls.query.filter(cls.loja == 'shopee', cls.ativa.is_(True),
+                tuple_(cls.tabela_peca, cls.peca_id).in_(referencias)).order_by(cls.preco, cls.id).all():
+            modelo = modelos.get(oferta.tabela_peca)
+            peca = modelo.buscar_por_id(oferta.peca_id) if modelo else None
+            dados = oferta.para_exibicao()
+            if peca and dados and oferta.shopee_validada(peca):
+                fichas[(oferta.tabela_peca, oferta.peca_id)]['ofertas'].append(dados)
         return pecas
 
     @classmethod
     def buscar_para_peca(cls, oferta_id, categoria, peca_id):
         return cls.query.filter_by(id=oferta_id, tabela_peca=categoria, peca_id=peca_id,
-                                   loja='mercado_livre', ativa=True).first()
+                                   ativa=True).filter(cls.loja.in_(('mercado_livre', 'shopee'))).first()
+
+    def shopee_validada(self, peca):
+        from . import ProdutoPendente
+        from utils.identidade_peca import assinatura_peca, assinatura_tecnica
+        p = ProdutoPendente.buscar_por_anuncio('shopee', self.produto_id_loja)
+        prova = (p.evidencias or {}).get('vinculo', {}) if p else {}
+        return bool(p and p.status == 'importado' and p.oferta_id == self.id
+                    and prova.get('assinatura_peca') == assinatura_peca(peca)
+                    and prova.get('assinatura_tecnica') == assinatura_tecnica(peca))
 
     def para_exibicao(self):
         from datetime import timezone
@@ -159,18 +177,25 @@ class Oferta(ModeloBase):
             return None
         try:
             url = urlsplit(self.url)
-            if (url.scheme != 'https' or url.hostname != 'produto.mercadolivre.com.br'
+            if self.loja == 'shopee':
+                from services.shopee_service.normalizar_produto_service import validar_url_shopee
+                if (not validar_url_shopee(self.url) or
+                        url.path != '/product/' + self.produto_id_loja.replace(':', '/')):
+                    return None
+                url_compra = self.url_afiliado if validar_url_shopee(self.url_afiliado, afiliado=True) else self.url
+            elif (url.scheme != 'https' or url.hostname != 'produto.mercadolivre.com.br'
                 or url.username or url.password or url.port not in (None, 443)):
                 return None
-            codigo = re.match(r'^/MLB-(\d+)(?:-|/|$)', url.path)
-            if not codigo or 'MLB' + codigo[1] != self.produto_id_loja:
-                return None
-            afiliado = urlsplit(self.url_afiliado or '')
-            url_compra = self.url
-            if (afiliado.scheme == 'https' and afiliado.hostname in
-                {'mercadolivre.com.br', 'www.mercadolivre.com.br', 'produto.mercadolivre.com.br'}
-                and not afiliado.username and not afiliado.password and afiliado.port in (None, 443)):
-                url_compra = self.url_afiliado
+            else:
+                codigo = re.match(r'^/MLB-(\d+)(?:-|/|$)', url.path)
+                if not codigo or 'MLB' + codigo[1] != self.produto_id_loja:
+                    return None
+                afiliado = urlsplit(self.url_afiliado or '')
+                url_compra = self.url
+                if (afiliado.scheme == 'https' and afiliado.hostname in
+                    {'mercadolivre.com.br', 'www.mercadolivre.com.br', 'produto.mercadolivre.com.br'}
+                    and not afiliado.username and not afiliado.password and afiliado.port in (None, 443)):
+                    url_compra = self.url_afiliado
         except ValueError:
             return None
         return {'id': self.id, 'loja': self.loja, 'produto_id_loja': self.produto_id_loja,

@@ -1,0 +1,84 @@
+"""Adapta ofertas Shopee aos serviços comuns; rede fora das transações."""
+from dataclasses import asdict
+from datetime import datetime, timezone
+
+from models import ProdutoPendente
+from services.peca_service.modelos_pecas import MODELOS_PECAS
+from services.catalogo_service.indice_candidatos_service import IndiceCandidatosService
+from services.catalogo_service.importar_catalogo_service import ImportarCatalogoService
+from services.catalogo_service.enriquecer_normalizado_service import EnriquecerNormalizadoService
+from repositories.ofertas_repository import atualizar_oferta_validada
+from utils.identidade_peca import assinatura_documento, assinatura_peca
+from .cliente_service import ClienteShopeeService
+from .normalizar_produto_service import NormalizarProdutoShopeeService
+
+
+class ProcessarOfertasShopeeService:
+    def __init__(self, cliente=None):
+        self.cliente = cliente or ClienteShopeeService()
+
+    def ofertas_peca(self, *, categoria, peca_id, simular=True, limite_ofertas=1):
+        modelo = next((m for m in MODELOS_PECAS if m.__tablename__ == categoria), None)
+        if modelo is None or type(peca_id) is not int or not 1 <= limite_ofertas <= 20:
+            raise ValueError('Filtro de peça inválido')
+        peca = modelo.buscar_por_id(peca_id)
+        if peca is None or not peca.publicavel:
+            raise ValueError('Peça ausente ou não aprovada')
+        assinatura = assinatura_peca(peca)
+        resultado = self.cliente.buscar(f'{peca.fabricante} {peca.modelo}'[:200])
+        indice = IndiceCandidatosService.carregar(modelo)
+        resumo = dict(associadas=0, revisao=0, invalidas=0, detalhes=[])
+        for bruto in resultado['nodes']:
+            try:
+                produto, oferta = NormalizarProdutoShopeeService().executar(bruto, categoria)
+            except ValueError:
+                resumo['invalidas'] += 1
+                continue
+            decisao = indice.avaliar(produto)
+            if decisao['classificacao'] != 'confirmada' or decisao['peca'] != f'{categoria}:{peca_id}':
+                resumo['revisao'] += 1
+                resumo['detalhes'].append(dict(anuncio=produto.id_externo, classificacao=decisao['classificacao']))
+                continue
+            propostas = atualizar_oferta_validada(peca, 'shopee', oferta, assinatura,
+                produto, simular=simular)
+            resumo['associadas'] += 1
+            resumo['detalhes'].extend(propostas)
+            if resumo['associadas'] >= limite_ofertas:
+                break
+        return resumo
+
+    def descobrir_pagina(self, *, categoria, termo, pagina=1, limite=20, simular=True):
+        if categoria not in {m.__tablename__ for m in MODELOS_PECAS}:
+            raise ValueError('Categoria inválida')
+        resposta = self.cliente.buscar(termo, pagina=pagina, limite=limite)
+        linhas, invalidas = [], 0
+        for bruto in resposta['nodes']:
+            try:
+                produto, oferta = NormalizarProdutoShopeeService().executar(bruto, categoria)
+            except ValueError:
+                invalidas += 1
+                continue
+            linhas.append(dict(loja='shopee', produto_id_loja=produto.id_externo,
+                vendedor_id=oferta['vendedor_id'], titulo=produto.titulo, url=produto.fonte,
+                categoria_sugerida=categoria, dados_originais={'normalizado': asdict(produto), 'anuncio': bruto},
+                coletado_em=datetime.now(timezone.utc).replace(tzinfo=None)))
+        resultado = ProdutoPendente.registrar_descobertos(linhas, simular=simular)
+        return dict(**resultado, invalidas=invalidas, pagina=resposta['pageInfo'],
+                    anuncios=[linha['produto_id_loja'] for linha in linhas])
+
+    def importar_anuncio(self, *, anuncio_id, simular=True, permitir_novos=False):
+        pendencia = ProdutoPendente.buscar_por_anuncio('shopee', anuncio_id)
+        if pendencia is None:
+            raise ValueError('Anúncio não descoberto')
+        shop, item = anuncio_id.split(':')
+        resposta = self.cliente.consultar_anuncio(shop, item)
+        if not resposta['nodes']:
+            return dict(acao='sem_oferta', anuncio=anuncio_id)
+        produto, oferta = NormalizarProdutoShopeeService().executar(resposta['nodes'][0], pendencia.categoria_sugerida)
+        if produto.id_externo != anuncio_id:
+            raise ValueError('Consulta retornou outro anúncio')
+        if produto.contexto.get('variantes_nao_resolvidas'):
+            return dict(acao='revisao', motivo='Variantes sem identificação de preço individual')
+        produto, ficha = EnriquecerNormalizadoService().executar(produto)
+        return ImportarCatalogoService().executar(pendencia.id, produto, ficha, oferta,
+            assinatura_documento(pendencia.dados_originais), simular=simular, permitir_novos=permitir_novos)

@@ -102,6 +102,7 @@ class AssociacaoInteligenteService:
         if not produto.id_externo:pendencias.append('identificacao_externa_invalida')
         if not produto.titulo:pendencias.append('nome_ausente')
         if produto.contexto.get('marcas_multiplas'):pendencias.append('marcas_multiplas')
+        if produto.contexto.get('variantes_nao_resolvidas'):pendencias.append('variantes_nao_resolvidas')
         if peca.__tablename__ in ('ssd','hd'):
             tipos={{'hdd':'hd'}.get(nome(str(v)),nome(str(v))) for v in valores(produto.especificacoes.get('tecnologia_armazenamento'))}
             if tipos and tipos!={peca.__tablename__}:conflitos.append('tipo_armazenamento_divergente')

@@ -70,6 +70,8 @@ def aplicar_lote_mercado_livre(peca, catalogo_id, assinatura, assinatura_catalog
                 if not simular:
                     registro.ativa = False
         if not simular and confirmar:
+            from services.marketplace_service.controle_requisicoes_service import verificar_execucao
+            verificar_execucao()
             db.session.commit()
         return propostas
     except Exception:
@@ -106,9 +108,61 @@ def aplicar_ofertas_loja(peca,loja,ofertas,agora):
         if mudou:
             registro.preco=preco;registro.esgotado=dados.get('esgotado');registro.url=dados['url'];registro.ativa=True
             registro.consultado_em=agora;registro.preco_atualizado_em=agora
+        if loja == 'shopee':
+            from services.shopee_service.normalizar_produto_service import validar_url_shopee
+            afiliado = dados.get('url_afiliado')
+            if afiliado and validar_url_shopee(afiliado, afiliado=True):
+                registro.url_afiliado = afiliado
+        registro.consultado_em = agora
         db.session.flush()
         ultimo=HistoricoOferta.ultimo(registro.id,bloquear=True)
         historico=ultimo is None or ultimo.preco!=preco or ultimo.esgotado!=registro.esgotado
         if historico:db.session.add(HistoricoOferta(oferta_id=registro.id,preco=preco,esgotado=registro.esgotado,coletado_em=agora))
         propostas.append(dict(anuncio=chave,acao='criada' if novo else 'atualizada' if mudou else 'inalterada',historico=historico))
     return propostas
+
+
+def atualizar_oferta_validada(peca, loja, oferta, assinatura, produto, *, simular):
+    """Revalida matching sob a trava de coleta; não altera preço da peça."""
+    from datetime import datetime, timezone
+    from models import ControleColeta
+    from utils.identidade_peca import assinatura_peca
+    from services.catalogo_service.indice_candidatos_service import IndiceCandidatosService
+    try:
+        db.session.rollback()
+        if not ControleColeta.bloquear():
+            raise ValueError('Prepare o controle de coleta')
+        db.session.refresh(peca, with_for_update=True)
+        if assinatura_peca(peca) != assinatura or not peca.publicavel:
+            raise ValueError('Peça mudou durante a consulta')
+        decisao = IndiceCandidatosService.carregar(type(peca)).avaliar(produto)
+        if decisao['classificacao'] != 'confirmada' or decisao['peca'] != f'{peca.__tablename__}:{peca.id}':
+            raise ValueError('Associação mudou durante a consulta')
+        propostas = aplicar_ofertas_loja(peca, loja, [oferta], datetime.now(timezone.utc).replace(tzinfo=None))
+        if loja == 'shopee':
+            from dataclasses import asdict
+            from models import ProdutoPendente
+            from utils.identidade_peca import assinatura_tecnica
+            agora = datetime.now(timezone.utc).replace(tzinfo=None)
+            registro = Oferta.query.filter_by(loja=loja, produto_id_loja=produto.id_externo).one()
+            pendente = ProdutoPendente.buscar_por_anuncio(loja, produto.id_externo)
+            if pendente is None:
+                pendente = ProdutoPendente(loja=loja, produto_id_loja=produto.id_externo,
+                    vendedor_id=oferta['vendedor_id'], titulo=produto.titulo, url=produto.fonte,
+                    categoria_sugerida=produto.categoria, dados_originais={'normalizado': asdict(produto)}, coletado_em=agora)
+                db.session.add(pendente)
+            pendente.status = 'importado'
+            pendente.oferta_id = registro.id
+            pendente.revisado_em = agora
+            pendente.evidencias = {**(pendente.evidencias or {}), 'vinculo': {
+                'assinatura_peca': assinatura_peca(peca), 'assinatura_tecnica': assinatura_tecnica(peca)}}
+        if simular:
+            db.session.rollback()
+        else:
+            from services.marketplace_service.controle_requisicoes_service import verificar_execucao
+            verificar_execucao()
+            db.session.commit()
+        return propostas
+    except Exception:
+        db.session.rollback()
+        raise

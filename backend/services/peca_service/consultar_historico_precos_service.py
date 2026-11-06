@@ -38,19 +38,23 @@ class ConsultarHistoricoPrecosService:
     @staticmethod
     def _historico_oferta(peca, oferta_id):
         categoria, peca_id = peca.__tablename__, peca.id
-        vinculo = VinculoMercadoLivre.buscar(categoria, peca_id)
-        if vinculo is None or vinculo.assinatura_peca != assinatura_peca(peca) or not vinculo.especificacoes_compativeis(peca):
-            raise LookupError("Identificação da peça precisa de revisão")
         if type(oferta_id) is not int or oferta_id <= 0:
             raise ValueError('Oferta inválida')
         oferta = Oferta.buscar_para_peca(oferta_id, categoria, peca_id)
         if oferta is None or oferta.para_exibicao() is None:
             raise LookupError('Oferta não encontrada')
+        if oferta.loja == 'mercado_livre':
+            vinculo = VinculoMercadoLivre.buscar(categoria, peca_id)
+            valido = vinculo is not None and vinculo.assinatura_peca == assinatura_peca(peca) and vinculo.especificacoes_compativeis(peca)
+        else:
+            valido = oferta.shopee_validada(peca)
+        if not valido:
+            raise LookupError('Identificação da peça precisa de revisão')
         linhas = HistoricoOferta.listar(oferta.id)
-        return {'peca_id': f'{categoria}:{peca_id}', 'oferta_id': oferta.id, 'loja': 'mercado_livre',
+        return {'peca_id': f'{categoria}:{peca_id}', 'oferta_id': oferta.id, 'loja': oferta.loja,
                 'produto_id_loja': oferta.produto_id_loja, 'limite': 1000, 'tem_mais': len(linhas) > 1000,
                 'historico_precos': [
                     {'data': linha.coletado_em.replace(tzinfo=timezone.utc).isoformat(timespec='milliseconds'),
                      'preco': float(linha.preco), 'esgotado': linha.esgotado,
-                     'loja': 'mercado_livre', 'produto_id_loja': oferta.produto_id_loja}
+                     'loja': oferta.loja, 'produto_id_loja': oferta.produto_id_loja}
                     for linha in reversed(linhas[:1000])]}

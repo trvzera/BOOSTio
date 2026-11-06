@@ -102,6 +102,30 @@ services:
       - traefik.enable=false
     networks: [backend]
 
+  marketplaces-worker:
+    profiles: [marketplaces]
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      APP_ENV: producao
+    command: ["python", "-m", "flask", "--app", "app", "marketplaces-worker"]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    mem_limit: 512m
+    cpus: 0.5
+    stop_grace_period: 45s
+    healthcheck:
+      disable: true
+    labels:
+      - traefik.enable=false
+    networks: [backend, marketplaces-egress]
+
   web:
     build:
       context: .
@@ -138,6 +162,7 @@ volumes:
   imagens_coletadas:
 
 networks:
+  marketplaces-egress:
   backend:
     internal: true
   traefik-proxy:

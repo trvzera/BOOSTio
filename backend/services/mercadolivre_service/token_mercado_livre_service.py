@@ -1,3 +1,5 @@
+from services.marketplace_service.controle_requisicoes_service import controle_em_execucao, executar_requisicao
+from services.marketplace_service.erros import FalhaMarketplace, FilaAguardando
 import json
 import math
 import time
@@ -16,6 +18,18 @@ class TokenMercadoLivreService:
         self.relogio = relogio or time.time
 
     def executar(self):
+        try:
+            return self._executar()
+        except (FilaAguardando, FalhaMarketplace):
+            raise
+        except ValueError:
+            controle = controle_em_execucao.get()
+            if controle is not None:
+                controle.erro = FalhaMarketplace(401)
+                raise controle.erro from None
+            raise
+
+    def _executar(self):
         with self.repository.bloquear():
             dados = self.repository.ler()
             if dados is None:
@@ -34,6 +48,7 @@ class TokenMercadoLivreService:
         client_id = self._credencial(current_app.config.get('MERCADO_LIVRE_CLIENT_ID'))
         secret = self._credencial(current_app.config.get('MERCADO_LIVRE_CLIENT_SECRET'))
         inicio = self.relogio()
+        executar_requisicao(lambda: None)
         # Refresh tokens são de uso único. Após resultado incerto, não repetir às cegas.
         self.repository.salvar({**dados, 'renovacao_pendente': True})
         try:

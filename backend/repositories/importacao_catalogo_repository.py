@@ -22,7 +22,10 @@ class RepositorioImportacaoCatalogo:
                 raise ValueError('Pendência ausente ou rejeitada')
             yield p
             if simular:db.session.rollback()
-            else:db.session.commit()
+            else:
+                from services.marketplace_service.controle_requisicoes_service import verificar_execucao
+                verificar_execucao()
+                db.session.commit()
         except Exception:
             db.session.rollback()
             raise
@@ -63,6 +66,10 @@ class RepositorioImportacaoCatalogo:
             'enriquecimento':json.loads(json.dumps(ficha,default=str)),
             'importacao':dict(peca=f'{peca.__tablename__}:{peca.id}',oferta_id=oferta.id,
                 origem=pendencia.loja,catalogo_id=ficha['produto'].get('id'),coletado_em=agora.isoformat(),resultado=propostas,associacao=decisao)}
+        if pendencia.loja == 'shopee':
+            from utils.identidade_peca import assinatura_tecnica
+            pendencia.evidencias = {**pendencia.evidencias, 'vinculo': {
+                'assinatura_peca': assinatura_peca(peca), 'assinatura_tecnica': assinatura_tecnica(peca)}}
 
 
     def registrar_revisao(self, pendencia, ficha, motivo=None):
