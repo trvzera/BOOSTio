@@ -17,16 +17,15 @@ class RepositorioControleCatalogo:
         if dialecto=='mysql':
             self.nome='boostio:'+self.escopo+':'+hashlib.sha256(str(db.engine.url.database).encode()).hexdigest()[:16]
             with db.engine.connect() as conexao:
-                self.conexao=conexao
                 resultado=conexao.execute(text('SELECT GET_LOCK(:nome,0)'),{'nome':self.nome}).scalar()
                 if resultado is None:raise RuntimeError('Não foi possível adquirir a trava do catálogo')
                 adquirido=resultado==1
+                if adquirido:self.conexao=conexao
                 try:yield adquirido
                 finally:
                     if adquirido:
                         try:conexao.execute(text('SELECT RELEASE_LOCK(:nome)'),{'nome':self.nome})
                         finally:self.conexao=None
-                    self.conexao=None
         elif dialecto=='sqlite':
             import fcntl
             caminho=db.engine.url.database
@@ -35,11 +34,12 @@ class RepositorioControleCatalogo:
             with arquivo.open('a') as trava:
                 try:fcntl.flock(trava,fcntl.LOCK_EX|fcntl.LOCK_NB);adquirido=True
                 except BlockingIOError:adquirido=False
-                self.arquivo=trava if adquirido else None
+                if adquirido:self.arquivo=trava
                 try:yield adquirido
                 finally:
-                    if adquirido:fcntl.flock(trava,fcntl.LOCK_UN)
-                    self.arquivo=None
+                    if adquirido:
+                        fcntl.flock(trava,fcntl.LOCK_UN)
+                        self.arquivo=None
         else:raise ValueError('Banco não suportado para worker')
 
     def verificar(self):

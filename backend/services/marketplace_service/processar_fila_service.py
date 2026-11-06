@@ -27,7 +27,8 @@ class ProcessarFilaMarketplaceService:
     def _bloquear(self, loja):
         repositorio = RepositorioControleCatalogo(escopo='fila_'+loja)
         with repositorio.bloquear() as adquirido:
-            self.verificar = repositorio.verificar
+            if adquirido:
+                self.verificar = repositorio.verificar
             yield adquirido
 
     def enfileirar(self, loja, tipo, dados, *, execucao):
