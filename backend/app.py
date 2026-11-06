@@ -20,6 +20,9 @@ from migrations.budget_usuario import registrar_migracao_budget
 from commands.fabricantes import registrar_comandos_fabricantes
 from commands.icecat import registrar_comandos_icecat
 from commands.catalogo_tecnico import registrar_comandos_catalogo_tecnico
+from commands.dataset_pecas import registrar_comandos_dataset_pecas
+from commands.buildcores import registrar_comandos_buildcores
+from commands.requisitos_montagem import registrar_comandos_requisitos_montagem
 from commands.catalogo import registrar_comandos_catalogo
 from commands.banco import registrar_comandos_banco
 from commands.benchmarks import registrar_comandos_benchmarks
@@ -64,6 +67,9 @@ registrar_migracao_budget(app, db)
 registrar_comandos_banco(app)
 registrar_comandos_catalogo(app)
 registrar_comandos_catalogo_tecnico(app)
+registrar_comandos_dataset_pecas(app)
+registrar_comandos_buildcores(app)
+registrar_comandos_requisitos_montagem(app)
 registrar_comandos_icecat(app)
 registrar_comandos_fabricantes(app)
 registrar_comandos_benchmarks(app)

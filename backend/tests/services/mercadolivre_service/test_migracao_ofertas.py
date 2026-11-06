@@ -35,7 +35,7 @@ def test_cli_default_simula_e_reporta_sem_chave(banco):
         resultado=banco.test_cli_runner().invoke(args=['mercadolivre-ofertas-atualizar'])
         assert resultado.exit_code==0
         assert service.return_value.executar.call_args.kwargs['simular'] is True
-        assert service.return_value.executar.call_args.kwargs['limite_ofertas']==5
+        assert service.return_value.executar.call_args.kwargs['limite_ofertas']==1
 
 def test_cli_vinculo_exige_revisao_explicita(banco):
     r=banco.test_cli_runner().invoke(args=['mercadolivre-vincular','--categoria','processador','--peca-id','1','--catalogo-id','MLB123'])

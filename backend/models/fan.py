@@ -6,7 +6,7 @@ class Fan(Peca):
     __tablename__ = "fan"
 
     tamanho_mm = db.Column(db.Integer(), nullable=False)
-    quantidade = db.Column(db.Integer(), nullable=False)
+    quantidade = db.Column(db.Integer(), nullable=True)
     iluminacao = db.Column(db.Boolean(), default=False)
 
     def to_catalogo(self):

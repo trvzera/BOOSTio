@@ -6,6 +6,10 @@ from defusedxml.common import DefusedXmlException
 from xml.etree.ElementTree import ParseError
 from services.catalogo_service.normalizar_produto import nome, numero, gtin
 
+
+class CategoriaIcecatIncompativel(ValueError):
+    """Candidato de outra categoria, não uma falha de leitura do lote."""
+
 # Nomes da taxonomia inglesa da ficha XML. Rótulos desconhecidos ficam pendentes.
 CATEGORIAS = {
     'processador': {'processors'}, 'placa_video': {'graphics cards'},
@@ -112,7 +116,7 @@ class NormalizarFichaIcecatService:
         cat = produto.find('Category')
         cat_nome = cat.find('Name') if cat is not None else None
         if cat is None or cat.get('ID') != referencia['categoria'] or cat_nome is None or nome(cat_nome.get('Value')) not in CATEGORIAS.get(categoria, set()):
-            raise ValueError('Categoria Icecat incompatível com o anúncio')
+            raise CategoriaIcecatIncompativel('Categoria Icecat incompatível com o anúncio')
         fornecedor = produto.find('Supplier')
         fabricante = fornecedor.get('Name') if fornecedor is not None else None
         modelo = produto.get('Name')

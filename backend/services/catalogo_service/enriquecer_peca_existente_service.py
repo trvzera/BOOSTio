@@ -64,6 +64,8 @@ class EnriquecerPecaExistenteService:
         identidade = motor.comparar_identificadores(peca,produto)
         avaliacao = motor.avaliar(peca,produto)
         conflitos = avaliacao['conflitos']
+        if any(c.startswith('titulo_divergente:') for c in conflitos):
+            return dict(status='revisao', motivo='Título diverge da ficha técnica', conflitos=conflitos)
         pendencias = [p for p in avaliacao['pendencias'] if not p.startswith('especificacao_essencial_ausente:')
                       and p != 'formato_notebook_nao_comprovado_localmente']
         if origem_confirmada and (nomes['exato'] or nome_original_compativel):

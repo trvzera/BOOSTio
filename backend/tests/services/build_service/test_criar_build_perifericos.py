@@ -18,6 +18,9 @@ class CriarBuildPerifericosTest(unittest.TestCase):
             for indice, tipo in enumerate(self.tipos, start=1)
         }
         self.catalogo["gabinete"][0]["fans_inclusos"] = 1
+        self.catalogo["processador"][0].update(videointegrado=True,cooler=True,consumo_energia=65)
+        self.catalogo["fonte"][0]["potencia_w"] = 500
+        self.catalogo["memoria_ram"][0]["quantidade_pentes"] = 1
         self.catalogo["monitor"][0]["tipo_painel"] = "IPS"
         self.build = {
             "nome": "Setup", "descricao": "Completo", "utilidade": "jogos",
@@ -83,12 +86,11 @@ class CriarBuildPerifericosTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "limite reservado para periféricos"):
             CriarBuildService._validar_build(self.build, self.catalogo, 2000, percentual=20)
 
-    def test_monitor_novo_nao_permite_painel_proibido_ou_desconhecido(self):
+    def test_monitor_novo_permite_painel_opcional(self):
         for painel in ("TN", "OLED", None):
             with self.subTest(painel=painel):
                 self.catalogo["monitor"][0]["tipo_painel"] = painel
-                with self.assertRaisesRegex(ValueError, "painel IPS ou VA"):
-                    CriarBuildService._validar_build(self.build, self.catalogo, 2000, percentual=20)
+                assert CriarBuildService._validar_build(self.build, self.catalogo, 2000, percentual=20)["preco_total"] == 1000
 
     def test_monitor_proprio_e_preservado_mesmo_sem_painel_confirmado(self):
         build = {**self.build,"componentes":[i.copy() for i in self.build["componentes"] if i["tipo"]!="monitor"]}

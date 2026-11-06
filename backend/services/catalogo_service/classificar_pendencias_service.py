@@ -1,10 +1,10 @@
 """Classifica qualquer loja usando produtos normalizados e models compartilhados."""
 from sqlalchemy.exc import SQLAlchemyError
-from models import ProdutoPendente,IdentidadeFabricante
+from models import ProdutoPendente
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_documento
 from .produto_normalizado import ProdutoNormalizado
-from .associacao_inteligente_service import AssociacaoInteligenteService
+from .indice_candidatos_service import IndiceCandidatosService
 
 
 class ClassificarPendenciasService:
@@ -28,10 +28,8 @@ class ClassificarPendenciasService:
                 cat=p.categoria_sugerida
                 if cat not in modelos:raise ValueError('Categoria precisa de revisão')
                 if cat not in pools:
-                    todos=modelos[cat].pool_para_matching(2001);pecas=todos[:2000]
-                    pools[cat]=(pecas,IdentidadeFabricante.para_matching(pecas),len(todos)<=2000)
-                pecas,ids,completo=pools[cat]
-                decisoes=[AssociacaoInteligenteService().selecionar(pecas,produto,identidades=ids,completo=completo) for produto in self.normalizador(p)]
+                    pools[cat]=IndiceCandidatosService.carregar(modelos[cat])
+                decisoes=[pools[cat].avaliar(produto) for produto in self.normalizador(p)]
                 if not decisoes:raise ValueError('Nenhum produto normalizado')
                 decisao=min(decisoes,key=lambda d:d['percentual'])
                 if len({d['peca'] for d in decisoes if d['classificacao']=='confirmada'})>1:

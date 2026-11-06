@@ -4,7 +4,7 @@ from . import Periferico
 class Teclado(Periferico):
     __tablename__ = "teclado"
 
-    layout = db.Column(db.String(20), nullable=False)
+    layout = db.Column(db.String(20), nullable=True)
     switch = db.Column(db.String(50))
     mecanico = db.Column(db.Boolean(), default=False)
     tamanho = db.Column(db.String(20))

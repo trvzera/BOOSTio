@@ -14,8 +14,9 @@ class BuscarOfertasMercadoLivreService:
     TAMANHO_PAGINA = 100
     MAX_OFERTAS = 1000
 
-    def __init__(self, controle=None):
+    def __init__(self, controle=None, http=None):
         self.controle = controle
+        self.http = http or requests
 
     def executar(self, catalogo_id: str, *, access_token: str | None = None, produto=None):
         self._validar_id(catalogo_id, "produto de catálogo")
@@ -65,7 +66,7 @@ class BuscarOfertasMercadoLivreService:
 
     def _requisitar(self, caminho, token, params=None):
         try:
-            resposta = requests.get(
+            resposta = self.http.get(
                 self.BASE_URL + caminho, params=params,
                 headers={"Authorization": f"Bearer {token}", "Accept": "application/json"},
                 timeout=(10, 30), stream=True, allow_redirects=False,

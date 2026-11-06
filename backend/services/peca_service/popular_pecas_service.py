@@ -30,8 +30,19 @@ class PopularPecasService:
       self._popular_classe(classe, itens)
     self._atualizar_links_rede()
     RestaurarLinksKabumService().executar()
+    self._aplicar_vinculos_revisados()
     if atualizar_precos:
       return AtualizarPrecosService().executar(limite=limite, intervalo=intervalo)
+
+  @staticmethod
+  def _aplicar_vinculos_revisados():
+    from models import VinculoMercadoLivre
+    from services.mercadolivre_service.importar_vinculos_revisados_service import ImportarVinculosRevisadosService
+    if not VinculoMercadoLivre.tabela_preparada():
+      print('[seed] Prepare as tabelas de ofertas para importar os vínculos Mercado Livre revisados')
+      return
+    resumo = ImportarVinculosRevisadosService().executar(simular=False)
+    print(f"[seed] Mercado Livre: {resumo['cadastrados']} vínculos novos, {resumo['inalterados']} inalterados, {resumo['revisao']} pendentes")
 
   @staticmethod
   def _atualizar_links_rede():

@@ -500,6 +500,8 @@ class CriarBuildService:
     }
     if planejamento_componentes is not None:
       restricoes["planejamento_componentes"] = planejamento_componentes
+    from .planejar_potencia_service import PlanejarPotenciaService
+    restricoes["planejamento_energia"] = {"reservas_w": PlanejarPotenciaService.RESERVAS, "margem_percentual": 20, "ram_e_fans_por_unidade_fisica": True}
     ryzen = [] if preferencia_neutra else PreferenciasProcessadorService.ids_prioritarios(catalogo, dados["utilidade"], proprias)
     restricoes["processadores_ryzen_prioritarios"] = ryzen
     regra_processador = (
@@ -594,7 +596,7 @@ class CriarBuildService:
         "necessárias para um setup completo e compatível: "
         "CPU, placa_mae, RAM, armazenamento, fonte e gabinete; inclua uma "
         "placa_video se o processador não tiver vídeo integrado ou se o uso exigir. "
-        "Inclua cooler quando o processador não trouxer um. Respeite a escolha de incluir "
+        "Inclua cooler separado com socket confirmado quando o processador não trouxer um ou a inclusão for desconhecida. Respeite a escolha de incluir "
         "periféricos e os dois tetos antes de escolher upgrades. Considere as quantidades na soma.\n"
         "- Depois distribua o saldo pelas peças que mais melhoram o uso solicitado. "
         "Para jogos, não deixe a placa_video apenas com o que sobrar; para trabalho "
@@ -630,8 +632,8 @@ class CriarBuildService:
         "DPI alto, RGB, marca ou preço alto isolados não comprovam qualidade. Não invente avaliações "
         "ou vendas. Prefira equilíbrio de qualidade entre os quatro periféricos; a reserva continua "
         "sendo teto, não gasto mínimo.\n"
-        "Monitores NOVOS devem ter painel confirmado IPS ou VA, incluindo Fast IPS, Rapid IPS, "
-        "Nano IPS e Fast VA. Não escolha TN, OLED ou painel desconhecido; preserve monitores próprios. "
+        "O tipo de painel é informação opcional. Prefira painel confirmado IPS ou VA, incluindo Fast IPS, Rapid IPS, "
+        "Nano IPS e Fast VA quando adequados ao uso. TN, OLED e painel desconhecido não são bloqueados por padrão; preserve monitores próprios. "
         "Para jogos, priorize taxa de atualização (Hz): avalie 144 Hz ou mais quando o conjunto e a "
         "reserva permitirem, sem prometer FPS nem sacrificar o PC. Mais Hz só é aproveitado conforme "
         "a GPU, o jogo e as conexões. Não troque um painel conhecido por um monitor sem ficha. "
@@ -732,6 +734,10 @@ class CriarBuildService:
         "Fora dessa preferência, não favoreça marca, linha ou fabricante. "
         "Entre opções equivalentes, decida por especificação, compatibilidade e preço.\n\n"
 
+        "# POTÊNCIA\n"
+        "- Exija consumo cadastrado de CPU e GPU. Para auxiliares sem consumo, use as reservas de planejamento_energia, "
+        "contando pentes por kit e fans por kit × quantidade. A fonte deve cobrir o total com 20% de margem. "
+        "Reservas não são dados de fabricante; não as escreva como especificações confirmadas.\n\n"
         "# MEMÓRIA RAM\n"
         "- Para memórias novas, prefira dois pentes do mesmo modelo quando viável dentro do teto, "
         "visando dual channel nas plataformas que o suportam. Quantidade par sozinha não garante dual channel.\n"
@@ -751,7 +757,7 @@ class CriarBuildService:
         "# VÍDEO INTEGRADO E PLACA DE VÍDEO\n"
         "- Primeiro verifique se o processador escolhido tem vídeo integrado "
         "(use apenas videointegrado confirmado no catálogo). Dado ausente não significa "
-        "false: prefira uma CPU com esse dado confirmado e não prometa vídeo integrado desconhecido.\n"
+        "false: com dado desconhecido, inclua GPU dedicada; não prometa vídeo integrado desconhecido.\n"
         "- Se tiver vídeo integrado, a placa_video NÃO é necessária: omita-a "
         "e redirecione o orçamento para as peças obrigatórias, "
         "a menos que o uso exija GPU dedicada (por exemplo, jogos pesados, "
@@ -960,6 +966,10 @@ class CriarBuildService:
       raise ValueError("A configuração sugerida contém incompatibilidades: " + motivos + ". Revise as peças ou tente novamente.")
     if diagnostico["pecasPendentes"]:
       raise ValueError("A IA não completou as peças obrigatórias da build: " + ", ".join(diagnostico["pecasPendentes"]) + ". Tente novamente.")
+    regras_essenciais={'fonte-potencia','air_cooler-socket','water_cooler-socket'}
+    desconhecidas=[r['titulo'] for r in diagnostico['naoVerificado'] if r['codigo'] in regras_essenciais]
+    if desconhecidas:
+      raise ValueError('Faltam dados para validar a combinação: '+', '.join(desconhecidas)+'. Escolha peças com dados confirmados ou complete a ficha.')
     fans = diagnostico.get("fans")
     if fans and fans["total"] is not None and fans["capacidade"] is not None and fans["total"] < fans["capacidade"]:
       raise ValueError("A IA não completou a ventilação do gabinete: faltam " + str(fans["capacidade"] - fans["total"]) +

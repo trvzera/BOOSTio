@@ -63,7 +63,10 @@ class NormalizarProdutoService:
             specs['tecnologia_armazenamento']=valores(('DRIVE_STORAGE_TYPE',))
             # INTERFACES pode misturar protocolo (NVMe), barramento e formato.
             # CONNECTIVITY também contém interfaces explícitas nos dados reais.
-            armazenamento = sorted({parte.strip() for v in valores(('INTERFACES','CONNECTIVITY'))
+            # VERSION só é interface quando explicita o protocolo; não interpretar
+            # revisões arbitrárias do produto como barramento.
+            versoes = [v for v in valores(('VERSION',)) if re.fullmatch(r'sata\s*(?:iii|ii|i|[123](?:\.0)?)', v)]
+            armazenamento = sorted({parte.strip() for v in [*valores(('INTERFACES','CONNECTIVITY')), *versoes]
                 for parte in re.split(r'[,;]\s*(?=[a-z])', v) if parte.strip()})
             specs['interface'] = [v for v in armazenamento
                 if re.search(r'\b(?:sata|pcie|pci[ -]?(?:e|express)|usb|sas)', v)]

@@ -58,12 +58,11 @@ class ImportarProdutoService:
             from dataclasses import replace
             normalizado=replace(normalizado,titulo=entrada['title'])
         if permitir_novos and (self.base_icecat is not None or self.fabricantes is not None):
-            from services.catalogo_service.associacao_inteligente_service import AssociacaoInteligenteService
-            pool=modelos[categoria].pool_para_matching(2001)
-            identidades=IdentidadeFabricante.para_matching(pool[:2000])
-            decisao=AssociacaoInteligenteService().selecionar(pool[:2000],normalizado,
-                identidades=identidades,completo=len(pool)<=2000)
-            if decisao['classificacao']=='rejeitada':
+            from services.catalogo_service.indice_candidatos_service import IndiceCandidatosService
+            decisao=IndiceCandidatosService.carregar(modelos[categoria]).avaliar(normalizado)
+            # Uma ficha técnica também pode resolver lacunas de uma associação
+            # ambígua. A decisão é refeita sob bloqueio depois do enriquecimento.
+            if decisao['classificacao']!='confirmada':
                 if self.base_icecat is not None:
                     normalizado,ficha=self.base_icecat.executar(normalizado,ficha)
                 if self.fabricantes is not None and not ficha.get('pronto'):

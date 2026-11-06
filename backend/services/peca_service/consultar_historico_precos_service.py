@@ -39,7 +39,7 @@ class ConsultarHistoricoPrecosService:
     def _historico_oferta(peca, oferta_id):
         categoria, peca_id = peca.__tablename__, peca.id
         vinculo = VinculoMercadoLivre.buscar(categoria, peca_id)
-        if vinculo is None or vinculo.assinatura_peca != assinatura_peca(peca):
+        if vinculo is None or vinculo.assinatura_peca != assinatura_peca(peca) or not vinculo.especificacoes_compativeis(peca):
             raise LookupError("Identificação da peça precisa de revisão")
         if type(oferta_id) is not int or oferta_id <= 0:
             raise ValueError('Oferta inválida')

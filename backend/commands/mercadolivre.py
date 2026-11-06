@@ -80,6 +80,25 @@ def registrar_comandos_mercadolivre(app):
         except (ValueError, SQLAlchemyError) as erro:
             raise click.ClickException(str(erro) if isinstance(erro, ValueError) else 'Prepare o esquema com catalogo-preparar antes da descoberta') from None
 
+    @app.cli.command('mercadolivre-vinculos-preparar')
+    def preparar_vinculos():
+        from migrations.vinculos_revisados import preparar_vinculos_revisados
+        try:
+            click.echo(json.dumps(preparar_vinculos_revisados(),ensure_ascii=False))
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro,ValueError) else 'Falha ao preparar vínculos revisados') from None
+
+    @app.cli.command('mercadolivre-vinculos-importar')
+    @click.option('--arquivo', type=click.Path(exists=True, dir_okay=False), default=None)
+    @click.option('--aplicar', is_flag=True, help='Grava somente vínculos revisados. Padrão: simulação.')
+    def importar_vinculos(arquivo, aplicar):
+        """Aplica o manifesto manual às peças existentes, sem cadastrar ofertas."""
+        from services.mercadolivre_service.importar_vinculos_revisados_service import ImportarVinculosRevisadosService, MANIFESTO
+        try:
+            click.echo(json.dumps(ImportarVinculosRevisadosService().executar(arquivo or MANIFESTO, simular=not aplicar),ensure_ascii=False))
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro,ValueError) else 'Falha ao aplicar vínculos; confira a preparação das ofertas') from None
+
     @app.cli.command('mercadolivre-autorizacao-preparar')
     def preparar_autorizacao():
         from migrations.autorizacao_mercado_livre import preparar_autorizacao_mercado_livre
@@ -137,25 +156,47 @@ def registrar_comandos_mercadolivre(app):
 
     @app.cli.command('mercadolivre-ofertas-atualizar')
     @click.option('--aplicar', is_flag=True, help='Grava vínculos comprovados, ofertas e histórico. Padrão: simulação.')
+    @click.option('--somente-vinculadas', is_flag=True, help='Consulta apenas peças já vinculadas.')
+    @click.option('--somente-com-minimos/--incluir-incompletas', default=True, show_default=True)
     @click.option('--categoria')
     @click.option('--peca-id', type=click.IntRange(min=1))
-    @click.option('--depois-id', default=0, type=click.IntRange(min=0), help='Continua uma categoria após este ID.')
+    @click.option('--depois-id', default=0, type=click.IntRange(min=0))
     @click.option('--limite-pecas', default=20, type=click.IntRange(1, 5000), show_default=True)
-    @click.option('--ofertas-por-peca', default=5, type=click.IntRange(1, 20), show_default=True)
+    @click.option('--todas', is_flag=True, help='Percorre todas as peças elegíveis, respeitando o orçamento de requisições.')
+    @click.option('--ofertas-por-peca', default=1, type=click.IntRange(1, 20), show_default=True)
     @click.option('--max-requisicoes', default=100, type=click.IntRange(min=1), show_default=True)
     @click.option('--intervalo', default=1.0, type=click.FloatRange(min=0.1), show_default=True)
-    def atualizar(aplicar, categoria, peca_id, depois_id, limite_pecas, ofertas_por_peca, max_requisicoes, intervalo):
-        """Busca e atualiza ofertas sem criar componentes ou misturar preços da KaBuM."""
+    @click.option('--resumo', type=click.Path(dir_okay=False), help='JSON de progresso e detalhes em arquivo JSONL ao lado.')
+    @click.option('--retomar', is_flag=True, help='Continua os cursores do arquivo --resumo, com os mesmos filtros e banco.')
+    def atualizar(aplicar, categoria, peca_id, depois_id, limite_pecas, todas, ofertas_por_peca,
+                  max_requisicoes, intervalo, somente_vinculadas, somente_com_minimos, resumo, retomar):
+        """Busca ofertas sem criar componentes ou alterar preços da KaBuM."""
+        from services.catalogo_service.relatorio_ofertas_service import RelatorioOfertasService
+        from models import db
+        import hashlib
+        if retomar and (not resumo or depois_id or peca_id):
+            raise click.ClickException('--retomar exige --resumo e não pode combinar com --depois-id/--peca-id')
+        opcoes = dict(categoria=categoria, peca_id=peca_id, depois_id=depois_id,
+            limite_pecas=None if todas else limite_pecas, limite_ofertas=ofertas_por_peca,
+            max_requisicoes=max_requisicoes, intervalo=intervalo, simular=not aplicar,
+            somente_vinculadas=somente_vinculadas, somente_com_minimos=somente_com_minimos)
         try:
-            resultado = AtualizarOfertasMercadoLivreService().executar(
-                categoria=categoria, peca_id=peca_id, depois_id=depois_id, limite_pecas=limite_pecas,
-                limite_ofertas=ofertas_por_peca, max_requisicoes=max_requisicoes,
-                intervalo=intervalo, simular=not aplicar)
-            click.echo(json.dumps(resultado, ensure_ascii=False))
+            if resumo:
+                identidade = dict(categoria=categoria, peca_id=peca_id, simular=not aplicar,
+                    somente_vinculadas=somente_vinculadas, somente_com_minimos=somente_com_minimos,
+                    limite_ofertas=ofertas_por_peca,
+                    banco=hashlib.sha256(str(db.engine.url).encode()).hexdigest())
+                with RelatorioOfertasService(resumo, identidade, retomar=retomar) as relatorio:
+                    resultado = AtualizarOfertasMercadoLivreService().executar(**opcoes,
+                        cursores=relatorio.cursores, progresso=relatorio.atualizar, guardar_detalhes=False)
+                    click.echo(json.dumps(relatorio.ultimo, ensure_ascii=False))
+            else:
+                resultado = AtualizarOfertasMercadoLivreService().executar(**opcoes)
+                click.echo(json.dumps(resultado, ensure_ascii=False))
             if resultado['interrompido']:
                 raise click.ClickException('Execução interrompida; consulte o resumo antes de repetir')
-        except (ValueError, SQLAlchemyError) as erro:
-            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else 'Banco indisponível para ofertas; execute mercadolivre-ofertas-preparar') from None
+        except (ValueError, OSError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, (ValueError, OSError)) else 'Banco indisponível para ofertas; execute mercadolivre-ofertas-preparar') from None
 
     @app.cli.command('mercadolivre-vincular')
     @click.option('--categoria', required=True)

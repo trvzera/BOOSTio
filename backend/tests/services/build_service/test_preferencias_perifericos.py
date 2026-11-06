@@ -16,7 +16,7 @@ def test_paineis_confirmados_aceitos(painel):
 
 @pytest.mark.parametrize("painel",[None,"","TN","OLED","QD-OLED","IPS ou TN","talvez IPS","<IPS>"])
 def test_painel_ausente_ou_nao_permitido_nao_e_inferido(painel):
-    assert not Regras.painel_permitido({"tipo_painel":painel,"modelo":"Monitor IPS Gamer"})
+    assert not Regras.painel_permitido({"tipo_painel":painel,"modelo":"Monitor IPS Gamer"}, tipos_exigidos={"IPS","VA"})
 
 
 def test_gamer_prioriza_hz_e_edicao_resolucao_sem_pontuacao_de_qualidade():
@@ -32,7 +32,7 @@ def test_catalogo_filtra_monitor_antes_de_amostrar_sem_excluir_outros_produtos()
     modelo=SimpleNamespace(__tablename__="monitor",listar_disponiveis_ate=lambda *a,**k:monitores)
     with patch("services.build_service.criar_build_service.MODELOS_PECAS",(modelo,)):
         catalogo=CriarBuildService._gerar_catalogo(200,500,utilidade="Jogos")
-    assert [p["id"] for p in catalogo["monitor"]] == [1,2]
+    assert {p["id"] for p in catalogo["monitor"]} == {1,2,3,4,5}
 
 
 def test_amostragem_preserva_opcoes_de_hz_e_resolucao_nao_apenas_preco():

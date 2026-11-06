@@ -9,7 +9,7 @@ from .comparar_codigo_modelo_service import CompararCodigoModeloService
 
 
 class AssociacaoInteligenteService:
-    VERSAO='associacao_v6'
+    VERSAO='associacao_v8'
 
     @staticmethod
     def classificar_percentual(percentual):
@@ -47,6 +47,11 @@ class AssociacaoInteligenteService:
         if re.search(r'\b(combo|upgrade|sucata|defeito)\b|somente (?:a )?(?:caixa|embalagem)',texto):conflitos.append('produto_composto_ou_inadequado')
         if cat not in ('cabo_rede', 'adaptador_wifi') and re.search(r'^(?:kit\s+de\s+)?(?:cabo|suporte|almofadas?|earpads?|case|estojo|carcaca|pelicula|adaptador)\s+(?:para|de reposicao)', texto):
             conflitos.append('acessorio_para_outro_produto')
+        if cat in ('processador', 'placa_video', 'memoria_ram') and re.search(
+                r'^(?:cooler|dissipador|ventoinha|water\s*cooler|bloco|pasta\s*termica)\b.*\bpara\b', texto):
+            conflitos.append('acessorio_para_outro_produto')
+        if cat in ('ssd', 'hd') and re.search(r'(?:\+|\bcom\b)\s*(?:um\s+)?(?:adaptador|caddy|case|gabinete)\b', texto):
+            conflitos.append('produto_composto_ou_inadequado')
         kit=bool(re.search(r'\bkit\b|\d+\s*[x×]\s*\d+\s*gb',texto))
         if kit and cat not in ('memoria_ram', 'fan'):conflitos.append('kit_nao_suportado')
         if cat in ('processador','placa_video'):
@@ -63,7 +68,8 @@ class AssociacaoInteligenteService:
             if lm and rm and not lm & rm:conflitos.append('modelo_no_titulo_divergente')
         if cat=='memoria_ram':
             formato=' '.join(str(v) for v in valores(produto.especificacoes.get('formato_ram')))
-            if re.search(r'so.?dimm|notebook|laptop',formato) and not re.search(r'so.?dimm|notebook|laptop',local):
+            formato_local = converter_valor('formato_ram', getattr(peca, 'formato', None))
+            if re.search(r'so.?dimm|notebook|laptop',formato) and not (formato_local == 'sodimm' or re.search(r'so.?dimm|notebook|laptop',local)):
                 return dict(conflitos=conflitos,pendencias=['formato_notebook_nao_comprovado_localmente'])
             if re.search(r'so.?dimm|notebook|laptop',local) and formato=='dimm':conflitos.append('formato_desktop_divergente')
         return dict(conflitos=conflitos,pendencias=[])
@@ -171,8 +177,12 @@ class AssociacaoInteligenteService:
         if conflitos:pontos=0
         classificacao=self.classificar_percentual(pontos)
         criterio=next((c for c in ('mpn','gtin','codigo_fabricante','modelo_especificacoes') if c in provas),None)
+        codigos_identidade = {codigo(v) for v in (mpn, codigo_fabricante) if v}
+        codigo_conclusivo = n.get('codigo_modelo') and codigo(n['codigo_modelo']) in codigos_identidade
         return dict(classificacao=classificacao,percentual=pontos,criterio=criterio,versao=self.VERSAO,
             codigo_modelo=n.get('codigo_modelo'),
+            identidade_modelo_conflitante=bool(conflitos and m['pontos'] > 0 and (
+                codigo_conclusivo or peca.__tablename__ == 'processador' and n['exato'] and cpu(peca.modelo))),
             avisos=identificadores['avisos'],
             conflitos=sorted(set(conflitos)),pendencias=sorted(set(pendencias)),evidencias=sorted(provas),
             parcelas=dict(marca=m['pontos'],modelo=n['pontos'],titulo=n['titulo'],especificacoes=e['pontos'],identificador_conclusivo=bool(identificadores['evidencias'])),
@@ -188,7 +198,8 @@ class AssociacaoInteligenteService:
             for peca in pecas:
                 resultado = self.avaliar(peca, produto, identidade=identidades.get(peca.id))
                 total += 1
-                if resultado['conflitos'] and {'mpn', 'gtin', 'codigo_fabricante'}.intersection(resultado['evidencias']):
+                if (resultado.get('identidade_modelo_conflitante') or resultado['conflitos']
+                        and {'mpn', 'gtin', 'codigo_fabricante'}.intersection(resultado['evidencias'])):
                     conflito_identidade = True
                 yield dict(peca=f'{peca.__tablename__}:{peca.id}', **resultado)
 
@@ -201,6 +212,12 @@ class AssociacaoInteligenteService:
         if not unico and (percentual > 80 or not completo or conflito_identidade):
             percentual = min(80, max(60, percentual))
         classificacao='confirmada' if unico else self.classificar_percentual(min(percentual,80))
+        impedimentos = []
+        if conflito_identidade:impedimentos.append('identidade_existente_com_dados_contraditorios')
+        if not completo:impedimentos.append('busca_incompleta')
+        if segundo is not None and melhor['percentual'] > 80 and (segundo > 80 or melhor['percentual'] - segundo < 10):
+            impedimentos.append('candidatos_sem_margem_suficiente')
         return dict(classificacao=classificacao,percentual=percentual,criterio=melhor['criterio'] if unico else None,
+            impedimentos=impedimentos,
             peca=melhor['peca'] if unico else None,busca_completa=completo,candidatos=ordenados[:10],total_candidatos_avaliados=total,candidatos_omitidos=max(0,total-10),
             motivo='Correspondência única acima de 80' if unico else 'Avaliar candidatos' if classificacao=='ambigua' else 'Sem correspondência; avaliar cadastro ou enriquecimento')

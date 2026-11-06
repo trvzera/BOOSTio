@@ -1,10 +1,9 @@
 """Importação reutilizável. A consulta externa pertence ao adaptador de cada loja."""
 from datetime import datetime, timezone
-from models import ProdutoPendente,IdentidadeFabricante
 from repositories.importacao_catalogo_repository import RepositorioImportacaoCatalogo
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_documento
-from .associacao_inteligente_service import AssociacaoInteligenteService
+from .indice_candidatos_service import IndiceCandidatosService
 from .validar_ficha_tecnica_service import ValidarFichaTecnicaService
 
 
@@ -21,8 +20,9 @@ class ImportarCatalogoService:
             if atual.status=='importado':return dict(acao='inalterada',pendencia_id=atual.id,oferta_id=atual.oferta_id)
             if atual.loja!=produto.loja or atual.categoria_sugerida!=categoria or assinatura_documento(atual.dados_originais)!=assinatura_original:
                 raise ValueError('Pendência mudou durante a consulta')
-            pool=modelos[categoria].pool_para_matching(2001);identidades=IdentidadeFabricante.para_matching(pool[:2000])
-            motor=AssociacaoInteligenteService();decisao=motor.selecionar(pool[:2000],produto,identidades=identidades,completo=len(pool)<=2000)
+            indice=IndiceCandidatosService.carregar(modelos[categoria])
+            pool=indice.pecas
+            decisao=indice.avaliar(produto)
             if decisao['classificacao']=='ambigua':
                 motivo='Pontuação entre 60 e 80, candidatos próximos ou busca incompleta; avaliar'
                 if not simular:self.repositorio.registrar_revisao(atual,ficha,motivo)

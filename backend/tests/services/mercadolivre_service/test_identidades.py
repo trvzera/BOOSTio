@@ -66,5 +66,5 @@ def test_divergencias_nao_cadastram(contexto, mudanca):
 
 
 def test_codigos_internos_nao_sao_mpn():
-    for codigo in ['SEED-RAM-1', 'REDE-WIFI-01', 'DEMO-1', 'BOOSTIO-1']:
+    for codigo in ['SEED-RAM-1', 'REDE-WIFI-01', 'KABUM-123', 'DEMO-1', 'BOOSTIO-1']:
         assert AssociarCatalogoService._mpn(SimpleNamespace(part_number=codigo)) is None

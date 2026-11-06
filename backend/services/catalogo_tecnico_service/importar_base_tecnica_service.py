@@ -3,10 +3,9 @@ import re
 import json
 from datetime import datetime
 from decimal import Decimal
-from models import db, IdentidadeFabricante
+from models import db
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
-from services.catalogo_service.associacao_inteligente_service import AssociacaoInteligenteService
 from services.catalogo_service.validar_ficha_tecnica_service import ValidarFichaTecnicaService
 from services.catalogo_service.conferir_especificacoes_service import converter
 from services.catalogo_service.normalizar_produto import codigo, gtin
@@ -109,15 +108,16 @@ class ImportarBaseTecnicaService:
                 estado='em_revisao' if avaliacao['conflitos'] else 'pendente_dados'
                 ficha.transicionar(estado,motivo='Ficha incompleta ou conflitante',responsavel=responsavel)
                 return dict(acao='revisao',**ficha.resumo())
-            pool=modelo.pool_para_matching(2001);identidades=IdentidadeFabricante.para_matching(pool[:2000])
-            decisao=AssociacaoInteligenteService().selecionar(pool[:2000],avaliacao['produto'],identidades=identidades,completo=len(pool)<=2000)
+            from services.catalogo_service.indice_candidatos_service import IndiceCandidatosService
+            indice=IndiceCandidatosService.carregar(modelo)
+            pool,identidades=indice.pecas,indice.identidades
+            decisao=indice.avaliar(avaliacao['produto'])
             identidade=documento['identidade'];mpn=identidade.get('mpn');ean=identidade.get('gtin')
             existentes=[p for p in pool if (mpn and codigo(identidades.get(p.id,{}).get('mpn') or p.part_number or '')==codigo(mpn))
                 or (ean and identidades.get(p.id,{}).get('gtin')==ean)]
             alvo=next((p for p in pool if f'{p.__tablename__}:{p.id}'==decisao.get('peca')),None)
             motivo=None
-            if len(pool)>2000:motivo='Pool incompleto; revisão necessária'
-            elif decisao['classificacao']=='ambigua':motivo='Candidatos ambíguos'
+            if decisao['classificacao']=='ambigua':motivo='Candidatos ambíguos'
             elif existentes and (len(existentes)>1 or alvo not in existentes):motivo='Identificador existente com dados conflitantes; não duplicar'
             elif ficha.peca_id and (not alvo or alvo.id!=ficha.peca_id):motivo='Origem já vinculada a outra identidade; não substituir a peça'
             elif alvo and not alvo.publicavel:motivo='Peça local aguarda revisão; não liberar automaticamente'

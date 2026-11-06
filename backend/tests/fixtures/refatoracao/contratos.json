@@ -1,0 +1,9 @@
+{
+  "prompt:desempenho:0": "4d221fc046ab1972362260659ee3ff630cad641203ab50f50d72d227b13e336f",
+  "prompt:desempenho:20": "c9c6ee7ad2b4fb705ca001f95f1ec564ba80e8dd653a159ea3bc7772519617b7",
+  "prompt:custo_beneficio:0": "fb388edc9f67826dd40302ca54a2f2c570c71f02d57c95294efad18380803732",
+  "prompt:custo_beneficio:20": "e165283d59a7ad870dfdc7efada7b51469906656357ed13b2ec3ba8eaffdd25d",
+  "seed": "3fb646e43da31888b61c4f4ce34d2fb8abaedc233f6b1d1cf6c2040ce53e303a",
+  "esquema:sqlite": "19223c19a6305d63652ee0a11f421523f59baa62e397441a822902cb0b421467",
+  "esquema:mysql": "d47ff9add7ebce556ecf6e35fea4215f3ad31d9d07a51342b6a96c834f667e1c"
+}

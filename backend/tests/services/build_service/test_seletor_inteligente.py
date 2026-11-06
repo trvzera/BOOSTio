@@ -164,11 +164,11 @@ def test_perifericos_seguem_reserva_e_painel_da_montagem(banco):
     from models import Monitor
     campos = dict(conexao='HDMI', tamanho_polegadas=24, resolucao='1920x1080', taxa_atualizacao_hz=60)
     permitido = salvar_modelo(Monitor, 900, tipo_painel='IPS', **campos)
-    salvar_modelo(Monitor, 950, tipo_painel='TN', **campos)
+    alternativa = salvar_modelo(Monitor, 950, tipo_painel='TN', **campos)
     salvar_modelo(Monitor, 1001, tipo_painel='VA', **campos)
     dados = dict(orcamento=5000, prioridade_montagem='desempenho')
     assert ids(dados) == []
-    assert ids({**dados, 'percentual_perifericos': 20}) == [permitido]
+    assert set(ids({**dados, 'percentual_perifericos': 20})) == {permitido, alternativa}
 
 
 def test_reaproveitamento_exclui_cpu_e_ambos_os_armazenamentos(banco, mocker):

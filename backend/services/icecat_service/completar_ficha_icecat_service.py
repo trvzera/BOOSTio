@@ -9,8 +9,8 @@ from services.catalogo_service.normalizar_produto import codigo, gtin
 from services.catalogo_service.conferir_especificacoes_service import valores
 from services.catalogo_service.validar_ficha_tecnica_service import ValidarFichaTecnicaService
 from .indice_icecat_service import IndiceIcecatService
-from .normalizar_ficha_icecat_service import NormalizarFichaIcecatService
-from .obter_ficha_icecat_service import ObterFichaIcecatService
+from .normalizar_ficha_icecat_service import NormalizarFichaIcecatService, CategoriaIcecatIncompativel
+from .obter_ficha_icecat_service import ObterFichaIcecatService, ErroConsultaIcecat
 
 
 class CompletarFichaIcecatService:
@@ -33,8 +33,10 @@ class CompletarFichaIcecatService:
             diagnostico = self.indice.diagnosticar_ausencia(produto)
             avaliacoes = []
             for referencia in diagnostico['candidatos_para_revisao'][:3]:
-                tecnica = NormalizarFichaIcecatService().executar(
-                    self.fichas.executar(referencia), referencia, produto.categoria)
+                tecnica, erro = self._ler_candidato(referencia, produto.categoria)
+                if erro:
+                    avaliacoes.append(erro)
+                    continue
                 local = SimpleNamespace(__tablename__=produto.categoria, id=0,
                     part_number=tecnica['identidade']['mpn'], **tecnica['dados'])
                 comparacao = AssociacaoInteligenteService().avaliar(
@@ -49,8 +51,10 @@ class CompletarFichaIcecatService:
         candidatos = []
         diagnosticos = []
         for referencia in referencias:
-            corpo = self.fichas.executar(referencia)
-            tecnica = NormalizarFichaIcecatService().executar(corpo, referencia, produto.categoria)
+            tecnica, erro = self._ler_candidato(referencia, produto.categoria)
+            if erro:
+                diagnosticos.append(erro)
+                continue
             if codigo(tecnica['identidade']['mpn']) != referencia['mpn']:
                 raise ValueError('MPN da ficha Icecat diverge do índice')
             procurados = {gtin(v) for v in valores(produto.identificadores.get('gtin')) if gtin(v)}
@@ -78,3 +82,19 @@ class CompletarFichaIcecatService:
         nova.update(referencia_icecat=tecnica['referencia_icecat'],
                     icecat={'status':'encontrada', 'id':tecnica['referencia_icecat'], 'candidatos':diagnosticos})
         return produto, nova
+
+    def _ler_candidato(self, referencia, categoria):
+        try:
+            tecnica = NormalizarFichaIcecatService().executar(
+                self.fichas.executar(referencia), referencia, categoria)
+            return tecnica, None
+        except CategoriaIcecatIncompativel:
+            return None, dict(id=referencia['id'], classificacao='rejeitada',
+                              conflitos=['categoria_icecat_incompativel'], pendencias=[])
+        except ErroConsultaIcecat as erro:
+            if erro.status != 404:
+                raise
+            # Não aprovar outro candidato enquanto esta identidade não foi lida.
+            # Autenticação, rate limit e indisponibilidade geral ainda interrompem.
+            return None, dict(id=referencia['id'], classificacao='ambigua',
+                              conflitos=[], pendencias=['ficha_icecat_indisponivel'], http=404)

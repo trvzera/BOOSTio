@@ -89,15 +89,16 @@ class Peca(ModeloBase):
     return self.status_validacao in ('aprovado', 'legado') or (self.status_validacao is None and self.id is not None)
 
   def pendencias_para_montagem(self):
-    from services.catalogo_service.conferir_especificacoes_service import ESSENCIAIS, converter
-    campos = ESSENCIAIS.get(self.__tablename__, ())
+    from services.catalogo_service.conferir_especificacoes_service import converter
+    from services.catalogo_service.requisitos_montagem import MINIMOS, CONSUMO_CONFIRMADO
+    campos = MINIMOS.get(self.__tablename__, ())
     aliases = {'tipo_fone':'tipo','categoria_cabo':'categoria','formato_ram':'formato'}
     faltantes = [campo for campo in campos if converter(campo,getattr(self,aliases.get(campo,campo),None)) is None]
-    if self.__tablename__ == 'processador':
-      faltantes.extend(c for c in ('videointegrado','cooler') if getattr(self,c) is None)
-    externos = {'fonte','monitor','teclado','mouse','fone','cabo_rede','adaptador_wifi'}
-    if self.__tablename__ not in externos and self.consumo_energia is None:
-      faltantes.append('consumo_energia')
+    if self.__tablename__ in CONSUMO_CONFIRMADO:
+      consumo=self.consumo_energia
+      try: valido=not isinstance(consumo,bool) and consumo is not None and isfinite(float(consumo)) and float(consumo)>0
+      except (TypeError,ValueError,OverflowError): valido=False
+      if not valido:faltantes.append('consumo_energia')
     return sorted(set(faltantes))
 
   def situacao_catalogo(self):
@@ -136,6 +137,21 @@ class Peca(ModeloBase):
     return cls.query.order_by(cls.id).limit(limite).all()
 
   @classmethod
+  def iterar_para_matching(cls, tamanho_lote=500):
+    """Catálogo completo, incluindo fichas em revisão para detectar duplicatas."""
+    if type(tamanho_lote) is not int or not 1 <= tamanho_lote <= 1000:
+      raise ValueError('Tamanho do lote entre 1 e 1000')
+    ultimo_id = 0
+    while True:
+      # Materializa e fecha o cursor antes de consultar identidades. MySQL
+      # não permite outra consulta durante a leitura de cursor não bufferizado.
+      lote = cls.query.filter(cls.id > ultimo_id).order_by(cls.id).limit(tamanho_lote).all()
+      if not lote:
+        return
+      ultimo_id = lote[-1].id
+      yield from lote
+
+  @classmethod
   def lote_para_identificadores(cls, depois_id=0, limite=100):
     return cls.query.filter(cls.id > depois_id).order_by(cls.id).limit(limite).all()
 
@@ -148,8 +164,13 @@ class Peca(ModeloBase):
     return preencher_especificacoes(self, proposta, assinatura, simular=simular)
 
   @classmethod
-  def lote_para_ofertas(cls, depois_id=0, limite=50):
-    return cls.query.filter(cls.id > depois_id).order_by(cls.id).limit(limite).all()
+  def lote_para_ofertas(cls, depois_id=0, limite=50, *, somente_vinculadas=False):
+    consulta = cls.query.filter(cls.id > depois_id)
+    if somente_vinculadas:
+      from . import VinculoMercadoLivre
+      consulta = consulta.join(VinculoMercadoLivre, db.and_(
+        VinculoMercadoLivre.tabela_peca == cls.__tablename__, VinculoMercadoLivre.peca_id == cls.id))
+    return consulta.order_by(cls.id).limit(limite).all()
 
   @classmethod
   def com_link_kabum(cls):

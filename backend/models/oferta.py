@@ -97,7 +97,7 @@ class Oferta(ModeloBase):
         return 'criada'
 
     @classmethod
-    def aplicar_lote_mercado_livre(cls, peca, catalogo_id, assinatura, assinatura_catalogo, criterio, ofertas, agora, *, simular, confirmar=True, desativar_ausentes=True):
+    def aplicar_lote_mercado_livre(cls, peca, catalogo_id, assinatura, assinatura_catalogo, criterio, ofertas, agora, *, simular, confirmar=True, desativar_ausentes=True, validar_identidade=None):
         """Uma transação por peça; nunca altera preço/estoque da peça da KaBuM."""
         from . import VinculoMercadoLivre, HistoricoOferta, ControleColeta
         from utils.identidade_peca import assinatura_peca
@@ -109,7 +109,11 @@ class Oferta(ModeloBase):
             db.session.refresh(peca, with_for_update=not simular)
             if assinatura_peca(peca) != assinatura:
                 raise ValueError('A identificação da peça mudou durante a consulta')
+            if not simular and validar_identidade is not None and not validar_identidade():
+                raise ValueError('Identidade local mudou ou ficou ambígua; revisão necessária')
             vinculo = VinculoMercadoLivre.buscar(peca.__tablename__, peca.id, bloquear=not simular)
+            if vinculo and not vinculo.especificacoes_compativeis(peca):
+                raise ValueError('Especificações da peça mudaram desde a revisão')
             if vinculo and (vinculo.catalogo_id != catalogo_id or vinculo.assinatura_peca != assinatura or vinculo.assinatura_catalogo != assinatura_catalogo):
                 raise ValueError('Vínculo existente divergente; revisão necessária')
             consulta_vinculo = VinculoMercadoLivre.query.filter_by(catalogo_id=catalogo_id)
@@ -178,6 +182,8 @@ class Oferta(ModeloBase):
             if not inspetor.has_table(modelo.__tablename__):
                 raise ValueError('Prepare as tabelas com integracoes-tokens-preparar e mercadolivre-ofertas-preparar')
             colunas = {c['name'] for c in inspetor.get_columns(modelo.__tablename__)}
+            if modelo is VinculoMercadoLivre and colunas == {c.name for c in modelo.__table__.columns} - {'especificacoes_revisadas'}:
+                raise ValueError('Execute mercadolivre-vinculos-preparar antes de coletar ofertas')
             if colunas != {c.name for c in modelo.__table__.columns}:
                 raise ValueError('Esquema de ofertas/tokens incompatível; revise as migrations')
         if db.session.get(ControleColeta, 1) is None:
@@ -190,6 +196,8 @@ class Oferta(ModeloBase):
         from utils.identidade_peca import assinatura_campos
         # Leitura opcional: catálogo anterior continua funcionando antes da migration.
         if not pecas or not all(inspect(db.engine).has_table(t) for t in (cls.__tablename__, VinculoMercadoLivre.__tablename__)):
+            return pecas
+        if not VinculoMercadoLivre.tabela_preparada():
             return pecas
         referencias = []
         for peca in pecas:
@@ -204,7 +212,8 @@ class Oferta(ModeloBase):
             ficha = fichas[(registro.tabela_peca, registro.peca_id)]
             assinatura = assinatura_campos(registro.tabela_peca, registro.peca_id,
                 ficha.get('fabricante'), ficha.get('modelo'), ficha.get('part_number'))
-            if vinculo.assinatura_peca != assinatura:
+            from types import SimpleNamespace
+            if vinculo.assinatura_peca != assinatura or not vinculo.especificacoes_compativeis(SimpleNamespace(**ficha)):
                 continue
             dados = registro.para_exibicao()
             if dados is not None:

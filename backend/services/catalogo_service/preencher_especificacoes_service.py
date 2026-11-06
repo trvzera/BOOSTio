@@ -4,6 +4,7 @@ from models import ProdutoPendente
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from .classificar_pendencias_service import ClassificarPendenciasService
 from .enriquecer_peca_existente_service import EnriquecerPecaExistenteService
+from .indice_candidatos_service import IndiceCandidatosService
 
 
 class PreencherEspecificacoesService:
@@ -25,26 +26,26 @@ class PreencherEspecificacoesService:
                 modelo = modelos.get(pendencia.categoria_sugerida)
                 if modelo is None:
                     raise ValueError('Categoria desconhecida')
-                pecas = modelo.pool_para_matching(2001)
-                if len(pecas) > 2000:
-                    resultado = dict(status='revisao', motivo='Busca de peças incompleta')
+                indice = IndiceCandidatosService.carregar(modelo)
+                produtos = tuple(self.normalizar(pendencia))
+                # União das fichas normalizadas: divergência entre anúncio e
+                # catálogo não pode ocultar um candidato antes da conferência.
+                pecas = {p.id:p for produto in produtos for p in indice.candidatos(produto)}
+                candidatos = []
+                for peca in pecas.values():
+                    propostas = [motor.preparar(peca, produto) for produto in produtos]
+                    if propostas and all(p['status'] in ('proposta', 'inalterada') for p in propostas):
+                        candidatos.append((peca, propostas))
+                if len(candidatos) > 1:
+                    resultado = dict(status='revisao', motivo='Código e ficha correspondem a mais de uma peça')
+                elif not candidatos:
+                    resultado = dict(status='sem_correspondencia', motivo='Sem identidade e ficha suficientes para preencher')
                 else:
-                    produtos = tuple(self.normalizar(pendencia))
-                    candidatos = []
-                    for peca in pecas:
-                        propostas = [motor.preparar(peca, produto) for produto in produtos]
-                        if propostas and all(p['status'] in ('proposta', 'inalterada') for p in propostas):
-                            candidatos.append((peca, propostas))
-                    if len(candidatos) > 1:
-                        resultado = dict(status='revisao', motivo='Código e ficha correspondem a mais de uma peça')
-                    elif not candidatos:
-                        resultado = dict(status='sem_correspondencia', motivo='Sem identidade e ficha suficientes para preencher')
+                    peca, propostas = candidatos[0]
+                    if any(p.get('dados') != propostas[0].get('dados') for p in propostas):
+                        resultado = dict(status='revisao', motivo='Título e ficha divergem')
                     else:
-                        peca, propostas = candidatos[0]
-                        if any(p.get('dados') != propostas[0].get('dados') for p in propostas):
-                            resultado = dict(status='revisao', motivo='Título e ficha divergem')
-                        else:
-                            resultado = motor.executar(peca, produtos[0], simular=simular)
+                        resultado = motor.executar(peca, produtos[0], simular=simular)
                 contador = {'proposta':'propostas','atualizada':'atualizadas','inalterada':'inalteradas'}.get(resultado['status'], resultado['status'])
                 resumo[contador] += 1
                 resumo['detalhes'].append(dict(pendencia_id=identificador, **resultado))

@@ -88,6 +88,12 @@ class EnriquecerProdutoService:
         from services.catalogo_service.consultar_base_hardware_service import ConsultarBaseHardwareService
         from .normalizar_produto_service import NormalizarProdutoService
         normalizado=NormalizarProdutoService().executar(produto,categoria)
+        from services.catalogo_service.extrair_dados_tecnicos_service import ExtrairDadosTecnicosService
+        extraidos=ExtrairDadosTecnicosService().executar(modelo,normalizado)
+        conflitos.extend(extraidos['conflitos'])
+        for campo,valor in extraidos['dados'].items():
+            if campo not in dados:
+                dados[campo]=valor
         consulta=self.base_hardware.executar(normalizado)
         normalizado=consulta['produto']
         for campo,valor in consulta['dados'].items():
@@ -103,6 +109,6 @@ class EnriquecerProdutoService:
         pronto=not pendentes and not conflitos and validacao['pronto'] and 'Título individual requer revisão' not in avisos
         return dict(categoria=categoria,pronto=pronto,dados=dados,identidade=identidade,
             campos_pendentes=sorted(set(pendentes)),conflitos=sorted(set(conflitos)),avisos=avisos,
-            fontes={**consulta['fontes'], **{k:dict(url=f"https://api.mercadolibre.com/products/{produto.get('id')}"+("/items" if v.startswith("anuncio.") else ""),atributo=v) for k,v in origens.items()}},
+            fontes={**consulta['fontes'], **extraidos['fontes'], **{k:dict(url=f"https://api.mercadolibre.com/products/{produto.get('id')}"+("/items" if v.startswith("anuncio.") else ""),atributo=v) for k,v in origens.items()}},
             benchmark=benchmark,normalizado=asdict(normalizado),normalizacao_versao=NormalizarProdutoService.VERSAO,loja='mercado_livre',fonte_identidade=normalizado.fonte,base_hardware=consulta['status'],assinatura_catalogo=assinatura_catalogo(produto),produto=produto,
             coletado_em=datetime.now(timezone.utc).isoformat())

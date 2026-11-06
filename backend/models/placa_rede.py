@@ -7,8 +7,8 @@ class PlacaRede(Peca):
 
     interface = db.Column(db.String(20), nullable=False)
     padrao_wifi = db.Column(db.String(20), nullable=False)
-    velocidade_mbps = db.Column(db.Integer, nullable=False)
-    bluetooth = db.Column(db.Boolean, nullable=False, default=False)
+    velocidade_mbps = db.Column(db.Integer, nullable=True)
+    bluetooth = db.Column(db.Boolean, nullable=True, default=False)
 
     @classmethod
     def atualizar_links_antigos(cls, trocas):

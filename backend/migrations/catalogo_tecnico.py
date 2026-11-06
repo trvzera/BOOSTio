@@ -8,7 +8,7 @@ from .fichas_tecnicas import preparar_fichas_tecnicas
 CAMPOS_NULOS=('preco','esgotado','consumo_energia')
 
 
-def preparar_catalogo_tecnico(*, simular=True):
+def preparar_catalogo_tecnico(*, simular=True, campos_por_tabela=None):
     dialecto=db.engine.dialect.name
     if dialecto not in ('sqlite','mysql'):raise ValueError('Banco não suportado')
     fila=preparar_fichas_tecnicas(simular=True)
@@ -20,7 +20,8 @@ def preparar_catalogo_tecnico(*, simular=True):
         esperadas=set(modelo.__table__.columns.keys())
         if set(colunas) not in (esperadas,esperadas-{'ficha_montagem_validada'}):
             raise ValueError(f'Prepare o esquema anterior com catalogo-preparar: {nome}')
-        mudar=[c for c in CAMPOS_NULOS if not colunas[c]['nullable']]
+        campos=tuple(dict.fromkeys((*CAMPOS_NULOS, *(campos_por_tabela or {}).get(nome, ()))))
+        mudar=[c for c in campos if not colunas[c]['nullable']]
         flag='ficha_montagem_validada' not in colunas
         if mudar or flag:
             tabelas.append((nome,mudar,flag))
@@ -56,7 +57,7 @@ def preparar_catalogo_tecnico(*, simular=True):
                 extras=conn.exec_driver_sql("SELECT sql FROM sqlite_master WHERE tbl_name=? AND type IN ('index','trigger') AND sql IS NOT NULL",(nome,)).scalars().all()
                 original=Table(nome,MetaData(),autoload_with=conn)
                 temporaria=original.to_metadata(MetaData(),name='__tecnico_'+nome)
-                for campo in CAMPOS_NULOS:temporaria.c[campo].nullable=True
+                for campo in mudar:temporaria.c[campo].nullable=True
                 if flag:
                     from sqlalchemy import Column,Boolean
                     temporaria.append_column(Column('ficha_montagem_validada',Boolean(),nullable=True))

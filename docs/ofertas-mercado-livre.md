@@ -21,7 +21,7 @@ criar tabelas. Requer tabelas de controle de coleta já preparadas. DDL MySQL n�
 
 ## Simulação e aplicação
 
-Simula por padrão, com até cinco ofertas novas de vendedores distintos:
+Simula por padrão, com uma oferta nova por peça (limite configurável):
 
 ```sh
 docker compose --env-file .env.production run --rm --no-deps api \
@@ -347,3 +347,108 @@ Não renovar a mesma família de refresh tokens no local e na VPS. Cada ambiente
 deve manter sua própria autorização e seu banco como fonte de credenciais.
 
 Referência: [autorização oficial Mercado Livre](https://developers.mercadolivre.com.br/autenticacao-e-autorizacao).
+
+
+Para a revisão manual e aplicação do manifesto nas seeds ou em um banco existente,
+consulte [o lote revisado e os comandos](revisao-manual-mercadolivre.md).
+
+
+## Teste local eficiente, mínimos técnicos e retomada
+
+O comando `mercadolivre-ofertas-atualizar` usa o novo comparador. O padrão é
+simulação, uma oferta por peça e somente peças que passam em
+`pendencias_para_montagem()`. Não depende apenas do indicador persistido de ficha:
+as regras são recalculadas para incluir também registros antigos. O banco usado
+é o `URL_DATABASE` do ambiente do backend; este comando não copia nem importa o
+catálogo BuildCores automaticamente.
+
+Da raiz do projeto:
+
+```bash
+cd backend
+../venv/bin/python -m flask --app app mercadolivre-ofertas-atualizar \
+  --todas --somente-com-minimos --ofertas-por-peca 1 \
+  --max-requisicoes 100000 --intervalo 0.35 \
+  --resumo ../output/ofertas-local.json
+```
+
+`--todas` remove o limite de peças, sem remover o orçamento de requisições nem o
+tratamento de HTTP 429. `--max-requisicoes` é um orçamento da execução local, não
+uma declaração de cota permitida pelo Mercado Livre. Não acrescente `--aplicar`
+para fazer o teste. `--limite-pecas 100`, sem `--todas`, permite um lote menor.
+
+Em outro terminal, confira `output/ofertas-local.json` a partir da raiz. O arquivo
+é atualizado durante a execução; os detalhes vão para
+`output/ofertas-local.detalhes.jsonl`. A saída final também apresenta o resumo.
+
+Para continuar, repita o mesmo comando acrescentando `--retomar`. Os cursores são
+por categoria, e a peça que falhou não é marcada como concluída. Os resultados
+anteriores entram nas contagens acumuladas; falhas anteriores ficam separadas. Não
+mude o banco, o modo simulação/aplicação, os filtros ou a quantidade de ofertas na
+retomada. Use outro arquivo para iniciar outra execução. Um lock local impede dois
+processos de usarem o mesmo relatório. O orçamento HTTP vale por invocação, podendo
+ser ajustado ao retomar. Consultas em andamento no instante de uma interrupção
+podem ser repetidas; resultados concluídos com checkpoint não são consultados de novo.
+
+Preparação de tabelas e OAuth continuam sendo requisitos. O comando detecta esquema
+incompleto antes da primeira chamada HTTP. Se necessário, use as migrations já
+existentes `mercadolivre-ofertas-preparar` e `integracoes-tokens-preparar`; configure
+ou reautorize os tokens pelo fluxo OAuth existente. Não reutilize refresh tokens
+antigos de uma cópia do banco: o proprietário das credenciais deve ser o armazenamento
+oficial, evitando duas cópias renovando o mesmo token.
+
+### Organização e eficiência
+
+- `AtualizarOfertasMercadoLivreService`: percorre os registros por ID, filtra os
+  mínimos antes de consultar a API e informa o progresso. Com relatório incremental,
+  não mantém todos os detalhes na memória. Não cria novos componentes.
+- `AssociarCatalogoService.localizar_candidatos`: carrega o índice da categoria uma
+  vez durante a simulação e compara cada resultado remoto individualmente. Não exige
+  que existam apenas vinte produtos na pesquisa inteira. Nomes semelhantes continuam
+  sem autorizar associação, e duplicatas locais continuam bloqueando a escolha.
+- `ClienteCatalogoCacheService`: conexão HTTP reutilizada; cache LRU de até 128
+  respostas durante 60 segundos, restrito à execução e ao token. Não armazena erros.
+  Na aplicação, detalhe atual e cotações sempre consultam a API.
+- `RelatorioOfertasService`: progresso JSON atômico, detalhes incrementais em JSONL,
+  validação dos filtros e retomada, independente da loja.
+
+O resultado do catálogo é revalidado antes de usar suas ofertas. Quando um produto
+comprovado não tem ofertas, tenta o próximo candidato comprovado; HTTP 403/404 de um
+catálogo fica para revisão, e HTTP 429/5xx interrompe conforme o controle existente.
+O critério é escolher uma oferta comprovada, sem presumir que exista um único
+produto remoto em todo o Mercado Livre. O preço é comparado dentro do catálogo
+consultado; não há promessa de menor preço global entre todos os resultados.
+
+Na gravação, a identidade é conferida novamente com o catálogo local atual dentro
+do bloqueio transacional, evitando gravar a partir de um índice de simulação
+obsoleto. Fichas locais ainda em revisão não são aprovadas nem recebem gravação de
+oferta por esse comando. Os preços e estoques da tabela de componentes são preservados.
+
+Validação real do comando oficial: três processadores consultados, duas propostas
+com oferta, um caso em revisão, sete requisições HTTP e zero gravações. Isso é um
+lote pequeno de verificação, não o resultado da varredura de todas as peças.
+Relatório local: `output/associacao-v7/oficial-simulacao.json`; auditoria dos dados:
+`output/associacao-v7/auditoria-oficial.json`. A preparação local criou apenas as
+outrora ausentes tabelas de vínculos e histórico, depois de backup; os dados das
+33 tabelas anteriores foram preservados. Não houve alteração na VPS.
+
+### Busca progressiva de candidatos
+
+A associação tenta primeiro o MPN do fabricante, depois marca e nome comercial
+(com capacidade no armazenamento/RAM), e por último o nome original. A limpeza
+para busca retira blocos descritivos entre colchetes com unidades técnicas; a
+comparação continua usando o registro original completo, incluindo variantes.
+Não há relaxamento do limite de aprovação nem da unicidade no catálogo local.
+
+Cada peça usa no máximo quatro consultas de pesquisa, com até duas páginas de
+20 resultados por texto. A busca para assim que encontra candidatos comprovados;
+IDs repetidos entre consultas não são reavaliados. Respostas inválidas e erros
+HTTP interrompem o fluxo existente, sem usar uma busca alternativa para contornar
+429. O orçamento global de requisições também continua valendo. Isso pode gastar
+mais requisições nas peças difíceis; não constitui garantia de cobertura.
+
+O relatório registra `buscas` (texto, offset, total e recebidos), inclusive nas
+associações bem-sucedidas. `total_busca` é o maior total informado entre buscas,
+não a soma de anúncios distintos; `candidatos_unicos` conta os IDs examinados.
+`busca_remota_completa` indica conclusão da última consulta, não de todo o site.
+As regras de validação final, simulação e persistência permanecem aplicáveis.

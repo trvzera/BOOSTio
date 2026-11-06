@@ -48,7 +48,9 @@ def cadastrar_pecas(tipos):
         modelo = MODELOS[tipo]
         dados = {"status_validacao": "aprovado", "fabricante": "Teste", "modelo": tipo, "preco": 100, "consumo_energia": 1}
         for coluna in modelo.__table__.columns:
-            if coluna.name not in dados and not coluna.nullable and not coluna.primary_key and not coluna.default and not coluna.server_default:
+            from models.campos_tecnicos import CAMPOS_TECNICOS_OBRIGATORIOS
+            obrigatoria = not coluna.nullable or coluna.name in CAMPOS_TECNICOS_OBRIGATORIOS.get(tipo, ())
+            if coluna.name not in dados and obrigatoria and not coluna.primary_key and not coluna.default and not coluna.server_default:
                 dados[coluna.name] = "Teste" if coluna.type.python_type is str else 1
         if tipo == "processador":
             dados.update(videointegrado=True, cooler=True, soquete="AM4")
@@ -274,6 +276,9 @@ def resposta_com_perifericos():
     catalogo = {item["tipo"]: [{"id": 1, "fabricante": "Teste", "modelo": item["tipo"],
                 "preco": 800 if item["tipo"] == "processador" else 50 if item["tipo"] in CriarBuildService.PERIFERICOS else 20}] for item in itens}
     catalogo["gabinete"][0]["fans_inclusos"] = 1
+    catalogo["processador"][0].update(videointegrado=True,cooler=True,consumo_energia=65)
+    catalogo["fonte"][0]["potencia_w"] = 500
+    catalogo["memoria_ram"][0]["quantidade_pentes"] = 1
     catalogo["monitor"][0]["tipo_painel"] = "IPS"
     return {**PEDIDO, "componentes": itens}, catalogo
 
@@ -881,7 +886,7 @@ def test_gpu_disponivel_nao_dispara_nova_compra_quando_gpu_ja_e_propria(mocker):
     catalogo["placa_video"] = [{"id": 1, "fabricante": "Teste", "modelo": "Outra GPU", "preco": 3000}]
     llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value=build)
     resultado = CriarBuildService()._gerar_validada(1, "Pedido", "teste", catalogo, 8000, 0,
-                                                 {"placa_video": "GPU já comprada"}, {}, {}, revisar_investimento=True)
+                                                 {"placa_video": "GPU já comprada"}, {"placa_video":{"especificacoes_confirmadas":{"consumo_energia":150}}}, {}, revisar_investimento=True)
     assert resultado["preco_total"] == 900 and not any(i["tipo"] == "placa_video" for i in resultado["componentes"])
     llm.assert_called_once()
 
@@ -890,7 +895,7 @@ def test_gpu_pode_ser_avaliada_quando_cpu_com_video_integrado_deixa_margem(mocke
     build, catalogo = resposta_com_perifericos()
     build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in CriarBuildService.PERIFERICOS]
     catalogo["processador"][0]["videointegrado"] = True
-    catalogo["placa_video"] = [{"id": 1, "fabricante": "Teste", "modelo": "GPU dedicada", "preco": 3000}]
+    catalogo["placa_video"] = [{"id": 1, "fabricante": "Teste", "modelo": "GPU dedicada", "preco": 3000, "consumo_energia": 150}]
     segunda = deepcopy(build)
     segunda["componentes"].append({"tipo": "placa_video", "id": 1, "quantidade": 1})
     llm = mocker.patch("services.build_service.criar_build_service.LLMService.executar", side_effect=[build, segunda])

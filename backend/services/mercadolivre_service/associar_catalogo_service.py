@@ -4,11 +4,131 @@ from models import VinculoMercadoLivre, IdentidadeFabricante
 
 
 class AssociarCatalogoService:
+    def __init__(self):
+        self._categoria = None
+        self._catalogo_local = None
+        self._decisoes = {}
+
+    def _indice(self, modelo):
+        from services.catalogo_service.indice_candidatos_service import IndiceCandidatosService
+        if self._categoria != modelo.__tablename__:
+            self._catalogo_local = IndiceCandidatosService.carregar(modelo)
+            self._categoria = modelo.__tablename__
+            self._decisoes.clear()
+        return self._catalogo_local
+
+    def localizar_candidatos(self, peca, cliente, token):
+        """Resultados remotos são independentes; cada um exige unicidade local."""
+        from services.catalogo_service.associacao_inteligente_service import AssociacaoInteligenteService
+        from .normalizar_produto_service import NormalizarProdutoService, DOMINIOS
+        from utils.identidade_peca import assinatura_catalogo
+        existente = VinculoMercadoLivre.buscar(peca.__tablename__, peca.id)
+        assinatura = assinatura_peca(peca)
+        if existente:
+            if existente.assinatura_peca != assinatura or not existente.especificacoes_compativeis(peca):
+                return dict(status='revisao', motivo='Identificação da peça mudou desde a associação', catalogos=[])
+            return dict(status='encontrada', catalogos=[dict(catalogo_id=existente.catalogo_id,
+                assinatura=assinatura, criterio=existente.criterio, assinatura_catalogo=existente.assinatura_catalogo)])
+        indice = self._indice(type(peca))
+        motor, normalizador = AssociacaoInteligenteService(), NormalizarProdutoService()
+        catalogos, revisao, vistos, buscas = [], [], set(), []
+        consultas = self.consultas(peca)
+        for consulta in consultas:
+            offset = 0
+            while len(buscas) < 4:
+                parametros = dict(site_id='MLB', status='active', q=consulta, limit=20)
+                if offset:
+                    parametros['offset'] = offset
+                if peca.__tablename__ in DOMINIOS:
+                    parametros['domain_id'] = DOMINIOS[peca.__tablename__]
+                dados = cliente._consultar('/products/search', token, params=parametros)
+                linhas, total = self._validar_pagina(dados, cliente)
+                buscas.append(dict(consulta=consulta, offset=offset, total=total, recebidos=len(linhas)))
+                novos = 0
+                for produto in linhas:
+                    if produto['id'] in vistos:
+                        continue
+                    vistos.add(produto['id'])
+                    novos += 1
+                    normal = normalizador.executar(produto, peca.__tablename__)
+                    comparacao = motor.avaliar(peca, normal, identidade=indice.identidades.get(peca.id))
+                    revisao.append(dict(catalogo_id=produto['id'], nome=normal.titulo, comparacao=comparacao))
+                    if comparacao['classificacao'] != 'confirmada':
+                        continue
+                    chave = assinatura_catalogo(produto)
+                    if chave not in self._decisoes:
+                        if len(self._decisoes) >= 256:
+                            self._decisoes.clear()
+                        self._decisoes[chave] = indice.avaliar(normal)
+                    decisao = self._decisoes[chave]
+                    if decisao['classificacao'] == 'confirmada' and decisao['peca'] == f'{peca.__tablename__}:{peca.id}':
+                        catalogos.append(dict(catalogo_id=produto['id'], assinatura=assinatura,
+                            criterio=comparacao['criterio'], percentual=comparacao['percentual']))
+                # Uma identidade comprovada já basta. Nunca paginar indefinidamente
+                # nem repetir páginas ignoradas pelo servidor.
+                if catalogos or not novos or len(linhas) < 20 or offset + len(linhas) >= total or offset >= 20:
+                    break
+                offset += len(linhas)
+            if catalogos or len(buscas) >= 4:
+                break
+        catalogos.sort(key=lambda c:(-c['percentual'], c['catalogo_id']))
+        revisao.sort(key=lambda c: -c['comparacao']['percentual'])
+        completa = all(b['offset'] + b['recebidos'] >= b['total'] for b in buscas[-1:])
+        return dict(status='encontrada' if catalogos else 'nao_encontrada' if not vistos else 'revisao',
+            catalogos=catalogos, busca_remota_completa=completa, total_busca=max(b['total'] for b in buscas),
+            buscas=buscas, candidatos_unicos=len(vistos),
+            motivo='Cada candidato requer identidade e unicidade local comprovadas', candidatos=revisao[:5])
+
+    def consultas(self, peca):
+        """MPN, nome comercial limpo e nome original; nunca remove variantes."""
+        modelo = str(peca.modelo or '').strip()
+        # Só retira blocos descritivos que contêm unidades técnicas. Não apaga
+        # sufixos de modelo, capacidade, Ti, SUPER, XT ou notebook fora deles.
+        limpo = re.sub(r'\[([^\]]*)\]', lambda m: '' if re.search(
+            r'\b(?:gb|tb|mhz|ghz|sata|nvme|ddr[345])\b', m[1], re.I) else m[0], modelo)
+        capacidade = getattr(peca, 'capacidade_gb', None)
+        if peca.__tablename__ in ('ssd', 'hd', 'memoria_ram') and capacidade and not re.search(r'\d\s*(?:gb|tb)\b', limpo, re.I):
+            limpo += f' {capacidade:g}GB'
+        marca = str(peca.fabricante or '').strip()
+        candidatos = [self._mpn(peca), f'{marca} {limpo}', f'{marca} {modelo}']
+        consultas, vistas = [], set()
+        for valor in candidatos:
+            valor = re.sub(r'\s+', ' ', valor or '').strip()
+            if valor and valor.casefold() not in vistas:
+                consultas.append(valor)
+                vistas.add(valor.casefold())
+        return consultas
+
+    @staticmethod
+    def _validar_pagina(dados, cliente):
+        if not isinstance(dados, dict):
+            raise ValueError('Resposta de busca de catálogo inválida')
+        linhas, pagina = dados.get('results'), dados.get('paging')
+        total = pagina.get('total') if isinstance(pagina, dict) else None
+        if not isinstance(linhas, list) or type(total) is not int or total < len(linhas) or len(linhas) > 20:
+            raise ValueError('Resposta de busca de catálogo inválida')
+        vistos = set()
+        for produto in linhas:
+            if not isinstance(produto, dict):
+                raise ValueError('Candidato de catálogo inválido')
+            cliente._validar_id(produto.get('id'), 'catálogo')
+            if produto['id'] in vistos:
+                raise ValueError('Catálogo repetido na pesquisa')
+            vistos.add(produto['id'])
+        return linhas, total
+
+    def conferir_detalhe(self, peca, produto, *, recarregar=False):
+        from services.catalogo_service.indice_candidatos_service import IndiceCandidatosService
+        from .normalizar_produto_service import NormalizarProdutoService
+        indice = IndiceCandidatosService.carregar(type(peca)) if recarregar else self._indice(type(peca))
+        decisao = indice.avaliar(NormalizarProdutoService().executar(produto, peca.__tablename__))
+        return decisao['classificacao'] == 'confirmada' and decisao['peca'] == f'{peca.__tablename__}:{peca.id}'
+
     def executar(self, peca, cliente, token):
         assinatura = assinatura_peca(peca)
         existente = VinculoMercadoLivre.buscar(peca.__tablename__, peca.id)
         if existente:
-            if existente.assinatura_peca != assinatura:
+            if existente.assinatura_peca != assinatura or not existente.especificacoes_compativeis(peca):
                 return {'status': 'revisao', 'motivo': 'Identificação da peça mudou desde a associação'}
             return {'status': 'encontrada', 'catalogo_id': existente.catalogo_id,
                     'assinatura': assinatura, 'criterio': existente.criterio,
@@ -44,10 +164,10 @@ class AssociarCatalogoService:
 
     @staticmethod
     def _unica_local(peca, produto):
-        from .comparar_produtos_service import CompararProdutosService
-        pecas = type(peca).pool_para_matching(2001)
-        decisao = CompararProdutosService().selecionar(pecas[:2000], produto,
-            identidades=IdentidadeFabricante.para_matching(pecas[:2000]), completo=len(pecas) <= 2000)
+        from services.catalogo_service.indice_candidatos_service import IndiceCandidatosService
+        from .normalizar_produto_service import NormalizarProdutoService
+        indice = IndiceCandidatosService.carregar(type(peca))
+        decisao = indice.avaliar(NormalizarProdutoService().executar(produto, peca.__tablename__))
         return decisao['classificacao'] == 'confirmada' and decisao['peca'] == f'{peca.__tablename__}:{peca.id}'
 
     @staticmethod

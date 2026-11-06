@@ -71,6 +71,9 @@ def converter(campo, valor):
         return 'nvme' if 'nvme' in s else 'sata' if 'sata' in s else None
     if campo=='interface':
         s=re.sub(r'\bpci\s*express\b','pcie',s).replace('pci-e','pcie')
+        velocidade_sata = re.fullmatch(r'sata\s*(1[.,]5|3(?:[.,]0)?|6(?:[.,]0)?)\s*g(?:b/s|bps|bit/s)', s)
+        if velocidade_sata:
+            return {1.5:'sata1', 3.0:'sata2', 6.0:'sata3'}[float(velocidade_sata[1].replace(',', '.'))]
         sata = re.fullmatch(r'sata\s*(?:rev(?:ision)?\.?\s*)?(iii|ii|i|[123](?:\.0)?)\s*(?:\(?\s*(1[.,]5|3|6)\s*g(?:b/s|bps|bit/s)\s*\)?)?', s)
         if sata:
             geracao = {'i':1,'ii':2,'iii':3}.get(sata[1], None)
@@ -115,7 +118,12 @@ def extrair_titulo(categoria,titulo):
         kit=re.search(r'\b(\d+)\s*[x×]\s*(\d+)\s*gb',texto)
         if categoria=='memoria_ram' and kit:
             dados['quantidade_pentes']=[kit[1]];dados['capacidade_gb']=[str(int(kit[1])*int(kit[2]))+' gb']
-        else:unico('memoria_gb' if categoria=='placa_video' else 'capacidade_gb',r'\b(\d+(?:[.,]\d+)?)\s*(gb|tb)\b',lambda m:''.join(m))
+            # Capacidade do módulo não é a capacidade total. Outros totais
+            # explícitos, porém, também precisam concordar com o kit anunciado.
+            restante = texto[:kit.start()] + texto[kit.end():]
+            extras = re.findall(r'\b(\d+(?:[.,]\d+)?)\s*(gb|tb)\b(?!\s*(?:/|ps\b))', restante)
+            dados['capacidade_gb'].extend(''.join(v) for v in extras)
+        else:unico('memoria_gb' if categoria=='placa_video' else 'capacidade_gb',r'\b(\d+(?:[.,]\d+)?)\s*(gb|tb)\b(?!\s*(?:/|ps\b))',lambda m:''.join(m))
     if categoria=='memoria_ram':
         unico('formato_ram',r'\b(so[ -]?dimm|dimm)\b',lambda m:m)
         unico('ddr',r'\b(ddr\s*[345])\b',lambda m:m)
@@ -140,6 +148,21 @@ def extrair_titulo(categoria,titulo):
 
 
 class ConferirEspecificacoesService:
+    @staticmethod
+    def confrontar_titulo(campo, estruturados, titulo):
+        """Não deixe um atributo correto esconder outro valor explícito no título."""
+        if not estruturados or not titulo:
+            return False
+        ficha = {converter(campo, v) for v in valores(estruturados)}
+        texto = {converter(campo, v) for v in valores(titulo)}
+        if None in ficha or None in texto:
+            return False
+        if campo in CONJUNTOS:
+            ficha, texto = {agregar(ficha)}, {agregar(texto)}
+        if campo == 'interface':
+            ficha, texto = consolidar_interfaces(ficha), consolidar_interfaces(texto)
+        return ficha != texto
+
     def executar(self, peca, produto):
         campos=ESSENCIAIS.get(peca.__tablename__,())
         if peca.__tablename__ == 'teclado' and getattr(peca, 'mecanico', False) is True:
@@ -147,6 +170,8 @@ class ConferirEspecificacoesService:
         dados=dict(produto.especificacoes);titulo=extrair_titulo(peca.__tablename__,produto.titulo)
         conflitos=[];ausentes=[];conferidos=[]
         for campo in dict.fromkeys((*campos,*OPCIONAIS.get(peca.__tablename__,()))):
+            if self.confrontar_titulo(campo, dados.get(campo), titulo.get(campo)):
+                conflitos.append('titulo_divergente:'+campo)
             valor_local=getattr(peca, {'tipo_fone':'tipo','categoria_cabo':'categoria'}.get(campo,campo),None)
             if campo=='formato_ram':
                 valor_local=getattr(peca,'formato',None) or valor_local

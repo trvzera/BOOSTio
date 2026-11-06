@@ -180,6 +180,27 @@ def test_autorizacao_oauth_convite_consumido_uma_vez_no_mysql(banco):
         resultados=list(executor.map(lambda _:consumir(),range(2)))
     assert sorted(resultados)==sorted(['v'*64,'recusado'])
 
+
+def test_migracao_e_importacao_manual_preservam_vinculos_mysql(banco):
+    from migrations.vinculos_revisados import preparar_vinculos_revisados
+    app,p=banco
+    preparar()
+    VinculoMercadoLivre.registrar_revisado(p,'MLB111',assinatura_peca(p),'c'*64)
+    pid=p.id
+    db.session.remove()
+    with db.engine.begin() as conn:
+        conn.execute(text('ALTER TABLE vinculo_mercado_livre DROP COLUMN especificacoes_revisadas'))
+    assert len(preparar_vinculos_revisados()['alteracoes'])==1
+    assert preparar_vinculos_revisados()['alteracoes']==[]
+    p=Processador.buscar_por_id(pid)
+    args=(p,'MLB111',assinatura_peca(p),'c'*64,{'nucleo':6,'soquete':'AM4'})
+    assert VinculoMercadoLivre.aplicar_revisado(*args,simular=True)=='proposto'
+    assert VinculoMercadoLivre.buscar('processador',pid).especificacoes_revisadas is None
+    assert VinculoMercadoLivre.aplicar_revisado(*args,simular=False)=='cadastrado'
+    assert VinculoMercadoLivre.aplicar_revisado(*args,simular=False)=='inalterado'
+    assert Usuario.query.count()==1 and VinculoMercadoLivre.query.count()==1
+
+
 def test_catalogo_aditivo_preserva_legado_e_define_novos_como_pendentes(banco):
     from migrations.catalogo_automatizado import preparar_catalogo_automatizado
     from models import ProdutoPendente
@@ -210,6 +231,7 @@ def test_catalogo_aditivo_preserva_legado_e_define_novos_como_pendentes(banco):
     assert Processador.query.order_by(Processador.id.desc()).first().status_validacao == 'pendente'
     assert len(Processador.listar_publicadas()) == 1
 
+
 def test_descoberta_mysql_grava_fila_e_auditoria_sem_publicar(banco):
     from models import ProdutoPendente, ExecucaoDescoberta
     from migrations.catalogo_automatizado import preparar_catalogo_automatizado
@@ -229,6 +251,7 @@ def test_descoberta_mysql_grava_fila_e_auditoria_sem_publicar(banco):
     assert ProdutoPendente.query.count() == 1 and ExecucaoDescoberta.query.count() == 2
     assert ProdutoPendente.query.one().status == 'pendente'
     assert Oferta.query.count() == 0
+
 
 def test_trava_worker_e_checkpoint_mysql(banco):
     from repositories.controle_catalogo_repository import RepositorioControleCatalogo
@@ -277,6 +300,7 @@ def test_importacao_concorrente_nao_duplica_componente_mysql(banco):
     db.session.remove()
     assert HD.query.count()==IdentidadeFabricante.query.count()==1
     assert Oferta.query.count()==HistoricoOferta.query.count()==2
+
 
 def test_ram_formato_nulo_migracao_e_importacao_sem_mpn_mysql(banco):
     from models import MemoriaRAM,ProdutoPendente

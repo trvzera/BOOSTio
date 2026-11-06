@@ -29,7 +29,11 @@ class CompararCodigoModeloService:
 
     @staticmethod
     def extrair(texto, categoria):
-        tokens = set(re.findall(r'(?<![a-z0-9/_.-])[a-z][a-z0-9]*(?:[-./][a-z0-9]+)*(?![a-z0-9/_.-])', nome(texto)))
+        normalizado = nome(texto)
+        # A normalização de nomes separa RTX4060 para comparar chips. Dentro
+        # de um SKU hifenizado, preserve DUAL-RTX4060-O8G-EVO inteiro.
+        normalizado = re.sub(r'(?<=[/-])(rtx|gtx|rx)\s+(?=\d)', r'\1', normalizado)
+        tokens = set(re.findall(r'(?<![a-z0-9/_.-])[a-z][a-z0-9]*(?:[-./][a-z0-9]+)*(?![a-z0-9/_.-])', normalizado))
         resultado = set()
         for token in tokens:
             if len(token) < 4 or not re.search(r'\d', token):
@@ -59,7 +63,7 @@ class CompararCodigoModeloService:
             if declarado and not codigo_interno(declarado):
                 locais.add(codigo(declarado))
         remotos = set().union(*(self.extrair(v, peca.__tablename__) for v in
-            (produto.modelo or '', *produto.modelos_alternativos)))
+            (produto.titulo, produto.modelo or '', *produto.modelos_alternativos)))
         for declarado in (produto.modelo or '', *produto.modelos_alternativos):
             if codigo(declarado) in locais:
                 remotos.add(codigo(declarado))

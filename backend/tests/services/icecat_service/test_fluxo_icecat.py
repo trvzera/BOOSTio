@@ -90,7 +90,7 @@ def test_descoberta_completa_com_icecat_cria_peca_oferta_historico_e_repete(banc
     assert r['acao']=='importada' and r['novo_componente'],r
     p=HD.query.one()
     assert p.capacidade_gb==8000 and p.interface=='SATA III' and p.velocidade_rpm==7200
-    assert p.consumo_energia is None and p.ficha_montagem_validada is False
+    assert p.consumo_energia is None and p.ficha_montagem_validada is True
     assert Oferta.query.one().preco==Decimal('999.90') and Oferta.query.one().esgotado is None
     assert HistoricoOferta.query.count()==1
     assert p.fontes_especificacoes['interface']['base']=='Icecat'
