@@ -112,4 +112,3 @@ def aplicar_ofertas_loja(peca,loja,ofertas,agora):
         if historico:db.session.add(HistoricoOferta(oferta_id=registro.id,preco=preco,esgotado=registro.esgotado,coletado_em=agora))
         propostas.append(dict(anuncio=chave,acao='criada' if novo else 'atualizada' if mudou else 'inalterada',historico=historico))
     return propostas
-

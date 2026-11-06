@@ -20,4 +20,3 @@ def ofertas_catalogo(dados):
     return []
   return [{"loja": "kabum", "url": link, "preco": preco,
            "atualizadoEm": dados["preco_atualizado_em"], "esgotado": bool(dados.get("esgotado"))}]
-
