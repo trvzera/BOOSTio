@@ -1,3 +1,4 @@
+from services.catalogo_service.ler_plano_catalogo_service import ler_plano
 import json
 import signal
 from threading import Event
@@ -100,7 +101,7 @@ def registrar_comandos_catalogo(app):
         if not aplicar and not uma_vez:raise click.ClickException('Use --uma-vez para simular sem avançar checkpoints')
         parada=Event();anteriores={}
         try:
-            trabalhos=ProcessarCatalogoService.ler_plano(plano)
+            trabalhos=ler_plano(plano)
             for sig in (signal.SIGTERM,signal.SIGINT):
                 anteriores[sig]=signal.getsignal(sig)
                 signal.signal(sig,lambda *_:parada.set())
@@ -122,7 +123,7 @@ def registrar_comandos_catalogo(app):
     @click.option('--nome',required=True)
     def reiniciar(plano,nome):
         try:
-            trabalho=next((t for t in ProcessarCatalogoService.ler_plano(plano) if t['nome']==nome),None)
+            trabalho=next((t for t in ler_plano(plano) if t['nome']==nome),None)
             if trabalho is None:raise ValueError('Nome ausente no plano')
             repo=RepositorioControleCatalogo()
             with repo.bloquear() as adquirido:

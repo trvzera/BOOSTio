@@ -112,7 +112,7 @@ class ColetaKabumTest(unittest.TestCase):
             codigo = url.split("/produto/")[1].split("/")[0]
             return resposta_html(url, pagina(codigo))
 
-        with patch.object(PopularPecasService, "_dados_seed", return_value={PlacaVideo: dados}), \
+        with patch("services.peca_service.popular_pecas_service.dados_seed", return_value={PlacaVideo: dados}), \
              patch("services.preco_service.buscar_pagina_kabum_service.requests.get", side_effect=buscar) as get, \
              patch("builtins.print"):
             resumo = PopularPecasService().executar(intervalo=0)

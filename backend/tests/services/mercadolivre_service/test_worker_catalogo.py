@@ -1,3 +1,4 @@
+from services.catalogo_service.ler_plano_catalogo_service import ler_plano
 import json
 from datetime import datetime, timedelta
 from unittest.mock import patch, Mock
@@ -26,7 +27,7 @@ def banco(tmp_path):
 def plano(tmp_path, **extras):
     arquivo=tmp_path/'plano.json'
     arquivo.write_text(json.dumps(dict(versao=1,trabalhos=[{**dict(nome='hd',categoria='hd',consulta='Seagate Exos',max_paginas=3,max_anuncios=20,max_requisicoes=20,intervalo=0.1),**extras}])))
-    return ProcessarCatalogoService.ler_plano(arquivo)
+    return ler_plano(arquivo)
 
 
 def api(self,caminho,token,params=None):

@@ -1,3 +1,4 @@
+from services.catalogo_service.ler_plano_catalogo_service import ler_plano
 from types import SimpleNamespace
 import json
 import pytest
@@ -14,7 +15,7 @@ def test_plano_reserva_100_por_categoria_marca_e_preserva_familia(tmp_path):
     assert all(t['max_produtos'] == t['max_anuncios'] == 100 and t['max_ofertas_por_produto'] == 1 for t in plano['trabalhos'])
     caminho = tmp_path / 'plano.json'
     caminho.write_text(json.dumps(plano))
-    assert len(ProcessarCatalogoService.ler_plano(caminho)) == 3
+    assert len(ler_plano(caminho)) == 3
 
 
 @pytest.mark.parametrize('limite', [True, 0, 101])
@@ -57,7 +58,7 @@ def test_busca_por_peca_preserva_codigo_e_nao_pesquisa_id_interno(tmp_path):
     assert all(t['max_produtos'] == 10 for t in plano['trabalhos'])
     arquivo = tmp_path / 'plano.json'
     arquivo.write_text(json.dumps(plano))
-    assert len(ProcessarCatalogoService.ler_plano(arquivo)) == 2
+    assert len(ler_plano(arquivo)) == 2
 
 
 def test_alternativas_preservam_sufixo_e_nao_usam_codigo_interno():

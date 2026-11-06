@@ -1,3 +1,4 @@
+from services.peca_service.dados_seed import dados_seed
 from services.build_service.prompt_build_service import criar_prompt
 """Referência anterior à reorganização: prompts, seed e esquema persistente."""
 import hashlib
@@ -26,7 +27,7 @@ def contratos():
             prompt = criar_prompt(pedido, 8000, 2000, {}, percentual,
                 plano_perifericos={'viavel': True, 'combinacoes': []}, preferencia_neutra=True)
             resultado[f'prompt:{prioridade}:{percentual}'] = _hash(prompt)
-    dados = PopularPecasService()._dados_seed()
+    dados = dados_seed()
     resultado['seed'] = _hash(json.dumps({m.__tablename__: v for m,v in dados.items()}, sort_keys=True, default=str))
     for nome, dialect in [('sqlite', sqlite.dialect()), ('mysql', mysql.dialect())]:
         ddl = []
