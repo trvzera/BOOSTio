@@ -5,7 +5,6 @@ from . import db, ModeloBase
 from .build import Build
 from .usuario import Usuario
 from sqlalchemy import update
-from utils.aparencia import validar_aparencia
 from . import Processador, PlacaMae, PlacaVideo, MemoriaRAM, SSD, HD, Fonte, Gabinete
 from . import WaterCooler, AirCooler, Fan, Fone, Teclado, Mouse, Monitor
 from . import PlacaRede, CaboRede
@@ -69,29 +68,6 @@ class BuildSalva(ModeloBase):
             db.session.rollback()
             raise
 
-    @classmethod
-    def criar_gerada_com_pecas_proprias(cls, usuario_id, dados, proprias, rede=None, percentual=0, aparencia=None):
-        componentes = {}
-        for tipo, nome in proprias.items():
-            if tipo not in MODELOS:
-                continue
-            item = {"proprio": nome, "quantidade": 1}
-            componentes[tipo] = [item] if tipo in MULTIPLAS else item
-        for item in dados["componentes"]:
-            tipo = item["tipo"]
-            componente = {"id": item["id"], "quantidade": item["quantidade"]}
-            componentes[tipo] = [componente] if tipo in MULTIPLAS else componente
-        estado = cls.validar_estado({
-            "titulo": dados["nome"][:100], "descricao": dados["descricao"][:300],
-            "orcamento": dados["orcamento"], "rede": rede or {},
-            "incluirPerifericos": percentual > 0 or any(tipo in componentes for tipo in ("monitor", "teclado", "mouse", "fone")),
-            "percentualPerifericos": percentual,
-            "aparencia": aparencia,
-            "incluirRede": (rede or {}).get("tipo") in ("cabo", "wifi"),
-            "pecasExtras": {tipo: nome for tipo, nome in proprias.items() if tipo not in MODELOS},
-            "componentes": componentes,
-        })
-        return cls.criar_limitada(usuario_id, estado)
 
     @classmethod
     def migrar_geradas(cls, usuario_id, confirmar=True):
@@ -137,80 +113,7 @@ class BuildSalva(ModeloBase):
         build = db.session.get(cls, int(identificador[2:]))
         return build if build is not None and build.estado.get("visibilidade") == "publico" else None
 
-    @staticmethod
-    def validar_estado(dados):
-        if not isinstance(dados, dict):
-            raise ValueError("Envie uma build válida")
-        titulo = dados.get("titulo")
-        if not isinstance(titulo, str) or not titulo.strip() or len(titulo) > 100:
-            raise ValueError("Informe um nome de até 100 caracteres")
-        descricao = dados.get("descricao", "")
-        if not isinstance(descricao, str) or len(descricao) > 300:
-            raise ValueError("Descrição inválida")
-        if dados.get("visibilidade", "privado") not in ("privado", "publico"):
-            raise ValueError("Visibilidade inválida")
-        componentes = dados.get("componentes", {})
-        if not isinstance(componentes, dict) or set(componentes) - set(MODELOS):
-            raise ValueError("Categoria de peça inválida")
-        limpos = {}
-        for tipo, selecao in componentes.items():
-            itens = selecao if isinstance(selecao, list) else [selecao]
-            if not itens or len(itens) > (64 if tipo in MULTIPLAS else 1):
-                raise ValueError("Quantidade de modelos inválida")
-            tratados = []
-            for item in itens:
-                if not isinstance(item, dict):
-                    raise ValueError("Componente inválido")
-                quantidade = item.get("quantidade", 1)
-                if type(quantidade) is not int or not 1 <= quantidade <= (64 if tipo in MULTIPLAS else 1):
-                    raise ValueError("Quantidade inválida")
-                if "id" in item:
-                    try:
-                        peca_id = int(str(item["id"]).split(":")[-1])
-                    except ValueError:
-                        raise ValueError("ID de peça inválido") from None
-                    if MODELOS[tipo].buscar_publicada_por_id(peca_id) is None:
-                        raise ValueError("Peça não encontrada no catálogo")
-                    tratados.append({"id": peca_id, "quantidade": quantidade})
-                elif isinstance(item.get("proprio"), str) and 0 < len(item["proprio"].strip()) <= 120:
-                    tratados.append({"proprio": item["proprio"].strip(), "quantidade": quantidade})
-                else:
-                    raise ValueError("Componente inválido")
-            limpos[tipo] = tratados if tipo in MULTIPLAS else tratados[0]
-        orcamento = dados.get("orcamento")
-        if orcamento is not None and (type(orcamento) not in (int, float) or not 0 <= orcamento <= 1000000):
-            raise ValueError("Orçamento inválido")
-        percentual = dados.get("percentualPerifericos", 0)
-        if type(dados.get("substituirFansWaterCooler", False)) is not bool:
-            raise ValueError("Opção de substituição das fans inválida")
-        if type(percentual) is not int or not 0 <= percentual <= 99:
-            raise ValueError("A porcentagem para periféricos deve ser de 0 a 99")
-        pecas_extras = dados.get("pecasExtras", {})
-        if not isinstance(pecas_extras, dict) or set(pecas_extras) - {"webcam", "microfone"}:
-            raise ValueError("Peça própria extra inválida")
-        if any(not isinstance(nome, str) or not nome.strip() or len(nome.strip()) > 120 for nome in pecas_extras.values()):
-            raise ValueError("Modelo de peça própria extra inválido")
-        return {
-            "titulo": titulo.strip(), "descricao": descricao.strip(), "visibilidade": dados.get("visibilidade", "privado"),
-            "travada": bool(dados.get("travada", False)), "orcamento": orcamento,
-            "incluirPerifericos": bool(dados.get("incluirPerifericos", False)),
-            "percentualPerifericos": percentual,
-            "aparencia": validar_aparencia(dados.get("aparencia")),
-            "substituirFansWaterCooler": dados.get("substituirFansWaterCooler", False),
-            "incluirRede": bool(dados.get("incluirRede", False)), "rede": dados.get("rede") or {},
-            "pecasExtras": {tipo: nome.strip() for tipo, nome in pecas_extras.items()},
-            "componentes": limpos,
-        }
 
-    def salvar_estado(self, dados):
-        if self.estado.get("travada"):
-            if dados != {"travada": False}:
-                raise ValueError("Destranque a build para alterar")
-            self.estado = {**self.estado, "travada": False}
-            db.session.commit()
-            return
-        self.estado = {**self.validar_estado(dados), "setupAtual": bool(self.estado.get("setupAtual", False))}
-        db.session.commit()
 
     @classmethod
     def definir_setup_atual(cls, usuario_id, identificador):
@@ -257,3 +160,7 @@ class BuildSalva(ModeloBase):
             "preco_total": round(sum(item["preco"] * item["quantidade"] for item in componentes), 2),
             "componentes": componentes, "estado": self.estado,
         }
+
+    def gravar_estado(self, estado):
+        self.estado = estado
+        db.session.commit()

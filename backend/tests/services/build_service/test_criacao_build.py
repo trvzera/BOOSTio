@@ -1,3 +1,4 @@
+from services.build_service.atualizar_build_service import atualizar_estado
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from decimal import Decimal
@@ -164,7 +165,7 @@ def test_reserva_preservada_ao_salvar_duplicar(app_build):
     with app_build.app_context():
         dados = CriarBuildManualService().executar(1, {**ESTADO, "orcamento": 5000, "incluirPerifericos": True, "percentualPerifericos": 20})
         salva = BuildSalva.buscar(1, dados["id"])
-        salva.salvar_estado({**salva.estado, "titulo": "Renomeada"})
+        atualizar_estado(salva, {**salva.estado, "titulo": "Renomeada"})
         assert salva.estado["percentualPerifericos"] == 20
         copia = DuplicarBuildService().executar(1, dados["id"])
         assert copia["estado"]["percentualPerifericos"] == 20
@@ -539,7 +540,7 @@ def test_geracao_com_pecas_proprias_preserva_reserva_rede_e_extras(app_build, mo
             assert "Não inclua periféricos novos" in llm.call_args.args[0]
             assert not set(perifericos[1:]) & set(estado["componentes"])
         salva = BuildSalva.buscar(1, resultado["id"])
-        salva.salvar_estado({**estado, "titulo": "Renomeada"})
+        atualizar_estado(salva, {**estado, "titulo": "Renomeada"})
         copia = DuplicarBuildService().executar(1, resultado["id"])
         assert copia["estado"]["pecasExtras"] == estado["pecasExtras"]
         assert copia["estado"]["percentualPerifericos"] == percentual

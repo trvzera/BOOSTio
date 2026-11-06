@@ -1,3 +1,4 @@
+from services.validacoes_service.validar_estado_build_service import validar_estado
 from datetime import datetime, timezone, timedelta
 from unittest.mock import patch
 
@@ -126,4 +127,4 @@ def test_peca_nao_aprovada_nao_publica_oferta_nem_historico(banco, status):
     assert resposta.status_code == 404
     from models import BuildSalva
     with pytest.raises(ValueError, match='não encontrada'):
-        BuildSalva.validar_estado({'titulo': 'Teste', 'componentes': {'processador': {'id': p.id}}})
+        validar_estado({'titulo': 'Teste', 'componentes': {'processador': {'id': p.id}}})

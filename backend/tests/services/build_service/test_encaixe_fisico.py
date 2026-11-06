@@ -1,3 +1,4 @@
+from services.validacoes_service.validar_estado_build_service import validar_estado
 import json
 from pathlib import Path
 
@@ -155,13 +156,13 @@ def test_diagnostico_resolve_medidas_do_catalogo_persistido_em_banco_isolado():
 def test_flag_substituicao_exige_booleano(valor):
     from models import BuildSalva
     with pytest.raises(ValueError, match="substituição das fans"):
-        BuildSalva.validar_estado({"titulo": "QA", "substituirFansWaterCooler": valor})
+        validar_estado({"titulo": "QA", "substituirFansWaterCooler": valor})
 
 
 def test_estado_preserva_substituicao_e_normaliza_default():
     from models import BuildSalva, Fan
-    assert BuildSalva.validar_estado({"titulo": "QA", "substituirFansWaterCooler": True})["substituirFansWaterCooler"] is True
-    assert BuildSalva.validar_estado({"titulo": "QA"})["substituirFansWaterCooler"] is False
+    assert validar_estado({"titulo": "QA", "substituirFansWaterCooler": True})["substituirFansWaterCooler"] is True
+    assert validar_estado({"titulo": "QA"})["substituirFansWaterCooler"] is False
     dados = Fan(id=1, modelo="TR120 Reverse").to_catalogo()
     assert dados["fluxo_ar"] == "reverso" and dados["fonte_fluxo_ar"] == "nome_comercial"
     assert "fluxo_ar" not in Fan(id=2, modelo="Sem informação").to_catalogo()
@@ -170,7 +171,7 @@ def test_estado_preserva_substituicao_e_normaliza_default():
 def test_estado_aceita_fans_de_modelos_diferentes_e_preserva_quantidade(monkeypatch):
     from models import BuildSalva, Fan
     monkeypatch.setattr(Fan, "buscar_publicada_por_id", lambda identificador: Fan(id=identificador, modelo="Fan"))
-    estado = BuildSalva.validar_estado({"titulo": "QA", "substituirFansWaterCooler": True,
+    estado = validar_estado({"titulo": "QA", "substituirFansWaterCooler": True,
                                       "componentes": {"fan": [{"id": 1, "quantidade": 3}, {"id": 2, "quantidade": 2}]}})
     assert estado["componentes"]["fan"] == [{"id": 1, "quantidade": 3}, {"id": 2, "quantidade": 2}]
     assert estado["substituirFansWaterCooler"] is True

@@ -1,3 +1,4 @@
+from services.validacoes_service.validar_estado_build_service import validar_estado
 from models import BuildSalva, Usuario
 from .avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
@@ -8,7 +9,7 @@ class CriarBuildManualService:
             raise ValueError("Envie uma build válida")
 
         dados = self._aplicar_budget(usuario_id, dados)
-        estado = BuildSalva.validar_estado(dados)
+        estado = validar_estado(dados)
         build = BuildSalva.criar_limitada(usuario_id, estado)
 
         return AvaliarCompatibilidadeService().para_resposta(build, incluir_links=True)
