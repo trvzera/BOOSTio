@@ -1,3 +1,5 @@
+from repositories.ofertas_repository import aplicar_lote_mercado_livre
+from repositories.ofertas_repository import aplicar_ofertas_loja
 from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 """Unidade de trabalho por anúncio, reaproveitando o bloqueio de coleta."""
 from contextlib import contextmanager
@@ -72,9 +74,9 @@ class RepositorioImportacaoCatalogo:
 
     def registrar_oferta(self,pendencia,peca,ficha,anuncio,criterio,agora):
         if pendencia.loja=='mercado_livre':
-            return Oferta.aplicar_lote_mercado_livre(peca,ficha['produto']['id'],assinatura_peca(peca),
+            return aplicar_lote_mercado_livre(peca,ficha['produto']['id'],assinatura_peca(peca),
                 ficha['assinatura_catalogo'],criterio,[anuncio],agora,simular=False,confirmar=False,desativar_ausentes=False)
-        return Oferta.aplicar_ofertas_loja(peca,pendencia.loja,[anuncio],agora)
+        return aplicar_ofertas_loja(peca,pendencia.loja,[anuncio],agora)
 
 
     def validar_referencia(self,pendencia,peca,ficha):

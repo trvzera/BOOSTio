@@ -1,3 +1,4 @@
+from repositories.especificacoes_peca_repository import preencher_especificacoes
 """Propõe somente lacunas com código completo em comum e ficha compatível."""
 import re
 from decimal import Decimal
@@ -153,5 +154,5 @@ class EnriquecerPecaExistenteService:
         assinatura = assinatura_peca(peca)
         proposta = self.preparar(peca,produto)
         if proposta['status']=='proposta':
-            return peca.preencher_especificacoes(proposta,assinatura,simular=simular)
+            return preencher_especificacoes(peca, proposta,assinatura,simular=simular)
         return proposta

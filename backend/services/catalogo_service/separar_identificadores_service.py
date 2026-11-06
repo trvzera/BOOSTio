@@ -1,3 +1,4 @@
+from repositories.identificadores_peca_repository import separar_identificadores
 """Coordena lotes; persistência e migração de cada peça ficam nos models."""
 from sqlalchemy.exc import SQLAlchemyError
 from models import Oferta
@@ -20,7 +21,7 @@ class SepararIdentificadoresService:
                 for peca in lote:
                     depois = peca.id
                     try:
-                        r = peca.separar_identificadores(simular=simular, ids_ambiguos=ambiguos)
+                        r = separar_identificadores(peca, simular=simular, ids_ambiguos=ambiguos)
                         resumo['examinadas'] += 1
                         resumo['alteradas' if r['alterada'] else 'inalteradas'] += 1
                         resumo['ofertas_criadas'] += r['oferta'] == 'criada'

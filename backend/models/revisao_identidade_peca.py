@@ -21,7 +21,7 @@ class RevisaoIdentidadePeca(ModeloBase):
 
     @classmethod
     def aplicar(cls, peca, proposta, *, simular=True):
-        from .identificadores_peca import _vinculos
+        from repositories.identificadores_peca_repository import _vinculos
         from . import Oferta
         try:
             db.session.refresh(peca, with_for_update=True)

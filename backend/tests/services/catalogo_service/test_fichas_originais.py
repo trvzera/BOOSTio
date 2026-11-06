@@ -66,7 +66,7 @@ def test_modelo_e_titulo_com_sufixos_distintos_ficam_em_revisao(banco):
 
 
 def test_revalida_oferta_original_antes_de_persistir(banco):
-    from models.especificacoes_peca import preencher_especificacoes
+    from repositories.especificacoes_peca_repository import preencher_especificacoes
     from utils.identidade_peca import assinatura_peca
     p=memoria();d=dto(p)
     oferta=Oferta(tabela_peca='memoria_ram',peca_id=p.id,loja='kabum',produto_id_loja='123',url=d.fonte)

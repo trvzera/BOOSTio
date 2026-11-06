@@ -1,3 +1,5 @@
+from repositories.ofertas_repository import aplicar_lote_mercado_livre
+from repositories.identificadores_peca_repository import separar_identificadores
 """Somente banco MySQL descartável local; rede Mercado Livre simulada."""
 import os
 from concurrent.futures import ThreadPoolExecutor
@@ -55,7 +57,7 @@ def test_migrations_preservam_usuarios_e_sao_repetiveis(banco):
 
 def aplicar(peca,preco,simular=False):
     dados={'produto_id_loja':'MLB11','vendedor_id':'5','preco':preco,'url':'https://produto.mercadolivre.com.br/MLB-11-_JM'}
-    return Oferta.aplicar_lote_mercado_livre(peca,'MLB123',assinatura_peca(peca),assinatura_catalogo({'id':'MLB123'}),
+    return aplicar_lote_mercado_livre(peca,'MLB123',assinatura_peca(peca),assinatura_catalogo({'id':'MLB123'}),
                                           'mpn',[dados],datetime(2026,11,3,0,0,0,123456),simular=simular)
 
 
@@ -112,7 +114,7 @@ def test_revalida_identidade_alterada_por_outra_conexao(banco):
         outra.query(Processador).filter_by(id=p.id).update({'modelo':'Modelo alterado'})
         outra.commit()
     with pytest.raises(ValueError,match='identificação'):
-        Oferta.aplicar_lote_mercado_livre(p,'MLB123',identidade,assinatura_catalogo({'id':'MLB123'}),
+        aplicar_lote_mercado_livre(p,'MLB123',identidade,assinatura_catalogo({'id':'MLB123'}),
             'mpn',[{'produto_id_loja':'MLB11','vendedor_id':'5','preco':100,'url':'url'}],datetime(2026,11,3),simular=False)
     assert Oferta.query.count()==VinculoMercadoLivre.query.count()==0
 
@@ -339,13 +341,13 @@ def test_separacao_identificadores_aditiva_preserva_usuario_e_cotacao_mysql(banc
     assert any('referencia_interna' in i.get('sql', '') for i in preparar_catalogo_automatizado()['alteracoes'])
     preparar_catalogo_automatizado(simular=False)
     p = Processador.query.one()
-    assert p.separar_identificadores()['alterada']
+    assert separar_identificadores(p)['alterada']
     assert p.part_number == 'KABUM-999' and Oferta.query.count() == 0
-    p.separar_identificadores(simular=False)
+    separar_identificadores(p, simular=False)
     assert p.part_number is None and p.referencia_interna == 'KABUM-999'
     assert Oferta.query.one().produto_id_loja == '999'
     assert p.id == ident and p.preco == preco and Usuario.query.count() == 1
-    assert not p.separar_identificadores(simular=False)['alterada']
+    assert not separar_identificadores(p, simular=False)['alterada']
     assert Oferta.query.count() == 1
 
 

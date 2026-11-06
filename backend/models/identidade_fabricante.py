@@ -33,7 +33,7 @@ class IdentidadeFabricante(ModeloBase):
         try:
             from utils.codigos_peca import codigo_interno
             from services.catalogo_service.normalizar_produto import codigo
-            from .identificadores_peca import _vinculos, reassinar_vinculos
+            from repositories.identificadores_peca_repository import _vinculos, reassinar_vinculos
             if not isinstance(mpn, str) or not mpn.strip() or len(mpn) > 100 or codigo_interno(mpn):
                 raise ValueError('Informe um código real do fabricante')
             # Releitura bloqueada protege contra mudança da peça durante a importação.

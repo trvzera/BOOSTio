@@ -1,3 +1,4 @@
+from repositories.especificacoes_peca_repository import preencher_especificacoes
 from dataclasses import replace, asdict
 from datetime import datetime
 import pytest
@@ -107,14 +108,14 @@ def test_concorrencia_bloqueia_proposta_antiga_e_campos_protegidos(banco):
     p.frequencia_mhz = 2666
     db.session.commit()
     with pytest.raises(ValueError, match='mudou'):
-        p.preencher_especificacoes(proposta, assinatura, simular=False)
+        preencher_especificacoes(p, proposta, assinatura, simular=False)
     assert p.formato is p.part_number is None
     p.frequencia_mhz = 3200
     db.session.commit()
     proposta = EnriquecerPecaExistenteService().preparar(p, produto())
     proposta['dados']['preco'] = 1
     with pytest.raises(ValueError, match='protegido'):
-        p.preencher_especificacoes(proposta, assinatura_peca(p), simular=False)
+        preencher_especificacoes(p, proposta, assinatura_peca(p), simular=False)
     assert p.preco == 123 and p.formato is None
 
 

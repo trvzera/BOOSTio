@@ -1,7 +1,7 @@
 """Persistência atômica das lacunas, com origem por campo e controle de concorrência."""
 from datetime import datetime, timezone
-from . import db
-from .identificadores_peca import _vinculos, reassinar_vinculos
+from models import db
+from repositories.identificadores_peca_repository import _vinculos, reassinar_vinculos
 from utils.identidade_peca import assinatura_peca, assinatura_tecnica
 from utils.codigos_peca import codigo_interno
 
@@ -16,7 +16,7 @@ def preencher_especificacoes(peca, proposta, assinatura, *, simular=True):
         if codigo_interno(peca.part_number):
             raise ValueError('Execute catalogo-identificadores-separar antes do enriquecimento')
         if proposta.get('criterio') == 'anuncio_original_e_especificacoes_compativeis':
-            from .oferta import Oferta
+            from models.oferta import Oferta
             origem = proposta.get('origem') or {}
             if not Oferta.corresponde_origem(peca, origem.get('loja'), origem.get('id_externo'), bloquear=True):
                 raise ValueError('Oferta original mudou; repita a validação')

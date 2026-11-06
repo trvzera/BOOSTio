@@ -1,3 +1,4 @@
+from repositories.identificadores_peca_repository import separar_identificadores
 import pytest
 from flask import Flask
 from sqlalchemy import update
@@ -43,17 +44,17 @@ def test_simulacao_preserva_banco_e_aplicar_e_idempotente(banco):
     p = memoria()
     legada(p, 'KABUM-175110')
     antes = p.id, p.preco, p.esgotado, p.kabum_external
-    r = p.separar_identificadores()
+    r = separar_identificadores(p)
     assert r['alterada'] and r['oferta'] == 'criada'
     assert Oferta.query.count() == 0
     assert p.part_number == 'KABUM-175110' and p.referencia_interna is None
-    p.separar_identificadores(simular=False)
+    separar_identificadores(p, simular=False)
     assert p.part_number is None and p.referencia_interna == 'KABUM-175110'
     o = Oferta.query.one()
     assert o.loja == 'kabum' and o.produto_id_loja == '175110'
     assert o.preco is None and o.esgotado is None and o.url_afiliado is None
     assert (p.id, p.preco, p.esgotado, p.kabum_external) == antes
-    r = p.separar_identificadores(simular=False)
+    r = separar_identificadores(p, simular=False)
     assert not r['alterada'] and r['oferta'] == 'inalterada' and Oferta.query.count() == 1
 
 
@@ -66,7 +67,7 @@ def test_mpn_revisado_e_vinculo_existente_sao_preservados(banco):
     db.session.add(VinculoMercadoLivre(tabela_peca='memoria_ram', peca_id=p.id, assinatura_peca=assinatura,
         assinatura_catalogo='a'*64, catalogo_id='MLB123', criterio='revisado'))
     db.session.commit()
-    p.separar_identificadores(simular=False)
+    separar_identificadores(p, simular=False)
     assert p.part_number == 'KVR26N19S8/8'
     assert IdentidadeFabricante.buscar(p).mpn == p.part_number
     assert VinculoMercadoLivre.query.one().assinatura_peca == assinatura_peca(p)
@@ -76,12 +77,12 @@ def test_mpn_revisado_e_vinculo_existente_sao_preservados(banco):
 def test_id_de_loja_contraditorio_fica_em_revisao(banco):
     p = memoria()
     legada(p, 'KABUM-999')
-    r = p.separar_identificadores(simular=False)
+    r = separar_identificadores(p, simular=False)
     assert r['oferta'] == 'revisao' and Oferta.query.count() == 0
     assert p.part_number is None and p.referencia_interna == 'KABUM-999'
 
 
 def test_seed_sem_anuncio_nao_cria_oferta_ficticia(banco):
     p = memoria(part_number='REDE-INTERNO', kabum_external=None)
-    r = p.separar_identificadores(simular=False)
+    r = separar_identificadores(p, simular=False)
     assert r['oferta'] == 'sem_anuncio' and Oferta.query.count() == 0

@@ -125,13 +125,7 @@ class Peca(ModeloBase):
   def lote_para_identificadores(cls, depois_id=0, limite=100):
     return cls.query.filter(cls.id > depois_id).order_by(cls.id).limit(limite).all()
 
-  def separar_identificadores(self, *, simular=True, ids_ambiguos=None):
-    from .identificadores_peca import separar_identificadores
-    return separar_identificadores(self, simular=simular, ids_ambiguos=ids_ambiguos)
 
-  def preencher_especificacoes(self, proposta, assinatura, *, simular=True):
-    from .especificacoes_peca import preencher_especificacoes
-    return preencher_especificacoes(self, proposta, assinatura, simular=simular)
 
   @classmethod
   def lote_para_ofertas(cls, depois_id=0, limite=50, *, somente_vinculadas=False):

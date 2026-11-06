@@ -1,3 +1,4 @@
+from repositories.ofertas_repository import aplicar_lote_mercado_livre
 from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 from datetime import datetime, timezone
 
@@ -121,7 +122,7 @@ class AtualizarOfertasMercadoLivreService:
                 if not simular and not peca.publicavel:
                     return dict(contador='revisao', status='revisao', motivo='Ficha local aguarda aprovação')
                 validar = (lambda: associador.conferir_detalhe(peca, produto, recarregar=True)) if vinculo['criterio'] in self.CRITERIOS_AUTOMATICOS else None
-                propostas = Oferta.aplicar_lote_mercado_livre(peca, vinculo['catalogo_id'], vinculo['assinatura'],
+                propostas = aplicar_lote_mercado_livre(peca, vinculo['catalogo_id'], vinculo['assinatura'],
                     assinatura, vinculo['criterio'], ofertas, datetime.now(timezone.utc).replace(tzinfo=None),
                     simular=simular, validar_identidade=validar)
                 return dict(contador='associadas', status='proposta' if simular else 'concluida',

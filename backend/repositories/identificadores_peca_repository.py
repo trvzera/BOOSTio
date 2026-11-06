@@ -1,7 +1,7 @@
 """Migração transacional de identificadores, preservando a identidade das peças."""
 from sqlalchemy import MetaData, Table, inspect, select, update
 from flask import g
-from . import db, Oferta, IdentidadeFabricante
+from models import db, Oferta, IdentidadeFabricante
 from utils.codigos_peca import codigo_interno
 from utils.identidade_peca import assinatura_peca
 
