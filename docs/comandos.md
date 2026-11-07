@@ -64,6 +64,7 @@ scripts de `deploy/` já fazem isso. A maioria **simula por padrão** e só grav
 | `mercadolivre-descobrir` | Busca anúncios no Mercado Livre e guarda como pendências. |
 | `mercadolivre-classificar` | Compara cada pendência com o catálogo e decide: confirmada, ambígua ou rejeitada. |
 | `admin-pendencias-sugerir` | A IA sugere a peça de cada pendência aberta (simula por padrão; `--aplicar` grava). Só sugere, não aceita. |
+| `catalogo-aprovar-lote` | Aprova em lote as peças importadas que passam nas regras (identidade, ficha mínima, sem duplicata). Simula por padrão; `--limite` sorteia uma amostra, `--reverter` desfaz. |
 | `mercadolivre-enriquecer` | Completa a ficha técnica das pendências (Icecat, fabricante, base técnica). |
 | `mercadolivre-importar-pendencias` | Cria a oferta (e a peça, se permitido) a partir das pendências aprovadas. |
 | `catalogo-worker` / `catalogo-worker-reiniciar` | Rodam essas quatro etapas sozinhas, em ciclo e com retomada; o segundo zera o ponto de retomada. |

@@ -10,6 +10,26 @@ from services.mercadolivre_service.processar_catalogo_service import ProcessarCa
 
 
 def registrar_comandos_catalogo(app):
+    @app.cli.command('catalogo-aprovar-lote')
+    @click.option('--categoria')
+    @click.option('--limite', type=click.IntRange(1), default=None,
+                  help='Aprova no máximo N peças por categoria, sorteadas entre as aprováveis (amostra).')
+    @click.option('--semente', type=int, default=None, help='Repete o mesmo sorteio.')
+    @click.option('--exigir-identificador', is_flag=True, help='Só aprova quem tem part number ou código do fabricante.')
+    @click.option('--reverter', is_flag=True, help='Volta para revisão as aprovadas por esta regra que ainda não têm oferta.')
+    @click.option('--aplicar', is_flag=True, help='Grava; sem esta opção só simula e mostra os números.')
+    def aprovar_lote(categoria, limite, semente, exigir_identificador, reverter, aplicar):
+        """Aprova peças importadas que passam nas regras de identidade, ficha mínima e duplicata."""
+        from services.catalogo_service.aprovar_em_lote_service import AprovarEmLoteService
+        try:
+            servico = AprovarEmLoteService()
+            resumo = (servico.reverter(categoria=categoria, simular=not aplicar) if reverter else
+                      servico.executar(categoria=categoria, limite=limite, semente=semente,
+                                       exigir_identificador=exigir_identificador, simular=not aplicar))
+            click.echo(json.dumps(resumo, ensure_ascii=False))
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else 'Confira o banco de dados') from None
+
     @app.cli.command('catalogo-gpus-converter-referencias')
     @click.option('--pasta', required=True, type=click.Path(exists=True, file_okay=False))
     @click.option('--aplicar', is_flag=True)
