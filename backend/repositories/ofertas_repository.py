@@ -127,11 +127,13 @@ def atualizar_oferta_validada(peca, loja, oferta, assinatura, produto, *, simula
     return atualizar_ofertas_validadas(peca, loja, [(oferta, produto)], assinatura, simular=simular)
 
 
-def atualizar_ofertas_validadas(peca, loja, itens, assinatura, *, simular, desativar_ausentes=False):
+def atualizar_ofertas_validadas(peca, loja, itens, assinatura, *, simular, desativar_ausentes=False, revisao_manual=None):
     """Revalida matching sob a trava de coleta e grava as ofertas de uma peça numa só transação.
 
     `itens` é uma lista de (oferta, ProdutoNormalizado). Com `desativar_ausentes`, as demais ofertas
     ativas da peça nessa loja são desativadas, como no Mercado Livre; use só com busca completa.
+    Com `revisao_manual` (dados de quem decidiu), a associação foi aprovada por uma pessoa: a decisão
+    automática não é refeita, mas peça, trava, publicação e posse do anúncio continuam sendo conferidas.
     Não altera o preço da peça: ele é lido das ofertas.
     """
     from datetime import datetime, timezone
@@ -145,15 +147,16 @@ def atualizar_ofertas_validadas(peca, loja, itens, assinatura, *, simular, desat
         db.session.refresh(peca, with_for_update=True)
         if assinatura_peca(peca) != assinatura or not peca.publicavel:
             raise ValueError('Peça mudou durante a consulta')
-        indice = IndiceCandidatosService.carregar(type(peca))
-        for _, produto in itens:
-            decisao = indice.avaliar(produto)
-            if decisao['classificacao'] != 'confirmada' or decisao['peca'] != f'{peca.__tablename__}:{peca.id}':
-                raise ValueError('Associação mudou durante a consulta')
+        if revisao_manual is None:
+            indice = IndiceCandidatosService.carregar(type(peca))
+            for _, produto in itens:
+                decisao = indice.avaliar(produto)
+                if decisao['classificacao'] != 'confirmada' or decisao['peca'] != f'{peca.__tablename__}:{peca.id}':
+                    raise ValueError('Associação mudou durante a consulta')
         agora = datetime.now(timezone.utc).replace(tzinfo=None)
         propostas = aplicar_ofertas_loja(peca, loja, [oferta for oferta, _ in itens], agora)
         if loja == 'shopee':
-            _registrar_vinculos_shopee(peca, itens, agora)
+            _registrar_vinculos_shopee(peca, itens, agora, revisao_manual)
         if desativar_ausentes:
             propostas += _desativar_ausentes(peca, loja, {produto.id_externo for _, produto in itens})
         if simular:
@@ -168,7 +171,7 @@ def atualizar_ofertas_validadas(peca, loja, itens, assinatura, *, simular, desat
         raise
 
 
-def _registrar_vinculos_shopee(peca, itens, agora):
+def _registrar_vinculos_shopee(peca, itens, agora, revisao_manual=None):
     from dataclasses import asdict
     from models import ProdutoPendente
     from utils.identidade_peca import assinatura_peca, assinatura_tecnica
@@ -185,6 +188,9 @@ def _registrar_vinculos_shopee(peca, itens, agora):
         pendente.revisado_em = agora
         pendente.evidencias = {**(pendente.evidencias or {}), 'vinculo': {
             'assinatura_peca': assinatura_peca(peca), 'assinatura_tecnica': assinatura_tecnica(peca)}}
+        if revisao_manual:
+            pendente.motivo = 'Associação aprovada por um administrador'
+            pendente.evidencias = {**pendente.evidencias, 'revisao_manual': revisao_manual}
 
 
 def _desativar_ausentes(peca, loja, mantidas):

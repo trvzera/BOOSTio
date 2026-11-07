@@ -6,6 +6,7 @@ from services.configuracao_service.configurar_acesso_service import ConfigurarAc
 from services.configuracao_service.validar_producao_service import ValidarProducaoService
 from models import db,lm,mail 
 from commands.marketplaces import registrar_comandos_marketplaces
+from commands.usuarios import registrar_comandos_usuarios
 from commands.precos import registrar_comandos_precos
 from commands.mercadolivre import registrar_comandos_mercadolivre
 import os
@@ -17,6 +18,7 @@ from controllers.email_controller import email_bp
 from controllers.benchmark_controller import benchmark_bp
 from controllers.build_controller import build_bp
 from controllers.saude_controller import saude_bp
+from controllers.admin_controller import admin_bp
 from migrations.budget_usuario import registrar_migracao_budget
 from commands.fabricantes import registrar_comandos_fabricantes
 from commands.icecat import registrar_comandos_icecat
@@ -63,9 +65,11 @@ app.register_blueprint(email_bp)
 app.register_blueprint(benchmark_bp)
 app.register_blueprint(build_bp)
 app.register_blueprint(saude_bp)
+app.register_blueprint(admin_bp)
 registrar_migracao_budget(app, db)
 
 registrar_comandos_marketplaces(app)
+registrar_comandos_usuarios(app)
 registrar_comandos_banco(app)
 registrar_comandos_catalogo(app)
 registrar_comandos_catalogo_tecnico(app)

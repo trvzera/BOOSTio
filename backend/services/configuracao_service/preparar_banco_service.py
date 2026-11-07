@@ -7,6 +7,7 @@ from sqlalchemy import inspect
 from models import db
 from migrations.budget_usuario import migrar_budget
 from migrations.google_usuario import migrar_google_usuario
+from migrations.administrador_usuario import preparar_administrador_usuario
 from migrations.sessao_usuario import migrar_sessao_usuario
 from migrations.tokens_recuperacao import migrar_tokens_recuperacao
 from migrations.imagens_pecas import migrar_imagens_pecas
@@ -33,6 +34,7 @@ class PrepararBancoService:
       migrar_budget(caminho)
     migrar_google_usuario()
     migrar_sessao_usuario()
+    preparar_administrador_usuario(simular=False)
     migrar_tokens_recuperacao()
     migrar_imagens_pecas()
     migrar_rede_build()

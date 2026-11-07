@@ -46,6 +46,42 @@ class ProdutoPendente(ModeloBase):
 
 
     @classmethod
+    def listar_para_admin(cls, *, status, loja=None, categoria=None, depois_id=0, limite=20):
+        """Página de pendências em ordem estável; devolve também o total do filtro."""
+        consulta = cls.query.filter(cls.status == status)
+        if loja is not None:
+            consulta = consulta.filter(cls.loja == loja)
+        if categoria is not None:
+            consulta = consulta.filter(cls.categoria_sugerida == categoria)
+        total = consulta.count()
+        return consulta.filter(cls.id > depois_id).order_by(cls.id).limit(limite).all(), total
+
+    @classmethod
+    def contar_por_status(cls):
+        from sqlalchemy import func
+        return dict(db.session.query(cls.status, func.count(cls.id)).group_by(cls.status).all())
+
+    @classmethod
+    def rejeitar(cls, identificador, motivo, revisao):
+        """Encerra uma pendência aberta; nunca reabre uma já importada ou rejeitada."""
+        from datetime import datetime, timezone
+        try:
+            registro = cls.query.filter_by(id=identificador).with_for_update().first()
+            if registro is None:
+                raise LookupError('Pendência não encontrada')
+            if registro.status not in ('pendente', 'em_revisao'):
+                raise ValueError('Esta pendência já foi decidida')
+            registro.status = 'rejeitado'
+            registro.motivo = motivo
+            registro.revisado_em = datetime.now(timezone.utc).replace(tzinfo=None)
+            registro.evidencias = {**(registro.evidencias or {}), 'revisao_manual': revisao}
+            db.session.commit()
+            return registro
+        except Exception:
+            db.session.rollback()
+            raise
+
+    @classmethod
     def registrar_descobertos(cls, linhas, *, simular=True):
         """Transação por página. Nunca reabre pendência revisada ou altera oferta."""
         from . import Oferta
