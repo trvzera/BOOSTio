@@ -59,3 +59,25 @@ Regras do aceite:
   outra peça, peça que mudou desde a análise ou anúncio que saiu do ar recusam o aceite. Se o Mercado Livre
   não responder, o painel recebe 502 e nada é gravado.
 - Pendência já aceita ou rejeitada não é reaberta (nem pelas buscas seguintes).
+
+## Sugestão da IA nas pendências
+
+Para não analisar tudo à mão, a IA pode recomendar a peça de cada pendência aberta:
+
+```bash
+cd backend
+python -m flask --app app admin-pendencias-sugerir --limite 20            # só conta o que analisaria
+python -m flask --app app admin-pendencias-sugerir --limite 20 --aplicar  # chama a IA e grava
+```
+
+- A IA **só sugere**. Nada é aceito ou rejeitado por ela: a recomendação (peça, confiança de 0 a 100,
+  justificativa curta, modelo e versão do prompt) fica em `evidencias.sugestao_ia` da pendência.
+- Entram só pendências que têm candidata aprovada e sem conflito. A resposta é validada: a peça indicada
+  precisa ser uma das candidatas e a confiança, um inteiro de 0 a 100; caso contrário conta como falha.
+- Pendência já analisada, com as mesmas candidatas e o mesmo anúncio, não gasta IA de novo (`--refazer` força).
+- O texto do anúncio vai como dado, com instrução de ignorar ordens contidas nele; mesmo assim, o painel
+  continua sendo quem aceita, e o aceite reconsulta o anúncio e valida a peça.
+- Usa `GEMINI_API_KEY`; o modelo pode ser trocado com `IA_ANALISE_MODELO`. Não consome a cota diária de
+  gerações dos usuários.
+- No painel aparece a etiqueta "IA sugere (92%)" na pendência e a marca "Sugerida pela IA" na candidata,
+  com a justificativa. `--loja` e `--categoria` filtram o lote.

@@ -66,6 +66,19 @@ class ProdutoPendente(ModeloBase):
         return dict(db.session.query(cls.status, func.count(cls.id)).group_by(cls.status).all())
 
     @classmethod
+    def registrar_sugestao_ia(cls, identificador, sugestao):
+        """Guarda a recomendação da IA; é só informação, nunca decide nem muda o status."""
+        try:
+            registro = cls.query.filter_by(id=identificador).with_for_update().first()
+            if registro is None or registro.status not in ('pendente', 'em_revisao'):
+                raise ValueError('Pendência ausente ou já encerrada')
+            registro.evidencias = {**(registro.evidencias or {}), 'sugestao_ia': sugestao}
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
+
+    @classmethod
     def descartar_candidato(cls, identificador, peca, revisao):
         """Tira uma peça da lista de candidatas; um novo matching não a recoloca."""
         try:

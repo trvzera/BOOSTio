@@ -15,6 +15,22 @@ from services.catalogo_service.pendencias_montagem_service import pendencias_par
 
 
 def registrar_comandos_marketplaces(app):
+    @app.cli.command('admin-pendencias-sugerir')
+    @click.option('--limite', type=click.IntRange(1, 200), default=20, show_default=True)
+    @click.option('--loja', type=click.Choice(LOJAS))
+    @click.option('--categoria', type=click.Choice([m.__tablename__ for m in MODELOS_PECAS]))
+    @click.option('--refazer', is_flag=True, help='Analisa de novo pendências que já têm sugestão.')
+    @click.option('--aplicar', is_flag=True, help='Chama a IA e grava as sugestões; padrão só conta o que analisaria.')
+    def sugerir_pendencias(limite, loja, categoria, refazer, aplicar):
+        """A IA sugere a peça de cada pendência aberta. Não aceita nada: a decisão é do administrador."""
+        from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
+        try:
+            resumo = SugerirPendenciaService().executar(limite=limite, loja=loja, categoria=categoria,
+                                                        refazer=refazer, simular=not aplicar)
+        except (ValueError, RuntimeError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, (ValueError, RuntimeError)) else 'Confira o banco de dados') from None
+        click.echo(json.dumps(resumo, ensure_ascii=False))
+
     @app.cli.command('shopee-descobrir')
     @click.option('--categoria', type=click.Choice([m.__tablename__ for m in MODELOS_PECAS]), required=True)
     @click.option('--termo', required=True)

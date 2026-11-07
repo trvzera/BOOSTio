@@ -41,6 +41,9 @@ export function iniciarPendencias(raiz) {
     const cabecalho = elemento("div", "admin-pending-head");
     cabecalho.append(elemento("span", "admin-badge", rotuloLoja(pendencia.loja)),
       elemento("span", "admin-badge admin-badge-muted", rotuloCategoria(pendencia.categoria)));
+    if (pendencia.sugestao_ia) {
+      cabecalho.append(elemento("span", "admin-badge admin-badge-ia", textoSugestao(pendencia.sugestao_ia)));
+    }
     const titulo = elemento("h3", "admin-pending-title font-1-m", pendencia.titulo);
     const meta = elemento("p", "admin-pending-meta font-2-s",
       `${formatarFaixaPreco(pendencia.preco)} · ${pendencia.total_candidatos} candidato(s) · ${rotuloSituacao(pendencia.status)}`);
@@ -78,7 +81,11 @@ export function iniciarPendencias(raiz) {
     }
   }
 
-  function candidato(dados, grupo, pendenciaId) {
+  function textoSugestao(sugestao) {
+    return sugestao.peca ? `IA sugere (${sugestao.confianca}%)` : "IA: sem correspondência segura";
+  }
+
+  function candidato(dados, grupo, pendenciaId, sugestao) {
     const linha = elemento("div", "admin-candidate-row");
     const rotulo = elemento("label", "admin-candidate");
     const radio = elemento("input");
@@ -88,6 +95,9 @@ export function iniciarPendencias(raiz) {
     texto.append(elemento("strong", "font-1-m", descreverCandidato(dados)),
       elemento("span", "font-2-s", `Pontuação ${dados.percentual ?? "—"}`));
     const {conflitos, pendencias} = textoRestricoes(dados);
+    if (sugestao?.peca && sugestao.peca === dados.peca) {
+      texto.append(elemento("span", "admin-ia font-2-s", `Sugerida pela IA (${sugestao.confianca}%)${sugestao.justificativa ? ": " + sugestao.justificativa : ""}`));
+    }
     if (conflitos.length) texto.append(elemento("span", "admin-alert font-2-s", "Conflito: " + conflitos.join(", ")));
     if (pendencias.length) texto.append(elemento("span", "admin-note font-2-s", "Falta comprovar: " + pendencias.join(", ")));
     rotulo.append(radio, texto);
@@ -137,6 +147,9 @@ export function iniciarPendencias(raiz) {
       elemento("p", "font-2-s", `${rotuloLoja(dados.loja)} · ${rotuloCategoria(dados.categoria)} · ${formatarFaixaPreco(dados.preco)}`),
       origem);
     if (dados.motivo) detalhe.append(elemento("p", "admin-note font-2-s", dados.motivo));
+    if (dados.sugestao_ia && !dados.sugestao_ia.peca) {
+      detalhe.append(elemento("p", "admin-ia font-2-s", `IA não encontrou correspondência segura${dados.sugestao_ia.justificativa ? ": " + dados.sugestao_ia.justificativa : "."}`));
+    }
     const aberta = ["em_revisao", "pendente"].includes(dados.status);
     if (!aberta) {
       detalhe.append(elemento("p", "admin-note font-2-s", `Esta pendência já foi decidida (${rotuloSituacao(dados.status)}).`));
@@ -145,7 +158,7 @@ export function iniciarPendencias(raiz) {
     const grupo = elemento("fieldset", "admin-candidates");
     grupo.append(elemento("legend", "font-1-m", "Peça correspondente"));
     if (!dados.candidatos.length) grupo.append(elemento("p", "font-2-s", "Sem candidatos: só é possível rejeitar."));
-    dados.candidatos.forEach(c => candidato(c, grupo, dados.id));
+    dados.candidatos.forEach(c => candidato(c, grupo, dados.id, dados.sugestao_ia));
     const motivo = elemento("input", "admin-reason");
     motivo.type = "text"; motivo.maxLength = 200; motivo.placeholder = "Motivo da rejeição (opcional)";
     motivo.setAttribute("aria-label", "Motivo da rejeição");

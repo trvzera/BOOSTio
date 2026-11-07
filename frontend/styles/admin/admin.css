@@ -43,6 +43,8 @@
   padding: 4px 12px; border-radius: 999px; background: var(--cor-2); color: var(--cor-5); font-size: 0.8125rem;
 }
 .admin-badge { background: var(--cor-p5); }
+.admin-badge-ia { background: var(--cor-2); color: var(--cor-s3); border: 1px solid var(--cor-s3); }
+.admin-ia { color: var(--cor-s3); }
 .admin-badge-muted { background: var(--cor-2); }
 
 .admin-status { min-height: 1.5em; margin-bottom: 16px; color: var(--cor-4); }

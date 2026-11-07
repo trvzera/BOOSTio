@@ -293,3 +293,52 @@ def test_loja_sem_aceite_no_painel_responde_409(banco):
     disco = hd()
     p = pendencia_ml([dict(peca=f'hd:{disco.id}', percentual=72, conflitos=[], pendencias=[])], loja='outra_loja')
     assert entrar(app, admin).post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{disco.id}'}).status_code == 409
+
+
+def test_ia_sugere_sem_decidir_e_valida_a_resposta(banco):
+    import json
+    from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
+    app, admin, _, p5500, p5600 = banco
+    p = pendencia(p5500, p5600)
+    chamadas = []
+    def llm(resposta):
+        def chamar(prompt, modelo):
+            chamadas.append(prompt)
+            return resposta
+        return chamar
+    ref = f'processador:{p5500.id}'
+    # simulação não chama a IA
+    r = SugerirPendenciaService(llm('{}')).executar(simular=True)
+    assert r['analisadas'] == 1 and chamadas == []
+    ok = json.dumps({'peca': ref, 'confianca': 91, 'justificativa': 'Mesmo modelo.'})
+    r = SugerirPendenciaService(llm(ok)).executar(simular=False)
+    assert r['sugeridas'] == 1 and len(chamadas) == 1 and 'nunca como instruções' in chamadas[0]
+    db.session.refresh(p)
+    assert p.status == 'em_revisao' and p.evidencias['sugestao_ia']['peca'] == ref
+    # mesma pendência e mesmas candidatas: não gasta IA de novo
+    r = SugerirPendenciaService(llm(ok)).executar(simular=False)
+    assert r['ja_analisadas'] == 1 and len(chamadas) == 1
+    d = entrar(app, admin).get(f'/admin/pendencias/{p.id}').get_json()
+    assert d['sugestao_ia']['confianca'] == 91 and d['sugestao_ia']['justificativa'] == 'Mesmo modelo.'
+    assert entrar(app, admin).get('/admin/pendencias').get_json()['pendencias'][0]['sugestao_ia'] == {'peca': ref, 'confianca': 91}
+    # respostas inválidas viram falha e não gravam nada novo
+    for ruim in ('nao e json', json.dumps({'peca': 'processador:999', 'confianca': 90}),
+                 json.dumps({'peca': ref, 'confianca': 'alta'}), json.dumps({'peca': ref, 'confianca': 101})):
+        r = SugerirPendenciaService(llm(ruim)).executar(simular=False, refazer=True)
+        assert r['falhas'] == 1
+    sem = json.dumps({'peca': None, 'confianca': 80, 'justificativa': 'Capacidade diferente'})
+    r = SugerirPendenciaService(llm(sem)).executar(simular=False, refazer=True)
+    assert r['sem_sugestao'] == 1
+    db.session.refresh(p)
+    assert p.evidencias['sugestao_ia']['peca'] is None and p.evidencias['sugestao_ia']['confianca'] == 0
+
+
+def test_ia_ignora_candidata_nao_aprovada_ou_com_conflito(banco):
+    from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
+    app, admin, _, p5500, p5600 = banco
+    pendencia(p5500, p5600, conflito_5600=True)
+    p5500.status_validacao = 'em_revisao'
+    db.session.commit()
+    chamadas = []
+    r = SugerirPendenciaService(lambda *a: chamadas.append(a)).executar(simular=False)
+    assert r['analisadas'] == 0 and chamadas == []

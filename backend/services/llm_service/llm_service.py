@@ -8,7 +8,7 @@ class RespostaLLMInvalida(ValueError):
   pass
 
 class LLMService:
-  def executar(self, prompt: str, modelo: str = "gemini-3.5-flash-lite"):
+  def executar(self, prompt: str, modelo: str = "gemini-3.5-flash-lite", *, reservar_cota: bool = True):
     if not isinstance(prompt, str) or not prompt.strip():
       raise ValueError("Informe o prompt para gerar a resposta")
     if not isinstance(modelo, str) or not modelo.strip():
@@ -18,7 +18,8 @@ class LLMService:
     if not chave:
       raise RuntimeError("GEMINI_API_KEY não configurada")
 
-    ReservarChamadaService().executar()
+    if reservar_cota:
+      ReservarChamadaService().executar()
 
     resposta = requests.post(
       f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent",

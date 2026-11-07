@@ -16,11 +16,26 @@ def apresentar_pendencia(pendencia, *, detalhado=False):
         "preco": _preco(pendencia),
         "coletado_em": pendencia.coletado_em.isoformat() if pendencia.coletado_em else None,
         "total_candidatos": len(candidatos),
+        "sugestao_ia": _sugestao(pendencia, detalhado),
     }
     if detalhado:
         dados["candidatos"] = [_candidato(c) for c in candidatos]
         dados["decisao"] = (pendencia.evidencias or {}).get("revisao_manual")
     return dados
+
+
+def _sugestao(pendencia, detalhado):
+    sugestao = (pendencia.evidencias or {}).get("sugestao_ia")
+    if not isinstance(sugestao, dict):
+        return None
+    resumo = {"peca": sugestao.get("peca"), "confianca": sugestao.get("confianca")}
+    if detalhado:
+        resumo["justificativa"] = sugestao.get("justificativa")
+    return resumo
+
+
+def preco_do_anuncio(pendencia):
+    return _preco(pendencia)
 
 
 def _preco(pendencia):
@@ -41,7 +56,7 @@ _FICHA = (("capacidade_gb", "{} GB"), ("tipo", "{}"), ("interface", "{}"), ("for
           ("velocidade_leitura_mbps", "leitura {} MB/s"), ("velocidade_gravacao_mbps", "gravação {} MB/s"))
 
 
-def _ficha(peca):
+def resumir_ficha(peca):
     """Resumo do que a peça já tem na ficha; o que falta simplesmente não aparece."""
     return [texto.format(getattr(peca, campo)) for campo, texto in _FICHA
             if peca is not None and getattr(peca, campo, None) not in (None, "")]
@@ -60,5 +75,5 @@ def _candidato(candidato):
         "fabricante": peca.fabricante if peca else None,
         "modelo": peca.modelo if peca else None,
         "part_number": peca.part_number if peca else None,
-        "ficha": _ficha(peca),
+        "ficha": resumir_ficha(peca),
     }
