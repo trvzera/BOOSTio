@@ -91,11 +91,12 @@ export function iniciarPendencias(raiz) {
     if (conflitos.length) texto.append(elemento("span", "admin-alert font-2-s", "Conflito: " + conflitos.join(", ")));
     if (pendencias.length) texto.append(elemento("span", "admin-note font-2-s", "Falta comprovar: " + pendencias.join(", ")));
     rotulo.append(radio, texto);
-    const tirar = elemento("button", "btn-ghost admin-candidate-remove", "Tirar da lista");
+    const tirar = elemento("button", "admin-candidate-remove", "×");
     tirar.type = "button";
     tirar.setAttribute("aria-label", `Tirar da lista: ${descreverCandidato(dados)}`);
     tirar.addEventListener("click", () => tirarCandidato(pendenciaId, dados.peca, tirar));
     linha.append(rotulo, tirar);
+    linha.dataset.peca = dados.peca;
     grupo.append(linha);
   }
 

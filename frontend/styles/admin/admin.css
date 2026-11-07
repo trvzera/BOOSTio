@@ -74,15 +74,22 @@
 
 .admin-candidates { margin: 16px 0 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px; }
 .admin-candidates legend { margin-bottom: 8px; padding: 0; }
-.admin-candidate-row { display: flex; gap: 8px; align-items: stretch; }
-.admin-candidate-row .admin-candidate { flex: 1; min-width: 0; }
-.admin-candidate-remove { align-self: center; white-space: nowrap; }
-.admin-candidate {
-  display: flex; gap: 12px; align-items: flex-start; padding: 12px;
-  border: 1px solid var(--cor-2); border-radius: 12px; cursor: pointer;
+.admin-candidate-row {
+  position: relative; border: 1px solid var(--cor-2); border-radius: 12px;
 }
-.admin-candidate:has(input:checked) { border-color: var(--cor-p1); }
-.admin-candidate:has(input:disabled) { opacity: 0.6; cursor: not-allowed; }
+.admin-candidate-row:has(input:checked) { border-color: var(--cor-p1); }
+.admin-candidate-row:has(input:disabled) { opacity: 0.6; }
+.admin-candidate {
+  display: flex; gap: 12px; align-items: flex-start; padding: 12px 44px 12px 12px; cursor: pointer;
+}
+.admin-candidate-remove {
+  position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; padding: 0;
+  border: 0; border-radius: 50%; background: transparent; color: var(--cor-4);
+  font-size: 1.25rem; line-height: 1; cursor: pointer;
+}
+.admin-candidate-remove:hover { background: var(--cor-2); color: var(--cor-6); }
+.admin-candidate-remove:disabled { opacity: 0.5; cursor: not-allowed; }
+.admin-candidate:has(input:disabled) { cursor: not-allowed; }
 .admin-candidate-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
 
 .admin-actions { display: flex; flex-wrap: wrap; gap: 12px; }
