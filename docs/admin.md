@@ -30,7 +30,7 @@ atualização, antes de subir o código novo: sem a coluna, o login quebra.
 ## Como a proteção funciona
 
 - O link "Administração" aparece no menu do perfil só para administradores (`/auth/me` devolve `administrador`).
-- A página confere o papel e leva quem não for administrador à tela de erro 403.
+- A página começa oculta e só aparece depois de confirmado o papel. Quem não é administrador vê "página não encontrada" (404), sem flash do painel nem título de administração. Visitante sem login vai para o login.
 - **O que protege de verdade é o servidor:** toda rota `/admin/*` usa `@login_required` e `@apenas_administrador`
   (401 sem login, 403 sem o papel) e as ações de escrita exigem o token CSRF como no resto do site.
 
