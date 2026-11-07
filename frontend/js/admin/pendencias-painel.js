@@ -75,8 +75,8 @@ export function iniciarPendencias(raiz) {
     enviarIA.textContent = n ? `Enviar para a IA (${n})` : "Enviar para a IA";
   }
 
-  // A IA analisa poucas pendências por pedido; o painel envia em grupos e mostra o andamento.
-  const TAMANHO_GRUPO = 5;
+  // Até 20 pendências vão numa só requisição à IA (o plano gratuito limita requisições por minuto).
+  const TAMANHO_GRUPO = 20;
   async function enviarSelecionadasParaIA({decidir = false} = {}) {
     const ids = marcadas().map(c => Number(c.value));
     if (!ids.length) return;

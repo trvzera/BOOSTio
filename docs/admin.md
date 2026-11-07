@@ -44,7 +44,7 @@ Lista os anúncios de `produto_pendente` (por padrão `em_revisao`), com filtros
 | `GET /admin/pendencias/<id>` | Detalhe com os candidatos (peça, pontuação, conflitos e o que falta comprovar). |
 | `POST /admin/pendencias/<id>/aceitar` | `{"peca": "categoria:id"}`: cria a oferta e o vínculo. |
 | `POST /admin/pendencias/<id>/candidatos/descartar` | `{"peca": "categoria:id"}`: tira só aquela peça da lista de candidatas (fica registrado e um novo matching não a recoloca). |
-| `POST /admin/pendencias/enviar-ia` | `{"ids": [1, 2], "decidir": false}`: a IA analisa até 10 pendências por pedido (sempre refaz); com `decidir: true` também aceita ou rejeita as de alta confiança. |
+| `POST /admin/pendencias/enviar-ia` | `{"ids": [1, 2], "decidir": false}`: a IA analisa até 20 pendências por pedido, numa só requisição (sempre refaz); com `decidir: true` também aceita ou rejeita as de alta confiança. |
 | `POST /admin/pendencias/<id>/rejeitar` | `{"motivo": "..."}` (opcional, até 200 caracteres). |
 
 Regras do aceite:
@@ -89,4 +89,12 @@ python -m flask --app app admin-pendencias-sugerir --limite 20 --aplicar  # cham
   com a justificativa. `--loja` e `--categoria` filtram o lote.
 
 No painel, cada pendência tem uma caixa de seleção, e há "Selecionar todas" e o botão **Enviar para a IA (n)**.
-O painel envia em grupos de 5 e mostra o andamento; ao final recarrega a lista com as etiquetas da IA.
+O painel envia em grupos de 20 (uma requisição à IA por grupo) e mostra o andamento; ao final recarrega a lista com as etiquetas da IA.
+
+### Requisições à IA
+
+O plano gratuito do Gemini limita as requisições por minuto, então as pendências vão **juntas**: até 20 por
+requisição (`IA_ANALISE_LOTE`, padrão 20). A resposta traz uma entrada por pendência e cada uma é validada
+separadamente: item ausente ou inválido fica sem sugestão e não estraga os demais. Se a resposta inteira
+falhar (JSON cortado, por exemplo), o lote é dividido ao meio e reenviado. Para reduzir o risco de uma
+resposta longa demais, mantenha o lote em torno de 20.

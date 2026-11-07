@@ -295,6 +295,15 @@ def test_loja_sem_aceite_no_painel_responde_409(banco):
     assert entrar(app, admin).post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{disco.id}'}).status_code == 409
 
 
+def _responder_lote(prompt, resposta):
+    """Simula o Gemini: uma resposta-modelo (dict) vale para todas as pendências recebidas no prompt."""
+    import json, re
+    if not isinstance(resposta, dict):
+        return resposta
+    ids = [int(i) for i in dict.fromkeys(re.findall(r'"pendencia_id": (\d+)', prompt))]
+    return json.dumps({'resultados': [{'pendencia_id': i, **resposta} for i in ids]})
+
+
 def test_ia_sugere_sem_decidir_e_valida_a_resposta(banco):
     import json
     from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
@@ -304,13 +313,13 @@ def test_ia_sugere_sem_decidir_e_valida_a_resposta(banco):
     def llm(resposta):
         def chamar(prompt, modelo):
             chamadas.append(prompt)
-            return resposta
+            return _responder_lote(prompt, resposta)
         return chamar
     ref = f'processador:{p5500.id}'
     # simulação não chama a IA
-    r = SugerirPendenciaService(llm('{}')).executar(simular=True)
+    r = SugerirPendenciaService(llm({})).executar(simular=True)
     assert r['analisadas'] == 1 and chamadas == []
-    ok = json.dumps({'peca': ref, 'confianca': 91, 'justificativa': 'Mesmo modelo.'})
+    ok = {'peca': ref, 'confianca': 91, 'justificativa': 'Mesmo modelo.'}
     r = SugerirPendenciaService(llm(ok)).executar(simular=False)
     assert r['sugeridas'] == 1 and len(chamadas) == 1 and 'nunca como instruções' in chamadas[0]
     db.session.refresh(p)
@@ -322,11 +331,11 @@ def test_ia_sugere_sem_decidir_e_valida_a_resposta(banco):
     assert d['sugestao_ia']['confianca'] == 91 and d['sugestao_ia']['justificativa'] == 'Mesmo modelo.'
     assert entrar(app, admin).get('/admin/pendencias').get_json()['pendencias'][0]['sugestao_ia'] == {'peca': ref, 'confianca': 91}
     # respostas inválidas viram falha e não gravam nada novo
-    for ruim in ('nao e json', json.dumps({'peca': 'processador:999', 'confianca': 90}),
-                 json.dumps({'peca': ref, 'confianca': 'alta'}), json.dumps({'peca': ref, 'confianca': 101})):
+    for ruim in ('nao e json', {'peca': 'processador:999', 'confianca': 90},
+                 {'peca': ref, 'confianca': 'alta'}, {'peca': ref, 'confianca': 101}):
         r = SugerirPendenciaService(llm(ruim)).executar(simular=False, refazer=True)
         assert r['falhas'] == 1
-    sem = json.dumps({'peca': None, 'confianca': 80, 'justificativa': 'Capacidade diferente'})
+    sem = {'peca': None, 'confianca': 80, 'justificativa': 'Capacidade diferente'}
     r = SugerirPendenciaService(llm(sem)).executar(simular=False, refazer=True)
     assert r['sem_sugestao'] == 1
     db.session.refresh(p)
@@ -352,12 +361,12 @@ def test_painel_envia_varias_pendencias_para_a_ia(banco, monkeypatch):
     ref = f'processador:{p5600.id}'
     chamadas = []
     monkeypatch.setattr(modulo.LLMService, 'executar',
-        lambda self, prompt, modelo, **kw: chamadas.append(kw) or json.dumps({'peca': ref, 'confianca': 88, 'justificativa': 'ok'}))
+        lambda self, prompt, modelo, **kw: chamadas.append(kw) or _responder_lote(prompt, {'peca': ref, 'confianca': 88, 'justificativa': 'ok'}))
     cliente = entrar(app, admin)
     r = cliente.post('/admin/pendencias/enviar-ia', json={'ids': [a.id, b.id, a.id, 9999]})
     assert r.status_code == 200
     d = r.get_json()
-    assert d['sugeridas'] == 2 and d['ignoradas'] == 1 and chamadas == [{'reservar_cota': False}] * 2
+    assert d['sugeridas'] == 2 and d['ignoradas'] == 1 and chamadas == [{'reservar_cota': False}]  # uma só requisição para as duas
     assert d['sugestoes'] == {str(a.id): {'peca': ref, 'confianca': 88}, str(b.id): {'peca': ref, 'confianca': 88}}
     # reenviar refaz a análise
     assert cliente.post('/admin/pendencias/enviar-ia', json={'ids': [a.id]}).get_json()['sugeridas'] == 1
@@ -374,7 +383,7 @@ def test_envio_para_ia_e_so_de_administrador(banco):
 def _ia(monkeypatch, resposta):
     import json
     from services.admin_service import sugerir_pendencia_service as modulo
-    monkeypatch.setattr(modulo.LLMService, 'executar', lambda self, prompt, modelo, **kw: json.dumps(resposta))
+    monkeypatch.setattr(modulo.LLMService, 'executar', lambda self, prompt, modelo, **kw: _responder_lote(prompt, resposta))
 
 
 def test_ia_decide_aceitando_ou_rejeitando_so_com_confianca_suficiente(banco, monkeypatch):
@@ -423,3 +432,42 @@ def test_ia_nao_decide_quando_o_aceite_falha(banco, monkeypatch):
     assert r['decisoes_falhas'] == 1 and r['aceitas'] == 0
     db.session.refresh(a)
     assert a.status == 'em_revisao'
+
+
+def test_ia_analisa_varias_pendencias_numa_requisicao_e_isola_respostas_ruins(banco, monkeypatch):
+    import json
+    from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
+    app, admin, _, p5500, p5600 = banco
+    pend = [pendencia(p5500, p5600, item=i) for i in range(1, 5)]
+    ref = f'processador:{p5500.id}'
+    prompts = []
+    def llm(prompt, modelo):
+        prompts.append(prompt)
+        itens = [{'pendencia_id': pend[0].id, 'peca': ref, 'confianca': 95, 'justificativa': 'ok'},
+                 {'pendencia_id': pend[1].id, 'peca': 'processador:999', 'confianca': 95},   # fora das candidatas
+                 {'pendencia_id': pend[2].id, 'peca': None, 'confianca': 'x'}]               # confiança inválida; a 4ª não veio
+        return json.dumps({'resultados': itens})
+    r = SugerirPendenciaService(llm).executar(simular=False)
+    assert len(prompts) == 1 and r['requisicoes_ia'] == 1
+    assert r['sugeridas'] == 1 and r['falhas'] == 3
+    for p in pend:
+        db.session.refresh(p)
+    assert p.status == 'em_revisao'
+    assert pend[0].evidencias['sugestao_ia']['peca'] == ref and 'sugestao_ia' not in (pend[1].evidencias or {})
+
+
+def test_ia_divide_o_lote_ao_meio_quando_a_resposta_inteira_falha(banco):
+    import json, re
+    from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
+    app, admin, _, p5500, p5600 = banco
+    pend = [pendencia(p5500, p5600, item=i) for i in range(1, 5)]
+    ref = f'processador:{p5500.id}'
+    tamanhos = []
+    def llm(prompt, modelo):
+        ids = [int(i) for i in dict.fromkeys(re.findall(r'"pendencia_id": (\d+)', prompt))]
+        tamanhos.append(len(ids))
+        if len(ids) > 2:
+            return '{"resultados": [{"pendencia_id"'   # resposta cortada
+        return json.dumps({'resultados': [{'pendencia_id': i, 'peca': ref, 'confianca': 90} for i in ids]})
+    r = SugerirPendenciaService(llm).executar(simular=False)
+    assert tamanhos == [4, 2, 2] and r['sugeridas'] == 4 and r['falhas'] == 0 and r['requisicoes_ia'] == 3
