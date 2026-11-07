@@ -16,6 +16,14 @@ A geração de builds passou a usar o **menor preço entre as ofertas ativas dis
 da KaBuM. A Shopee não informa estoque, e por decisão do projeto seus anúncios ativos contam como
 disponíveis. Ofertas do Mercado Livre só entram quando o estoque é conhecido como disponível.
 
+## Peça sem preço não aparece
+
+O catálogo do site e a montagem (manual e inteligente) só enxergam peças **aprovadas e com preço**, isto é,
+com pelo menos uma oferta ativa com preço (`Peca.consulta_catalogo()`). Sem oferta, ou com oferta ativa sem
+preço, a peça some do catálogo, não é candidata na geração por IA e não pode ser salva numa build manual
+("Peça não encontrada no catálogo"). Ao ganhar uma oferta com preço ela volta sozinha. O reconhecimento de
+marcas e o cadastro por importação não dependem de preço.
+
 ## Escrita
 
 | Operação | Onde |

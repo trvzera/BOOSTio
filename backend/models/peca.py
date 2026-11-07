@@ -81,16 +81,24 @@ class Peca(ModeloBase):
     return cls.query.filter(db.or_(cls.status_validacao.is_(None), cls.status_validacao.in_(('aprovado', 'legado'))))
 
   @classmethod
+  def consulta_catalogo(cls):
+    """O que o site mostra e a montagem (manual e inteligente) pode usar: aprovada e com preço.
+
+    O preço vem das ofertas ativas; sem oferta com preço a peça não existe para o usuário.
+    """
+    return cls.consulta_publicavel().filter(cls.preco > 0)
+
+  @classmethod
   def consulta_para_montagem(cls):
-    return cls.consulta_publicavel().filter(cls.ficha_montagem_validada.is_not(False))
+    return cls.consulta_catalogo().filter(cls.ficha_montagem_validada.is_not(False))
 
   @classmethod
   def listar_publicadas(cls):
-    return cls.consulta_publicavel().all()
+    return cls.consulta_catalogo().all()
 
   @classmethod
   def buscar_publicada_por_id(cls, peca_id):
-    return cls.consulta_publicavel().filter_by(id=peca_id).first()
+    return cls.consulta_catalogo().filter_by(id=peca_id).first()
 
   @classmethod
   def fabricantes_para_descoberta(cls):

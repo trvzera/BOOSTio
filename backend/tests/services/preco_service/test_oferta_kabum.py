@@ -129,3 +129,37 @@ def test_shopee_conta_como_disponivel_mesmo_sem_informar_estoque(banco):
     banco.session.commit()
     banco.session.refresh(p)
     assert p.preco == 700
+
+
+def test_peca_sem_oferta_com_preco_nao_existe_para_o_usuario(banco):
+    from models import Processador
+    from services.build_service.listar_catalogo_build_service import ListarCatalogoBuildService
+    sem_oferta, sem_preco, inativa, com_preco = nova_placa(), nova_placa(), nova_placa(), nova_placa()
+    definir_link(sem_preco, 'https://www.kabum.com.br/produto/201/sem-preco')
+    gravar_cotacao_inicial(inativa, 'https://www.kabum.com.br/produto/202/inativa', 800, False, DATA)
+    gravar_cotacao_inicial(com_preco, 'https://www.kabum.com.br/produto/203/ok', 700, False, DATA)
+    banco.session.commit()
+    definir_link(inativa, None)
+    banco.session.commit()
+    esperado = [com_preco.id]
+    assert [p.id for p in PlacaVideo.listar_publicadas()] == esperado
+    assert [p.id for p in PlacaVideo.consulta_para_montagem().all()] == esperado
+    assert [p.id for p in PlacaVideo.listar_candidatos_disponiveis(5000)] == esperado
+    for peca in (sem_oferta, sem_preco, inativa):
+        assert PlacaVideo.buscar_publicada_por_id(peca.id) is None
+    assert PlacaVideo.buscar_publicada_por_id(com_preco.id) is not None
+    catalogo = ListarCatalogoBuildService().executar()
+    assert [p['id'] for p in catalogo] == [f'placa_video:{com_preco.id}']
+    # A marca continua conhecida para reconhecer anúncios, mesmo sem preço.
+    assert PlacaVideo.fabricantes_para_descoberta() == ['Marca']
+
+
+def test_montagem_manual_recusa_peca_sem_preco_e_aceita_a_com_preco(banco):
+    from services.validacoes_service.validar_estado_build_service import validar_estado
+    sem_preco, com_preco = nova_placa(), nova_placa()
+    gravar_cotacao_inicial(com_preco, 'https://www.kabum.com.br/produto/301/ok', 700, False, DATA)
+    banco.session.commit()
+    with pytest.raises(ValueError, match='Peça não encontrada no catálogo'):
+        validar_estado({'titulo': 'Teste', 'componentes': {'placa_video': {'id': sem_preco.id, 'quantidade': 1}}})
+    estado = validar_estado({'titulo': 'Teste', 'componentes': {'placa_video': {'id': com_preco.id, 'quantidade': 1}}})
+    assert estado['componentes']['placa_video']['id'] == com_preco.id

@@ -58,7 +58,8 @@ def test_sem_historico_nao_fabrica_preco_atual(banco):
     _,client,p=banco
     assert client.get(url(p)).get_json()['historico_precos']==[]
     Oferta.query.update({'ativa':False});db.session.commit()
-    assert client.get(url(p)).get_json()['historico_precos']==[]
+    # Sem oferta ativa a peça não existe para o usuário: nem catálogo nem histórico.
+    assert client.get(url(p)).status_code==404
 
 
 def test_exige_sessao(banco):
