@@ -109,6 +109,20 @@ def test_429_repetido_backoff_e_nao_encurta_retry_after(banco):
     assert repo.intervalo('shopee',agora,1)==1000
 
 
+def test_tarefa_concluida_zera_contador_de_limitacoes(banco):
+    app,repo=banco
+    agora=datetime.now(timezone.utc).replace(tzinfo=None)+timedelta(seconds=1)
+    for _ in range(3):
+        repo.suspender('shopee',agora,espera=1,rate_limit=True)
+    assert repo.limitacoes('shopee')==3
+    repo.normalizar_limitacoes('shopee')
+    assert repo.limitacoes('shopee')==0
+    controle=ControleRequisicoesMarketplaceService('shopee',repo,relogio=lambda:agora+timedelta(seconds=5))
+    with pytest.raises(FalhaMarketplace) as erro:
+        controle.executar(Mock(side_effect=FalhaMarketplace(429)))
+    assert erro.value.espera==60
+
+
 def test_nao_permite_intervalo_menor_que_um_segundo(banco):
     for valor in (0,.5,float('inf'),float('nan')):
         with pytest.raises(ValueError):ControleRequisicoesMarketplaceService('shopee',banco[1],intervalo=valor)

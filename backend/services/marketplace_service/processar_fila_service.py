@@ -64,6 +64,7 @@ class ProcessarFilaMarketplaceService:
                     raise controle.erro
                 self.verificar()
                 self.repositorio.finalizar(tarefa, 'concluida', resultado=resultado)
+                self.repositorio.normalizar_limitacoes(loja)
                 status = 'concluida'
             except FilaAguardando:
                 self.repositorio.finalizar(tarefa, 'pendente', disponivel_em=self.relogio()+timedelta(seconds=1))

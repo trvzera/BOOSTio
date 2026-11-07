@@ -54,7 +54,8 @@ A reserva é compartilhada entre workers que usam o mesmo banco.
 
 429: pausa de pelo menos 60 segundos; respeita Retry-After em segundos ou data.
 Limitações repetidas aumentam o backoff até uma hora, sem reduzir um Retry-After
-maior. A tarefa permanece pendente. 500/502/503/504 e falhas temporárias de rede
+maior. O contador de limitações volta a zero quando uma tarefa conclui sem 429,
+então uma limitação isolada não mantém a loja pausada por uma hora. A tarefa permanece pendente. 500/502/503/504 e falhas temporárias de rede
 reagendam com backoff progressivo, também limitado a uma hora. Não há limite que
 apague uma tarefa temporariamente indisponível.
 

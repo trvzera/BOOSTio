@@ -98,6 +98,11 @@ class RepositorioFilaMarketplace:
             s.execute(update(Tarefa).where(Tarefa.loja == loja,
                 Tarefa.status == 'bloqueada').values(status='pendente', disponivel_em=agora))
 
+    def normalizar_limitacoes(self, loja):
+        """Zera o contador de 429 seguidos depois de uma tarefa concluída sem limitação."""
+        with Session(db.engine) as s, s.begin():
+            s.execute(update(Limite).where(Limite.loja == loja, Limite.limitacoes > 0).values(limitacoes=0))
+
     def limitacoes(self, loja):
         with Session(db.engine) as s:
             return s.execute(select(Limite.limitacoes).where(Limite.loja == loja)).scalar_one()
