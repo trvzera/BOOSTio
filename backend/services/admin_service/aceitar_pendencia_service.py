@@ -19,7 +19,7 @@ class AceitarPendenciaService:
     def __init__(self, importador_mercado_livre=None):
         self._importador_mercado_livre = importador_mercado_livre
 
-    def executar(self, pendencia_id, administrador_id, referencia_peca):
+    def executar(self, pendencia_id, administrador_id, referencia_peca, *, origem="administrador"):
         pendencia = ProdutoPendente.buscar_por_id(pendencia_id)
         if pendencia is None:
             raise LookupError("Pendência não encontrada")
@@ -29,7 +29,7 @@ class AceitarPendenciaService:
             raise ConflitoPendencia("Esta loja não tem aceite pelo painel")
         peca = self._peca_candidata(pendencia, referencia_peca)
         revisao = {"acao": "aceitar", "peca": referencia_peca, "administrador_id": administrador_id,
-                   "em": datetime.now(timezone.utc).replace(tzinfo=None).isoformat()}
+                   "origem": origem, "em": datetime.now(timezone.utc).replace(tzinfo=None).isoformat()}
         # A gravação é a mesma da busca automática: trava, posse do anúncio, histórico e vínculo.
         propostas = (self._aceitar_shopee if pendencia.loja == "shopee" else self._aceitar_mercado_livre)(
             pendencia, peca, revisao)

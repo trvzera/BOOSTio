@@ -78,7 +78,8 @@ def descartar_candidato(pendencia_id):
 @apenas_administrador
 def enviar_pendencias_para_ia():
     corpo = request.get_json(silent=True) or {}
-    return _responder(lambda: EnviarPendenciasParaIAService().executar(corpo.get("ids")))
+    return _responder(lambda: EnviarPendenciasParaIAService().executar(
+        corpo.get("ids"), decidir=corpo.get("decidir") is True))
 
 
 @admin_bp.post("/pendencias/<int:pendencia_id>/rejeitar")

@@ -21,12 +21,15 @@ def registrar_comandos_marketplaces(app):
     @click.option('--categoria', type=click.Choice([m.__tablename__ for m in MODELOS_PECAS]))
     @click.option('--refazer', is_flag=True, help='Analisa de novo pendências que já têm sugestão.')
     @click.option('--aplicar', is_flag=True, help='Chama a IA e grava as sugestões; padrão só conta o que analisaria.')
-    def sugerir_pendencias(limite, loja, categoria, refazer, aplicar):
-        """A IA sugere a peça de cada pendência aberta. Não aceita nada: a decisão é do administrador."""
+    @click.option('--decidir', is_flag=True, help='A IA aceita (peça indicada) ou rejeita (nenhuma serve) quando a confiança alcança o mínimo.')
+    @click.option('--confianca-minima', type=click.IntRange(50, 100), default=90, show_default=True)
+    def sugerir_pendencias(limite, loja, categoria, refazer, aplicar, decidir, confianca_minima):
+        """A IA sugere a peça de cada pendência aberta; com --decidir ela também aceita ou rejeita os casos claros."""
         from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
         try:
             resumo = SugerirPendenciaService().executar(limite=limite, loja=loja, categoria=categoria,
-                                                        refazer=refazer, simular=not aplicar)
+                                                        refazer=refazer, simular=not aplicar,
+                                                        decidir=decidir, confianca_minima=confianca_minima)
         except (ValueError, RuntimeError, SQLAlchemyError) as erro:
             raise click.ClickException(str(erro) if isinstance(erro, (ValueError, RuntimeError)) else 'Confira o banco de dados') from None
         click.echo(json.dumps(resumo, ensure_ascii=False))

@@ -330,7 +330,7 @@ def test_ia_sugere_sem_decidir_e_valida_a_resposta(banco):
     r = SugerirPendenciaService(llm(sem)).executar(simular=False, refazer=True)
     assert r['sem_sugestao'] == 1
     db.session.refresh(p)
-    assert p.evidencias['sugestao_ia']['peca'] is None and p.evidencias['sugestao_ia']['confianca'] == 0
+    assert p.evidencias['sugestao_ia']['peca'] is None and p.evidencias['sugestao_ia']['confianca'] == 80
 
 
 def test_ia_ignora_candidata_nao_aprovada_ou_com_conflito(banco):
@@ -369,3 +369,57 @@ def test_envio_para_ia_e_so_de_administrador(banco):
     app, _, comum, p5500, p5600 = banco
     p = pendencia(p5500, p5600)
     assert entrar(app, comum).post('/admin/pendencias/enviar-ia', json={'ids': [p.id]}).status_code in (403, 404)
+
+
+def _ia(monkeypatch, resposta):
+    import json
+    from services.admin_service import sugerir_pendencia_service as modulo
+    monkeypatch.setattr(modulo.LLMService, 'executar', lambda self, prompt, modelo, **kw: json.dumps(resposta))
+
+
+def test_ia_decide_aceitando_ou_rejeitando_so_com_confianca_suficiente(banco, monkeypatch):
+    from services.admin_service.sugerir_pendencia_service import EnviarPendenciasParaIAService
+    app, admin, _, p5500, p5600 = banco
+    ref = f'processador:{p5500.id}'
+    # confiança baixa: só sugere
+    a = pendencia(p5500, p5600, item=1)
+    _ia(monkeypatch, {'peca': ref, 'confianca': 70, 'justificativa': 'talvez'})
+    r = EnviarPendenciasParaIAService().executar([a.id], decidir=True)
+    assert (r['aceitas'], r['rejeitadas']) == (0, 0)
+    db.session.refresh(a)
+    assert a.status == 'em_revisao'
+    # confiança alta na peça: aceita pelo caminho seguro, com origem "ia"
+    _ia(monkeypatch, {'peca': ref, 'confianca': 95, 'justificativa': 'mesmo modelo'})
+    r = EnviarPendenciasParaIAService().executar([a.id], decidir=True)
+    assert r['aceitas'] == 1
+    db.session.refresh(a)
+    assert a.status == 'importado' and a.evidencias['revisao_manual']['origem'] == 'ia'
+    assert Oferta.query.filter_by(loja='shopee', peca_id=p5500.id).count() == 1
+    # nenhuma serve, com certeza: rejeita
+    b = pendencia(p5500, p5600, item=2)
+    _ia(monkeypatch, {'peca': None, 'confianca': 93, 'justificativa': 'capacidade diferente'})
+    r = EnviarPendenciasParaIAService().executar([b.id], decidir=True)
+    assert r['rejeitadas'] == 1
+    db.session.refresh(b)
+    assert b.status == 'rejeitado' and b.motivo.startswith('IA: sem correspondência segura')
+    assert b.evidencias['revisao_manual']['origem'] == 'ia'
+    # sem decidir (padrão do painel "Enviar"), nada muda
+    c = pendencia(p5500, p5600, item=3)
+    _ia(monkeypatch, {'peca': None, 'confianca': 99, 'justificativa': 'x'})
+    r = EnviarPendenciasParaIAService().executar([c.id])
+    assert r['rejeitadas'] == 0
+    db.session.refresh(c)
+    assert c.status == 'em_revisao'
+
+
+def test_ia_nao_decide_quando_o_aceite_falha(banco, monkeypatch):
+    from services.admin_service.sugerir_pendencia_service import EnviarPendenciasParaIAService
+    app, admin, _, p5500, p5600 = banco
+    a = pendencia(p5500, p5600)
+    _ia(monkeypatch, {'peca': f'processador:{p5500.id}', 'confianca': 99, 'justificativa': 'ok'})
+    monkeypatch.setattr('services.admin_service.aceitar_pendencia_service.AceitarPendenciaService._aceitar_shopee',
+                        staticmethod(lambda *a, **k: (_ for _ in ()).throw(ValueError('anúncio mudou'))))
+    r = EnviarPendenciasParaIAService().executar([a.id], decidir=True)
+    assert r['decisoes_falhas'] == 1 and r['aceitas'] == 0
+    db.session.refresh(a)
+    assert a.status == 'em_revisao'

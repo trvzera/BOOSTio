@@ -27,6 +27,7 @@ export function iniciarPendencias(raiz) {
   const lote = raiz.querySelector("[data-pendencias-lote]");
   const todas = raiz.querySelector("[data-pendencias-todas]");
   const enviarIA = raiz.querySelector("[data-pendencias-enviar-ia]");
+  const decidirIA = raiz.querySelector("[data-pendencias-ia-decidir]");
   const selects = {
     status: filtros.elements.status, loja: filtros.elements.loja, categoria: filtros.elements.categoria,
   };
@@ -70,26 +71,29 @@ export function iniciarPendencias(raiz) {
     const n = marcadas().length;
     lote.hidden = selects.status.value === "rejeitado" || selects.status.value === "importado" || caixas.length === 0;
     todas.checked = caixas.length > 0 && n === caixas.length;
-    enviarIA.disabled = n === 0;
+    enviarIA.disabled = decidirIA.disabled = n === 0;
     enviarIA.textContent = n ? `Enviar para a IA (${n})` : "Enviar para a IA";
   }
 
   // A IA analisa poucas pendências por pedido; o painel envia em grupos e mostra o andamento.
   const TAMANHO_GRUPO = 5;
-  async function enviarSelecionadasParaIA() {
+  async function enviarSelecionadasParaIA({decidir = false} = {}) {
     const ids = marcadas().map(c => Number(c.value));
     if (!ids.length) return;
-    enviarIA.disabled = todas.disabled = true;
-    const total = { sugeridas: 0, sem_sugestao: 0, falhas: 0, ignoradas: 0 };
+    if (decidir && !window.confirm(`A IA vai aceitar ou rejeitar até ${ids.length} pendência(s) com alta confiança. Rejeições não podem ser desfeitas. Continuar?`)) return;
+    enviarIA.disabled = decidirIA.disabled = todas.disabled = true;
+    const total = { sugeridas: 0, sem_sugestao: 0, falhas: 0, ignoradas: 0, aceitas: 0, rejeitadas: 0, decisoes_falhas: 0 };
     try {
       for (let i = 0; i < ids.length; i += TAMANHO_GRUPO) {
         avisar(`Enviando para a IA… ${Math.min(i + TAMANHO_GRUPO, ids.length)} de ${ids.length}`);
-        const r = await enviarPendenciasParaIA(ids.slice(i, i + TAMANHO_GRUPO));
+        const r = await enviarPendenciasParaIA(ids.slice(i, i + TAMANHO_GRUPO), {decidir});
         for (const chave of Object.keys(total)) total[chave] += r[chave] || 0;
       }
       await carregar();
-      avisar(`IA analisou ${ids.length}: ${total.sugeridas} com sugestão, ${total.sem_sugestao} sem correspondência segura`
-        + (total.falhas ? `, ${total.falhas} falha(s) — tente de novo` : "") + ".", total.falhas > 0);
+      const decisao = decidir ? ` Aceitas: ${total.aceitas}; rejeitadas: ${total.rejeitadas}; mantidas para você: ${ids.length - total.aceitas - total.rejeitadas}.` : "";
+      const falhas = total.falhas + total.decisoes_falhas;
+      avisar(`IA analisou ${ids.length}: ${total.sugeridas} com sugestão, ${total.sem_sugestao} sem correspondência segura.${decisao}`
+        + (falhas ? ` ${falhas} falha(s): tente de novo.` : ""), falhas > 0);
     } catch (erro) {
       avisar(erro.message, true);
     } finally {
@@ -240,7 +244,8 @@ export function iniciarPendencias(raiz) {
     lista.querySelectorAll(".admin-pending-check").forEach(c => { c.checked = todas.checked; });
     atualizarLote();
   });
-  enviarIA.addEventListener("click", enviarSelecionadasParaIA);
+  enviarIA.addEventListener("click", () => enviarSelecionadasParaIA());
+  decidirIA.addEventListener("click", () => enviarSelecionadasParaIA({decidir: true}));
   maisBotao.addEventListener("click", () => carregar({anexar: true}));
   carregar();
 }

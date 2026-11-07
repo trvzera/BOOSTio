@@ -44,7 +44,7 @@ Lista os anúncios de `produto_pendente` (por padrão `em_revisao`), com filtros
 | `GET /admin/pendencias/<id>` | Detalhe com os candidatos (peça, pontuação, conflitos e o que falta comprovar). |
 | `POST /admin/pendencias/<id>/aceitar` | `{"peca": "categoria:id"}`: cria a oferta e o vínculo. |
 | `POST /admin/pendencias/<id>/candidatos/descartar` | `{"peca": "categoria:id"}`: tira só aquela peça da lista de candidatas (fica registrado e um novo matching não a recoloca). |
-| `POST /admin/pendencias/enviar-ia` | `{"ids": [1, 2]}`: a IA analisa até 10 pendências por pedido (sempre refaz) e grava só a sugestão. |
+| `POST /admin/pendencias/enviar-ia` | `{"ids": [1, 2], "decidir": false}`: a IA analisa até 10 pendências por pedido (sempre refaz); com `decidir: true` também aceita ou rejeita as de alta confiança. |
 | `POST /admin/pendencias/<id>/rejeitar` | `{"motivo": "..."}` (opcional, até 200 caracteres). |
 
 Regras do aceite:
@@ -71,7 +71,12 @@ python -m flask --app app admin-pendencias-sugerir --limite 20            # só 
 python -m flask --app app admin-pendencias-sugerir --limite 20 --aplicar  # chama a IA e grava
 ```
 
-- A IA **só sugere**. Nada é aceito ou rejeitado por ela: a recomendação (peça, confiança de 0 a 100,
+- Por padrão a IA **só sugere**. Com `--decidir` (ou o botão "Deixar a IA decidir" no painel) ela também
+  **aceita** quando indica uma peça e **rejeita** quando conclui que nenhuma serve, em ambos os casos só com
+  confiança de pelo menos 90 (`--confianca-minima`, de 50 a 100). Abaixo disso a pendência fica para uma pessoa.
+  O aceite usa o mesmo caminho seguro do painel (reconsulta o anúncio e valida a peça); se ele falhar, a
+  pendência continua aberta. A decisão fica registrada com `origem: "ia"`. **Rejeição não pode ser desfeita.**
+- Sem `--decidir`, nada é aceito ou rejeitado pela IA: a recomendação (peça, confiança de 0 a 100,
   justificativa curta, modelo e versão do prompt) fica em `evidencias.sugestao_ia` da pendência.
 - Entram só pendências que têm candidata aprovada e sem conflito. A resposta é validada: a peça indicada
   precisa ser uma das candidatas e a confiança, um inteiro de 0 a 100; caso contrário conta como falha.
