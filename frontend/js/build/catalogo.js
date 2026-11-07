@@ -87,6 +87,12 @@ export function imagemPeca(peca, classe = "") {
     : alternativa;
 }
 
+// Lojas de anúncios de terceiros: o endereço precisa ser https e do domínio da própria loja.
+export const marketplaces = {
+  mercado_livre: {nome:"Mercado Livre", vendedor:"Vendedor ", dominios:["mercadolivre.com.br","www.mercadolivre.com.br","produto.mercadolivre.com.br"]},
+  shopee: {nome:"Shopee", vendedor:"Loja ", dominios:["shopee.com.br","www.shopee.com.br","s.shopee.com.br","shope.ee"]},
+};
+
 export function ofertasPeca(peca) {
   const nome = nomePeca(peca);
   const busca = encodeURIComponent(nome);
@@ -115,7 +121,8 @@ export function ofertasPeca(peca) {
       logo:new URL("../../svgs/" + logos[loja.codigo],import.meta.url).href};
   });
   const vistas = new Set();
-  const mercado = (Array.isArray(peca.ofertas) ? peca.ofertas : []).filter(o => o?.loja === "mercado_livre").flatMap(oferta => {
+  const mercado = (Array.isArray(peca.ofertas) ? peca.ofertas : []).filter(o => Object.hasOwn(marketplaces, o?.loja)).flatMap(oferta => {
+    const mp = marketplaces[oferta.loja];
     if (!Number.isSafeInteger(oferta.id) || oferta.id <= 0 || vistas.has(oferta.id)
         || typeof oferta.preco !== "number" || !Number.isFinite(oferta.preco) || oferta.preco <= 0
         || typeof oferta.vendedor_id !== "string" || !/^\d+$/.test(oferta.vendedor_id)
@@ -123,10 +130,10 @@ export function ofertasPeca(peca) {
     try {
       const url = new URL(oferta.url);
       if (url.protocol !== "https:" || url.username || url.password || (url.port && url.port !== "443")
-          || !["mercadolivre.com.br","www.mercadolivre.com.br","produto.mercadolivre.com.br"].includes(url.hostname)) return [];
+          || !mp.dominios.includes(url.hostname)) return [];
       vistas.add(oferta.id);
-      return [{codigo:"mercado_livre",loja:"Mercado Livre",url:url.href,direta:true,logo:null,
-        id:oferta.id,produto_id_loja:oferta.produto_id_loja,vendedor:oferta.vendedor_nome || "Vendedor " + oferta.vendedor_id,
+      return [{codigo:oferta.loja,loja:mp.nome,url:url.href,direta:true,logo:null,marketplace:true,
+        id:oferta.id,produto_id_loja:oferta.produto_id_loja,vendedor:oferta.vendedor_nome || mp.vendedor + oferta.vendedor_id,
         preco:oferta.preco,atualizadoEm:oferta.atualizadoEm,esgotado:oferta.esgotado === true,estoqueConfirmado:oferta.esgotado === false}];
     } catch { return []; }
   });

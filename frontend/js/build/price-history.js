@@ -14,6 +14,8 @@ function instanteRegistro(valor) {
 
 // Usa cotações explícitas da loja recebidas do backend, nunca visitas locais
 // ou cópias do preço atual apresentadas como se fossem cotações anteriores.
+const nomesLojas = {kabum: "KaBuM!", mercado_livre: "Mercado Livre", shopee: "Shopee"};
+
 export function normalizarHistoricoPrecos(registros, agora = Date.now(), lojaEsperada = "kabum") {
   if (!Array.isArray(registros)) return [];
   const porInstante = new Map();
@@ -21,7 +23,7 @@ export function normalizarHistoricoPrecos(registros, agora = Date.now(), lojaEsp
     if (!registro || typeof registro !== "object") continue;
     const instante = instanteRegistro(registro.data);
     const loja = typeof registro.loja === "string" ? registro.loja.trim().toLowerCase().replace(/!$/, "") : "";
-    if (!["kabum", "mercado_livre"].includes(lojaEsperada) || loja !== lojaEsperada || typeof registro.preco !== "number" || !Number.isFinite(registro.preco) || registro.preco <= 0 || !Number.isFinite(instante) || instante > agora || registro.esgotado === true) continue;
+    if (!["kabum", "mercado_livre", "shopee"].includes(lojaEsperada) || loja !== lojaEsperada || typeof registro.preco !== "number" || !Number.isFinite(registro.preco) || registro.preco <= 0 || !Number.isFinite(instante) || instante > agora || registro.esgotado === true) continue;
     porInstante.set(instante, {instante, preco:registro.preco});
   }
   return [...porInstante.values()].sort((a, b) => a.instante - b.instante);
@@ -65,8 +67,8 @@ function conteudoHistorico(registros, temHistorico, nomeLoja = "KaBuM!") {
 }
 
 export function historicoPrecosHtml(peca, agora = Date.now()) {
-  const loja = peca?.historico_loja === "mercado_livre" ? "mercado_livre" : "kabum";
-  const nomeLoja = loja === "mercado_livre" ? "Mercado Livre" : "KaBuM!";
+  const loja = nomesLojas[peca?.historico_loja] ? peca.historico_loja : "kabum";
+  const nomeLoja = nomesLojas[loja];
   const registros = normalizarHistoricoPrecos(peca?.historico_precos, agora, loja);
   return '<section class="product-price-history glass-card" data-price-history aria-labelledby="price-history-title"><div class="price-history-heading"><div><h2 class="font-1-l" id="price-history-title">Histórico de preços</h2>' +
     '<p>Veja como o preço desta peça mudou ao longo do tempo.</p></div><span class="price-history-store">' + h(nomeLoja) + '</span></div>' +
@@ -80,8 +82,8 @@ export function iniciarHistoricoPrecos(raiz, peca, agora = Date.now()) {
   const secao = raiz.querySelector("[data-price-history]");
   if (!secao || secao.dataset.historyInitialized) return;
   secao.dataset.historyInitialized = "true";
-  const loja = peca?.historico_loja === "mercado_livre" ? "mercado_livre" : "kabum";
-  const nomeLoja = loja === "mercado_livre" ? "Mercado Livre" : "KaBuM!";
+  const loja = nomesLojas[peca?.historico_loja] ? peca.historico_loja : "kabum";
+  const nomeLoja = nomesLojas[loja];
   const registros = normalizarHistoricoPrecos(peca?.historico_precos, agora, loja);
   secao.querySelectorAll("[data-history-period]").forEach(botao => botao.addEventListener("click", () => {
     if (botao.getAttribute("aria-pressed") === "true") return;
