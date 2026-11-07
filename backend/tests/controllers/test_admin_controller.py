@@ -370,7 +370,7 @@ def test_painel_envia_varias_pendencias_para_a_ia(banco, monkeypatch):
     assert d['sugestoes'] == {str(a.id): {'peca': ref, 'confianca': 88}, str(b.id): {'peca': ref, 'confianca': 88}}
     # reenviar refaz a análise
     assert cliente.post('/admin/pendencias/enviar-ia', json={'ids': [a.id]}).get_json()['sugeridas'] == 1
-    for ruim in ({}, {'ids': []}, {'ids': ['1']}, {'ids': [0]}, {'ids': list(range(1, 12))}):
+    for ruim in ({}, {'ids': []}, {'ids': ['1']}, {'ids': [0]}, {'ids': list(range(1, 22))}):
         assert cliente.post('/admin/pendencias/enviar-ia', json=ruim).status_code == 400
 
 
