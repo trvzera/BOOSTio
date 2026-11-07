@@ -83,3 +83,12 @@ test('seções do dashboard: hoje só pendências, cada uma com iniciar()', () =
   assert.deepEqual(secoes.map(s => s.id), ['pendencias']);
   assert.ok(secoes.every(s => s.rotulo && typeof s.iniciar === 'function'));
 });
+
+test('o link de administração do menu realmente some quando oculto (display:flex não pode vencer [hidden])', async () => {
+  const {readFile} = await import('node:fs/promises');
+  const css = await readFile(new URL('../styles/componentes/site-menu.css', import.meta.url), 'utf8');
+  assert.match(css, /\.profile-link\[hidden\]\s*\{\s*display:\s*none;\s*\}/);
+  const header = await readFile(new URL('../js/header.js', import.meta.url), 'utf8');
+  assert.match(header, /data-menu-admin hidden/);
+  assert.match(header, /link\.hidden = !\(autenticado && administrador\)/);
+});
