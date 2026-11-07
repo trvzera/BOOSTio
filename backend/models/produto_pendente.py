@@ -66,6 +66,27 @@ class ProdutoPendente(ModeloBase):
         return dict(db.session.query(cls.status, func.count(cls.id)).group_by(cls.status).all())
 
     @classmethod
+    def descartar_candidato(cls, identificador, peca, revisao):
+        """Tira uma peça da lista de candidatas; um novo matching não a recoloca."""
+        try:
+            registro = cls.query.filter_by(id=identificador).with_for_update().first()
+            if registro is None:
+                raise LookupError('Pendência não encontrada')
+            if registro.status not in ('pendente', 'em_revisao'):
+                raise ValueError('Esta pendência já foi decidida')
+            restantes = [c for c in registro.candidatos or [] if c.get('peca') != peca]
+            if len(restantes) == len(registro.candidatos or []):
+                raise ValueError('Esta peça não é candidata desta pendência')
+            registro.candidatos = restantes
+            registro.evidencias = {**(registro.evidencias or {}),
+                                   'descartados': [*(registro.evidencias or {}).get('descartados', []), {'peca': peca, **revisao}]}
+            db.session.commit()
+            return registro
+        except Exception:
+            db.session.rollback()
+            raise
+
+    @classmethod
     def rejeitar(cls, identificador, motivo, revisao):
         """Encerra uma pendência aberta; nunca reabre uma já importada ou rejeitada."""
         from datetime import datetime, timezone
@@ -128,7 +149,8 @@ class ProdutoPendente(ModeloBase):
             evidencias = {**(registro.evidencias or {}), 'matching': decisao}
             if not simular and registro.evidencias != evidencias:
                 registro.evidencias = evidencias
-                registro.candidatos = decisao['candidatos']
+                descartados = {d.get('peca') for d in (registro.evidencias or {}).get('descartados', [])}
+                registro.candidatos = [c for c in decisao['candidatos'] if c.get('peca') not in descartados]
                 registro.status = 'em_revisao'
                 registro.motivo = 'Matching ' + decisao['classificacao']
                 db.session.commit()

@@ -74,6 +74,9 @@
 
 .admin-candidates { margin: 16px 0 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px; }
 .admin-candidates legend { margin-bottom: 8px; padding: 0; }
+.admin-candidate-row { display: flex; gap: 8px; align-items: stretch; }
+.admin-candidate-row .admin-candidate { flex: 1; min-width: 0; }
+.admin-candidate-remove { align-self: center; white-space: nowrap; }
 .admin-candidate {
   display: flex; gap: 12px; align-items: flex-start; padding: 12px;
   border: 1px solid var(--cor-2); border-radius: 12px; cursor: pointer;

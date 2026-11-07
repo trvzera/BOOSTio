@@ -4,6 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from models import db
 from services.admin_service.aceitar_pendencia_service import AceitarPendenciaService, ConflitoPendencia
+from services.admin_service.descartar_candidato_service import DescartarCandidatoService
 from services.admin_service.detalhar_pendencia_service import DetalharPendenciaService
 from services.admin_service.listar_pendencias_service import ListarPendenciasService
 from services.admin_service.rejeitar_pendencia_service import RejeitarPendenciaService
@@ -60,6 +61,15 @@ def aceitar_pendencia(pendencia_id):
     corpo = request.get_json(silent=True) or {}
     return _responder(lambda: AceitarPendenciaService().executar(
         pendencia_id, current_user.id, corpo.get("peca") if isinstance(corpo.get("peca"), str) else ""))
+
+
+@admin_bp.post("/pendencias/<int:pendencia_id>/candidatos/descartar")
+@login_required
+@apenas_administrador
+def descartar_candidato(pendencia_id):
+    corpo = request.get_json(silent=True) or {}
+    return _responder(lambda: DescartarCandidatoService().executar(
+        pendencia_id, current_user.id, corpo.get("peca")))
 
 
 @admin_bp.post("/pendencias/<int:pendencia_id>/rejeitar")

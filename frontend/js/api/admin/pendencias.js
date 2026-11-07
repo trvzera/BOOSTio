@@ -29,3 +29,9 @@ export async function rejeitarPendencia(id, motivo = "") {
     method: "POST", body: JSON.stringify({motivo}),
   });
 }
+
+export async function descartarCandidato(id, peca) {
+  return fetchComErro(`/admin/pendencias/${encodeURIComponent(id)}/candidatos/descartar`, {
+    method: "POST", body: JSON.stringify({peca}),
+  });
+}

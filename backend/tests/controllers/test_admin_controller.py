@@ -125,6 +125,24 @@ def test_pendencia_so_com_peca_nao_aprovada_fica_fora_do_painel(banco):
     assert d['total'] == 2 and d['por_status'] == {'em_revisao': 2}
 
 
+def test_descartar_candidato_tira_so_aquela_peca_e_nao_volta_no_matching(banco):
+    app, admin, _, p5500, p5600 = banco
+    p = pendencia(p5500, p5600)
+    cliente = entrar(app, admin)
+    r = cliente.post(f'/admin/pendencias/{p.id}/candidatos/descartar', json={'peca': f'processador:{p5600.id}'})
+    assert r.status_code == 200
+    assert [c['peca'] for c in r.get_json()['candidatos']] == [f'processador:{p5500.id}']
+    assert cliente.post(f'/admin/pendencias/{p.id}/candidatos/descartar', json={'peca': f'processador:{p5600.id}'}).status_code == 400
+    assert cliente.post(f'/admin/pendencias/{p.id}/candidatos/descartar', json={}).status_code == 400
+    assert cliente.post('/admin/pendencias/999/candidatos/descartar', json={'peca': 'x'}).status_code == 404
+    decisao = {'classificacao': 'ambigua', 'candidatos': [dict(peca=f'processador:{p5500.id}'), dict(peca=f'processador:{p5600.id}')]}
+    from utils.identidade_peca import assinatura_documento
+    ProdutoPendente.registrar_matching(p.id, decisao, assinatura_documento(p.dados_originais), simular=False)
+    db.session.refresh(p)
+    assert [c['peca'] for c in p.candidatos] == [f'processador:{p5500.id}']
+    assert p.evidencias['descartados'][0]['peca'] == f'processador:{p5600.id}'
+
+
 def test_detalhe_mostra_candidatos_com_nome_da_peca(banco):
     app, admin, _, p5500, p5600 = banco
     p = pendencia(p5500, p5600)

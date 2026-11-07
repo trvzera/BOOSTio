@@ -1,6 +1,6 @@
 // Seção "Pendências" do dashboard de administração: lista, detalhe e decisão (aceitar ou rejeitar).
 // Todo texto vindo da API entra por textContent; nada é montado com innerHTML.
-import { listarPendencias, detalharPendencia, aceitarPendencia, rejeitarPendencia } from "../api/admin/pendencias.js";
+import { listarPendencias, detalharPendencia, aceitarPendencia, rejeitarPendencia, descartarCandidato } from "../api/admin/pendencias.js";
 import {
   rotuloLoja, rotuloSituacao, rotuloCategoria, formatarFaixaPreco, linkSeguro,
   candidatoSelecionavel, descreverCandidato, textoRestricoes,
@@ -78,7 +78,8 @@ export function iniciarPendencias(raiz) {
     }
   }
 
-  function candidato(dados, grupo) {
+  function candidato(dados, grupo, pendenciaId) {
+    const linha = elemento("div", "admin-candidate-row");
     const rotulo = elemento("label", "admin-candidate");
     const radio = elemento("input");
     radio.type = "radio"; radio.name = "candidato"; radio.value = dados.peca;
@@ -90,7 +91,25 @@ export function iniciarPendencias(raiz) {
     if (conflitos.length) texto.append(elemento("span", "admin-alert font-2-s", "Conflito: " + conflitos.join(", ")));
     if (pendencias.length) texto.append(elemento("span", "admin-note font-2-s", "Falta comprovar: " + pendencias.join(", ")));
     rotulo.append(radio, texto);
-    grupo.append(rotulo);
+    const tirar = elemento("button", "btn-ghost admin-candidate-remove", "Tirar da lista");
+    tirar.type = "button";
+    tirar.setAttribute("aria-label", `Tirar da lista: ${descreverCandidato(dados)}`);
+    tirar.addEventListener("click", () => tirarCandidato(pendenciaId, dados.peca, tirar));
+    linha.append(rotulo, tirar);
+    grupo.append(linha);
+  }
+
+  async function tirarCandidato(pendenciaId, peca, botao) {
+    botao.disabled = true;
+    avisar("Tirando peça da lista…");
+    try {
+      desenharDetalhe(await descartarCandidato(pendenciaId, peca));
+      await carregar();
+      avisar("Peça tirada da lista.");
+    } catch (erro) {
+      botao.disabled = false;
+      avisar(erro.message, true);
+    }
   }
 
   async function abrir(id) {
@@ -125,7 +144,7 @@ export function iniciarPendencias(raiz) {
     const grupo = elemento("fieldset", "admin-candidates");
     grupo.append(elemento("legend", "font-1-m", "Peça correspondente"));
     if (!dados.candidatos.length) grupo.append(elemento("p", "font-2-s", "Sem candidatos: só é possível rejeitar."));
-    dados.candidatos.forEach(c => candidato(c, grupo));
+    dados.candidatos.forEach(c => candidato(c, grupo, dados.id));
     const motivo = elemento("input", "admin-reason");
     motivo.type = "text"; motivo.maxLength = 200; motivo.placeholder = "Motivo da rejeição (opcional)";
     motivo.setAttribute("aria-label", "Motivo da rejeição");

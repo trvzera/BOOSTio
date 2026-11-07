@@ -43,6 +43,7 @@ Lista os anúncios de `produto_pendente` (por padrão `em_revisao`), com filtros
 | `GET /admin/pendencias` | Lista com `status`, `loja`, `categoria`, `limite` e `depois_id` (cursor). |
 | `GET /admin/pendencias/<id>` | Detalhe com os candidatos (peça, pontuação, conflitos e o que falta comprovar). |
 | `POST /admin/pendencias/<id>/aceitar` | `{"peca": "categoria:id"}`: cria a oferta e o vínculo. |
+| `POST /admin/pendencias/<id>/candidatos/descartar` | `{"peca": "categoria:id"}`: tira só aquela peça da lista de candidatas (fica registrado e um novo matching não a recoloca). |
 | `POST /admin/pendencias/<id>/rejeitar` | `{"motivo": "..."}` (opcional, até 200 caracteres). |
 
 Regras do aceite:
