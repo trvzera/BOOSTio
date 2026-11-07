@@ -20,6 +20,19 @@ def validar_url_shopee(url, *, afiliado=False):
         return False
 
 
+# Títulos da Shopee são escritos pelo vendedor: retirar propaganda sem tocar em modelo, capacidade ou sufixo.
+_RUIDO = re.compile(
+    r'[\U0001F000-\U0001FAFF\u2600-\u27BF\u3010\u3011\u300A\u300B\u2B50]|'
+    r'\b(?:frete\s+gr[aá]tis|envio\s+(?:imediato|r[aá]pido|em\s+24\s*h)|pronta\s+entrega|entrega\s+r[aá]pida|'
+    r'nota\s+fiscal|nf-?e?|garantia(?:\s+de)?\s+\d+\s*(?:meses|mes|anos?|dias)|100%\s*original|original|lacrad[oa]|'
+    r'promo[cç][aã]o|oferta|lan[cç]amento|melhor\s+pre[cç]o|novo|nova)\b', re.I)
+_USADO = re.compile(r'\b(?:usad[oa]|seminov[oa]|recondicionad[oa]|open\s*box|vitrine|retirada\s+de\s+pe[cç]as)\b', re.I)
+
+
+def limpar_titulo(titulo):
+    return re.sub(r'\s+', ' ', _RUIDO.sub(' ', titulo)).strip(' -|/,.')
+
+
 class NormalizarProdutoShopeeService:
     CATEGORIAS_OBSERVADAS = {'processador': 101950, 'placa_mae': 101951,
                             'placa_video': 101952, 'memoria_ram': 101955}
@@ -35,7 +48,9 @@ class NormalizarProdutoShopeeService:
         url = anuncio.get('productLink')
         if not validar_url_shopee(url) or urlsplit(url).path != f'/product/{shop}/{item}':
             raise ValueError('Link Shopee diverge do anúncio')
-        contexto = {'variantes_nao_resolvidas': self._variantes(titulo, categoria)}
+        original, titulo = titulo, limpar_titulo(titulo) or titulo
+        contexto = {'variantes_nao_resolvidas': self._variantes(titulo, categoria),
+                    'titulo_original': original, 'usado': bool(_USADO.search(original))}
         # Categorias observadas na API oficial. Demais categorias permanecem
         # não confirmadas até existir evidência, nunca inferidas do termo buscado.
         confirmada = self.CATEGORIAS_OBSERVADAS.get(categoria) in anuncio.get('productCatIds', [])

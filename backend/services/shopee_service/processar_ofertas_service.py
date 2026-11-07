@@ -7,7 +7,8 @@ from services.peca_service.modelos_pecas import MODELOS_PECAS
 from services.catalogo_service.indice_candidatos_service import IndiceCandidatosService
 from services.catalogo_service.importar_catalogo_service import ImportarCatalogoService
 from services.catalogo_service.enriquecer_normalizado_service import EnriquecerNormalizadoService
-from repositories.ofertas_repository import atualizar_oferta_validada
+from repositories.ofertas_repository import atualizar_ofertas_validadas
+from services.catalogo_service.consultas_peca_service import consultas_da_peca
 from utils.identidade_peca import assinatura_documento, assinatura_peca
 from .cliente_service import ClienteShopeeService
 from .normalizar_produto_service import NormalizarProdutoShopeeService
@@ -17,7 +18,12 @@ class ProcessarOfertasShopeeService:
     def __init__(self, cliente=None):
         self.cliente = cliente or ClienteShopeeService()
 
+    MAX_BUSCAS = 4
+    POR_PAGINA = 20
+
     def ofertas_peca(self, *, categoria, peca_id, simular=True, limite_ofertas=1):
+        """Associa anúncios à peça como no Mercado Livre: busca por MPN, depois por nome, e exige
+        correspondência única; fica o menor preço de cada loja (vendedor), até `limite_ofertas`."""
         modelo = next((m for m in MODELOS_PECAS if m.__tablename__ == categoria), None)
         if modelo is None or type(peca_id) is not int or not 1 <= limite_ofertas <= 20:
             raise ValueError('Filtro de peça inválido')
@@ -25,27 +31,67 @@ class ProcessarOfertasShopeeService:
         if peca is None or not peca.publicavel:
             raise ValueError('Peça ausente ou não aprovada')
         assinatura = assinatura_peca(peca)
-        resultado = self.cliente.buscar(f'{peca.fabricante} {peca.modelo}'[:200])
+        identificador = f'{categoria}:{peca_id}'
         indice = IndiceCandidatosService.carregar(modelo)
-        resumo = dict(associadas=0, revisao=0, invalidas=0, detalhes=[])
-        for bruto in resultado['nodes']:
-            try:
-                produto, oferta = NormalizarProdutoShopeeService().executar(bruto, categoria)
-            except ValueError:
-                resumo['invalidas'] += 1
-                continue
-            decisao = indice.avaliar(produto)
-            if decisao['classificacao'] != 'confirmada' or decisao['peca'] != f'{categoria}:{peca_id}':
-                resumo['revisao'] += 1
-                resumo['detalhes'].append(dict(anuncio=produto.id_externo, classificacao=decisao['classificacao']))
-                continue
-            propostas = atualizar_oferta_validada(peca, 'shopee', oferta, assinatura,
-                produto, simular=simular)
-            resumo['associadas'] += 1
-            resumo['detalhes'].extend(propostas)
-            if resumo['associadas'] >= limite_ofertas:
+        resumo = dict(peca=identificador, associadas=0, revisao=0, invalidas=0, buscas=[], detalhes=[])
+        confirmados, vistos, completa = [], set(), False
+        for consulta in consultas_da_peca(peca):
+            pagina = 1
+            while len(resumo['buscas']) < self.MAX_BUSCAS:
+                resposta = self.cliente.buscar(consulta[:200], pagina=pagina, limite=self.POR_PAGINA)
+                nos = resposta['nodes']
+                resumo['buscas'].append(dict(consulta=consulta, pagina=pagina, recebidos=len(nos)))
+                novos = 0
+                for bruto in nos:
+                    chave = str(bruto.get('itemId')) if isinstance(bruto, dict) else None
+                    if chave in vistos:
+                        continue
+                    vistos.add(chave)
+                    novos += 1
+                    self._classificar(bruto, categoria, identificador, indice, confirmados, resumo)
+                tem_mais = resposta['pageInfo']['hasNextPage']
+                completa = not tem_mais
+                # Identidade comprovada basta; nunca repetir páginas sem novidade nem paginar sem fim.
+                if confirmados or not novos or not tem_mais or len(nos) < self.POR_PAGINA:
+                    break
+                pagina += 1
+            if confirmados or len(resumo['buscas']) >= self.MAX_BUSCAS:
                 break
+        selecionados = self._selecionar(confirmados, limite_ofertas)
+        resumo['busca_completa'] = completa
+        resumo['candidatos_unicos'] = len(vistos)
+        if selecionados:
+            propostas = atualizar_ofertas_validadas(peca, 'shopee', selecionados, assinatura,
+                simular=simular, desativar_ausentes=completa)
+            resumo['associadas'] = len(selecionados)
+            resumo['detalhes'].extend(propostas)
         return resumo
+
+    @staticmethod
+    def _classificar(bruto, categoria, identificador, indice, confirmados, resumo):
+        try:
+            produto, oferta = NormalizarProdutoShopeeService().executar(bruto, categoria)
+        except ValueError:
+            resumo['invalidas'] += 1
+            return
+        decisao = indice.avaliar(produto)
+        if decisao['classificacao'] == 'confirmada' and decisao['peca'] == identificador:
+            confirmados.append((oferta, produto))
+        else:
+            resumo['revisao'] += 1
+
+    @staticmethod
+    def _selecionar(confirmados, limite):
+        """Menor preço primeiro, um anúncio por loja da Shopee, como o Mercado Livre faz por vendedor."""
+        vendedores, selecionados = set(), []
+        for oferta, produto in sorted(confirmados, key=lambda i: (i[0]['preco'], i[0]['vendedor_id'], i[0]['produto_id_loja'])):
+            if oferta['vendedor_id'] in vendedores:
+                continue
+            vendedores.add(oferta['vendedor_id'])
+            selecionados.append((oferta, produto))
+            if len(selecionados) == limite:
+                break
+        return selecionados
 
     def descobrir_pagina(self, *, categoria, termo, pagina=1, limite=20, simular=True):
         if categoria not in {m.__tablename__ for m in MODELOS_PECAS}:

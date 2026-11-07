@@ -2,14 +2,9 @@
 
 ## Estado atual
 
-A fila compartilhada está implementada e integrada ao processamento de ofertas
-por peça do Mercado Livre. O adaptador da Shopee **ainda não está implementado**:
-a modalidade foi confirmada como API de Afiliados, mas as variáveis não foram
-encontradas nos arquivos deste checkout. A documentação oficial em
-https://affiliate.shopee.com.br/open_api exige login e não foi possível confirmar
-seu schema, limites da conta e permissões. Não foram inventados endpoints nem
-assumidas permissões de consulta ou escrita.
-
+A fila compartilhada está implementada e integrada ao Mercado Livre e à Shopee. O adaptador da Shopee
+usa a API de Afiliados (`productOfferV2`) e está descrito em [shopee.md](shopee.md). Nenhuma chamada real
+à Shopee foi feita: os testes usam respostas simuladas, porque as credenciais não estão neste checkout.
 Nenhuma coleta externa, migração no banco do usuário ou implantação foi executada.
 A nova fila não é iniciada ao importar a aplicação. Os comandos antigos permanecem.
 
@@ -114,8 +109,6 @@ para continuar verificando que todas as tabelas anteriores permanecem iguais.
 A migração aditiva é testada separadamente. Não houve atualização dos hashes dos
 prompts nem da seed.
 
-Pendências antes de considerar o pedido completo: acesso à documentação oficial;
-credenciais locais; autenticação, consultas e normalização Shopee; reutilização do
-matching e enriquecimento com anúncios reais dessa API; exibição genérica das ofertas;
-limitação global dos comandos legados; filas de descoberta/enriquecimento/importação;
-Compose e integração real em MySQL descartável; relatório final de implementação.
+Pendências: credenciais Shopee e uma execução real limitada; limitação global dos comandos legados;
+filas de descoberta/enriquecimento/importação do Mercado Livre; serviço do worker no Compose;
+integração real em MySQL descartável.

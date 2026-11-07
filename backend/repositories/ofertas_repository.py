@@ -123,7 +123,17 @@ def aplicar_ofertas_loja(peca,loja,ofertas,agora):
 
 
 def atualizar_oferta_validada(peca, loja, oferta, assinatura, produto, *, simular):
-    """Revalida matching sob a trava de coleta; não altera preço da peça."""
+    """Uma oferta; mantido para a importação de um anúncio descoberto."""
+    return atualizar_ofertas_validadas(peca, loja, [(oferta, produto)], assinatura, simular=simular)
+
+
+def atualizar_ofertas_validadas(peca, loja, itens, assinatura, *, simular, desativar_ausentes=False):
+    """Revalida matching sob a trava de coleta e grava as ofertas de uma peça numa só transação.
+
+    `itens` é uma lista de (oferta, ProdutoNormalizado). Com `desativar_ausentes`, as demais ofertas
+    ativas da peça nessa loja são desativadas, como no Mercado Livre; use só com busca completa.
+    Não altera o preço da peça: ele é lido das ofertas.
+    """
     from datetime import datetime, timezone
     from models import ControleColeta
     from utils.identidade_peca import assinatura_peca
@@ -135,27 +145,17 @@ def atualizar_oferta_validada(peca, loja, oferta, assinatura, produto, *, simula
         db.session.refresh(peca, with_for_update=True)
         if assinatura_peca(peca) != assinatura or not peca.publicavel:
             raise ValueError('Peça mudou durante a consulta')
-        decisao = IndiceCandidatosService.carregar(type(peca)).avaliar(produto)
-        if decisao['classificacao'] != 'confirmada' or decisao['peca'] != f'{peca.__tablename__}:{peca.id}':
-            raise ValueError('Associação mudou durante a consulta')
-        propostas = aplicar_ofertas_loja(peca, loja, [oferta], datetime.now(timezone.utc).replace(tzinfo=None))
+        indice = IndiceCandidatosService.carregar(type(peca))
+        for _, produto in itens:
+            decisao = indice.avaliar(produto)
+            if decisao['classificacao'] != 'confirmada' or decisao['peca'] != f'{peca.__tablename__}:{peca.id}':
+                raise ValueError('Associação mudou durante a consulta')
+        agora = datetime.now(timezone.utc).replace(tzinfo=None)
+        propostas = aplicar_ofertas_loja(peca, loja, [oferta for oferta, _ in itens], agora)
         if loja == 'shopee':
-            from dataclasses import asdict
-            from models import ProdutoPendente
-            from utils.identidade_peca import assinatura_tecnica
-            agora = datetime.now(timezone.utc).replace(tzinfo=None)
-            registro = Oferta.query.filter_by(loja=loja, produto_id_loja=produto.id_externo).one()
-            pendente = ProdutoPendente.buscar_por_anuncio(loja, produto.id_externo)
-            if pendente is None:
-                pendente = ProdutoPendente(loja=loja, produto_id_loja=produto.id_externo,
-                    vendedor_id=oferta['vendedor_id'], titulo=produto.titulo, url=produto.fonte,
-                    categoria_sugerida=produto.categoria, dados_originais={'normalizado': asdict(produto)}, coletado_em=agora)
-                db.session.add(pendente)
-            pendente.status = 'importado'
-            pendente.oferta_id = registro.id
-            pendente.revisado_em = agora
-            pendente.evidencias = {**(pendente.evidencias or {}), 'vinculo': {
-                'assinatura_peca': assinatura_peca(peca), 'assinatura_tecnica': assinatura_tecnica(peca)}}
+            _registrar_vinculos_shopee(peca, itens, agora)
+        if desativar_ausentes:
+            propostas += _desativar_ausentes(peca, loja, {produto.id_externo for _, produto in itens})
         if simular:
             db.session.rollback()
         else:
@@ -166,3 +166,32 @@ def atualizar_oferta_validada(peca, loja, oferta, assinatura, produto, *, simula
     except Exception:
         db.session.rollback()
         raise
+
+
+def _registrar_vinculos_shopee(peca, itens, agora):
+    from dataclasses import asdict
+    from models import ProdutoPendente
+    from utils.identidade_peca import assinatura_peca, assinatura_tecnica
+    for oferta, produto in itens:
+        registro = Oferta.query.filter_by(loja='shopee', produto_id_loja=produto.id_externo).one()
+        pendente = ProdutoPendente.buscar_por_anuncio('shopee', produto.id_externo)
+        if pendente is None:
+            pendente = ProdutoPendente(loja='shopee', produto_id_loja=produto.id_externo,
+                vendedor_id=oferta['vendedor_id'], titulo=produto.titulo, url=produto.fonte,
+                categoria_sugerida=produto.categoria, dados_originais={'normalizado': asdict(produto)}, coletado_em=agora)
+            db.session.add(pendente)
+        pendente.status = 'importado'
+        pendente.oferta_id = registro.id
+        pendente.revisado_em = agora
+        pendente.evidencias = {**(pendente.evidencias or {}), 'vinculo': {
+            'assinatura_peca': assinatura_peca(peca), 'assinatura_tecnica': assinatura_tecnica(peca)}}
+
+
+def _desativar_ausentes(peca, loja, mantidas):
+    propostas = []
+    ativas = Oferta.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id, loja=loja, ativa=True)
+    for registro in ativas.with_for_update().all():
+        if registro.produto_id_loja not in mantidas:
+            registro.ativa = False
+            propostas.append(dict(anuncio=registro.produto_id_loja, acao='desativada', historico=False))
+    return propostas

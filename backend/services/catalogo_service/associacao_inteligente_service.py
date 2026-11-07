@@ -52,6 +52,7 @@ class AssociacaoInteligenteService:
             conflitos.append('acessorio_para_outro_produto')
         if cat in ('ssd', 'hd') and re.search(r'(?:\+|\bcom\b)\s*(?:um\s+)?(?:adaptador|caddy|case|gabinete)\b', texto):
             conflitos.append('produto_composto_ou_inadequado')
+        if produto.contexto.get('usado'):conflitos.append('produto_usado_ou_recondicionado')
         kit=bool(re.search(r'\bkit\b|\d+\s*[x×]\s*\d+\s*gb',texto))
         if kit and cat not in ('memoria_ram', 'fan'):conflitos.append('kit_nao_suportado')
         if cat in ('processador','placa_video'):

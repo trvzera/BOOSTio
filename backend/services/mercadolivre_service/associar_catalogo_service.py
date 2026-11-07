@@ -1,6 +1,7 @@
 import re
 from utils.identidade_peca import normalizar_identidade as normalizar, assinatura_peca
 from models import VinculoMercadoLivre, IdentidadeFabricante
+from services.catalogo_service.consultas_peca_service import consultas_da_peca, mpn_da_peca
 
 
 class AssociarCatalogoService:
@@ -80,24 +81,7 @@ class AssociarCatalogoService:
             motivo='Cada candidato requer identidade e unicidade local comprovadas', candidatos=revisao[:5])
 
     def consultas(self, peca):
-        """MPN, nome comercial limpo e nome original; nunca remove variantes."""
-        modelo = str(peca.modelo or '').strip()
-        # Só retira blocos descritivos que contêm unidades técnicas. Não apaga
-        # sufixos de modelo, capacidade, Ti, SUPER, XT ou notebook fora deles.
-        limpo = re.sub(r'\[([^\]]*)\]', lambda m: '' if re.search(
-            r'\b(?:gb|tb|mhz|ghz|sata|nvme|ddr[345])\b', m[1], re.I) else m[0], modelo)
-        capacidade = getattr(peca, 'capacidade_gb', None)
-        if peca.__tablename__ in ('ssd', 'hd', 'memoria_ram') and capacidade and not re.search(r'\d\s*(?:gb|tb)\b', limpo, re.I):
-            limpo += f' {capacidade:g}GB'
-        marca = str(peca.fabricante or '').strip()
-        candidatos = [self._mpn(peca), f'{marca} {limpo}', f'{marca} {modelo}']
-        consultas, vistas = [], set()
-        for valor in candidatos:
-            valor = re.sub(r'\s+', ' ', valor or '').strip()
-            if valor and valor.casefold() not in vistas:
-                consultas.append(valor)
-                vistas.add(valor.casefold())
-        return consultas
+        return consultas_da_peca(peca)
 
     @staticmethod
     def _validar_pagina(dados, cliente):
@@ -188,8 +172,4 @@ class AssociarCatalogoService:
 
     @staticmethod
     def _mpn(peca):
-        from flask import has_app_context
-        verificada = IdentidadeFabricante.buscar(peca) if has_app_context() else None
-        codigo = verificada.mpn if verificada else str(peca.part_number or '').strip()
-        # Identificadores internos da seed não são códigos do fabricante.
-        return None if not codigo or re.match(r'^(SEED|DEMO|BOOSTIO|REDE|KABUM)[-_]', codigo, re.I) else codigo
+        return mpn_da_peca(peca)
