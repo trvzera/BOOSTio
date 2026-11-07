@@ -110,6 +110,21 @@ def test_lista_filtra_e_pagina(banco):
         assert cliente.get('/admin/pendencias?' + ruim).status_code == 400
 
 
+def test_pendencia_so_com_peca_nao_aprovada_fica_fora_do_painel(banco):
+    app, admin, _, p5500, p5600 = banco
+    p = pendencia(p5500, p5600, item=1)
+    pendencia(p5500, p5600, item=2)
+    p5500.status_validacao = p5600.status_validacao = 'em_revisao'
+    db.session.commit()
+    cliente = entrar(app, admin)
+    d = cliente.get('/admin/pendencias').get_json()
+    assert d['total'] == 0 and d['pendencias'] == [] and d['por_status'] == {}
+    p5600.status_validacao = 'aprovado'
+    db.session.commit()
+    d = cliente.get('/admin/pendencias').get_json()
+    assert d['total'] == 2 and d['por_status'] == {'em_revisao': 2}
+
+
 def test_detalhe_mostra_candidatos_com_nome_da_peca(banco):
     app, admin, _, p5500, p5600 = banco
     p = pendencia(p5500, p5600)

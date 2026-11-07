@@ -36,7 +36,8 @@ export function candidatoSelecionavel(candidato) {
 export function descreverCandidato(candidato) {
   const nome = [candidato.fabricante, candidato.modelo].filter(Boolean).join(" ") || candidato.peca;
   const codigo = candidato.part_number ? ` · ${candidato.part_number}` : "";
-  return `${nome}${codigo}`;
+  const ficha = Array.isArray(candidato.ficha) && candidato.ficha.length ? ` — ${candidato.ficha.join(" · ")}` : "";
+  return `${nome}${codigo}${ficha}`;
 }
 
 export function textoRestricoes(candidato) {

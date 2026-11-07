@@ -46,13 +46,17 @@ class ProdutoPendente(ModeloBase):
 
 
     @classmethod
-    def listar_para_admin(cls, *, status, loja=None, categoria=None, depois_id=0, limite=20):
+    def listar_para_admin(cls, *, status, loja=None, categoria=None, depois_id=0, limite=20, ids=None):
         """Página de pendências em ordem estável; devolve também o total do filtro."""
         consulta = cls.query.filter(cls.status == status)
         if loja is not None:
             consulta = consulta.filter(cls.loja == loja)
         if categoria is not None:
             consulta = consulta.filter(cls.categoria_sugerida == categoria)
+        if ids is not None:
+            if not ids:
+                return [], 0
+            consulta = consulta.filter(cls.id.in_(ids))
         total = consulta.count()
         return consulta.filter(cls.id > depois_id).order_by(cls.id).limit(limite).all(), total
 

@@ -37,6 +37,16 @@ def _numero(valor):
         return None
 
 
+_FICHA = (("capacidade_gb", "{} GB"), ("tipo", "{}"), ("interface", "{}"), ("formato", "{}"),
+          ("velocidade_leitura_mbps", "leitura {} MB/s"), ("velocidade_gravacao_mbps", "gravação {} MB/s"))
+
+
+def _ficha(peca):
+    """Resumo do que a peça já tem na ficha; o que falta simplesmente não aparece."""
+    return [texto.format(getattr(peca, campo)) for campo, texto in _FICHA
+            if peca is not None and getattr(peca, campo, None) not in (None, "")]
+
+
 def _candidato(candidato):
     referencia = str(candidato.get("peca", ""))
     categoria, _, identificador = referencia.partition(":")
@@ -50,4 +60,5 @@ def _candidato(candidato):
         "fabricante": peca.fabricante if peca else None,
         "modelo": peca.modelo if peca else None,
         "part_number": peca.part_number if peca else None,
+        "ficha": _ficha(peca),
     }

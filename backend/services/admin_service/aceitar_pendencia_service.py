@@ -57,8 +57,11 @@ class AceitarPendenciaService:
         categoria, _, identificador = str(referencia).partition(":")
         modelo = next((m for m in MODELOS_PECAS if m.__tablename__ == categoria), None)
         peca = modelo.buscar_por_id(int(identificador)) if modelo and identificador.isdecimal() else None
-        if peca is None or not peca.publicavel:
-            raise ValueError("Peça ausente ou ainda não aprovada")
+        if peca is None:
+            raise ValueError("Peça candidata não encontrada")
+        if not peca.publicavel:
+            raise ValueError("A peça candidata ainda está em revisão (importada, não aprovada). "
+                             "Aprove a peça antes de aceitar o anúncio")
         if categoria != pendencia.categoria_sugerida:
             raise ValueError("A categoria da peça é diferente da do anúncio")
         return peca
