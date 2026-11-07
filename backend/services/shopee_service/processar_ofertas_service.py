@@ -17,6 +17,25 @@ from .normalizar_produto_service import NormalizarProdutoShopeeService
 class ProcessarOfertasShopeeService:
     def __init__(self, cliente=None):
         self.cliente = cliente or ClienteShopeeService()
+        self._marcas = None
+
+    def _normalizador(self):
+        """Marcas conhecidas: as do catálogo e as da base técnica; só elas identificam o fabricante."""
+        if self._marcas is None:
+            marcas = {m for modelo in MODELOS_PECAS for m in modelo.fabricantes_para_descoberta()}
+            marcas |= {m[1] for m in self._marcas_da_base_tecnica()}
+            self._marcas = tuple(sorted(marcas))
+        return NormalizarProdutoShopeeService(self._marcas)
+
+    @staticmethod
+    def _marcas_da_base_tecnica():
+        from services.catalogo_service.consultar_base_hardware_service import ConsultarBaseHardwareService
+        base = ConsultarBaseHardwareService()
+        try:
+            base._ler()
+        except (OSError, ValueError, KeyError):
+            return []
+        return [(g, linha['vendor']) for g, linhas in base.por_marca.items() for linha in linhas[:1]]
 
     MAX_BUSCAS = 4
     POR_PAGINA = 20
@@ -67,10 +86,9 @@ class ProcessarOfertasShopeeService:
             resumo['detalhes'].extend(propostas)
         return resumo
 
-    @staticmethod
-    def _classificar(bruto, categoria, identificador, indice, confirmados, resumo):
+    def _classificar(self, bruto, categoria, identificador, indice, confirmados, resumo):
         try:
-            produto, oferta = NormalizarProdutoShopeeService().executar(bruto, categoria)
+            produto, oferta = self._normalizador().executar(bruto, categoria)
         except ValueError:
             resumo['invalidas'] += 1
             return
@@ -100,7 +118,7 @@ class ProcessarOfertasShopeeService:
         linhas, invalidas = [], 0
         for bruto in resposta['nodes']:
             try:
-                produto, oferta = NormalizarProdutoShopeeService().executar(bruto, categoria)
+                produto, oferta = self._normalizador().executar(bruto, categoria)
             except ValueError:
                 invalidas += 1
                 continue
@@ -120,11 +138,16 @@ class ProcessarOfertasShopeeService:
         resposta = self.cliente.consultar_anuncio(shop, item)
         if not resposta['nodes']:
             return dict(acao='sem_oferta', anuncio=anuncio_id)
-        produto, oferta = NormalizarProdutoShopeeService().executar(resposta['nodes'][0], pendencia.categoria_sugerida)
+        produto, oferta = self._normalizador().executar(resposta['nodes'][0], pendencia.categoria_sugerida)
         if produto.id_externo != anuncio_id:
             raise ValueError('Consulta retornou outro anúncio')
         if produto.contexto.get('variantes_nao_resolvidas'):
             return dict(acao='revisao', motivo='Variantes sem identificação de preço individual')
         produto, ficha = EnriquecerNormalizadoService().executar(produto)
+        # Preço e disponibilidade são da oferta; entram na ficha só para a validação comercial.
+        ficha['dados'].setdefault('preco', float(oferta['preco']))
+        ficha['dados'].setdefault('esgotado', False)
+        for campo in ('preco', 'esgotado'):
+            ficha['fontes'].setdefault(campo, {'url': produto.fonte})
         return ImportarCatalogoService().executar(pendencia.id, produto, ficha, oferta,
             assinatura_documento(pendencia.dados_originais), simular=simular, permitir_novos=permitir_novos)

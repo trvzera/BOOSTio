@@ -30,6 +30,18 @@ Segue o fluxo do Mercado Livre e usa o mesmo motor (`AssociacaoInteligenteServic
 O preço da peça passa a ser o da menor oferta ativa, sem alterar a ficha da peça
 (ver [ofertas-unificadas.md](ofertas-unificadas.md)).
 
+## Peça nova sem MPN
+
+Anúncio que não corresponde a nenhuma peça pode virar peça e oferta, sem MPN, quando a ficha estiver
+completa e sem contradição (`shopee-descobrir --gravar-catalogo --permitir-novos`):
+
+- A marca só é reconhecida se for uma marca do catálogo ou da base técnica; o modelo é o título sem a
+  categoria e sem a marca. Marca desconhecida ou duas marcas no título → revisão.
+- Os demais campos (núcleos, capacidade, consumo etc.) vêm da base técnica local, do Icecat ou do
+  fabricante, nunca inventados. Preço e disponibilidade vêm do anúncio.
+- Com a ficha incompleta, a quantidade de pentes não provada no título (`1x8GB`) ou qualquer conflito,
+  o anúncio fica em revisão e nada é gravado. Sem `--permitir-novos` também não cria peça.
+
 ## Uso
 
 ```sh
@@ -45,8 +57,8 @@ backup e sem uma simulação revisada.
 
 ## Limites conhecidos
 
-- Estoque desconhecido: a oferta aparece no catálogo, mas a geração de builds só usa o preço de ofertas com
-  estoque conhecido como disponível, então ofertas da Shopee não entram nas builds por enquanto.
+- Estoque desconhecido: a Shopee não informa estoque; o projeto trata o anúncio ativo como disponível,
+  então o preço da Shopee entra nas builds quando for o menor. O usuário vê as outras lojas ao clicar.
 - Sem MPN/GTIN, a confirmação depende de modelo + especificações extraídas do título; título genérico
   fica em revisão.
 - Credenciais e comportamento real da API (limites, permissões da conta) ainda não foram verificados.

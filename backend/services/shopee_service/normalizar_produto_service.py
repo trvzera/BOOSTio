@@ -6,6 +6,8 @@ from urllib.parse import urlsplit
 
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
 from services.catalogo_service.conferir_especificacoes_service import extrair_titulo
+from services.catalogo_service.comparar_nomes_service import marca as normalizar_marca
+from services.catalogo_service.normalizar_produto import nome as normalizar_nome
 
 
 def validar_url_shopee(url, *, afiliado=False):
@@ -33,7 +35,34 @@ def limpar_titulo(titulo):
     return re.sub(r'\s+', ' ', _RUIDO.sub(' ', titulo)).strip(' -|/,.')
 
 
+_PREFIXO_CATEGORIA = re.compile(
+    r'^(?:mem[oó]ria(?:\s+ram)?|processador|placa\s+de\s+v[ií]deo|placa[\s-]+m[aã]e|ssd|hd|fonte|gabinete|cooler|water\s*cooler|ventoinha|fan|teclado|mouse|monitor|headset|fone)\b[\s:-]*', re.I)
+
+
+def identificar_marca(titulo, marcas):
+    """Marca conhecida citada no título. Duas marcas diferentes citadas = ambíguo (devolve o conjunto)."""
+    texto = normalizar_nome(titulo)
+    achadas = {}
+    for original in marcas:
+        chave = normalizar_marca(original)
+        if chave and re.search(r'(?<!\w)' + re.escape(chave) + r'(?!\w)', texto):
+            achadas.setdefault(chave, original)
+    # "kingston" e "kingston technology" são a mesma marca citada; vale a mais específica.
+    finais = {c: o for c, o in achadas.items() if not any(c != d and c in d for d in achadas)}
+    return finais
+
+
+def derivar_modelo(titulo, marca):
+    """Nome sem a categoria e sem a marca; só descreve o que o anunciante escreveu."""
+    restante = _PREFIXO_CATEGORIA.sub('', titulo)
+    restante = re.sub(r'(?<!\w)' + re.escape(marca) + r'(?!\w)', ' ', restante, count=1, flags=re.I)
+    restante = re.sub(r'\s+', ' ', restante).strip(' -|/,.:')
+    return restante or None
+
+
 class NormalizarProdutoShopeeService:
+    def __init__(self, marcas=()):
+        self.marcas = tuple(marcas)
     CATEGORIAS_OBSERVADAS = {'processador': 101950, 'placa_mae': 101951,
                             'placa_video': 101952, 'memoria_ram': 101955}
     def executar(self, anuncio, categoria):
@@ -66,7 +95,12 @@ class NormalizarProdutoShopeeService:
             contexto['variantes_nao_resolvidas'] |= minimo != maximo
         except InvalidOperation:
             raise ValueError('Preço Shopee inválido') from None
-        produto = ProdutoNormalizado(loja='shopee', id_externo=f'{shop}:{item}', categoria=categoria,
+        marcas = identificar_marca(titulo, self.marcas)
+        if len(marcas) > 1:
+            contexto['marcas_multiplas'] = True
+        marca = next(iter(marcas.values())) if len(marcas) == 1 else None
+        modelo = derivar_modelo(titulo, marca) if marca else None
+        produto = ProdutoNormalizado(loja='shopee', marca=marca, modelo=modelo, id_externo=f'{shop}:{item}', categoria=categoria,
             titulo=titulo, especificacoes=extrair_titulo(categoria, titulo), ativo=ativo,
             categoria_confirmada=confirmada, fonte=url, contexto=contexto)
         oferta = dict(produto_id_loja=produto.id_externo, vendedor_id=shop, url=url,

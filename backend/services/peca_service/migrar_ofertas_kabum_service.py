@@ -25,17 +25,35 @@ class MigrarOfertasKabumService:
         inspetor = inspect(db.engine)
         # Verificado uma vez, fora da transação: consultar o esquema no meio dela pode descartá-la.
         self.historico_antigo = inspetor.has_table('historico_preco')
+        if not simular and db.engine.dialect.name == 'mysql':
+            self._tornar_colunas_antigas_opcionais(inspetor)
         tabelas = [m.__tablename__ for m in MODELOS_PECAS if inspetor.has_table(m.__tablename__)
                    and COLUNAS_ANTIGAS <= {c['name'] for c in inspetor.get_columns(m.__tablename__)}]
         for tabela in tabelas:
+            nome = db.engine.dialect.identifier_preparer.quote(tabela)
             for linha in db.session.execute(text(
-                    f'SELECT id, kabum_external, preco, esgotado, preco_atualizado_em FROM "{tabela}"')).mappings().all():
+                    f'SELECT id, kabum_external, preco, esgotado, preco_atualizado_em FROM {nome}')).mappings().all():
                 self._migrar_peca(tabela, linha, resumo, simular)
         if simular:
             db.session.rollback()
         else:
             db.session.commit()
         return resumo
+
+    @staticmethod
+    def comandos_colunas_opcionais(dialeto, tabela, colunas):
+        """ALTER TABLE para as colunas antigas ainda NOT NULL: peças novas não as preenchem mais."""
+        nome = dialeto.identifier_preparer.quote(tabela)
+        return [f'ALTER TABLE {nome} MODIFY {dialeto.identifier_preparer.quote(c["name"])} {c["type"].compile(dialect=dialeto)} NULL'
+                for c in colunas if c['name'] in COLUNAS_ANTIGAS and not c['nullable']]
+
+    def _tornar_colunas_antigas_opcionais(self, inspetor):
+        for modelo in MODELOS_PECAS:
+            if not inspetor.has_table(modelo.__tablename__):
+                continue
+            for comando in self.comandos_colunas_opcionais(
+                    db.engine.dialect, modelo.__tablename__, inspetor.get_columns(modelo.__tablename__)):
+                db.session.execute(text(comando))
 
     def _migrar_peca(self, tabela, linha, resumo, simular):
         url = (linha['kabum_external'] or '').strip()

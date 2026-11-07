@@ -100,3 +100,32 @@ def test_migracao_copia_colunas_antigas_e_e_repetivel(banco):
     r = MigrarOfertasKabumService().executar(simular=False)
     assert (r['criadas'], r['inalteradas'], r['historicos']) == (0, 1, 0)
     assert Oferta.query.count() == 1 and sem_link.preco is None
+
+
+def test_mysql_comandos_para_colunas_antigas_obrigatorias_e_aspas_de_tabela():
+    from sqlalchemy import Boolean, Float, Text
+    from sqlalchemy.dialects import mysql
+    colunas = [{'name': 'preco', 'type': Float(), 'nullable': False},
+               {'name': 'esgotado', 'type': Boolean(), 'nullable': False},
+               {'name': 'kabum_external', 'type': Text(), 'nullable': True},
+               {'name': 'modelo', 'type': Text(), 'nullable': False}]
+    comandos = MigrarOfertasKabumService.comandos_colunas_opcionais(mysql.dialect(), 'placa_video', colunas)
+    assert comandos == ['ALTER TABLE placa_video MODIFY preco FLOAT NULL',
+                        'ALTER TABLE placa_video MODIFY esgotado BOOL NULL']
+    assert mysql.dialect().identifier_preparer.quote('order') == '`order`'
+
+
+def test_shopee_conta_como_disponivel_mesmo_sem_informar_estoque(banco):
+    p = nova_placa()
+    banco.session.add(Oferta(tabela_peca='placa_video', peca_id=p.id, loja='shopee', produto_id_loja='10:2',
+                             vendedor_id='10', url='https://shopee.com.br/product/10/2', preco=Decimal('700'), esgotado=None))
+    banco.session.commit()
+    banco.session.refresh(p)
+    assert p.preco == 700 and p.esgotado is False
+    assert PlacaVideo.listar_candidatos_disponiveis(800) == [p]
+    # Mercado Livre sem estoque conhecido continua não entrando nas builds.
+    banco.session.add(Oferta(tabela_peca='placa_video', peca_id=p.id, loja='mercado_livre', produto_id_loja='MLB9',
+                             vendedor_id='1', url='https://produto.mercadolivre.com.br/MLB-9-x', preco=Decimal('500'), esgotado=None))
+    banco.session.commit()
+    banco.session.refresh(p)
+    assert p.preco == 700

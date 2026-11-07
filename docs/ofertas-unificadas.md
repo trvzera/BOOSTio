@@ -13,8 +13,8 @@ desconhecido, esgotada; em cada grupo, a de menor preço. `kabum_external` (camp
 link da oferta ativa da KaBuM. Peça sem oferta tem preço e disponibilidade `NULL`.
 
 A geração de builds passou a usar o **menor preço entre as ofertas ativas disponíveis**, e não só o
-da KaBuM. Ofertas do Mercado Livre e da Shopee entram quando a associação revisada já as gravou como
-ativas e com estoque conhecido como disponível.
+da KaBuM. A Shopee não informa estoque, e por decisão do projeto seus anúncios ativos contam como
+disponíveis. Ofertas do Mercado Livre só entram quando o estoque é conhecido como disponível.
 
 ## Escrita
 
@@ -42,7 +42,29 @@ sobrescreve uma cotação já gravada na oferta. As colunas antigas **não são 
 de segurança, e as verificações de esquema as ignoram. Observações sem preço (só "esgotado") permanecem
 apenas em `historico_preco`.
 
-Rode antes de subir esta versão: sem as ofertas, as peças ficam sem preço. Faça backup do banco.
+### VPS (MySQL)
+
+```sh
+bash deploy/migrar_ofertas_kabum.sh             # constrói a imagem e simula: só conta
+BOOSTIO_BACKUP_DIR=/caminho/fora/do/projeto bash deploy/migrar_ofertas_kabum.sh --aplicar
+```
+
+O `--aplicar` para web e API, faz o backup (`deploy/backup_mysql.sh`), cria `oferta`/`historico_oferta`
+se faltarem, torna `NULL` as colunas antigas que ainda forem `NOT NULL` (as peças novas não as preenchem),
+copia os dados, repete o comando para confirmar que nada mais muda e só então sobe a API. Pare antes
+qualquer cron que grave (`precos-atualizar`, ofertas do Mercado Livre, worker). Sem as ofertas as peças
+ficam sem preço, por isso a API não deve rodar o código novo antes da cópia.
+
+Conferência depois da cópia (exemplo para uma categoria; repita para as demais):
+
+```sql
+SELECT COUNT(*) FROM processador p JOIN oferta o ON o.tabela_peca='processador' AND o.peca_id=p.id
+  AND o.loja='kabum' AND o.ativa=1 WHERE p.preco IS NOT NULL AND ABS(p.preco - o.preco) > 0.01;
+```
+
+Para voltar atrás: restaure o backup e a versão anterior do código; as colunas antigas estão intactas.
+O código novo só foi testado em SQLite; a leitura do preço usa subconsultas que o MySQL 8.4 aceita, mas
+a execução real na VPS é a primeira validação em MySQL.
 
 Medido numa cópia do banco local: 1.534 ofertas criadas, 51.921 peças sem link (catálogo técnico),
 segunda execução sem alterações e preço lido igual à coluna antiga em todas as 5.001 peças de CPU/GPU
