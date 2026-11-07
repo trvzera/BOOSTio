@@ -16,7 +16,8 @@ from services.catalogo_service.pendencias_montagem_service import pendencias_par
 
 def registrar_comandos_marketplaces(app):
     @app.cli.command('admin-pendencias-sugerir')
-    @click.option('--limite', type=click.IntRange(1, 200), default=20, show_default=True)
+    @click.option('--limite', type=click.IntRange(1, 5000), default=20, show_default=True,
+                  help='Máximo de pendências a analisar; a IA recebe 20 por requisição, com espera e nova tentativa em caso de limite.')
     @click.option('--loja', type=click.Choice(LOJAS))
     @click.option('--categoria', type=click.Choice([m.__tablename__ for m in MODELOS_PECAS]))
     @click.option('--refazer', is_flag=True, help='Analisa de novo pendências que já têm sugestão.')
@@ -27,7 +28,7 @@ def registrar_comandos_marketplaces(app):
         """A IA sugere a peça de cada pendência aberta; com --decidir ela também aceita ou rejeita os casos claros."""
         from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
         try:
-            resumo = SugerirPendenciaService().executar(limite=limite, loja=loja, categoria=categoria,
+            resumo = SugerirPendenciaService(tentativas_transitorias=3, espera=30).executar(limite=limite, loja=loja, categoria=categoria,
                                                         refazer=refazer, simular=not aplicar,
                                                         decidir=decidir, confianca_minima=confianca_minima)
         except (ValueError, RuntimeError, SQLAlchemyError) as erro:

@@ -2,8 +2,10 @@
 import hashlib
 import json
 import os
+import time
 from datetime import datetime, timezone
 
+import requests
 from sqlalchemy.exc import SQLAlchemyError
 
 from models import ProdutoPendente
@@ -31,7 +33,9 @@ INSTRUCAO = (
 
 
 class SugerirPendenciaService:
-    def __init__(self, llm=None):
+    def __init__(self, llm=None, *, tentativas_transitorias=0, espera=30, dormir=time.sleep):
+        # Limite de requisições (429) ou instabilidade (5xx): espera e repete antes de desistir do grupo.
+        self.tentativas_transitorias, self.espera, self.dormir = tentativas_transitorias, espera, dormir
         self.llm = llm or (lambda prompt, modelo: LLMService().executar(prompt, modelo, reservar_cota=False))
         self.modelo = os.getenv("IA_ANALISE_MODELO", MODELO_PADRAO)
 
@@ -43,7 +47,7 @@ class SugerirPendenciaService:
         plano gratuito do Gemini limita requisições por minuto."""
         resumo = {"simulacao": simular, "analisadas": 0, "sugeridas": 0, "sem_sugestao": 0, "ja_analisadas": 0,
                   "falhas": 0, "ignoradas": 0, "aceitas": 0, "rejeitadas": 0, "decisoes_falhas": 0,
-                  "requisicoes_ia": 0, "detalhes": []}
+                  "requisicoes_ia": 0, "ids_falhos": [], "detalhes": []}
         fila, prontas = [], []   # fila: vai à IA; prontas: já têm sugestão atual
         for pendencia_id in (self._ids(loja, categoria) if ids is None else ids):
             pendencia = ProdutoPendente.buscar_por_id(pendencia_id)
@@ -80,22 +84,42 @@ class SugerirPendenciaService:
                     ProdutoPendente.registrar_sugestao_ia(pendencia_id, sugestao)
                 except (ValueError, SQLAlchemyError):
                     resumo["falhas"] += 1
+                    resumo["ids_falhos"].append(pendencia_id)
                     continue
                 resumo["sugeridas" if sugestao["peca"] else "sem_sugestao"] += 1
                 resultados.append((pendencia_id, sugestao))
         return resultados
 
+    @staticmethod
+    def _transitorio(erro):
+        if isinstance(erro, requests.HTTPError):
+            return getattr(erro.response, "status_code", None) in (429, 500, 502, 503, 504)
+        return isinstance(erro, (requests.ConnectionError, requests.Timeout))
+
     def _analisar_grupo(self, grupo, resumo):
-        """Uma requisição para o grupo. Se a resposta inteira falhar, divide ao meio e tenta de novo."""
-        resumo["requisicoes_ia"] += 1
-        try:
-            return self.analisar_lote(grupo, resumo)
-        except (ValueError, RuntimeError, OSError):
-            if len(grupo) == 1:
-                resumo["falhas"] += 1
+        """Uma requisição para o grupo. Limite/instabilidade: espera e repete. Resposta ruim: divide ao meio."""
+        for tentativa in range(self.tentativas_transitorias + 1):
+            resumo["requisicoes_ia"] += 1
+            try:
+                return self.analisar_lote(grupo, resumo)
+            except (ValueError, RuntimeError, OSError) as erro:
+                if not self._transitorio(erro):
+                    break
+                if tentativa < self.tentativas_transitorias:
+                    self.dormir(self.espera * 2 ** tentativa)
+                    continue
+                self._marcar_falhos(grupo, resumo)
                 return []
+        if len(grupo) == 1:
+            self._marcar_falhos(grupo, resumo)
+            return []
         meio = len(grupo) // 2
         return [*self._analisar_grupo(grupo[:meio], resumo), *self._analisar_grupo(grupo[meio:], resumo)]
+
+    @staticmethod
+    def _marcar_falhos(grupo, resumo):
+        resumo["falhas"] += len(grupo)
+        resumo["ids_falhos"].extend(i for i, _, _ in grupo)
 
     def analisar_lote(self, grupo, resumo):
         resposta = self.llm(self._prompt([c for _, c, _ in grupo]), self.modelo)
@@ -117,6 +141,7 @@ class SugerirPendenciaService:
             except ValueError:
                 # Item inválido ou ausente: só ele fica sem sugestão; os demais valem.
                 invalidas += 1
+                resumo["ids_falhos"].append(pendencia_id)
         if not sugestoes:
             raise ValueError("Nenhuma resposta válida da IA")
         resumo["falhas"] += invalidas
@@ -206,13 +231,13 @@ class EnviarPendenciasParaIAService:
     def __init__(self, sugeridor=None):
         self.sugeridor = sugeridor or SugerirPendenciaService()
 
-    def executar(self, ids, *, decidir=False, administrador_id=None):
+    def executar(self, ids, *, decidir=False, refazer=True, administrador_id=None):
         if not isinstance(ids, list) or not ids or any(type(i) is not int or i <= 0 for i in ids):
             raise ValueError("Escolha as pendências a enviar")
         ids = list(dict.fromkeys(ids))
         if len(ids) > LIMITE_ENVIO:
             raise ValueError(f"Envie até {LIMITE_ENVIO} pendências por vez")
-        resumo = self.sugeridor.executar(limite=LIMITE_ENVIO, refazer=True, simular=False, ids=ids, decidir=decidir)
+        resumo = self.sugeridor.executar(limite=LIMITE_ENVIO, refazer=refazer, simular=False, ids=ids, decidir=decidir)
         sugestoes = {}
         for i in ids:
             pendencia = ProdutoPendente.buscar_por_id(i)
@@ -221,3 +246,11 @@ class EnviarPendenciasParaIAService:
                 sugestoes[i] = {"peca": sugestao.get("peca"), "confianca": sugestao.get("confianca")}
         resumo.pop("detalhes", None)
         return {**resumo, "sugestoes": sugestoes}
+
+
+def listar_ids_para_ia(*, status="em_revisao", loja=None, categoria=None):
+    """Todas as pendências abertas do filtro que a IA consegue analisar (têm candidata aprovada)."""
+    if status not in ABERTAS:
+        raise ValueError("Só pendências abertas podem ir para a IA")
+    ids = ids_acionaveis(status, loja, categoria)
+    return {"ids": ids, "total": len(ids)}

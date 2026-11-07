@@ -44,7 +44,8 @@ Lista os anúncios de `produto_pendente` (por padrão `em_revisao`), com filtros
 | `GET /admin/pendencias/<id>` | Detalhe com os candidatos (peça, pontuação, conflitos e o que falta comprovar). |
 | `POST /admin/pendencias/<id>/aceitar` | `{"peca": "categoria:id"}`: cria a oferta e o vínculo. |
 | `POST /admin/pendencias/<id>/candidatos/descartar` | `{"peca": "categoria:id"}`: tira só aquela peça da lista de candidatas (fica registrado e um novo matching não a recoloca). |
-| `POST /admin/pendencias/enviar-ia` | `{"ids": [1, 2], "decidir": false}`: a IA analisa até 20 pendências por pedido, numa só requisição (sempre refaz); com `decidir: true` também aceita ou rejeita as de alta confiança. |
+| `GET /admin/pendencias/ids-para-ia` | Ids de todas as pendências abertas do filtro (`status`, `loja`, `categoria`) que a IA consegue analisar. |
+| `POST /admin/pendencias/enviar-ia` | `{"ids": [1, 2], "decidir": false, "refazer": true}`: a IA analisa até 20 pendências por pedido, numa só requisição (sempre refaz); com `decidir: true` também aceita ou rejeita as de alta confiança. |
 | `POST /admin/pendencias/<id>/rejeitar` | `{"motivo": "..."}` (opcional, até 200 caracteres). |
 
 Regras do aceite:
@@ -98,3 +99,17 @@ requisição (`IA_ANALISE_LOTE`, padrão 20). A resposta traz uma entrada por pe
 separadamente: item ausente ou inválido fica sem sugestão e não estraga os demais. Se a resposta inteira
 falhar (JSON cortado, por exemplo), o lote é dividido ao meio e reenviado. Para reduzir o risco de uma
 resposta longa demais, mantenha o lote em torno de 20.
+
+### Enviar tudo de uma vez
+
+O botão **Enviar todas** pega todas as pendências abertas do filtro atual (não só as da página) e as envia
+como um processo: lotes de 20, uma requisição à IA por lote, mostrando o andamento. Quem falhar (limite de
+requisições, instabilidade, resposta inválida) espera 15s, depois 45s e 90s e é reenviado; se ainda assim
+falhar, é contado como falha e o processo segue com o próximo lote. O botão **Parar** interrompe depois do
+lote atual. Pendências que já têm sugestão atual não gastam IA de novo, então um envio interrompido pode ser
+retomado clicando de novo. A caixa **Deixar a IA decidir** vale também para "Enviar todas". O processo roda
+com a aba aberta; para rodar sem o navegador, use o comando (ele também espera e repete em caso de limite):
+
+```bash
+python -m flask --app app admin-pendencias-sugerir --limite 500 --decidir --aplicar
+```

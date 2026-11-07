@@ -471,3 +471,44 @@ def test_ia_divide_o_lote_ao_meio_quando_a_resposta_inteira_falha(banco):
         return json.dumps({'resultados': [{'pendencia_id': i, 'peca': ref, 'confianca': 90} for i in ids]})
     r = SugerirPendenciaService(llm).executar(simular=False)
     assert tamanhos == [4, 2, 2] and r['sugeridas'] == 4 and r['falhas'] == 0 and r['requisicoes_ia'] == 3
+
+
+def test_ia_espera_e_repete_quando_o_gemini_limita_as_requisicoes(banco):
+    import json
+    import requests
+    from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
+    app, admin, _, p5500, p5600 = banco
+    pend = [pendencia(p5500, p5600, item=i) for i in range(1, 4)]
+    ref = f'processador:{p5500.id}'
+    def http(status):
+        erro = requests.HTTPError('limite')
+        erro.response = requests.Response()
+        erro.response.status_code = status
+        return erro
+    chamadas, esperas = [], []
+    def llm(prompt, modelo):
+        chamadas.append(1)
+        if len(chamadas) <= 2:
+            raise http(429)
+        return _responder_lote(prompt, {'peca': ref, 'confianca': 90})
+    r = SugerirPendenciaService(llm, tentativas_transitorias=3, espera=30, dormir=esperas.append).executar(simular=False)
+    assert r['sugeridas'] == 3 and r['falhas'] == 0 and esperas == [30, 60] and len(chamadas) == 3  # sem dividir o lote
+    # sem tentativas, o grupo inteiro vira "falhou" e o painel decide quando repetir
+    def sempre(prompt, modelo):
+        raise http(503)
+    r = SugerirPendenciaService(sempre).executar(simular=False, refazer=True)
+    assert r['sugeridas'] == 0 and sorted(r['ids_falhos']) == sorted(p.id for p in pend)
+
+
+def test_enviar_todas_lista_ids_do_filtro_e_nao_refaz_o_que_ja_foi_analisado(banco, monkeypatch):
+    app, admin, _, p5500, p5600 = banco
+    a, b = pendencia(p5500, p5600, item=1), pendencia(p5500, p5600, item=2)
+    pendencia(p5500, p5600, loja='mercado_livre', item=3)
+    cliente = entrar(app, admin)
+    d = cliente.get('/admin/pendencias/ids-para-ia?loja=shopee').get_json()
+    assert d['ids'] == [a.id, b.id] and d['total'] == 2
+    assert cliente.get('/admin/pendencias/ids-para-ia?status=importado').status_code == 400
+    _ia(monkeypatch, {'peca': f'processador:{p5500.id}', 'confianca': 80})
+    assert cliente.post('/admin/pendencias/enviar-ia', json={'ids': [a.id, b.id], 'refazer': False}).get_json()['sugeridas'] == 2
+    d = cliente.post('/admin/pendencias/enviar-ia', json={'ids': [a.id, b.id], 'refazer': False}).get_json()
+    assert d['sugeridas'] == 0 and d['ja_analisadas'] == 2 and d['ids_falhos'] == []

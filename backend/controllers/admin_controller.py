@@ -8,7 +8,7 @@ from services.admin_service.descartar_candidato_service import DescartarCandidat
 from services.admin_service.detalhar_pendencia_service import DetalharPendenciaService
 from services.admin_service.listar_pendencias_service import ListarPendenciasService
 from services.admin_service.rejeitar_pendencia_service import RejeitarPendenciaService
-from services.admin_service.sugerir_pendencia_service import EnviarPendenciasParaIAService
+from services.admin_service.sugerir_pendencia_service import EnviarPendenciasParaIAService, listar_ids_para_ia
 from services.mercadolivre_service.controle_requisicoes_service import ErroMercadoLivre, OrcamentoRequisicoesEsgotado
 from utils.decorators import apenas_administrador
 
@@ -73,13 +73,23 @@ def descartar_candidato(pendencia_id):
         pendencia_id, current_user.id, corpo.get("peca")))
 
 
+@admin_bp.get("/pendencias/ids-para-ia")
+@login_required
+@apenas_administrador
+def ids_para_ia():
+    argumentos = request.args
+    return _responder(lambda: listar_ids_para_ia(
+        status=argumentos.get("status", "em_revisao"), loja=argumentos.get("loja") or None,
+        categoria=argumentos.get("categoria") or None))
+
+
 @admin_bp.post("/pendencias/enviar-ia")
 @login_required
 @apenas_administrador
 def enviar_pendencias_para_ia():
     corpo = request.get_json(silent=True) or {}
     return _responder(lambda: EnviarPendenciasParaIAService().executar(
-        corpo.get("ids"), decidir=corpo.get("decidir") is True))
+        corpo.get("ids"), decidir=corpo.get("decidir") is True, refazer=corpo.get("refazer") is not False))
 
 
 @admin_bp.post("/pendencias/<int:pendencia_id>/rejeitar")

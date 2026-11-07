@@ -36,6 +36,13 @@ export async function descartarCandidato(id, peca) {
   });
 }
 
-export async function enviarPendenciasParaIA(ids, {decidir = false} = {}) {
-  return fetchComErro("/admin/pendencias/enviar-ia", {method: "POST", body: JSON.stringify({ids, decidir})});
+export async function enviarPendenciasParaIA(ids, {decidir = false, refazer = true} = {}) {
+  return fetchComErro("/admin/pendencias/enviar-ia", {method: "POST", body: JSON.stringify({ids, decidir, refazer})});
+}
+
+export async function listarIdsParaIA({status = "em_revisao", loja = "", categoria = ""} = {}) {
+  const parametros = new URLSearchParams({status});
+  if (loja) parametros.set("loja", loja);
+  if (categoria) parametros.set("categoria", categoria);
+  return fetchComErro("/admin/pendencias/ids-para-ia?" + parametros.toString(), {method: "GET", cache: "no-store"});
 }
