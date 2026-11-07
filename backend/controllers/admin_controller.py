@@ -7,6 +7,7 @@ from services.admin_service.aceitar_pendencia_service import AceitarPendenciaSer
 from services.admin_service.detalhar_pendencia_service import DetalharPendenciaService
 from services.admin_service.listar_pendencias_service import ListarPendenciasService
 from services.admin_service.rejeitar_pendencia_service import RejeitarPendenciaService
+from services.mercadolivre_service.controle_requisicoes_service import ErroMercadoLivre, OrcamentoRequisicoesEsgotado
 from utils.decorators import apenas_administrador
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -18,6 +19,9 @@ def _responder(funcao):
         resposta = jsonify(funcao())
         resposta.headers["Cache-Control"] = "no-store"
         return resposta, 200
+    except (ErroMercadoLivre, OrcamentoRequisicoesEsgotado):
+        # Antes de ValueError, de que ambos herdam: é falha da loja, não da entrada do administrador.
+        return jsonify({"erro": "O Mercado Livre não respondeu agora. Tente novamente em instantes.", "codigo": "loja-indisponivel"}), 502
     except ConflitoPendencia as erro:
         return jsonify({"erro": str(erro), "codigo": "conflito"}), 409
     except ValueError as erro:

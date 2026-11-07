@@ -51,7 +51,10 @@ Regras do aceite:
 - Usa o mesmo caminho de gravação da busca automática: trava da coleta, peça inalterada desde a análise e
   anúncio que não pertence a outra peça. Só a decisão automática de "confirmada" é dispensada, porque quem
   decidiu foi uma pessoa; o `administrador_id` e a data ficam em `evidencias.revisao_manual`.
-- **Hoje só a Shopee pode ser aceita pelo painel.** Para o Mercado Livre o aceite continua sendo
-  `mercadolivre-vincular` (exige consulta à API do Mercado Livre); no painel o Mercado Livre pode ser visto
-  e rejeitado.
+- **Shopee e Mercado Livre podem ser aceitos pelo painel.** No Mercado Livre o servidor reconsulta o
+  catálogo e o anúncio na API da loja (poucas requisições, antes da transação) e confere que continua
+  disponível como oferta nova do mesmo vendedor. Depois grava o vínculo do catálogo com a peça (critério
+  `revisao_manual`), a oferta e o histórico, e fecha a pendência, tudo numa transação. Catálogo já ligado a
+  outra peça, peça que mudou desde a análise ou anúncio que saiu do ar recusam o aceite. Se o Mercado Livre
+  não responder, o painel recebe 502 e nada é gravado.
 - Pendência já aceita ou rejeitada não é reaberta (nem pelas buscas seguintes).

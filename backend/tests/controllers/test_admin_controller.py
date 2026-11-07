@@ -9,6 +9,11 @@ from flask_login import LoginManager
 from controllers.admin_controller import admin_bp
 from models import db, Usuario, Processador, ProdutoPendente, Oferta, ControleColeta
 from services.shopee_service.normalizar_produto_service import NormalizarProdutoShopeeService
+from unittest.mock import Mock
+from models import HD, HistoricoOferta, VinculoMercadoLivre
+from services.mercadolivre_service.buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
+from services.mercadolivre_service.controle_requisicoes_service import ErroMercadoLivre
+from services.mercadolivre_service.importar_produto_service import ImportarProdutoService
 from dataclasses import asdict
 
 AGORA = int(time.time())
@@ -129,16 +134,13 @@ def test_aceitar_grava_oferta_pelo_caminho_seguro_e_fecha_a_pendencia(banco):
     assert cliente.post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'processador:{p5500.id}'}).status_code == 409
 
 
-def test_aceitar_recusa_peca_fora_dos_candidatos_com_conflito_ou_loja_sem_suporte(banco):
+def test_aceitar_recusa_peca_fora_dos_candidatos_ou_com_conflito(banco):
     app, admin, _, p5500, p5600 = banco
     p = pendencia(p5500, p5600, conflito_5600=True)
     cliente = entrar(app, admin)
     for corpo in ({}, {'peca': 'processador:999'}, {'peca': f'processador:{p5600.id}'}, {'peca': 5}):
         assert cliente.post(f'/admin/pendencias/{p.id}/aceitar', json=corpo).status_code == 400
-    ml = pendencia(p5500, p5600, loja='mercado_livre', item=2)
-    r = cliente.post(f'/admin/pendencias/{ml.id}/aceitar', json={'peca': f'processador:{p5500.id}'})
-    assert r.status_code == 409 and 'mercadolivre-vincular' in r.get_json()['erro']
-    assert Oferta.query.count() == 0 and ProdutoPendente.query.filter_by(status='em_revisao').count() == 2
+    assert Oferta.query.count() == 0 and ProdutoPendente.query.filter_by(status='em_revisao').count() == 1
 
 
 def test_aceitar_nao_rouba_anuncio_de_outra_peca(banco):
@@ -166,3 +168,95 @@ def test_rejeitar_registra_quem_decidiu_e_nao_reabre(banco):
     outra = pendencia(p5500, p5600, item=2)
     assert cliente.post(f'/admin/pendencias/{outra.id}/rejeitar', json={'motivo': 'x' * 201}).status_code == 400
     assert cliente.post(f'/admin/pendencias/{outra.id}/rejeitar').get_json()['motivo'] == 'Rejeitada por um administrador'
+
+
+PRODUTO_ML = dict(id='MLB99', name='Seagate Exos 8TB', status='active', domain_id='MLB-HARD_DRIVES_AND_SSDS', attributes=[
+    dict(id=k, value_name=v) for k, v in [('BRAND', 'Seagate'), ('MODEL', 'ST8000NM017B'), ('MPN', 'ST8000NM017B'),
+                                          ('CAPACITY', '8 TB'), ('DRIVE_STORAGE_TYPE', 'HDD')]])
+
+
+def importador_ml(monkeypatch, erro=None):
+    """Mercado Livre simulado: catálogo MLB99 com a oferta nova MLB10 do vendedor 7."""
+    cliente = BuscarOfertasMercadoLivreService()
+    cliente._consultar = Mock(side_effect=erro) if erro else Mock(return_value=PRODUTO_ML)
+    bruto = dict(item_id='MLB10', seller_id=7, site_id='MLB', currency_id='BRL', price=999.90, condition='new', available_quantity=3)
+    cliente.executar = Mock(return_value={'ofertas': [cliente._normalizar(bruto, 'MLB99')]})
+    tokens = Mock()
+    tokens.executar.return_value = 'teste'
+    monkeypatch.setattr('services.admin_service.aceitar_pendencia_service.ImportarProdutoService',
+                        lambda **_: ImportarProdutoService(cliente=cliente, tokens=tokens))
+    return cliente
+
+
+def pendencia_ml(candidatos, loja='mercado_livre'):
+    p = ProdutoPendente(loja=loja, produto_id_loja='MLB10', vendedor_id='7', titulo='Seagate Exos 8TB',
+                        url='https://produto.mercadolivre.com.br/MLB-10-_JM', categoria_sugerida='hd',
+                        coletado_em=datetime(2026, 11, 7), status='em_revisao', motivo='Matching ambigua',
+                        dados_originais={'catalogo': {'id': 'MLB99'}, 'anuncio': {'price': 1, 'available_quantity': 1}},
+                        candidatos=candidatos)
+    db.session.add(p)
+    db.session.commit()
+    return p
+
+
+def hd(**extras):
+    h = HD(**{**dict(fabricante='Seagate', modelo='Exos 8TB', part_number='ST8000NM017B', consumo_energia=7,
+                     capacidade_gb=8000, status_validacao='aprovado'), **extras})
+    db.session.add(h)
+    db.session.commit()
+    return h
+
+
+def test_aceitar_mercado_livre_cria_vinculo_oferta_e_historico_pelo_caminho_seguro(banco, monkeypatch):
+    app, admin, *_ = banco
+    disco = hd()
+    p = pendencia_ml([dict(peca=f'hd:{disco.id}', percentual=72, conflitos=[], pendencias=['modelo_exato_nao_comprovado'])])
+    cliente_ml = importador_ml(monkeypatch)
+    r = entrar(app, admin).post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{disco.id}'})
+    assert r.status_code == 200, r.get_json()
+    oferta = Oferta.query.filter_by(loja='mercado_livre').one()
+    assert (oferta.tabela_peca, oferta.peca_id, oferta.produto_id_loja, oferta.vendedor_id) == ('hd', disco.id, 'MLB10', '7')
+    assert oferta.preco == Decimal('999.90') and HistoricoOferta.query.count() == 1
+    vinculo = VinculoMercadoLivre.query.one()
+    assert (vinculo.catalogo_id, vinculo.peca_id, vinculo.criterio) == ('MLB99', disco.id, 'revisao_manual')
+    db.session.refresh(p)
+    assert p.status == 'importado' and p.oferta_id == oferta.id
+    assert p.evidencias['revisao_manual']['administrador_id'] == admin.id and p.motivo.startswith('Associação aprovada')
+    assert cliente_ml._consultar.call_count == 1  # o anúncio é reconsultado, e só aqui
+    assert entrar(app, admin).post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{disco.id}'}).status_code == 409
+
+
+def test_aceitar_mercado_livre_recusa_conflito_peca_mudada_e_catalogo_de_outra_peca(banco, monkeypatch):
+    app, admin, *_ = banco
+    disco, outro = hd(), hd(part_number='ST8000NM0000', modelo='Exos 8TB X')
+    p = pendencia_ml([dict(peca=f'hd:{disco.id}', percentual=72, conflitos=[], pendencias=[]),
+                      dict(peca=f'hd:{outro.id}', percentual=70, conflitos=['marca_divergente'], pendencias=[])])
+    importador_ml(monkeypatch)
+    cliente = entrar(app, admin)
+    assert cliente.post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{outro.id}'}).status_code == 400
+    db.session.add(VinculoMercadoLivre(tabela_peca='hd', peca_id=outro.id, catalogo_id='MLB99', assinatura_peca='a' * 64,
+                                       assinatura_catalogo='b' * 64, criterio='revisado'))
+    db.session.commit()
+    r = cliente.post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{disco.id}'})
+    assert r.status_code == 400 and Oferta.query.count() == 0
+    db.session.refresh(p)
+    assert p.status == 'em_revisao'
+
+
+def test_aceitar_mercado_livre_fora_do_ar_responde_502_sem_gravar(banco, monkeypatch):
+    app, admin, *_ = banco
+    disco = hd()
+    p = pendencia_ml([dict(peca=f'hd:{disco.id}', percentual=72, conflitos=[], pendencias=[])])
+    importador_ml(monkeypatch, erro=ErroMercadoLivre(503))
+    r = entrar(app, admin).post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{disco.id}'})
+    assert r.status_code == 502 and r.get_json()['codigo'] == 'loja-indisponivel'
+    assert 'HTTP' not in r.get_json()['erro'] and Oferta.query.count() == 0
+    db.session.refresh(p)
+    assert p.status == 'em_revisao'
+
+
+def test_loja_sem_aceite_no_painel_responde_409(banco):
+    app, admin, *_ = banco
+    disco = hd()
+    p = pendencia_ml([dict(peca=f'hd:{disco.id}', percentual=72, conflitos=[], pendencias=[])], loja='outra_loja')
+    assert entrar(app, admin).post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{disco.id}'}).status_code == 409

@@ -2,7 +2,7 @@
 from services.icecat_service.obter_ficha_icecat_service import ErroConsultaIcecat
 from datetime import datetime, timezone
 from sqlalchemy.exc import SQLAlchemyError
-from models import ProdutoPendente, IdentidadeFabricante, Oferta
+from models import db, ProdutoPendente, IdentidadeFabricante, Oferta
 from repositories.importacao_catalogo_repository import RepositorioImportacaoCatalogo
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_peca, assinatura_catalogo, assinatura_documento
@@ -35,17 +35,7 @@ class ImportarProdutoService:
         modelos={m.__tablename__:m for m in MODELOS_PECAS}
         if p.categoria_sugerida not in modelos:raise ValueError('Categoria precisa de revisão')
         categoria=p.categoria_sugerida;bruto=p.dados_originais;assinatura=assinatura_documento(bruto)
-        catalogo=(bruto.get('catalogo') or {}).get('id') or (bruto.get('anuncio') or {}).get('catalog_product_id')
-        self.cliente._validar_id(catalogo,'catálogo')
-        token=(self.tokens or TokenMercadoLivreService()).executar()
-        produto=self.cliente._consultar('/products/'+catalogo,token)
-        if produto.get('id')!=catalogo:raise ValueError('Catálogo retornado diverge')
-        resultado=self.cliente.executar(catalogo,access_token=token,produto=produto)
-        ofertas=[a for a in resultado['ofertas'] if a['produto_id_loja']==p.produto_id_loja and a['condicao']=='new']
-        if len(ofertas)!=1:raise ValueError('Anúncio não está mais disponível como oferta nova no catálogo')
-        anuncio=ofertas[0]
-        if p.vendedor_id is not None and p.vendedor_id!=anuncio['vendedor_id']:
-            raise ValueError('Vendedor mudou desde a descoberta')
+        produto,anuncio=self._consultar_anuncio(p)
         # Somente preço e estoque atuais; nunca reutilizar a cotação antiga da descoberta.
         entrada={'price':anuncio['preco'],'available_quantity':anuncio.get('quantidade_disponivel')}
         if (bruto.get('anuncio') or {}).get('title'):entrada['title']=bruto['anuncio']['title']
@@ -74,6 +64,44 @@ class ImportarProdutoService:
         if ficha.get('fabricante_oficial'):
             resultado_importacao['fabricante_oficial']=ficha['fabricante_oficial']
         return resultado_importacao
+
+    def _consultar_anuncio(self,p):
+        """Rede antes da transação: catálogo atual e o anúncio como oferta nova do mesmo vendedor."""
+        bruto=p.dados_originais
+        catalogo=(bruto.get('catalogo') or {}).get('id') or (bruto.get('anuncio') or {}).get('catalog_product_id')
+        self.cliente._validar_id(catalogo,'catálogo')
+        token=(self.tokens or TokenMercadoLivreService()).executar()
+        produto=self.cliente._consultar('/products/'+catalogo,token)
+        if produto.get('id')!=catalogo:raise ValueError('Catálogo retornado diverge')
+        resultado=self.cliente.executar(catalogo,access_token=token,produto=produto)
+        ofertas=[a for a in resultado['ofertas'] if a['produto_id_loja']==p.produto_id_loja and a['condicao']=='new']
+        if len(ofertas)!=1:raise ValueError('Anúncio não está mais disponível como oferta nova no catálogo')
+        anuncio=ofertas[0]
+        if p.vendedor_id is not None and p.vendedor_id!=anuncio['vendedor_id']:
+            raise ValueError('Vendedor mudou desde a descoberta')
+        return produto,anuncio
+
+    def aceitar_revisado(self,pendencia_id,peca,revisao):
+        """Associação decidida por uma pessoa: a decisão automática não é refeita, mas o anúncio é
+        reconsultado e a gravação (trava, vínculo do catálogo, posse do anúncio e histórico) é a mesma."""
+        p=ProdutoPendente.buscar_por_id(pendencia_id)
+        if p is None or p.loja!='mercado_livre':raise ValueError('Pendência ausente ou de outra loja')
+        if p.status not in ('pendente','em_revisao'):raise ValueError('Esta pendência já foi decidida')
+        assinatura_original=assinatura_documento(p.dados_originais);assinatura_da_peca=assinatura_peca(peca)
+        produto,anuncio=self._consultar_anuncio(p)
+        ficha={'produto':{'id':produto['id']},'assinatura_catalogo':assinatura_catalogo(produto)}
+        with self.repositorio.transacao(pendencia_id,simular=False) as atual:
+            if atual.status not in ('pendente','em_revisao') or assinatura_documento(atual.dados_originais)!=assinatura_original:
+                raise ValueError('A pendência mudou durante a consulta; abra de novo')
+            db.session.refresh(peca,with_for_update=True)
+            if assinatura_peca(peca)!=assinatura_da_peca or not peca.publicavel:
+                raise ValueError('A peça mudou durante a consulta; abra de novo')
+            agora=datetime.now(timezone.utc).replace(tzinfo=None)
+            propostas=self.repositorio.registrar_oferta(atual,peca,ficha,anuncio,'revisao_manual',agora)
+            self.repositorio.concluir(atual,peca,ficha,anuncio,propostas,agora)
+            atual.motivo='Associação aprovada por um administrador'
+            atual.evidencias={**(atual.evidencias or {}),'revisao_manual':revisao}
+        return propostas
 
     def executar_lote(self, *, limite=20, depois_id=0, categoria=None, simular=True, permitir_novos=False):
         ids=[p.id for p in ProdutoPendente.listar_para_revisao(depois_id,limite,categoria)]
