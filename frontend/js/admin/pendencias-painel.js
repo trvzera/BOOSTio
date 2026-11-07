@@ -71,7 +71,7 @@ export function iniciarPendencias(raiz) {
     const n = marcadas().length;
     lote.hidden = selects.status.value === "rejeitado" || selects.status.value === "importado" || caixas.length === 0;
     todas.checked = caixas.length > 0 && n === caixas.length;
-    enviarIA.disabled = decidirIA.disabled = n === 0;
+    enviarIA.disabled = n === 0;
     enviarIA.textContent = n ? `Enviar para a IA (${n})` : "Enviar para a IA";
   }
 
@@ -81,7 +81,7 @@ export function iniciarPendencias(raiz) {
     const ids = marcadas().map(c => Number(c.value));
     if (!ids.length) return;
     if (decidir && !window.confirm(`A IA vai aceitar ou rejeitar até ${ids.length} pendência(s) com alta confiança. Rejeições não podem ser desfeitas. Continuar?`)) return;
-    enviarIA.disabled = decidirIA.disabled = todas.disabled = true;
+    enviarIA.disabled = todas.disabled = decidirIA.disabled = true;
     const total = { sugeridas: 0, sem_sugestao: 0, falhas: 0, ignoradas: 0, aceitas: 0, rejeitadas: 0, decisoes_falhas: 0 };
     try {
       for (let i = 0; i < ids.length; i += TAMANHO_GRUPO) {
@@ -97,7 +97,7 @@ export function iniciarPendencias(raiz) {
     } catch (erro) {
       avisar(erro.message, true);
     } finally {
-      todas.disabled = false;
+      todas.disabled = decidirIA.disabled = false;
       atualizarLote();
     }
   }
@@ -244,8 +244,7 @@ export function iniciarPendencias(raiz) {
     lista.querySelectorAll(".admin-pending-check").forEach(c => { c.checked = todas.checked; });
     atualizarLote();
   });
-  enviarIA.addEventListener("click", () => enviarSelecionadasParaIA());
-  decidirIA.addEventListener("click", () => enviarSelecionadasParaIA({decidir: true}));
+  enviarIA.addEventListener("click", () => enviarSelecionadasParaIA({decidir: decidirIA.checked}));
   maisBotao.addEventListener("click", () => carregar({anexar: true}));
   carregar();
 }

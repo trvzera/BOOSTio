@@ -4,15 +4,15 @@
 #admin-page {
   position: relative;
   isolation: isolate;
-  padding: 140px var(--espacamento-24) 80px;
-  max-width: 1280px;
+  padding: 120px clamp(16px, 3vw, 48px) 64px;
+  max-width: min(1920px, 100%);
   margin: 0 auto;
 }
 
 .admin-header { margin-bottom: 32px; }
 .admin-header p { color: var(--cor-4); }
 
-.admin-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 32px; align-items: start; }
+.admin-layout { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 24px; align-items: start; }
 
 .admin-menu {
   display: flex; flex-direction: column; gap: 8px; padding: 16px;
@@ -25,7 +25,7 @@
 .admin-menu-item:hover, .admin-menu-item[aria-current="page"] { background: var(--cor-2); color: var(--cor-6); }
 
 .admin-content {
-  min-width: 0; padding: 32px; border: 1px solid var(--cor-2); border-radius: 24px;
+  min-width: 0; padding: 28px clamp(16px, 2.2vw, 36px); border: 1px solid var(--cor-2); border-radius: 24px;
   background: rgba(28, 28, 30, 0.76);
 }
 .admin-content > section > p { color: var(--cor-4); margin: 8px 0 24px; }
@@ -50,11 +50,11 @@
 .admin-status { min-height: 1.5em; margin-bottom: 16px; color: var(--cor-4); }
 .admin-status[data-estado="erro"] { color: var(--status-error); }
 
-.admin-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.admin-split { display: grid; grid-template-columns: minmax(340px, 5fr) minmax(0, 7fr); gap: 28px; align-items: start; }
 
-.admin-bulk { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.admin-bulk { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-bottom: 12px; }
 .admin-bulk[hidden] { display: none; }
-.admin-bulk-all { display: flex; align-items: center; gap: 8px; color: var(--cor-4); }
+.admin-bulk-check { display: flex; align-items: center; gap: 8px; color: var(--cor-4); }
 .admin-pending-check { width: 18px; height: 18px; margin: 0; align-self: center; cursor: pointer; }
 .admin-pending-list { display: flex; flex-direction: column; gap: 12px; margin: 0 0 16px; padding: 0; list-style: none; }
 .admin-pending-item {
@@ -68,9 +68,9 @@
 .admin-pending-open { align-self: flex-start; }
 
 .admin-detail {
-  position: sticky; top: 120px; padding: 24px; border: 1px solid var(--cor-2); border-radius: 20px; background: var(--cor-1);
+  position: sticky; top: 108px; padding: 24px; border: 1px solid var(--cor-2); border-radius: 20px; background: var(--cor-1);
   /* Rolagem própria: a lista da esquerda rola com a página e o detalhe rola sozinho. */
-  max-height: calc(100vh - 140px); overflow-y: auto; overscroll-behavior: contain;
+  max-height: calc(100vh - 130px); overflow-y: auto; overscroll-behavior: contain;
 }
 .admin-detail[hidden] { display: none; }
 .admin-detail p { margin: 8px 0; }
