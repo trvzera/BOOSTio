@@ -316,3 +316,15 @@ def test_catalogo_ambiguo_vira_pendencia_como_na_shopee(banco):
     # repetir não duplica
     executar(p,prod=sem_mpn,ofertas=[anuncio('MLB77',5,300)],simular=False)
     assert ProdutoPendente.query.count()==1
+
+
+def test_catalogo_ambiguo_cujo_anuncio_ja_e_oferta_nao_quebra(banco):
+    from models import ProdutoPendente
+    _,p=banco
+    sem_mpn=produto(attributes=[{'id':'BRAND','value_name':'AMD'}])
+    db.session.add(Oferta(loja='mercado_livre',produto_id_loja='MLB77',vendedor_id='5',url='https://x/MLB77',
+                          preco=Decimal('300.00'),tabela_peca='processador',peca_id=p.id,ativa=True))
+    db.session.commit()
+    r=executar(p,prod=sem_mpn,ofertas=[anuncio('MLB77',5,300)],simular=False)
+    assert r['detalhes'][0]['ambiguas_registradas']==0
+    assert ProdutoPendente.query.count()==0

@@ -47,6 +47,8 @@ class RegistrarAmbiguosMercadoLivreService:
                          coletado_em=datetime.now(timezone.utc).replace(tzinfo=None))
             ProdutoPendente.registrar_descobertos([linha], simular=False)
             pendente = ProdutoPendente.buscar_por_anuncio('mercado_livre', oferta['produto_id_loja'])
+            if pendente is None:
+                continue  # o anúncio já é uma oferta (registrar_descobertos o contou como associado)
             try:
                 ProdutoPendente.registrar_matching(pendente.id, decisao, assinatura_documento(pendente.dados_originais), simular=False)
                 registradas += 1
