@@ -25,7 +25,7 @@ export async function confirmaUsuario() {
   const resposta = await carregarPerfil();
   limparFalhaSessao();
   const autenticado = Boolean(resposta?.auth);
-  atualizarMenu(autenticado);
+  atualizarMenu(autenticado, resposta?.usuario?.administrador);
   if (autenticado && ['login.html','signin.html','index.html'].includes(paginaAtual)) {
     const retorno = consumirRetornoPublico();
     if (retorno) { location.replace(new URL(retorno,location.href).href); return resposta; }

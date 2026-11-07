@@ -1,0 +1,97 @@
+/* Dashboard de administração (pages/admin.html) */
+.admin-page-body { min-height: 100vh; height: auto; overflow-x: hidden; }
+
+#admin-page {
+  position: relative;
+  isolation: isolate;
+  padding: 140px var(--espacamento-24) 80px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.admin-header { margin-bottom: 32px; }
+.admin-header p { color: var(--cor-4); }
+
+.admin-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 32px; align-items: start; }
+
+.admin-menu {
+  display: flex; flex-direction: column; gap: 8px; padding: 16px;
+  border: 1px solid var(--cor-2); border-radius: 20px; background: rgba(28, 28, 30, 0.76);
+}
+.admin-menu-item {
+  padding: 12px 16px; border: 0; border-radius: 12px; background: transparent;
+  color: var(--cor-5); text-align: left; cursor: pointer;
+}
+.admin-menu-item:hover, .admin-menu-item[aria-current="page"] { background: var(--cor-2); color: var(--cor-6); }
+
+.admin-content {
+  min-width: 0; padding: 32px; border: 1px solid var(--cor-2); border-radius: 24px;
+  background: rgba(28, 28, 30, 0.76);
+}
+.admin-content > section > p { color: var(--cor-4); margin: 8px 0 24px; }
+
+.admin-filters { display: flex; flex-wrap: wrap; align-items: end; gap: 16px; margin-bottom: 16px; }
+.admin-filters label { display: flex; flex-direction: column; gap: 6px; color: var(--cor-4); }
+.admin-filters select, .admin-reason {
+  min-height: 44px; padding: 0 12px; border: 1px solid var(--cor-2); border-radius: 12px;
+  background: var(--cor-1); color: var(--cor-5);
+}
+.admin-reason { width: 100%; margin: 16px 0; }
+
+.admin-counts { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; padding: 0; list-style: none; }
+.admin-count, .admin-badge {
+  padding: 4px 12px; border-radius: 999px; background: var(--cor-2); color: var(--cor-5); font-size: 0.8125rem;
+}
+.admin-badge { background: var(--cor-p5); }
+.admin-badge-muted { background: var(--cor-2); }
+
+.admin-status { min-height: 1.5em; margin-bottom: 16px; color: var(--cor-4); }
+.admin-status[data-estado="erro"] { color: var(--status-error); }
+
+.admin-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+
+.admin-pending-list { display: flex; flex-direction: column; gap: 12px; margin: 0 0 16px; padding: 0; list-style: none; }
+.admin-pending-item {
+  display: flex; flex-direction: column; gap: 8px; padding: 16px;
+  border: 1px solid var(--cor-2); border-radius: 16px; background: var(--cor-1);
+}
+.admin-pending-item[data-selected] { border-color: var(--cor-p1); }
+.admin-pending-head { display: flex; flex-wrap: wrap; gap: 8px; }
+.admin-pending-title { margin: 0; overflow-wrap: anywhere; }
+.admin-pending-meta { margin: 0; color: var(--cor-4); }
+.admin-pending-open { align-self: flex-start; }
+
+.admin-detail {
+  position: sticky; top: 120px; padding: 24px; border: 1px solid var(--cor-2); border-radius: 20px; background: var(--cor-1);
+}
+.admin-detail[hidden] { display: none; }
+.admin-detail p { margin: 8px 0; }
+.admin-link { color: var(--cor-s3); text-decoration: underline; }
+.admin-note { color: var(--cor-4); }
+.admin-alert { color: var(--status-error); }
+
+.admin-candidates { margin: 16px 0 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px; }
+.admin-candidates legend { margin-bottom: 8px; padding: 0; }
+.admin-candidate {
+  display: flex; gap: 12px; align-items: flex-start; padding: 12px;
+  border: 1px solid var(--cor-2); border-radius: 12px; cursor: pointer;
+}
+.admin-candidate:has(input:checked) { border-color: var(--cor-p1); }
+.admin-candidate:has(input:disabled) { opacity: 0.6; cursor: not-allowed; }
+.admin-candidate-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+
+.admin-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.admin-detail-title { margin: 0 0 8px; overflow-wrap: anywhere; }
+
+@media (max-width: 1100px) {
+  .admin-split { grid-template-columns: 1fr; }
+  .admin-detail { position: static; }
+}
+
+@media (max-width: 900px) {
+  .admin-layout { grid-template-columns: 1fr; }
+  .admin-menu { flex-direction: row; }
+  .admin-detail { position: static; }
+  .admin-content { padding: 20px; }
+}

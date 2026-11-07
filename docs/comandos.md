@@ -17,6 +17,14 @@ scripts de `deploy/` já fazem isso. A maioria **simula por padrão** e só grav
 | `shopee-descobrir` | Procura anúncios novos na Shopee por termo. Com `--gravar-catalogo --permitir-novos` pode cadastrar peça nova. |
 | `pecas-imagens` | Baixa a foto principal das peças que têm link da KaBuM e ainda não têm imagem. |
 
+## 1b. Administradores
+
+| Comando | Para que serve |
+| --- | --- |
+| `usuario-promover-admin --email ...` | Torna a conta administradora e encerra as sessões dela. |
+| `usuario-remover-admin --email ...` | Retira o papel. |
+| `usuario-listar-admins` | Mostra quem é administrador. |
+
 ## 2. Preparar o banco (normalmente uma vez por versão)
 
 | Comando | Para que serve |
@@ -33,6 +41,7 @@ scripts de `deploy/` já fazem isso. A maioria **simula por padrão** e só grav
 | `catalogo-tecnico-preparar` | Ajusta as tabelas de peças para aceitar ficha técnica sem preço. |
 | `dataset-pecas-preparar` | Prepara a importação do dataset público de peças. |
 | `preferencias-preparar` | Cria a tabela de preferências do usuário. |
+| `usuarios-admin-preparar` | Adiciona `usuario.administrador` (simula; `--aplicar` grava). Ver [admin.md](admin.md). |
 | `precos-migrar`, `migrar-budget` | Migrações antigas de SQLite (links; orçamento do usuário). |
 
 ## 3. Cadastrar e importar peças
