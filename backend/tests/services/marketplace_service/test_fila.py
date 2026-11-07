@@ -161,3 +161,31 @@ def test_falhas_de_rede_sao_temporarias_sem_expor_payload(banco,erro):
     with pytest.raises(FalhaMarketplace) as falha:
         controle.executar(Mock(side_effect=erro))
     assert falha.value.temporaria and falha.value.status is None
+
+
+def test_enfileirar_sem_categoria_percorre_todas_e_so_pecas_aprovadas_e_completas(banco):
+    import json
+    from commands.marketplaces import registrar_comandos_marketplaces
+    from models import Processador, Fonte
+    app, repo = banco
+    db.create_all()
+    cpu = dict(fabricante='AMD', soquete='AM4', nucleo=6, thread=12, clockbase=3.6, clockmax=4.2, consumo_energia=65)
+    db.session.add_all([
+        Processador(modelo='Ryzen 5 5500', status_validacao='aprovado', **cpu),
+        Processador(modelo='Ryzen 5 5600', status_validacao='legado', **cpu),
+        Processador(modelo='Ryzen 5 4500', status_validacao='em_revisao', **cpu),  # não aprovada
+        Fonte(fabricante='Corsair', modelo='CV550', potencia_w=550, consumo_energia=0, status_validacao='aprovado')])
+    db.session.commit()
+    registrar_comandos_marketplaces(app)
+    runner = app.test_cli_runner()
+    simulado = json.loads(runner.invoke(args=['marketplaces-enfileirar-ofertas', '--loja', 'shopee', '--execucao', 'todas']).output)
+    assert simulado['simulacao'] is True and simulado['por_categoria']['processador'] == 2
+    assert simulado['tarefas'] == sum(simulado['por_categoria'].values()) and repo.resumo() == []
+    aplicado = json.loads(runner.invoke(args=['marketplaces-enfileirar-ofertas', '--loja', 'shopee', '--execucao', 'todas', '--aplicar']).output)
+    assert aplicado['tarefas'] == simulado['tarefas'] and TarefaMarketplace.query.count() == aplicado['tarefas']
+    # repetir com a mesma identificação não duplica; outra categoria continua exigindo o filtro
+    runner.invoke(args=['marketplaces-enfileirar-ofertas', '--loja', 'shopee', '--execucao', 'todas', '--aplicar'])
+    assert TarefaMarketplace.query.count() == aplicado['tarefas']
+    uma = json.loads(runner.invoke(args=['marketplaces-enfileirar-ofertas', '--loja', 'shopee', '--categoria', 'processador', '--execucao', 'so-cpu']).output)
+    assert uma['tarefas'] == 2 and list(uma['por_categoria']) == ['processador']
+    assert runner.invoke(args=['marketplaces-enfileirar-ofertas', '--loja', 'shopee', '--peca-id', '1', '--execucao', 'x']).exit_code != 0

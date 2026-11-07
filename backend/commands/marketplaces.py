@@ -51,33 +51,26 @@ def registrar_comandos_marketplaces(app):
 
     @app.cli.command('marketplaces-enfileirar-ofertas')
     @click.option('--loja', type=click.Choice(LOJAS), required=True)
-    @click.option('--categoria', type=click.Choice([m.__tablename__ for m in MODELOS_PECAS]), required=True)
+    @click.option('--categoria', type=click.Choice([m.__tablename__ for m in MODELOS_PECAS]), default=None,
+                  help='Uma categoria. Omitida, percorre todas as categorias do banco.')
     @click.option('--peca-id', type=click.IntRange(1), default=None)
     @click.option('--execucao', required=True, help='Mesma identificação evita duplicatas na reexecução.')
     @click.option('--gravar-ofertas', is_flag=True, help='As tarefas gravarão ofertas; padrão só simula a importação.')
     @click.option('--aplicar', is_flag=True, help='Grava tarefas na fila; sem esta opção somente conta as propostas.')
     def enfileirar(loja, categoria, peca_id, execucao, gravar_ofertas, aplicar):
+        """Uma tarefa por peça aprovada e com o mínimo técnico; sem --categoria, todas as categorias."""
         worker = ProcessarFilaMarketplaceService(executores_disponiveis())
         if (loja, 'ofertas') not in worker.executores:
             raise click.ClickException('Adaptador de ofertas ainda indisponível para esta loja')
-        modelo = next(m for m in MODELOS_PECAS if m.__tablename__ == categoria)
-        quantidade, depois = 0, 0
-        while True:
-            pecas = [modelo.buscar_por_id(peca_id)] if peca_id else modelo.lote_para_ofertas(depois, 100)
-            pecas = [p for p in pecas if p is not None]
-            if not pecas:
-                break
-            for peca in pecas:
-                if pendencias_para_montagem(peca):
-                    continue
-                quantidade += 1
-                if aplicar:
-                    worker.enfileirar(loja, 'ofertas', dict(categoria=categoria, peca_id=peca.id,
-                        simular=not gravar_ofertas, limite_ofertas=1), execucao=execucao)
-            depois = pecas[-1].id
-            if peca_id:
-                break
-        click.echo(json.dumps(dict(simulacao=not aplicar, tarefas=quantidade, gravar_ofertas=gravar_ofertas)))
+        if peca_id and not categoria:
+            raise click.ClickException('--peca-id exige --categoria')
+        modelos = [m for m in MODELOS_PECAS if categoria in (None, m.__tablename__)]
+        por_categoria = {}
+        for modelo in modelos:
+            por_categoria[modelo.__tablename__] = _enfileirar_categoria(
+                worker, loja, modelo, peca_id, execucao, gravar_ofertas, aplicar)
+        click.echo(json.dumps(dict(simulacao=not aplicar, tarefas=sum(por_categoria.values()),
+                                   por_categoria=por_categoria, gravar_ofertas=gravar_ofertas)))
 
     @app.cli.command('marketplaces-worker')
     @click.option('--uma-vez', is_flag=True)
@@ -109,3 +102,24 @@ def registrar_comandos_marketplaces(app):
                 raise click.ClickException('Marketplace em execução; repita após concluir a tarefa')
             RepositorioFilaMarketplace().reativar(loja, agora_utc())
         click.echo(json.dumps(dict(loja=loja, reativado=True)))
+
+
+def _enfileirar_categoria(worker, loja, modelo, peca_id, execucao, gravar_ofertas, aplicar):
+    """Só peças publicáveis: oferta de peça não aprovada nunca é gravada, então não vale a requisição."""
+    quantidade, depois = 0, 0
+    while True:
+        pecas = [modelo.buscar_por_id(peca_id)] if peca_id else modelo.lote_para_ofertas(depois, 100)
+        pecas = [p for p in pecas if p is not None]
+        if not pecas:
+            break
+        for peca in pecas:
+            if not peca.publicavel or pendencias_para_montagem(peca):
+                continue
+            quantidade += 1
+            if aplicar:
+                worker.enfileirar(loja, 'ofertas', dict(categoria=modelo.__tablename__, peca_id=peca.id,
+                    simular=not gravar_ofertas, limite_ofertas=1), execucao=execucao)
+        depois = pecas[-1].id
+        if peca_id:
+            break
+    return quantidade

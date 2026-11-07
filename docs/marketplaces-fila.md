@@ -81,6 +81,8 @@ A partir de `backend/`, com o ambiente correto configurado:
 python -m flask --app app marketplaces-fila-preparar
 python -m flask --app app marketplaces-fila-preparar --aplicar
 python -m flask --app app marketplaces-enfileirar-ofertas --loja mercado_livre --categoria ssd --execucao teste-ssd
+# sem --categoria: todas as categorias (só peças aprovadas e com o mínimo técnico)
+python -m flask --app app marketplaces-enfileirar-ofertas --loja mercado_livre --execucao teste-todas
 python -m flask --app app marketplaces-enfileirar-ofertas --loja mercado_livre --categoria ssd --execucao teste-ssd --aplicar
 python -m flask --app app marketplaces-worker --uma-vez
 python -m flask --app app marketplaces-fila-resumo

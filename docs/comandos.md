@@ -10,7 +10,7 @@ scripts de `deploy/` já fazem isso. A maioria **simula por padrão** e só grav
 | --- | --- |
 | `precos-atualizar` | Atualiza preço e estoque da **KaBuM** (um anúncio por vez). Agendado por `deploy/atualizar_precos.sh`. |
 | `mercadolivre-ofertas-atualizar` | Atualiza as ofertas do **Mercado Livre** das peças. Script: `deploy/atualizar_ofertas_mercadolivre.sh`. |
-| `marketplaces-enfileirar-ofertas` | Põe na fila uma tarefa de ofertas por peça, para **Mercado Livre ou Shopee**. Uma categoria por vez. |
+| `marketplaces-enfileirar-ofertas` | Põe na fila uma tarefa de ofertas por peça, para **Mercado Livre ou Shopee**. Sem `--categoria`, percorre **todas** as categorias; só entram peças aprovadas e com o mínimo técnico. |
 | `marketplaces-worker` | Executa a fila acima (processo que fica rodando). `--uma-vez` processa uma tarefa por loja e termina. |
 | `marketplaces-fila-resumo` | Mostra quantas tarefas estão pendentes, em andamento, concluídas ou com falha. |
 | `marketplaces-fila-reativar` | Libera uma loja bloqueada (ex.: credencial vencida) depois de você corrigir o problema. |

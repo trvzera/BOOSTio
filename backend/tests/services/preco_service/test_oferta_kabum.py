@@ -163,3 +163,23 @@ def test_montagem_manual_recusa_peca_sem_preco_e_aceita_a_com_preco(banco):
         validar_estado({'titulo': 'Teste', 'componentes': {'placa_video': {'id': sem_preco.id, 'quantidade': 1}}})
     estado = validar_estado({'titulo': 'Teste', 'componentes': {'placa_video': {'id': com_preco.id, 'quantidade': 1}}})
     assert estado['componentes']['placa_video']['id'] == com_preco.id
+
+
+def test_cooler_sem_socket_identificavel_nao_e_candidato_a_montagem(banco):
+    from models import AirCooler, WaterCooler
+    def cooler(modelo_classe, nome, compat, link, **extras):
+        c = modelo_classe(fabricante='Marca', modelo=nome, compatibilidade=compat, status_validacao='aprovado', **extras)
+        banco.session.add(c)
+        banco.session.flush()
+        gravar_cotacao_inicial(c, link, 100, False, DATA)
+        return c
+    vago = cooler(AirCooler, 'Vago', 'AMD,Intel', 'https://www.kabum.com.br/produto/401/vago')
+    claro = cooler(AirCooler, 'Claro', 'AM4, AM5, LGA1700', 'https://www.kabum.com.br/produto/402/claro')
+    agua_vaga = cooler(WaterCooler, 'Agua vaga', 'AMD,Intel', 'https://www.kabum.com.br/produto/403/a', tamanho_radiador_mm=240, quantidade_fans=2)
+    agua = cooler(WaterCooler, 'Agua clara', 'AM4 AM5 LGA1700', 'https://www.kabum.com.br/produto/404/b', tamanho_radiador_mm=240, quantidade_fans=2)
+    banco.session.commit()
+    assert [c.id for c in AirCooler.listar_candidatos_disponiveis(1000)] == [claro.id]
+    assert [c.id for c in WaterCooler.listar_candidatos_disponiveis(1000)] == [agua.id]
+    assert [c.id for c in AirCooler.listar_disponiveis_ate(1000)] == [claro.id]
+    # continuam no catálogo do site: só deixam de ser oferecidos à montagem automática
+    assert {c.id for c in AirCooler.listar_publicadas()} == {vago.id, claro.id}
