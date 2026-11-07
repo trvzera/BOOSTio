@@ -47,17 +47,17 @@ def test_novo_atomico_simulacao_permissao_e_idempotencia(banco):
     s=service()
     assert s.executar(banco.id)['acao']=='revisao'
     assert s.executar(banco.id,permitir_novos=True)['acao']=='proposta'
-    assert HD.query.count()==Oferta.query.count()==HistoricoOferta.query.count()==0
+    assert HD.query.count()==Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==0
     r=s.executar(banco.id,simular=False,permitir_novos=True)
     assert r['novo_componente'] and r['acao']=='importada'
-    assert HD.query.count()==Oferta.query.count()==HistoricoOferta.query.count()==IdentidadeFabricante.query.count()==1
+    assert HD.query.count()==Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==IdentidadeFabricante.query.count()==1
     novo=HD.query.one()
     assert novo.status_validacao=='aprovado' and novo.preco==999.90 and novo.velocidade_rpm is None
-    assert banco.status=='importado' and banco.oferta_id==Oferta.query.one().id
-    assert Oferta.query.one().esgotado is False
-    antes=(Oferta.query.one().atualizado_em,HistoricoOferta.query.one().id)
+    assert banco.status=='importado' and banco.oferta_id==Oferta.query.filter(Oferta.loja!='kabum').one().id
+    assert Oferta.query.filter(Oferta.loja!='kabum').one().esgotado is False
+    antes=(Oferta.query.filter(Oferta.loja!='kabum').one().atualizado_em,HistoricoOferta.query.one().id)
     assert s.executar(banco.id,simular=False,permitir_novos=True)['acao']=='inalterada'
-    assert (Oferta.query.one().atualizado_em,HistoricoOferta.query.one().id)==antes
+    assert (Oferta.query.filter(Oferta.loja!='kabum').one().atualizado_em,HistoricoOferta.query.one().id)==antes
     novo.preco=900;db.session.commit()
     assert IdentidadeFabricante.buscar(novo) is not None
 
@@ -69,7 +69,7 @@ def test_existente_recebe_oferta_sem_alterar_peca_ou_desativar_outras(banco):
     r=service().executar(banco.id,simular=False)
     assert r['acao']=='importada' and not r['novo_componente']
     assert HD.query.count()==1 and p.preco==500
-    assert Oferta.query.count()==2 and all(o.ativa for o in Oferta.query.all())
+    assert Oferta.query.filter(Oferta.loja!='kabum').count()==2 and all(o.ativa for o in Oferta.query.filter(Oferta.loja!='kabum').all())
 
 
 def test_ambiguidades_e_incompletos_nao_publicam(banco):
@@ -77,7 +77,7 @@ def test_ambiguidades_e_incompletos_nao_publicam(banco):
     resultado=service().executar(banco.id,simular=False,permitir_novos=True)
     assert resultado['acao']=='revisao' and 'candidatos' in resultado['motivo']
     assert banco.status=='em_revisao'
-    assert Oferta.query.count()==0
+    assert Oferta.query.filter(Oferta.loja!='kabum').count()==0
 
 
 def test_estoque_antigo_nao_e_reaproveitado_e_vendedor_mudou(banco):
@@ -96,7 +96,7 @@ def test_falha_no_historico_reverte_componente_identidade_vinculo_e_oferta(banco
     try:
         with pytest.raises(OperationalError):service().executar(banco.id,simular=False,permitir_novos=True)
     finally:event.remove(db.engine,'before_cursor_execute',falhar)
-    assert HD.query.count()==Oferta.query.count()==HistoricoOferta.query.count()==IdentidadeFabricante.query.count()==VinculoMercadoLivre.query.count()==0
+    assert HD.query.count()==Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==IdentidadeFabricante.query.count()==VinculoMercadoLivre.query.count()==0
     assert ProdutoPendente.query.one().status=='pendente'
 
 
@@ -107,4 +107,4 @@ def test_ficha_comercial_completa_nao_libera_identidade_em_revisao_no_icecat(ban
         produto, {**ficha, 'icecat': {'status': 'ambigua'}})
     resultado = importador.executar(banco.id, simular=False, permitir_novos=True)
     assert resultado['acao'] == 'revisao'
-    assert HD.query.count() == Oferta.query.count() == HistoricoOferta.query.count() == 0
+    assert HD.query.count() == Oferta.query.filter(Oferta.loja!='kabum').count() == HistoricoOferta.query.count() == 0

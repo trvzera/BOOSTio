@@ -57,6 +57,10 @@ from .ficha_tecnica_catalogo import FichaTecnicaCatalogo, RevisaoFichaTecnica
 
 from .tarefa_marketplace import TarefaMarketplace, LimiteMarketplace
 
+# Preço e link das peças vêm das ofertas; depende de todos os models acima.
+from .preco_oferta import instalar_precos_derivados
+instalar_precos_derivados()
+
 #Funcão obrigatória para o login buscar informações do usuario pelo id
 @lm.user_loader
 def user_loader(id: str) -> Usuario | None:

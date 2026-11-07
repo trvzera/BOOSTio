@@ -17,7 +17,6 @@ def par():
     p=PlacaVideo(fabricante='NVIDIA',modelo='GeForce RTX 4060',memoria_gb=8,tipo_memoria='GDDR6',
         preco=1500,consumo_energia=115,kabum_external='https://www.kabum.com.br/produto/123')
     db.session.add(p);db.session.commit()
-    db.session.add(Oferta(tabela_peca='placa_video',peca_id=p.id,loja='kabum',produto_id_loja='123',url=p.kabum_external));db.session.commit()
     d=ProdutoNormalizado(loja='kabum',id_externo='123',categoria='placa_video',categoria_confirmada=True,
         titulo='Placa de Vídeo Marca GeForce RTX 4060 8GB GDDR6 - GV-N4060-8GD',marca='Marca',modelo='GV-N4060-8GD',
         modelos_alternativos=('GV-N4060-8GD',),ativo=True,fonte=p.kabum_external,

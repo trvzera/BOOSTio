@@ -12,13 +12,11 @@ class PlacaRede(Peca):
 
     @classmethod
     def atualizar_links_antigos(cls, trocas):
+        from repositories.ofertas_kabum_repository import definir_link
         alteradas = 0
         for antigo, novo in trocas.items():
-            for peca in cls.query.filter_by(kabum_external=antigo).all():
-                peca.kabum_external = novo
-                peca.preco = 0
-                peca.esgotado = True
-                peca.preco_atualizado_em = None
+            for peca in cls.query.filter(cls.kabum_external == antigo).all():
+                definir_link(peca, novo)
                 peca.imagem_url = None
                 alteradas += 1
         if alteradas:

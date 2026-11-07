@@ -985,7 +985,7 @@ def test_requisito_armazenamento_aciona_correcao_antes_de_salvar(app_build, mock
         ssd = MODELOS['ssd'].buscar_por_id(1)
         ssd.capacidade_gb = 120
         copia = {c.name: getattr(ssd, c.name) for c in ssd.__table__.columns if c.name != 'id'}
-        db.session.add(MODELOS['ssd'](**{**copia, 'capacidade_gb': 500}))
+        db.session.add(MODELOS['ssd'](**{**copia, 'capacidade_gb': 500, 'preco': ssd.preco, 'esgotado': ssd.esgotado}))
         db.session.commit()
         llm = mocker.patch('services.build_service.gerar_candidata_service.LLMService.executar',
                            side_effect=[primeira, segunda])

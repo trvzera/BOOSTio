@@ -3,7 +3,7 @@ from types import SimpleNamespace
 
 import pytest
 from flask import Flask
-from models import db, MemoriaRAM, IdentidadeFabricante
+from models import db, MemoriaRAM, IdentidadeFabricante, Oferta
 from migrations.identidades_fabricante import preparar_identidades_fabricante
 from services.mercadolivre_service.importar_identidades_service import ImportarIdentidadesService
 from services.mercadolivre_service.associar_catalogo_service import AssociarCatalogoService
@@ -16,6 +16,7 @@ def contexto(tmp_path):
     db.init_app(app)
     with app.app_context():
         MemoriaRAM.__table__.create(db.engine)
+        Oferta.__table__.create(db.engine)
         assert preparar_identidades_fabricante()['criadas'] == ['identidade_fabricante']
         assert preparar_identidades_fabricante()['criadas'] == []
         p = MemoriaRAM(fabricante='Kingston', modelo='Fury Beast 8GB', part_number='SEED-RAM-01',

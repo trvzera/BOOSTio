@@ -52,7 +52,7 @@ def test_preenche_codigo_literal_e_formato_sem_tocar_preco_e_idempotente(banco):
     assert p.fontes_especificacoes['formato']['valor_original'] == ['UDIMM']
     assert p.fontes_especificacoes['formato']['url'] == produto().fonte
     assert s.executar(p, produto(), simular=False)['status'] == 'inalterada'
-    assert Oferta.query.count() == 0
+    assert Oferta.query.filter(Oferta.loja != 'kabum').count() == 0
 
 
 @pytest.mark.parametrize('dados', [

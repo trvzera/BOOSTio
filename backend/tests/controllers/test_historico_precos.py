@@ -6,7 +6,7 @@ from flask import Flask
 from flask_login import LoginManager, UserMixin
 from sqlalchemy.exc import OperationalError
 
-from models import db, PlacaVideo, ConsultaPreco, HistoricoPreco
+from models import db, PlacaVideo, HistoricoOferta, Oferta
 from controllers.build_controller import build_bp
 
 
@@ -28,11 +28,15 @@ def banco():
         db.session.remove(); db.engine.dispose()
 
 
-def registrar(p,preco=100,esgotado=False,anuncio='123',loja='kabum',data=None,tabela='placa_video'):
-    c=ConsultaPreco(tabela_peca=tabela,peca_id=p.id,url='https://www.kabum.com.br/produto/'+anuncio,dia='2026-11-02',status='concluida')
-    db.session.add(c);db.session.flush()
-    h=HistoricoPreco(consulta_id=c.id,tabela_peca=tabela,peca_id=p.id,loja=loja,produto_id_loja=anuncio,url=c.url,preco=preco,esgotado=esgotado,coletado_em=data or datetime(2026,11,2,12,0,0,123456))
-    db.session.add(h); db.session.commit()
+def registrar(p,preco=100,esgotado=False,anuncio='123',data=None,tabela='placa_video'):
+    """Observação de uma oferta da KaBuM; cria a oferta do anúncio quando ainda não existe."""
+    o=Oferta.query.filter_by(loja='kabum',produto_id_loja=anuncio).first()
+    if o is None:
+        o=Oferta(tabela_peca=tabela,peca_id=p.id,loja='kabum',produto_id_loja=anuncio,
+                 url='https://www.kabum.com.br/produto/'+anuncio,ativa=False)
+        db.session.add(o);db.session.flush()
+    db.session.add(HistoricoOferta(oferta_id=o.id,preco=preco,esgotado=esgotado,coletado_em=data or datetime(2026,11,2,12,0,0,123456)))
+    db.session.commit()
 
 
 def url(p): return f'/build/catalogo/placa_video/{p.id}/historico-precos'
@@ -40,21 +44,20 @@ def url(p): return f'/build/catalogo/placa_video/{p.id}/historico-precos'
 
 def test_rota_retorna_historico_real_do_anuncio_sem_misturar(banco):
     _,client,p=banco
-    registrar(p,120,data=datetime(2026,11,1)); registrar(p,100);registrar(p,None,True)
-    registrar(p,1,anuncio='999'); registrar(p,2,loja='mercado_livre'); registrar(p,3,tabela='processador')
+    registrar(p,120,data=datetime(2026,11,1)); registrar(p,100)
+    registrar(p,1,anuncio='999'); registrar(p,3,tabela='processador',anuncio='777')
     r=client.get(url(p)); d=r.get_json()
     assert r.status_code==200 and r.headers['Cache-Control']=='no-store'
-    assert [h['preco'] for h in d['historico_precos']]==[120.0,100.0,None]
+    assert [h['preco'] for h in d['historico_precos']]==[120.0,100.0]
     assert d['historico_precos'][1]['data']=='2026-11-02T12:00:00.123+00:00'
-    assert d['historico_precos'][2]['esgotado'] is True
-    assert d['peca_id']==f'placa_video:{p.id}' and d['tem_mais'] is False
+    assert d['peca_id']==f'placa_video:{p.id}' and d['tem_mais'] is False and d['loja']=='kabum'
     assert 'url' not in d['historico_precos'][0]
 
 
 def test_sem_historico_nao_fabrica_preco_atual(banco):
     _,client,p=banco
     assert client.get(url(p)).get_json()['historico_precos']==[]
-    p.kabum_external=None;db.session.commit()
+    Oferta.query.update({'ativa':False});db.session.commit()
     assert client.get(url(p)).get_json()['historico_precos']==[]
 
 
@@ -74,7 +77,7 @@ def test_parametros_rejeitados(banco):
 
 def test_banco_indisponivel_nao_parece_historico_vazio(banco):
     _,client,p=banco
-    with patch.object(HistoricoPreco,'listar_por_peca_anuncio',side_effect=OperationalError('segredo',{},None)):
+    with patch.object(HistoricoOferta,'listar',side_effect=OperationalError('segredo',{},None)):
         r=client.get(url(p))
     assert r.status_code==503 and 'segredo' not in r.get_data(as_text=True)
 
@@ -82,10 +85,9 @@ def test_banco_indisponivel_nao_parece_historico_vazio(banco):
 def test_limite_e_ordem_deterministica(banco):
     _,client,p=banco
     # Mesmo instante: IDs desempatem, sem perder a indicação de recorte.
+    o=Oferta.query.filter_by(loja='kabum',produto_id_loja='123').one()
     for i in range(1001):
-        c=ConsultaPreco(tabela_peca='placa_video',peca_id=p.id,url='url',dia='2026-11-02',status='concluida')
-        db.session.add(c);db.session.flush()
-        db.session.add(HistoricoPreco(consulta_id=c.id,tabela_peca='placa_video',peca_id=p.id,loja='kabum',produto_id_loja='123',url='url',preco=i+1,esgotado=False,coletado_em=datetime(2026,11,2)))
+        db.session.add(HistoricoOferta(oferta_id=o.id,preco=i+1,esgotado=False,coletado_em=datetime(2026,11,2)))
     db.session.commit()
     r=client.get(url(p)).get_json()
     assert r['tem_mais'] is True and len(r['historico_precos'])==1000

@@ -51,7 +51,7 @@ def test_catalogo_exibe_ofertas_ativas_sem_trocar_preco_da_peca(banco):
     resposta=cliente.get('/build/catalogo')
     assert resposta.status_code==200
     ficha=next(x for x in resposta.json['pecas'] if x['id']==f'processador:{p.id}')
-    assert ficha['preco']==600 and ficha['esgotado'] is True
+    assert ficha['preco']==100 and ficha['esgotado'] is None  # a oferta ML (estoque desconhecido) é mais barata que a KaBuM esgotada
     assert len(ficha['ofertas'])==1
     dados=ficha['ofertas'][0]
     assert dados['id']==o.id and dados['vendedor_id']=='4' and dados['preco']==100

@@ -26,8 +26,8 @@ def test_duas_lojas_mesma_peca_sem_mpn_sem_transporte_mercadolivre():
             r=s.executar(pend.id,dto,ficha,anuncio,assinatura_documento(bruto),simular=False)
             assert r['acao']=='importada' and r['criterio']=='modelo_especificacoes'
             assert s.executar(pend.id,dto,ficha,anuncio,assinatura_documento(bruto),simular=False)['acao']=='inalterada'
-        assert Processador.query.count()==1 and Oferta.query.count()==HistoricoOferta.query.count()==2
-        assert p.preco==500
+        assert Processador.query.count()==1 and Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==2
+        assert p.preco==450  # a menor oferta ativa e disponível define o preço da peça
         db.session.remove();db.engine.dispose()
 
 
@@ -49,5 +49,5 @@ def test_cadastra_novo_sem_mpn_quando_ficha_e_fontes_estao_completas():
         assert s.executar(p.id,dto,semfonte,a,assinatura_documento(bruto),permitir_novos=True)['acao']=='revisao'
         r=s.executar(p.id,dto,ficha,a,assinatura_documento(bruto),simular=False,permitir_novos=True)
         assert r['acao']=='importada' and r['novo_componente'] and r['criterio']=='modelo_especificacoes'
-        assert Processador.query.one().part_number is None and Oferta.query.count()==HistoricoOferta.query.count()==1
+        assert Processador.query.one().part_number is None and Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==1
         db.session.remove();db.engine.dispose()

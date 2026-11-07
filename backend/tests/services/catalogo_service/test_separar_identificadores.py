@@ -45,14 +45,14 @@ def test_simulacao_preserva_banco_e_aplicar_e_idempotente(banco):
     legada(p, 'KABUM-175110')
     antes = p.id, p.preco, p.esgotado, p.kabum_external
     r = separar_identificadores(p)
-    assert r['alterada'] and r['oferta'] == 'criada'
-    assert Oferta.query.count() == 0
+    # O link da peça já é uma oferta da KaBuM; separar identificadores não cria outra.
+    assert r['alterada'] and r['oferta'] == 'inalterada'
+    assert Oferta.query.count() == 1
     assert p.part_number == 'KABUM-175110' and p.referencia_interna is None
     separar_identificadores(p, simular=False)
     assert p.part_number is None and p.referencia_interna == 'KABUM-175110'
     o = Oferta.query.one()
-    assert o.loja == 'kabum' and o.produto_id_loja == '175110'
-    assert o.preco is None and o.esgotado is None and o.url_afiliado is None
+    assert o.loja == 'kabum' and o.produto_id_loja == '175110' and o.url_afiliado is None
     assert (p.id, p.preco, p.esgotado, p.kabum_external) == antes
     r = separar_identificadores(p, simular=False)
     assert not r['alterada'] and r['oferta'] == 'inalterada' and Oferta.query.count() == 1
@@ -78,11 +78,11 @@ def test_id_de_loja_contraditorio_fica_em_revisao(banco):
     p = memoria()
     legada(p, 'KABUM-999')
     r = separar_identificadores(p, simular=False)
-    assert r['oferta'] == 'revisao' and Oferta.query.count() == 0
+    assert r['oferta'] == 'revisao' and Oferta.query.count() == 1
     assert p.part_number is None and p.referencia_interna == 'KABUM-999'
 
 
 def test_seed_sem_anuncio_nao_cria_oferta_ficticia(banco):
     p = memoria(part_number='REDE-INTERNO', kabum_external=None)
     r = separar_identificadores(p, simular=False)
-    assert r['oferta'] == 'sem_anuncio' and Oferta.query.count() == 0
+    assert r['oferta'] == 'sem_anuncio' and Oferta.query.filter(Oferta.url != '').count() == 0

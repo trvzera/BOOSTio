@@ -1,3 +1,4 @@
+from utils.colunas_antigas import COLUNAS_ANTIGAS_DA_PECA
 """Permite ausência de cotação e consumo, preservando linhas, índices e FKs."""
 from sqlalchemy import inspect, MetaData, Table, select
 from sqlalchemy.schema import CreateTable, CreateColumn
@@ -5,7 +6,7 @@ from models import db
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from .fichas_tecnicas import preparar_fichas_tecnicas
 
-CAMPOS_NULOS=('preco','esgotado','consumo_energia')
+CAMPOS_NULOS=('consumo_energia',)
 
 
 def preparar_catalogo_tecnico(*, simular=True, campos_por_tabela=None):
@@ -18,7 +19,7 @@ def preparar_catalogo_tecnico(*, simular=True, campos_por_tabela=None):
         if not insp.has_table(nome):continue
         colunas={c['name']:c for c in insp.get_columns(nome)}
         esperadas=set(modelo.__table__.columns.keys())
-        if set(colunas) not in (esperadas,esperadas-{'ficha_montagem_validada'}):
+        if set(colunas)-COLUNAS_ANTIGAS_DA_PECA not in (esperadas,esperadas-{'ficha_montagem_validada'}):
             raise ValueError(f'Prepare o esquema anterior com catalogo-preparar: {nome}')
         campos=tuple(dict.fromkeys((*CAMPOS_NULOS, *(campos_por_tabela or {}).get(nome, ()))))
         mudar=[c for c in campos if not colunas[c]['nullable']]

@@ -29,8 +29,8 @@ def legado(modelo):
 
 
 def dados_ssd(**extras):
-    return dict(fabricante='Teste', modelo='SSD 500', consumo_energia=4, preco=100,
-                capacidade_gb=500, tipo='NVMe', interface='PCIe 4.0', esgotado=False, **extras)
+    return dict(fabricante='Teste', modelo='SSD 500', consumo_energia=4,
+                capacidade_gb=500, tipo='NVMe', interface='PCIe 4.0', **extras)
 
 
 def test_migracao_preserva_usuarios_pecas_ofertas_historico_e_nao_publica_novas(banco):
@@ -75,7 +75,8 @@ def test_duplicatas_bloqueiam_todo_plano_sem_excluir(banco):
 
 def test_novas_pecas_fora_da_publicacao_e_selecao_ate_aprovacao(banco):
     SSD.__table__.create(db.engine)
-    p = SSD(**dados_ssd())
+    Oferta.__table__.create(db.engine)
+    p = SSD(preco=100, esgotado=False, kabum_external='https://www.kabum.com.br/produto/1/ssd', **dados_ssd())
     db.session.add(p);db.session.commit()
     assert p.status_validacao == 'pendente' and not p.publicavel
     assert SSD.listar_publicadas() == SSD.listar_candidatos_disponiveis(200) == []
@@ -131,6 +132,7 @@ def test_status_e_identidade_invalidos_rejeitados_no_banco(banco):
 def test_migracao_formato_ram_preserva_dados_e_nao_inventa_dimm(banco):
     from models import MemoriaRAM
     MemoriaRAM.__table__.create(db.engine)
+    Oferta.__table__.create(db.engine)
     db.session.add(MemoriaRAM(fabricante='Teste',modelo='Memória',capacidade_gb=8,ddr='DDR4',frequencia_mhz=3200,quantidade_pentes=1,consumo_energia=5,preco=100))
     db.session.commit();db.session.remove()
     with db.engine.begin() as c:c.execute(text('ALTER TABLE memoria_ram DROP COLUMN formato'))

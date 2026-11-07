@@ -1,7 +1,4 @@
-from utils.ofertas_catalogo import ofertas_catalogo
 from datetime import timezone
-from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
-from math import isfinite
 
 from . import db
 from sqlalchemy.orm import declared_attr, validates
@@ -18,14 +15,10 @@ class Peca(ModeloBase):
   fabricante = db.Column(db.String(30),nullable = False)
   modelo = db.Column(db.String(120),nullable = False)
   consumo_energia = db.Column(db.Float(),nullable = True)
-  preco = db.Column(db.Float(),nullable = True)
   part_number = db.Column(db.String(100), nullable=True)
   referencia_interna = db.Column(db.String(100), nullable=True)
   codigo_modelo_fabricante = db.Column(db.String(150), nullable=True)
   fontes_especificacoes = db.Column(db.JSON, nullable=True)
-  kabum_external = db.Column(db.Text, nullable=True)
-  preco_atualizado_em = db.Column(db.DateTime, nullable=True)
-  esgotado = db.Column(db.Boolean(), nullable=True, default=False)
   imagem_url = db.Column(db.Text, nullable=True)
 
   ficha_montagem_validada = db.Column(db.Boolean(), nullable=True)
@@ -40,7 +33,7 @@ class Peca(ModeloBase):
   def __table_args__(cls):
     return (
       db.CheckConstraint("status_validacao IS NULL OR status_validacao IN ('pendente','em_revisao','aprovado','rejeitado','legado')", name=f'ck_{cls.__tablename__}_validacao'),
-      db.Index(f'ix_{cls.__tablename__}_publicacao', 'status_validacao', 'esgotado', 'preco'),
+      db.Index(f'ix_{cls.__tablename__}_publicacao', 'status_validacao'),
       db.Index(f'ix_{cls.__tablename__}_nome', 'fabricante', 'modelo'),
       db.Index(f'ix_{cls.__tablename__}_part_number', 'part_number'),
       db.Index(f'ix_{cls.__tablename__}_referencia', 'referencia_interna'),
@@ -52,8 +45,13 @@ class Peca(ModeloBase):
       raise ValueError('Status de validação inválido')
     return valor
 
+  CAMPOS_DA_OFERTA = ('preco', 'esgotado', 'preco_atualizado_em', 'kabum_external')
+
   def __init__(self, **dados):
     from utils.codigos_peca import separar_codigos
+    invalidos = [campo for campo in self.CAMPOS_DA_OFERTA if campo in dados]
+    if invalidos:
+      raise ValueError(f"Preço e link pertencem à oferta, não à peça: {', '.join(invalidos)}")
     super().__init__(**separar_codigos(dados))
 
   @validates('part_number')
@@ -145,17 +143,6 @@ class Peca(ModeloBase):
     return cls.query.filter(cls.imagem_url.is_(None), cls.kabum_external.isnot(None), cls.kabum_external != "").all()
 
   @classmethod
-  def restaurar_links_ausentes(cls, links):
-    pecas = cls.query.filter(db.or_(cls.part_number.in_(links), cls.referencia_interna.in_(links))).all()
-    atualizadas = 0
-    for peca in pecas:
-      if not peca.kabum_external:
-        peca.kabum_external = links.get(peca.referencia_interna) or links.get(peca.part_number)
-        atualizadas += 1
-    db.session.commit()
-    return atualizadas
-
-  @classmethod
   def buscar_por_id(cls, peca_id):
     return db.session.get(cls, peca_id)
 
@@ -171,18 +158,20 @@ class Peca(ModeloBase):
 
   def to_catalogo(self):
     dados = {coluna.name: getattr(self, coluna.name) for coluna in self.__table__.columns
-             if coluna.name not in ("preco_atualizado_em", "criado_em", "atualizado_em", "status_validacao", "validacao_motivo", "validado_em", "fontes_especificacoes", "ficha_montagem_validada")}
+             if coluna.name not in ("criado_em", "atualizado_em", "status_validacao", "validacao_motivo", "validado_em", "fontes_especificacoes", "ficha_montagem_validada")}
+    dados["preco"] = float(self.preco) if self.preco is not None else None
+    dados["esgotado"] = self.esgotado
     dados["id"] = f"{self.__tablename__}:{self.id}"
     if self.__tablename__ == "cabo_rede":
       dados["categoria_cabo"] = dados.get("categoria")
     dados["categoria"] = self.__tablename__
-    dados["link"] = dados.pop("kabum_external", None)
+    dados["link"] = self.kabum_external
     data = self.preco_atualizado_em
     # As coletas gravam UTC sem tzinfo no SQLite; o contrato explicita o fuso.
     if data and data.tzinfo is None:
       data = data.replace(tzinfo=timezone.utc)
     dados["preco_atualizado_em"] = data.isoformat() if data else None
-    dados["ofertas"] = ofertas_catalogo(dados)
+    dados["ofertas"] = []
     dados["imagem"] = dados.pop("imagem_url", None) or imagem_referencia(dados)
     return completar_medidas(dados)
 
@@ -190,29 +179,14 @@ class Peca(ModeloBase):
     self.imagem_url = caminho
     db.session.commit()
 
-  def aplicar_cotacao(self, resultado, atualizado_em):
-    preco_alterado = False
-    if resultado["preco"] is not None:
-      novo = Decimal(str(resultado["preco"])).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-      try:
-        atual = Decimal(str(self.preco)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-      except InvalidOperation:
-        atual = None
-      if novo != atual:
-        self.preco = float(novo)
-        self.preco_atualizado_em = atualizado_em
-        preco_alterado = True
-    estoque_alterado = self.esgotado != resultado["esgotado"]
-    if estoque_alterado:
-      self.esgotado = resultado["esgotado"]
-    return {"preco_alterado": preco_alterado, "estoque_alterado": estoque_alterado}
-
   @classmethod
   def cadastrar_ausentes(cls, itens):
     from utils.codigos_peca import separar_codigos
     novos = []
     try:
       for original in itens:
+        original = dict(original)
+        oferta = {campo: original.pop(campo, None) for campo in cls.CAMPOS_DA_OFERTA}
         item = separar_codigos(original)
         referencia, numero = item.get('referencia_interna'), item.get('part_number')
         if referencia:
@@ -225,6 +199,10 @@ class Peca(ModeloBase):
           existente = cls(status_validacao='legado', **{k:v for k,v in item.items() if k != 'status_validacao'})
           db.session.add(existente)
           db.session.flush()
+          if oferta['kabum_external']:
+            from repositories.ofertas_kabum_repository import gravar_cotacao_inicial
+            gravar_cotacao_inicial(existente, oferta['kabum_external'], oferta['preco'],
+                                   oferta['esgotado'], oferta['preco_atualizado_em'])
           novos.append(existente)
       db.session.commit()
     except Exception:

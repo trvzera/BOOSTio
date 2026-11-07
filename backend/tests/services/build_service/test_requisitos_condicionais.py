@@ -64,7 +64,7 @@ def test_reavaliacao_nao_aprova_identidade_e_e_idempotente():
     with app.app_context():
         db.create_all();ControleColeta.inicializar()
         p=MemoriaRAM(fabricante='Teste',modelo='RAM',capacidade_gb=16,ddr='DDR4',frequencia_mhz=3200,quantidade_pentes=2,formato='DIMM',
-          status_validacao='em_revisao',ficha_montagem_validada=False,preco=null(),esgotado=null(),fontes_especificacoes={'_pc_part_dataset':{}})
+          status_validacao='em_revisao',ficha_montagem_validada=False,fontes_especificacoes={'_pc_part_dataset':{}})
         db.session.add(p);db.session.commit()
         s=ReavaliarMontagemService();r=s.executar()
         db.session.refresh(p);assert r['minimos_atendidos']==1 and p.ficha_montagem_validada is False

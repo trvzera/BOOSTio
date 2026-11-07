@@ -6,7 +6,7 @@ import requests
 from flask import Flask
 from sqlalchemy import event
 
-from models import db, PlacaVideo, ConsultaPreco, ControleColeta, HistoricoPreco
+from models import db, PlacaVideo, ConsultaPreco, ControleColeta, HistoricoPreco, HistoricoOferta, Oferta
 from commands.banco import registrar_comandos_banco
 from migrations.historico_precos import preparar_historico_precos
 from services.peca_service import atualizar_precos_service as coleta
@@ -55,16 +55,17 @@ def test_preco_igual_registra_historico_sem_update_da_peca(banco,mocker):
     assert atualizacoes==[]
     assert p.preco==100 and p.preco_atualizado_em==DATA_ANTIGA and p.atualizado_em==data_geral
     assert r['historicos']==r['inalteradas']==1 and r['atualizadas']==0
-    h=HistoricoPreco.query.one()
+    h=HistoricoOferta.query.one()
     assert h.preco==Decimal('100.00') and h.coletado_em==datetime(2026,11,2,12)
-    assert (h.tabela_peca,h.peca_id,h.loja,h.produto_id_loja,h.url)==('placa_video',p.id,'kabum','123',URL)
-    assert db.session.get(ConsultaPreco,h.consulta_id).status=='concluida'
+    o=db.session.get(Oferta,h.oferta_id)
+    assert (o.tabela_peca,o.peca_id,o.loja,o.produto_id_loja,o.url)==('placa_video',p.id,'kabum','123',URL)
+    assert ConsultaPreco.query.one().status=='concluida'
 
 
 def test_preco_alterado_grava_peca_e_observacao_na_mesma_data(banco,mocker):
     _,p=banco
     r,_=executar(mocker,{'preco':Decimal('89.90'),'esgotado':False})
-    h=HistoricoPreco.query.one()
+    h=HistoricoOferta.query.one()
     assert p.preco==89.90 and p.preco_atualizado_em==h.coletado_em
     assert h.preco==Decimal('89.90')
     assert r['atualizadas']==r['historicos']==r['precos_alterados']==1
@@ -83,8 +84,8 @@ def test_estoque_muda_com_preco_igual_sem_mudar_data_do_preco(banco,mocker):
 def test_esgotado_registra_sem_preco_e_preserva_valor_anterior(banco,mocker):
     _,p=banco
     r,_=executar(mocker,{'preco':None,'esgotado':True})
-    h=HistoricoPreco.query.one()
-    assert h.preco is None and h.esgotado is True
+    h=HistoricoOferta.query.one()
+    assert h.preco==Decimal('100.00') and h.esgotado is True
     assert p.preco==100 and p.preco_atualizado_em==DATA_ANTIGA and p.esgotado is True
     assert r['estoques_alterados']==1 and r['precos_alterados']==0
 
@@ -93,10 +94,10 @@ def test_mesmo_preco_em_dias_diferentes_gera_observacoes_distintas(banco,mocker)
     _,p=banco
     executar(mocker,{'preco':Decimal('100.00'),'esgotado':False})
     r,_=executar(mocker,{'preco':Decimal('100.00'),'esgotado':False},dia=1)
-    assert HistoricoPreco.query.count()==2 and r['historicos']==1
+    assert HistoricoOferta.query.count()==2 and r['historicos']==1
     assert p.preco_atualizado_em==DATA_ANTIGA
     r,buscar=executar(mocker,{'preco':Decimal('100.00'),'esgotado':False},dia=1)
-    assert r['consultas']==0 and HistoricoPreco.query.count()==2
+    assert r['consultas']==0 and HistoricoOferta.query.count()==2
     buscar.assert_not_called()
 
 
@@ -105,7 +106,7 @@ def test_cotacao_invalida_nao_cria_historico_nem_muda_peca(banco,mocker,valor):
     _,p=banco
     r,_=executar(mocker,{'preco':valor,'esgotado':False})
     assert r['falhas']==1 and r['historicos']==r['atualizadas']==0
-    assert HistoricoPreco.query.count()==0 and p.preco==100
+    assert HistoricoOferta.query.count()==0 and p.preco==100
     assert p.preco_atualizado_em==DATA_ANTIGA
     assert ConsultaPreco.query.one().status=='falha'
 
@@ -114,19 +115,19 @@ def test_falha_rede_nao_e_historico_de_preco(banco,mocker):
     _,p=banco
     mocker.patch.object(BuscarPrecoKabumService,'executar',side_effect=requests.ConnectionError('rede'))
     r=coleta.AtualizarPrecosService().executar(intervalo=0)
-    assert r['falhas']==1 and HistoricoPreco.query.count()==0 and p.preco==100
+    assert r['falhas']==1 and HistoricoOferta.query.count()==0 and p.preco==100
 
 
 def test_erro_persistencia_reverte_preco_historico_e_status(banco,mocker):
     _,p=banco
     def falhar(session):
-        if any(isinstance(x,HistoricoPreco) for x in session.new):raise RuntimeError('falha simulada')
+        if any(isinstance(x,HistoricoOferta) for x in session.new):raise RuntimeError('falha simulada')
     event.listen(db.session(),'before_commit',falhar)
     try:
         with pytest.raises(RuntimeError,match='falha simulada'):
             executar(mocker,{'preco':Decimal('80.00'),'esgotado':False})
     finally:event.remove(db.session(),'before_commit',falhar)
-    assert HistoricoPreco.query.count()==0 and p.preco==100
+    assert HistoricoOferta.query.count()==0 and p.preco==100
     assert p.preco_atualizado_em==DATA_ANTIGA
     assert ConsultaPreco.query.one().status=='reservada'
 
@@ -139,7 +140,7 @@ def test_link_trocado_durante_rede_nao_grava_cotacao_antiga(banco,mocker):
         return {'preco':Decimal('80.00'),'esgotado':False}
     mocker.patch.object(BuscarPrecoKabumService,'executar',side_effect=trocar)
     r=coleta.AtualizarPrecosService().executar(intervalo=0)
-    assert r['ignoradas']==1 and HistoricoPreco.query.count()==0 and p.preco==100
+    assert r['ignoradas']==1 and HistoricoOferta.query.count()==0 and p.preco==100
 
 
 def test_migracao_cria_so_historico_preserva_pecas_e_e_repetivel(banco):
@@ -155,9 +156,9 @@ def test_migracao_cria_so_historico_preserva_pecas_e_e_repetivel(banco):
 
 def test_sem_tabela_interrompe_antes_de_consultar_loja(banco,mocker):
     _,p=banco
-    db.session.remove();HistoricoPreco.__table__.drop(db.engine)
+    db.session.remove();HistoricoOferta.__table__.drop(db.engine)
     buscar=mocker.patch.object(BuscarPrecoKabumService,'executar')
-    with pytest.raises(ValueError,match='historico-precos-preparar'):
+    with pytest.raises(ValueError,match='ofertas-kabum-migrar'):
         coleta.AtualizarPrecosService().executar()
     buscar.assert_not_called()
     assert ConsultaPreco.query.count()==0
@@ -169,7 +170,7 @@ def test_compara_preco_em_centavos_sem_falso_update_de_float(banco,mocker):
     r,_=executar(mocker,{'preco':Decimal('0.30'),'esgotado':False})
     assert r['precos_alterados']==0 and r['historicos']==1
     assert p.preco_atualizado_em==DATA_ANTIGA
-    assert HistoricoPreco.query.one().preco==Decimal('0.30')
+    assert HistoricoOferta.query.one().preco==Decimal('0.30')
 
 
 def test_tentativa_finalizada_nao_consulta_loja_nem_duplica_historico(banco,mocker):
@@ -178,4 +179,4 @@ def test_tentativa_finalizada_nao_consulta_loja_nem_duplica_historico(banco,mock
     buscar=mocker.patch.object(BuscarPrecoKabumService,'executar')
     assert coleta.AtualizarPrecosService()._consultar(c,{}) is True
     buscar.assert_not_called()
-    assert c.status=='concluida' and HistoricoPreco.query.count()==1
+    assert c.status=='concluida' and HistoricoOferta.query.count()==1

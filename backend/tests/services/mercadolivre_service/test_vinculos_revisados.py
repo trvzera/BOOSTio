@@ -40,7 +40,7 @@ def test_simulacao_aplicacao_idempotencia_e_ficha_alterada(contexto):
     assert service.executar(arquivo,simular=False)['inalterados']==1
     v=VinculoMercadoLivre.query.one()
     assert v.criterio=='revisado' and v.especificacoes_revisadas['ddr']=='DDR4'
-    assert Oferta.query.count()==HistoricoOferta.query.count()==0
+    assert Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==0
     assert MemoriaRAM.query.count()==1 and p.part_number is None and p.referencia_interna=='SEED-TESTE-1'
     p.ddr='DDR5';db.session.commit()
     assert service.executar(arquivo,simular=False)['revisao']==1

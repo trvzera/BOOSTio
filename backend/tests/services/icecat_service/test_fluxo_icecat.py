@@ -85,23 +85,23 @@ def importar(base):
 def test_descoberta_completa_com_icecat_cria_peca_oferta_historico_e_repete(banco,base):
     service=importar(base)
     assert service.executar(banco.id,permitir_novos=True)['acao']=='proposta'
-    assert HD.query.count()==Oferta.query.count()==HistoricoOferta.query.count()==0
+    assert HD.query.count()==Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==0
     r=service.executar(banco.id,simular=False,permitir_novos=True)
     assert r['acao']=='importada' and r['novo_componente'],r
     p=HD.query.one()
     assert p.capacidade_gb==8000 and p.interface=='SATA III' and p.velocidade_rpm==7200
     assert p.consumo_energia is None and p.ficha_montagem_validada is True
-    assert Oferta.query.one().preco==Decimal('999.90') and Oferta.query.one().esgotado is None
+    assert Oferta.query.filter(Oferta.loja!='kabum').one().preco==Decimal('999.90') and Oferta.query.filter(Oferta.loja!='kabum').one().esgotado is None
     assert HistoricoOferta.query.count()==1
     assert p.fontes_especificacoes['interface']['base']=='Icecat'
     assert service.executar(banco.id,simular=False,permitir_novos=True)['acao']=='inalterada'
-    assert HD.query.count()==Oferta.query.count()==HistoricoOferta.query.count()==1
+    assert HD.query.count()==Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==1
 
 
 def test_divergencia_na_ficha_nao_cadastra(banco,base):
     base.fichas.executar.return_value=xml_ficha(capacidade='4 TB')
     assert importar(base).executar(banco.id,simular=False,permitir_novos=True)['acao']=='revisao'
-    assert HD.query.count()==Oferta.query.count()==0
+    assert HD.query.count()==Oferta.query.filter(Oferta.loja!='kabum').count()==0
 
 
 def test_sem_permissao_nao_consulta_icecat(banco,base):
@@ -114,7 +114,7 @@ def test_falha_historico_reverte_peca_e_oferta(banco,base,monkeypatch):
     def falhar(*a,**k):raise ValueError('Falha de persistência')
     monkeypatch.setattr(RepositorioImportacaoCatalogo,'concluir',falhar)
     with pytest.raises(ValueError):importar(base).executar(banco.id,simular=False,permitir_novos=True)
-    assert HD.query.count()==Oferta.query.count()==HistoricoOferta.query.count()==0
+    assert HD.query.count()==Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==0
 
 
 def test_peca_conflitante_com_mesmo_mpn_nao_vira_duplicata(banco,base):
@@ -123,7 +123,7 @@ def test_peca_conflitante_com_mesmo_mpn_nao_vira_duplicata(banco,base):
     db.session.commit()
     r=importar(base).executar(banco.id,simular=False,permitir_novos=True)
     assert r['acao']=='revisao'
-    assert HD.query.count()==1 and Oferta.query.count()==0
+    assert HD.query.count()==1 and Oferta.query.filter(Oferta.loja!='kabum').count()==0
 
 
 def test_indice_gtin_contraditorio_nao_recua_para_modelo(tmp_path):
@@ -172,7 +172,7 @@ def test_embalagem_de_20_discos_nao_vira_componente_unitario(banco,base):
     resultado = importar(base).executar(banco.id,simular=False,permitir_novos=True)
     assert resultado['acao']=='revisao'
     assert 'icecat_embalagem_com_varias_unidades' in resultado['icecat']['candidatos'][0]['conflitos']
-    assert HD.query.count()==Oferta.query.count()==0
+    assert HD.query.count()==Oferta.query.filter(Oferta.loja!='kabum').count()==0
 
 
 def test_codigo_regional_e_somente_sugestao_para_revisao(tmp_path):

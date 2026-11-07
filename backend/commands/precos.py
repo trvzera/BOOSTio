@@ -66,6 +66,17 @@ def registrar_comandos_precos(app):
         """Repõe links conhecidos da seed sem sobrescrever os links atuais."""
         click.echo(json.dumps(RestaurarLinksKabumService().executar(), ensure_ascii=False))
 
+    @app.cli.command("ofertas-kabum-migrar")
+    @click.option("--aplicar", is_flag=True, help="Grava as ofertas; sem esta opção, apenas simula e conta.")
+    def migrar_ofertas_kabum(aplicar):
+        """Copia link, preço e estoque das peças para a oferta da KaBuM (colunas antigas ficam intactas)."""
+        from services.peca_service.migrar_ofertas_kabum_service import MigrarOfertasKabumService
+        try:
+            resumo = MigrarOfertasKabumService().executar(simular=not aplicar)
+        except SQLAlchemyError as erro:
+            raise click.ClickException("Não foi possível migrar as ofertas no banco.") from erro
+        click.echo(json.dumps(resumo, ensure_ascii=False))
+
     @app.cli.command("precos-migrar")
     def migrar():
         MigrarLinksService().executar()

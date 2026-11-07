@@ -6,7 +6,7 @@ import requests
 from flask import Flask
 from sqlalchemy import inspect, text
 
-from models import db, PlacaVideo, ConsultaPreco
+from models import db, PlacaVideo, ConsultaPreco, Oferta
 from services.preco_service.reservar_consulta_service import ReservarConsultaService
 from services.preco_service.validar_link_service import ValidarLinkService
 from services.peca_service.atualizar_precos_service import AtualizarPrecosService
@@ -173,10 +173,13 @@ class ColetaKabumTest(unittest.TestCase):
         peca.preco = 500
         db.session.commit()
         SalvarPecaService().executar(PlacaVideo, {"kabum_external": URL_2}, peca.id)
-        self.assertEqual(peca.preco, 0)
+        db.session.refresh(peca)
+        self.assertIsNone(peca.preco)
         self.assertIsNone(peca.preco_atualizado_em)
         self.assertIsNone(peca.imagem_url)
-        self.assertTrue(peca.esgotado)
+        self.assertEqual(peca.kabum_external, URL_2)
+        antiga = Oferta.query.filter_by(loja="kabum", produto_id_loja="123").one()
+        self.assertFalse(antiga.ativa)
 
     def test_link_fora_da_kabum_e_rejeitado(self):
         with self.assertRaises(ValueError):
@@ -196,6 +199,7 @@ class ColetaKabumTest(unittest.TestCase):
     def test_esgotado_preserva_ultimo_preco(self):
         peca = self.criar(URL_1, "A")
         peca.preco = 500
+        peca.esgotado = True
         db.session.commit()
         html = ('<script type="application/ld+json">{"@type":"Product","sku":"123",'
                 '"offers":{"availability":"https://schema.org/OutOfStock"}}</script>')

@@ -3,7 +3,10 @@ from datetime import datetime, timedelta, timezone
 
 import requests
 
-from models import ConsultaPreco, ControleColeta, HistoricoPreco
+from sqlalchemy import inspect
+
+from models import db, ConsultaPreco, ControleColeta, HistoricoOferta, Oferta
+from repositories.ofertas_kabum_repository import aplicar_cotacao, buscar_ativa, validar_cotacao
 from .modelos_pecas import MODELOS_PECAS
 from services.preco_service.buscar_preco_kabum_service import BuscarPrecoKabumService
 from services.preco_service.reservar_consulta_service import ReservarConsultaService
@@ -18,7 +21,7 @@ class AtualizarPrecosService:
         if intervalo < 0:
             raise ValueError("O intervalo não pode ser negativo")
 
-        HistoricoPreco.verificar_esquema()
+        self._verificar_esquema()
         ControleColeta.inicializar()
 
         resumo = {"consultas": 0, "atualizadas": 0, "falhas": 0, "ignoradas": 0,
@@ -77,16 +80,13 @@ class AtualizarPrecosService:
         try:
             resultado = BuscarPrecoKabumService().executar(consulta.url)
             peca.recarregar()
-            if peca.kabum_external != consulta.url:
+            oferta = buscar_ativa(peca, bloquear=True)
+            if oferta is None or oferta.url != consulta.url:
                 consulta.status = "ignorada"
                 resumo["ignoradas"] += 1
             else:
                 instante = datetime.now(timezone.utc).replace(tzinfo=None)
-                codigo = ValidarLinkService().codigo_produto(consulta.url)
-                observacao = HistoricoPreco.registrar_observacao(
-                    consulta, resultado, instante, loja="kabum", produto_id_loja=codigo)
-                alteracoes = peca.aplicar_cotacao(
-                    {"preco": observacao.preco, "esgotado": observacao.esgotado}, instante)
+                alteracoes = aplicar_cotacao(oferta, validar_cotacao(resultado), instante)
                 consulta.status = "concluida"
                 consulta.erro = None
         except requests.HTTPError as erro:
@@ -113,6 +113,13 @@ class AtualizarPrecosService:
             chave = "atualizadas" if any(alteracoes.values()) else "inalteradas"
             resumo[chave] += 1
         return continuar
+
+    @staticmethod
+    def _verificar_esquema():
+        inspetor = inspect(db.engine)
+        for modelo in (Oferta, HistoricoOferta):
+            if not inspetor.has_table(modelo.__tablename__):
+                raise ValueError("Execute ofertas-kabum-migrar antes de atualizar preços")
 
     @staticmethod
     def _link_valido(url):

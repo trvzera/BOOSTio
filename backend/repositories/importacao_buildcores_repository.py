@@ -191,7 +191,7 @@ class RepositorioImportacaoBuildcores:
         if self._proximos(r,chave):
             return dict(acao='revisao',categoria=cat,id_externo=origem['id_externo'],motivo='Nome próximo de peça existente; revisar antes de cadastrar')
         valores={**r['dados'],'fabricante':r['fabricante_original'],'modelo':r['modelo'],
-          'preco':null(),'esgotado':null(),'part_number':r.get('mpn_unico') or null(),
+          'part_number':r.get('mpn_unico') or null(),
           'referencia_interna':'BUILDCORES:'+origem['id_externo'],
           'status_validacao':'em_revisao','ficha_montagem_validada':False,
           'validacao_motivo':'Ficha BuildCores importada; identidade e compatibilidade final dependem de validação',

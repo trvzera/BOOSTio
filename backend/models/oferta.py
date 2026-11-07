@@ -119,14 +119,16 @@ class Oferta(ModeloBase):
         from . import VinculoMercadoLivre
         from utils.identidade_peca import assinatura_campos
         # Leitura opcional: catálogo anterior continua funcionando antes da migration.
-        if not pecas or not all(inspect(db.engine).has_table(t) for t in (cls.__tablename__, VinculoMercadoLivre.__tablename__)):
-            return pecas
-        if not VinculoMercadoLivre.tabela_preparada():
+        if not pecas or not inspect(db.engine).has_table(cls.__tablename__):
             return pecas
         referencias = []
         for peca in pecas:
             tipo, identificador = str(peca.get('id', '')).rsplit(':', 1)
             referencias.append((tipo, int(identificador)))
+            peca.setdefault('ofertas', [])
+        cls._anexar_kabum(pecas, referencias)
+        if not inspect(db.engine).has_table(VinculoMercadoLivre.__tablename__) or not VinculoMercadoLivre.tabela_preparada():
+            return pecas
         registros = db.session.query(cls, VinculoMercadoLivre).join(VinculoMercadoLivre, and_(
             VinculoMercadoLivre.tabela_peca == cls.tabela_peca, VinculoMercadoLivre.peca_id == cls.peca_id)).filter(cls.loja == 'mercado_livre', cls.ativa.is_(True),
             tuple_(cls.tabela_peca, cls.peca_id).in_(referencias)).order_by(cls.preco.asc(), cls.id.asc()).all()
@@ -156,6 +158,16 @@ class Oferta(ModeloBase):
         return pecas
 
     @classmethod
+    def _anexar_kabum(cls, pecas, referencias):
+        from sqlalchemy import tuple_
+        fichas = dict(zip(referencias, pecas))
+        for oferta in cls.query.filter(cls.loja == 'kabum', cls.ativa.is_(True),
+                tuple_(cls.tabela_peca, cls.peca_id).in_(referencias)).order_by(cls.id).all():
+            dados = oferta.para_exibicao()
+            if dados is not None:
+                fichas[(oferta.tabela_peca, oferta.peca_id)]['ofertas'].append(dados)
+
+    @classmethod
     def buscar_para_peca(cls, oferta_id, categoria, peca_id):
         return cls.query.filter_by(id=oferta_id, tabela_peca=categoria, peca_id=peca_id,
                                    ativa=True).filter(cls.loja.in_(('mercado_livre', 'shopee'))).first()
@@ -173,11 +185,17 @@ class Oferta(ModeloBase):
         from datetime import timezone
         from urllib.parse import urlsplit
         import re
-        if self.preco is None or self.preco <= 0 or self.consultado_em is None:
+        coleta = self.preco_atualizado_em if self.loja == 'kabum' else self.consultado_em
+        if self.preco is None or self.preco <= 0 or coleta is None:
             return None
         try:
             url = urlsplit(self.url)
-            if self.loja == 'shopee':
+            if self.loja == 'kabum':
+                from .medidas_fisicas import produto_kabum
+                if produto_kabum(self.url) != self.produto_id_loja:
+                    return None
+                url_compra = self.url
+            elif self.loja == 'shopee':
                 from services.shopee_service.normalizar_produto_service import validar_url_shopee
                 if (not validar_url_shopee(self.url) or
                         url.path != '/product/' + self.produto_id_loja.replace(':', '/')):
@@ -200,5 +218,6 @@ class Oferta(ModeloBase):
             return None
         return {'id': self.id, 'loja': self.loja, 'produto_id_loja': self.produto_id_loja,
                 'vendedor_id': self.vendedor_id, 'vendedor_nome': self.vendedor_nome,
-                'url': url_compra, 'preco': float(self.preco), 'esgotado': self.esgotado,
-                'atualizadoEm': self.consultado_em.replace(tzinfo=timezone.utc).isoformat(timespec='seconds')}
+                'url': url_compra, 'preco': float(self.preco),
+                'esgotado': bool(self.esgotado) if self.loja == 'kabum' else self.esgotado,
+                'atualizadoEm': coleta.replace(tzinfo=timezone.utc).isoformat(timespec='seconds')}

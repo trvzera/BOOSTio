@@ -76,6 +76,6 @@ def test_consulta_ficha_oficial_e_registra_pendencias_sem_publicar():
         s=EnriquecerPendenciasService(cliente=cliente,tokens=tokens)
         assert s.executar()['completas']==1 and p.evidencias is None
         assert s.executar(simular=False)['completas']==1
-        assert p.evidencias['enriquecimento']['pronto'] and Oferta.query.count()==0
+        assert p.evidencias['enriquecimento']['pronto'] and Oferta.query.filter(Oferta.loja!='kabum').count()==0
         cliente._consultar.assert_called_with('/products/MLB99','teste')
         db.session.remove();db.engine.dispose()

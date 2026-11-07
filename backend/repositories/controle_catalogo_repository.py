@@ -3,7 +3,8 @@ import hashlib
 from contextlib import contextmanager
 from pathlib import Path
 from sqlalchemy import text
-from models import db
+from models import db, Peca
+from utils.colunas_antigas import COLUNAS_ANTIGAS_DA_PECA
 
 
 class RepositorioControleCatalogo:
@@ -58,5 +59,5 @@ class RepositorioControleCatalogo:
         modelos += [m for m in MODELOS_PECAS if m.__tablename__ in {t['categoria'] for t in trabalhos}]
         insp=inspect(db.engine)
         for m in modelos:
-            if not insp.has_table(m.__tablename__) or {c['name'] for c in insp.get_columns(m.__tablename__)}!={c.name for c in m.__table__.columns}:
+            if not insp.has_table(m.__tablename__) or {c['name'] for c in insp.get_columns(m.__tablename__)}-(COLUNAS_ANTIGAS_DA_PECA if issubclass(m,Peca) else set())!={c.name for c in m.__table__.columns}:
                 raise ValueError('Esquema incompleto; execute as preparações do catálogo, identidades e ofertas')

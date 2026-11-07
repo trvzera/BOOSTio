@@ -1,4 +1,5 @@
 """Etapa 1: estrutura aditiva, sem descobrir/importar anúncios ou excluir peças."""
+from utils.colunas_antigas import COLUNAS_ANTIGAS_DA_PECA
 from sqlalchemy import inspect, text
 from sqlalchemy.schema import CreateIndex
 from models import db, Oferta, ProdutoPendente, ExecucaoDescoberta, EstadoCatalogo, RevisaoIdentidadePeca
@@ -34,7 +35,7 @@ def preparar_catalogo_automatizado(*, simular=True):
         nome = modelo.__tablename__
         if not insp.has_table(nome):
             continue  # A criação inicial de componentes continua no comando já existente.
-        cols = {c['name'] for c in insp.get_columns(nome)}
+        cols = {c['name'] for c in insp.get_columns(nome)} - COLUNAS_ANTIGAS_DA_PECA
         esperadas = set(modelo.__table__.columns.keys())
         novos = CAMPOS | {'referencia_interna','fontes_especificacoes','codigo_modelo_fabricante','ficha_montagem_validada'} | ({'formato'} if nome=='memoria_ram' else set())
         if nome == 'placa_video':novos |= {'fabricante_chip','modelo_referencia'}

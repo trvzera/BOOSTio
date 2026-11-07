@@ -109,7 +109,7 @@ def test_classifica_fila_sem_publicar_e_detecta_codigo_local_duplicado(tmp_path)
         s=ClassificarPendenciasService()
         assert s.executar()['confirmadas']==1 and p.evidencias is None
         assert s.executar(simular=False)['confirmadas']==1
-        assert p.evidencias['matching']['classificacao']=='confirmada' and Oferta.query.count()==0
+        assert p.evidencias['matching']['classificacao']=='confirmada' and Oferta.query.filter(Oferta.loja!='kabum').count()==0
         db.session.add(Processador(**dados));db.session.commit()
         assert s.executar()['ambiguas']==1
         db.session.remove();db.engine.dispose()

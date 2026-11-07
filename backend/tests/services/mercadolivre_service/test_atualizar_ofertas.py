@@ -57,7 +57,7 @@ def test_simulacao_nao_grava_e_retorna_propostas(banco):
     r=executar(p)
     assert r['associadas']==1 and r['requisicoes']==3
     assert r['detalhes'][0]['ofertas'][0]['acao']=='criada'
-    assert Oferta.query.count()==HistoricoOferta.query.count()==VinculoMercadoLivre.query.count()==0
+    assert Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==VinculoMercadoLivre.query.count()==0
 
 
 def test_importacao_idempotente_preserva_peca_e_afiliado(banco):
@@ -65,14 +65,14 @@ def test_importacao_idempotente_preserva_peca_e_afiliado(banco):
     antes=(p.preco,p.esgotado,p.preco_atualizado_em)
     r=executar(p,simular=False)
     assert r['associadas']==1
-    o=Oferta.query.one();o.url_afiliado='https://exemplo.test/afiliado';db.session.commit()
+    o=Oferta.query.filter(Oferta.loja!='kabum').one();o.url_afiliado='https://exemplo.test/afiliado';db.session.commit()
     r=executar(p,simular=False)
     assert r['requisicoes']==2 and r['detalhes'][0]['ofertas'][0]['acao']=='inalterada'
-    assert Oferta.query.count()==HistoricoOferta.query.count()==VinculoMercadoLivre.query.count()==1
+    assert Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==VinculoMercadoLivre.query.count()==1
     assert o.esgotado is None and o.url_afiliado=='https://exemplo.test/afiliado'
     assert (p.preco,p.esgotado,p.preco_atualizado_em)==antes
     executar(p,ofertas=[anuncio(preco=90)],simular=False)
-    assert HistoricoOferta.query.count()==2 and Oferta.query.one().preco==Decimal('90')
+    assert HistoricoOferta.query.count()==2 and Oferta.query.filter(Oferta.loja!='kabum').one().preco==Decimal('90')
 
 
 def test_cinco_menores_novas_de_vendedores_distintos(banco):
@@ -80,7 +80,7 @@ def test_cinco_menores_novas_de_vendedores_distintos(banco):
     ofertas=[anuncio('MLB1',1,1,'used'),anuncio('MLB2',1,40),anuncio('MLB3',1,30)]
     ofertas += [anuncio(f'MLB{10+i}',i,50+i) for i in range(2,10)]
     executar(p,ofertas=ofertas,limite_ofertas=5,simular=False)
-    registros=Oferta.query.order_by(Oferta.preco).all()
+    registros=Oferta.query.filter(Oferta.loja!='kabum').order_by(Oferta.preco).all()
     assert len(registros)==5 and registros[0].produto_id_loja=='MLB3'
     assert len({o.vendedor_id for o in registros})==5
 
@@ -92,7 +92,7 @@ def test_cinco_menores_novas_de_vendedores_distintos(banco):
 def test_nao_associa_variantes_ou_kits(banco,mudanca):
     _,p=banco
     r=executar(p,prod=produto(**mudanca),simular=False)
-    assert r['revisao']==1 and Oferta.query.count()==0
+    assert r['revisao']==1 and Oferta.query.filter(Oferta.loja!='kabum').count()==0
 
 
 def test_sem_mpn_exige_revisao(banco):
@@ -122,20 +122,20 @@ def test_orcamento_nao_persiste_resultado_parcial(banco):
     _,p=banco
     r=executar(p,max_requisicoes=2,simular=False)
     assert r['interrompido'] is True and r['requisicoes']==2
-    assert Oferta.query.count()==VinculoMercadoLivre.query.count()==0
+    assert Oferta.query.filter(Oferta.loja!='kabum').count()==VinculoMercadoLivre.query.count()==0
 
 
 def test_sem_ofertas_nao_marca_esgotado_nem_apaga(banco):
     _,p=banco;executar(p,simular=False)
     assert executar(p,ofertas=[],simular=False)['sem_ofertas']==1
-    assert Oferta.query.one().ativa and Oferta.query.one().esgotado is None
+    assert Oferta.query.filter(Oferta.loja!='kabum').one().ativa and Oferta.query.filter(Oferta.loja!='kabum').one().esgotado is None
 
 
 def test_falha_na_gravacao_reverte_vinculo_ofertas_e_historico(banco):
     _,p=banco
     with patch.object(db.session,'commit',side_effect=RuntimeError('falha')):
         with pytest.raises(RuntimeError): executar(p,simular=False)
-    assert Oferta.query.count()==HistoricoOferta.query.count()==VinculoMercadoLivre.query.count()==0
+    assert Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==VinculoMercadoLivre.query.count()==0
 
 
 def test_limite_reduzido_desativa_sem_esgotar(banco):
@@ -165,7 +165,7 @@ def test_fluxo_novo_aceita_resultado_comprovado_em_busca_ampla(banco):
         tokens.return_value.executar.return_value='token'
         r=Service().executar(categoria='processador',somente_com_minimos=True)
     assert r['associadas']==1 and r['detalhes'][0]['busca_remota_completa'] is False
-    assert Oferta.query.count()==0
+    assert Oferta.query.filter(Oferta.loja!='kabum').count()==0
 
 
 def test_nao_consulta_api_para_peca_sem_minimos(banco):
@@ -179,7 +179,7 @@ def test_nao_consulta_api_para_peca_sem_minimos(banco):
 def test_nao_grava_oferta_para_ficha_ainda_em_revisao(banco):
     _,p=banco;p.status_validacao='em_revisao';db.session.commit()
     r=executar(p,simular=False)
-    assert r['revisao']==1 and Oferta.query.count()==0
+    assert r['revisao']==1 and Oferta.query.filter(Oferta.loja!='kabum').count()==0
     assert p.status_validacao=='em_revisao'
 
 
@@ -196,7 +196,7 @@ def test_duplicata_criada_durante_http_e_detectada_antes_da_gravacao(banco):
         tokens.return_value.executar.return_value='token'
         r=Service().executar(categoria='processador',peca_id=p.id,simular=False)
     assert r['falhas']==1 and r['interrompido']
-    assert Oferta.query.count()==HistoricoOferta.query.count()==VinculoMercadoLivre.query.count()==0
+    assert Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==VinculoMercadoLivre.query.count()==0
 
 
 def test_cli_relatorio_retoma_sem_repetir_peca_concluida(banco,tmp_path):
@@ -219,7 +219,7 @@ def test_cli_relatorio_retoma_sem_repetir_peca_concluida(banco,tmp_path):
     dados=json.loads(path.read_text())
     assert dados['pecas']==dados['associadas']==1
     assert dados['requisicoes']==3 and len(path.with_suffix('.detalhes.jsonl').read_text().splitlines())==1
-    assert Oferta.query.count()==0
+    assert Oferta.query.filter(Oferta.loja!='kabum').count()==0
 
 
 def test_carrega_catalogo_uma_vez_por_categoria_na_simulacao(banco):

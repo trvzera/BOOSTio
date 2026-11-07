@@ -41,7 +41,6 @@ class RepositorioCatalogoTecnico:
         # Ausência é NULL explícito: defaults booleanos antigos não viram evidência.
         for c in modelo.__table__.columns:
             if c.nullable and c.default is not None and c.name not in valores:valores[c.name]=null()
-        valores.update(preco=null(),esgotado=null())
         p=modelo(**valores);db.session.add(p);db.session.flush();db.session.refresh(p)
         p.ficha_montagem_validada=not pendencias_para_montagem(p)
         RepositorioCatalogoTecnico.registrar_fontes(p,fontes,identidade,ficha)

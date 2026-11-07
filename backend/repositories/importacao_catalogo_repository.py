@@ -42,7 +42,7 @@ class RepositorioImportacaoCatalogo:
         if ficha.get('benchmark',{}).get('dados'):
             dados['benchmark_atualizado_em']=datetime.now(timezone.utc).replace(tzinfo=None)
         dados['fontes_especificacoes']=ficha.get('fontes',{})
-        peca=modelo(**dados);db.session.add(peca);db.session.flush();db.session.refresh(peca)
+        peca=modelo(**{k:v for k,v in dados.items() if k not in modelo.CAMPOS_DA_OFERTA});db.session.add(peca);db.session.flush();db.session.refresh(peca)
         peca.ficha_montagem_validada=not pendencias_para_montagem(peca)
         if ficha.get('icecat',{}).get('status')=='encontrada':
             from utils.identidade_peca import assinatura_tecnica

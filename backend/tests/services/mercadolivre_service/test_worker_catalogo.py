@@ -52,7 +52,7 @@ def test_worker_percorre_fases_retoma_e_so_publica_com_opcao(banco,tmp_path):
             assert r['status']=='concluido' and r['fase']==fase, r
             if fase!='importacao':liberar_agenda()
     assert ProdutoPendente.query.one().status=='importado'
-    assert HD.query.count()==Oferta.query.count()==HistoricoOferta.query.count()==1
+    assert HD.query.count()==Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==1
     e=EstadoCatalogo.query.one()
     assert e.fase=='descoberta' and e.cursor_fila==0 and e.cursor_descoberta is None
     assert ProcessarCatalogoService().executar(trabalhos,simular=False)['status']=='aguardando'
@@ -128,4 +128,4 @@ def test_ambiguidade_nao_bloqueia_importacao_do_lote(banco,tmp_path):
     assert r['resumo']['revisao']==1 and r['resumo']['falhas']==0
     assert EstadoCatalogo.query.one().fase=='descoberta'
     assert ProdutoPendente.query.one().status=='em_revisao'
-    assert Oferta.query.count()==0 and HD.query.count()==2
+    assert Oferta.query.filter(Oferta.loja!='kabum').count()==0 and HD.query.count()==2

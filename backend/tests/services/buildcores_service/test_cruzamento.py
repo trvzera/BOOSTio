@@ -49,7 +49,7 @@ def test_simulacao_aplicacao_repeticao_sem_publicar_ou_criar(banco,tmp_path):
     assert banco.videointegrado is False
     assert banco.cooler is banco.part_number is None  # Box/Tray não identificado no docyx.
     assert banco.preco is None and banco.status_validacao=='em_revisao' and banco.ficha_montagem_validada is True
-    assert Processador.query.count()==1 and Oferta.query.count()==0
+    assert Processador.query.count()==1 and Oferta.query.filter(Oferta.loja!='kabum').count()==0
     fontes=deepcopy(banco.fontes_especificacoes)
     r=s.executar(tmp_path,simular=False)
     assert r['inalteradas']==1 and r['atualizadas']==r['campos_preenchidos']==0
