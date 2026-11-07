@@ -8,6 +8,7 @@ from services.admin_service.descartar_candidato_service import DescartarCandidat
 from services.admin_service.detalhar_pendencia_service import DetalharPendenciaService
 from services.admin_service.listar_pendencias_service import ListarPendenciasService
 from services.admin_service.rejeitar_pendencia_service import RejeitarPendenciaService
+from services.admin_service.sugerir_pendencia_service import EnviarPendenciasParaIAService
 from services.mercadolivre_service.controle_requisicoes_service import ErroMercadoLivre, OrcamentoRequisicoesEsgotado
 from utils.decorators import apenas_administrador
 
@@ -70,6 +71,14 @@ def descartar_candidato(pendencia_id):
     corpo = request.get_json(silent=True) or {}
     return _responder(lambda: DescartarCandidatoService().executar(
         pendencia_id, current_user.id, corpo.get("peca")))
+
+
+@admin_bp.post("/pendencias/enviar-ia")
+@login_required
+@apenas_administrador
+def enviar_pendencias_para_ia():
+    corpo = request.get_json(silent=True) or {}
+    return _responder(lambda: EnviarPendenciasParaIAService().executar(corpo.get("ids")))
 
 
 @admin_bp.post("/pendencias/<int:pendencia_id>/rejeitar")

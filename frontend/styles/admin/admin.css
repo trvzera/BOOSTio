@@ -52,6 +52,10 @@
 
 .admin-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
 
+.admin-bulk { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.admin-bulk[hidden] { display: none; }
+.admin-bulk-all { display: flex; align-items: center; gap: 8px; color: var(--cor-4); }
+.admin-pending-check { width: 18px; height: 18px; margin: 0; align-self: center; cursor: pointer; }
 .admin-pending-list { display: flex; flex-direction: column; gap: 12px; margin: 0 0 16px; padding: 0; list-style: none; }
 .admin-pending-item {
   display: flex; flex-direction: column; gap: 8px; padding: 16px;

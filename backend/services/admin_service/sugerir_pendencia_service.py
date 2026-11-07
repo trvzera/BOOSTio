@@ -8,7 +8,7 @@ from models import ProdutoPendente
 from services.llm_service.llm_service import LLMService
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 from .apresentar_pendencia_service import preco_do_anuncio, resumir_ficha
-from .pendencias_acionaveis import ids_acionaveis
+from .pendencias_acionaveis import ABERTAS, ids_acionaveis
 
 VERSAO_PROMPT = "sugestao_v1"
 MODELO_PADRAO = "gemini-3.5-flash-lite"
@@ -27,12 +27,14 @@ class SugerirPendenciaService:
         self.llm = llm or (lambda prompt, modelo: LLMService().executar(prompt, modelo, reservar_cota=False))
         self.modelo = os.getenv("IA_ANALISE_MODELO", MODELO_PADRAO)
 
-    def executar(self, *, limite=20, loja=None, categoria=None, refazer=False, simular=True):
-        resumo = {"simulacao": simular, "analisadas": 0, "sugeridas": 0, "sem_sugestao": 0, "ja_analisadas": 0, "falhas": 0, "detalhes": []}
-        for pendencia_id in self._ids(loja, categoria):
+    def executar(self, *, limite=20, loja=None, categoria=None, refazer=False, simular=True, ids=None):
+        resumo = {"simulacao": simular, "analisadas": 0, "sugeridas": 0, "sem_sugestao": 0, "ja_analisadas": 0, "falhas": 0, "ignoradas": 0, "detalhes": []}
+        for pendencia_id in (self._ids(loja, categoria) if ids is None else ids):
             pendencia = ProdutoPendente.buscar_por_id(pendencia_id)
-            contexto = self._contexto(pendencia)
+            contexto = self._contexto(pendencia) if pendencia is not None and pendencia.status in ABERTAS else None
             if contexto is None:
+                if ids is not None:
+                    resumo['ignoradas'] += 1
                 continue
             impressao = self._impressao(contexto)
             anterior = (pendencia.evidencias or {}).get("sugestao_ia") or {}
@@ -79,7 +81,7 @@ class SugerirPendenciaService:
     @staticmethod
     def _ids(loja, categoria):
         ids = []
-        for status in ("em_revisao", "pendente"):
+        for status in ABERTAS:
             ids += ids_acionaveis(status, loja, categoria)
         return sorted(ids)
 
@@ -114,3 +116,29 @@ class SugerirPendenciaService:
     @staticmethod
     def _prompt(contexto):
         return INSTRUCAO + "\n\nDADOS:\n" + json.dumps(contexto, ensure_ascii=False, default=str)
+
+
+LIMITE_ENVIO = 10
+
+
+class EnviarPendenciasParaIAService:
+    """Envio manual pelo painel: um lote pequeno por pedido, sempre refazendo a análise."""
+
+    def __init__(self, sugeridor=None):
+        self.sugeridor = sugeridor or SugerirPendenciaService()
+
+    def executar(self, ids):
+        if not isinstance(ids, list) or not ids or any(type(i) is not int or i <= 0 for i in ids):
+            raise ValueError("Escolha as pendências a enviar")
+        ids = list(dict.fromkeys(ids))
+        if len(ids) > LIMITE_ENVIO:
+            raise ValueError(f"Envie até {LIMITE_ENVIO} pendências por vez")
+        resumo = self.sugeridor.executar(limite=LIMITE_ENVIO, refazer=True, simular=False, ids=ids)
+        sugestoes = {}
+        for i in ids:
+            pendencia = ProdutoPendente.buscar_por_id(i)
+            sugestao = (pendencia.evidencias or {}).get("sugestao_ia") if pendencia else None
+            if isinstance(sugestao, dict):
+                sugestoes[i] = {"peca": sugestao.get("peca"), "confianca": sugestao.get("confianca")}
+        resumo.pop("detalhes", None)
+        return {**resumo, "sugestoes": sugestoes}

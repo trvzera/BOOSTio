@@ -35,3 +35,7 @@ export async function descartarCandidato(id, peca) {
     method: "POST", body: JSON.stringify({peca}),
   });
 }
+
+export async function enviarPendenciasParaIA(ids) {
+  return fetchComErro("/admin/pendencias/enviar-ia", {method: "POST", body: JSON.stringify({ids})});
+}

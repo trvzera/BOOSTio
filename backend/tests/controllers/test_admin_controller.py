@@ -342,3 +342,30 @@ def test_ia_ignora_candidata_nao_aprovada_ou_com_conflito(banco):
     chamadas = []
     r = SugerirPendenciaService(lambda *a: chamadas.append(a)).executar(simular=False)
     assert r['analisadas'] == 0 and chamadas == []
+
+
+def test_painel_envia_varias_pendencias_para_a_ia(banco, monkeypatch):
+    import json
+    from services.admin_service import sugerir_pendencia_service as modulo
+    app, admin, comum, p5500, p5600 = banco
+    a, b = pendencia(p5500, p5600, item=1), pendencia(p5500, p5600, item=2)
+    ref = f'processador:{p5600.id}'
+    chamadas = []
+    monkeypatch.setattr(modulo.LLMService, 'executar',
+        lambda self, prompt, modelo, **kw: chamadas.append(kw) or json.dumps({'peca': ref, 'confianca': 88, 'justificativa': 'ok'}))
+    cliente = entrar(app, admin)
+    r = cliente.post('/admin/pendencias/enviar-ia', json={'ids': [a.id, b.id, a.id, 9999]})
+    assert r.status_code == 200
+    d = r.get_json()
+    assert d['sugeridas'] == 2 and d['ignoradas'] == 1 and chamadas == [{'reservar_cota': False}] * 2
+    assert d['sugestoes'] == {str(a.id): {'peca': ref, 'confianca': 88}, str(b.id): {'peca': ref, 'confianca': 88}}
+    # reenviar refaz a análise
+    assert cliente.post('/admin/pendencias/enviar-ia', json={'ids': [a.id]}).get_json()['sugeridas'] == 1
+    for ruim in ({}, {'ids': []}, {'ids': ['1']}, {'ids': [0]}, {'ids': list(range(1, 12))}):
+        assert cliente.post('/admin/pendencias/enviar-ia', json=ruim).status_code == 400
+
+
+def test_envio_para_ia_e_so_de_administrador(banco):
+    app, _, comum, p5500, p5600 = banco
+    p = pendencia(p5500, p5600)
+    assert entrar(app, comum).post('/admin/pendencias/enviar-ia', json={'ids': [p.id]}).status_code in (403, 404)

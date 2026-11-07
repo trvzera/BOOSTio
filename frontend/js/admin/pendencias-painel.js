@@ -1,6 +1,6 @@
 // Seção "Pendências" do dashboard de administração: lista, detalhe e decisão (aceitar ou rejeitar).
 // Todo texto vindo da API entra por textContent; nada é montado com innerHTML.
-import { listarPendencias, detalharPendencia, aceitarPendencia, rejeitarPendencia, descartarCandidato } from "../api/admin/pendencias.js";
+import { listarPendencias, detalharPendencia, aceitarPendencia, rejeitarPendencia, descartarCandidato, enviarPendenciasParaIA } from "../api/admin/pendencias.js";
 import {
   rotuloLoja, rotuloSituacao, rotuloCategoria, formatarFaixaPreco, linkSeguro,
   candidatoSelecionavel, descreverCandidato, textoRestricoes,
@@ -24,6 +24,9 @@ export function iniciarPendencias(raiz) {
   const resumo = raiz.querySelector("[data-pendencias-resumo]");
   const status = raiz.querySelector("[data-pendencias-status]");
   const maisBotao = raiz.querySelector("[data-pendencias-mais]");
+  const lote = raiz.querySelector("[data-pendencias-lote]");
+  const todas = raiz.querySelector("[data-pendencias-todas]");
+  const enviarIA = raiz.querySelector("[data-pendencias-enviar-ia]");
   const selects = {
     status: filtros.elements.status, loja: filtros.elements.loja, categoria: filtros.elements.categoria,
   };
@@ -39,6 +42,11 @@ export function iniciarPendencias(raiz) {
     const item = elemento("li", "admin-pending-item");
     if (pendencia.id === selecionada) item.dataset.selected = "";
     const cabecalho = elemento("div", "admin-pending-head");
+    const marcar = elemento("input", "admin-pending-check");
+    marcar.type = "checkbox"; marcar.value = String(pendencia.id);
+    marcar.setAttribute("aria-label", `Selecionar para a IA: ${pendencia.titulo}`);
+    marcar.addEventListener("change", atualizarLote);
+    cabecalho.append(marcar);
     cabecalho.append(elemento("span", "admin-badge", rotuloLoja(pendencia.loja)),
       elemento("span", "admin-badge admin-badge-muted", rotuloCategoria(pendencia.categoria)));
     if (pendencia.sugestao_ia) {
@@ -53,6 +61,41 @@ export function iniciarPendencias(raiz) {
     botao.addEventListener("click", () => abrir(pendencia.id));
     item.append(cabecalho, titulo, meta, botao);
     return item;
+  }
+
+  const marcadas = () => [...lista.querySelectorAll(".admin-pending-check:checked")];
+
+  function atualizarLote() {
+    const caixas = lista.querySelectorAll(".admin-pending-check");
+    const n = marcadas().length;
+    lote.hidden = selects.status.value === "rejeitado" || selects.status.value === "importado" || caixas.length === 0;
+    todas.checked = caixas.length > 0 && n === caixas.length;
+    enviarIA.disabled = n === 0;
+    enviarIA.textContent = n ? `Enviar para a IA (${n})` : "Enviar para a IA";
+  }
+
+  // A IA analisa poucas pendências por pedido; o painel envia em grupos e mostra o andamento.
+  const TAMANHO_GRUPO = 5;
+  async function enviarSelecionadasParaIA() {
+    const ids = marcadas().map(c => Number(c.value));
+    if (!ids.length) return;
+    enviarIA.disabled = todas.disabled = true;
+    const total = { sugeridas: 0, sem_sugestao: 0, falhas: 0, ignoradas: 0 };
+    try {
+      for (let i = 0; i < ids.length; i += TAMANHO_GRUPO) {
+        avisar(`Enviando para a IA… ${Math.min(i + TAMANHO_GRUPO, ids.length)} de ${ids.length}`);
+        const r = await enviarPendenciasParaIA(ids.slice(i, i + TAMANHO_GRUPO));
+        for (const chave of Object.keys(total)) total[chave] += r[chave] || 0;
+      }
+      await carregar();
+      avisar(`IA analisou ${ids.length}: ${total.sugeridas} com sugestão, ${total.sem_sugestao} sem correspondência segura`
+        + (total.falhas ? `, ${total.falhas} falha(s) — tente de novo` : "") + ".", total.falhas > 0);
+    } catch (erro) {
+      avisar(erro.message, true);
+    } finally {
+      todas.disabled = false;
+      atualizarLote();
+    }
   }
 
   function mostrarResumo(porStatus) {
@@ -75,6 +118,7 @@ export function iniciarPendencias(raiz) {
       proximo = dados.proximo;
       maisBotao.hidden = proximo === null;
       mostrarResumo(dados.por_status);
+      atualizarLote();
       avisar(dados.total ? `${dados.total} pendência(s) neste filtro.` : "Nenhuma pendência neste filtro.");
     } catch (erro) {
       if (minha === requisicao) avisar(erro.message, true);
@@ -192,6 +236,11 @@ export function iniciarPendencias(raiz) {
   }
 
   filtros.addEventListener("submit", evento => { evento.preventDefault(); detalhe.hidden = true; carregar(); });
+  todas.addEventListener("change", () => {
+    lista.querySelectorAll(".admin-pending-check").forEach(c => { c.checked = todas.checked; });
+    atualizarLote();
+  });
+  enviarIA.addEventListener("click", enviarSelecionadasParaIA);
   maisBotao.addEventListener("click", () => carregar({anexar: true}));
   carregar();
 }
