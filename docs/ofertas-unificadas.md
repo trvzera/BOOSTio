@@ -86,3 +86,22 @@ comparadas.
   KaBuM, porque o front-end descarta pontos cuja `loja` não seja `kabum`. Mostrar o menor preço entre
   lojas exige mudar o front-end.
 - Não foi testado em MySQL real (subconsultas correlacionadas por peça e travas em `refresh ... FOR UPDATE`).
+
+## Padrão para todas as lojas
+
+Toda loja segue o mesmo caminho por peça (tarefa `ofertas_peca` da fila):
+
+1. Buscar pelas consultas da peça (`consultas_da_peca`: MPN primeiro, depois nome), no máximo 4 buscas.
+2. Normalizar cada resultado e avaliá-lo com o mesmo motor (`IndiceCandidatosService.avaliar`).
+3. **Confirmada** (acima de 80 e única): grava a oferta, o histórico e o vínculo.
+4. **Ambígua** (60 a 80) que envolve a peça: grava em `produto_pendente` (`em_revisao`) com as candidatas,
+   para o painel de administração aceitar, rejeitar ou a IA sugerir. Nunca reabre pendência já decidida.
+5. **Rejeitada** (abaixo de 60): descartada.
+
+A diferença entre as lojas é só a origem do resultado: na Shopee, anúncios de uma busca por texto; no
+Mercado Livre, produtos do catálogo oficial (`/products/search`), e a pendência é a oferta nova mais barata
+do catálogo em dúvida (o aceite reconsulta o anúncio no catálogo antes de gravar). No Mercado Livre até
+`3` catálogos ambíguos por peça viram pendência por execução, para limitar as requisições.
+
+Tarefas do Mercado Livre já concluídas antes dessa mudança não geram pendências retroativas: enfileire de
+novo com outra identificação de execução (`--execucao`).

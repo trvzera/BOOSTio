@@ -32,7 +32,7 @@ class AssociarCatalogoService:
                 assinatura=assinatura, criterio=existente.criterio, assinatura_catalogo=existente.assinatura_catalogo)])
         indice = self._indice(type(peca))
         motor, normalizador = AssociacaoInteligenteService(), NormalizarProdutoService()
-        catalogos, revisao, vistos, buscas = [], [], set(), []
+        catalogos, revisao, vistos, buscas, ambiguos = [], [], set(), [], []
         consultas = self.consultas(peca)
         for consulta in consultas:
             offset = 0
@@ -54,7 +54,7 @@ class AssociarCatalogoService:
                     normal = normalizador.executar(produto, peca.__tablename__)
                     comparacao = motor.avaliar(peca, normal, identidade=indice.identidades.get(peca.id))
                     revisao.append(dict(catalogo_id=produto['id'], nome=normal.titulo, comparacao=comparacao))
-                    if comparacao['classificacao'] != 'confirmada':
+                    if comparacao['classificacao'] not in ('confirmada', 'ambigua'):
                         continue
                     chave = assinatura_catalogo(produto)
                     if chave not in self._decisoes:
@@ -62,9 +62,13 @@ class AssociarCatalogoService:
                             self._decisoes.clear()
                         self._decisoes[chave] = indice.avaliar(normal)
                     decisao = self._decisoes[chave]
-                    if decisao['classificacao'] == 'confirmada' and decisao['peca'] == f'{peca.__tablename__}:{peca.id}':
+                    referencia = f'{peca.__tablename__}:{peca.id}'
+                    if comparacao['classificacao'] == 'confirmada' and decisao['classificacao'] == 'confirmada' and decisao['peca'] == referencia:
                         catalogos.append(dict(catalogo_id=produto['id'], assinatura=assinatura,
                             criterio=comparacao['criterio'], percentual=comparacao['percentual']))
+                    elif decisao['classificacao'] == 'ambigua' and any(c['peca'] == referencia for c in decisao['candidatos']):
+                        # Como na Shopee: dúvida real que envolve esta peça vira pendência para revisão.
+                        ambiguos.append(dict(produto=produto, normal=normal, decisao=decisao))
                 # Uma identidade comprovada já basta. Nunca paginar indefinidamente
                 # nem repetir páginas ignoradas pelo servidor.
                 if catalogos or not novos or len(linhas) < 20 or offset + len(linhas) >= total or offset >= 20:
@@ -77,7 +81,7 @@ class AssociarCatalogoService:
         completa = all(b['offset'] + b['recebidos'] >= b['total'] for b in buscas[-1:])
         return dict(status='encontrada' if catalogos else 'nao_encontrada' if not vistos else 'revisao',
             catalogos=catalogos, busca_remota_completa=completa, total_busca=max(b['total'] for b in buscas),
-            buscas=buscas, candidatos_unicos=len(vistos),
+            buscas=buscas, candidatos_unicos=len(vistos), ambiguos=ambiguos,
             motivo='Cada candidato requer identidade e unicidade local comprovadas', candidatos=revisao[:5])
 
     def consultas(self, peca):

@@ -12,6 +12,7 @@ from .buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreServi
 from .controle_requisicoes_service import ControleRequisicoesService, OrcamentoRequisicoesEsgotado, ErroMercadoLivre
 from .token_mercado_livre_service import TokenMercadoLivreService
 from .cliente_catalogo_cache_service import ClienteCatalogoCacheService
+from .registrar_ambiguos_service import RegistrarAmbiguosMercadoLivreService
 
 
 class AtualizarOfertasMercadoLivreService:
@@ -101,6 +102,16 @@ class AtualizarOfertasMercadoLivreService:
 
     def _processar_peca(self, peca, cliente, associador, token, limite, simular):
         busca = associador.localizar_candidatos(peca, cliente, token)
+        ambiguos = busca.pop('ambiguos', [])
+        registradas = 0 if simular or not ambiguos else RegistrarAmbiguosMercadoLivreService().executar(
+            peca.__tablename__, ambiguos, cliente, token)
+        resultado = self._processar_busca(peca, busca, cliente, associador, token, limite, simular)
+        if ambiguos:
+            resultado['ambiguas'] = len(ambiguos)
+            resultado['ambiguas_registradas'] = registradas
+        return resultado
+
+    def _processar_busca(self, peca, busca, cliente, associador, token, limite, simular):
         if busca['status'] != 'encontrada':
             contador = 'nao_encontradas' if busca['status'] == 'nao_encontrada' else 'revisao'
             return dict(contador=contador, **busca)

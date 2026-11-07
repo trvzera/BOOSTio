@@ -298,3 +298,21 @@ def test_consulta_limpa_descricao_preserva_capacidade_e_variante():
     assert consultas == ['Samsung 860 EVO 500GB', 'Samsung 860 EVO [500 GB M.2 SATA]']
     p.__tablename__='placa_video';p.modelo='RTX 4070 Ti SUPER';p.fabricante='ASUS'
     assert AssociarCatalogoService().consultas(p) == ['ASUS RTX 4070 Ti SUPER']
+
+
+def test_catalogo_ambiguo_vira_pendencia_como_na_shopee(banco):
+    from models import ProdutoPendente
+    _,p=banco
+    sem_mpn=produto(attributes=[{'id':'BRAND','value_name':'AMD'}])
+    simulado=executar(p,prod=sem_mpn,ofertas=[anuncio('MLB77',5,300),anuncio('MLB78',6,250,'used')])
+    assert ProdutoPendente.query.count()==0  # simulação não grava
+    r=executar(p,prod=sem_mpn,ofertas=[anuncio('MLB77',5,300),anuncio('MLB78',6,250,'used')],simular=False)
+    assert r['revisao']==1 and r['detalhes'][0]['ambiguas']==1 and r['detalhes'][0]['ambiguas_registradas']==1
+    pendencia=ProdutoPendente.query.one()
+    assert (pendencia.loja,pendencia.produto_id_loja,pendencia.status)==('mercado_livre','MLB77','em_revisao')
+    assert pendencia.dados_originais['catalogo']['id']==CAT and pendencia.dados_originais['anuncio']['price']=='300.00'
+    assert [c['peca'] for c in pendencia.candidatos]==[f'processador:{p.id}']
+    assert Oferta.query.filter(Oferta.loja!='kabum').count()==0
+    # repetir não duplica
+    executar(p,prod=sem_mpn,ofertas=[anuncio('MLB77',5,300)],simular=False)
+    assert ProdutoPendente.query.count()==1
