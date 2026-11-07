@@ -26,6 +26,9 @@ Segue o fluxo do Mercado Livre e usa o mesmo motor (`AssociacaoInteligenteServic
    oferta, histórico e a prova de vínculo em `produto_pendente`. Se a busca terminou sem mais páginas, as
    outras ofertas ativas da peça nessa loja são desativadas; com busca incompleta nada é desativado.
    Simulação não grava.
+6. **Ambíguas:** anúncio entre 60 e 80 que envolve a peça (ou sem margem para o segundo candidato) é gravado em
+   `produto_pendente` com status `em_revisao`, motivo e candidatos, como no Mercado Livre. Não cria oferta e
+   não reabre pendência já importada ou rejeitada.
 
 O preço da peça passa a ser o da menor oferta ativa, sem alterar a ficha da peça
 (ver [ofertas-unificadas.md](ofertas-unificadas.md)).

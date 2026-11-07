@@ -257,3 +257,24 @@ def test_nao_cadastra_quando_o_titulo_nao_prova_a_quantidade_de_pentes(banco, mo
     s.descobrir_pagina(categoria='memoria_ram', termo='ram', simular=False)
     assert s.importar_anuncio(anuncio_id='10:1', simular=False, permitir_novos=True)['acao'] == 'revisao'
     assert MemoriaRAM.query.filter_by(modelo='Fury Beast').count() == 0
+
+
+def test_anuncio_ambiguo_vai_para_pendencias_em_revisao_sem_criar_oferta(banco):
+    p5500, p5600 = banco
+    titulo = 'Processador AMD Ryzen 5 AM4 6 Núcleos 12 Threads'  # serve para as duas peças
+    s = servico(((consultas(p5500)[0], 1), ([anuncio(1, 10, titulo)], False)))
+    simulado = rodar(s, p5500, simular=True)
+    assert simulado['ambiguas'] == 1 and ProdutoPendente.query.count() == 0
+    r = rodar(s, p5500, simular=False)
+    assert r['associadas'] == 0 and r['ambiguas_registradas'] == 1 and Oferta.query.count() == 0
+    pendente = ProdutoPendente.query.one()
+    assert pendente.status == 'em_revisao' and pendente.loja == 'shopee' and pendente.produto_id_loja == '10:1'
+    assert pendente.motivo.startswith('Matching') and {c['peca'] for c in pendente.candidatos} >= {
+        f'processador:{p5500.id}', f'processador:{p5600.id}'}
+    # nova busca não duplica nem reabre uma pendência já decidida
+    rodar(s, p5500, simular=False)
+    assert ProdutoPendente.query.count() == 1
+    pendente.status = 'rejeitado'
+    db.session.commit()
+    rodar(s, p5500, simular=False)
+    assert ProdutoPendente.query.one().status == 'rejeitado'

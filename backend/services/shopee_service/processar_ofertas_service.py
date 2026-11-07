@@ -52,8 +52,8 @@ class ProcessarOfertasShopeeService:
         assinatura = assinatura_peca(peca)
         identificador = f'{categoria}:{peca_id}'
         indice = IndiceCandidatosService.carregar(modelo)
-        resumo = dict(peca=identificador, associadas=0, revisao=0, invalidas=0, buscas=[], detalhes=[])
-        confirmados, vistos, completa = [], set(), False
+        resumo = dict(peca=identificador, associadas=0, revisao=0, invalidas=0, ambiguas=0, buscas=[], detalhes=[])
+        confirmados, ambiguos, vistos, completa = [], [], set(), False
         for consulta in consultas_da_peca(peca):
             pagina = 1
             while len(resumo['buscas']) < self.MAX_BUSCAS:
@@ -67,7 +67,7 @@ class ProcessarOfertasShopeeService:
                         continue
                     vistos.add(chave)
                     novos += 1
-                    self._classificar(bruto, categoria, identificador, indice, confirmados, resumo)
+                    self._classificar(bruto, categoria, identificador, indice, confirmados, ambiguos, resumo)
                 tem_mais = resposta['pageInfo']['hasNextPage']
                 completa = not tem_mais
                 # Identidade comprovada basta; nunca repetir páginas sem novidade nem paginar sem fim.
@@ -79,6 +79,9 @@ class ProcessarOfertasShopeeService:
         selecionados = self._selecionar(confirmados, limite_ofertas)
         resumo['busca_completa'] = completa
         resumo['candidatos_unicos'] = len(vistos)
+        resumo['ambiguas'] = len(ambiguos)
+        if ambiguos and not simular:
+            resumo['ambiguas_registradas'] = self._registrar_ambiguos(categoria, ambiguos)
         if selecionados:
             propostas = atualizar_ofertas_validadas(peca, 'shopee', selecionados, assinatura,
                 simular=simular, desativar_ausentes=completa)
@@ -86,7 +89,7 @@ class ProcessarOfertasShopeeService:
             resumo['detalhes'].extend(propostas)
         return resumo
 
-    def _classificar(self, bruto, categoria, identificador, indice, confirmados, resumo):
+    def _classificar(self, bruto, categoria, identificador, indice, confirmados, ambiguos, resumo):
         try:
             produto, oferta = self._normalizador().executar(bruto, categoria)
         except ValueError:
@@ -97,6 +100,27 @@ class ProcessarOfertasShopeeService:
             confirmados.append((oferta, produto))
         else:
             resumo['revisao'] += 1
+            # Ambígua que envolve esta peça: guardar para revisão, em vez de perder na próxima busca.
+            if decisao['classificacao'] == 'ambigua' and any(c['peca'] == identificador for c in decisao['candidatos']):
+                ambiguos.append((bruto, produto, oferta, decisao))
+
+    @staticmethod
+    def _registrar_ambiguos(categoria, ambiguos):
+        """Grava em produto_pendente (em_revisao) com os candidatos; nunca reabre pendência encerrada."""
+        agora = datetime.now(timezone.utc).replace(tzinfo=None)
+        registradas = 0
+        for bruto, produto, oferta, decisao in ambiguos:
+            linha = dict(loja='shopee', produto_id_loja=produto.id_externo, vendedor_id=oferta['vendedor_id'],
+                titulo=produto.titulo, url=produto.fonte, categoria_sugerida=categoria, coletado_em=agora,
+                dados_originais={'normalizado': asdict(produto), 'anuncio': bruto})
+            ProdutoPendente.registrar_descobertos([linha], simular=False)
+            pendente = ProdutoPendente.buscar_por_anuncio('shopee', produto.id_externo)
+            try:
+                ProdutoPendente.registrar_matching(pendente.id, decisao, assinatura_documento(pendente.dados_originais), simular=False)
+                registradas += 1
+            except ValueError:
+                continue  # já importada ou rejeitada: a decisão anterior vale
+        return registradas
 
     @staticmethod
     def _selecionar(confirmados, limite):
