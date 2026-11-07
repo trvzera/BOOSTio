@@ -28,7 +28,7 @@ export function iniciarPendencias(raiz) {
   const lote = raiz.querySelector("[data-pendencias-lote]");
   const todas = raiz.querySelector("[data-pendencias-todas]");
   const enviarIA = raiz.querySelector("[data-pendencias-enviar-ia]");
-  const enviarTodas = raiz.querySelector("[data-pendencias-enviar-todas]");
+  const vinte = raiz.querySelector("[data-pendencias-vinte]");
   const pararEnvio = raiz.querySelector("[data-pendencias-parar]");
   const decidirIA = raiz.querySelector("[data-pendencias-ia-decidir]");
   const selects = {
@@ -49,7 +49,8 @@ export function iniciarPendencias(raiz) {
     const marcar = elemento("input", "admin-pending-check");
     marcar.type = "checkbox"; marcar.value = String(pendencia.id);
     marcar.setAttribute("aria-label", `Selecionar para a IA: ${pendencia.titulo}`);
-    marcar.addEventListener("change", atualizarLote);
+    marcar.checked = todasSelecionadas;
+    marcar.addEventListener("change", () => { todasSelecionadas = false; atualizarLote(); });
     cabecalho.append(marcar);
     cabecalho.append(elemento("span", "admin-badge", rotuloLoja(pendencia.loja)),
       elemento("span", "admin-badge admin-badge-muted", rotuloCategoria(pendencia.categoria)));
@@ -69,13 +70,44 @@ export function iniciarPendencias(raiz) {
 
   const marcadas = () => [...lista.querySelectorAll(".admin-pending-check:checked")];
 
+  // "Selecionar todas" vale para o filtro inteiro (inclusive páginas ainda não carregadas); "Selecionar 20" só a lista visível.
+  let todasSelecionadas = false, idsTodas = [];
+  const TAMANHO_SELECAO = 20;
+
   function atualizarLote() {
     const caixas = lista.querySelectorAll(".admin-pending-check");
-    const n = marcadas().length;
+    const marcadasAgora = marcadas().length;
+    const n = todasSelecionadas ? idsTodas.length : marcadasAgora;
     lote.hidden = selects.status.value === "rejeitado" || selects.status.value === "importado" || caixas.length === 0;
-    todas.checked = caixas.length > 0 && n === caixas.length;
+    todas.checked = todasSelecionadas;
+    vinte.checked = !todasSelecionadas && marcadasAgora > 0 && marcadasAgora === Math.min(TAMANHO_SELECAO, caixas.length);
     enviarIA.disabled = n === 0;
     enviarIA.textContent = n ? `Enviar para a IA (${n})` : "Enviar para a IA";
+  }
+
+  async function selecionarTodas() {
+    if (!todas.checked) {
+      todasSelecionadas = false;
+      lista.querySelectorAll(".admin-pending-check").forEach(c => { c.checked = false; });
+      return atualizarLote();
+    }
+    todas.disabled = true;
+    avisar("Buscando todas as pendências do filtro…");
+    try {
+      idsTodas = (await listarIdsParaIA(filtrosAtuais())).ids;
+      todasSelecionadas = idsTodas.length > 0;
+      lista.querySelectorAll(".admin-pending-check").forEach(c => { c.checked = todasSelecionadas; });
+      avisar(idsTodas.length ? `${idsTodas.length} pendência(s) selecionada(s).`
+        : "Nenhuma pendência do filtro pode ser analisada (faltam candidatas aprovadas).");
+    } catch (erro) { avisar(erro.message, true); }
+    todas.disabled = false;
+    atualizarLote();
+  }
+
+  function selecionarVinte() {
+    todasSelecionadas = false;
+    [...lista.querySelectorAll(".admin-pending-check")].forEach((c, i) => { c.checked = vinte.checked && i < TAMANHO_SELECAO; });
+    atualizarLote();
   }
 
   // O envio é um processo: lotes de 20 (uma requisição à IA por lote); o que falhar espera e tenta de novo.
@@ -92,7 +124,7 @@ export function iniciarPendencias(raiz) {
     if (enviando || !ids.length) return;
     if (decidir && !window.confirm(`A IA vai aceitar ou rejeitar até ${ids.length} pendência(s) com alta confiança. Rejeições não podem ser desfeitas. Continuar?`)) return;
     enviando = true; parar = false;
-    enviarIA.disabled = enviarTodas.disabled = todas.disabled = decidirIA.disabled = true;
+    enviarIA.disabled = todas.disabled = vinte.disabled = decidirIA.disabled = true;
     pararEnvio.hidden = false;
     try {
       const r = await processarEnvioIA({
@@ -109,24 +141,15 @@ export function iniciarPendencias(raiz) {
     } finally {
       enviando = false;
       pararEnvio.hidden = true;
-      enviarTodas.disabled = todas.disabled = decidirIA.disabled = false;
+      todas.disabled = vinte.disabled = decidirIA.disabled = false;
       atualizarLote();
     }
   }
 
-  const enviarSelecionadasParaIA = () =>
-    enviarParaIA(marcadas().map(c => Number(c.value)), {decidir: decidirIA.checked, refazer: true});
-
-  async function enviarTodasParaIA() {
-    if (enviando) return;
-    avisar("Buscando as pendências do filtro…");
-    try {
-      const {ids} = await listarIdsParaIA(filtrosAtuais());
-      if (!ids.length) { avisar("Nenhuma pendência do filtro pode ser analisada (faltam candidatas aprovadas)."); return; }
-      // Quem já tem sugestão atual não gasta IA de novo; assim um envio interrompido pode ser retomado.
-      await enviarParaIA(ids, {decidir: decidirIA.checked, refazer: false});
-    } catch (erro) { avisar(erro.message, true); }
-  }
+  // Com "todas" selecionadas, quem já tem sugestão atual não gasta IA de novo: um envio interrompido pode ser retomado.
+  const enviarSelecionadasParaIA = () => todasSelecionadas
+    ? enviarParaIA(idsTodas, {decidir: decidirIA.checked, refazer: false})
+    : enviarParaIA(marcadas().map(c => Number(c.value)), {decidir: decidirIA.checked, refazer: true});
 
   function mostrarResumo(porStatus) {
     resumo.replaceChildren(...Object.entries(porStatus || {}).map(([situacao, total]) =>
@@ -144,6 +167,7 @@ export function iniciarPendencias(raiz) {
         opcoes(selects.categoria, dados.categorias, rotuloCategoria, "Todas as categorias");
       }
       const itens = dados.pendencias.map(cartao);
+      if (!anexar) todasSelecionadas = false;
       if (anexar) lista.append(...itens); else lista.replaceChildren(...itens);
       proximo = dados.proximo;
       maisBotao.hidden = proximo === null;
@@ -266,12 +290,9 @@ export function iniciarPendencias(raiz) {
   }
 
   filtros.addEventListener("submit", evento => { evento.preventDefault(); detalhe.hidden = true; carregar(); });
-  todas.addEventListener("change", () => {
-    lista.querySelectorAll(".admin-pending-check").forEach(c => { c.checked = todas.checked; });
-    atualizarLote();
-  });
+  todas.addEventListener("change", selecionarTodas);
+  vinte.addEventListener("change", selecionarVinte);
   enviarIA.addEventListener("click", enviarSelecionadasParaIA);
-  enviarTodas.addEventListener("click", enviarTodasParaIA);
   pararEnvio.addEventListener("click", () => { parar = true; avisar("Parando depois do lote atual…"); });
   maisBotao.addEventListener("click", () => carregar({anexar: true}));
   carregar();

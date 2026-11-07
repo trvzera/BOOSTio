@@ -102,12 +102,13 @@ resposta longa demais, mantenha o lote em torno de 20.
 
 ### Enviar tudo de uma vez
 
-O botão **Enviar todas** pega todas as pendências abertas do filtro atual (não só as da página) e as envia
+A caixa **Selecionar todas** marca todas as pendências abertas do filtro atual (não só as da página), e
+**Selecionar 20** marca as 20 primeiras da lista. Ao clicar em **Enviar para a IA**, o envio roda
 como um processo: lotes de 20, uma requisição à IA por lote, mostrando o andamento. Quem falhar (limite de
 requisições, instabilidade, resposta inválida) espera 15s, depois 45s e 90s e é reenviado; se ainda assim
 falhar, é contado como falha e o processo segue com o próximo lote. O botão **Parar** interrompe depois do
 lote atual. Pendências que já têm sugestão atual não gastam IA de novo, então um envio interrompido pode ser
-retomado clicando de novo. A caixa **Deixar a IA decidir** vale também para "Enviar todas". O processo roda
+retomado selecionando todas e enviando de novo. A caixa **Deixar a IA decidir** vale para qualquer seleção. O processo roda
 com a aba aberta; para rodar sem o navegador, use o comando (ele também espera e repete em caso de limite):
 
 ```bash

@@ -68,10 +68,10 @@
             <div class="admin-split">
               <div>
                 <div class="admin-bulk" data-pendencias-lote hidden>
-                  <label class="admin-bulk-check font-2-s"><input type="checkbox" data-pendencias-todas aria-label="Selecionar todas as pendências listadas"> Selecionar todas</label>
+                  <label class="admin-bulk-check font-2-s" title="Todas as pendências do filtro, inclusive as que ainda não foram carregadas"><input type="checkbox" data-pendencias-todas aria-label="Selecionar todas as pendências do filtro"> Selecionar todas</label>
+                  <label class="admin-bulk-check font-2-s" title="As 20 primeiras da lista"><input type="checkbox" data-pendencias-vinte aria-label="Selecionar as 20 primeiras pendências da lista"> Selecionar 20</label>
                   <label class="admin-bulk-check font-2-s" title="Com esta opção marcada, a IA aceita ou rejeita as pendências de alta confiança"><input type="checkbox" data-pendencias-ia-decidir aria-label="Deixar a IA decidir (aceitar ou rejeitar)"> Deixar a IA decidir</label>
                   <button type="button" class="btn-primary" data-pendencias-enviar-ia disabled aria-label="Enviar pendências selecionadas para a IA">Enviar para a IA</button>
-                  <button type="button" class="btn-ghost" data-pendencias-enviar-todas aria-label="Enviar para a IA todas as pendências do filtro atual">Enviar todas</button>
                   <button type="button" class="btn-ghost" data-pendencias-parar hidden aria-label="Parar o envio para a IA">Parar</button>
                 </div>
                 <ul class="admin-pending-list" data-pendencias-lista></ul>
