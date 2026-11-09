@@ -26,6 +26,16 @@ foi incorporado à `main`, mas preparar a imagem não atualiza os contêineres e
 - `marketplaces-fila-preparar --aplicar` criou `tarefa_marketplace` e
   `limite_marketplace`. A repetição retornou `tabelas: []`, e o resumo retornou
   `[]`: fila preparada, ainda sem tarefas.
+- A segunda rotina concluiu catálogo, coluna de administrador, vínculos e
+  identidades do Mercado Livre, catálogo técnico, fila e benchmarks, seguida
+  pelos preflights. O responsável enviou `MIGRACAO_OK`, com logs privados em
+  `/root/boostio-migracao-r3jsrAwY` e backup
+  `/root/boostio-backups/boostio-20261109T132734Z.sql.gz`.
+- Após essa rotina, `/health` respondeu novamente `{"status":"ok"}` com HTTP 200.
+- A rotina do worker parou na validação do Mercado Livre, com a mensagem de
+  tokens não cadastrados. Nesse bloco, aprovação, enfileiramento e início do
+  worker não foram alcançados. A mensagem precisa ser conferida usando a
+  interpretação de ambiente do Compose antes de concluir que a autorização foi perdida.
 
 O console web perdeu repetidamente o foco de digitação e deixou de confirmar
 novos comandos, mesmo após abrir outra sessão e receber foco manualmente.
@@ -48,7 +58,9 @@ externos. A consulta pública `GET https://api.boostio.com.br/health` respondeu
 
 ## Ainda pendente na VPS
 
-- Aplicação das demais migrações, repetição dos preflights e conferência dos dados preservados.
+- Revisão dos relatórios privados das migrações e conferência dos dados preservados.
+- Reparo e validação do `.env.production`, após um diagnóstico ter sido
+  inserido indevidamente no arquivo durante a automação do console.
 - Atualização do checkout de produção, reconstrução/publicação de API e frontend.
 - Homologação dos fluxos com a versão publicada.
 - Rotina de aprovação da amostra, enfileiramento de ofertas, worker e sugestões de IA.
@@ -70,6 +82,18 @@ chamar o backup existente em um bloco, redirecionar explicitamente a entrada:
 ```bash
 BOOSTIO_BACKUP_DIR=/root/boostio-backups bash /opt/BOOSTio/deploy/backup_mysql.sh </dev/null
 ```
+
+## Reparo restrito do ambiente
+
+`deploy/reparar_env_producao.py` reconhece somente a linha literal do diagnóstico
+inserido por engano no `.env.production`. Simula por padrão; com `--aplicar`,
+exige uma pasta privada de backup, preserva as demais linhas byte a byte e
+substitui o arquivo atomicamente. Não exibe valores, redefine credenciais nem
+altera os tokens no banco. Se a linha não for exatamente a reconhecida, não
+altera o arquivo. A rotina e a proteção do backup têm seis testes locais aprovados.
+
+O reparo preparado no repositório ainda não foi confirmado na VPS. Conferir o
+retorno antes de tentar iniciar o worker; não colar comandos dentro do nano.
 
 ## Retomada
 
