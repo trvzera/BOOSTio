@@ -183,7 +183,7 @@
 .benchmark-type-copy { display: grid; gap: .25rem; text-align: left; }
 .benchmark-type-copy small { font: 400 .75rem/1.4 var(--font-body); }
 .benchmark-type-picker .ui-lottie { width: 24px; height: 24px; flex-basis: 24px; }
-.benchmark-type-picker [aria-pressed="true"] { color: var(--cor-p1); border-color: var(--cor-p1); background: rgba(0,123,255,.08); }
+.benchmark-type-picker [aria-pressed="true"] { color: var(--text-accent); border-color: var(--cor-p1); background: rgba(0,123,255,.08); }
 .blender-panel { display: grid; gap: 1rem; min-width: 0; font: 400 1rem/1.6 var(--font-body); color: var(--cor-6); }
 .blender-panel form { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem; }
 .blender-panel .test-field { display: grid; gap: .5rem; flex: 1 1 15rem; min-width: 0; font: 500 .8rem/1.4 var(--font-heading); }

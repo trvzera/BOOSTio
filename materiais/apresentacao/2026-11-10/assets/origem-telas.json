@@ -1,0 +1,120 @@
+{
+  "origem": "HTML/CSS/JavaScript reais do frontend local; respostas de sessão, builds e catálogo simuladas com o catálogo demonstrativo versionado. Estas capturas não comprovam execução de backend nem resultados de IA.",
+  "builds": [
+    {
+      "id": "s-1",
+      "nome": "Estudos e programação",
+      "descricao": "Configuração de demonstração",
+      "criado_em": "2026-11-08T12:00:00Z",
+      "estado": {
+        "titulo": "Estudos e programação",
+        "descricao": "Configuração de demonstração",
+        "orcamento": 6000,
+        "visibilidade": "privado",
+        "travada": false,
+        "incluirPerifericos": false,
+        "incluirRede": false,
+        "percentualPerifericos": 0,
+        "rede": {},
+        "componentes": {
+          "processador": {
+            "id": 3,
+            "quantidade": 1
+          },
+          "placa_mae": {
+            "id": 17,
+            "quantidade": 1
+          },
+          "memoria_ram": [
+            {
+              "id": 3,
+              "quantidade": 1
+            }
+          ],
+          "ssd": [
+            {
+              "id": 6,
+              "quantidade": 1
+            }
+          ],
+          "fonte": {
+            "id": 4,
+            "quantidade": 1
+          },
+          "gabinete": {
+            "id": 2,
+            "quantidade": 1
+          },
+          "fan": [
+            {
+              "id": 1,
+              "quantidade": 2
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "s-2",
+      "nome": "Jogos e criação",
+      "descricao": "Configuração de demonstração",
+      "criado_em": "2026-11-08T12:00:00Z",
+      "estado": {
+        "titulo": "Jogos e criação",
+        "descricao": "Configuração de demonstração",
+        "orcamento": 6000,
+        "visibilidade": "privado",
+        "travada": false,
+        "incluirPerifericos": false,
+        "incluirRede": false,
+        "percentualPerifericos": 0,
+        "rede": {},
+        "componentes": {
+          "processador": {
+            "id": 4,
+            "quantidade": 1
+          },
+          "placa_mae": {
+            "id": 17,
+            "quantidade": 1
+          },
+          "memoria_ram": [
+            {
+              "id": 3,
+              "quantidade": 2
+            }
+          ],
+          "ssd": [
+            {
+              "id": 4,
+              "quantidade": 1
+            }
+          ],
+          "placa_video": {
+            "id": 4,
+            "quantidade": 1
+          },
+          "fonte": {
+            "id": 3,
+            "quantidade": 1
+          },
+          "gabinete": {
+            "id": 2,
+            "quantidade": 1
+          },
+          "fan": [
+            {
+              "id": 1,
+              "quantidade": 2
+            }
+          ],
+          "air_cooler": {
+            "id": 2,
+            "quantidade": 1
+          }
+        }
+      }
+    }
+  ],
+  "catalogoTamanho": 750
+}

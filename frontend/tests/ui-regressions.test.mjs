@@ -110,8 +110,11 @@ test("montagem e benchmark usam os ícones correspondentes sem alterar ações e
   for (const [nome,rotulo] of [["handsparkle","Formulário inteligente"],["normalhand","Montagem manual"]])
     assert.ok(builds.includes('iconeAnimado("' + nome + '") + \'<strong>' + rotulo + '</strong>'));
   assert.match(acoes,/iconeAnimado\("microchip"\) \+ '<span>Blender · Renderização<\/span>/);
-  assert.match(acoes,/data-benchmark-type="games" disabled/);
-  assert.match(acoes,/iconeAnimado\("gamepad"\).*Jogos · FPS<small>Em desenvolvimento<\/small>/);
+  const jogos = acoes.match(/<button\b[^>]*data-benchmark-type="games"[^>]*>/)?.[0];
+  assert.ok(jogos);
+  assert.doesNotMatch(jogos,/\bdisabled(?:\s|=|>)/);
+  assert.match(jogos,/aria-label="Selecionar teste de desempenho em jogos"/);
+  assert.match(acoes,/iconeAnimado\("gamepad"\) \+ '<span>Jogos · FPS<\/span>/);
   assert.match(css,/\.build-create-option:is\(:hover,:focus-visible\)/);
   assert.match(css,/\.build-create-option > \.ui-lottie \{[^}]*color: var\(--cor-p1\)/);
   assert.match(css,/span:not\(\.build-create-option-action\):not\(\.ui-lottie\)/);
@@ -233,16 +236,23 @@ test("ícone do setup atual usa o estado inverso sem afetar os demais", () => {
   assert.match(iconeAnimado("circledot","internal",{invertido:true}),/data-lottie-reversed="true"/);
   assert.doesNotMatch(iconeAnimado("circledot"),/data-lottie-reversed/);
 });
-test("rodapés incluem Instagram oficial com nome acessível e proteção na nova aba",async () => {
+test("rodapés usam ícones sociais com destino, nome acessível e proteção na nova aba",async () => {
   for (const pagina of ['index','sobre','configuracoes-prontas','configuracao-build','pecas']) {
     const html=await readFile(new URL('../pages/'+pagina+'.html',import.meta.url),'utf8');
     const contato=html.match(/<div id="contact-section">([\s\S]*?)<\/div>/)?.[1];
     assert.ok(contato,pagina);
-    const link=contato.match(/<a\b[^>]*href="https:\/\/www\.instagram\.com\/boostiooficial\/"[^>]*>Instagram: @boostiooficial<\/a>/)?.[0];
+    const link=contato.match(/<a\b[^>]*href="https:\/\/www\.instagram\.com\/boostiooficial\/"[^>]*>[\s\S]*?<\/a>/)?.[0];
     assert.ok(link,pagina);
     assert.match(link,/target="_blank"/);
     assert.match(link,/rel="noopener noreferrer"/);
     assert.match(link,/aria-label="Instagram: @boostiooficial \(abre em nova aba\)"/);
+    assert.match(link,/footer-social-icon-instagram[^>]*aria-hidden="true"/);
+    const telegram=contato.match(/<a\b[^>]*href="https:\/\/t\.me\/boostioofertas"[^>]*>[\s\S]*?<\/a>/)?.[0];
+    assert.ok(telegram,pagina);
+    assert.match(telegram,/aria-label="Telegram: grupo de ofertas da BOOSTio \(abre em nova aba\)"/);
+    assert.match(telegram,/target="_blank"/);
+    assert.match(telegram,/rel="noopener noreferrer"/);
+    assert.match(telegram,/footer-social-icon-telegram[^>]*aria-hidden="true"/);
   }
 });
 
