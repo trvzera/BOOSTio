@@ -512,3 +512,15 @@ def test_enviar_todas_lista_ids_do_filtro_e_nao_refaz_o_que_ja_foi_analisado(ban
     assert cliente.post('/admin/pendencias/enviar-ia', json={'ids': [a.id, b.id], 'refazer': False}).get_json()['sugeridas'] == 2
     d = cliente.post('/admin/pendencias/enviar-ia', json={'ids': [a.id, b.id], 'refazer': False}).get_json()
     assert d['sugeridas'] == 0 and d['ja_analisadas'] == 2 and d['ids_falhos'] == []
+
+
+def test_aceitar_mercado_livre_peca_ja_vinculada_a_outro_catalogo_explica_o_que_fazer(banco, monkeypatch):
+    app, admin, *_ = banco
+    disco = hd()
+    db.session.add(VinculoMercadoLivre(tabela_peca='hd', peca_id=disco.id, catalogo_id='MLB11', assinatura_peca='a' * 64,
+                                       assinatura_catalogo='b' * 64, criterio='revisao_manual'))
+    p = pendencia_ml([dict(peca=f'hd:{disco.id}', percentual=72, conflitos=[], pendencias=[])])
+    cliente_ml = importador_ml(monkeypatch)
+    r = entrar(app, admin).post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{disco.id}'})
+    assert r.status_code == 400 and 'MLB11' in r.get_json()['erro'] and 'rejeite' in r.get_json()['erro']
+    assert cliente_ml._consultar.call_count == 0 and Oferta.query.count() == 0  # nem consultou a loja
