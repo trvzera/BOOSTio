@@ -114,13 +114,13 @@ export function abrirCompraBuild(build,catalogo,{publica = false,loja,recarregar
 function linksCompra(peca, loja, referenciaIndisponivel) {
   if (!peca) return "";
   const ofertas = ofertasPeca(peca).filter(o => (!loja || o.codigo === loja) && !o.esgotado
-    && (!referenciaIndisponivel || o.codigo === "mercado_livre"));
+    && (!referenciaIndisponivel || o.marketplace));
   return '<div class="build-store-links">' + ofertas.map(oferta => '<a class="build-store-link" href="' + h(oferta.url) + '" target="_blank" rel="noopener noreferrer" aria-label="' +
     h((oferta.direta ? 'Conferir na ' : 'Buscar na ') + oferta.loja + (oferta.vendedor ? ' · ' + oferta.vendedor : '')) + '">' +
     (oferta.logo ? '<img src="' + h(oferta.logo) + '" alt="' + h(oferta.loja) + '">' : '') +
     '<span>' + h(oferta.loja) + (oferta.vendedor ? ' · ' + h(oferta.vendedor) : '') + '</span> <strong>' +
     (oferta.preco != null ? moeda(oferta.preco) + ' por unidade' : 'Preço a consultar') + '</strong>' +
-    (oferta.codigo === "mercado_livre" ? '<small>Preço registrado · confirme estoque e frete na loja</small>' : '') + '</a>').join("") + '</div>';
+    (oferta.marketplace ? '<small>Preço registrado · confirme estoque e frete na loja</small>' : '') + '</a>').join("") + '</div>';
 }
 
 export function conteudoCompra(build,catalogo,comparacao,loja) {

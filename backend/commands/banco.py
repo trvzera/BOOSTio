@@ -13,6 +13,25 @@ from models import db, PreferenciasUso
 
 
 def registrar_comandos_banco(app):
+    @app.cli.command("catalogo-preparar")
+    @click.option("--aplicar", is_flag=True, help="Aplica a migração aditiva. Padrão: simulação.")
+    def preparar_catalogo(aplicar):
+        from migrations.catalogo_automatizado import preparar_catalogo_automatizado
+        try:
+            click.echo(json.dumps(preparar_catalogo_automatizado(simular=not aplicar), ensure_ascii=False))
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else "Falha ao preparar catálogo; não reinicie antes de conferir o esquema") from None
+
+    @app.cli.command("usuarios-admin-preparar")
+    @click.option("--aplicar", is_flag=True, help="Adiciona a coluna; sem esta opção apenas simula.")
+    def preparar_admin(aplicar):
+        """Adiciona usuario.administrador; faça backup antes em bancos existentes."""
+        from migrations.administrador_usuario import preparar_administrador_usuario
+        try:
+            click.echo(json.dumps(preparar_administrador_usuario(simular=not aplicar), ensure_ascii=False))
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else "Falha ao preparar o papel de administrador.") from erro
+
     @app.cli.command("integracoes-tokens-preparar")
     def preparar_tokens():
         """Cria somente a tabela de tokens; faça backup antes em bancos existentes."""

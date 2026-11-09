@@ -1,3 +1,4 @@
+from services.build_service.prompt_build_service import criar_prompt_correcao
 import json
 
 import pytest
@@ -15,7 +16,7 @@ def test_prompt_correcao_preserva_pedido_e_informa_erro_custos_e_limites(mensage
     build = {'componentes': [{'tipo': 'ssd', 'id': 1, 'quantidade': 2}]}
     catalogo = {'ssd': [{'id': 1, 'preco': 200, 'capacidade_gb': 120}]}
     original = 'Pedido original: jogos, sem trocar peças próprias.'
-    prompt = CriarBuildService._criar_prompt_correcao(original, ValueError(mensagem), build, build,
+    prompt = criar_prompt_correcao(original, ValueError(mensagem), build, build,
                                                      catalogo, 8000, 20, 1000)
     assert prompt.startswith(original)
     dados = json.loads(prompt.splitlines()[-1])
@@ -29,7 +30,7 @@ def test_prompt_correcao_preserva_pedido_e_informa_erro_custos_e_limites(mensage
 
 
 def test_resposta_grande_nao_trunca_estrutura_json_do_diagnostico():
-    prompt = CriarBuildService._criar_prompt_correcao('Pedido', ValueError('JSON inválido'),
+    prompt = criar_prompt_correcao('Pedido', ValueError('JSON inválido'),
                                                      'x' * 30000, None, {}, 8000)
     dados = json.loads(prompt.splitlines()[-1])
     assert dados['resposta_anterior_truncada'] is True

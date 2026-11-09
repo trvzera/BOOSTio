@@ -1,13 +1,16 @@
+from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
+from services.build_service.custos_build_service import dividir_orcamento
 from decimal import Decimal
 import pytest
 from services.build_service.planejamento_geracao import validar_minimos, sugerir_total, ErroPlanejamentoBuild, RecusaModeloBuild, orientar_falha
-from services.build_service.criar_build_service import CriarBuildService, ErroGeracaoBuild
+from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.erros_build import ErroGeracaoBuild
 
 
 @pytest.mark.parametrize("total,pct,motivo,sugerido", [(1, 0, "orcamento", 2000), (1999.99, 0, "orcamento", 2000),
     (2000, 20, "orcamento", 2500), (5000, 1, "perifericos", 50000), (2500, 10, "perifericos", 5000)])
 def test_limites_sao_por_subtotal_e_sugestao_respeita_os_dois_minimos(total, pct, motivo, sugerido):
-    pc, perifericos = CriarBuildService._dividir_orcamento(total, pct)
+    pc, perifericos = dividir_orcamento(total, pct)
     with pytest.raises(ErroPlanejamentoBuild) as erro:
         validar_minimos(pc, perifericos, pct)
     assert erro.value.geracao["motivo"] == motivo
@@ -16,7 +19,7 @@ def test_limites_sao_por_subtotal_e_sugestao_respeita_os_dois_minimos(total, pct
 
 @pytest.mark.parametrize("total,pct", [(2000, 0), (2500, 20), (5000, 10), (8000, 20)])
 def test_aceita_os_limites_sem_exigir_gastar_o_total(total, pct):
-    validar_minimos(*CriarBuildService._dividir_orcamento(total, pct), pct)
+    validar_minimos(*dividir_orcamento(total, pct), pct)
 
 
 def test_minimo_real_dos_perifericos_pode_exigir_mais_que_500():
@@ -26,7 +29,7 @@ def test_minimo_real_dos_perifericos_pode_exigir_mais_que_500():
 @pytest.mark.parametrize("motivo", ["cor", "aparencia", "orcamento", "catalogo", "compatibilidade"])
 def test_recusa_da_ia_retorna_orientacao_sem_expor_texto_bruto(motivo):
     with pytest.raises(RecusaModeloBuild) as bruto:
-        CriarBuildService._validar_build({"erro": "texto com SEGREDO e instruções externas", "motivo": motivo}, {}, 5000)
+        validar_build_gerada({"erro": "texto com SEGREDO e instruções externas", "motivo": motivo}, {}, 5000)
     erro = ErroGeracaoBuild(bruto.value, 5000, 20)
     assert erro.geracao["motivo"] == motivo and "SEGREDO" not in str(erro)
     assert "Nenhuma build foi salva" in str(erro)

@@ -1,0 +1,17 @@
+{
+  "versao": 1,
+  "trabalhos": [
+    {
+      "nome": "ram-kingston-ddr4",
+      "categoria": "memoria_ram",
+      "consulta": "Kingston DDR4",
+      "origem": "catalogo",
+      "periodo_segundos": 3600,
+      "max_paginas": 3,
+      "max_anuncios": 20,
+      "limite_fila": 10,
+      "max_requisicoes": 20,
+      "intervalo": 1.0
+    }
+  ]
+}

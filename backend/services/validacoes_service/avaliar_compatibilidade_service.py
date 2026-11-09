@@ -6,7 +6,7 @@ from utils.sockets import normalizar_socket, suporte_socket_cooler
 from .encaixe_fisico import avaliar_medidas
 from .armazenamento import avaliar_armazenamento
 from .conectores import avaliar_conectores
-from .preferencias_gabinete_service import PreferenciasGabineteService
+from services.build_service.preferencias_gabinete_service import PreferenciasGabineteService
 
 
 def numero(valor):
@@ -42,11 +42,12 @@ class AvaliarCompatibilidadeService:
         regras, orientacoes = [], PreferenciasGabineteService.orientacoes(estado, itens)
         self._orientar_rede(estado, componentes, orientacoes)
 
-        def _registrar(codigo, titulo, condicao, motivo, fonte="catalogo_da_conta"):
+        def _registrar(codigo, titulo, condicao, motivo, fonte="catalogo_da_conta", detalhes=None):
             status = "nao_verificado" if condicao is None else "sem_conflitos" if condicao else "incompativel"
             mensagem = "Conflito confirmado: " + titulo + ". " + motivo if condicao is False else motivo
             regras.append({"codigo": codigo, "titulo": titulo, "status": status, "mensagem": mensagem,
                            "fonte": fonte})
+            if detalhes is not None:regras[-1]['detalhes']=detalhes
 
         def _possui_peca(tipo):
             return tipo in componentes
@@ -66,9 +67,9 @@ class AvaliarCompatibilidadeService:
         if gabinete.get("observacoes_medidas"):
             orientacoes.append({"codigo": "gabinete-condicoes", "titulo": "Condições da ficha do gabinete",
                                "mensagem": gabinete["observacoes_medidas"], "fonte": "catalogo_da_conta"})
-        if _possui_peca("processador") and cpu.get("videointegrado") is False and not _possui_peca("placa_video"):
+        if _possui_peca("processador") and cpu.get("videointegrado") is not True and not _possui_peca("placa_video"):
             faltam.append("placa_video")
-        if _possui_peca("processador") and cpu.get("cooler") is False and not _possui_peca("air_cooler") and not _possui_peca("water_cooler"):
+        if _possui_peca("processador") and cpu.get("cooler") is not True and not _possui_peca("air_cooler") and not _possui_peca("water_cooler"):
             faltam.append("cooler")
 
         self._avaliar_processador(_possui_peca, cpu, placa, _registrar)
@@ -195,20 +196,23 @@ class AvaliarCompatibilidadeService:
     @staticmethod
     def _avaliar_fonte(_possui_peca, itens, fonte, _registrar):
         if _possui_peca("fonte"):
-            internos = [(item, peca) for tipo, item, peca in itens if tipo not in ("fonte", "monitor", "teclado", "mouse", "fone", "cabo_rede", "adaptador_wifi")]
-            consumos = [numero((p or {}).get("consumo_energia")) for _, p in internos]
+            from services.build_service.planejar_potencia_service import PlanejarPotenciaService
+            plano = PlanejarPotenciaService().executar(itens)
             potencia = numero(fonte.get("potencia_w")) or None
-            minimo_conhecido = sum((consumo or 0) * item.get("quantidade", 1)
-                                  for (item, _), consumo in zip(internos, consumos))
-            consumo = minimo_conhecido if internos and all(v is not None for v in consumos) else None
+            minimo_conhecido = plano['consumo_conhecido_w']
+            consumo = plano['potencia_minima_w']
             condicao = None
             if potencia is not None:
                 if minimo_conhecido > potencia:
                     condicao = False
-                elif consumo is not None and consumo < potencia:
-                    condicao = True
+                elif consumo is not None:
+                    condicao = consumo <= potencia
             _registrar("fonte-potencia", "Consumo estimado e fonte", condicao,
-                      "A potência deve superar o consumo estimado cadastrado; essa soma não mede picos reais de carga.")
+                      "Planejamento com 20% de margem sobre consumos cadastrados e reservas de componentes auxiliares. "
+                      f"Conhecido: {minimo_conhecido:g} W; reserva: {plano['reserva_w']:g} W; "
+                      f"mínimo planejado: {str(consumo)+' W' if consumo is not None else 'não calculável com os dados disponíveis'}. "
+                      "Reservas são estimativas de planejamento, não medições nem garantia de picos reais.",
+                      fonte='politica_planejamento_energia', detalhes=plano)
             consumidores = [(t, i, p) for t, i, p in itens if t in ('placa_mae', 'placa_video', 'ssd', 'hd')]
             condicao, mensagem = avaliar_conectores(fonte, consumidores)
             _registrar("fonte-conectores", "Conectores da placa-mãe, GPU e discos", condicao, mensagem)

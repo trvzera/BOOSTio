@@ -1,3 +1,6 @@
+from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
+from services.build_service.catalogo_geracao_service import campos_pecas
+from services.build_service.prompt_build_service import criar_prompt
 from copy import deepcopy
 
 import pytest
@@ -26,7 +29,7 @@ def sugestao():
 
 def validar(sugestao, **opcoes):
     build, catalogo = deepcopy(sugestao)
-    return CriarBuildService._validar_build(build, catalogo, 5000, **opcoes)
+    return validar_build_gerada(build, catalogo, 5000, **opcoes)
 
 
 def adicionar(sugestao, tipo, **campos):
@@ -70,7 +73,7 @@ def test_geracao_sem_slots_reais_limita_dois_pentes_e_prompt_nao_inventa_especif
     ram["quantidade"] = 3
     with pytest.raises(ValueError, match="Limite provisório de RAM"):
         validar(sugestao)
-    prompt = CriarBuildService._criar_prompt({"nome": "QA", "descricao": "QA", "utilidade": "Estudos"}, 5000, 800, {})
+    prompt = criar_prompt({"nome": "QA", "descricao": "QA", "utilidade": "Estudos"}, 5000, 800, {})
     assert "limite provisoriamente" in prompt and "não uma especificação confirmada" in prompt
     assert "dois pentes (próprios + novos, incluindo todos os kits)" in prompt
 
@@ -99,7 +102,8 @@ def test_nao_bloqueia_sugestao_so_por_especificacoes_ausentes(sugestao):
         itens[0] = {k: v for k, v in itens[0].items() if k in ("id", "fabricante", "modelo", "preco")}
     # A presença obrigatória de ventilação é independente das medidas incompletas.
     sugestao[1]["gabinete"][0]["fans_inclusos"] = 1
-    assert validar(sugestao)["preco_total"] == 600
+    with pytest.raises(ValueError, match="placa_video|cooler"):
+        validar(sugestao)
 
 
 def test_valida_peca_propria_identificada_sem_inventar_dados(sugestao):
@@ -107,7 +111,10 @@ def test_valida_peca_propria_identificada_sem_inventar_dados(sugestao):
     build["componentes"] = [item for item in build["componentes"] if item["tipo"] != "processador"]
     del catalogo["processador"]
     proprias = {"processador": "Minha CPU"}
-    assert validar(sugestao, proprias=proprias)["preco_total"] == 500
+    with pytest.raises(ValueError, match="placa_video|cooler"):
+        validar(sugestao, proprias=proprias)
+    confirmadas={"processador":{"especificacoes_confirmadas":{"soquete":"AM4","videointegrado":True,"cooler":True,"consumo_energia":65}}}
+    assert validar(sugestao, proprias=proprias, detalhes_proprias=confirmadas)["preco_total"] == 500
     detalhes = {"processador": {"especificacoes_confirmadas": {"soquete": "AM5"}}}
     with pytest.raises(ValueError, match="incompatibilidades"):
         validar(sugestao, proprias=proprias, detalhes_proprias=detalhes)
@@ -134,12 +141,12 @@ def test_nao_aceita_peca_esgotada_ou_especificacoes_inventadas_pela_ia(sugestao)
 def test_prompt_recebe_os_dados_tecnicos_que_a_validacao_usa():
     from models import PlacaMae, AirCooler, Gabinete
 
-    dados = CriarBuildService._campos_pecas(PlacaMae(id=1, quantidade_slots_ram=4, quantidade_slots_m2=2))
+    dados = campos_pecas(PlacaMae(id=1, quantidade_slots_ram=4, quantidade_slots_m2=2))
     assert dados["quantidade_slots_ram"] == 4
     assert dados["quantidade_slots_m2"] == 2
-    dados = CriarBuildService._campos_pecas(AirCooler(id=2, compatibilidade="AM4, AM5"))
+    dados = campos_pecas(AirCooler(id=2, compatibilidade="AM4, AM5"))
     assert dados["compatibilidade"] == "AM4, AM5"
-    dados = CriarBuildService._campos_pecas(Gabinete(id=3, tamanho_max_gpu_mm=320, tamanho_max_cooler_mm=160))
+    dados = campos_pecas(Gabinete(id=3, tamanho_max_gpu_mm=320, tamanho_max_cooler_mm=160))
     assert dados["tamanho_max_gpu_mm"] == 320
     assert dados["tamanho_max_cooler_mm"] == 160
 
@@ -149,7 +156,7 @@ def test_geracao_completa_sete_posicoes_descontando_duas_fans_do_water(sugestao)
     catalogo["gabinete"][0].update(fans_inclusos=0, quantidade_max_fans=7,
                                  tamanhos_fan_suportados_mm=[120], suporte_water_cooler=True,
                                  radiadores_suportados_mm=[240])
-    adicionar(sugestao, "water_cooler", tamanho_radiador_mm=240, quantidade_fans=2, tamanho_fan_mm=120)
+    adicionar(sugestao, "water_cooler", compatibilidade="AM4", tamanho_radiador_mm=240, quantidade_fans=2, tamanho_fan_mm=120)
     adicionar(sugestao, "fan", tamanho_mm=120, quantidade=1)
     fan = build["componentes"][-1]
     fan["quantidade"] = 4
@@ -171,7 +178,7 @@ def test_geracao_nao_omite_fans_quando_so_gabinete_foi_selecionado(sugestao):
 
 
 def test_prompt_descreve_ventilacao_sem_inferir_tamanho_do_gabinete_ou_folga():
-    prompt = CriarBuildService._criar_prompt({"nome": "QA", "descricao": "QA", "utilidade": "Jogos"}, 5000, 800, {})
+    prompt = criar_prompt({"nome": "QA", "descricao": "QA", "utilidade": "Jogos"}, 5000, 800, {})
     assert "sete posições" in prompt and "cinco fans" in prompt
     assert "Não planeje substituir fans originais" in prompt
     assert "Não some uma folga genérica" in prompt
@@ -189,7 +196,7 @@ def test_geracao_exige_fans_mesmo_com_capacidade_desconhecida(sugestao):
 
 def test_fans_do_aio_confirmadas_nao_sao_compradas_novamente(sugestao):
     sugestao[1]["gabinete"][0].update(fans_inclusos=0, suporte_water_cooler=True)
-    adicionar(sugestao, "water_cooler", tamanho_radiador_mm=240, tamanho_fan_mm=120, quantidade_fans=2)
+    adicionar(sugestao, "water_cooler", compatibilidade="AM4", tamanho_radiador_mm=240, tamanho_fan_mm=120, quantidade_fans=2)
     assert validar(sugestao)["preco_total"] == 700
 
 

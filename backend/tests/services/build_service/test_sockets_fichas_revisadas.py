@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from models.medidas_fisicas import completar_medidas
-from services.build_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
+from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 from utils.sockets import normalizar_socket, listar_sockets, suporte_socket_cooler
 
 FIXTURES = Path(__file__).resolve().parents[4] / 'frontend/tests/fixtures'

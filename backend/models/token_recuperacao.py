@@ -18,9 +18,6 @@ class TokenRecuperacao(ModeloBase):
 
   usuario = db.relationship('Usuario', backref='tokens_recuperacao')
 
-  def marcar_como_usado(self):
-    self.usado = True
-    db.session.commit()
 
   def esta_expirado(self):
     expiracao = self.data_expiracao

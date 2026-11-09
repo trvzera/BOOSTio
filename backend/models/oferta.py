@@ -11,7 +11,7 @@ class Oferta(ModeloBase):
     loja = db.Column(db.String(20), nullable=False)
     produto_id_loja = db.Column(db.String(80), nullable=False)
     # Vazio identifica venda direta. Em marketplace, informar o ID do vendedor.
-    # Não usar NULL na identidade: índices únicos permitem vários NULLs.
+    # Metadado: a identidade única do anúncio é loja + produto_id_loja.
     vendedor_id = db.Column(db.String(80), nullable=False, default="")
     vendedor_nome = db.Column(db.String(120), nullable=True)
     # Endereço original do anúncio para consultar preço e disponibilidade.
@@ -29,84 +29,73 @@ class Oferta(ModeloBase):
     consultado_em = db.Column(db.DateTime, nullable=True)
 
     __table_args__ = (
-        db.UniqueConstraint("loja", "produto_id_loja", "vendedor_id", name="uq_oferta_loja_produto_vendedor"),
+        db.UniqueConstraint("loja", "produto_id_loja", name="uq_oferta_loja_produto"),
         db.CheckConstraint("peca_id > 0", name="ck_oferta_peca_positiva"),
         db.CheckConstraint("preco IS NULL OR preco > 0", name="ck_oferta_preco_positivo"),
         db.CheckConstraint("esgotado IS NULL OR esgotado = 1 OR preco IS NOT NULL", name="ck_oferta_disponivel_com_preco"),
+        db.Index("ix_oferta_publicacao", "tabela_peca", "peca_id", "ativa", "preco"),
         db.Index("ix_oferta_peca", "tabela_peca", "peca_id"),
         db.Index("ix_oferta_coleta", "loja", "ativa", "consultado_em"),
     )
 
     @classmethod
-    def aplicar_lote_mercado_livre(cls, peca, catalogo_id, assinatura, assinatura_catalogo, criterio, ofertas, agora, *, simular):
-        """Uma transação por peça; nunca altera preço/estoque da peça da KaBuM."""
-        from . import VinculoMercadoLivre, HistoricoOferta, ControleColeta
-        from utils.identidade_peca import assinatura_peca
-        propostas = []
-        try:
-            if not simular:
-                if not ControleColeta.bloquear():
-                    raise ValueError('Prepare o controle de coleta antes da importação')
-            db.session.refresh(peca, with_for_update=not simular)
-            if assinatura_peca(peca) != assinatura:
-                raise ValueError('A identificação da peça mudou durante a consulta')
-            vinculo = VinculoMercadoLivre.buscar(peca.__tablename__, peca.id, bloquear=not simular)
-            if vinculo and (vinculo.catalogo_id != catalogo_id or vinculo.assinatura_peca != assinatura or vinculo.assinatura_catalogo != assinatura_catalogo):
-                raise ValueError('Vínculo existente divergente; revisão necessária')
-            consulta_vinculo = VinculoMercadoLivre.query.filter_by(catalogo_id=catalogo_id)
-            ocupante = (consulta_vinculo.populate_existing().with_for_update() if not simular else consulta_vinculo).first()
-            if ocupante and (ocupante.tabela_peca, ocupante.peca_id) != (peca.__tablename__, peca.id):
-                raise ValueError('Catálogo já associado a outra peça')
-            consulta_ofertas = cls.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id, loja='mercado_livre')
-            existentes = (consulta_ofertas.populate_existing().with_for_update() if not simular else consulta_ofertas).all()
-            selecionadas = set()
-            if not simular and vinculo is None:
-                db.session.add(VinculoMercadoLivre(tabela_peca=peca.__tablename__, peca_id=peca.id,
-                    catalogo_id=catalogo_id, assinatura_peca=assinatura, assinatura_catalogo=assinatura_catalogo, criterio=criterio))
-            for dados in ofertas:
-                anuncio, vendedor = dados['produto_id_loja'], dados['vendedor_id']
-                identidade = (anuncio, vendedor)
-                selecionadas.add(identidade)
-                consulta_anuncio = cls.query.filter_by(loja='mercado_livre', produto_id_loja=anuncio, vendedor_id=vendedor)
-                registro = (consulta_anuncio.populate_existing().with_for_update() if not simular else consulta_anuncio).first()
-                if registro and (registro.tabela_peca, registro.peca_id) != (peca.__tablename__, peca.id):
-                    raise ValueError('Anúncio já vinculado a outra peça')
-                acao = 'criada' if registro is None else 'atualizada' if (
-                    registro.preco != dados['preco'] or not registro.ativa or registro.url != dados['url']) else 'inalterada'
-                ultimo = HistoricoOferta.ultimo(registro.id, bloquear=not simular) if registro else None
-                registrar_historico = ultimo is None or ultimo.preco != dados['preco'] or ultimo.esgotado is not None or ultimo.coletado_em.date() != agora.date()
-                propostas.append({'anuncio': anuncio, 'vendedor': vendedor, 'preco': str(dados['preco']), 'acao': acao, 'historico': registrar_historico})
-                if simular:
-                    continue
-                if registro is None:
-                    registro = cls(tabela_peca=peca.__tablename__, peca_id=peca.id, loja='mercado_livre',
-                                   produto_id_loja=anuncio, vendedor_id=vendedor, url=dados['url'])
-                    db.session.add(registro)
-                mudou = registro.preco != dados['preco']
-                registro.preco = dados['preco']
-                registro.url = dados['url']
-                registro.esgotado = None
-                registro.ativa = True
-                registro.consultado_em = agora
-                if mudou:
-                    registro.preco_atualizado_em = agora
-                # url_afiliado e nome do vendedor cadastrados manualmente são preservados.
-                db.session.flush()
-                if registrar_historico:
-                    db.session.add(HistoricoOferta(oferta_id=registro.id, preco=registro.preco, esgotado=None, coletado_em=agora))
-            # Fora das cinco selecionadas não significa esgotado; apenas sai da seleção ativa.
-            for registro in existentes:
-                if registro.ativa and (registro.produto_id_loja, registro.vendedor_id) not in selecionadas:
-                    propostas.append({'anuncio': registro.produto_id_loja, 'acao': 'desativada'})
-                    if not simular:
-                        registro.ativa = False
-            if not simular:
-                db.session.commit()
-            return propostas
-        except Exception:
-            if not simular:
-                db.session.rollback()
-            raise
+    def corresponde_origem(cls, peca, loja, identificador, *, bloquear=False):
+        consulta = cls.query.filter_by(loja=loja, produto_id_loja=identificador)
+        registro = (consulta.with_for_update() if bloquear else consulta).first()
+        return bool(registro and (registro.tabela_peca, registro.peca_id) == (peca.__tablename__, peca.id))
+
+    @classmethod
+    def identidades_kabum_ambiguas(cls):
+        from sqlalchemy import inspect
+        from collections import defaultdict
+        from services.peca_service.modelos_pecas import MODELOS_PECAS
+        from .medidas_fisicas import produto_kabum
+        import re
+        encontrados = defaultdict(set)
+        inspetor = inspect(db.engine)
+        if not inspetor.has_table(cls.__tablename__) or not set(cls.__table__.columns.keys()) <= {
+                c['name'] for c in inspetor.get_columns(cls.__tablename__)}:
+            raise ValueError('Prepare as tabelas com catalogo-preparar antes de separar identificadores')
+        for modelo in MODELOS_PECAS:
+            if not inspetor.has_table(modelo.__tablename__):
+                continue
+            for ident, link, referencia, numero in modelo.query.with_entities(
+                    modelo.id, modelo.kabum_external, modelo.referencia_interna, modelo.part_number).all():
+                legado = re.fullmatch(r'KABUM-([1-9][0-9]*)', referencia or numero or '', re.I)
+                codigo = produto_kabum(link) or (legado[1] if legado else None)
+                if codigo:
+                    encontrados[codigo].add((modelo.__tablename__, ident))
+        return {codigo for codigo, pecas in encontrados.items() if len(pecas) > 1}
+
+    @classmethod
+    def registrar_identidade_kabum(cls, peca, *, simular=False, ids_ambiguos=None):
+        """Registra o ID real do anúncio. Não inventa cotação nem estoque da seed."""
+        from .medidas_fisicas import produto_kabum
+        import re
+        referencia = peca.referencia_interna or peca.part_number or ''
+        legado = re.fullmatch(r'KABUM-([1-9][0-9]*)', referencia, re.I)
+        identificador = produto_kabum(peca.kabum_external)
+        if legado and identificador and legado[1] != identificador:
+            raise ValueError('ID KaBuM diverge do link; exige revisão')
+        identificador = identificador or (legado[1] if legado else None)
+        if identificador is None:
+            return 'sem_anuncio'
+        atual = cls.query.filter_by(loja='kabum', produto_id_loja=identificador).with_for_update().first()
+        if atual:
+            if (atual.tabela_peca, atual.peca_id) != (peca.__tablename__, peca.id):
+                raise ValueError('Anúncio KaBuM já pertence a outra peça')
+            return 'inalterada'
+        if ids_ambiguos is not None and identificador in ids_ambiguos:
+            raise ValueError('Mais de uma peça referencia o mesmo anúncio KaBuM; revisar duplicidade')
+        if simular:
+            return 'criada'
+        cls_url = peca.kabum_external if produto_kabum(peca.kabum_external) else f'https://www.kabum.com.br/produto/{identificador}'
+        db.session.add(cls(tabela_peca=peca.__tablename__, peca_id=peca.id, loja='kabum',
+            produto_id_loja=identificador, vendedor_id='', url=cls_url,
+            preco=None, esgotado=None, preco_atualizado_em=None, consultado_em=None))
+        db.session.flush()
+        return 'criada'
+
 
     @classmethod
     def verificar_esquema_mercado_livre(cls):
@@ -117,6 +106,8 @@ class Oferta(ModeloBase):
             if not inspetor.has_table(modelo.__tablename__):
                 raise ValueError('Prepare as tabelas com integracoes-tokens-preparar e mercadolivre-ofertas-preparar')
             colunas = {c['name'] for c in inspetor.get_columns(modelo.__tablename__)}
+            if modelo is VinculoMercadoLivre and colunas == {c.name for c in modelo.__table__.columns} - {'especificacoes_revisadas'}:
+                raise ValueError('Execute mercadolivre-vinculos-preparar antes de coletar ofertas')
             if colunas != {c.name for c in modelo.__table__.columns}:
                 raise ValueError('Esquema de ofertas/tokens incompatível; revise as migrations')
         if db.session.get(ControleColeta, 1) is None:
@@ -128,12 +119,16 @@ class Oferta(ModeloBase):
         from . import VinculoMercadoLivre
         from utils.identidade_peca import assinatura_campos
         # Leitura opcional: catálogo anterior continua funcionando antes da migration.
-        if not pecas or not all(inspect(db.engine).has_table(t) for t in (cls.__tablename__, VinculoMercadoLivre.__tablename__)):
+        if not pecas or not inspect(db.engine).has_table(cls.__tablename__):
             return pecas
         referencias = []
         for peca in pecas:
             tipo, identificador = str(peca.get('id', '')).rsplit(':', 1)
             referencias.append((tipo, int(identificador)))
+            peca.setdefault('ofertas', [])
+        cls._anexar_kabum(pecas, referencias)
+        if not inspect(db.engine).has_table(VinculoMercadoLivre.__tablename__) or not VinculoMercadoLivre.tabela_preparada():
+            return pecas
         registros = db.session.query(cls, VinculoMercadoLivre).join(VinculoMercadoLivre, and_(
             VinculoMercadoLivre.tabela_peca == cls.tabela_peca, VinculoMercadoLivre.peca_id == cls.peca_id)).filter(cls.loja == 'mercado_livre', cls.ativa.is_(True),
             tuple_(cls.tabela_peca, cls.peca_id).in_(referencias)).order_by(cls.preco.asc(), cls.id.asc()).all()
@@ -143,43 +138,86 @@ class Oferta(ModeloBase):
             ficha = fichas[(registro.tabela_peca, registro.peca_id)]
             assinatura = assinatura_campos(registro.tabela_peca, registro.peca_id,
                 ficha.get('fabricante'), ficha.get('modelo'), ficha.get('part_number'))
-            if vinculo.assinatura_peca != assinatura:
+            from types import SimpleNamespace
+            if vinculo.assinatura_peca != assinatura or not vinculo.especificacoes_compativeis(SimpleNamespace(**ficha)):
                 continue
             dados = registro.para_exibicao()
             if dados is not None:
                 por_peca.setdefault((registro.tabela_peca, registro.peca_id), []).append(dados)
         for peca, referencia in zip(pecas, referencias):
             peca['ofertas'] = [*peca.get('ofertas', []), *por_peca.get(referencia, [])]
+        from services.peca_service.modelos_pecas import MODELOS_PECAS
+        modelos = {m.__tablename__: m for m in MODELOS_PECAS}
+        for oferta in cls.query.filter(cls.loja == 'shopee', cls.ativa.is_(True),
+                tuple_(cls.tabela_peca, cls.peca_id).in_(referencias)).order_by(cls.preco, cls.id).all():
+            modelo = modelos.get(oferta.tabela_peca)
+            peca = modelo.buscar_por_id(oferta.peca_id) if modelo else None
+            dados = oferta.para_exibicao()
+            if peca and dados and oferta.shopee_validada(peca):
+                fichas[(oferta.tabela_peca, oferta.peca_id)]['ofertas'].append(dados)
         return pecas
+
+    @classmethod
+    def _anexar_kabum(cls, pecas, referencias):
+        from sqlalchemy import tuple_
+        fichas = dict(zip(referencias, pecas))
+        for oferta in cls.query.filter(cls.loja == 'kabum', cls.ativa.is_(True),
+                tuple_(cls.tabela_peca, cls.peca_id).in_(referencias)).order_by(cls.id).all():
+            dados = oferta.para_exibicao()
+            if dados is not None:
+                fichas[(oferta.tabela_peca, oferta.peca_id)]['ofertas'].append(dados)
 
     @classmethod
     def buscar_para_peca(cls, oferta_id, categoria, peca_id):
         return cls.query.filter_by(id=oferta_id, tabela_peca=categoria, peca_id=peca_id,
-                                   loja='mercado_livre', ativa=True).first()
+                                   ativa=True).filter(cls.loja.in_(('mercado_livre', 'shopee'))).first()
+
+    def shopee_validada(self, peca):
+        from . import ProdutoPendente
+        from utils.identidade_peca import assinatura_peca, assinatura_tecnica
+        p = ProdutoPendente.buscar_por_anuncio('shopee', self.produto_id_loja)
+        prova = (p.evidencias or {}).get('vinculo', {}) if p else {}
+        return bool(p and p.status == 'importado' and p.oferta_id == self.id
+                    and prova.get('assinatura_peca') == assinatura_peca(peca)
+                    and prova.get('assinatura_tecnica') == assinatura_tecnica(peca))
 
     def para_exibicao(self):
         from datetime import timezone
         from urllib.parse import urlsplit
         import re
-        if self.preco is None or self.preco <= 0 or self.consultado_em is None:
+        coleta = self.preco_atualizado_em if self.loja == 'kabum' else self.consultado_em
+        if self.preco is None or self.preco <= 0 or coleta is None:
             return None
         try:
             url = urlsplit(self.url)
-            if (url.scheme != 'https' or url.hostname != 'produto.mercadolivre.com.br'
+            if self.loja == 'kabum':
+                from .medidas_fisicas import produto_kabum
+                if produto_kabum(self.url) != self.produto_id_loja:
+                    return None
+                url_compra = self.url
+            elif self.loja == 'shopee':
+                from services.shopee_service.normalizar_produto_service import validar_url_shopee
+                if (not validar_url_shopee(self.url) or
+                        url.path != '/product/' + self.produto_id_loja.replace(':', '/')):
+                    return None
+                url_compra = self.url_afiliado if validar_url_shopee(self.url_afiliado, afiliado=True) else self.url
+            elif (url.scheme != 'https' or url.hostname != 'produto.mercadolivre.com.br'
                 or url.username or url.password or url.port not in (None, 443)):
                 return None
-            codigo = re.match(r'^/MLB-(\d+)(?:-|/|$)', url.path)
-            if not codigo or 'MLB' + codigo[1] != self.produto_id_loja:
-                return None
-            afiliado = urlsplit(self.url_afiliado or '')
-            url_compra = self.url
-            if (afiliado.scheme == 'https' and afiliado.hostname in
-                {'mercadolivre.com.br', 'www.mercadolivre.com.br', 'produto.mercadolivre.com.br'}
-                and not afiliado.username and not afiliado.password and afiliado.port in (None, 443)):
-                url_compra = self.url_afiliado
+            else:
+                codigo = re.match(r'^/MLB-(\d+)(?:-|/|$)', url.path)
+                if not codigo or 'MLB' + codigo[1] != self.produto_id_loja:
+                    return None
+                afiliado = urlsplit(self.url_afiliado or '')
+                url_compra = self.url
+                if (afiliado.scheme == 'https' and afiliado.hostname in
+                    {'mercadolivre.com.br', 'www.mercadolivre.com.br', 'produto.mercadolivre.com.br'}
+                    and not afiliado.username and not afiliado.password and afiliado.port in (None, 443)):
+                    url_compra = self.url_afiliado
         except ValueError:
             return None
         return {'id': self.id, 'loja': self.loja, 'produto_id_loja': self.produto_id_loja,
                 'vendedor_id': self.vendedor_id, 'vendedor_nome': self.vendedor_nome,
-                'url': url_compra, 'preco': float(self.preco), 'esgotado': self.esgotado,
-                'atualizadoEm': self.consultado_em.replace(tzinfo=timezone.utc).isoformat(timespec='seconds')}
+                'url': url_compra, 'preco': float(self.preco),
+                'esgotado': bool(self.esgotado) if self.loja == 'kabum' else self.esgotado,
+                'atualizadoEm': coleta.replace(tzinfo=timezone.utc).isoformat(timespec='seconds')}

@@ -1,5 +1,5 @@
 from models import BuildSalva
-from .avaliar_compatibilidade_service import AvaliarCompatibilidadeService
+from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
 
 class BuscarBuildService:

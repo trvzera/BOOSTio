@@ -7,12 +7,14 @@ from sqlalchemy import inspect
 from models import db
 from migrations.budget_usuario import migrar_budget
 from migrations.google_usuario import migrar_google_usuario
+from migrations.administrador_usuario import preparar_administrador_usuario
 from migrations.sessao_usuario import migrar_sessao_usuario
 from migrations.tokens_recuperacao import migrar_tokens_recuperacao
 from migrations.imagens_pecas import migrar_imagens_pecas
 from migrations.rede_build import migrar_rede_build
 from migrations.codigos_email import migrar_codigos_email
 from migrations.benchmarks_pecas import migrar_benchmarks_pecas
+from migrations.catalogo_automatizado import preparar_catalogo_automatizado
 from services.peca_service.migrar_links_service import MigrarLinksService
 
 
@@ -32,11 +34,13 @@ class PrepararBancoService:
       migrar_budget(caminho)
     migrar_google_usuario()
     migrar_sessao_usuario()
+    preparar_administrador_usuario(simular=False)
     migrar_tokens_recuperacao()
     migrar_imagens_pecas()
     migrar_rede_build()
     migrar_codigos_email()
     migrar_benchmarks_pecas()
+    preparar_catalogo_automatizado(simular=False)
     MigrarLinksService().executar()
     return {"backup": backup, "mensagem": "Banco preparado"}
 

@@ -1,0 +1,514 @@
+import time
+from datetime import datetime
+from decimal import Decimal
+
+import pytest
+from flask import Flask
+from flask_login import LoginManager
+
+from controllers.admin_controller import admin_bp
+from models import db, Usuario, Processador, ProdutoPendente, Oferta, ControleColeta
+from services.shopee_service.normalizar_produto_service import NormalizarProdutoShopeeService
+from unittest.mock import Mock
+from models import HD, HistoricoOferta, VinculoMercadoLivre
+from services.mercadolivre_service.buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
+from services.mercadolivre_service.controle_requisicoes_service import ErroMercadoLivre
+from services.mercadolivre_service.importar_produto_service import ImportarProdutoService
+from dataclasses import asdict
+
+AGORA = int(time.time())
+
+
+def anuncio(item, shop, titulo, preco='900.00'):
+    return dict(itemId=str(item), shopId=str(shop), productName=titulo, priceMin=preco, priceMax=preco,
+                productLink=f'https://shopee.com.br/product/{shop}/{item}', offerLink=None, productCatIds=[101950],
+                periodStartTime=AGORA - 3600, periodEndTime=AGORA + 3600)
+
+
+@pytest.fixture
+def banco():
+    app = Flask(__name__)
+    app.config.update(SECRET_KEY='teste', SQLALCHEMY_DATABASE_URI='sqlite:///:memory:')
+    db.init_app(app)
+    login = LoginManager(app)
+    login.user_loader(lambda ident: Usuario.buscar_por_sessao(ident))
+    app.register_blueprint(admin_bp)
+    with app.app_context():
+        db.create_all()
+        ControleColeta.inicializar()
+        admin = Usuario(nome='Admin', email='admin@teste.com', senha='x', verificado=True, administrador=True)
+        comum = Usuario(nome='Comum', email='comum@teste.com', senha='x', verificado=True)
+        p5500 = Processador(fabricante='AMD', modelo='Ryzen 5 5500', soquete='AM4', nucleo=6, thread=12, clockbase=3.6,
+                            clockmax=4.2, consumo_energia=65, status_validacao='aprovado')
+        p5600 = Processador(fabricante='AMD', modelo='Ryzen 5 5600', soquete='AM4', nucleo=6, thread=12, clockbase=3.5,
+                            clockmax=4.4, consumo_energia=65, status_validacao='aprovado')
+        db.session.add_all([admin, comum, p5500, p5600])
+        db.session.commit()
+        yield app, admin, comum, p5500, p5600
+        db.session.remove()
+        db.engine.dispose()
+
+
+def entrar(app, usuario):
+    cliente = app.test_client()
+    with cliente.session_transaction() as sessao:
+        sessao['_user_id'] = usuario.get_id()
+        sessao['_fresh'] = True
+    return cliente
+
+
+def pendencia(p5500, p5600, loja='shopee', item=1, conflito_5600=False, **extras):
+    bruto = anuncio(item, 10, 'Processador AMD Ryzen 5 AM4 6 Núcleos 12 Threads')
+    produto, _ = NormalizarProdutoShopeeService().executar(bruto, 'processador')
+    candidatos = [dict(peca=f'processador:{p5500.id}', percentual=75, conflitos=[], pendencias=['modelo_exato_nao_comprovado']),
+                  dict(peca=f'processador:{p5600.id}', percentual=70, conflitos=['modelo_ou_sufixo_divergente'] if conflito_5600 else [],
+                       pendencias=[])]
+    p = ProdutoPendente(loja=loja, produto_id_loja=f'10:{item}', vendedor_id='10', titulo=produto.titulo, url=produto.fonte,
+                        categoria_sugerida='processador', dados_originais={'normalizado': asdict(produto), 'anuncio': bruto},
+                        candidatos=candidatos, status='em_revisao', motivo='Matching ambigua',
+                        coletado_em=datetime(2026, 11, 7), **extras)
+    db.session.add(p)
+    db.session.commit()
+    return p
+
+
+def test_exige_login(banco):
+    app, *_ = banco
+    assert app.test_client().get('/admin/pendencias').status_code == 401
+    assert app.test_client().post('/admin/pendencias/1/rejeitar').status_code == 401
+
+
+def test_conta_comum_recebe_403_e_administrador_acessa(banco):
+    app, admin, comum, *_ = banco
+    comum_logado = entrar(app, comum)
+    r = comum_logado.get('/admin/pendencias')
+    assert r.status_code == 403 and r.get_json()['codigo'] == 'sem-permissao'
+    assert comum_logado.get('/admin/pendencias/1').status_code == 403
+    assert comum_logado.post('/admin/pendencias/1/rejeitar').status_code == 403
+    assert comum_logado.post('/admin/pendencias/1/aceitar', json={'peca': 'processador:1'}).status_code == 403
+
+
+def test_administrador_acessa(banco):
+    app, admin, *_ = banco
+    assert entrar(app, admin).get('/admin/pendencias').status_code == 200
+
+
+def test_lista_filtra_e_pagina(banco):
+    app, admin, _, p5500, p5600 = banco
+    for i in range(1, 4):
+        pendencia(p5500, p5600, item=i)
+    pendencia(p5500, p5600, loja='mercado_livre', item=9)
+    cliente = entrar(app, admin)
+    d = cliente.get('/admin/pendencias?limite=2').get_json()
+    assert d['total'] == 4 and len(d['pendencias']) == 2 and d['proximo'] == d['pendencias'][-1]['id']
+    assert d['por_status'] == {'em_revisao': 4} and 'shopee' in d['lojas']
+    assert [p['loja'] for p in cliente.get('/admin/pendencias?loja=mercado_livre').get_json()['pendencias']] == ['mercado_livre']
+    assert cliente.get('/admin/pendencias?status=importado').get_json()['total'] == 0
+    primeiro = d['pendencias'][0]
+    assert primeiro['preco'] == {'minimo': 900.0, 'maximo': 900.0} and primeiro['total_candidatos'] == 2
+    for ruim in ('status=x', 'loja=x', 'categoria=x', 'limite=0', 'limite=101', 'depois_id=-1', 'limite=abc'):
+        assert cliente.get('/admin/pendencias?' + ruim).status_code == 400
+
+
+def test_pendencia_so_com_peca_nao_aprovada_fica_fora_do_painel(banco):
+    app, admin, _, p5500, p5600 = banco
+    p = pendencia(p5500, p5600, item=1)
+    pendencia(p5500, p5600, item=2)
+    p5500.status_validacao = p5600.status_validacao = 'em_revisao'
+    db.session.commit()
+    cliente = entrar(app, admin)
+    d = cliente.get('/admin/pendencias').get_json()
+    assert d['total'] == 0 and d['pendencias'] == [] and d['por_status'] == {}
+    p5600.status_validacao = 'aprovado'
+    db.session.commit()
+    d = cliente.get('/admin/pendencias').get_json()
+    assert d['total'] == 2 and d['por_status'] == {'em_revisao': 2}
+
+
+def test_descartar_candidato_tira_so_aquela_peca_e_nao_volta_no_matching(banco):
+    app, admin, _, p5500, p5600 = banco
+    p = pendencia(p5500, p5600)
+    cliente = entrar(app, admin)
+    r = cliente.post(f'/admin/pendencias/{p.id}/candidatos/descartar', json={'peca': f'processador:{p5600.id}'})
+    assert r.status_code == 200
+    assert [c['peca'] for c in r.get_json()['candidatos']] == [f'processador:{p5500.id}']
+    assert cliente.post(f'/admin/pendencias/{p.id}/candidatos/descartar', json={'peca': f'processador:{p5600.id}'}).status_code == 400
+    assert cliente.post(f'/admin/pendencias/{p.id}/candidatos/descartar', json={}).status_code == 400
+    assert cliente.post('/admin/pendencias/999/candidatos/descartar', json={'peca': 'x'}).status_code == 404
+    decisao = {'classificacao': 'ambigua', 'candidatos': [dict(peca=f'processador:{p5500.id}'), dict(peca=f'processador:{p5600.id}')]}
+    from utils.identidade_peca import assinatura_documento
+    ProdutoPendente.registrar_matching(p.id, decisao, assinatura_documento(p.dados_originais), simular=False)
+    db.session.refresh(p)
+    assert [c['peca'] for c in p.candidatos] == [f'processador:{p5500.id}']
+    assert p.evidencias['descartados'][0]['peca'] == f'processador:{p5600.id}'
+
+
+def test_detalhe_mostra_candidatos_com_nome_da_peca(banco):
+    app, admin, _, p5500, p5600 = banco
+    p = pendencia(p5500, p5600)
+    cliente = entrar(app, admin)
+    d = cliente.get(f'/admin/pendencias/{p.id}').get_json()
+    assert [(c['modelo'], c['percentual']) for c in d['candidatos']] == [('Ryzen 5 5500', 75), ('Ryzen 5 5600', 70)]
+    assert cliente.get('/admin/pendencias/999').status_code == 404
+
+
+def test_aceitar_grava_oferta_pelo_caminho_seguro_e_fecha_a_pendencia(banco):
+    app, admin, _, p5500, p5600 = banco
+    p = pendencia(p5500, p5600)
+    cliente = entrar(app, admin)
+    r = cliente.post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'processador:{p5500.id}'})
+    assert r.status_code == 200, r.get_json()
+    oferta = Oferta.query.filter_by(loja='shopee').one()
+    assert (oferta.tabela_peca, oferta.peca_id, oferta.produto_id_loja) == ('processador', p5500.id, '10:1')
+    assert oferta.preco == Decimal('900.00') and oferta.para_exibicao() is not None
+    db.session.refresh(p)
+    assert p.status == 'importado' and p.oferta_id == oferta.id
+    assert p.evidencias['revisao_manual']['administrador_id'] == admin.id and p.evidencias['revisao_manual']['acao'] == 'aceitar'
+    assert cliente.post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'processador:{p5500.id}'}).status_code == 409
+
+
+def test_aceitar_recusa_peca_fora_dos_candidatos_ou_com_conflito(banco):
+    app, admin, _, p5500, p5600 = banco
+    p = pendencia(p5500, p5600, conflito_5600=True)
+    cliente = entrar(app, admin)
+    for corpo in ({}, {'peca': 'processador:999'}, {'peca': f'processador:{p5600.id}'}, {'peca': 5}):
+        assert cliente.post(f'/admin/pendencias/{p.id}/aceitar', json=corpo).status_code == 400
+    assert Oferta.query.count() == 0 and ProdutoPendente.query.filter_by(status='em_revisao').count() == 1
+
+
+def test_aceitar_nao_rouba_anuncio_de_outra_peca(banco):
+    app, admin, _, p5500, p5600 = banco
+    p = pendencia(p5500, p5600)
+    db.session.add(Oferta(tabela_peca='processador', peca_id=p5600.id, loja='shopee', produto_id_loja='10:1',
+                          vendedor_id='10', url='https://shopee.com.br/product/10/1', preco=Decimal('500')))
+    db.session.commit()
+    r = entrar(app, admin).post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'processador:{p5500.id}'})
+    assert r.status_code == 400 and Oferta.query.filter_by(peca_id=p5500.id).count() == 0
+    db.session.refresh(p)
+    assert p.status == 'em_revisao'
+
+
+def test_rejeitar_registra_quem_decidiu_e_nao_reabre(banco):
+    app, admin, _, p5500, p5600 = banco
+    p = pendencia(p5500, p5600)
+    cliente = entrar(app, admin)
+    r = cliente.post(f'/admin/pendencias/{p.id}/rejeitar', json={'motivo': 'Outro produto'})
+    assert r.status_code == 200 and r.get_json()['status'] == 'rejeitado' and r.get_json()['motivo'] == 'Outro produto'
+    db.session.refresh(p)
+    assert p.evidencias['revisao_manual']['administrador_id'] == admin.id and p.revisado_em is not None
+    assert cliente.post(f'/admin/pendencias/{p.id}/rejeitar').status_code == 400
+    assert cliente.post('/admin/pendencias/999/rejeitar').status_code == 404
+    outra = pendencia(p5500, p5600, item=2)
+    assert cliente.post(f'/admin/pendencias/{outra.id}/rejeitar', json={'motivo': 'x' * 201}).status_code == 400
+    assert cliente.post(f'/admin/pendencias/{outra.id}/rejeitar').get_json()['motivo'] == 'Rejeitada por um administrador'
+
+
+PRODUTO_ML = dict(id='MLB99', name='Seagate Exos 8TB', status='active', domain_id='MLB-HARD_DRIVES_AND_SSDS', attributes=[
+    dict(id=k, value_name=v) for k, v in [('BRAND', 'Seagate'), ('MODEL', 'ST8000NM017B'), ('MPN', 'ST8000NM017B'),
+                                          ('CAPACITY', '8 TB'), ('DRIVE_STORAGE_TYPE', 'HDD')]])
+
+
+def importador_ml(monkeypatch, erro=None):
+    """Mercado Livre simulado: catálogo MLB99 com a oferta nova MLB10 do vendedor 7."""
+    cliente = BuscarOfertasMercadoLivreService()
+    cliente._consultar = Mock(side_effect=erro) if erro else Mock(return_value=PRODUTO_ML)
+    bruto = dict(item_id='MLB10', seller_id=7, site_id='MLB', currency_id='BRL', price=999.90, condition='new', available_quantity=3)
+    cliente.executar = Mock(return_value={'ofertas': [cliente._normalizar(bruto, 'MLB99')]})
+    tokens = Mock()
+    tokens.executar.return_value = 'teste'
+    monkeypatch.setattr('services.admin_service.aceitar_pendencia_service.ImportarProdutoService',
+                        lambda **_: ImportarProdutoService(cliente=cliente, tokens=tokens))
+    return cliente
+
+
+def pendencia_ml(candidatos, loja='mercado_livre'):
+    p = ProdutoPendente(loja=loja, produto_id_loja='MLB10', vendedor_id='7', titulo='Seagate Exos 8TB',
+                        url='https://produto.mercadolivre.com.br/MLB-10-_JM', categoria_sugerida='hd',
+                        coletado_em=datetime(2026, 11, 7), status='em_revisao', motivo='Matching ambigua',
+                        dados_originais={'catalogo': {'id': 'MLB99'}, 'anuncio': {'price': 1, 'available_quantity': 1}},
+                        candidatos=candidatos)
+    db.session.add(p)
+    db.session.commit()
+    return p
+
+
+def hd(**extras):
+    h = HD(**{**dict(fabricante='Seagate', modelo='Exos 8TB', part_number='ST8000NM017B', consumo_energia=7,
+                     capacidade_gb=8000, status_validacao='aprovado'), **extras})
+    db.session.add(h)
+    db.session.commit()
+    return h
+
+
+def test_aceitar_mercado_livre_cria_vinculo_oferta_e_historico_pelo_caminho_seguro(banco, monkeypatch):
+    app, admin, *_ = banco
+    disco = hd()
+    p = pendencia_ml([dict(peca=f'hd:{disco.id}', percentual=72, conflitos=[], pendencias=['modelo_exato_nao_comprovado'])])
+    cliente_ml = importador_ml(monkeypatch)
+    r = entrar(app, admin).post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{disco.id}'})
+    assert r.status_code == 200, r.get_json()
+    oferta = Oferta.query.filter_by(loja='mercado_livre').one()
+    assert (oferta.tabela_peca, oferta.peca_id, oferta.produto_id_loja, oferta.vendedor_id) == ('hd', disco.id, 'MLB10', '7')
+    assert oferta.preco == Decimal('999.90') and HistoricoOferta.query.count() == 1
+    vinculo = VinculoMercadoLivre.query.one()
+    assert (vinculo.catalogo_id, vinculo.peca_id, vinculo.criterio) == ('MLB99', disco.id, 'revisao_manual')
+    db.session.refresh(p)
+    assert p.status == 'importado' and p.oferta_id == oferta.id
+    assert p.evidencias['revisao_manual']['administrador_id'] == admin.id and p.motivo.startswith('Associação aprovada')
+    assert cliente_ml._consultar.call_count == 1  # o anúncio é reconsultado, e só aqui
+    assert entrar(app, admin).post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{disco.id}'}).status_code == 409
+
+
+def test_aceitar_mercado_livre_recusa_conflito_peca_mudada_e_catalogo_de_outra_peca(banco, monkeypatch):
+    app, admin, *_ = banco
+    disco, outro = hd(), hd(part_number='ST8000NM0000', modelo='Exos 8TB X')
+    p = pendencia_ml([dict(peca=f'hd:{disco.id}', percentual=72, conflitos=[], pendencias=[]),
+                      dict(peca=f'hd:{outro.id}', percentual=70, conflitos=['marca_divergente'], pendencias=[])])
+    importador_ml(monkeypatch)
+    cliente = entrar(app, admin)
+    assert cliente.post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{outro.id}'}).status_code == 400
+    db.session.add(VinculoMercadoLivre(tabela_peca='hd', peca_id=outro.id, catalogo_id='MLB99', assinatura_peca='a' * 64,
+                                       assinatura_catalogo='b' * 64, criterio='revisado'))
+    db.session.commit()
+    r = cliente.post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{disco.id}'})
+    assert r.status_code == 400 and Oferta.query.count() == 0
+    db.session.refresh(p)
+    assert p.status == 'em_revisao'
+
+
+def test_aceitar_mercado_livre_fora_do_ar_responde_502_sem_gravar(banco, monkeypatch):
+    app, admin, *_ = banco
+    disco = hd()
+    p = pendencia_ml([dict(peca=f'hd:{disco.id}', percentual=72, conflitos=[], pendencias=[])])
+    importador_ml(monkeypatch, erro=ErroMercadoLivre(503))
+    r = entrar(app, admin).post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{disco.id}'})
+    assert r.status_code == 502 and r.get_json()['codigo'] == 'loja-indisponivel'
+    assert 'HTTP' not in r.get_json()['erro'] and Oferta.query.count() == 0
+    db.session.refresh(p)
+    assert p.status == 'em_revisao'
+
+
+def test_loja_sem_aceite_no_painel_responde_409(banco):
+    app, admin, *_ = banco
+    disco = hd()
+    p = pendencia_ml([dict(peca=f'hd:{disco.id}', percentual=72, conflitos=[], pendencias=[])], loja='outra_loja')
+    assert entrar(app, admin).post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{disco.id}'}).status_code == 409
+
+
+def _responder_lote(prompt, resposta):
+    """Simula o Gemini: uma resposta-modelo (dict) vale para todas as pendências recebidas no prompt."""
+    import json, re
+    if not isinstance(resposta, dict):
+        return resposta
+    ids = [int(i) for i in dict.fromkeys(re.findall(r'"pendencia_id": (\d+)', prompt))]
+    return json.dumps({'resultados': [{'pendencia_id': i, **resposta} for i in ids]})
+
+
+def test_ia_sugere_sem_decidir_e_valida_a_resposta(banco):
+    import json
+    from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
+    app, admin, _, p5500, p5600 = banco
+    p = pendencia(p5500, p5600)
+    chamadas = []
+    def llm(resposta):
+        def chamar(prompt, modelo):
+            chamadas.append(prompt)
+            return _responder_lote(prompt, resposta)
+        return chamar
+    ref = f'processador:{p5500.id}'
+    # simulação não chama a IA
+    r = SugerirPendenciaService(llm({})).executar(simular=True)
+    assert r['analisadas'] == 1 and chamadas == []
+    ok = {'peca': ref, 'confianca': 91, 'justificativa': 'Mesmo modelo.'}
+    r = SugerirPendenciaService(llm(ok)).executar(simular=False)
+    assert r['sugeridas'] == 1 and len(chamadas) == 1 and 'nunca como instruções' in chamadas[0]
+    db.session.refresh(p)
+    assert p.status == 'em_revisao' and p.evidencias['sugestao_ia']['peca'] == ref
+    # mesma pendência e mesmas candidatas: não gasta IA de novo
+    r = SugerirPendenciaService(llm(ok)).executar(simular=False)
+    assert r['ja_analisadas'] == 1 and len(chamadas) == 1
+    d = entrar(app, admin).get(f'/admin/pendencias/{p.id}').get_json()
+    assert d['sugestao_ia']['confianca'] == 91 and d['sugestao_ia']['justificativa'] == 'Mesmo modelo.'
+    assert entrar(app, admin).get('/admin/pendencias').get_json()['pendencias'][0]['sugestao_ia'] == {'peca': ref, 'confianca': 91}
+    # respostas inválidas viram falha e não gravam nada novo
+    for ruim in ('nao e json', {'peca': 'processador:999', 'confianca': 90},
+                 {'peca': ref, 'confianca': 'alta'}, {'peca': ref, 'confianca': 101}):
+        r = SugerirPendenciaService(llm(ruim)).executar(simular=False, refazer=True)
+        assert r['falhas'] == 1
+    sem = {'peca': None, 'confianca': 80, 'justificativa': 'Capacidade diferente'}
+    r = SugerirPendenciaService(llm(sem)).executar(simular=False, refazer=True)
+    assert r['sem_sugestao'] == 1
+    db.session.refresh(p)
+    assert p.evidencias['sugestao_ia']['peca'] is None and p.evidencias['sugestao_ia']['confianca'] == 80
+
+
+def test_ia_ignora_candidata_nao_aprovada_ou_com_conflito(banco):
+    from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
+    app, admin, _, p5500, p5600 = banco
+    pendencia(p5500, p5600, conflito_5600=True)
+    p5500.status_validacao = 'em_revisao'
+    db.session.commit()
+    chamadas = []
+    r = SugerirPendenciaService(lambda *a: chamadas.append(a)).executar(simular=False)
+    assert r['analisadas'] == 0 and chamadas == []
+
+
+def test_painel_envia_varias_pendencias_para_a_ia(banco, monkeypatch):
+    import json
+    from services.admin_service import sugerir_pendencia_service as modulo
+    app, admin, comum, p5500, p5600 = banco
+    a, b = pendencia(p5500, p5600, item=1), pendencia(p5500, p5600, item=2)
+    ref = f'processador:{p5600.id}'
+    chamadas = []
+    monkeypatch.setattr(modulo.LLMService, 'executar',
+        lambda self, prompt, modelo, **kw: chamadas.append(kw) or _responder_lote(prompt, {'peca': ref, 'confianca': 88, 'justificativa': 'ok'}))
+    cliente = entrar(app, admin)
+    r = cliente.post('/admin/pendencias/enviar-ia', json={'ids': [a.id, b.id, a.id, 9999]})
+    assert r.status_code == 200
+    d = r.get_json()
+    assert d['sugeridas'] == 2 and d['ignoradas'] == 1 and chamadas == [{'reservar_cota': False}]  # uma só requisição para as duas
+    assert d['sugestoes'] == {str(a.id): {'peca': ref, 'confianca': 88}, str(b.id): {'peca': ref, 'confianca': 88}}
+    # reenviar refaz a análise
+    assert cliente.post('/admin/pendencias/enviar-ia', json={'ids': [a.id]}).get_json()['sugeridas'] == 1
+    for ruim in ({}, {'ids': []}, {'ids': ['1']}, {'ids': [0]}, {'ids': list(range(1, 22))}):
+        assert cliente.post('/admin/pendencias/enviar-ia', json=ruim).status_code == 400
+
+
+def test_envio_para_ia_e_so_de_administrador(banco):
+    app, _, comum, p5500, p5600 = banco
+    p = pendencia(p5500, p5600)
+    assert entrar(app, comum).post('/admin/pendencias/enviar-ia', json={'ids': [p.id]}).status_code in (403, 404)
+
+
+def _ia(monkeypatch, resposta):
+    import json
+    from services.admin_service import sugerir_pendencia_service as modulo
+    monkeypatch.setattr(modulo.LLMService, 'executar', lambda self, prompt, modelo, **kw: _responder_lote(prompt, resposta))
+
+
+def test_ia_decide_aceitando_ou_rejeitando_so_com_confianca_suficiente(banco, monkeypatch):
+    from services.admin_service.sugerir_pendencia_service import EnviarPendenciasParaIAService
+    app, admin, _, p5500, p5600 = banco
+    ref = f'processador:{p5500.id}'
+    # confiança baixa: só sugere
+    a = pendencia(p5500, p5600, item=1)
+    _ia(monkeypatch, {'peca': ref, 'confianca': 70, 'justificativa': 'talvez'})
+    r = EnviarPendenciasParaIAService().executar([a.id], decidir=True)
+    assert (r['aceitas'], r['rejeitadas']) == (0, 0)
+    db.session.refresh(a)
+    assert a.status == 'em_revisao'
+    # confiança alta na peça: aceita pelo caminho seguro, com origem "ia"
+    _ia(monkeypatch, {'peca': ref, 'confianca': 95, 'justificativa': 'mesmo modelo'})
+    r = EnviarPendenciasParaIAService().executar([a.id], decidir=True)
+    assert r['aceitas'] == 1
+    db.session.refresh(a)
+    assert a.status == 'importado' and a.evidencias['revisao_manual']['origem'] == 'ia'
+    assert Oferta.query.filter_by(loja='shopee', peca_id=p5500.id).count() == 1
+    # nenhuma serve, com certeza: rejeita
+    b = pendencia(p5500, p5600, item=2)
+    _ia(monkeypatch, {'peca': None, 'confianca': 93, 'justificativa': 'capacidade diferente'})
+    r = EnviarPendenciasParaIAService().executar([b.id], decidir=True)
+    assert r['rejeitadas'] == 1
+    db.session.refresh(b)
+    assert b.status == 'rejeitado' and b.motivo.startswith('IA: sem correspondência segura')
+    assert b.evidencias['revisao_manual']['origem'] == 'ia'
+    # sem decidir (padrão do painel "Enviar"), nada muda
+    c = pendencia(p5500, p5600, item=3)
+    _ia(monkeypatch, {'peca': None, 'confianca': 99, 'justificativa': 'x'})
+    r = EnviarPendenciasParaIAService().executar([c.id])
+    assert r['rejeitadas'] == 0
+    db.session.refresh(c)
+    assert c.status == 'em_revisao'
+
+
+def test_ia_nao_decide_quando_o_aceite_falha(banco, monkeypatch):
+    from services.admin_service.sugerir_pendencia_service import EnviarPendenciasParaIAService
+    app, admin, _, p5500, p5600 = banco
+    a = pendencia(p5500, p5600)
+    _ia(monkeypatch, {'peca': f'processador:{p5500.id}', 'confianca': 99, 'justificativa': 'ok'})
+    monkeypatch.setattr('services.admin_service.aceitar_pendencia_service.AceitarPendenciaService._aceitar_shopee',
+                        staticmethod(lambda *a, **k: (_ for _ in ()).throw(ValueError('anúncio mudou'))))
+    r = EnviarPendenciasParaIAService().executar([a.id], decidir=True)
+    assert r['decisoes_falhas'] == 1 and r['aceitas'] == 0
+    db.session.refresh(a)
+    assert a.status == 'em_revisao'
+
+
+def test_ia_analisa_varias_pendencias_numa_requisicao_e_isola_respostas_ruins(banco, monkeypatch):
+    import json
+    from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
+    app, admin, _, p5500, p5600 = banco
+    pend = [pendencia(p5500, p5600, item=i) for i in range(1, 5)]
+    ref = f'processador:{p5500.id}'
+    prompts = []
+    def llm(prompt, modelo):
+        prompts.append(prompt)
+        itens = [{'pendencia_id': pend[0].id, 'peca': ref, 'confianca': 95, 'justificativa': 'ok'},
+                 {'pendencia_id': pend[1].id, 'peca': 'processador:999', 'confianca': 95},   # fora das candidatas
+                 {'pendencia_id': pend[2].id, 'peca': None, 'confianca': 'x'}]               # confiança inválida; a 4ª não veio
+        return json.dumps({'resultados': itens})
+    r = SugerirPendenciaService(llm).executar(simular=False)
+    assert len(prompts) == 1 and r['requisicoes_ia'] == 1
+    assert r['sugeridas'] == 1 and r['falhas'] == 3
+    for p in pend:
+        db.session.refresh(p)
+    assert p.status == 'em_revisao'
+    assert pend[0].evidencias['sugestao_ia']['peca'] == ref and 'sugestao_ia' not in (pend[1].evidencias or {})
+
+
+def test_ia_divide_o_lote_ao_meio_quando_a_resposta_inteira_falha(banco):
+    import json, re
+    from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
+    app, admin, _, p5500, p5600 = banco
+    pend = [pendencia(p5500, p5600, item=i) for i in range(1, 5)]
+    ref = f'processador:{p5500.id}'
+    tamanhos = []
+    def llm(prompt, modelo):
+        ids = [int(i) for i in dict.fromkeys(re.findall(r'"pendencia_id": (\d+)', prompt))]
+        tamanhos.append(len(ids))
+        if len(ids) > 2:
+            return '{"resultados": [{"pendencia_id"'   # resposta cortada
+        return json.dumps({'resultados': [{'pendencia_id': i, 'peca': ref, 'confianca': 90} for i in ids]})
+    r = SugerirPendenciaService(llm).executar(simular=False)
+    assert tamanhos == [4, 2, 2] and r['sugeridas'] == 4 and r['falhas'] == 0 and r['requisicoes_ia'] == 3
+
+
+def test_ia_espera_e_repete_quando_o_gemini_limita_as_requisicoes(banco):
+    import json
+    import requests
+    from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
+    app, admin, _, p5500, p5600 = banco
+    pend = [pendencia(p5500, p5600, item=i) for i in range(1, 4)]
+    ref = f'processador:{p5500.id}'
+    def http(status):
+        erro = requests.HTTPError('limite')
+        erro.response = requests.Response()
+        erro.response.status_code = status
+        return erro
+    chamadas, esperas = [], []
+    def llm(prompt, modelo):
+        chamadas.append(1)
+        if len(chamadas) <= 2:
+            raise http(429)
+        return _responder_lote(prompt, {'peca': ref, 'confianca': 90})
+    r = SugerirPendenciaService(llm, tentativas_transitorias=3, espera=30, dormir=esperas.append).executar(simular=False)
+    assert r['sugeridas'] == 3 and r['falhas'] == 0 and esperas == [30, 60] and len(chamadas) == 3  # sem dividir o lote
+    # sem tentativas, o grupo inteiro vira "falhou" e o painel decide quando repetir
+    def sempre(prompt, modelo):
+        raise http(503)
+    r = SugerirPendenciaService(sempre).executar(simular=False, refazer=True)
+    assert r['sugeridas'] == 0 and sorted(r['ids_falhos']) == sorted(p.id for p in pend)
+
+
+def test_enviar_todas_lista_ids_do_filtro_e_nao_refaz_o_que_ja_foi_analisado(banco, monkeypatch):
+    app, admin, _, p5500, p5600 = banco
+    a, b = pendencia(p5500, p5600, item=1), pendencia(p5500, p5600, item=2)
+    pendencia(p5500, p5600, loja='mercado_livre', item=3)
+    cliente = entrar(app, admin)
+    d = cliente.get('/admin/pendencias/ids-para-ia?loja=shopee').get_json()
+    assert d['ids'] == [a.id, b.id] and d['total'] == 2
+    assert cliente.get('/admin/pendencias/ids-para-ia?status=importado').status_code == 400
+    _ia(monkeypatch, {'peca': f'processador:{p5500.id}', 'confianca': 80})
+    assert cliente.post('/admin/pendencias/enviar-ia', json={'ids': [a.id, b.id], 'refazer': False}).get_json()['sugeridas'] == 2
+    d = cliente.post('/admin/pendencias/enviar-ia', json={'ids': [a.id, b.id], 'refazer': False}).get_json()
+    assert d['sugeridas'] == 0 and d['ja_analisadas'] == 2 and d['ids_falhos'] == []

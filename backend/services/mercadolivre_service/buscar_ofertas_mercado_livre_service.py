@@ -1,3 +1,5 @@
+from services.marketplace_service.controle_requisicoes_service import executar_requisicao, controle_em_execucao
+from services.marketplace_service.erros import FalhaMarketplace
 """Consulta de ofertas do catálogo oficial; não persiste nem associa peças por nome."""
 import json
 import re
@@ -14,8 +16,9 @@ class BuscarOfertasMercadoLivreService:
     TAMANHO_PAGINA = 100
     MAX_OFERTAS = 1000
 
-    def __init__(self, controle=None):
+    def __init__(self, controle=None, http=None):
         self.controle = controle
+        self.http = http or requests
 
     def executar(self, catalogo_id: str, *, access_token: str | None = None, produto=None):
         self._validar_id(catalogo_id, "produto de catálogo")
@@ -60,12 +63,12 @@ class BuscarOfertasMercadoLivreService:
                 "ofertas": list(ofertas.values())}
 
     def _consultar(self, caminho, token, params=None):
-        chamada = lambda: self._requisitar(caminho, token, params)
+        chamada = lambda: executar_requisicao(lambda: self._requisitar(caminho, token, params))
         return self.controle.executar(chamada) if self.controle else chamada()
 
     def _requisitar(self, caminho, token, params=None):
         try:
-            resposta = requests.get(
+            resposta = self.http.get(
                 self.BASE_URL + caminho, params=params,
                 headers={"Authorization": f"Bearer {token}", "Accept": "application/json"},
                 timeout=(10, 30), stream=True, allow_redirects=False,
@@ -91,6 +94,8 @@ class BuscarOfertasMercadoLivreService:
             finally:
                 resposta.close()
         except requests.RequestException:
+            if controle_em_execucao.get() is not None:
+                raise FalhaMarketplace(temporaria=True) from None
             # Não propagar objetos de request, cabeçalhos ou credenciais para logs.
             raise ValueError("Falha de rede na consulta ao Mercado Livre") from None
 
@@ -118,7 +123,8 @@ class BuscarOfertasMercadoLivreService:
         return {"loja": "mercado_livre", "catalogo_id": catalogo_id,
                 "produto_id_loja": anuncio, "vendedor_id": str(vendedor),
                 "preco": preco, "preco_original": original, "moeda": "BRL",
-                "condicao": condicao, "esgotado": None, "condicao_pagamento": None,
+                "condicao": condicao, "esgotado": (linha["available_quantity"] == 0 if type(linha.get("available_quantity")) is int and linha["available_quantity"] >= 0 else None),
+                "quantidade_disponivel": (linha["available_quantity"] if type(linha.get("available_quantity")) is int and linha["available_quantity"] >= 0 else None), "condicao_pagamento": None,
                 "url": f"https://produto.mercadolivre.com.br/MLB-{anuncio[3:]}-_JM",
                 "url_afiliado": None}
 

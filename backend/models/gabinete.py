@@ -5,7 +5,7 @@ class Gabinete(Peca):
     __tablename__ = "gabinete"
 
     formato = db.Column(db.String(50), nullable=False)
-    formatos_placa_mae = db.Column(db.String(100), nullable=False)
+    formatos_placa_mae = db.Column(db.String(100), nullable=True)
     slots_expansao = db.Column(db.Integer())
     bays_disco = db.Column(db.Integer())
     fans_inclusos = db.Column(db.Integer())

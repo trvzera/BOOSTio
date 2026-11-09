@@ -1,3 +1,7 @@
+import services.build_service.ajustar_aparencia_service as validacao_module
+from services.build_service.ajustar_aparencia_service import ajustar_aparencia
+from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
+import services.build_service.criar_build_service as criacao_module
 from copy import deepcopy
 
 import pytest
@@ -62,12 +66,12 @@ def test_ajuste_estetico_revalida_orcamento_antes_de_trocar(mocker):
     preta = {**branca, "id": 2, "modelo": "GM1 Black", "preco": 119}
     build = {"componentes": [{"tipo": "teclado", "id": 1, "quantidade": 1}]}
     antes = deepcopy(build)
-    mocker.patch("services.build_service.criar_build_service.CompletarVentilacaoService.executar", side_effect=lambda b,*a,**k:b)
-    validar = mocker.patch.object(CriarBuildService, "_validar_build", side_effect=ValueError("Teto de periféricos"))
-    assert CriarBuildService()._ajustar_aparencia(build, {"teclado": [branca, preta]}, 8000, 10, {}, {}, {}, {"cor": "preto"}) == antes
+    mocker.patch("services.build_service.gerar_candidata_service.CompletarVentilacaoService.executar", side_effect=lambda b,*a,**k:b)
+    validar = mocker.patch.object(validacao_module, "validar_build_gerada", side_effect=ValueError("Teto de periféricos"))
+    assert ajustar_aparencia(build, {"teclado": [branca, preta]}, 8000, 10, {}, {}, {}, {"cor": "preto"}) == antes
     validar.assert_called_once()
     validar.side_effect = lambda b,*a,**k:b
-    assert CriarBuildService()._ajustar_aparencia(build, {"teclado": [branca, preta]}, 8000, 10, {}, {}, {}, {"cor": "preto"})["componentes"][0]["id"] == 2
+    assert ajustar_aparencia(build, {"teclado": [branca, preta]}, 8000, 10, {}, {}, {}, {"cor": "preto"})["componentes"][0]["id"] == 2
     assert build == antes
 
 

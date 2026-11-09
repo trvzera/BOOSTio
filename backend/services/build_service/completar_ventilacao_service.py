@@ -2,7 +2,7 @@ from copy import deepcopy
 from decimal import Decimal
 from math import isfinite
 
-from .encaixe_fisico import avaliar_fans
+from services.validacoes_service.encaixe_fisico import avaliar_fans
 from .preferencias_cores_service import PreferenciasCoresService
 
 

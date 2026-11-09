@@ -2,7 +2,7 @@ from copy import deepcopy
 
 from models import BuildSalva, Oferta
 from models.build_salva import MODELOS
-from .avaliar_compatibilidade_service import AvaliarCompatibilidadeService
+from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
 
 class BuscarBuildPublicaService:

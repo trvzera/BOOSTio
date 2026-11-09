@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOOSTio</title>
+  <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
+  <link rel="stylesheet" href="../styles/style.css">
+  <noscript><link rel="stylesheet" href="../styles/componentes/no-script.css"></noscript>
+  <meta name="description" content="Área restrita a administradores da BOOSTio.">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="preload" href="../fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <script type="module" src="../js/pages/loading.js" defer></script>
+  <script type="module" src="../js/pages/admin.js" defer></script>
+</head>
+
+<body class="admin-page-body" data-private-page>
+  <a class="skip-link" href="#main-content" aria-label="Pular para o conteúdo principal">Pular para o conteúdo principal</a>
+  <div id="loading-screen">
+    <video id="loading-video" width="1000" height="1000" autoplay muted playsinline aria-hidden="true" tabindex="-1">
+      <source src="../video/loading-toggle.webm" type="video/webm">
+    </video>
+  </div>
+  <div data-site-navigation></div>
+
+  <main id="main-content" tabindex="-1">
+    <section id="admin-page" hidden>
+      <div class="decoration decoration-1"></div>
+      <div class="decoration decoration-2"></div>
+      <header class="admin-header">
+        <h1 class="font-1-l">Administração</h1>
+        <p class="font-2-s">Área restrita. Aqui ficam as ferramentas de gestão do catálogo.</p>
+      </header>
+
+      <div class="admin-layout">
+        <nav class="admin-menu" aria-label="Seções da administração">
+          <button type="button" class="admin-menu-item font-1-m" data-admin-menu="pendencias" aria-label="Abrir pendências de ofertas">Pendências</button>
+        </nav>
+
+        <div class="admin-content">
+          <section data-admin-secao="pendencias" aria-labelledby="admin-pendencias-titulo" hidden>
+            <h2 id="admin-pendencias-titulo" class="font-1-l">Pendências de ofertas</h2>
+            <p class="font-2-s">Anúncios que o sistema não conseguiu associar sozinho a uma peça. Aceite indicando a peça certa ou rejeite.</p>
+
+            <form class="admin-filters" data-pendencias-filtros>
+              <label class="font-2-s">Situação
+                <select name="status">
+                  <option value="em_revisao" selected>Em revisão</option>
+                  <option value="pendente">Pendente</option>
+                  <option value="rejeitado">Rejeitada</option>
+                  <option value="importado">Aceita</option>
+                </select>
+              </label>
+              <label class="font-2-s">Loja
+                <select name="loja"><option value="">Todas as lojas</option></select>
+              </label>
+              <label class="font-2-s">Categoria
+                <select name="categoria"><option value="">Todas as categorias</option></select>
+              </label>
+              <button type="submit" class="btn-primary" aria-label="Aplicar filtros">Filtrar</button>
+            </form>
+
+            <ul class="admin-counts" data-pendencias-resumo aria-label="Pendências por situação"></ul>
+            <p class="admin-status font-2-s" data-pendencias-status role="status" aria-live="polite"></p>
+
+            <div class="admin-split">
+              <div>
+                <div class="admin-bulk" data-pendencias-lote hidden>
+                  <label class="admin-bulk-check font-2-s" title="Todas as pendências do filtro, inclusive as que ainda não foram carregadas"><input type="checkbox" data-pendencias-todas aria-label="Selecionar todas as pendências do filtro"> Selecionar todas</label>
+                  <label class="admin-bulk-check font-2-s" title="As 20 primeiras da lista"><input type="checkbox" data-pendencias-vinte aria-label="Selecionar as 20 primeiras pendências da lista"> Selecionar 20</label>
+                  <label class="admin-bulk-check font-2-s" title="Com esta opção marcada, a IA aceita ou rejeita as pendências de alta confiança"><input type="checkbox" data-pendencias-ia-decidir aria-label="Deixar a IA decidir (aceitar ou rejeitar)"> Deixar a IA decidir</label>
+                  <button type="button" class="btn-primary" data-pendencias-enviar-ia disabled aria-label="Enviar pendências selecionadas para a IA">Enviar para a IA</button>
+                  <button type="button" class="btn-ghost" data-pendencias-parar hidden aria-label="Parar o envio para a IA">Parar</button>
+                </div>
+                <ul class="admin-pending-list" data-pendencias-lista></ul>
+                <button type="button" class="btn-ghost" data-pendencias-mais hidden aria-label="Carregar mais pendências">Carregar mais</button>
+              </div>
+              <section class="admin-detail" data-pendencias-detalhe hidden></section>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+
+</html>

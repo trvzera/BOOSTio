@@ -5,7 +5,7 @@ from requests import Response
 from requests.exceptions import HTTPError, Timeout, ConnectionError
 
 from services.build_service.gerar_build_service import GerarBuildService
-from services.build_service.criar_build_service import ErroGeracaoBuild
+from services.build_service.erros_build import ErroGeracaoBuild
 
 
 def preparar(mocker, respostas):

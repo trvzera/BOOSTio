@@ -77,6 +77,8 @@ class AutorizarContaMercadoLivreService:
 
     @staticmethod
     def _trocar(parametros):
+        from services.marketplace_service.controle_requisicoes_service import executar_requisicao
+        executar_requisicao(lambda: None)
         try:
             resposta = requests.post('https://api.mercadolibre.com/oauth/token', data=parametros,
                 headers={'Accept': 'application/json'}, timeout=(10,30), stream=True, allow_redirects=False)

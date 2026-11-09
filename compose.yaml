@@ -75,6 +75,57 @@ services:
       - traefik.http.middlewares.boostio-api-security.headers.customResponseHeaders.Permissions-Policy=camera=(), microphone=(), geolocation=()
     networks: [backend, traefik-proxy]
 
+  catalogo-worker:
+    profiles: [catalogo]
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      APP_ENV: producao
+      CATALOGO_PERMITIR_NOVOS: ${CATALOGO_PERMITIR_NOVOS:-false}
+    command: ["python", "-m", "flask", "--app", "app", "catalogo-worker", "--plano", "/app/plano-catalogo.json", "--aplicar"]
+    volumes:
+      - ${CATALOGO_PLANO:-./backend/data/catalogo/plano-exemplo.json}:/app/plano-catalogo.json:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    mem_limit: 256m
+    cpus: 0.5
+    stop_grace_period: 45s
+    healthcheck:
+      disable: true
+    labels:
+      - traefik.enable=false
+    networks: [backend]
+
+  marketplaces-worker:
+    profiles: [marketplaces]
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      APP_ENV: producao
+    command: ["python", "-m", "flask", "--app", "app", "marketplaces-worker"]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    mem_limit: 512m
+    cpus: 0.5
+    stop_grace_period: 45s
+    healthcheck:
+      disable: true
+    labels:
+      - traefik.enable=false
+    networks: [backend, marketplaces-egress]
+
   web:
     build:
       context: .
@@ -111,6 +162,7 @@ volumes:
   imagens_coletadas:
 
 networks:
+  marketplaces-egress:
   backend:
     internal: true
   traefik-proxy:

@@ -1,3 +1,9 @@
+import services.build_service.gerar_candidata_service as validacao_module
+from services.build_service.gerar_candidata_service import gerar_candidata
+from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
+import services.build_service.criar_build_service as criacao_module
+from services.build_service.catalogo_geracao_service import campos_pecas, gerar_catalogo
+from services.build_service.prompt_build_service import criar_prompt
 from copy import deepcopy
 from decimal import Decimal
 from types import SimpleNamespace
@@ -98,20 +104,20 @@ def test_cor_nao_recompra_periferico_proprio_nem_torna_catalogo_sem_cor_inviavel
 
 def test_cor_e_origem_da_referencia_chegam_ao_prompt_sem_mudar_cor_cadastrada():
     peca = SimpleNamespace(id=4, to_catalogo=lambda: {"id": "teclado:4", "categoria": "teclado", "modelo": "Teclado Branco", "preco": 100})
-    campos = CriarBuildService._campos_pecas(peca)
+    campos = campos_pecas(peca)
     assert campos["cor_referencia"] == ["branco"] and campos["fonte_cor_referencia"] == "nome_cadastrado"
     assert "cor" not in campos
-    prompt = CriarBuildService._criar_prompt({"nome": "PC", "descricao": "Teste", "utilidade": "Jogos", "aparencia": {"cor": "branco"}}, 5000, 800, {"teclado": [campos]})
+    prompt = criar_prompt({"nome": "PC", "descricao": "Teste", "utilidade": "Jogos", "aparencia": {"cor": "branco"}}, 5000, 800, {"teclado": [campos]})
     for termo in ("TODOS os itens novos", "ventoinhas", "monitor, teclado, mouse, fone", "não cor confirmada",
                   "Nunca substitua peças próprias", "sacrifique orçamento, segurança", "Copie nome, descricao"):
         assert termo in prompt
 
 
 def test_cor_propagada_para_complemento_de_fans_sem_chamar_llm_real(mocker):
-    mocker.patch("services.build_service.criar_build_service.LLMService.executar", return_value={"componentes": []})
-    completar = mocker.patch("services.build_service.criar_build_service.CompletarVentilacaoService.executar", return_value={"componentes": []})
-    mocker.patch.object(CriarBuildService, "_validar_build", return_value={"componentes": []})
-    CriarBuildService()._gerar_validada(1, "Prompt", "teste", {}, 1000, 0, {}, {}, {}, tentativas_correcao=0, cor="branco")
+    mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value={"componentes": []})
+    completar = mocker.patch("services.build_service.gerar_candidata_service.CompletarVentilacaoService.executar", return_value={"componentes": []})
+    mocker.patch.object(validacao_module, "validar_build_gerada", return_value={"componentes": []})
+    gerar_candidata(1, "Prompt", "teste", {}, 1000, 0, {}, {}, {}, tentativas_correcao=0, cor="branco")
     assert completar.call_args.kwargs == {"cor": "branco"}
 
 
@@ -127,7 +133,7 @@ def test_catalogo_preserva_variante_preta_equivalente_omitida_pela_amostra(mocke
     branco = Teclado(id=1, fabricante="Marca", modelo="GM1 White", preco=100, mecanico=True, switch="Brown", layout="ABNT2")
     preto = Teclado(id=2, fabricante="Marca", modelo="GM1 Black", preco=120, mecanico=True, switch="Brown", layout="ABNT2")
     modelo = SimpleNamespace(__tablename__="teclado", listar_disponiveis_ate=lambda *a, **k:[branco,preto])
-    mocker.patch("services.build_service.criar_build_service.MODELOS_PECAS", (modelo,))
-    mocker.patch.object(AmostrarCatalogoService, "executar", return_value=[CriarBuildService._campos_pecas(branco)])
-    catalogo = CriarBuildService._gerar_catalogo(200, reserva_perifericos=200, cor="preto")
+    mocker.patch("services.build_service.catalogo_geracao_service.MODELOS_PECAS", (modelo,))
+    mocker.patch.object(AmostrarCatalogoService, "executar", return_value=[campos_pecas(branco)])
+    catalogo = gerar_catalogo(200, reserva_perifericos=200, cor="preto")
     assert {p["id"] for p in catalogo["teclado"]} == {1, 2}

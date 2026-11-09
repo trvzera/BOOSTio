@@ -55,6 +55,7 @@
 .site-profile::after { content: ""; position: absolute; top: 100%; right: 0; width: 100%; height: 8px; }
 .profile-panel { position: absolute; top: calc(100% + 8px); right: 0; width: max-content; min-width: 190px; max-width: calc(100vw - 32px); max-height: calc(100dvh - 96px); overflow-y: auto; padding: 8px; border: 1px solid var(--cor-2); border-radius: 16px; visibility: hidden; opacity: 0; pointer-events: none; transform: translateY(-6px) scale(.96); transform-origin: top right; transition: opacity .2s ease, transform .25s var(--ease), visibility .25s; }
 .site-profile[data-open] .profile-panel { opacity: 1; visibility: visible; pointer-events: auto; transform: none; }
+.profile-link[hidden] { display: none; }
 .profile-link { display: flex; align-items: center; width: 100%; min-height: 44px; padding: 6px 10px; border: 0; border-radius: 10px; background: transparent; color: var(--cor-6); cursor: pointer; text-align: left; transition: color .2s ease, background .2s ease; }
 .profile-link .ui-lottie { width: 26px; height: 26px; flex: 0 0 26px; color: var(--cor-4); }
 .profile-link .site-menu-link-label { display: grid; grid-template-columns: 26px minmax(0,1fr); align-items: center; width: 100%; }

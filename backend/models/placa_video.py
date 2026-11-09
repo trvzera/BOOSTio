@@ -8,6 +8,8 @@ class PlacaVideo(BenchmarkMixin, Peca):
     BENCHMARK_TESTE = "PassMark G2D / G3D"
 
     memoria_gb = db.Column(db.Integer(), nullable=False)
+    fabricante_chip = db.Column(db.String(30), nullable=True)
+    modelo_referencia = db.Column(db.String(120), nullable=True)
     tipo_memoria = db.Column(db.String(20))
     interface_memoria = db.Column(db.String(20))
     consumo_w = db.Column(db.Integer())
