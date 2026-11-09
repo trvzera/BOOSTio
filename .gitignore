@@ -18,6 +18,8 @@ coverage/
 node_modules/
 /output/
 /materiais/exportacoes/
+# Intermediários locais de geração de apresentações.
+/materiais/apresentacao/**/.build/
 /test-results/
 /playwright-report/
 /.cursor/

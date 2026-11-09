@@ -26,13 +26,16 @@ test('listar é GET autenticado; aceitar e rejeitar são POST com CSRF e corpo m
   await listarPendencias({loja: 'shopee'});
   await aceitarPendencia(4, 'processador:9');
   await rejeitarPendencia(4, 'Outro produto');
-  const [lista, , csrf1, aceitar, , rejeitar] = chamadas;
+  assert.equal(chamadas.length, 5);
+  const [lista, csrf1, aceitar, csrf2, rejeitar] = chamadas;
   assert.match(lista[0], /\/admin\/pendencias\?status=em_revisao&limite=20&loja=shopee$/);
   assert.equal(lista[1].credentials, 'include');
   assert.match(csrf1[0], /\/auth\/csrf$/);
   assert.match(aceitar[0], /\/admin\/pendencias\/4\/aceitar$/);
   assert.equal(aceitar[1].headers['X-CSRF-Token'], 'tk');
   assert.deepEqual(JSON.parse(aceitar[1].body), {peca: 'processador:9'});
+  assert.match(csrf2[0], /\/auth\/csrf$/);
+  assert.equal(rejeitar[1].headers['X-CSRF-Token'], 'tk');
   assert.deepEqual(JSON.parse(rejeitar[1].body), {motivo: 'Outro produto'});
 });
 
