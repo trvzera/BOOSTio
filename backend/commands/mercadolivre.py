@@ -88,6 +88,16 @@ def registrar_comandos_mercadolivre(app):
         except (ValueError, SQLAlchemyError) as erro:
             raise click.ClickException(str(erro) if isinstance(erro,ValueError) else 'Falha ao preparar vínculos revisados') from None
 
+    @app.cli.command('mercadolivre-vinculos-criterio-preparar')
+    @click.option('--aplicar', is_flag=True, help='Altera a coluna. Padrão: simulação.')
+    def preparar_vinculos_criterio_cmd(aplicar):
+        """Alarga vinculo_mercado_livre.criterio para 100 caracteres (o MySQL recusava critérios longos)."""
+        from migrations.vinculos_criterio import preparar_vinculos_criterio
+        try:
+            click.echo(json.dumps(preparar_vinculos_criterio(simular=not aplicar), ensure_ascii=False))
+        except (ValueError, SQLAlchemyError) as erro:
+            raise click.ClickException(str(erro) if isinstance(erro, ValueError) else 'Falha ao preparar o critério dos vínculos') from None
+
     @app.cli.command('mercadolivre-vinculos-importar')
     @click.option('--arquivo', type=click.Path(exists=True, dir_okay=False), default=None)
     @click.option('--aplicar', is_flag=True, help='Grava somente vínculos revisados. Padrão: simulação.')

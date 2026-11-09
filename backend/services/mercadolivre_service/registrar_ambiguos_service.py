@@ -25,7 +25,9 @@ class RegistrarAmbiguosMercadoLivreService:
             produto, normal, decisao = item['produto'], item['normal'], item['decisao']
             try:
                 resultado = cliente.executar(produto['id'], access_token=token, produto=produto)
-            except (FalhaMarketplace, ErroMercadoLivre, OrcamentoRequisicoesEsgotado):
+            except (FalhaMarketplace, ErroMercadoLivre, OrcamentoRequisicoesEsgotado) as erro:
+                if getattr(erro, 'status', None) == 404:
+                    continue  # catálogo sem ofertas disponíveis: não vira pendência
                 raise  # limite ou autorização: a fila decide a espera
             except ValueError:
                 continue  # catálogo inativo ou formato inesperado: não vira pendência

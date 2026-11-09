@@ -328,3 +328,17 @@ def test_catalogo_ambiguo_cujo_anuncio_ja_e_oferta_nao_quebra(banco):
     r=executar(p,prod=sem_mpn,ofertas=[anuncio('MLB77',5,300)],simular=False)
     assert r['detalhes'][0]['ambiguas_registradas']==0
     assert ProdutoPendente.query.count()==0
+
+
+def test_catalogo_sem_ofertas_404_na_fila_nao_derruba_a_tarefa(banco):
+    from services.marketplace_service.erros import FalhaMarketplace
+    _,p=banco
+    prod=produto()
+    def api(self,path,token,params=None):
+        if path=='/products/search': return {'paging':{'total':1},'results':[prod]}
+        if path==f'/products/{CAT}': return prod
+        raise FalhaMarketplace(404)  # /items: na fila o 404 chega como FalhaMarketplace
+    with patch.object(BuscarOfertasMercadoLivreService,'_requisitar',api),patch('services.mercadolivre_service.atualizar_ofertas_service.TokenMercadoLivreService') as tokens:
+        tokens.return_value.executar.return_value='token'
+        r=Service().executar(categoria='processador',peca_id=p.id,simular=False)
+    assert r['falhas']==0 and r['revisao']==1 and not r['interrompido']
