@@ -142,8 +142,9 @@ class AtualizarOfertasMercadoLivreService:
                     busca_remota_completa=busca.get('busca_remota_completa'),
                     buscas=busca.get('buscas', []))
             except (ErroMercadoLivre, FalhaMarketplace) as erro:
-                # Na fila o 404 chega como FalhaMarketplace; 403 ali é autorização e interrompe.
-                if erro.status not in ((403,404) if isinstance(erro, ErroMercadoLivre) else (404,)):raise
+                # 404/206 (sem ofertas ou resposta parcial) não são falha da peça. Na fila o erro chega
+                # como FalhaMarketplace, onde 403 é autorização e interrompe.
+                if erro.status not in ((403,404,206) if isinstance(erro, ErroMercadoLivre) else (404,206)):raise
                 indisponiveis.append(dict(catalogo_id=vinculo['catalogo_id'], http=erro.status))
         return dict(contador='revisao' if indisponiveis else 'sem_ofertas',
             status='revisao' if indisponiveis else 'sem_ofertas', catalogos_indisponiveis=indisponiveis)

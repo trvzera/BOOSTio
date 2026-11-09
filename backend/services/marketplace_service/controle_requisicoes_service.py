@@ -90,9 +90,9 @@ class ControleRequisicoesMarketplaceService:
                 falha = FalhaMarketplace(erro.status, getattr(erro, 'espera', 0))
             else:
                 raise
-            # 404 é resposta de um recurso (ex.: catálogo sem ofertas), não falha da loja:
-            # não envenena as próximas chamadas da tarefa.
-            if falha.status != 404:
+            # 404 (catálogo sem ofertas) e 206 (resposta parcial) dizem respeito a um recurso,
+            # não à loja: não envenenam as próximas chamadas da tarefa.
+            if falha.status not in (404, 206):
                 self.erro = falha
             if falha.status == 429:
                 repeticoes = self.repositorio.limitacoes(self.loja)
