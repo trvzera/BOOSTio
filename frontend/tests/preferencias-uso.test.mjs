@@ -22,13 +22,26 @@ test("guias ajustam apresentação sem impedir abertura manual",t => {
   const antigo=globalThis.document;
   globalThis.document={documentElement:{dataset:{hardwareLevel:"experiente"}}};
   t.after(()=>{if(antigo)globalThis.document=antigo;else delete globalThis.document;});
-  const raiz={querySelectorAll:()=>[guia]};
+  const raiz={querySelectorAll:seletor=>seletor === "details[data-knowledge-guide]" ? [guia] : []};
   ajustarGuiasConhecimento(raiz);assert.equal(guia.open,false);
   guia.open=true;ajustarGuiasConhecimento(raiz);assert.equal(guia.open,true);
   document.documentElement.dataset.hardwareLevel="iniciante";
   ajustarGuiasConhecimento(raiz);assert.equal(guia.open,true);
   document.documentElement.dataset.hardwareLevel="intermediario";guia.open=false;
   ajustarGuiasConhecimento(raiz);assert.equal(guia.open,true);
+});
+
+test("explicações extras aparecem para iniciantes e perfis sem nível definido",t => {
+  const anterior=globalThis.document;
+  globalThis.document={documentElement:{dataset:{}}};
+  t.after(()=>{if(anterior)globalThis.document=anterior;else delete globalThis.document;});
+  const ajuda={hidden:false};
+  const raiz={querySelectorAll:seletor=>seletor === "[data-knowledge-beginner]" ? [ajuda] : []};
+  for(const [nivel,oculta] of [[undefined,false],["iniciante",false],["intermediario",true],["experiente",true],["iniciante",false]]) {
+    document.documentElement.dataset.hardwareLevel=nivel;
+    ajustarGuiasConhecimento(raiz);
+    assert.equal(ajuda.hidden,oculta);
+  }
 });
 
 test("salvamento usa CSRF e só atualiza a própria conta com resposta confirmada",async t => {

@@ -39,7 +39,7 @@ test("periféricos têm etapa própria e opções já possuídas usam Lottie com
   assert.doesNotMatch(css,/\.peripheral-budget-toggle[^}]*\bwidth: 20px/);
 });
 
-test("formulário concentra a rolagem no card e nas respostas, preservando os controles", async () => {
+test("formulário concentra a rolagem nas respostas, preservando os controles", async () => {
   const css = await readFile(new URL("../styles/responsividades/r-forms.css",import.meta.url),"utf8");
   const orcamento = await readFile(new URL("../styles/forms/orcamento.css",import.meta.url),"utf8");
   assert.match(css,/#questions \{[^}]*height: auto;/);
@@ -47,7 +47,6 @@ test("formulário concentra a rolagem no card e nas respostas, preservando os co
   assert.match(css,/#form-network \{[^}]*overflow: visible;/);
   assert.match(css,/\.form-page \{[^}]*height: 100dvh;[^}]*overflow: hidden;/);
   assert.match(css,/\.question-options-scroll \{[^}]*overflow-y: auto;/);
-  assert.match(css,/\.form-page #questions \{[^}]*overflow-y: auto;/);
   assert.doesNotMatch(orcamento,/\.budget-fields \{[^}]*overflow-y: auto/);
 });
 
