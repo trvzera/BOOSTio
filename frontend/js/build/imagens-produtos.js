@@ -1,3 +1,4 @@
+import { separarCodigos, referenciasPeca } from './codigos-pecas.js';
 let manifestoPendente;
 
 export function carregarManifestoImagens() {
@@ -26,8 +27,10 @@ export function enderecoImagem(valor) {
 }
 
 export function completarImagens(pecas,mapa = {}) {
-  return pecas.map(peca => {
-    const ficha = Object.hasOwn(mapa,peca.part_number) ? mapa[peca.part_number] : null;
+  return pecas.map(original => {
+    const peca = separarCodigos(original);
+    const chave = referenciasPeca(peca).find(codigo => Object.hasOwn(mapa,codigo));
+    const ficha = chave ? mapa[chave] : null;
     const referencia = typeof ficha === 'string' ? ficha : ficha && ['categoria','fabricante','modelo'].every(c => ficha[c] === peca[c]) ? ficha.imagem : null;
     const origem = [peca.imagem,peca.imagem_url,referencia]
       .find(valor => enderecoImagem(valor));

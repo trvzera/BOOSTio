@@ -2,7 +2,7 @@ from copy import deepcopy
 
 import pytest
 
-from services.build_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService, numero
+from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService, numero
 
 
 def avaliar(pecas, componentes=None):
@@ -133,7 +133,7 @@ def test_fonte_usa_quantidades_e_falta_de_consumo_permanece_desconhecida():
     componentes = {"fonte": {"id": 1}, "processador": {"id": 2}, "memoria_ram": [{"id": 3, "quantidade": 5}]}
     assert regra(avaliar(pecas, componentes), "fonte-potencia")["status"] == "incompativel"
     componentes["memoria_ram"][0]["quantidade"] = 4
-    assert regra(avaliar(pecas, componentes), "fonte-potencia")["status"] == "nao_verificado"
+    assert regra(avaliar(pecas, componentes), "fonte-potencia")["status"] == "incompativel"  # Falta margem de planejamento.
     pecas[2]["consumo_energia"] = None
     assert regra(avaliar(pecas, componentes), "fonte-potencia")["status"] == "nao_verificado"
 

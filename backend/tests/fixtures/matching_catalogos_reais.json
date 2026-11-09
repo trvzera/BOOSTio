@@ -1,0 +1,5423 @@
+[
+  {
+    "categoria": "processador",
+    "fabricante": "AMD",
+    "modelo": "Ryzen 7 7700X",
+    "mpn": "100-100000591WOF",
+    "especificacoes": {
+      "soquete": "AM5",
+      "nucleo": 8,
+      "thread": 16,
+      "clockbase": 4.5,
+      "clockmax": 5.4,
+      "videointegrado": 1,
+      "modelo_videointegrado": "Radeon Graphics",
+      "cooler": 0,
+      "modelo_cooler": null,
+      "consumo_energia": 105.0
+    },
+    "produto": {
+      "id": "MLB19711896",
+      "catalog_product_id": "MLB19711896",
+      "status": "active",
+      "pdp_types": [
+        "traditional"
+      ],
+      "domain_id": "MLB-COMPUTER_PROCESSORS",
+      "permalink": "",
+      "name": "Processador gamer AMD Ryzen 7 7700X 100-100000591WOF de 8 núcleos e 5.4GHz de frequência com gráfica integrada",
+      "family_name": "Processador gamer AMD Ryzen 7 7700X 100-100000591WOF de 8 núcleos e 5.4GHz de frequência com gráfica integrada",
+      "type": "catalog_product",
+      "buy_box_winner": null,
+      "pickers": [
+        {
+          "picker_id": "MODEL",
+          "picker_name": "Modelo",
+          "products": [
+            {
+              "product_id": "MLB19711896",
+              "picker_label": "7700X",
+              "picture_id": "",
+              "thumbnail": "",
+              "tags": [
+                "selected"
+              ],
+              "changes": [],
+              "permalink": "",
+              "product_name": "AMD Ryzen 7 7700X 100-100000591WOF",
+              "auto_completed": false
+            }
+          ],
+          "tags": [],
+          "attributes": [
+            {
+              "attribute_id": "MODEL",
+              "template": "",
+              "position": 1
+            }
+          ],
+          "value_name_delimiter": "",
+          "hide_extra_decoration": false,
+          "secondary_picker_name": ""
+        }
+      ],
+      "pictures": [
+        {
+          "id": "742266-MLA99578794952_122025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_742266-MLA99578794952_122025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1196,
+          "max_height": 1200,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "652629-MLA91558287134_092025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_652629-MLA91558287134_092025-F.jpg",
+          "suggested_for_picker": [],
+          "max_width": 1030,
+          "max_height": 1200,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "967500-MLA74781901371_022024",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_967500-MLA74781901371_022024-F.jpg",
+          "suggested_for_picker": [],
+          "max_width": 254,
+          "max_height": 955,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "705006-MLU75333713816_032024",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_705006-MLU75333713816_032024-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 316,
+          "max_height": 1198,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        }
+      ],
+      "description_pictures": [],
+      "main_features": [
+        {
+          "text": "É ideal para jogadores e criadores de conteúdo que requerem de um instrumento de alto desempenho.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Memória cache de 32 MB, rápida e volátil.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Processador gráfico Radeon Graphics.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Suporta memória RAM DDR5.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Conta com 16 filos que favorecem a execução de múltiplos programas a cada vez.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Produto na embalagem original.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Processador inovador desenvolvido sob altos padrões de qualidade. ",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Soquetes compatíveis: AM5.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "TDP 105 W.",
+          "type": "key_value",
+          "metadata": {}
+        }
+      ],
+      "disclaimers": [],
+      "attributes": [
+        {
+          "id": "BRAND",
+          "name": "Marca",
+          "value_id": "18034",
+          "value_name": "AMD",
+          "values": [
+            {
+              "id": "18034",
+              "name": "AMD"
+            }
+          ]
+        },
+        {
+          "id": "LINE",
+          "name": "Linha",
+          "value_id": "968657",
+          "value_name": "Ryzen 7",
+          "values": [
+            {
+              "id": "968657",
+              "name": "Ryzen 7"
+            }
+          ]
+        },
+        {
+          "id": "MODEL",
+          "name": "Modelo",
+          "value_id": "13354429",
+          "value_name": "7700X",
+          "values": [
+            {
+              "id": "13354429",
+              "name": "7700X"
+            }
+          ]
+        },
+        {
+          "id": "ALPHANUMERIC_MODEL",
+          "name": "Modelo alfanumérico",
+          "value_id": "13354425",
+          "value_name": "100-100000591WOF",
+          "values": [
+            {
+              "id": "13354425",
+              "name": "100-100000591WOF"
+            }
+          ]
+        },
+        {
+          "id": "COMPATIBLE_SOCKETS",
+          "name": "Soquetes compatíveis",
+          "value_id": "13496738",
+          "value_name": "AM5",
+          "values": [
+            {
+              "id": "13496738",
+              "name": "AM5"
+            }
+          ]
+        },
+        {
+          "id": "SUPPORTED_RAM_MEMORY_TYPES",
+          "name": "Tipos de memória RAM suportadas",
+          "value_id": "11329219",
+          "value_name": "DDR5",
+          "values": [
+            {
+              "id": "11329219",
+              "name": "DDR5"
+            }
+          ]
+        },
+        {
+          "id": "ARCHITECTURE",
+          "name": "Arquitetura",
+          "value_id": "43237670",
+          "value_name": "x86-64",
+          "values": [
+            {
+              "id": "43237670",
+              "name": "x86-64"
+            }
+          ]
+        },
+        {
+          "id": "APPLICATION",
+          "name": "Aplicação",
+          "value_id": "312347",
+          "value_name": "Computadores de mesa",
+          "values": [
+            {
+              "id": "312347",
+              "name": "Computadores de mesa"
+            }
+          ]
+        },
+        {
+          "id": "GRAPHIC_PROCESSOR",
+          "name": "Processador gráfico",
+          "value_id": "11097369",
+          "value_name": "Radeon Graphics",
+          "values": [
+            {
+              "id": "11097369",
+              "name": "Radeon Graphics"
+            }
+          ]
+        },
+        {
+          "id": "CPU_CORES_NUMBER",
+          "name": "Quantidade de núcleos de CPU",
+          "value_id": "2549447",
+          "value_name": "8",
+          "values": [
+            {
+              "id": "2549447",
+              "name": "8"
+            }
+          ]
+        },
+        {
+          "id": "MAX_RAM_MEMORY_SIZE_SUPPORTED",
+          "name": "Tamanho máximo de memória RAM suportada",
+          "value_id": "4053161",
+          "value_name": "128 GB",
+          "values": [
+            {
+              "id": "4053161",
+              "name": "128 GB"
+            }
+          ]
+        },
+        {
+          "id": "MIN_CLOCK_FREQUENCY",
+          "name": "Frequência mínima de relógio",
+          "value_id": "13354415",
+          "value_name": "4.5 GHz",
+          "values": [
+            {
+              "id": "13354415",
+              "name": "4.5 GHz"
+            }
+          ]
+        },
+        {
+          "id": "MAX_CLOCK_FREQUENCY",
+          "name": "Frequência máxima de relógio",
+          "value_id": "13354427",
+          "value_name": "5.4 GHz",
+          "values": [
+            {
+              "id": "13354427",
+              "name": "5.4 GHz"
+            }
+          ]
+        },
+        {
+          "id": "CACHE",
+          "name": "Cache",
+          "value_id": "2090007",
+          "value_name": "32 MB",
+          "values": [
+            {
+              "id": "2090007",
+              "name": "32 MB"
+            }
+          ]
+        },
+        {
+          "id": "IS_GAMER",
+          "name": "É gamer",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "IS_UNLOCKED",
+          "name": "Está desbloqueado",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "LITHOGRAPHY",
+          "name": "Litografia",
+          "value_id": "13483373",
+          "value_name": "6 nm",
+          "values": [
+            {
+              "id": "13483373",
+              "name": "6 nm"
+            }
+          ]
+        },
+        {
+          "id": "RELEASE_YEAR",
+          "name": "Ano de lançamento",
+          "value_id": "11166326",
+          "value_name": "2022",
+          "values": [
+            {
+              "id": "11166326",
+              "name": "2022"
+            }
+          ]
+        },
+        {
+          "id": "TDP",
+          "name": "TDP",
+          "value_id": "7520955",
+          "value_name": "105 W",
+          "values": [
+            {
+              "id": "7520955",
+              "name": "105 W"
+            }
+          ]
+        },
+        {
+          "id": "CPU_THREADS_NUMBER",
+          "name": "Quantidade de fios de CPU",
+          "value_id": "8584214",
+          "value_name": "16",
+          "values": [
+            {
+              "id": "8584214",
+              "name": "16"
+            }
+          ]
+        },
+        {
+          "id": "WITH_HYPER_THREADING",
+          "name": "Com hyper-threading",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "IS_4K_COMPATIBLE",
+          "name": "É compatível com 4K",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "GPU_BRAND",
+          "name": "Marca de GPU",
+          "value_id": "55495730",
+          "value_name": "AMD",
+          "values": [
+            {
+              "id": "55495730",
+              "name": "AMD"
+            }
+          ]
+        },
+        {
+          "id": "GPU_LINE",
+          "name": "Linha de GPU",
+          "value_id": "66232738",
+          "value_name": "Radeon",
+          "values": [
+            {
+              "id": "66232738",
+              "name": "Radeon"
+            }
+          ]
+        },
+        {
+          "id": "GPU_MODEL",
+          "name": "Modelo de GPU",
+          "value_id": "89267413",
+          "value_name": "Radeon Graphics integrada",
+          "values": [
+            {
+              "id": "89267413",
+              "name": "Radeon Graphics integrada"
+            }
+          ]
+        },
+        {
+          "id": "GPU_CORES_NUMBER",
+          "name": "Quantidade de núcleos de GPU",
+          "value_id": "67697766",
+          "value_name": "2",
+          "values": [
+            {
+              "id": "67697766",
+              "name": "2"
+            }
+          ]
+        },
+        {
+          "id": "GPU_FREQUENCY",
+          "name": "Frequência de GPU",
+          "value_id": "70078541",
+          "value_name": "2200 MHz",
+          "values": [
+            {
+              "id": "70078541",
+              "name": "2200 MHz"
+            }
+          ]
+        },
+        {
+          "id": "PCI_EXPRESS_VERSION",
+          "name": "Versão de PCI Express",
+          "value_id": "55492477",
+          "value_name": "PCIe 5.0",
+          "values": [
+            {
+              "id": "55492477",
+              "name": "PCIe 5.0"
+            }
+          ]
+        },
+        {
+          "id": "MAX_RAM_MEMORY_SPEED",
+          "name": "Velocidade máxima da memória RAM",
+          "value_id": "65698326",
+          "value_name": "5200 MT/s",
+          "values": [
+            {
+              "id": "65698326",
+              "name": "5200 MT/s"
+            }
+          ]
+        },
+        {
+          "id": "MAX_TEMPERATURE",
+          "name": "Temperatura máxima",
+          "value_id": "7159814",
+          "value_name": "95 °C",
+          "values": [
+            {
+              "id": "7159814",
+              "name": "95 °C"
+            }
+          ]
+        },
+        {
+          "id": "WITH_GRAPHIC_MEMORY_ECC",
+          "name": "Com memória gráfica ECC",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "MEMORY_CHANNEL_QUANTITY",
+          "name": "Quantidade de canais de memória",
+          "value_id": "55665488",
+          "value_name": "2",
+          "values": [
+            {
+              "id": "55665488",
+              "name": "2"
+            }
+          ]
+        },
+        {
+          "id": "L1_CACHE_SIZE",
+          "name": "Tamanho do cache L1",
+          "value_id": "58536426",
+          "value_name": "512 KB",
+          "values": [
+            {
+              "id": "58536426",
+              "name": "512 KB"
+            }
+          ]
+        },
+        {
+          "id": "L2_CACHE_SIZE",
+          "name": "Tamanho do cache L2",
+          "value_id": "65752014",
+          "value_name": "8 MB",
+          "values": [
+            {
+              "id": "65752014",
+              "name": "8 MB"
+            }
+          ]
+        },
+        {
+          "id": "L3_CACHE_SIZE",
+          "name": "Tamanho do cache L3",
+          "value_id": "56945925",
+          "value_name": "32 MB",
+          "values": [
+            {
+              "id": "56945925",
+              "name": "32 MB"
+            }
+          ]
+        },
+        {
+          "id": "PACKAGE_DATA_SOURCE",
+          "name": "Origem do dado do pacote de fábrica",
+          "value_id": "52228230",
+          "value_name": "CERTIFIED_MEASUREMENT",
+          "values": [
+            {
+              "id": "52228230",
+              "name": "CERTIFIED_MEASUREMENT"
+            }
+          ]
+        },
+        {
+          "id": "IS_OEM",
+          "name": "É OEM",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "MPN",
+          "name": "MPN",
+          "value_id": "23156211",
+          "value_name": "100-100000591WOF",
+          "values": [
+            {
+              "id": "23156211",
+              "name": "100-100000591WOF"
+            }
+          ]
+        }
+      ],
+      "short_description": {
+        "type": "plaintext",
+        "content": "Descrição do Produto\n\nO AMD Ryzen 7 7700X foi desenvolvido para entregar alto desempenho em PCs Gamer, streaming, criação de conteúdo e aplicações profissionais exigentes. Baseado na arquitetura AMD Zen 4, conta com 8 núcleos e 16 threads, frequência base de 4.5GHz e clock boost de até 5.4GHz, proporcionando excelente capacidade para jogos atuais, multitarefas intensas, renderização e edição. Compatível com a plataforma AM5, oferece suporte a memórias DDR5 e PCI Express 5.0, permitindo montar configurações modernas e preparadas para upgrades. Também possui gráficos integrados AMD Radeon para uso básico e diagnóstico do sistema, mesmo sem uma placa de vídeo dedicada.\n\nEspecificações técnicas\n\nCaracterísticas\n\nMarca: AMD\nModelo: Ryzen 7 7700X\nPart Number: 100-100000591WOF\nLinha: AMD Ryzen 7 7000 Series\nCodinome: Raphael\nArquitetura: Zen 4\nNúcleos: 8\nThreads: 16\nFrequência Base: 4.5GHz\nFrequência Turbo: até 5.4GHz\nCache L1: 512KB\nCache L2: 8MB\nCache L3: 32MB\nCache Total: 40MB\nSocket: AM5\nProcesso de Fabricação: TSMC 5nm FinFET\nTecnologia da Matriz de I/O: TSMC 6nm FinFET\nTDP: 105W\nTemperatura Máxima: 95°C\nDesbloqueado para Overclock: Sim\nTecnologia de Boost: AMD Precision Boost 2\nRecursos de Overclock: AMD EXPO, AMD Precision Boost Overdrive e Curve Optimizer\nInterface PCI Express: PCI Express 5.0\nCompatibilidade: Placas-mãe com soquete AM5 e BIOS compatível\nChipsets Compatíveis: A620, B650, B650E, X670, X670E, B840, B850, X870 e X870E\n\nOutras Características\n\nGráficos Integrados: AMD Radeon Graphics\nNúcleos Gráficos: 2\nFrequência Gráfica Base: 400MHz\nFrequência Gráfica Máxima: até 2200MHz\nMemória Compatível: DDR5\nFrequência Máxima de Memória: até DDR5-5200MHz, conforme a configuração dos módulos\nCanais de Memória: Dual Channel\nCapacidade Máxima de Memória: até 128GB\nSuporte ECC: Sim, sujeito à compatibilidade da placa-mãe e da memória utilizada\nRecursos: AMD Ryzen Master, AMD EXPO, AMD Precision Boost 2 e AMD Precision Boost Overdrive\nAplicação: PCs Gamer de alto desempenho, streaming, edição de vídeo, renderização, criação de conteúdo e workstations modernas\nRefrigeração Inclusa: Não acompanha cooler\nCooler Recomendado: Cooler dedicado de alto desempenho compatível com AM5\nMaterial: Silício e componentes metálicos\nDimensões: Padrão AM5\nPeso: Informações sob consulta no manual\nSistemas Operacionais Compatíveis: Windows 10/11 64-bit, Ubuntu 64-bit e RHEL 64-bit\nConteúdo da Embalagem: 1 Processador AMD Ryzen 7 7700X e documentação do produto"
+      },
+      "parent_id": null,
+      "children_ids": [],
+      "settings": {
+        "content": "fixed",
+        "listing_strategy": "catalog_required",
+        "exclusive": false,
+        "with_enhanced_pictures": false,
+        "base_site_product_id": null,
+        "ttr": "2026-11-04T02:17:49.340190825"
+      },
+      "quality_type": "COMPLETE",
+      "release_info": null,
+      "enhanced_content": null,
+      "tags": [],
+      "date_created": "2022-10-24T22:02:23Z",
+      "authorized_stores": null,
+      "last_updated": "2026-10-02T01:38:21Z",
+      "grouper_id": null,
+      "experiments": {},
+      "decoration_partial_content": false
+    },
+    "fontes": [
+      "https://www.kabum.com.br/produto/378413/processador-amd-ryzen-7-7700x-4-5ghz-5-4ghz-max-turbo-cache-40mb-8-nucleos-16-threads-am5-com-video-integrado-100-100000591wof",
+      "https://www.mercadolivre.com.br/p/MLB19711896"
+    ],
+    "revisado_em": "2026-11-03"
+  },
+  {
+    "categoria": "processador",
+    "fabricante": "Intel",
+    "modelo": "Core i7-13700K",
+    "mpn": "BX8071513700K",
+    "especificacoes": {
+      "soquete": "LGA1700",
+      "nucleo": 16,
+      "thread": 24,
+      "clockbase": 3.4,
+      "clockmax": 5.4,
+      "videointegrado": 1,
+      "modelo_videointegrado": "UHD Graphics 770",
+      "cooler": 0,
+      "modelo_cooler": null,
+      "consumo_energia": 125.0
+    },
+    "produto": {
+      "id": "MLB19917322",
+      "catalog_product_id": "MLB19917322",
+      "status": "active",
+      "pdp_types": [
+        "traditional"
+      ],
+      "domain_id": "MLB-COMPUTER_PROCESSORS",
+      "permalink": "",
+      "name": "Intel Core i7-13700K 16 núcleos 5.4GHz gamer com gráficos UHD 4K",
+      "family_name": "Intel Core i7-13700K 16 núcleos 5.4GHz gamer com gráficos UHD 4K",
+      "type": "catalog_product",
+      "buy_box_winner": null,
+      "pickers": [
+        {
+          "picker_id": "MODEL",
+          "picker_name": "Modelo",
+          "products": [
+            {
+              "product_id": "MLB19917322",
+              "picker_label": "i7-13700K",
+              "picture_id": "",
+              "thumbnail": "",
+              "tags": [
+                "selected"
+              ],
+              "changes": [],
+              "permalink": "",
+              "product_name": "Intel Core i7 i7-13700K BX8071513700K",
+              "auto_completed": false
+            }
+          ],
+          "tags": [],
+          "attributes": [
+            {
+              "attribute_id": "MODEL",
+              "template": "",
+              "position": 1
+            }
+          ],
+          "value_name_delimiter": "",
+          "hide_extra_decoration": false,
+          "secondary_picker_name": ""
+        }
+      ],
+      "pictures": [
+        {
+          "id": "746094-MLA99547953918_122025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_746094-MLA99547953918_122025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1006,
+          "max_height": 1200,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        }
+      ],
+      "description_pictures": [],
+      "main_features": [
+        {
+          "text": "Produto de alto desempenho e linha exclusiva para profissionais que executam muitos programas ao mesmo tempo.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Memória cache de 30 MB, rápida e volátil.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Processador gráfico Intel UHD Graphics 770.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Suporta memória RAM DDR4.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Possui Hyper-Threading que favorece a execução de programas de maneira simultânea, ao dividir o processador físico em dois processadores lógicos.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Produto na embalagem original.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Soquetes compatíveis: FCLGA1700.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "TDP 128 W.",
+          "type": "key_value",
+          "metadata": {}
+        }
+      ],
+      "disclaimers": [],
+      "attributes": [
+        {
+          "id": "BRAND",
+          "name": "Marca",
+          "value_id": "7855833",
+          "value_name": "Intel",
+          "values": [
+            {
+              "id": "7855833",
+              "name": "Intel"
+            }
+          ]
+        },
+        {
+          "id": "LINE",
+          "name": "Linha",
+          "value_id": "7769180",
+          "value_name": "Core i7",
+          "values": [
+            {
+              "id": "7769180",
+              "name": "Core i7"
+            }
+          ]
+        },
+        {
+          "id": "MODEL",
+          "name": "Modelo",
+          "value_id": "13723915",
+          "value_name": "i7-13700K",
+          "values": [
+            {
+              "id": "13723915",
+              "name": "i7-13700K"
+            }
+          ]
+        },
+        {
+          "id": "ALPHANUMERIC_MODEL",
+          "name": "Modelo alfanumérico",
+          "value_id": "13723912",
+          "value_name": "BX8071513700K",
+          "values": [
+            {
+              "id": "13723912",
+              "name": "BX8071513700K"
+            }
+          ]
+        },
+        {
+          "id": "COMPATIBLE_SOCKETS",
+          "name": "Soquetes compatíveis",
+          "value_id": "11329220",
+          "value_name": "FCLGA1700",
+          "values": [
+            {
+              "id": "11329220",
+              "name": "FCLGA1700"
+            }
+          ]
+        },
+        {
+          "id": "SUPPORTED_RAM_MEMORY_TYPES",
+          "name": "Tipos de memória RAM suportadas",
+          "value_id": null,
+          "value_name": "DDR4, DDR5",
+          "values": [
+            {
+              "id": "6991503",
+              "name": "DDR4"
+            },
+            {
+              "id": "11329219",
+              "name": "DDR5"
+            }
+          ]
+        },
+        {
+          "id": "APPLICATION",
+          "name": "Aplicação",
+          "value_id": "312347",
+          "value_name": "Computadores de mesa",
+          "values": [
+            {
+              "id": "312347",
+              "name": "Computadores de mesa"
+            }
+          ]
+        },
+        {
+          "id": "GRAPHIC_PROCESSOR",
+          "name": "Processador gráfico",
+          "value_id": "11329240",
+          "value_name": "Intel UHD Graphics 770",
+          "values": [
+            {
+              "id": "11329240",
+              "name": "Intel UHD Graphics 770"
+            }
+          ]
+        },
+        {
+          "id": "CPU_CORES_NUMBER",
+          "name": "Quantidade de núcleos de CPU",
+          "value_id": "2605974",
+          "value_name": "16",
+          "values": [
+            {
+              "id": "2605974",
+              "name": "16"
+            }
+          ]
+        },
+        {
+          "id": "MAX_RAM_MEMORY_SIZE_SUPPORTED",
+          "name": "Tamanho máximo de memória RAM suportada",
+          "value_id": "4053161",
+          "value_name": "128 GB",
+          "values": [
+            {
+              "id": "4053161",
+              "name": "128 GB"
+            }
+          ]
+        },
+        {
+          "id": "MIN_CLOCK_FREQUENCY",
+          "name": "Frequência mínima de relógio",
+          "value_id": "927849",
+          "value_name": "3.4 GHz",
+          "values": [
+            {
+              "id": "927849",
+              "name": "3.4 GHz"
+            }
+          ]
+        },
+        {
+          "id": "MAX_CLOCK_FREQUENCY",
+          "name": "Frequência máxima de relógio",
+          "value_id": "13354427",
+          "value_name": "5.4 GHz",
+          "values": [
+            {
+              "id": "13354427",
+              "name": "5.4 GHz"
+            }
+          ]
+        },
+        {
+          "id": "CACHE",
+          "name": "Cache",
+          "value_id": "2334474",
+          "value_name": "30 MB",
+          "values": [
+            {
+              "id": "2334474",
+              "name": "30 MB"
+            }
+          ]
+        },
+        {
+          "id": "IS_GAMER",
+          "name": "É gamer",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "IS_UNLOCKED",
+          "name": "Está desbloqueado",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "LITHOGRAPHY",
+          "name": "Litografia",
+          "value_id": "13386410",
+          "value_name": "7 nm",
+          "values": [
+            {
+              "id": "13386410",
+              "name": "7 nm"
+            }
+          ]
+        },
+        {
+          "id": "RELEASE_YEAR",
+          "name": "Ano de lançamento",
+          "value_id": "11166326",
+          "value_name": "2022",
+          "values": [
+            {
+              "id": "11166326",
+              "name": "2022"
+            }
+          ]
+        },
+        {
+          "id": "TDP",
+          "name": "TDP",
+          "value_id": "13723914",
+          "value_name": "128 W",
+          "values": [
+            {
+              "id": "13723914",
+              "name": "128 W"
+            }
+          ]
+        },
+        {
+          "id": "CPU_THREADS_NUMBER",
+          "name": "Quantidade de fios de CPU",
+          "value_id": "8584216",
+          "value_name": "24",
+          "values": [
+            {
+              "id": "8584216",
+              "name": "24"
+            }
+          ]
+        },
+        {
+          "id": "COOLING_TYPE",
+          "name": "Tipo de refrigeração",
+          "value_id": "47685204",
+          "value_name": "Ar",
+          "values": [
+            {
+              "id": "47685204",
+              "name": "Ar"
+            }
+          ]
+        },
+        {
+          "id": "WITH_HYPER_THREADING",
+          "name": "Com hyper-threading",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "IS_4K_COMPATIBLE",
+          "name": "É compatível com 4K",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "GPU_BRAND",
+          "name": "Marca de GPU",
+          "value_id": "55495729",
+          "value_name": "Intel",
+          "values": [
+            {
+              "id": "55495729",
+              "name": "Intel"
+            }
+          ]
+        },
+        {
+          "id": "GPU_LINE",
+          "name": "Linha de GPU",
+          "value_id": "55866906",
+          "value_name": "UHD Graphics",
+          "values": [
+            {
+              "id": "55866906",
+              "name": "UHD Graphics"
+            }
+          ]
+        },
+        {
+          "id": "GPU_MODEL",
+          "name": "Modelo de GPU",
+          "value_id": "67523490",
+          "value_name": "770",
+          "values": [
+            {
+              "id": "67523490",
+              "name": "770"
+            }
+          ]
+        },
+        {
+          "id": "GPU_CORES_NUMBER",
+          "name": "Quantidade de núcleos de GPU",
+          "value_id": "68009125",
+          "value_name": "32",
+          "values": [
+            {
+              "id": "68009125",
+              "name": "32"
+            }
+          ]
+        },
+        {
+          "id": "GPU_FREQUENCY",
+          "name": "Frequência de GPU",
+          "value_id": "70160277",
+          "value_name": "1.6 GHz",
+          "values": [
+            {
+              "id": "70160277",
+              "name": "1.6 GHz"
+            }
+          ]
+        },
+        {
+          "id": "PCI_EXPRESS_VERSION",
+          "name": "Versão de PCI Express",
+          "value_id": "55492477",
+          "value_name": "PCIe 5.0",
+          "values": [
+            {
+              "id": "55492477",
+              "name": "PCIe 5.0"
+            }
+          ]
+        },
+        {
+          "id": "MAX_RAM_MEMORY_SPEED",
+          "name": "Velocidade máxima da memória RAM",
+          "value_id": "63146206",
+          "value_name": "5600 MT/s",
+          "values": [
+            {
+              "id": "63146206",
+              "name": "5600 MT/s"
+            }
+          ]
+        },
+        {
+          "id": "MEMORY_CHANNEL_QUANTITY",
+          "name": "Quantidade de canais de memória",
+          "value_id": "55665488",
+          "value_name": "2",
+          "values": [
+            {
+              "id": "55665488",
+              "name": "2"
+            }
+          ]
+        },
+        {
+          "id": "L2_CACHE_SIZE",
+          "name": "Tamanho do cache L2",
+          "value_id": "66259755",
+          "value_name": "24 MB",
+          "values": [
+            {
+              "id": "66259755",
+              "name": "24 MB"
+            }
+          ]
+        },
+        {
+          "id": "L3_CACHE_SIZE",
+          "name": "Tamanho do cache L3",
+          "value_id": "55654810",
+          "value_name": "30 MB",
+          "values": [
+            {
+              "id": "55654810",
+              "name": "30 MB"
+            }
+          ]
+        },
+        {
+          "id": "PACKAGE_DATA_SOURCE",
+          "name": "Origem do dado do pacote de fábrica",
+          "value_id": "52228230",
+          "value_name": "CERTIFIED_MEASUREMENT",
+          "values": [
+            {
+              "id": "52228230",
+              "name": "CERTIFIED_MEASUREMENT"
+            }
+          ]
+        },
+        {
+          "id": "IS_OEM",
+          "name": "É OEM",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "MPN",
+          "name": "MPN",
+          "value_id": "13723913",
+          "value_name": "BX8071513700K",
+          "values": [
+            {
+              "id": "13723913",
+              "name": "BX8071513700K"
+            }
+          ]
+        }
+      ],
+      "short_description": {
+        "type": "plaintext",
+        "content": "Núcleos: o coração do processador  \nNeste produto, você encontrará os núcleos, que são responsáveis por executar as instruções e atividades que você atribui ao seu dispositivo. Estes estão diretamente relacionados com dois elementos: os threads e o modelo. Portanto, na hora de escolher um processador, é importante que você valorize os três como um todo.\n\nMáxima potência  \nQuando desbloqueado, você poderá fazer overclocking e assim aumentar a frequência de funcionamento e otimizar o desempenho do seu dispositivo. Personalize ao seu gosto e curta seus videogames ou agilize a renderização de imagens. Descubra as variedades de possibilidades que este recurso oferece a você!"
+      },
+      "parent_id": null,
+      "children_ids": [],
+      "settings": {
+        "content": "fixed",
+        "listing_strategy": "catalog_required",
+        "exclusive": false,
+        "with_enhanced_pictures": false,
+        "base_site_product_id": null,
+        "ttr": "2026-11-03T19:59:52.27547753"
+      },
+      "quality_type": "COMPLETE",
+      "release_info": null,
+      "enhanced_content": null,
+      "tags": [],
+      "date_created": "2022-12-01T14:31:22Z",
+      "authorized_stores": null,
+      "last_updated": "2026-10-15T16:03:05Z",
+      "grouper_id": null,
+      "experiments": {},
+      "decoration_partial_content": false
+    },
+    "fontes": [
+      "https://www.kabum.com.br/produto/400720/processador-intel-core-i7-13700k-lga-1700-3-4ghz-5-4ghz-max-turbo-cache-30mb-16-nucleos-24-threads-bx8071513700k",
+      "https://www.mercadolivre.com.br/p/MLB19917322"
+    ],
+    "revisado_em": "2026-11-03"
+  },
+  {
+    "categoria": "processador",
+    "fabricante": "AMD",
+    "modelo": "Ryzen 3 4100",
+    "mpn": "100-100000510BOX",
+    "especificacoes": {
+      "soquete": "AM4",
+      "nucleo": 4,
+      "thread": 8,
+      "clockbase": 3.8,
+      "clockmax": 4,
+      "videointegrado": 0,
+      "modelo_videointegrado": null,
+      "cooler": 1,
+      "modelo_cooler": "Wraith Stealth",
+      "consumo_energia": 65.0
+    },
+    "produto": {
+      "id": "MLB21034791",
+      "catalog_product_id": "MLB21034791",
+      "status": "active",
+      "pdp_types": [
+        "traditional"
+      ],
+      "domain_id": "MLB-COMPUTER_PROCESSORS",
+      "permalink": "",
+      "name": "Processador para jogadores AMD Ryzen 3 4100 100-100000510BOX de 4 núcleos e 4 GHz",
+      "family_name": "Processador para jogadores AMD Ryzen 3 4100 100-100000510BOX de 4 núcleos e 4 GHz",
+      "type": "catalog_product",
+      "buy_box_winner": null,
+      "pickers": [
+        {
+          "picker_id": "MODEL",
+          "picker_name": "Modelo",
+          "products": [
+            {
+              "product_id": "MLB21034791",
+              "picker_label": "4100",
+              "picture_id": "",
+              "thumbnail": "",
+              "tags": [
+                "selected"
+              ],
+              "changes": [],
+              "permalink": "",
+              "product_name": "AMD Ryzen 3 4100 100-100000510BOX",
+              "auto_completed": false
+            }
+          ],
+          "tags": [],
+          "attributes": [
+            {
+              "attribute_id": "MODEL",
+              "template": "",
+              "position": 1
+            }
+          ],
+          "value_name_delimiter": "",
+          "hide_extra_decoration": false,
+          "secondary_picker_name": ""
+        }
+      ],
+      "pictures": [
+        {
+          "id": "858652-MLA95402946594_102025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_858652-MLA95402946594_102025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 910,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "866305-MLA53109787454_122022",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_866305-MLA53109787454_122022-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 889,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "965757-MLA74157032333_012024",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_965757-MLA74157032333_012024-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 669,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "675118-MLU77986468156_082024",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_675118-MLU77986468156_082024-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1103,
+          "max_height": 1198,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "688353-MLU77986468160_082024",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_688353-MLU77986468160_082024-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1198,
+          "max_height": 828,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "818589-MLU78211108283_082024",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_818589-MLU78211108283_082024-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1199,
+          "max_height": 1191,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "814352-MLU77986250898_082024",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_814352-MLU77986250898_082024-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1199,
+          "max_height": 770,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "943392-MLU77986468192_082024",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_943392-MLU77986468192_082024-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1182,
+          "max_height": 1200,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "749312-MLU77986468204_082024",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_749312-MLU77986468204_082024-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1092,
+          "max_height": 1200,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "756308-MLU77986468210_082024",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_756308-MLU77986468210_082024-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 1091,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        }
+      ],
+      "description_pictures": [],
+      "main_features": [
+        {
+          "text": "Suporta RAM DDR4.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Sua potência é de 65 W.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Possui Hyper-Threading que favorece a execução de programas simultaneamente, dividindo o processador físico em dois processadores lógicos.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "É compatível com 4K.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Produto na embalagem original.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Memória cache rápida e volátil de 4 MB.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Processador inovador desenvolvido sob altos padrões de qualidade.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Soquetes compatíveis: AM4.",
+          "type": "key_value",
+          "metadata": {}
+        }
+      ],
+      "disclaimers": [],
+      "attributes": [
+        {
+          "id": "BRAND",
+          "name": "Marca",
+          "value_id": "18034",
+          "value_name": "AMD",
+          "values": [
+            {
+              "id": "18034",
+              "name": "AMD"
+            }
+          ]
+        },
+        {
+          "id": "LINE",
+          "name": "Linha",
+          "value_id": "1260236",
+          "value_name": "Ryzen 3",
+          "values": [
+            {
+              "id": "1260236",
+              "name": "Ryzen 3"
+            }
+          ]
+        },
+        {
+          "id": "MODEL",
+          "name": "Modelo",
+          "value_id": "11893",
+          "value_name": "4100",
+          "values": [
+            {
+              "id": "11893",
+              "name": "4100"
+            }
+          ]
+        },
+        {
+          "id": "ALPHANUMERIC_MODEL",
+          "name": "Modelo alfanumérico",
+          "value_id": "12316936",
+          "value_name": "100-100000510BOX",
+          "values": [
+            {
+              "id": "12316936",
+              "name": "100-100000510BOX"
+            }
+          ]
+        },
+        {
+          "id": "COMPATIBLE_SOCKETS",
+          "name": "Soquetes compatíveis",
+          "value_id": "2273462",
+          "value_name": "AM4",
+          "values": [
+            {
+              "id": "2273462",
+              "name": "AM4"
+            }
+          ]
+        },
+        {
+          "id": "SUPPORTED_RAM_MEMORY_TYPES",
+          "name": "Tipos de memória RAM suportadas",
+          "value_id": "6991503",
+          "value_name": "DDR4",
+          "values": [
+            {
+              "id": "6991503",
+              "name": "DDR4"
+            }
+          ]
+        },
+        {
+          "id": "ARCHITECTURE",
+          "name": "Arquitetura",
+          "value_id": "927846",
+          "value_name": "x86-64",
+          "values": [
+            {
+              "id": "927846",
+              "name": "x86-64"
+            }
+          ]
+        },
+        {
+          "id": "APPLICATION",
+          "name": "Aplicação",
+          "value_id": "312347",
+          "value_name": "Computadores de mesa",
+          "values": [
+            {
+              "id": "312347",
+              "name": "Computadores de mesa"
+            }
+          ]
+        },
+        {
+          "id": "GRAPHIC_PROCESSOR",
+          "name": "Processador gráfico",
+          "value_id": "22612313",
+          "value_name": "Sem vídeo/Não possui vídeo integrado",
+          "values": [
+            {
+              "id": "22612313",
+              "name": "Sem vídeo/Não possui vídeo integrado"
+            }
+          ]
+        },
+        {
+          "id": "CPU_CORES_NUMBER",
+          "name": "Quantidade de núcleos de CPU",
+          "value_id": "2502518",
+          "value_name": "4",
+          "values": [
+            {
+              "id": "2502518",
+              "name": "4"
+            }
+          ]
+        },
+        {
+          "id": "MAX_RAM_MEMORY_SIZE_SUPPORTED",
+          "name": "Tamanho máximo de memória RAM suportada",
+          "value_id": "4053161",
+          "value_name": "128 GB",
+          "values": [
+            {
+              "id": "4053161",
+              "name": "128 GB"
+            }
+          ]
+        },
+        {
+          "id": "MIN_CLOCK_FREQUENCY",
+          "name": "Frequência mínima de relógio",
+          "value_id": "3934766",
+          "value_name": "3.8 GHz",
+          "values": [
+            {
+              "id": "3934766",
+              "name": "3.8 GHz"
+            }
+          ]
+        },
+        {
+          "id": "MAX_CLOCK_FREQUENCY",
+          "name": "Frequência máxima de relógio",
+          "value_id": "121373",
+          "value_name": "4 GHz",
+          "values": [
+            {
+              "id": "121373",
+              "name": "4 GHz"
+            }
+          ]
+        },
+        {
+          "id": "CACHE",
+          "name": "Cache",
+          "value_id": "927839",
+          "value_name": "4 MB",
+          "values": [
+            {
+              "id": "927839",
+              "name": "4 MB"
+            }
+          ]
+        },
+        {
+          "id": "IS_GAMER",
+          "name": "É gamer",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "IS_UNLOCKED",
+          "name": "Está desbloqueado",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "LITHOGRAPHY",
+          "name": "Litografia",
+          "value_id": "13386410",
+          "value_name": "7 nm",
+          "values": [
+            {
+              "id": "13386410",
+              "name": "7 nm"
+            }
+          ]
+        },
+        {
+          "id": "RELEASE_YEAR",
+          "name": "Ano de lançamento",
+          "value_id": "11166326",
+          "value_name": "2022",
+          "values": [
+            {
+              "id": "11166326",
+              "name": "2022"
+            }
+          ]
+        },
+        {
+          "id": "TDP",
+          "name": "TDP",
+          "value_id": "7504299",
+          "value_name": "65 W",
+          "values": [
+            {
+              "id": "7504299",
+              "name": "65 W"
+            }
+          ]
+        },
+        {
+          "id": "CPU_THREADS_NUMBER",
+          "name": "Quantidade de fios de CPU",
+          "value_id": "8584215",
+          "value_name": "8",
+          "values": [
+            {
+              "id": "8584215",
+              "name": "8"
+            }
+          ]
+        },
+        {
+          "id": "WITH_HYPER_THREADING",
+          "name": "Com hyper-threading",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "IS_4K_COMPATIBLE",
+          "name": "É compatível com 4K",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "PACKAGE_DATA_SOURCE",
+          "name": "Origem do dado do pacote de fábrica",
+          "value_id": "52228230",
+          "value_name": "CERTIFIED_MEASUREMENT",
+          "values": [
+            {
+              "id": "52228230",
+              "name": "CERTIFIED_MEASUREMENT"
+            }
+          ]
+        },
+        {
+          "id": "IS_OEM",
+          "name": "É OEM",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "MPN",
+          "name": "MPN",
+          "value_id": "12316938",
+          "value_name": "100-100000510BOX",
+          "values": [
+            {
+              "id": "12316938",
+              "name": "100-100000510BOX"
+            }
+          ]
+        }
+      ],
+      "short_description": {
+        "type": "plaintext",
+        "content": "Fundamental para o desempenho do seu computador desktop, você não precisa mais pensar em como distribuir tempo e ações, pois agora é possível realizar tarefas simultâneas. \n A AMD tem um catálogo de produtos que se adaptam aos requisitos de todos os tipos de usuários: jogos on-line, edição em grande escala, conteúdo em várias plataformas e muito mais. \n \n Núcleos: o coração do processador \n Neste produto, você encontrará os núcleos, que são responsáveis por executar as instruções e atividades que você atribui ao seu dispositivo. Eles estão diretamente relacionados a dois elementos: os fios e o modelo. Portanto, ao escolher um processador, é importante que você valorize os três como um todo. \n \n Potência máxima \n Quando desbloqueado, você pode fazer overclock e, assim, aumentar a frequência operacional e otimizar o desempenho do seu dispositivo. Personalize-o ao seu gosto e curta seus videogames ou torne a renderização de imagens mais ágil. Descubra a gama de possibilidades que esse recurso oferece a você!"
+      },
+      "parent_id": null,
+      "children_ids": [],
+      "settings": {
+        "content": "fixed",
+        "listing_strategy": "catalog_required",
+        "exclusive": false,
+        "with_enhanced_pictures": false,
+        "base_site_product_id": null,
+        "ttr": "2026-11-03T20:10:18.272934872"
+      },
+      "quality_type": "COMPLETE",
+      "release_info": null,
+      "enhanced_content": null,
+      "tags": [],
+      "date_created": "2023-01-05T22:03:09Z",
+      "authorized_stores": null,
+      "last_updated": "2026-10-02T06:31:55Z",
+      "grouper_id": null,
+      "experiments": {},
+      "decoration_partial_content": false
+    },
+    "fontes": [
+      "https://www.kabum.com.br/produto/357485/processador-amd-ryzen-3-4100-4-0ghz-cache-6mb-am4-wraith-stealth-sem-vi-deo-integrado-100-100000510box",
+      "https://www.mercadolivre.com.br/p/MLB21034791"
+    ],
+    "revisado_em": "2026-11-03"
+  },
+  {
+    "categoria": "processador",
+    "fabricante": "AMD",
+    "modelo": "Ryzen 3 3200G",
+    "mpn": "YD3200C5FHBOX",
+    "especificacoes": {
+      "soquete": "AM4",
+      "nucleo": 4,
+      "thread": 4,
+      "clockbase": 3.6,
+      "clockmax": 4,
+      "videointegrado": 1,
+      "modelo_videointegrado": "Radeon Vega 8",
+      "cooler": 1,
+      "modelo_cooler": "Wraith Stealth",
+      "consumo_energia": 65.0
+    },
+    "produto": {
+      "id": "MLB15076943",
+      "catalog_product_id": "MLB15076943",
+      "status": "active",
+      "pdp_types": [
+        "traditional"
+      ],
+      "domain_id": "MLB-COMPUTER_PROCESSORS",
+      "permalink": "",
+      "name": "Processador gamer AMD Ryzen 3 3200G YD3200C5FHBOX de 4 núcleos e 4GHz de frequência com gráfica integrada",
+      "family_name": "Processador gamer AMD Ryzen 3 3200G YD3200C5FHBOX de 4 núcleos e 4GHz de frequência com gráfica integrada",
+      "type": "catalog_product",
+      "buy_box_winner": null,
+      "pickers": [
+        {
+          "picker_id": "MODEL",
+          "picker_name": "Modelo",
+          "products": [
+            {
+              "product_id": "MLB15076943",
+              "picker_label": "3200G",
+              "picture_id": "",
+              "thumbnail": "",
+              "tags": [
+                "selected"
+              ],
+              "changes": [],
+              "permalink": "",
+              "product_name": "AMD Ryzen 3 3200G YD3200C5FHBOX",
+              "auto_completed": false
+            }
+          ],
+          "tags": [],
+          "attributes": [
+            {
+              "attribute_id": "MODEL",
+              "template": "",
+              "position": 1
+            }
+          ],
+          "value_name_delimiter": "",
+          "hide_extra_decoration": false,
+          "secondary_picker_name": ""
+        }
+      ],
+      "pictures": [
+        {
+          "id": "641806-MLA99527450778_122025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_641806-MLA99527450778_122025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 1172,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "688793-MLA91970212281_092025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_688793-MLA91970212281_092025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1199,
+          "max_height": 1200,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "981284-MLA91571347334_092025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_981284-MLA91571347334_092025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 1173,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "921644-MLA91570982806_092025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_921644-MLA91570982806_092025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 829,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "916061-MLA91571317744_092025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_916061-MLA91571317744_092025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 1168,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "764718-MLA112318431678_062026",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_764718-MLA112318431678_062026-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 800,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "879443-MLA112317813288_062026",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_879443-MLA112317813288_062026-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 800,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "798727-MLA112318166382_062026",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_798727-MLA112318166382_062026-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 800,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        }
+      ],
+      "description_pictures": [],
+      "main_features": [
+        {
+          "text": "É ideal para jogadores e criadores de conteúdo que requerem de um instrumento de alto desempenho.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Memória cache de 4 MB, rápida e volátil.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Processador gráfico Radeon Vega 8 Graphics.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Suporta memória RAM DDR4.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Conta com 4 filos que favorecem a execução de múltiplos programas a cada vez.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Produto na embalagem original.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Processador inovador desenvolvido sob altos padrões de qualidade. ",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Soquetes compatíveis: AM4.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "TDP 65 W.",
+          "type": "key_value",
+          "metadata": {}
+        }
+      ],
+      "disclaimers": [],
+      "attributes": [
+        {
+          "id": "BRAND",
+          "name": "Marca",
+          "value_id": "18034",
+          "value_name": "AMD",
+          "values": [
+            {
+              "id": "18034",
+              "name": "AMD"
+            }
+          ]
+        },
+        {
+          "id": "LINE",
+          "name": "Linha",
+          "value_id": "1260236",
+          "value_name": "Ryzen 3",
+          "values": [
+            {
+              "id": "1260236",
+              "name": "Ryzen 3"
+            }
+          ]
+        },
+        {
+          "id": "MODEL",
+          "name": "Modelo",
+          "value_id": "7626035",
+          "value_name": "3200G",
+          "values": [
+            {
+              "id": "7626035",
+              "name": "3200G"
+            }
+          ]
+        },
+        {
+          "id": "ALPHANUMERIC_MODEL",
+          "name": "Modelo alfanumérico",
+          "value_id": "7626034",
+          "value_name": "YD3200C5FHBOX",
+          "values": [
+            {
+              "id": "7626034",
+              "name": "YD3200C5FHBOX"
+            }
+          ]
+        },
+        {
+          "id": "COMPATIBLE_SOCKETS",
+          "name": "Soquetes compatíveis",
+          "value_id": "2273462",
+          "value_name": "AM4",
+          "values": [
+            {
+              "id": "2273462",
+              "name": "AM4"
+            }
+          ]
+        },
+        {
+          "id": "SUPPORTED_RAM_MEMORY_TYPES",
+          "name": "Tipos de memória RAM suportadas",
+          "value_id": "6991503",
+          "value_name": "DDR4",
+          "values": [
+            {
+              "id": "6991503",
+              "name": "DDR4"
+            }
+          ]
+        },
+        {
+          "id": "ARCHITECTURE",
+          "name": "Arquitetura",
+          "value_id": "927846",
+          "value_name": "x86-64",
+          "values": [
+            {
+              "id": "927846",
+              "name": "x86-64"
+            }
+          ]
+        },
+        {
+          "id": "APPLICATION",
+          "name": "Aplicação",
+          "value_id": "312347",
+          "value_name": "Computadores de mesa",
+          "values": [
+            {
+              "id": "312347",
+              "name": "Computadores de mesa"
+            }
+          ]
+        },
+        {
+          "id": "GRAPHIC_PROCESSOR",
+          "name": "Processador gráfico",
+          "value_id": "9609244",
+          "value_name": "Radeon Vega 8 Graphics",
+          "values": [
+            {
+              "id": "9609244",
+              "name": "Radeon Vega 8 Graphics"
+            }
+          ]
+        },
+        {
+          "id": "CPU_CORES_NUMBER",
+          "name": "Quantidade de núcleos de CPU",
+          "value_id": "2502518",
+          "value_name": "4",
+          "values": [
+            {
+              "id": "2502518",
+              "name": "4"
+            }
+          ]
+        },
+        {
+          "id": "MAX_RAM_MEMORY_SIZE_SUPPORTED",
+          "name": "Tamanho máximo de memória RAM suportada",
+          "value_id": "2968333",
+          "value_name": "64 GB",
+          "values": [
+            {
+              "id": "2968333",
+              "name": "64 GB"
+            }
+          ]
+        },
+        {
+          "id": "MIN_CLOCK_FREQUENCY",
+          "name": "Frequência mínima de relógio",
+          "value_id": "3934809",
+          "value_name": "3.6 GHz",
+          "values": [
+            {
+              "id": "3934809",
+              "name": "3.6 GHz"
+            }
+          ]
+        },
+        {
+          "id": "MAX_CLOCK_FREQUENCY",
+          "name": "Frequência máxima de relógio",
+          "value_id": "121373",
+          "value_name": "4 GHz",
+          "values": [
+            {
+              "id": "121373",
+              "name": "4 GHz"
+            }
+          ]
+        },
+        {
+          "id": "CACHE",
+          "name": "Cache",
+          "value_id": "927839",
+          "value_name": "4 MB",
+          "values": [
+            {
+              "id": "927839",
+              "name": "4 MB"
+            }
+          ]
+        },
+        {
+          "id": "IS_GAMER",
+          "name": "É gamer",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "IS_UNLOCKED",
+          "name": "Está desbloqueado",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "LITHOGRAPHY",
+          "name": "Litografia",
+          "value_id": "13733736",
+          "value_name": "14 nm",
+          "values": [
+            {
+              "id": "13733736",
+              "name": "14 nm"
+            }
+          ]
+        },
+        {
+          "id": "RELEASE_YEAR",
+          "name": "Ano de lançamento",
+          "value_id": "5057727",
+          "value_name": "2019",
+          "values": [
+            {
+              "id": "5057727",
+              "name": "2019"
+            }
+          ]
+        },
+        {
+          "id": "TDP",
+          "name": "TDP",
+          "value_id": "7504299",
+          "value_name": "65 W",
+          "values": [
+            {
+              "id": "7504299",
+              "name": "65 W"
+            }
+          ]
+        },
+        {
+          "id": "CPU_THREADS_NUMBER",
+          "name": "Quantidade de fios de CPU",
+          "value_id": "8584213",
+          "value_name": "4",
+          "values": [
+            {
+              "id": "8584213",
+              "name": "4"
+            }
+          ]
+        },
+        {
+          "id": "COOLING_TYPE",
+          "name": "Tipo de refrigeração",
+          "value_id": "47685204",
+          "value_name": "Ar",
+          "values": [
+            {
+              "id": "47685204",
+              "name": "Ar"
+            }
+          ]
+        },
+        {
+          "id": "WITH_HYPER_THREADING",
+          "name": "Com hyper-threading",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "IS_4K_COMPATIBLE",
+          "name": "É compatível com 4K",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "GPU_BRAND",
+          "name": "Marca de GPU",
+          "value_id": "55495730",
+          "value_name": "AMD",
+          "values": [
+            {
+              "id": "55495730",
+              "name": "AMD"
+            }
+          ]
+        },
+        {
+          "id": "GPU_LINE",
+          "name": "Linha de GPU",
+          "value_id": "66232738",
+          "value_name": "Radeon",
+          "values": [
+            {
+              "id": "66232738",
+              "name": "Radeon"
+            }
+          ]
+        },
+        {
+          "id": "GPU_MODEL",
+          "name": "Modelo de GPU",
+          "value_id": "67522841",
+          "value_name": "Vega 8",
+          "values": [
+            {
+              "id": "67522841",
+              "name": "Vega 8"
+            }
+          ]
+        },
+        {
+          "id": "PCI_EXPRESS_VERSION",
+          "name": "Versão de PCI Express",
+          "value_id": "55492475",
+          "value_name": "PCIe 3.0",
+          "values": [
+            {
+              "id": "55492475",
+              "name": "PCIe 3.0"
+            }
+          ]
+        },
+        {
+          "id": "MAX_RAM_MEMORY_SPEED",
+          "name": "Velocidade máxima da memória RAM",
+          "value_id": "59707149",
+          "value_name": "2933 MT/s",
+          "values": [
+            {
+              "id": "59707149",
+              "name": "2933 MT/s"
+            }
+          ]
+        },
+        {
+          "id": "MAX_TEMPERATURE",
+          "name": "Temperatura máxima",
+          "value_id": "7159814",
+          "value_name": "95 °C",
+          "values": [
+            {
+              "id": "7159814",
+              "name": "95 °C"
+            }
+          ]
+        },
+        {
+          "id": "MEMORY_CHANNEL_QUANTITY",
+          "name": "Quantidade de canais de memória",
+          "value_id": "55665488",
+          "value_name": "2",
+          "values": [
+            {
+              "id": "55665488",
+              "name": "2"
+            }
+          ]
+        },
+        {
+          "id": "L1_CACHE_SIZE",
+          "name": "Tamanho do cache L1",
+          "value_id": "56945926",
+          "value_name": "384 KB",
+          "values": [
+            {
+              "id": "56945926",
+              "name": "384 KB"
+            }
+          ]
+        },
+        {
+          "id": "L2_CACHE_SIZE",
+          "name": "Tamanho do cache L2",
+          "value_id": "55656098",
+          "value_name": "2 MB",
+          "values": [
+            {
+              "id": "55656098",
+              "name": "2 MB"
+            }
+          ]
+        },
+        {
+          "id": "L3_CACHE_SIZE",
+          "name": "Tamanho do cache L3",
+          "value_id": "61300385",
+          "value_name": "4 MB",
+          "values": [
+            {
+              "id": "61300385",
+              "name": "4 MB"
+            }
+          ]
+        },
+        {
+          "id": "PACKAGE_DATA_SOURCE",
+          "name": "Origem do dado do pacote de fábrica",
+          "value_id": "52228230",
+          "value_name": "CERTIFIED_MEASUREMENT",
+          "values": [
+            {
+              "id": "52228230",
+              "name": "CERTIFIED_MEASUREMENT"
+            }
+          ]
+        },
+        {
+          "id": "IS_OEM",
+          "name": "É OEM",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "MPN",
+          "name": "MPN",
+          "value_id": "22782287",
+          "value_name": "YD3200C5FHBOX",
+          "values": [
+            {
+              "id": "22782287",
+              "name": "YD3200C5FHBOX"
+            }
+          ]
+        }
+      ],
+      "short_description": {
+        "type": "plaintext",
+        "content": "Processador AMD Ryzen 3 3200G 3.6GHz Turbo 4.0GHz 4 Núcleos AM4 com Radeon Vega 8 Graphics\n\nO AMD Ryzen 3 3200G oferece excelente desempenho para tarefas do dia a dia, produtividade e entretenimento. Equipado com gráficos integrados Radeon Vega 8, dispensa o uso de placa de vídeo dedicada em diversas aplicações, proporcionando uma solução completa para PCs domésticos e gamers de entrada.\n\nESPECIFICAÇÕES:\n\nMarca: AMD\nLinha: Ryzen 3\nModelo: YD3200C5FHBOX\nSocket: AM4\nArquitetura: Zen\nProcesso de Fabricação: 12 nm FinFET\nTDP: 65 W\nTemperatura Máxima: 95 °C\n\nDESEMPENHO:\n\nQuantidade de Núcleos: 4\nQuantidade de Threads: 4\nFrequência Base: 3.6 GHz\nFrequência Máxima em Boost: até 4.0 GHz\n\nMEMÓRIA CACHE:\n\nCache L1: 384 KB\nCache L2: 2 MB\nCache L3: 4 MB\n\nMEMÓRIA:\n\nTipo de Memória: DDR4\nCanais de Memória: Dual Channel\nVelocidade Máxima Suportada: até 2933 MHz\n\nGRÁFICOS INTEGRADOS:\n\nGPU Integrada: Radeon Vega 8 Graphics\n\nEXPANSÃO:\n\nVersão PCI Express: PCIe 3.0 x8\n\nREFRIGERAÇÃO:\n\nCooler Incluso: Wraith Stealth\n\nDIFERENCIAIS:\n\nAlto desempenho com 4 núcleos e 4 threads\nGráficos Radeon Vega 8 integrados\nCompatibilidade com plataforma AM4\nSuporte a memórias DDR4 de alta velocidade\nExcelente opção para computadores domésticos, escritório e configurações gamer de entrada\n\nCONTEÚDO DA EMBALAGEM:\n\n1 Processador AMD Ryzen 3 3200G\n1 Cooler AMD Wraith Stealth\n1 Manual do usuário\n\nModelo: YD3200C5FHBOX\nMarca: AMD\n"
+      },
+      "parent_id": null,
+      "children_ids": [],
+      "settings": {
+        "content": "fixed",
+        "listing_strategy": "catalog_required",
+        "exclusive": false,
+        "with_enhanced_pictures": false,
+        "base_site_product_id": null,
+        "ttr": "2026-11-05T08:28:31.327103567"
+      },
+      "quality_type": "COMPLETE",
+      "release_info": null,
+      "enhanced_content": null,
+      "tags": [],
+      "date_created": "2019-08-22T13:43:41Z",
+      "authorized_stores": null,
+      "last_updated": "2026-10-15T15:41:42Z",
+      "grouper_id": null,
+      "experiments": {},
+      "decoration_partial_content": false
+    },
+    "fontes": [
+      "https://www.kabum.com.br/produto/161591/processador-amd-ryzen-3-3200g-3-6ghz-4ghz-max-turbo-cache-6mb-am4-yd3200c5fhbox",
+      "https://www.mercadolivre.com.br/p/MLB15076943"
+    ],
+    "revisado_em": "2026-11-03"
+  },
+  {
+    "categoria": "processador",
+    "fabricante": "AMD",
+    "modelo": "Ryzen 7 5700G",
+    "mpn": "100-100000263BOX",
+    "especificacoes": {
+      "soquete": "AM4",
+      "nucleo": 8,
+      "thread": 16,
+      "clockbase": 3.8,
+      "clockmax": 4.6,
+      "videointegrado": 1,
+      "modelo_videointegrado": "Radeon Vega 8",
+      "cooler": 1,
+      "modelo_cooler": "Wraith Stealth",
+      "consumo_energia": 65.0
+    },
+    "produto": {
+      "id": "MLB18441624",
+      "catalog_product_id": "MLB18441624",
+      "status": "active",
+      "pdp_types": [
+        "traditional"
+      ],
+      "domain_id": "MLB-COMPUTER_PROCESSORS",
+      "permalink": "",
+      "name": "Processador AMD Ryzen 7 5700G 100-100000263BOX de 8 núcleos e 4.6GHz de frequência com gráfica integrada",
+      "family_name": "Processador AMD Ryzen 7 5700G 100-100000263BOX de 8 núcleos e 4.6GHz de frequência com gráfica integrada",
+      "type": "catalog_product",
+      "buy_box_winner": null,
+      "pickers": [
+        {
+          "picker_id": "MODEL",
+          "picker_name": "Modelo",
+          "products": [
+            {
+              "product_id": "MLB18441624",
+              "picker_label": "5700G",
+              "picture_id": "",
+              "thumbnail": "",
+              "tags": [
+                "selected"
+              ],
+              "changes": [],
+              "permalink": "",
+              "product_name": "AMD Ryzen 7 5700G 100-100000263BOX",
+              "auto_completed": false
+            }
+          ],
+          "tags": [],
+          "attributes": [
+            {
+              "attribute_id": "MODEL",
+              "template": "",
+              "position": 1
+            }
+          ],
+          "value_name_delimiter": "",
+          "hide_extra_decoration": false,
+          "secondary_picker_name": ""
+        }
+      ],
+      "pictures": [
+        {
+          "id": "941100-MLA99523579842_122025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_941100-MLA99523579842_122025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1199,
+          "max_height": 1200,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "994748-MLA91614712168_092025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_994748-MLA91614712168_092025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1062,
+          "max_height": 1200,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "724475-MLA92014785883_092025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_724475-MLA92014785883_092025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 1095,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "772704-MLA92014340745_092025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_772704-MLA92014340745_092025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 889,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "612097-MLA92014528937_092025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_612097-MLA92014528937_092025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1099,
+          "max_height": 1200,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "989909-MLA54404266985_032023",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_989909-MLA54404266985_032023-F.jpg",
+          "suggested_for_picker": [],
+          "max_width": 1012,
+          "max_height": 562,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        }
+      ],
+      "description_pictures": [],
+      "main_features": [
+        {
+          "text": "É ideal para jogadores e criadores de conteúdo que requerem de um instrumento de alto desempenho.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Memória cache de 16 MB, rápida e volátil.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Processador gráfico Radeon Graphics.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Suporta memória RAM DDR4.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Possui Hyper-Threading que favorece a execução de programas de maneira simultânea, ao dividir o processador físico em dois processadores lógicos.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Produto na embalagem original.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Processador inovador desenvolvido sob altos padrões de qualidade. ",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Soquetes compatíveis: AM4.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "TDP 65 W.",
+          "type": "key_value",
+          "metadata": {}
+        }
+      ],
+      "disclaimers": [],
+      "attributes": [
+        {
+          "id": "BRAND",
+          "name": "Marca",
+          "value_id": "18034",
+          "value_name": "AMD",
+          "values": [
+            {
+              "id": "18034",
+              "name": "AMD"
+            }
+          ]
+        },
+        {
+          "id": "LINE",
+          "name": "Linha",
+          "value_id": "968657",
+          "value_name": "Ryzen 7",
+          "values": [
+            {
+              "id": "968657",
+              "name": "Ryzen 7"
+            }
+          ]
+        },
+        {
+          "id": "MODEL",
+          "name": "Modelo",
+          "value_id": "11087667",
+          "value_name": "5700G",
+          "values": [
+            {
+              "id": "11087667",
+              "name": "5700G"
+            }
+          ]
+        },
+        {
+          "id": "ALPHANUMERIC_MODEL",
+          "name": "Modelo alfanumérico",
+          "value_id": "11087664",
+          "value_name": "100-100000263BOX",
+          "values": [
+            {
+              "id": "11087664",
+              "name": "100-100000263BOX"
+            }
+          ]
+        },
+        {
+          "id": "COMPATIBLE_SOCKETS",
+          "name": "Soquetes compatíveis",
+          "value_id": "2273462",
+          "value_name": "AM4",
+          "values": [
+            {
+              "id": "2273462",
+              "name": "AM4"
+            }
+          ]
+        },
+        {
+          "id": "SUPPORTED_RAM_MEMORY_TYPES",
+          "name": "Tipos de memória RAM suportadas",
+          "value_id": "6991503",
+          "value_name": "DDR4",
+          "values": [
+            {
+              "id": "6991503",
+              "name": "DDR4"
+            }
+          ]
+        },
+        {
+          "id": "ARCHITECTURE",
+          "name": "Arquitetura",
+          "value_id": "43689162",
+          "value_name": "x86-64",
+          "values": [
+            {
+              "id": "43689162",
+              "name": "x86-64"
+            }
+          ]
+        },
+        {
+          "id": "APPLICATION",
+          "name": "Aplicação",
+          "value_id": "17407377",
+          "value_name": "PC - Computadores de mesa",
+          "values": [
+            {
+              "id": "17407377",
+              "name": "PC - Computadores de mesa"
+            }
+          ]
+        },
+        {
+          "id": "GRAPHIC_PROCESSOR",
+          "name": "Processador gráfico",
+          "value_id": "11097369",
+          "value_name": "Radeon Graphics",
+          "values": [
+            {
+              "id": "11097369",
+              "name": "Radeon Graphics"
+            }
+          ]
+        },
+        {
+          "id": "CPU_CORES_NUMBER",
+          "name": "Quantidade de núcleos de CPU",
+          "value_id": "2549447",
+          "value_name": "8",
+          "values": [
+            {
+              "id": "2549447",
+              "name": "8"
+            }
+          ]
+        },
+        {
+          "id": "MAX_RAM_MEMORY_SIZE_SUPPORTED",
+          "name": "Tamanho máximo de memória RAM suportada",
+          "value_id": "4053161",
+          "value_name": "128 GB",
+          "values": [
+            {
+              "id": "4053161",
+              "name": "128 GB"
+            }
+          ]
+        },
+        {
+          "id": "MIN_CLOCK_FREQUENCY",
+          "name": "Frequência mínima de relógio",
+          "value_id": "3934766",
+          "value_name": "3.8 GHz",
+          "values": [
+            {
+              "id": "3934766",
+              "name": "3.8 GHz"
+            }
+          ]
+        },
+        {
+          "id": "MAX_CLOCK_FREQUENCY",
+          "name": "Frequência máxima de relógio",
+          "value_id": "2134830",
+          "value_name": "4.6 GHz",
+          "values": [
+            {
+              "id": "2134830",
+              "name": "4.6 GHz"
+            }
+          ]
+        },
+        {
+          "id": "CACHE",
+          "name": "Cache",
+          "value_id": "507009",
+          "value_name": "16 MB",
+          "values": [
+            {
+              "id": "507009",
+              "name": "16 MB"
+            }
+          ]
+        },
+        {
+          "id": "IS_GAMER",
+          "name": "É gamer",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "IS_UNLOCKED",
+          "name": "Está desbloqueado",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "LITHOGRAPHY",
+          "name": "Litografia",
+          "value_id": "13386410",
+          "value_name": "7 nm",
+          "values": [
+            {
+              "id": "13386410",
+              "name": "7 nm"
+            }
+          ]
+        },
+        {
+          "id": "RELEASE_YEAR",
+          "name": "Ano de lançamento",
+          "value_id": "9676768",
+          "value_name": "2021",
+          "values": [
+            {
+              "id": "9676768",
+              "name": "2021"
+            }
+          ]
+        },
+        {
+          "id": "TDP",
+          "name": "TDP",
+          "value_id": "7504299",
+          "value_name": "65 W",
+          "values": [
+            {
+              "id": "7504299",
+              "name": "65 W"
+            }
+          ]
+        },
+        {
+          "id": "CPU_THREADS_NUMBER",
+          "name": "Quantidade de fios de CPU",
+          "value_id": "8584214",
+          "value_name": "16",
+          "values": [
+            {
+              "id": "8584214",
+              "name": "16"
+            }
+          ]
+        },
+        {
+          "id": "COOLING_TYPE",
+          "name": "Tipo de refrigeração",
+          "value_id": "47685204",
+          "value_name": "Ar",
+          "values": [
+            {
+              "id": "47685204",
+              "name": "Ar"
+            }
+          ]
+        },
+        {
+          "id": "WITH_HYPER_THREADING",
+          "name": "Com hyper-threading",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "IS_4K_COMPATIBLE",
+          "name": "É compatível com 4K",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "GPU_BRAND",
+          "name": "Marca de GPU",
+          "value_id": "55495730",
+          "value_name": "AMD",
+          "values": [
+            {
+              "id": "55495730",
+              "name": "AMD"
+            }
+          ]
+        },
+        {
+          "id": "GPU_LINE",
+          "name": "Linha de GPU",
+          "value_id": "66232738",
+          "value_name": "Radeon",
+          "values": [
+            {
+              "id": "66232738",
+              "name": "Radeon"
+            }
+          ]
+        },
+        {
+          "id": "GPU_MODEL",
+          "name": "Modelo de GPU",
+          "value_id": "75558994",
+          "value_name": "Integrated Vega 8",
+          "values": [
+            {
+              "id": "75558994",
+              "name": "Integrated Vega 8"
+            }
+          ]
+        },
+        {
+          "id": "GPU_CORES_NUMBER",
+          "name": "Quantidade de núcleos de GPU",
+          "value_id": "67837859",
+          "value_name": "8",
+          "values": [
+            {
+              "id": "67837859",
+              "name": "8"
+            }
+          ]
+        },
+        {
+          "id": "GPU_FREQUENCY",
+          "name": "Frequência de GPU",
+          "value_id": "72452353",
+          "value_name": "2 GHz",
+          "values": [
+            {
+              "id": "72452353",
+              "name": "2 GHz"
+            }
+          ]
+        },
+        {
+          "id": "PCI_EXPRESS_VERSION",
+          "name": "Versão de PCI Express",
+          "value_id": "55492475",
+          "value_name": "PCIe 3.0",
+          "values": [
+            {
+              "id": "55492475",
+              "name": "PCIe 3.0"
+            }
+          ]
+        },
+        {
+          "id": "MAX_RAM_MEMORY_SPEED",
+          "name": "Velocidade máxima da memória RAM",
+          "value_id": "55779913",
+          "value_name": "3200 MT/s",
+          "values": [
+            {
+              "id": "55779913",
+              "name": "3200 MT/s"
+            }
+          ]
+        },
+        {
+          "id": "MAX_TEMPERATURE",
+          "name": "Temperatura máxima",
+          "value_id": "7159814",
+          "value_name": "95 °C",
+          "values": [
+            {
+              "id": "7159814",
+              "name": "95 °C"
+            }
+          ]
+        },
+        {
+          "id": "WITH_GRAPHIC_MEMORY_ECC",
+          "name": "Com memória gráfica ECC",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "MEMORY_CHANNEL_QUANTITY",
+          "name": "Quantidade de canais de memória",
+          "value_id": "55665488",
+          "value_name": "2",
+          "values": [
+            {
+              "id": "55665488",
+              "name": "2"
+            }
+          ]
+        },
+        {
+          "id": "L1_CACHE_SIZE",
+          "name": "Tamanho do cache L1",
+          "value_id": "58536426",
+          "value_name": "512 KB",
+          "values": [
+            {
+              "id": "58536426",
+              "name": "512 KB"
+            }
+          ]
+        },
+        {
+          "id": "L2_CACHE_SIZE",
+          "name": "Tamanho do cache L2",
+          "value_id": "56278619",
+          "value_name": "4 MB",
+          "values": [
+            {
+              "id": "56278619",
+              "name": "4 MB"
+            }
+          ]
+        },
+        {
+          "id": "L3_CACHE_SIZE",
+          "name": "Tamanho do cache L3",
+          "value_id": "58536427",
+          "value_name": "16 MB",
+          "values": [
+            {
+              "id": "58536427",
+              "name": "16 MB"
+            }
+          ]
+        },
+        {
+          "id": "PACKAGE_DATA_SOURCE",
+          "name": "Origem do dado do pacote de fábrica",
+          "value_id": "52228230",
+          "value_name": "CERTIFIED_MEASUREMENT",
+          "values": [
+            {
+              "id": "52228230",
+              "name": "CERTIFIED_MEASUREMENT"
+            }
+          ]
+        },
+        {
+          "id": "IS_OEM",
+          "name": "É OEM",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "MPN",
+          "name": "MPN",
+          "value_id": "24219669",
+          "value_name": "100-100000263BOX",
+          "values": [
+            {
+              "id": "24219669",
+              "name": "100-100000263BOX"
+            }
+          ]
+        }
+      ],
+      "short_description": {
+        "type": "plaintext",
+        "content": "Características:\n* Marca: AMD\n* Modelo: 100-100000263BOX\nEspecificações:\n* Nº de núcleos de CPU: 8\n* Nº de threads: 16\n* Nº de núcleos de GPU: 8\n* Clock básico: 3.8GHz\n* Clock de Max Boost: Até 4.6GHz\n* Total de Cache L2: 4MB\n* Cachê L3 total: 16MB\n* Desbloqueado: Sim\n* CMOS: TSMC 7nm FinFET\n* Pacote: AM4\n* Versão PCI Express: PCIe® 3.0\n* Solução térmica: Wraith Stealth\n* TDP / TDP Padrão: 65W\n* cTDP: 45-65W\n* Temps máx: 95°C\n\nMemória:\n* Velocidade máxima da memória: Até 3200MHz\n* Tipo de memória: DDR4\n* Canais de memória: 2\n\nEspecificações da placa de vídeo:\n* Frequência gráfica: 2000 MHz\n* Modelo gráfico: Radeon Graphics\n* Contagem de núcleos gráficos: 8"
+      },
+      "parent_id": null,
+      "children_ids": [],
+      "settings": {
+        "content": "fixed",
+        "listing_strategy": "catalog_required",
+        "exclusive": false,
+        "with_enhanced_pictures": false,
+        "base_site_product_id": null,
+        "ttr": "2026-11-05T02:19:15.704022561"
+      },
+      "quality_type": "COMPLETE",
+      "release_info": null,
+      "enhanced_content": null,
+      "tags": [],
+      "date_created": "2021-09-09T19:08:47Z",
+      "authorized_stores": null,
+      "last_updated": "2026-10-02T01:42:09Z",
+      "grouper_id": null,
+      "experiments": {},
+      "decoration_partial_content": false
+    },
+    "fontes": [
+      "https://www.kabum.com.br/produto/181089/processador-amd-ryzen-7-5700g-3-8ghz-4-6ghz-max-turbo-cache-20mb-8-nucleos-16-threads-am4-com-video-integrado-100-100000263box",
+      "https://www.mercadolivre.com.br/p/MLB18441624"
+    ],
+    "revisado_em": "2026-11-03"
+  },
+  {
+    "categoria": "processador",
+    "fabricante": "AMD",
+    "modelo": "Ryzen 7 5800XT",
+    "mpn": "100-100001582WOF",
+    "especificacoes": {
+      "soquete": "AM4",
+      "nucleo": 8,
+      "thread": 16,
+      "clockbase": 3.8,
+      "clockmax": 4.8,
+      "videointegrado": 0,
+      "modelo_videointegrado": null,
+      "cooler": 0,
+      "modelo_cooler": null,
+      "consumo_energia": 105.0
+    },
+    "produto": {
+      "id": "MLB62146896",
+      "catalog_product_id": "MLB62146896",
+      "status": "active",
+      "pdp_types": [
+        "traditional"
+      ],
+      "domain_id": "MLB-COMPUTER_PROCESSORS",
+      "permalink": "",
+      "name": "Processador Cpu S/cooler Amd Ryzen 7 5800xt 100-100001582wof",
+      "family_name": "Processador Cpu S/cooler Amd Ryzen 7 5800xt 100-100001582wof",
+      "type": "catalog_product",
+      "buy_box_winner": null,
+      "pickers": [
+        {
+          "picker_id": "MODEL",
+          "picker_name": "Modelo",
+          "products": [
+            {
+              "product_id": "MLB62146896",
+              "picker_label": "Ryzen 7 5800XT",
+              "picture_id": "",
+              "thumbnail": "",
+              "tags": [
+                "selected"
+              ],
+              "changes": [],
+              "permalink": "",
+              "product_name": "AMD Ryzen 7 5800XT 100-100001582WOF",
+              "auto_completed": false
+            }
+          ],
+          "tags": [],
+          "attributes": [
+            {
+              "attribute_id": "MODEL",
+              "template": "",
+              "position": 1
+            }
+          ],
+          "value_name_delimiter": "",
+          "hide_extra_decoration": false,
+          "secondary_picker_name": ""
+        }
+      ],
+      "pictures": [
+        {
+          "id": "905372-MLA98359288723_112025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_905372-MLA98359288723_112025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 882,
+          "max_height": 974,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        }
+      ],
+      "description_pictures": [],
+      "main_features": [
+        {
+          "text": "Oito núcleos e 16 threads com clock de até 4,8 GHz que processam multitarefas simultâneas com agilidade em desktop.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Arquitetura Zen 3 com 32 MB de cache L3 que acelera o carregamento de texturas e reduz latências em jogos pesados.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Suporte para até 128 GB de memória RAM DDR4 3200 MT/s que permite a execução de softwares de edição de vídeo complexos.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "PCIe 4.0 integrado que possibilita taxas de transferência de dados mais rápidas entre a placa de vídeo e o processador.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Multiplicador desbloqueado para overclock manual que permite ajustar a frequência conforme o limite térmico de 90 °C.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Compatibilidade com soquete AM4 que viabiliza a atualização de computadores existentes com chipsets X570, B550 ou A520.",
+          "type": "key_value",
+          "metadata": {}
+        }
+      ],
+      "disclaimers": [],
+      "attributes": [
+        {
+          "id": "BRAND",
+          "name": "Marca",
+          "value_id": "18034",
+          "value_name": "AMD",
+          "values": [
+            {
+              "id": "18034",
+              "name": "AMD"
+            }
+          ]
+        },
+        {
+          "id": "LINE",
+          "name": "Linha",
+          "value_id": "507010",
+          "value_name": "Ryzen",
+          "values": [
+            {
+              "id": "507010",
+              "name": "Ryzen"
+            }
+          ]
+        },
+        {
+          "id": "MODEL",
+          "name": "Modelo",
+          "value_id": "66924276",
+          "value_name": "Ryzen 7 5800XT",
+          "values": [
+            {
+              "id": "66924276",
+              "name": "Ryzen 7 5800XT"
+            }
+          ]
+        },
+        {
+          "id": "ALPHANUMERIC_MODEL",
+          "name": "Modelo alfanumérico",
+          "value_id": "66924274",
+          "value_name": "100-100001582WOF",
+          "values": [
+            {
+              "id": "66924274",
+              "name": "100-100001582WOF"
+            }
+          ]
+        },
+        {
+          "id": "COMPATIBLE_SOCKETS",
+          "name": "Soquetes compatíveis",
+          "value_id": "2273462",
+          "value_name": "AM4",
+          "values": [
+            {
+              "id": "2273462",
+              "name": "AM4"
+            }
+          ]
+        },
+        {
+          "id": "SUPPORTED_RAM_MEMORY_TYPES",
+          "name": "Tipos de memória RAM suportadas",
+          "value_id": "6991503",
+          "value_name": "DDR4",
+          "values": [
+            {
+              "id": "6991503",
+              "name": "DDR4"
+            }
+          ]
+        },
+        {
+          "id": "ARCHITECTURE",
+          "name": "Arquitetura",
+          "value_id": "927846",
+          "value_name": "x86-64",
+          "values": [
+            {
+              "id": "927846",
+              "name": "x86-64"
+            }
+          ]
+        },
+        {
+          "id": "APPLICATION",
+          "name": "Aplicação",
+          "value_id": "312347",
+          "value_name": "Computadores de mesa",
+          "values": [
+            {
+              "id": "312347",
+              "name": "Computadores de mesa"
+            }
+          ]
+        },
+        {
+          "id": "CPU_CORES_NUMBER",
+          "name": "Quantidade de núcleos de CPU",
+          "value_id": "2549447",
+          "value_name": "8",
+          "values": [
+            {
+              "id": "2549447",
+              "name": "8"
+            }
+          ]
+        },
+        {
+          "id": "MAX_RAM_MEMORY_SIZE_SUPPORTED",
+          "name": "Tamanho máximo de memória RAM suportada",
+          "value_id": "4053161",
+          "value_name": "128 GB",
+          "values": [
+            {
+              "id": "4053161",
+              "name": "128 GB"
+            }
+          ]
+        },
+        {
+          "id": "MIN_CLOCK_FREQUENCY",
+          "name": "Frequência mínima de relógio",
+          "value_id": "3934766",
+          "value_name": "3.8 GHz",
+          "values": [
+            {
+              "id": "3934766",
+              "name": "3.8 GHz"
+            }
+          ]
+        },
+        {
+          "id": "MAX_CLOCK_FREQUENCY",
+          "name": "Frequência máxima de relógio",
+          "value_id": "4053162",
+          "value_name": "4.8 GHz",
+          "values": [
+            {
+              "id": "4053162",
+              "name": "4.8 GHz"
+            }
+          ]
+        },
+        {
+          "id": "CACHE",
+          "name": "Cache",
+          "value_id": "2090007",
+          "value_name": "32 MB",
+          "values": [
+            {
+              "id": "2090007",
+              "name": "32 MB"
+            }
+          ]
+        },
+        {
+          "id": "IS_GAMER",
+          "name": "É gamer",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "IS_UNLOCKED",
+          "name": "Está desbloqueado",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "LITHOGRAPHY",
+          "name": "Litografia",
+          "value_id": "13386410",
+          "value_name": "7 nm",
+          "values": [
+            {
+              "id": "13386410",
+              "name": "7 nm"
+            }
+          ]
+        },
+        {
+          "id": "RELEASE_YEAR",
+          "name": "Ano de lançamento",
+          "value_id": "22764580",
+          "value_name": "2024",
+          "values": [
+            {
+              "id": "22764580",
+              "name": "2024"
+            }
+          ]
+        },
+        {
+          "id": "TDP",
+          "name": "TDP",
+          "value_id": "7520955",
+          "value_name": "105 W",
+          "values": [
+            {
+              "id": "7520955",
+              "name": "105 W"
+            }
+          ]
+        },
+        {
+          "id": "CPU_THREADS_NUMBER",
+          "name": "Quantidade de fios de CPU",
+          "value_id": "8584214",
+          "value_name": "16",
+          "values": [
+            {
+              "id": "8584214",
+              "name": "16"
+            }
+          ]
+        },
+        {
+          "id": "PCI_EXPRESS_VERSION",
+          "name": "Versão de PCI Express",
+          "value_id": "55492476",
+          "value_name": "PCIe 4.0",
+          "values": [
+            {
+              "id": "55492476",
+              "name": "PCIe 4.0"
+            }
+          ]
+        },
+        {
+          "id": "MAX_RAM_MEMORY_SPEED",
+          "name": "Velocidade máxima da memória RAM",
+          "value_id": "55779913",
+          "value_name": "3200 MT/s",
+          "values": [
+            {
+              "id": "55779913",
+              "name": "3200 MT/s"
+            }
+          ]
+        },
+        {
+          "id": "MAX_TEMPERATURE",
+          "name": "Temperatura máxima",
+          "value_id": "7159815",
+          "value_name": "90 °C",
+          "values": [
+            {
+              "id": "7159815",
+              "name": "90 °C"
+            }
+          ]
+        },
+        {
+          "id": "L1_CACHE_SIZE",
+          "name": "Tamanho do cache L1",
+          "value_id": "58536426",
+          "value_name": "512 KB",
+          "values": [
+            {
+              "id": "58536426",
+              "name": "512 KB"
+            }
+          ]
+        },
+        {
+          "id": "L2_CACHE_SIZE",
+          "name": "Tamanho do cache L2",
+          "value_id": "56278619",
+          "value_name": "4 MB",
+          "values": [
+            {
+              "id": "56278619",
+              "name": "4 MB"
+            }
+          ]
+        },
+        {
+          "id": "L3_CACHE_SIZE",
+          "name": "Tamanho do cache L3",
+          "value_id": "56945925",
+          "value_name": "32 MB",
+          "values": [
+            {
+              "id": "56945925",
+              "name": "32 MB"
+            }
+          ]
+        },
+        {
+          "id": "IS_OEM",
+          "name": "É OEM",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "MPN",
+          "name": "MPN",
+          "value_id": "66924277",
+          "value_name": "100-100001582WOF",
+          "values": [
+            {
+              "id": "66924277",
+              "name": "100-100001582WOF"
+            }
+          ]
+        }
+      ],
+      "short_description": {
+        "type": "plaintext",
+        "content": "Descrição do Produto\n\nO AMD Ryzen 7 5800XT foi desenvolvido para usuários que buscam alto desempenho em jogos, multitarefas, streaming e aplicações avançadas de produtividade. Baseado na arquitetura AMD Zen 3, conta com 8 núcleos e 16 threads, oferecendo excelente capacidade de processamento para PCs gamer e workstations com plataforma AM4. Com frequência turbo de até 4.8GHz, 36MB de cache total e suporte a memórias DDR4, proporciona respostas rápidas em tarefas exigentes, além de ser desbloqueado para overclock. Por não possuir gráficos integrados e não acompanhar solução térmica, recomenda-se a utilização de uma placa de vídeo dedicada e cooler compatível de alto desempenho.\n\nEspecificações técnicas\n\nCaracterísticas\n\nMarca: AMD\nModelo: Ryzen 7 5800XT\nCódigo do Produto: 100-100001582WOF\nLinha: AMD Ryzen 5000 Series\nArquitetura: AMD Zen 3 (Vermeer)\nNúcleos: 8\nThreads: 16\nFrequência Base: 3.8GHz\nFrequência Max Turbo: até 4.8GHz\nCache L1: 512KB\nCache L2: 4MB\nCache L3: 32MB\nCache Total: 36MB\nSocket: AM4\nProcesso de Fabricação: TSMC 7nm FinFET\nTDP Padrão: 105W\nGráficos Integrados: Não possui\nDesbloqueado para Overclock: Sim\nTecnologia de Boost: AMD Precision Boost 2\nInterface PCI Express: PCIe 4.0\n\nOutras Características\n\nCategoria: Processador\nSegmento: Desktop de alto desempenho\nTipo de Memória Suportada: DDR4\nCanais de Memória: 2 canais\nVelocidade Máxima de Memória: até DDR4-3200MHz\nCapacidade Máxima de Memória: até 128GB\nCompatibilidade: Placas-mãe AMD com socket AM4 e BIOS compatível\nChipsets Compatíveis: Séries AMD 400 e 500, conforme atualização de BIOS da placa-mãe\nSolução Térmica Inclusa: Não possui cooler incluso\nRefrigeração Recomendada: Cooler para socket AM4 compatível com processadores de 105W ou superior\nAplicação: Games, streaming, edição de vídeo, criação de conteúdo e multitarefas avançadas\nRecursos Compatíveis: AMD Ryzen Master, AMD StoreMI e AMD Virtualization\nCompatibilidade de Sistema: Windows 10 e Windows 11 64-bit, RHEL e Ubuntu\nConteúdo da Embalagem: 1 Processador AMD Ryzen 7 5800XT e documentação do fabricante"
+      },
+      "parent_id": null,
+      "children_ids": [],
+      "settings": {
+        "content": "fixed",
+        "listing_strategy": "catalog_required",
+        "exclusive": false,
+        "with_enhanced_pictures": false,
+        "base_site_product_id": null,
+        "ttr": "2026-11-05T00:39:27.605861461"
+      },
+      "quality_type": "COMPLETE",
+      "release_info": null,
+      "enhanced_content": null,
+      "tags": [],
+      "date_created": "2025-11-14T12:54:39Z",
+      "authorized_stores": null,
+      "last_updated": "2026-01-20T19:55:29Z",
+      "grouper_id": null,
+      "experiments": {},
+      "decoration_partial_content": false
+    },
+    "fontes": [
+      "https://www.kabum.com.br/produto/938498/processador-amd-ryzen-7-5800xt-3-8-ghz-4-8-ghz-max-turbo-cache-32mb-8-nucleos-16-threads-am4-sem-video-integrado-100-100001582wof",
+      "https://www.mercadolivre.com.br/p/MLB62146896"
+    ],
+    "revisado_em": "2026-11-03"
+  },
+  {
+    "categoria": "processador",
+    "fabricante": "Intel",
+    "modelo": "Core i9-12900K",
+    "mpn": "BX8071512900K",
+    "especificacoes": {
+      "soquete": "LGA1700",
+      "nucleo": 16,
+      "thread": 24,
+      "clockbase": 3.2,
+      "clockmax": 5.2,
+      "videointegrado": 1,
+      "modelo_videointegrado": "UHD Graphics 770",
+      "cooler": 0,
+      "modelo_cooler": null,
+      "consumo_energia": 125.0
+    },
+    "produto": {
+      "id": "MLB18603111",
+      "catalog_product_id": "MLB18603111",
+      "status": "active",
+      "pdp_types": [
+        "traditional"
+      ],
+      "domain_id": "MLB-COMPUTER_PROCESSORS",
+      "permalink": "",
+      "name": "Processador gamer Intel Core I9-12900K BX8071512900K de 16 núcleos e 5.2GHz de frequência com gráfica integrada",
+      "family_name": "Processador gamer Intel Core I9-12900K BX8071512900K de 16 núcleos e 5.2GHz de frequência com gráfica integrada",
+      "type": "catalog_product",
+      "buy_box_winner": null,
+      "pickers": [
+        {
+          "picker_id": "MODEL",
+          "picker_name": "Modelo",
+          "products": [
+            {
+              "product_id": "MLB18603111",
+              "picker_label": "I9-12900K",
+              "picture_id": "",
+              "thumbnail": "",
+              "tags": [
+                "selected"
+              ],
+              "changes": [],
+              "permalink": "",
+              "product_name": "Intel Core i9 I9-12900K BX8071512900K",
+              "auto_completed": false
+            }
+          ],
+          "tags": [],
+          "attributes": [
+            {
+              "attribute_id": "MODEL",
+              "template": "",
+              "position": 1
+            }
+          ],
+          "value_name_delimiter": "",
+          "hide_extra_decoration": false,
+          "secondary_picker_name": ""
+        }
+      ],
+      "pictures": [
+        {
+          "id": "764509-MLA116668243081_082026",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_764509-MLA116668243081_082026-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 517,
+          "max_height": 517,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "992981-MLA99905165775_112025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_992981-MLA99905165775_112025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 1006,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "757387-MLA91952079435_092025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_757387-MLA91952079435_092025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1008,
+          "max_height": 1200,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "853160-MLA91951893387_092025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_853160-MLA91951893387_092025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 1175,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        }
+      ],
+      "description_pictures": [],
+      "main_features": [
+        {
+          "text": "Os 16 núcleos e 24 fios de CPU processam múltiplas tarefas simultâneas de edição e renderização sem travamentos.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "A frequência de até 5.2 GHz acelera o carregamento de texturas e a fluidez de quadros em jogos de alto desempenho.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "O suporte para até 128 GB de memória RAM DDR4 ou DDR5 permite a execução de softwares pesados sem gargalos de sistema.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "A placa de vídeo integrada Intel UHD Graphics 770 permite a reprodução de conteúdos em resolução 4K nativa.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "O multiplicador desbloqueado viabiliza o ajuste manual da frequência para otimizar o desempenho térmico e computacional.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "O TDP de 125 W exige a instalação de sistemas de arrefecimento dedicados para manter a estabilidade operacional.",
+          "type": "key_value",
+          "metadata": {}
+        }
+      ],
+      "disclaimers": [],
+      "attributes": [
+        {
+          "id": "BRAND",
+          "name": "Marca",
+          "value_id": "7855833",
+          "value_name": "Intel",
+          "values": [
+            {
+              "id": "7855833",
+              "name": "Intel"
+            }
+          ]
+        },
+        {
+          "id": "LINE",
+          "name": "Linha",
+          "value_id": "7769247",
+          "value_name": "Core i9",
+          "values": [
+            {
+              "id": "7769247",
+              "name": "Core i9"
+            }
+          ]
+        },
+        {
+          "id": "MODEL",
+          "name": "Modelo",
+          "value_id": "11329247",
+          "value_name": "I9-12900K",
+          "values": [
+            {
+              "id": "11329247",
+              "name": "I9-12900K"
+            }
+          ]
+        },
+        {
+          "id": "ALPHANUMERIC_MODEL",
+          "name": "Modelo alfanumérico",
+          "value_id": "11329244",
+          "value_name": "BX8071512900K",
+          "values": [
+            {
+              "id": "11329244",
+              "name": "BX8071512900K"
+            }
+          ]
+        },
+        {
+          "id": "COMPATIBLE_SOCKETS",
+          "name": "Soquetes compatíveis",
+          "value_id": "11329220",
+          "value_name": "FCLGA1700",
+          "values": [
+            {
+              "id": "11329220",
+              "name": "FCLGA1700"
+            }
+          ]
+        },
+        {
+          "id": "SUPPORTED_RAM_MEMORY_TYPES",
+          "name": "Tipos de memória RAM suportadas",
+          "value_id": null,
+          "value_name": "DDR4, DDR5",
+          "values": [
+            {
+              "id": "6991503",
+              "name": "DDR4"
+            },
+            {
+              "id": "11329219",
+              "name": "DDR5"
+            }
+          ]
+        },
+        {
+          "id": "ARCHITECTURE",
+          "name": "Arquitetura",
+          "value_id": "927846",
+          "value_name": "x86-64",
+          "values": [
+            {
+              "id": "927846",
+              "name": "x86-64"
+            }
+          ]
+        },
+        {
+          "id": "APPLICATION",
+          "name": "Aplicação",
+          "value_id": "312347",
+          "value_name": "Computadores de mesa",
+          "values": [
+            {
+              "id": "312347",
+              "name": "Computadores de mesa"
+            }
+          ]
+        },
+        {
+          "id": "GRAPHIC_PROCESSOR",
+          "name": "Processador gráfico",
+          "value_id": "11329228",
+          "value_name": "Intel HD Graphics 770",
+          "values": [
+            {
+              "id": "11329228",
+              "name": "Intel HD Graphics 770"
+            }
+          ]
+        },
+        {
+          "id": "CPU_CORES_NUMBER",
+          "name": "Quantidade de núcleos de CPU",
+          "value_id": "2605974",
+          "value_name": "16",
+          "values": [
+            {
+              "id": "2605974",
+              "name": "16"
+            }
+          ]
+        },
+        {
+          "id": "MAX_RAM_MEMORY_SIZE_SUPPORTED",
+          "name": "Tamanho máximo de memória RAM suportada",
+          "value_id": "4053161",
+          "value_name": "128 GB",
+          "values": [
+            {
+              "id": "4053161",
+              "name": "128 GB"
+            }
+          ]
+        },
+        {
+          "id": "MIN_CLOCK_FREQUENCY",
+          "name": "Frequência mínima de relógio",
+          "value_id": "927812",
+          "value_name": "2.4 GHz",
+          "values": [
+            {
+              "id": "927812",
+              "name": "2.4 GHz"
+            }
+          ]
+        },
+        {
+          "id": "MAX_CLOCK_FREQUENCY",
+          "name": "Frequência máxima de relógio",
+          "value_id": "8767994",
+          "value_name": "5.2 GHz",
+          "values": [
+            {
+              "id": "8767994",
+              "name": "5.2 GHz"
+            }
+          ]
+        },
+        {
+          "id": "CACHE",
+          "name": "Cache",
+          "value_id": "2334474",
+          "value_name": "30 MB",
+          "values": [
+            {
+              "id": "2334474",
+              "name": "30 MB"
+            }
+          ]
+        },
+        {
+          "id": "IS_GAMER",
+          "name": "É gamer",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "IS_UNLOCKED",
+          "name": "Está desbloqueado",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "LITHOGRAPHY",
+          "name": "Litografia",
+          "value_id": "13386410",
+          "value_name": "7 nm",
+          "values": [
+            {
+              "id": "13386410",
+              "name": "7 nm"
+            }
+          ]
+        },
+        {
+          "id": "RELEASE_YEAR",
+          "name": "Ano de lançamento",
+          "value_id": "9676768",
+          "value_name": "2021",
+          "values": [
+            {
+              "id": "9676768",
+              "name": "2021"
+            }
+          ]
+        },
+        {
+          "id": "TDP",
+          "name": "TDP",
+          "value_id": "7510654",
+          "value_name": "125 W",
+          "values": [
+            {
+              "id": "7510654",
+              "name": "125 W"
+            }
+          ]
+        },
+        {
+          "id": "CPU_THREADS_NUMBER",
+          "name": "Quantidade de fios de CPU",
+          "value_id": "8584216",
+          "value_name": "24",
+          "values": [
+            {
+              "id": "8584216",
+              "name": "24"
+            }
+          ]
+        },
+        {
+          "id": "WITH_HYPER_THREADING",
+          "name": "Com hyper-threading",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "IS_4K_COMPATIBLE",
+          "name": "É compatível com 4K",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "GPU_BRAND",
+          "name": "Marca de GPU",
+          "value_id": "55495729",
+          "value_name": "Intel",
+          "values": [
+            {
+              "id": "55495729",
+              "name": "Intel"
+            }
+          ]
+        },
+        {
+          "id": "GPU_LINE",
+          "name": "Linha de GPU",
+          "value_id": "62271148",
+          "value_name": "HD Graphics",
+          "values": [
+            {
+              "id": "62271148",
+              "name": "HD Graphics"
+            }
+          ]
+        },
+        {
+          "id": "GPU_MODEL",
+          "name": "Modelo de GPU",
+          "value_id": "67523490",
+          "value_name": "770",
+          "values": [
+            {
+              "id": "67523490",
+              "name": "770"
+            }
+          ]
+        },
+        {
+          "id": "PACKAGE_DATA_SOURCE",
+          "name": "Origem do dado do pacote de fábrica",
+          "value_id": "52228230",
+          "value_name": "CERTIFIED_MEASUREMENT",
+          "values": [
+            {
+              "id": "52228230",
+              "name": "CERTIFIED_MEASUREMENT"
+            }
+          ]
+        },
+        {
+          "id": "IS_OEM",
+          "name": "É OEM",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "MPN",
+          "name": "MPN",
+          "value_id": "11329246",
+          "value_name": "BX8071512900K",
+          "values": [
+            {
+              "id": "11329246",
+              "name": "BX8071512900K"
+            }
+          ]
+        }
+      ],
+      "short_description": {
+        "type": "plaintext",
+        "content": "Processador Core i9-12900K Box Intel 3.2GHz (5.2GHz Max Turbo) 16 Cores 24 Threads LGA 1700 - BX8071512900K\n\nO Processador Intel Core i9-12900K de 12ª geração feito com a arquitetura híbrida onde combina núcleos de desempenho e eficiência. Os 8 núcleos de desempenho P-cores possuem desempenho em cargas de trabalho fácil e os 8 núcleos eficientes E-cores contam com desempenho multithreaded. O processador contém tecnologia Turbo Boost Max 3.0, cache de 30MB e suporte para PCIe Gen 5 e DDR5 para componentes de alto desempenho, como memória e gráficos.\n\nCaracterísticas Processador i9-12900K Box 12ª Geração Intel 3.2GHz (5.2GHz Max Turbo) LGA 1700 Cache 30MB\n- Marca: Intel\n- Modelo: BX8071512900K\n\nEspecificações Processador i9-12900K Box 3.2GHz Cache 30MB Intel\n\nCPU\n- Total de Núcleos: 16\n- Nº de núcleos de desempenho: 8\n- Nº de núcleos eficientes: 8\n- Tópicos totais: 24\n- Frequência Turbo Máxima: 5,20 GHz\n- Tecnologia Intel Turbo Boost Max 3.0 Frequência: 5,20 GHz\n- Frequência Turbo máxima do núcleo de desempenho: 5,10 GHz\n- Frequência Turbo máxima de núcleo eficiente: 3,90 GHz\n- Frequência base do núcleo de desempenho: 3,20 GHz\n- Frequência básica de núcleo eficiente: 2,40 GHz\n- Cache: 30 MB Intel Cache Inteligente\n- Cache L2 Total: 14 MB\n- Potência Base do Processador: 125 W\n- Potência Turbo Máxima: 241 W\n\nMemória\n- Tamanho máximo da memória (dependente do tipo de memória): 128 GB\n- Tipos de memória: Até DDR5 4800 MT/s / Até DDR4 3200 MT/s\n- Nº máximo de canais de memória: 2\n- Largura de banda máxima de memória: 76,8 GB/s\n\nGráficos\n- Gráficos do Processador: Gráficos Intel UHD 770\n- Frequência básica de gráficos: 300 MHz\n- Frequência Dinâmica Máxima dos Gráficos: 1,55 GHz\n- Saída gráfica: eDP 1.4b, DP 1.4a, HDMI 2.1\n- Unidades de Execução: 32\n- Resolução máxima (HDMI): 4096 x 2160 @ 60Hz\n- Resolução máxima (DP): 7680 x 4320 @ 60Hz\n- Resolução Máxima (eDP - Painel Plano Integrado): 5120 x 3200 @ 120Hz\n- Suporte DirectX: 12\n- Suporte OpenGL*: 4,5\n- Mecanismos de codec multiformato: 2\n- Vídeo de sincronização rápida Intel: sim\n- Tecnologia Intel Clear Video HD: sim\n- Nº de monitores suportados: 4\n- ID de dispositivo: 0x4680\n- Suporte OpenCL: 2.1\n\nOpções de expansão\n- Revisão da interface de mídia direta (DMI): 4,0\n- Nº máximo de pistas DMI: 8\n- Escalabilidade: Apenas 1S\n- Revisão PCI Express: 5,0 e 4,0\n- Configurações PCI Express: Até 1x16+4, 2x8+4\n- Nº máximo de pistas PCI Express: 20\n\nTecnologias avançadas\n- Acelerador Intel Gaussiano e Neural: 3,0\n- Diretor de threads Intel: Sim\n- Intel Deep Learning Boost (Intel DL Boost): Sim\n- Memória Intel Optane compatível: Sim\n- Tecnologia Intel Speed Shift: Sim\n- Tecnologia Intel Turbo Boost Max 3.0: Sim\n- Tecnologia Intel Turbo Boost: 2,0\n- Tecnologia Intel Hyper-Threading: Sim\n- Tecnologia de virtualização Intel (VT-x): Sim\n- Tecnologia de virtualização Intel para E/S direcionada (VT-d): Sim\n- Intel VT-x com tabelas de páginas estendidas (EPT): Sim\n- Intel 64: Sim\n- Conjunto de instruções: 64 bits\n- Extensões do conjunto de instruções: Intel SSE4.1, Intel SSE4.2, Intel AVX2\n- Estados ociosos: Sim\n- Tecnologia Intel SpeedStep aprimorada: Sim\n- Tecnologias de monitoramento térmico: Sim\n- Dispositivo de gerenciamento de volume Intel (VMD): Sim"
+      },
+      "parent_id": null,
+      "children_ids": [],
+      "settings": {
+        "content": "fixed",
+        "listing_strategy": "catalog_required",
+        "exclusive": false,
+        "with_enhanced_pictures": false,
+        "base_site_product_id": null,
+        "ttr": "2026-11-03T19:31:23.973272964"
+      },
+      "quality_type": "COMPLETE",
+      "release_info": null,
+      "enhanced_content": null,
+      "tags": [],
+      "date_created": "2021-11-08T14:01:57Z",
+      "authorized_stores": null,
+      "last_updated": "2026-10-30T14:55:01Z",
+      "grouper_id": null,
+      "experiments": {},
+      "decoration_partial_content": false
+    },
+    "fontes": [
+      "https://www.kabum.com.br/produto/241050/processador-intel-core-i9-12900k-3-2ghz-5-2ghz-max-turbo-cache-30mb-16-nucleos-24-threads-lga-1700-com-video-integrado-bx8071512900k",
+      "https://www.mercadolivre.com.br/p/MLB18603111"
+    ],
+    "revisado_em": "2026-11-03"
+  },
+  {
+    "categoria": "ssd",
+    "fabricante": "WD",
+    "modelo": "Green 240GB",
+    "mpn": "WDS240G3G0A",
+    "especificacoes": {
+      "capacidade_gb": 240,
+      "tipo": "SATA",
+      "interface": "SATA III",
+      "formato": "2.5",
+      "velocidade_leitura_mbps": 545,
+      "velocidade_gravacao_mbps": 430,
+      "consumo_energia": 4.0
+    },
+    "produto": {
+      "id": "MLB20596154",
+      "catalog_product_id": "MLB20596154",
+      "status": "active",
+      "pdp_types": [
+        "traditional"
+      ],
+      "domain_id": "MLB-HARD_DRIVES_AND_SSDS",
+      "permalink": "",
+      "name": "interno Western Digital WD Green WDS240G3G0A 240GB preto",
+      "family_name": "interno Western Digital WD Green WDS240G3G0A 240GB",
+      "type": "catalog_product",
+      "buy_box_winner": null,
+      "pickers": [
+        {
+          "picker_id": "COLOR",
+          "picker_name": "Cor",
+          "products": [
+            {
+              "product_id": "MLB20596154",
+              "picker_label": "Preto",
+              "picture_id": "835076-MLA99524060370_122025",
+              "thumbnail": "https://http2.mlstatic.com/D_NQ_NP_835076-MLA99524060370_122025-I.jpg",
+              "tags": [
+                "selected"
+              ],
+              "changes": [],
+              "permalink": "",
+              "product_name": "Western Digital WD Green WDS240G3G0A 240 GB - Preto",
+              "auto_completed": true
+            }
+          ],
+          "tags": [],
+          "attributes": [
+            {
+              "attribute_id": "COLOR",
+              "template": "",
+              "position": 1
+            }
+          ],
+          "value_name_delimiter": "",
+          "hide_extra_decoration": false,
+          "secondary_picker_name": ""
+        }
+      ],
+      "pictures": [
+        {
+          "id": "835076-MLA99524060370_122025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_835076-MLA99524060370_122025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 1200,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "864495-MLA91572871406_092025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_864495-MLA91572871406_092025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 1144,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "608072-MLA91572851688_092025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_608072-MLA91572851688_092025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1191,
+          "max_height": 1200,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "937780-MLA91972285873_092025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_937780-MLA91972285873_092025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 1199,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        },
+        {
+          "id": "756603-MLA91972206905_092025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_756603-MLA91972206905_092025-F.jpg",
+          "suggested_for_picker": null,
+          "max_width": 1200,
+          "max_height": 1199,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        }
+      ],
+      "description_pictures": [],
+      "main_features": [
+        {
+          "text": "É útil para salvar programas e documentos com a sua capacidade de 240 GB.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Resistente aos choques fortes.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Tamanho de 2.5 \".",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Interface de conexão: SATA III.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Adequado para PC e Notebook.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Capacidade de armazenamento de 240 GB para guardar todos os seus arquivos importantes.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Velocidade de transferência de dados de 545 MB/s para um desempenho rápido e eficiente.",
+          "type": "key_value",
+          "metadata": {}
+        }
+      ],
+      "disclaimers": [],
+      "attributes": [
+        {
+          "id": "BRAND",
+          "name": "Marca",
+          "value_id": "9593",
+          "value_name": "Western Digital",
+          "values": [
+            {
+              "id": "9593",
+              "name": "Western Digital"
+            }
+          ]
+        },
+        {
+          "id": "LINE",
+          "name": "Linha",
+          "value_id": "7737770",
+          "value_name": "WD Green",
+          "values": [
+            {
+              "id": "7737770",
+              "name": "WD Green"
+            }
+          ]
+        },
+        {
+          "id": "MODEL",
+          "name": "Modelo",
+          "value_id": "12909517",
+          "value_name": "WDS240G3G0A",
+          "values": [
+            {
+              "id": "12909517",
+              "name": "WDS240G3G0A"
+            }
+          ]
+        },
+        {
+          "id": "CAPACITY",
+          "name": "Capacidade",
+          "value_id": "47555",
+          "value_name": "240 GB",
+          "values": [
+            {
+              "id": "47555",
+              "name": "240 GB"
+            }
+          ]
+        },
+        {
+          "id": "COLOR",
+          "name": "Cor",
+          "value_id": "52049",
+          "value_name": "Preto",
+          "values": [
+            {
+              "id": "52049",
+              "name": "Preto"
+            }
+          ]
+        },
+        {
+          "id": "DETAILED_MODEL",
+          "name": "Modelo detalhado",
+          "value_id": "10739290",
+          "value_name": "Green",
+          "values": [
+            {
+              "id": "10739290",
+              "name": "Green"
+            }
+          ]
+        },
+        {
+          "id": "DRIVE_STORAGE_TYPE",
+          "name": "Tipo de armazenamento do disco",
+          "value_id": "122392",
+          "value_name": "SSD",
+          "values": [
+            {
+              "id": "122392",
+              "name": "SSD"
+            }
+          ]
+        },
+        {
+          "id": "INTERFACES",
+          "name": "Interfaces",
+          "value_id": "1118308",
+          "value_name": "SATA III",
+          "values": [
+            {
+              "id": "1118308",
+              "name": "SATA III"
+            }
+          ]
+        },
+        {
+          "id": "HARD_DRIVE_AND_SSD_LOCATION",
+          "name": "Localização do disco rígido e SSD",
+          "value_id": "96008",
+          "value_name": "Interno",
+          "values": [
+            {
+              "id": "96008",
+              "name": "Interno"
+            }
+          ]
+        },
+        {
+          "id": "HARD_DRIVE_AND_SSD_FORM_FACTOR",
+          "name": "Fator de forma do disco rígido e SSD",
+          "value_id": "9049266",
+          "value_name": "2.5 \"",
+          "values": [
+            {
+              "id": "9049266",
+              "name": "2.5 \""
+            }
+          ]
+        },
+        {
+          "id": "OPERATING_TEMPERATURE",
+          "name": "Temperatura de operação",
+          "value_id": "11642676",
+          "value_name": "0 °C - 70 °C",
+          "values": [
+            {
+              "id": "11642676",
+              "name": "0 °C - 70 °C"
+            }
+          ]
+        },
+        {
+          "id": "IS_SUITABLE_FOR_RAID",
+          "name": "É adequado para RAID",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "IS_DUST_RESISTANT",
+          "name": "É resistente ao pó",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "IS_WATER_RESISTANT",
+          "name": "É resistente à água",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "CONNECTIVITY",
+          "name": "Conectividade",
+          "value_id": "1118308",
+          "value_name": "SATA III",
+          "values": [
+            {
+              "id": "1118308",
+              "name": "SATA III"
+            }
+          ]
+        },
+        {
+          "id": "PACKAGE_DATA_SOURCE",
+          "name": "Origem do dado do pacote de fábrica",
+          "value_id": "52228230",
+          "value_name": "CERTIFIED_MEASUREMENT",
+          "values": [
+            {
+              "id": "52228230",
+              "name": "CERTIFIED_MEASUREMENT"
+            }
+          ]
+        },
+        {
+          "id": "IS_GAMER",
+          "name": "É gamer",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "IS_SHOCK_RESISTANT",
+          "name": "É resistente a choques",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "WITH_SECURITY_DATA_SYSTEM",
+          "name": "Com sistema de segurança de dados",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "WITH_CLOUD_BACKUP",
+          "name": "Com copia de segurança na nuvem",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "WITH_3D_NAND_TECHNOLOGY",
+          "name": "Com tecnologia 3D NAND",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "WITH_HEATSINK",
+          "name": "Com dissipador de calor",
+          "value_id": "242084",
+          "value_name": "Não",
+          "values": [
+            {
+              "id": "242084",
+              "name": "Não",
+              "meta": {
+                "value": false
+              }
+            }
+          ],
+          "meta": {
+            "value": false
+          }
+        },
+        {
+          "id": "STORAGE_TEMPERATURE",
+          "name": "Temperatura de armazenamento",
+          "value_id": "43978252",
+          "value_name": "-55 °C x 85 °C",
+          "values": [
+            {
+              "id": "43978252",
+              "name": "-55 °C x 85 °C"
+            }
+          ]
+        },
+        {
+          "id": "DATA_CACHE",
+          "name": "Dados do cache",
+          "value_id": "1126292",
+          "value_name": "64 MB",
+          "values": [
+            {
+              "id": "1126292",
+              "name": "64 MB"
+            }
+          ]
+        },
+        {
+          "id": "HARD_DRIVE_AND_SSD_POWER_CONSUMPTION",
+          "name": "Consumo energético do disco rígido e SSD",
+          "value_id": null,
+          "value_name": "60mW ativo, 1700mW leitura y escritura, 10mW cessação",
+          "values": [
+            {
+              "id": "12909514",
+              "name": "60mW ativo"
+            },
+            {
+              "id": "12909515",
+              "name": "1700mW leitura y escritura"
+            },
+            {
+              "id": "12909516",
+              "name": "10mW cessação"
+            }
+          ]
+        },
+        {
+          "id": "WIDTH",
+          "name": "Largura",
+          "value_id": "22772181",
+          "value_name": "6.985 cm",
+          "values": [
+            {
+              "id": "22772181",
+              "name": "6.985 cm"
+            }
+          ]
+        },
+        {
+          "id": "HEIGHT",
+          "name": "Altura",
+          "value_id": "11892226",
+          "value_name": "0.7 cm",
+          "values": [
+            {
+              "id": "11892226",
+              "name": "0.7 cm"
+            }
+          ]
+        },
+        {
+          "id": "DEPTH",
+          "name": "Profundidade",
+          "value_id": "48721320",
+          "value_name": "10.05 cm",
+          "values": [
+            {
+              "id": "48721320",
+              "name": "10.05 cm"
+            }
+          ]
+        },
+        {
+          "id": "WEIGHT",
+          "name": "Peso",
+          "value_id": "8607130",
+          "value_name": "32.1 g",
+          "values": [
+            {
+              "id": "8607130",
+              "name": "32.1 g"
+            }
+          ]
+        },
+        {
+          "id": "MPN",
+          "name": "MPN",
+          "value_id": "17283231",
+          "value_name": "WDS240G3G0A",
+          "values": [
+            {
+              "id": "17283231",
+              "name": "WDS240G3G0A"
+            }
+          ]
+        }
+      ],
+      "short_description": {
+        "type": "plaintext",
+        "content": "O armazenamento que você precisa  \nAproveite ao máximo sua capacidade de 240 GB, a qual lhe permitirá salvar um grande número de documentos, filmes, músicas e todos os arquivos necessários.\n\nMais velocidade a seu alcance  \nSua interface SATA III permitirá maior velocidade, uso e eficiência ao transferir dados."
+      },
+      "parent_id": "MLB19464935",
+      "children_ids": [],
+      "settings": {
+        "content": "fixed",
+        "listing_strategy": "catalog_required",
+        "exclusive": false,
+        "with_enhanced_pictures": false,
+        "base_site_product_id": null,
+        "ttr": "2026-11-03T12:16:36.42685611"
+      },
+      "quality_type": "COMPLETE",
+      "release_info": null,
+      "enhanced_content": null,
+      "tags": [],
+      "date_created": "2022-12-11T19:17:40Z",
+      "authorized_stores": null,
+      "last_updated": "2026-10-20T23:32:21Z",
+      "grouper_id": null,
+      "experiments": {},
+      "decoration_partial_content": false
+    },
+    "fontes": [
+      "https://www.kabum.com.br/produto/384777/ssd-wd-green-240gb-2-5-7mm-sata-3-wds240g3g0a",
+      "https://www.mercadolivre.com.br/p/MLB20596154"
+    ],
+    "revisado_em": "2026-11-03"
+  },
+  {
+    "categoria": "hd",
+    "fabricante": "Seagate",
+    "modelo": "Exos 8TB",
+    "mpn": "ST8000NM017B",
+    "especificacoes": {
+      "capacidade_gb": 8000,
+      "velocidade_rpm": 7200,
+      "interface": "SATA III",
+      "memoria_cache_mb": 256,
+      "consumo_energia": 6.5
+    },
+    "produto": {
+      "id": "MLB23074841",
+      "catalog_product_id": "MLB23074841",
+      "status": "active",
+      "pdp_types": [
+        "traditional"
+      ],
+      "domain_id": "MLB-HARD_DRIVES_AND_SSDS",
+      "permalink": "",
+      "name": "Hd Servidor Seagate Exos 7e10 8tb St8000nm017b Cor Prateado",
+      "family_name": "Seagate Exos 7E10 ST8000NM017B 8TB 8TB",
+      "type": "catalog_product",
+      "buy_box_winner": null,
+      "pickers": [
+        {
+          "picker_id": "COLOR",
+          "picker_name": "Cor",
+          "products": [
+            {
+              "product_id": "MLB23074841",
+              "picker_label": "Prateado",
+              "picture_id": "785552-MLA94154515984_102025",
+              "thumbnail": "https://http2.mlstatic.com/D_NQ_NP_785552-MLA94154515984_102025-I.jpg",
+              "tags": [
+                "selected"
+              ],
+              "changes": [],
+              "permalink": "",
+              "product_name": "Seagate Exos 7E10 ST8000NM017B 8TB 8 TB - Prateado",
+              "auto_completed": true
+            }
+          ],
+          "tags": [],
+          "attributes": [
+            {
+              "attribute_id": "COLOR",
+              "template": "",
+              "position": 1
+            }
+          ],
+          "value_name_delimiter": "",
+          "hide_extra_decoration": false,
+          "secondary_picker_name": ""
+        }
+      ],
+      "pictures": [
+        {
+          "id": "785552-MLA94154515984_102025",
+          "url": "https://http2.mlstatic.com/D_NQ_NP_785552-MLA94154515984_102025-F.jpg",
+          "suggested_for_picker": [],
+          "max_width": 694,
+          "max_height": 1000,
+          "source_metadata": null,
+          "tags": [
+            "CAROUSEL"
+          ]
+        }
+      ],
+      "description_pictures": [],
+      "main_features": [
+        {
+          "text": "Disco rígido de 8TB com interface SATA para alta transferência de dados.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Velocidade de rotação de 7200 rpm para desempenho otimizado.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Transferência de dados de até 255 MB/s para eficiência.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Sistema de segurança integrado para proteção de dados sensíveis.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Resistente a choques, garantindo durabilidade em uso intenso.",
+          "type": "key_value",
+          "metadata": {}
+        },
+        {
+          "text": "Adequado para configurações RAID, aumentando a confiabilidade.",
+          "type": "key_value",
+          "metadata": {}
+        }
+      ],
+      "disclaimers": [],
+      "attributes": [
+        {
+          "id": "BRAND",
+          "name": "Marca",
+          "value_id": "9597",
+          "value_name": "Seagate",
+          "values": [
+            {
+              "id": "9597",
+              "name": "Seagate"
+            }
+          ]
+        },
+        {
+          "id": "LINE",
+          "name": "Linha",
+          "value_id": "13251246",
+          "value_name": "Exos 7E10",
+          "values": [
+            {
+              "id": "13251246",
+              "name": "Exos 7E10"
+            }
+          ]
+        },
+        {
+          "id": "MODEL",
+          "name": "Modelo",
+          "value_id": "17592961",
+          "value_name": "ST8000NM017B",
+          "values": [
+            {
+              "id": "17592961",
+              "name": "ST8000NM017B"
+            }
+          ]
+        },
+        {
+          "id": "VERSION",
+          "name": "Versão",
+          "value_id": "17623493",
+          "value_name": "8TB",
+          "values": [
+            {
+              "id": "17623493",
+              "name": "8TB"
+            }
+          ]
+        },
+        {
+          "id": "CAPACITY",
+          "name": "Capacidade",
+          "value_id": "48321",
+          "value_name": "8 TB",
+          "values": [
+            {
+              "id": "48321",
+              "name": "8 TB"
+            }
+          ]
+        },
+        {
+          "id": "COLOR",
+          "name": "Cor",
+          "value_id": "52053",
+          "value_name": "Prateado",
+          "values": [
+            {
+              "id": "52053",
+              "name": "Prateado"
+            }
+          ]
+        },
+        {
+          "id": "DETAILED_MODEL",
+          "name": "Modelo detalhado",
+          "value_id": "20923231",
+          "value_name": "ST8000NM017B",
+          "values": [
+            {
+              "id": "20923231",
+              "name": "ST8000NM017B"
+            }
+          ]
+        },
+        {
+          "id": "SSD_MAX_READ_SPEED",
+          "name": "Velocidade máxima de leitura SSD",
+          "value_id": "53551409",
+          "value_name": "6 GB/s",
+          "values": [
+            {
+              "id": "53551409",
+              "name": "6 GB/s"
+            }
+          ]
+        },
+        {
+          "id": "SSD_MAX_WRITE_SPEED",
+          "name": "Velocidade máxima de gravação SSD",
+          "value_id": "53707441",
+          "value_name": "6 GB/s",
+          "values": [
+            {
+              "id": "53707441",
+              "name": "6 GB/s"
+            }
+          ]
+        },
+        {
+          "id": "DRIVE_STORAGE_TYPE",
+          "name": "Tipo de armazenamento do disco",
+          "value_id": "122391",
+          "value_name": "HDD",
+          "values": [
+            {
+              "id": "122391",
+              "name": "HDD"
+            }
+          ]
+        },
+        {
+          "id": "INTERFACES",
+          "name": "Interfaces",
+          "value_id": "10474921",
+          "value_name": "SATA",
+          "values": [
+            {
+              "id": "10474921",
+              "name": "SATA"
+            }
+          ]
+        },
+        {
+          "id": "HARD_DRIVE_AND_SSD_LOCATION",
+          "name": "Localização do disco rígido e SSD",
+          "value_id": "96008",
+          "value_name": "Interno",
+          "values": [
+            {
+              "id": "96008",
+              "name": "Interno"
+            }
+          ]
+        },
+        {
+          "id": "HARD_DRIVE_AND_SSD_FORM_FACTOR",
+          "name": "Fator de forma do disco rígido e SSD",
+          "value_id": "9049275",
+          "value_name": "3.5 \"",
+          "values": [
+            {
+              "id": "9049275",
+              "name": "3.5 \""
+            }
+          ]
+        },
+        {
+          "id": "OPERATING_TEMPERATURE",
+          "name": "Temperatura de operação",
+          "value_id": "11659069",
+          "value_name": "5 °C - 60 °C",
+          "values": [
+            {
+              "id": "11659069",
+              "name": "5 °C - 60 °C"
+            }
+          ]
+        },
+        {
+          "id": "IS_SUITABLE_FOR_RAID",
+          "name": "É adequado para RAID",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "ROTATION_SPEED",
+          "name": "Velocidade de rotação",
+          "value_id": "7870148",
+          "value_name": "7200 rpm",
+          "values": [
+            {
+              "id": "7870148",
+              "name": "7200 rpm"
+            }
+          ]
+        },
+        {
+          "id": "CONNECTIVITY",
+          "name": "Conectividade",
+          "value_id": "10474921",
+          "value_name": "SATA",
+          "values": [
+            {
+              "id": "10474921",
+              "name": "SATA"
+            }
+          ]
+        },
+        {
+          "id": "IS_SHOCK_RESISTANT",
+          "name": "É resistente a choques",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "WITH_SECURITY_DATA_SYSTEM",
+          "name": "Com sistema de segurança de dados",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "WITH_CLOUD_BACKUP",
+          "name": "Com copia de segurança na nuvem",
+          "value_id": "242085",
+          "value_name": "Sim",
+          "values": [
+            {
+              "id": "242085",
+              "name": "Sim",
+              "meta": {
+                "value": true
+              }
+            }
+          ],
+          "meta": {
+            "value": true
+          }
+        },
+        {
+          "id": "OS_SUPPORTED",
+          "name": "Sistemas operativos suportados",
+          "value_id": "17592957",
+          "value_name": "D2D",
+          "values": [
+            {
+              "id": "17592957",
+              "name": "D2D"
+            }
+          ]
+        },
+        {
+          "id": "DATA_CACHE",
+          "name": "Dados do cache",
+          "value_id": "2338819",
+          "value_name": "256 MB",
+          "values": [
+            {
+              "id": "2338819",
+              "name": "256 MB"
+            }
+          ]
+        },
+        {
+          "id": "HARD_DRIVE_AND_SSD_POWER_CONSUMPTION",
+          "name": "Consumo energético do disco rígido e SSD",
+          "value_id": null,
+          "value_name": "11.03W leitura, 7.06W reposo",
+          "values": [
+            {
+              "id": "84263463",
+              "name": "11.03W leitura"
+            },
+            {
+              "id": "84263464",
+              "name": "7.06W reposo"
+            }
+          ]
+        },
+        {
+          "id": "WIDTH",
+          "name": "Largura",
+          "value_id": "22646010",
+          "value_name": "10.185 cm",
+          "values": [
+            {
+              "id": "22646010",
+              "name": "10.185 cm"
+            }
+          ]
+        },
+        {
+          "id": "HEIGHT",
+          "name": "Altura",
+          "value_id": "20753067",
+          "value_name": "2.611 cm",
+          "values": [
+            {
+              "id": "20753067",
+              "name": "2.611 cm"
+            }
+          ]
+        },
+        {
+          "id": "DEPTH",
+          "name": "Profundidade",
+          "value_id": "13783221",
+          "value_name": "14.7 cm",
+          "values": [
+            {
+              "id": "13783221",
+              "name": "14.7 cm"
+            }
+          ]
+        },
+        {
+          "id": "WEIGHT",
+          "name": "Peso",
+          "value_id": "9789328",
+          "value_name": "716 g",
+          "values": [
+            {
+              "id": "9789328",
+              "name": "716 g"
+            }
+          ]
+        },
+        {
+          "id": "MPN",
+          "name": "MPN",
+          "value_id": "17592958",
+          "value_name": "ST8000NM017B",
+          "values": [
+            {
+              "id": "17592958",
+              "name": "ST8000NM017B"
+            }
+          ]
+        }
+      ],
+      "short_description": {
+        "type": "plaintext",
+        "content": "A Seagate, uma referência no mercado de unidades de armazenamento é responsável por fornecer os melhores produtos aos seus clientes. Seu controle de qualidade somado ao seu compromisso com a produção sustentável e  responsável com o meio ambiente fazem dela uma líder indiscutível. Seus dispositivos destacam todas essas características que geram um desempenho ótimo, com o objetivo de lhe proporcionar uma ótima experiência de uso.\nO Exos 7E10 ST8000NM017B é caracterizado pela sua eficiência e bom funcionamento, que juntamente com o seu baixo consumo de energia o tornam um disco indispensável para funções padrão.\n\nInquebrável\nAlém de sua funcionalidade e suporte, a importância dos discos de armazenamento também reside na sua qualidade e resistência. Não se preocupe e aproveite a durabilidade deste produto devido à sua capacidade de absorver e resistir a fortes impactos.\n\nConfiança acima de tudo\nProteja todo tipo de informação sensível por meio de seu sistema de segurança integrado. Sua defesa é impenetrável.\n\nMais velocidade ao seu alcance\nEste disco transfere dados através de uma interface SATA, que lhe permitirá transmitir uma quantidade maior de informação."
+      },
+      "parent_id": "MLB23074832",
+      "children_ids": [],
+      "settings": {
+        "content": "fixed",
+        "listing_strategy": "catalog_required",
+        "exclusive": false,
+        "with_enhanced_pictures": false,
+        "base_site_product_id": null,
+        "ttr": "2026-11-03T22:25:35.284978701"
+      },
+      "quality_type": "COMPLETE",
+      "release_info": null,
+      "enhanced_content": null,
+      "tags": [],
+      "date_created": "2023-05-06T13:43:09Z",
+      "authorized_stores": null,
+      "last_updated": "2026-10-27T14:18:57Z",
+      "grouper_id": null,
+      "experiments": {},
+      "decoration_partial_content": false
+    },
+    "fontes": [
+      "https://www.kabum.com.br/produto/404177/hd-seagate-8tb-exos-7e10-7200-rpm-256mb-sata-iii-st8000nm017b",
+      "https://www.mercadolivre.com.br/p/MLB23074841"
+    ],
+    "revisado_em": "2026-11-03"
+  }
+]

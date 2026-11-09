@@ -1,0 +1,11 @@
+[Unit]
+Description=BOOSTio - atualizar precos diariamente as 03h de Brasilia
+
+[Timer]
+OnCalendar=*-*-* 03:00:00 America/Sao_Paulo
+Persistent=true
+AccuracySec=1min
+Unit=boostio-precos.service
+
+[Install]
+WantedBy=timers.target

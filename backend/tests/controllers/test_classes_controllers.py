@@ -17,17 +17,17 @@ CONTROLLERS = [
 
 
 @pytest.mark.parametrize("modulo,nome,blueprint", CONTROLLERS)
-def test_rotas_sao_metodos_de_classes_sem_estado_compartilhado(modulo, nome, blueprint):
+def test_rotas_sao_funcoes_sem_classes_de_controller(modulo, nome, blueprint):
     arquivo = importlib.import_module("controllers." + modulo)
-    classe = getattr(arquivo, nome)
+    assert not hasattr(arquivo, nome)
     app = Flask(__name__)
     app.register_blueprint(getattr(arquivo, blueprint))
     views = [f for endpoint, f in app.view_functions.items() if endpoint != "static"]
     assert views
     for view in views:
         original = inspect.unwrap(view)
-        assert original.__qualname__.startswith(nome + ".")
-        assert isinstance(inspect.getattr_static(classe, original.__name__), staticmethod)
+        assert original.__qualname__ == original.__name__
+        assert inspect.isfunction(original)
 
 
 def test_contrato_de_urls_metodos_e_endpoints_preservado():

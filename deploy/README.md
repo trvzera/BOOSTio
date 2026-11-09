@@ -50,3 +50,44 @@ Para autorizar o Mercado Livre diretamente no servidor, use
 `mercadolivre-autorizacao-preparar` e depois `mercadolivre-conectar`.
 O link administrativo expira em dez minutos e não deve ser compartilhado.
 Instruções e configuração do callback em `docs/ofertas-mercado-livre.md`.
+
+## Atualização diária de preços na VPS
+
+As unidades em `deploy/systemd/` executam o script existente
+`deploy/atualizar_precos.sh` diariamente às **03h de Brasília**, inclusive após
+reiniciar a VPS. O fuso é declarado na própria agenda; em um servidor UTC,
+o horário equivalente atual é 06h. A execução respeita a trava `flock` do script
+e as reservas e limites de consulta da aplicação. O serviço não recria o banco.
+
+Instalação no host Ubuntu, para o projeto em `/opt/BOOSTio` (confira unidades ou
+agendamentos anteriores antes de instalar para não duplicar tarefas):
+
+```bash
+sudo install -m 644 deploy/systemd/boostio-precos.service /etc/systemd/system/
+sudo install -m 644 deploy/systemd/boostio-precos.timer /etc/systemd/system/
+sudo systemd-analyze verify /etc/systemd/system/boostio-precos.service /etc/systemd/system/boostio-precos.timer
+sudo systemctl daemon-reload
+sudo systemctl enable --now boostio-precos.timer
+```
+
+Executar agora, sem depender de manter o terminal conectado:
+
+```bash
+sudo systemctl start --no-block boostio-precos.service
+```
+
+Acompanhar o próximo horário e os resultados:
+
+```bash
+systemctl list-timers boostio-precos.timer --no-pager
+systemctl status boostio-precos.service --no-pager
+journalctl -u boostio-precos.service -n 30 --no-pager
+```
+
+Durante a execução, um serviço `oneshot` pode aparecer como `activating (start)`.
+Isso não significa falha nem conclusão. O resumo JSON ao final informa quantas
+consultas, alterações, históricos e falhas realmente ocorreram. Antes de aplicar
+migrações, suspenda a agenda e aguarde encerrar qualquer coleta em execução.
+O limite de três horas evita uma execução indefinida. Retomar após interrupção
+continua sujeito às reservas diárias da aplicação; não apague essas reservas
+para forçar requisições repetidas.

@@ -31,9 +31,9 @@ class AtualizarImagemPecaService:
 
     @staticmethod
     def exportar_manifesto():
-        imagens = {peca.part_number: peca.imagem_url
+        imagens = {peca.referencia_interna or peca.part_number: peca.imagem_url
                    for classe in MODELOS_PECAS for peca in classe.mostrar_pecas()
-                   if peca.part_number and peca.imagem_url}
+                   if (peca.referencia_interna or peca.part_number) and peca.imagem_url}
         MANIFESTO.parent.mkdir(parents=True, exist_ok=True)
         with NamedTemporaryFile(mode="w", encoding="utf-8", dir=MANIFESTO.parent, prefix=".tmp-", delete=False) as temporario:
             temporario.write(json.dumps(imagens, ensure_ascii=False, indent=2) + "\n")

@@ -1,3 +1,5 @@
+from repositories.ofertas_repository import aplicar_lote_mercado_livre
+from repositories.identificadores_peca_repository import separar_identificadores
 """Somente banco MySQL descartável local; rede Mercado Livre simulada."""
 import os
 from concurrent.futures import ThreadPoolExecutor
@@ -55,7 +57,7 @@ def test_migrations_preservam_usuarios_e_sao_repetiveis(banco):
 
 def aplicar(peca,preco,simular=False):
     dados={'produto_id_loja':'MLB11','vendedor_id':'5','preco':preco,'url':'https://produto.mercadolivre.com.br/MLB-11-_JM'}
-    return Oferta.aplicar_lote_mercado_livre(peca,'MLB123',assinatura_peca(peca),assinatura_catalogo({'id':'MLB123'}),
+    return aplicar_lote_mercado_livre(peca,'MLB123',assinatura_peca(peca),assinatura_catalogo({'id':'MLB123'}),
                                           'mpn',[dados],datetime(2026,11,3,0,0,0,123456),simular=simular)
 
 
@@ -112,7 +114,7 @@ def test_revalida_identidade_alterada_por_outra_conexao(banco):
         outra.query(Processador).filter_by(id=p.id).update({'modelo':'Modelo alterado'})
         outra.commit()
     with pytest.raises(ValueError,match='identificação'):
-        Oferta.aplicar_lote_mercado_livre(p,'MLB123',identidade,assinatura_catalogo({'id':'MLB123'}),
+        aplicar_lote_mercado_livre(p,'MLB123',identidade,assinatura_catalogo({'id':'MLB123'}),
             'mpn',[{'produto_id_loja':'MLB11','vendedor_id':'5','preco':100,'url':'url'}],datetime(2026,11,3),simular=False)
     assert Oferta.query.count()==VinculoMercadoLivre.query.count()==0
 
@@ -179,3 +181,198 @@ def test_autorizacao_oauth_convite_consumido_uma_vez_no_mysql(banco):
     with ThreadPoolExecutor(max_workers=2) as executor:
         resultados=list(executor.map(lambda _:consumir(),range(2)))
     assert sorted(resultados)==sorted(['v'*64,'recusado'])
+
+
+def test_migracao_e_importacao_manual_preservam_vinculos_mysql(banco):
+    from migrations.vinculos_revisados import preparar_vinculos_revisados
+    app,p=banco
+    preparar()
+    VinculoMercadoLivre.registrar_revisado(p,'MLB111',assinatura_peca(p),'c'*64)
+    pid=p.id
+    db.session.remove()
+    with db.engine.begin() as conn:
+        conn.execute(text('ALTER TABLE vinculo_mercado_livre DROP COLUMN especificacoes_revisadas'))
+    assert len(preparar_vinculos_revisados()['alteracoes'])==1
+    assert preparar_vinculos_revisados()['alteracoes']==[]
+    p=Processador.buscar_por_id(pid)
+    args=(p,'MLB111',assinatura_peca(p),'c'*64,{'nucleo':6,'soquete':'AM4'})
+    assert VinculoMercadoLivre.aplicar_revisado(*args,simular=True)=='proposto'
+    assert VinculoMercadoLivre.buscar('processador',pid).especificacoes_revisadas is None
+    assert VinculoMercadoLivre.aplicar_revisado(*args,simular=False)=='cadastrado'
+    assert VinculoMercadoLivre.aplicar_revisado(*args,simular=False)=='inalterado'
+    assert Usuario.query.count()==1 and VinculoMercadoLivre.query.count()==1
+
+
+def test_catalogo_aditivo_preserva_legado_e_define_novos_como_pendentes(banco):
+    from migrations.catalogo_automatizado import preparar_catalogo_automatizado
+    from models import ProdutoPendente
+    _, p = banco
+    preparar()
+    aplicar(p, 100)
+    antes_usuario = list(db.session.execute(text('SELECT * FROM usuario')))
+    antes_oferta = list(db.session.execute(text('SELECT * FROM oferta')))
+    antes_historico = list(db.session.execute(text('SELECT * FROM historico_oferta')))
+    db.session.remove()
+    with db.engine.begin() as conn:
+        conn.execute(text('ALTER TABLE processador DROP CHECK ck_processador_validacao'))
+        conn.execute(text('DROP INDEX ix_processador_publicacao ON processador'))
+        for campo in ('status_validacao', 'validacao_motivo', 'validado_em'):
+            conn.execute(text(f'ALTER TABLE processador DROP COLUMN {campo}'))
+    assert preparar_catalogo_automatizado()['alteracoes']
+    preparar_catalogo_automatizado(simular=False)
+    assert preparar_catalogo_automatizado()['alteracoes'] == []
+    assert Processador.query.one().status_validacao is None
+    assert Processador.listar_publicadas()
+    assert list(db.session.execute(text('SELECT * FROM usuario'))) == antes_usuario
+    assert list(db.session.execute(text('SELECT * FROM oferta'))) == antes_oferta
+    assert list(db.session.execute(text('SELECT * FROM historico_oferta'))) == antes_historico
+    assert ProdutoPendente.query.count() == 0
+    with db.engine.begin() as conn:
+        conn.execute(text("INSERT INTO processador (fabricante, modelo, soquete, nucleo, thread, clockbase, clockmax, consumo_energia, preco, esgotado, criado_em, atualizado_em) VALUES ('Teste','Novo','AM4',6,12,3,4,65,100,0,NOW(),NOW())"))
+    db.session.remove()  # Encerra o snapshot REPEATABLE READ anterior à inserção externa.
+    assert Processador.query.order_by(Processador.id.desc()).first().status_validacao == 'pendente'
+    assert len(Processador.listar_publicadas()) == 1
+
+
+def test_descoberta_mysql_grava_fila_e_auditoria_sem_publicar(banco):
+    from models import ProdutoPendente, ExecucaoDescoberta
+    from migrations.catalogo_automatizado import preparar_catalogo_automatizado
+    from services.mercadolivre_service.descobrir_produtos_service import DescobrirProdutosService
+    from services.mercadolivre_service.buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
+    preparar_catalogo_automatizado(simular=False)
+    cliente = BuscarOfertasMercadoLivreService()
+    pagina = lambda linhas: {'results':linhas, 'paging':{'offset':0, 'total':len(linhas)}}
+    respostas = [pagina([{'id':'MLB20','name':'Kingston DDR4'}]), pagina([{
+        'item_id':'MLB1','seller_id':7,'site_id':'MLB','currency_id':'BRL','price':100,'condition':'new'}])]
+    tokens = Mock();tokens.executar.return_value = 'teste'
+    for chave in ('novos', 'ja_coletados'):
+        cliente._consultar = Mock(side_effect=respostas)
+        r = DescobrirProdutosService(cliente=cliente, tokens=tokens).executar(
+            categoria='memoria_ram', consulta='Kingston DDR4', simular=False)
+        assert r[chave] == 1 and not r['interrompido']
+    assert ProdutoPendente.query.count() == 1 and ExecucaoDescoberta.query.count() == 2
+    assert ProdutoPendente.query.one().status == 'pendente'
+    assert Oferta.query.count() == 0
+
+
+def test_trava_worker_e_checkpoint_mysql(banco):
+    from repositories.controle_catalogo_repository import RepositorioControleCatalogo
+    from models import EstadoCatalogo
+    from migrations.catalogo_automatizado import preparar_catalogo_automatizado
+    preparar_catalogo_automatizado(simular=False)
+    um,dois=RepositorioControleCatalogo(),RepositorioControleCatalogo()
+    with um.bloquear() as ok:
+        assert ok
+        with dois.bloquear() as outro:assert not outro
+        um.verificar()
+    with dois.bloquear() as ok:assert ok
+    plano={'nome':'teste','categoria':'processador','consulta':'AMD Ryzen'}
+    e=EstadoCatalogo.obter(plano);e.registrar_progresso(cursor_descoberta={'origem':'catalogo','offset':20})
+    db.session.remove()
+    assert EstadoCatalogo.obter(plano).cursor_descoberta['offset']==20
+
+
+def test_importacao_concorrente_nao_duplica_componente_mysql(banco):
+    from threading import Barrier
+    from models import HD, ProdutoPendente, IdentidadeFabricante
+    from migrations.catalogo_automatizado import preparar_catalogo_automatizado
+    from migrations.identidades_fabricante import preparar_identidades_fabricante
+    from services.mercadolivre_service.importar_produto_service import ImportarProdutoService
+    from services.mercadolivre_service.buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
+    app,_=banco;preparar();preparar_catalogo_automatizado(simular=False);preparar_identidades_fabricante()
+    HD.__table__.create(db.engine)
+    produto=dict(id='MLB99',name='Seagate Exos 8TB',status='active',domain_id='MLB-HARD_DRIVES_AND_SSDS',attributes=[
+        dict(id=k,value_name=v) for k,v in [('BRAND','Seagate'),('MODEL','ST8000NM017B'),('MPN','ST8000NM017B'),('CAPACITY','8 TB'),('DRIVE_STORAGE_TYPE','HDD'),('HARD_DRIVE_AND_SSD_POWER_CONSUMPTION','7 W')]])
+    ids=[]
+    for num in (10,11):
+        p=ProdutoPendente(loja='mercado_livre',produto_id_loja='MLB'+str(num),vendedor_id='7',titulo='Seagate',url='https://example.test',categoria_sugerida='hd',
+            dados_originais={'catalogo':{'id':'MLB99'},'anuncio':{}},coletado_em=datetime(2026,11,3))
+        db.session.add(p);db.session.flush();ids.append(p.id)
+    db.session.commit();barreira=Barrier(2)
+    def executar(item):
+        pid,num=item
+        with app.app_context():
+            c=BuscarOfertasMercadoLivreService();c._consultar=Mock(return_value=produto)
+            anuncio=c._normalizar(dict(item_id='MLB'+str(num),seller_id=7,site_id='MLB',currency_id='BRL',price=100,condition='new',available_quantity=3),'MLB99')
+            def consultar(*a,**kw):barreira.wait(timeout=10);return {'ofertas':[anuncio]}
+            c.executar=consultar;t=Mock();t.executar.return_value='teste'
+            return ImportarProdutoService(cliente=c,tokens=t).executar(pid,simular=False,permitir_novos=True)['acao']
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        assert list(executor.map(executar,zip(ids,(10,11))))==['importada','importada']
+    db.session.remove()
+    assert HD.query.count()==IdentidadeFabricante.query.count()==1
+    assert Oferta.query.count()==HistoricoOferta.query.count()==2
+
+
+def test_ram_formato_nulo_migracao_e_importacao_sem_mpn_mysql(banco):
+    from models import MemoriaRAM,ProdutoPendente
+    from migrations.catalogo_automatizado import preparar_catalogo_automatizado
+    from migrations.identidades_fabricante import preparar_identidades_fabricante
+    from services.catalogo_service.produto_normalizado import ProdutoNormalizado
+    from services.catalogo_service.importar_catalogo_service import ImportarCatalogoService
+    from utils.identidade_peca import assinatura_documento
+    app,p=banco;preparar();preparar_identidades_fabricante()
+    MemoriaRAM.__table__.create(db.engine)
+    db.session.add(MemoriaRAM(fabricante='Teste',modelo='RAM',preco=100,consumo_energia=5,capacidade_gb=8,ddr='DDR4',frequencia_mhz=3200,quantidade_pentes=1));db.session.commit();db.session.remove()
+    with db.engine.begin() as conn:conn.execute(text('ALTER TABLE memoria_ram DROP COLUMN formato'))
+    preparar_catalogo_automatizado(simular=False)
+    assert MemoriaRAM.query.one().formato is None
+    p=Processador.query.one();p.part_number='SEED-CPU-1';p.status_validacao='aprovado';db.session.commit()
+    dto=ProdutoNormalizado(loja='outra_loja',id_externo='cpu',categoria='processador',categoria_confirmada=True,titulo='AMD Ryzen 5 5500',modelo='Ryzen 5 5500',marca='AMD',ativo=True,especificacoes={'soquete':'AM4','nucleo':6,'thread':12})
+    bruto={'teste':'multiloja'}
+    pend=ProdutoPendente(loja='outra_loja',produto_id_loja='1',titulo=dto.titulo,url='https://loja.example/cpu',categoria_sugerida='processador',dados_originais=bruto,coletado_em=datetime(2026,11,3));db.session.add(pend);db.session.commit()
+    ficha={'dados':{},'identidade':{},'pronto':False,'conflitos':[],'produto':{'id':'cpu'}}
+    anuncio={'produto_id_loja':'1','url':'https://loja.example/cpu','preco':'500.00','esgotado':False}
+    r=ImportarCatalogoService().executar(pend.id,dto,ficha,anuncio,assinatura_documento(bruto),simular=False)
+    assert r['acao']=='importada' and r['criterio']=='modelo_especificacoes'
+    assert Oferta.query.count()==HistoricoOferta.query.count()==1
+
+
+def test_separacao_identificadores_aditiva_preserva_usuario_e_cotacao_mysql(banco):
+    from migrations.catalogo_automatizado import preparar_catalogo_automatizado
+    p = Processador.query.one()
+    ident, preco = p.id, p.preco
+    db.session.execute(text("UPDATE processador SET part_number='KABUM-999', kabum_external='https://www.kabum.com.br/produto/999/teste' WHERE id=:id"), {'id': ident})
+    db.session.commit()
+    with db.engine.begin() as conn:
+        conn.execute(text('DROP INDEX ix_processador_referencia ON processador'))
+        conn.execute(text('ALTER TABLE processador DROP COLUMN referencia_interna'))
+    db.session.expire_all()
+    assert any('referencia_interna' in i.get('sql', '') for i in preparar_catalogo_automatizado()['alteracoes'])
+    preparar_catalogo_automatizado(simular=False)
+    p = Processador.query.one()
+    assert separar_identificadores(p)['alterada']
+    assert p.part_number == 'KABUM-999' and Oferta.query.count() == 0
+    separar_identificadores(p, simular=False)
+    assert p.part_number is None and p.referencia_interna == 'KABUM-999'
+    assert Oferta.query.one().produto_id_loja == '999'
+    assert p.id == ident and p.preco == preco and Usuario.query.count() == 1
+    assert not separar_identificadores(p, simular=False)['alterada']
+    assert Oferta.query.count() == 1
+
+
+def test_especificacoes_json_migracao_aditiva_e_idempotencia_mysql(banco):
+    from models import MemoriaRAM
+    from migrations.catalogo_automatizado import preparar_catalogo_automatizado
+    from services.catalogo_service.produto_normalizado import ProdutoNormalizado
+    from services.catalogo_service.enriquecer_peca_existente_service import EnriquecerPecaExistenteService
+    MemoriaRAM.__table__.create(db.engine)
+    with db.engine.begin() as conn:
+        conn.execute(text('ALTER TABLE memoria_ram DROP COLUMN fontes_especificacoes'))
+    assert any('fontes_especificacoes' in item.get('sql','') for item in preparar_catalogo_automatizado()['alteracoes'])
+    preparar_catalogo_automatizado(simular=False)
+    assert preparar_catalogo_automatizado()['alteracoes'] == []
+    p = MemoriaRAM(fabricante='Crucial',modelo='CT8G4DFRA32A',consumo_energia=5,preco=123,
+        capacidade_gb=8,ddr='DDR4',frequencia_mhz=3200,quantidade_pentes=1,latencia='CL22')
+    db.session.add(p); db.session.commit()
+    dto = ProdutoNormalizado(loja='outra_loja',id_externo='memoria-1',categoria='memoria_ram',
+        categoria_confirmada=True,titulo='Crucial CT8G4DFRA32A',modelo='CT8G4DFRA32A',marca='Crucial',
+        ativo=True,fonte='https://loja.example/1',especificacoes={'capacidade_gb':'8 GB','ddr':'DDR4',
+        'frequencia_mhz':'3200 MHz','quantidade_pentes':1,'latencia':'CL22','formato_ram':'UDIMM'})
+    s = EnriquecerPecaExistenteService()
+    assert s.executar(p,dto)['status'] == 'proposta'
+    assert p.formato is None
+    assert s.executar(p,dto,simular=False)['status'] == 'atualizada'
+    assert p.fontes_especificacoes['formato']['valor'] == 'DIMM'
+    assert s.executar(p,dto,simular=False)['status'] == 'inalterada'
+    assert p.preco == 123 and Usuario.query.one().nome == 'Preservado'

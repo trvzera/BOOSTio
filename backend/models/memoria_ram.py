@@ -7,6 +7,7 @@ class MemoriaRAM(Peca):
     capacidade_gb = db.Column(db.Integer(), nullable=False)
     ddr = db.Column(db.String(20), nullable=False)  
     frequencia_mhz = db.Column(db.Integer(), nullable=False)
+    formato = db.Column(db.String(20), nullable=True)
     latencia = db.Column(db.String(20))  
     quantidade_pentes = db.Column(db.Integer(), nullable=False)
     iluminacao = db.Column(db.Boolean(), default=False)
@@ -18,7 +19,7 @@ class MemoriaRAM(Peca):
         grupos = {ddr: [] for valor in ddrs if (ddr := normalizar_ddr(valor))}
         if not grupos:
             return grupos
-        pecas = (cls.query.filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
+        pecas = (cls.consulta_para_montagem().filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
                  .order_by(cls.preco.asc(), cls.id.asc()).yield_per(200))
         for peca in pecas:
             ddr = normalizar_ddr(peca.ddr)

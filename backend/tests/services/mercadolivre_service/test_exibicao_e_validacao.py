@@ -1,3 +1,4 @@
+from services.validacoes_service.validar_estado_build_service import validar_estado
 from datetime import datetime, timezone, timedelta
 from unittest.mock import patch
 
@@ -25,7 +26,7 @@ def banco():
     app.register_blueprint(build_bp)
     with app.app_context():
         db.create_all();ControleColeta.inicializar()
-        p=Processador(fabricante='AMD',modelo='Ryzen 5500',soquete='AM4',nucleo=6,thread=12,
+        p=Processador(status_validacao='aprovado', fabricante='AMD',modelo='Ryzen 5500',soquete='AM4',nucleo=6,thread=12,
             clockbase=3.6,clockmax=4.2,consumo_energia=65,preco=600,esgotado=True)
         db.session.add(p);db.session.commit()
         db.session.add(VinculoMercadoLivre(tabela_peca='processador',peca_id=p.id,catalogo_id='MLB777',
@@ -50,7 +51,7 @@ def test_catalogo_exibe_ofertas_ativas_sem_trocar_preco_da_peca(banco):
     resposta=cliente.get('/build/catalogo')
     assert resposta.status_code==200
     ficha=next(x for x in resposta.json['pecas'] if x['id']==f'processador:{p.id}')
-    assert ficha['preco']==600 and ficha['esgotado'] is True
+    assert ficha['preco']==100 and ficha['esgotado'] is None  # a oferta ML (estoque desconhecido) é mais barata que a KaBuM esgotada
     assert len(ficha['ofertas'])==1
     dados=ficha['ofertas'][0]
     assert dados['id']==o.id and dados['vendedor_id']=='4' and dados['preco']==100
@@ -113,3 +114,17 @@ def test_identidade_local_alterada_oculta_oferta_antiga(banco):
     ficha=next(x for x in cliente.get('/build/catalogo').json['pecas'] if x['id']==f'processador:{p.id}')
     assert not any(o['loja']=='mercado_livre' for o in ficha['ofertas'])
     assert cliente.get(f'/build/catalogo/processador/{p.id}/ofertas/{o.id}/historico-precos').status_code==404
+
+
+@pytest.mark.parametrize('status', ['pendente', 'em_revisao', 'rejeitado'])
+def test_peca_nao_aprovada_nao_publica_oferta_nem_historico(banco, status):
+    _, p, cliente = banco
+    o = oferta(p)
+    p.status_validacao = status
+    db.session.commit()
+    assert cliente.get('/build/catalogo').json['pecas'] == []
+    resposta = cliente.get(f'/build/catalogo/processador/{p.id}/ofertas/{o.id}/historico-precos')
+    assert resposta.status_code == 404
+    from models import BuildSalva
+    with pytest.raises(ValueError, match='não encontrada'):
+        validar_estado({'titulo': 'Teste', 'componentes': {'processador': {'id': p.id}}})

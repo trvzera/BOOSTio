@@ -9,7 +9,7 @@ from models.medidas_fisicas import completar_medidas
 from commands.precos import registrar_comandos_precos
 from services.peca_service.pecas_complementares import pecas_complementares
 from services.peca_service.cadastrar_complementares_service import CadastrarComplementaresService
-from services.build_service.encaixe_fisico import avaliar_fans, encaixe_radiador
+from services.validacoes_service.encaixe_fisico import avaliar_fans, encaixe_radiador
 
 
 CASOS = json.loads((Path(__file__).resolve().parents[4] /
@@ -82,6 +82,6 @@ def test_cli_idempotente_simula_sem_gravar_e_preserva_anuncio_existente(tmp_path
         assert resumo["inseridas"] == 6 and resumo["existentes"] == 1
         assert CadastrarComplementaresService().executar()["inseridas"] == 0
         assert antiga.preco == 123 and antiga.esgotado is False
-        assert antiga.part_number == "KABUM-464964" and antiga.modelo == "Nome interno"
+        assert antiga.part_number is None and antiga.referencia_interna == "KABUM-464964" and antiga.modelo == "Nome interno"
         db.session.remove()
         db.engine.dispose()

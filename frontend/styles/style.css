@@ -25,6 +25,7 @@
 @import "./services/services.css";
 @import "./paginas/termos.css";
 @import "./paginas/erro.css";
+@import "./admin/admin.css";
 @import "./paginas/sobre.css";
 @import "./conta/campos.css";
 @import "./conta/signin.css";

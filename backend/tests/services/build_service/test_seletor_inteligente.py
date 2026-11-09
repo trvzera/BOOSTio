@@ -21,7 +21,7 @@ def banco(tmp_path):
 
 def inserir(preco, score, gpu=False, **extras):
     classe = PlacaVideo if gpu else Processador
-    dados = dict(fabricante='Teste', modelo='Modelo', preco=preco, consumo_energia=65,
+    dados = dict(status_validacao='aprovado', fabricante='Teste', modelo='Modelo', preco=preco, consumo_energia=65,
                  benchmark_teste='PassMark G2D / G3D' if gpu else 'PassMark CPU Mark / Single Thread')
     dados.update(dict(memoria_gb=8, benchmark_g3d=score) if gpu else dict(
         soquete='AM4', nucleo=6, thread=12, clockbase=3, clockmax=4, benchmark_multi_core=score))
@@ -136,7 +136,7 @@ def test_empate_custo_beneficio_prioriza_menor_preco_depois_id(banco, gpu):
 
 
 def salvar_modelo(classe, preco, **campos):
-    obj = classe(**{'fabricante': 'Teste', 'modelo': 'Modelo', 'preco': preco,
+    obj = classe(**{'status_validacao': 'aprovado', 'fabricante': 'Teste', 'modelo': 'Modelo', 'preco': preco,
                     'consumo_energia': 10, **campos})
     db.session.add(obj)
     db.session.commit()
@@ -164,11 +164,11 @@ def test_perifericos_seguem_reserva_e_painel_da_montagem(banco):
     from models import Monitor
     campos = dict(conexao='HDMI', tamanho_polegadas=24, resolucao='1920x1080', taxa_atualizacao_hz=60)
     permitido = salvar_modelo(Monitor, 900, tipo_painel='IPS', **campos)
-    salvar_modelo(Monitor, 950, tipo_painel='TN', **campos)
+    alternativa = salvar_modelo(Monitor, 950, tipo_painel='TN', **campos)
     salvar_modelo(Monitor, 1001, tipo_painel='VA', **campos)
     dados = dict(orcamento=5000, prioridade_montagem='desempenho')
     assert ids(dados) == []
-    assert ids({**dados, 'percentual_perifericos': 20}) == [permitido]
+    assert set(ids({**dados, 'percentual_perifericos': 20})) == {permitido, alternativa}
 
 
 def test_reaproveitamento_exclui_cpu_e_ambos_os_armazenamentos(banco, mocker):
@@ -461,3 +461,12 @@ def test_fallback_sem_benchmark_nao_aceita_score_invalido_ou_outra_escala(banco)
     r = SeletorInteligenteService().executar(dict(orcamento=4000, prioridade_montagem='desempenho'))
     assert not any(p['categoria']=='processador' for p in r['componentes_selecionados'])
     assert 'processador' in r['categorias_pendentes']
+
+
+@pytest.mark.parametrize('gpu', [False, True])
+def test_benchmark_nao_publica_candidato_pendente(banco, gpu):
+    aprovado = inserir(500, 10000, gpu)
+    inserir(400, 50000, gpu, status_validacao='pendente')
+    classe = PlacaVideo if gpu else Processador
+    candidatos = classe.listar_por_benchmark(1000, 'desempenho')
+    assert [f'{classe.__tablename__}:{p.id}' for p in candidatos] == [aprovado]

@@ -15,6 +15,7 @@ class Usuario(ModeloBase,UserMixin):
   versao_sessao = db.Column(db.Integer, nullable=False, default=1, server_default="1")
   budget = db.Column(db.Numeric(12, 2), nullable=True)
   usar_budget = db.Column(db.Boolean, default=False, server_default=db.false(), nullable=False)
+  administrador = db.Column(db.Boolean, default=False, server_default=db.false(), nullable=False)
   preferencias_uso = db.relationship("PreferenciasUso", uselist=False, cascade="all, delete-orphan")
 
   @property
@@ -43,6 +44,7 @@ class Usuario(ModeloBase,UserMixin):
       "verificado": self.verificado,
       "google_vinculado": bool(self.google_sub),
       "possui_senha": bool(self.senha),
+      "administrador": bool(self.administrador),
       "criado_em":self.criado_em
     }
     # A listagem geral de usuários não deve expor o orçamento de cada conta.
@@ -87,6 +89,19 @@ class Usuario(ModeloBase,UserMixin):
     db.session.commit()
 
   @staticmethod
+  def alterar_administrador(usuario_id: int, administrador: bool) -> bool:
+    """Concede ou retira o papel e encerra as sessões da conta, para o novo papel valer de imediato."""
+    alteradas = Usuario.query.filter_by(id=usuario_id, ativo=True, verificado=True).update(
+      {Usuario.administrador: administrador, Usuario.versao_sessao: Usuario.versao_sessao + 1},
+      synchronize_session=False)
+    db.session.commit()
+    return alteradas == 1
+
+  @staticmethod
+  def listar_administradores() -> list["Usuario"]:
+    return Usuario.query.filter_by(administrador=True, ativo=True).order_by(Usuario.id).all()
+
+  @staticmethod
   def buscar_por_google_sub(google_sub: str) -> "Usuario | None":
     return Usuario.query.filter_by(google_sub=google_sub).first()
 
@@ -106,12 +121,7 @@ class Usuario(ModeloBase,UserMixin):
 
     return usuario
 
-  @staticmethod
-  def listar_todos() -> list["Usuario"]:
-    return Usuario.query.all()
 
   @staticmethod
   def buscar_por_id(id: int | str) -> "Usuario | None":
     return Usuario.query.get(id)
-
-

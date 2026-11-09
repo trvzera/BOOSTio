@@ -1,3 +1,4 @@
+from services.validacoes_service.validar_pedido_build_service import validar_textos_pedido
 import pytest
 from flask import Flask
 
@@ -21,7 +22,7 @@ def test_pedido_grande_rejeitado_antes_de_consultar_banco(campo, valor):
     dados = {"nome": "PC", "descricao": "Teste", "utilidade": "Jogos"}
     dados[campo] = valor
     with pytest.raises(ValueError, match=campo):
-        CriarBuildService()._validar_textos_pedido(dados)
+        validar_textos_pedido(dados)
 
 
 def test_cadastro_e_login_rejeitam_tamanho_excessivo():

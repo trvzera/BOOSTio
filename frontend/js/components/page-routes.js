@@ -2,7 +2,7 @@
 export const paginas = new Set([
   "index.html", "login.html", "signin.html", "esqueci-senha.html", "reset-senha.html",
   "formulario.html", "builds.html", "configuracoes.html", "configuracoes-prontas.html",
-  "configuracao-build.html", "pecas.html", "peca.html", "sobre.html", "termos.html", "erro.html", "testes.html",
+  "configuracao-build.html", "pecas.html", "peca.html", "sobre.html", "termos.html", "erro.html", "testes.html", "admin.html",
 ]);
 export function nomePagina(caminho) {
   if (String(caminho).endsWith("/pages/")) return "index.html";

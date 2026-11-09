@@ -1,6 +1,9 @@
 from models import db
 from .modelos_pecas import MODELOS_PECAS
 from services.preco_service.validar_link_service import ValidarLinkService
+from repositories.ofertas_kabum_repository import definir_link
+
+_SEM_LINK = object()
 
 
 class SalvarPecaService:
@@ -14,30 +17,30 @@ class SalvarPecaService:
         if peca is None:
             raise ValueError("Peça não encontrada")
         campos = dict(dados)
-        self._atualizar_link(peca, campos)
-        if peca_id is None:
-            peca.preco = 0
-            peca.esgotado = True
+        link = self._validar_link(peca, campos)
         for campo, valor in campos.items():
             if campo not in classe.__table__.columns or campo in {"id", "criado_em", "atualizado_em", "preco_atualizado_em", "imagem_url"}:
                 raise ValueError(f"Campo de peça inválido: {campo}")
             setattr(peca, campo, valor)
         try:
-            peca.salvar()
+            db.session.add(peca)
+            db.session.flush()
+            if link is not _SEM_LINK:
+                definir_link(peca, link)
+            db.session.commit()
         except Exception:
             db.session.rollback()
             raise
         return peca
 
     @staticmethod
-    def _atualizar_link(peca, campos):
-        if "kabum_external" in campos:
-            url = (campos["kabum_external"] or "").strip() or None
-            if url:
-                ValidarLinkService().executar(url)
-            if url != peca.kabum_external:
-                peca.preco_atualizado_em = None
-                peca.esgotado = True
-                peca.preco = 0
-                peca.imagem_url = None
-            campos["kabum_external"] = url
+    def _validar_link(peca, campos):
+        """O link é da oferta KaBuM: sai dos campos da peça e é gravado depois dela."""
+        if "kabum_external" not in campos:
+            return _SEM_LINK
+        url = (campos.pop("kabum_external") or "").strip() or None
+        if url:
+            ValidarLinkService().executar(url)
+        if url != peca.kabum_external:
+            peca.imagem_url = None
+        return url

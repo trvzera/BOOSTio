@@ -1,3 +1,4 @@
+from services.build_service.catalogo_geracao_service import campos_pecas
 """Fichas compartilhadas com JS; sem rede, escrita ou migração do banco real."""
 import json
 from pathlib import Path
@@ -7,8 +8,8 @@ import pytest
 from models import Gabinete
 from models.medidas_fisicas import completar_medidas
 from services.build_service.criar_build_service import CriarBuildService
-from services.build_service.encaixe_fisico import avaliar_fans, encaixe_radiador
-from services.build_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
+from services.validacoes_service.encaixe_fisico import avaliar_fans, encaixe_radiador
+from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
 CASOS = json.loads((Path(__file__).resolve().parents[4] / "frontend/tests/fixtures/gabinetes-ventilacao.json").read_text())
 
@@ -61,7 +62,7 @@ def test_fabrica_vagas_e_excesso(caso):
 def test_api_e_prompt_recebem_contagens_sem_alterar_modelo(caso):
     obj = Gabinete(id=1, fabricante=caso["fabricante"], modelo=caso["modelo"], part_number=caso["part_number"],
                    kabum_external=base(caso)["link"], fans_inclusos=None)
-    for dados in (obj.to_catalogo(), CriarBuildService._campos_pecas(obj)):
+    for dados in (obj.to_catalogo(), campos_pecas(obj)):
         for k in ("fans_inclusos", "quantidade_max_fans", "tamanhos_fan_suportados_mm"):
             assert dados[k] == caso["esperado"][k]
         assert dados["fonte_medidas"].startswith("https://")

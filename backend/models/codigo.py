@@ -17,9 +17,6 @@ class Codigo(ModeloBase):
 
   usuario = db.relationship('Usuario', backref='codigo')
 
-  def marcar_como_usado(self):
-    self.usado = True
-    db.session.commit()
 
   @staticmethod
   def invalidar_anteriores(usuario_id):

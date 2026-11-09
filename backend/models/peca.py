@@ -1,32 +1,12 @@
 from datetime import timezone
-from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
-from math import isfinite
-import re
-from urllib.parse import urlsplit
 
 from . import db
+from sqlalchemy.orm import declared_attr, validates
 from . import ModeloBase
 from .medidas_fisicas import completar_medidas
 from .imagens_referencia import imagem_referencia
 
 
-def ofertas_catalogo(dados):
-  """Expõe a última cotação coletada, nunca o preço inicial da seed como oferta."""
-  link, preco = dados.get("link"), dados.get("preco")
-  if not isinstance(link, str) or not dados.get("preco_atualizado_em"):
-    return []
-  if type(preco) not in (int, float) or not isfinite(preco) or preco <= 0:
-    return []
-  try:
-    partes = urlsplit(link)
-    if (partes.scheme != "https" or partes.hostname not in {"kabum.com.br", "www.kabum.com.br"}
-        or partes.username or partes.password or partes.port not in (None, 443)
-        or not re.match(r"^/produto/\d+(?:/|$)", partes.path)):
-      return []
-  except ValueError:
-    return []
-  return [{"loja": "kabum", "url": link, "preco": preco,
-           "atualizadoEm": dados["preco_atualizado_em"], "esgotado": bool(dados.get("esgotado"))}]
 
 
 class Peca(ModeloBase):
@@ -34,17 +14,133 @@ class Peca(ModeloBase):
   
   fabricante = db.Column(db.String(30),nullable = False)
   modelo = db.Column(db.String(120),nullable = False)
-  consumo_energia = db.Column(db.Float(),nullable = False)
-  preco = db.Column(db.Float(),nullable = False)
+  consumo_energia = db.Column(db.Float(),nullable = True)
   part_number = db.Column(db.String(100), nullable=True)
-  kabum_external = db.Column(db.Text, nullable=True)
-  preco_atualizado_em = db.Column(db.DateTime, nullable=True)
-  esgotado = db.Column(db.Boolean(), nullable=False, default=False)
+  referencia_interna = db.Column(db.String(100), nullable=True)
+  codigo_modelo_fabricante = db.Column(db.String(150), nullable=True)
+  fontes_especificacoes = db.Column(db.JSON, nullable=True)
   imagem_url = db.Column(db.Text, nullable=True)
 
+  ficha_montagem_validada = db.Column(db.Boolean(), nullable=True)
+
+  # NULL identifica exclusivamente os registros anteriores à migração.
+  # Legado preserva publicação sem afirmar que a ficha já foi auditada.
+  status_validacao = db.Column(db.String(20), nullable=True, default='pendente', server_default='pendente')
+  validacao_motivo = db.Column(db.Text, nullable=True)
+  validado_em = db.Column(db.DateTime, nullable=True)
+
+  @declared_attr
+  def __table_args__(cls):
+    return (
+      db.CheckConstraint("status_validacao IS NULL OR status_validacao IN ('pendente','em_revisao','aprovado','rejeitado','legado')", name=f'ck_{cls.__tablename__}_validacao'),
+      db.Index(f'ix_{cls.__tablename__}_publicacao', 'status_validacao'),
+      db.Index(f'ix_{cls.__tablename__}_nome', 'fabricante', 'modelo'),
+      db.Index(f'ix_{cls.__tablename__}_part_number', 'part_number'),
+      db.Index(f'ix_{cls.__tablename__}_referencia', 'referencia_interna'),
+    )
+
+  @validates('status_validacao')
+  def validar_status(self, chave, valor):
+    if valor not in (None, 'pendente', 'em_revisao', 'aprovado', 'rejeitado', 'legado'):
+      raise ValueError('Status de validação inválido')
+    return valor
+
+  CAMPOS_DA_OFERTA = ('preco', 'esgotado', 'preco_atualizado_em', 'kabum_external')
+
+  def __init__(self, **dados):
+    from utils.codigos_peca import separar_codigos
+    invalidos = [campo for campo in self.CAMPOS_DA_OFERTA if campo in dados]
+    if invalidos:
+      raise ValueError(f"Preço e link pertencem à oferta, não à peça: {', '.join(invalidos)}")
+    super().__init__(**separar_codigos(dados))
+
+  @validates('part_number')
+  def validar_part_number(self, chave, valor):
+    from utils.codigos_peca import codigo_interno
+    if codigo_interno(valor):
+      if self.referencia_interna and self.referencia_interna != valor:
+        raise ValueError('Referências internas divergentes')
+      self.referencia_interna = valor
+      return None
+    return valor.strip() if isinstance(valor, str) and valor.strip() else None
+
+  @property
+  def publicavel(self):
+    return self.status_validacao in ('aprovado', 'legado') or (self.status_validacao is None and self.id is not None)
+
+
+  def situacao_catalogo(self):
+    if not self.publicavel:return 'pendente_validacao'
+    if self.ficha_montagem_validada is False:return 'ficha_incompleta_para_montagem'
+    if self.preco is None:return 'sem_preco'
+    if self.esgotado is None:return 'disponibilidade_desconhecida'
+    return 'indisponivel' if self.esgotado else 'disponivel'
+
   @classmethod
-  def lote_para_ofertas(cls, depois_id=0, limite=50):
+  def consulta_publicavel(cls):
+    return cls.query.filter(db.or_(cls.status_validacao.is_(None), cls.status_validacao.in_(('aprovado', 'legado'))))
+
+  @classmethod
+  def consulta_catalogo(cls):
+    """O que o site mostra e a montagem (manual e inteligente) pode usar: aprovada e com preço.
+
+    O preço vem das ofertas ativas; sem oferta com preço a peça não existe para o usuário.
+    """
+    return cls.consulta_publicavel().filter(cls.preco > 0)
+
+  @classmethod
+  def consulta_para_montagem(cls):
+    return cls.consulta_catalogo().filter(cls.ficha_montagem_validada.is_not(False))
+
+  @classmethod
+  def listar_publicadas(cls):
+    return cls.consulta_catalogo().all()
+
+  @classmethod
+  def buscar_publicada_por_id(cls, peca_id):
+    return cls.consulta_catalogo().filter_by(id=peca_id).first()
+
+  @classmethod
+  def fabricantes_para_descoberta(cls):
+    """Marcas por presença no catálogo publicável, com desempate estável."""
+    from sqlalchemy import func
+    return [linha[0] for linha in cls.consulta_publicavel().with_entities(
+      cls.fabricante).group_by(cls.fabricante).order_by(
+      func.count(cls.id).desc(), cls.fabricante).all() if linha[0] and linha[0].strip()]
+
+  @classmethod
+  def pool_para_matching(cls, limite=2001):
+    return cls.query.order_by(cls.id).limit(limite).all()
+
+  @classmethod
+  def iterar_para_matching(cls, tamanho_lote=500):
+    """Catálogo completo, incluindo fichas em revisão para detectar duplicatas."""
+    if type(tamanho_lote) is not int or not 1 <= tamanho_lote <= 1000:
+      raise ValueError('Tamanho do lote entre 1 e 1000')
+    ultimo_id = 0
+    while True:
+      # Materializa e fecha o cursor antes de consultar identidades. MySQL
+      # não permite outra consulta durante a leitura de cursor não bufferizado.
+      lote = cls.query.filter(cls.id > ultimo_id).order_by(cls.id).limit(tamanho_lote).all()
+      if not lote:
+        return
+      ultimo_id = lote[-1].id
+      yield from lote
+
+  @classmethod
+  def lote_para_identificadores(cls, depois_id=0, limite=100):
     return cls.query.filter(cls.id > depois_id).order_by(cls.id).limit(limite).all()
+
+
+
+  @classmethod
+  def lote_para_ofertas(cls, depois_id=0, limite=50, *, somente_vinculadas=False):
+    consulta = cls.query.filter(cls.id > depois_id)
+    if somente_vinculadas:
+      from . import VinculoMercadoLivre
+      consulta = consulta.join(VinculoMercadoLivre, db.and_(
+        VinculoMercadoLivre.tabela_peca == cls.__tablename__, VinculoMercadoLivre.peca_id == cls.id))
+    return consulta.order_by(cls.id).limit(limite).all()
 
   @classmethod
   def com_link_kabum(cls):
@@ -53,17 +149,6 @@ class Peca(ModeloBase):
   @classmethod
   def sem_imagem_com_link(cls):
     return cls.query.filter(cls.imagem_url.is_(None), cls.kabum_external.isnot(None), cls.kabum_external != "").all()
-
-  @classmethod
-  def restaurar_links_ausentes(cls, links):
-    pecas = cls.query.filter(cls.part_number.in_(links)).all()
-    atualizadas = 0
-    for peca in pecas:
-      if not peca.kabum_external:
-        peca.kabum_external = links[peca.part_number]
-        atualizadas += 1
-    db.session.commit()
-    return atualizadas
 
   @classmethod
   def buscar_por_id(cls, peca_id):
@@ -81,18 +166,20 @@ class Peca(ModeloBase):
 
   def to_catalogo(self):
     dados = {coluna.name: getattr(self, coluna.name) for coluna in self.__table__.columns
-             if coluna.name not in ("preco_atualizado_em", "criado_em", "atualizado_em")}
+             if coluna.name not in ("criado_em", "atualizado_em", "status_validacao", "validacao_motivo", "validado_em", "fontes_especificacoes", "ficha_montagem_validada")}
+    dados["preco"] = float(self.preco) if self.preco is not None else None
+    dados["esgotado"] = self.esgotado
     dados["id"] = f"{self.__tablename__}:{self.id}"
     if self.__tablename__ == "cabo_rede":
       dados["categoria_cabo"] = dados.get("categoria")
     dados["categoria"] = self.__tablename__
-    dados["link"] = dados.pop("kabum_external", None)
+    dados["link"] = self.kabum_external
     data = self.preco_atualizado_em
     # As coletas gravam UTC sem tzinfo no SQLite; o contrato explicita o fuso.
     if data and data.tzinfo is None:
       data = data.replace(tzinfo=timezone.utc)
     dados["preco_atualizado_em"] = data.isoformat() if data else None
-    dados["ofertas"] = ofertas_catalogo(dados)
+    dados["ofertas"] = []
     dados["imagem"] = dados.pop("imagem_url", None) or imagem_referencia(dados)
     return completar_medidas(dados)
 
@@ -100,45 +187,37 @@ class Peca(ModeloBase):
     self.imagem_url = caminho
     db.session.commit()
 
-  def aplicar_cotacao(self, resultado, atualizado_em):
-    preco_alterado = False
-    if resultado["preco"] is not None:
-      novo = Decimal(str(resultado["preco"])).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-      try:
-        atual = Decimal(str(self.preco)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-      except InvalidOperation:
-        atual = None
-      if novo != atual:
-        self.preco = float(novo)
-        self.preco_atualizado_em = atualizado_em
-        preco_alterado = True
-    estoque_alterado = self.esgotado != resultado["esgotado"]
-    if estoque_alterado:
-      self.esgotado = resultado["esgotado"]
-    return {"preco_alterado": preco_alterado, "estoque_alterado": estoque_alterado}
-
   @classmethod
   def cadastrar_ausentes(cls, itens):
-    part_numbers = [item["part_number"] for item in itens]
-    existentes = {
-      row.part_number
-      for row in cls.query.filter(cls.part_number.in_(part_numbers)).all()
-    }
-    novos = [cls(**item) for item in itens if item["part_number"] not in existentes]
+    from utils.codigos_peca import separar_codigos
+    novos = []
     try:
-      db.session.add_all(novos)
+      for original in itens:
+        original = dict(original)
+        oferta = {campo: original.pop(campo, None) for campo in cls.CAMPOS_DA_OFERTA}
+        item = separar_codigos(original)
+        referencia, numero = item.get('referencia_interna'), item.get('part_number')
+        if referencia:
+          existente = cls.query.filter(db.or_(cls.referencia_interna == referencia, cls.part_number == referencia)).first()
+        elif numero:
+          existente = cls.query.filter_by(part_number=numero, fabricante=item['fabricante']).first()
+        else:
+          raise ValueError('Cadastro sem identificador estável')
+        if existente is None:
+          existente = cls(status_validacao='legado', **{k:v for k,v in item.items() if k != 'status_validacao'})
+          db.session.add(existente)
+          db.session.flush()
+          if oferta['kabum_external']:
+            from repositories.ofertas_kabum_repository import gravar_cotacao_inicial
+            gravar_cotacao_inicial(existente, oferta['kabum_external'], oferta['preco'],
+                                   oferta['esgotado'], oferta['preco_atualizado_em'])
+          novos.append(existente)
       db.session.commit()
     except Exception:
       db.session.rollback()
       raise
     return len(novos)
   
-  def atualizar_preco(self, preco: float) -> None:
-    if preco < 0:
-      raise Exception("O preço não pode ser negativo")
-
-    self.preco = preco
-    db.session.commit()
 
   @classmethod
   def mostrar_pecas(cls):
@@ -153,12 +232,9 @@ class Peca(ModeloBase):
     return [pecas[indice * (len(pecas) - 1) // (limite - 1)] for indice in range(limite)]
 
 
-  @classmethod
-  def buscar_mais_barata_por_part_number(cls, part_number: str) -> "Peca | None":
-    return cls.query.filter_by(part_number=part_number).order_by(cls.preco.asc()).first()
 
   @classmethod
   def listar_candidatos_disponiveis(cls, preco_maximo):
     """Pool completo para planejamento; não aplica corte/amostragem prematuros."""
-    return (cls.query.filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
+    return (cls.consulta_para_montagem().filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
             .order_by(cls.preco.asc(), cls.id.asc()).all())

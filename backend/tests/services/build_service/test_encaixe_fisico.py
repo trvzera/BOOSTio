@@ -1,3 +1,7 @@
+from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
+from services.build_service.catalogo_geracao_service import campos_pecas
+from services.build_service.constantes_build import CAMPOS_PECAS
+from services.validacoes_service.validar_estado_build_service import validar_estado
 import json
 from pathlib import Path
 
@@ -5,9 +9,9 @@ import pytest
 
 from models import Gabinete, AirCooler
 from models.medidas_fisicas import completar_medidas
-from services.build_service.encaixe_fisico import avaliar_fans, encaixe_radiador
+from services.validacoes_service.encaixe_fisico import avaliar_fans, encaixe_radiador
 from services.build_service.criar_build_service import CriarBuildService
-from services.build_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
+from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
 
 def test_estimativa_visual_nao_substitui_limites_fisicos_confirmados():
@@ -59,7 +63,7 @@ def test_catalogo_real_expoe_complemento_sem_migracao_e_sem_mutar_db():
     dados = gabinete.to_catalogo()
     assert dados["quantidade_max_fans"] == 6 and dados["tamanho_max_cooler_mm"] == 159
     assert len(dados["posicoes_fans"]) == 4 and dados["fonte_medidas"].startswith("https://www.coolermaster.com/")
-    enviado = CriarBuildService._campos_pecas(gabinete)
+    enviado = campos_pecas(gabinete)
     assert enviado["id"] == 1 and enviado["quantidade_max_fans"] == 6
     assert len(enviado["posicoes_fans"]) == 4
     assert gabinete.tamanho_max_cooler_mm == 160
@@ -84,7 +88,7 @@ def test_limites_fisicos_aparecem_no_diagnostico_python_e_catalogo_llm():
     for codigo in ("placa_video-medida", "air_cooler-medida", "fonte-medida", "fonte-formato", "fans-posicoes"):
         assert regra(resultado, codigo)["status"] == "incompativel"
     assert resultado["fans"]["selecionadas"] == 3
-    assert set(("comprimento_mm", "altura_mm", "posicoes_fans", "quantidade", "tamanho_mm", "quantidade_fans", "tamanho_fan_mm", "baias_25")) <= set(CriarBuildService.CAMPOS_PECAS)
+    assert set(("comprimento_mm", "altura_mm", "posicoes_fans", "quantidade", "tamanho_mm", "quantidade_fans", "tamanho_fan_mm", "baias_25")) <= set(CAMPOS_PECAS)
     componentes = {p["categoria"]: {"id": p["id"], "quantidade": 1} for p in pecas}
     componentes["ssd"]["quantidade"] = 2
     assert regra(avaliar(pecas, componentes), "baias-baias_25")["status"] == "incompativel"
@@ -129,7 +133,7 @@ def test_geracao_nao_salva_configuracao_com_fans_que_nao_cabem():
     build = {"nome": "Teste", "descricao": "Montagem", "utilidade": "Estudos",
              "componentes": [{"tipo": tipo, "id": i} for i, tipo in enumerate(tipos, 1)]}
     with pytest.raises(ValueError, match="Posições das fans"):
-        CriarBuildService._validar_build(build, catalogo, 5000)
+        validar_build_gerada(build, catalogo, 5000)
 
 
 def test_diagnostico_resolve_medidas_do_catalogo_persistido_em_banco_isolado():
@@ -155,13 +159,13 @@ def test_diagnostico_resolve_medidas_do_catalogo_persistido_em_banco_isolado():
 def test_flag_substituicao_exige_booleano(valor):
     from models import BuildSalva
     with pytest.raises(ValueError, match="substituição das fans"):
-        BuildSalva.validar_estado({"titulo": "QA", "substituirFansWaterCooler": valor})
+        validar_estado({"titulo": "QA", "substituirFansWaterCooler": valor})
 
 
 def test_estado_preserva_substituicao_e_normaliza_default():
     from models import BuildSalva, Fan
-    assert BuildSalva.validar_estado({"titulo": "QA", "substituirFansWaterCooler": True})["substituirFansWaterCooler"] is True
-    assert BuildSalva.validar_estado({"titulo": "QA"})["substituirFansWaterCooler"] is False
+    assert validar_estado({"titulo": "QA", "substituirFansWaterCooler": True})["substituirFansWaterCooler"] is True
+    assert validar_estado({"titulo": "QA"})["substituirFansWaterCooler"] is False
     dados = Fan(id=1, modelo="TR120 Reverse").to_catalogo()
     assert dados["fluxo_ar"] == "reverso" and dados["fonte_fluxo_ar"] == "nome_comercial"
     assert "fluxo_ar" not in Fan(id=2, modelo="Sem informação").to_catalogo()
@@ -169,8 +173,8 @@ def test_estado_preserva_substituicao_e_normaliza_default():
 
 def test_estado_aceita_fans_de_modelos_diferentes_e_preserva_quantidade(monkeypatch):
     from models import BuildSalva, Fan
-    monkeypatch.setattr(Fan, "buscar_por_id", lambda identificador: Fan(id=identificador, modelo="Fan"))
-    estado = BuildSalva.validar_estado({"titulo": "QA", "substituirFansWaterCooler": True,
+    monkeypatch.setattr(Fan, "buscar_publicada_por_id", lambda identificador: Fan(id=identificador, modelo="Fan"))
+    estado = validar_estado({"titulo": "QA", "substituirFansWaterCooler": True,
                                       "componentes": {"fan": [{"id": 1, "quantidade": 3}, {"id": 2, "quantidade": 2}]}})
     assert estado["componentes"]["fan"] == [{"id": 1, "quantidade": 3}, {"id": 2, "quantidade": 2}]
     assert estado["substituirFansWaterCooler"] is True

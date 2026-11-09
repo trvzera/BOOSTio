@@ -33,7 +33,7 @@ test("grupos preservam todos os campos técnicos sem misturar preço ou ofertas"
   const linhas = grupos.flatMap(grupo => grupo.campos);
   for (const linha of fichaTecnica(peca)) assert.ok(linhas.some(item => JSON.stringify(item) === JSON.stringify(linha)));
   assert.equal(linhas.length,fichaTecnica(peca).length + 1);
-  assert.equal(Object.fromEntries(linhas)["Referência do catálogo / part number"],"PN-1");
+  assert.equal(Object.fromEntries(linhas)["Part number do fabricante"],"PN-1");
   assert.equal(Object.fromEntries(grupos.find(grupo=>grupo.titulo==="Compatibilidade e instalação").campos)["Ventoinhas inclusas"],"0");
   assert.equal(Object.fromEntries(grupos.find(grupo=>grupo.titulo==="Origem das informações").campos)["Ficha consultada em"],"23/10/2026");
   assert.ok(!linhas.some(([rotulo])=>["id","preco","esgotado","ofertas","imagem"].includes(rotulo)));

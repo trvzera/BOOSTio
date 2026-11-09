@@ -44,12 +44,13 @@ def test_mesmo_anuncio_nao_pode_ser_duplicado_nem_vinculado_a_duas_pecas(banco):
     assert Oferta.query.one().id == original.id
 
 
-def test_marketplace_separa_vendedores_do_mesmo_anuncio(banco):
+def test_identidade_do_anuncio_independe_do_vendedor(banco):
     oferta(vendedor_id='a', vendedor_nome='Loja A')
-    oferta(vendedor_id='b', vendedor_nome='Loja B')
     with pytest.raises(IntegrityError):
-        oferta(vendedor_id='a')
+        oferta(vendedor_id='b', vendedor_nome='Loja B')
     db.session.rollback()
+    assert Oferta.query.count() == 1
+    oferta(produto_id_loja='456', vendedor_id='b')
     assert Oferta.query.count() == 2
 
 

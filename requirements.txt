@@ -13,3 +13,5 @@ Flask-Limiter[redis]==4.1.1
 gunicorn==26.2.0; sys_platform != "win32"
 PyMySQL==1.1.2
 cryptography==50.0.0
+
+defusedxml==0.7.1

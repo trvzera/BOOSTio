@@ -38,6 +38,7 @@ export function iniciarNavegacao() {
     iconeAnimado("profile") + '</button><nav id="profile-options" class="profile-panel" aria-label="Menu do perfil" aria-hidden="true" inert>' +
     '<div class="site-menu-group" data-profile-guest>' + links(linksVisitante, true) + '</div>' +
     '<div class="site-menu-group" data-profile-user hidden>' + links(conta, true) +
+    '<a class="profile-link font-1-s" href="' + pagina("admin.html") + '" data-menu-admin hidden aria-label="Ir para a administração"><span class="site-menu-link-label">' + iconeAnimado("user") + '<span>Administração</span></span></a>' +
     '<div class="site-menu-divider"></div><button type="button" class="profile-link font-1-s profile-logout" id="btn-logout" aria-label="Sair da conta">' +
     '<span class="site-menu-link-label">' + iconeAnimado("logout") + '<span>Sair</span></span></button></div></nav></div>' +
     '<div class="site-menu" data-site-menu' + (preview ? "" : " hidden") + '><nav id="site-menu-panel" class="site-menu-panel" aria-label="Navegação entre páginas" aria-hidden="true" inert>' +
@@ -118,11 +119,12 @@ export function iniciarNavegacao() {
   return navegacao;
 }
 
-export function atualizarNavegacao(autenticado) {
+export function atualizarNavegacao(autenticado, administrador = false) {
   const {host, perfil, hamburger} = iniciarNavegacao();
   host.querySelector("[data-profile-guest]").hidden = Boolean(autenticado);
   host.querySelector("[data-profile-user]").hidden = !autenticado;
   host.querySelectorAll("[data-menu-auth]").forEach(link => { link.hidden = !autenticado; });
+  host.querySelectorAll("[data-menu-admin]").forEach(link => { link.hidden = !(autenticado && administrador); });
   hamburger.container.hidden = false; // Visitantes também acessam a navegação pública.
   iniciarIcones(host);
   perfil.alternar(false);

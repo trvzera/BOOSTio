@@ -2,12 +2,12 @@ from models import Processador, PlacaMae, PlacaVideo, MemoriaRAM, SSD, HD, Fonte
 
 class MostrarPecasService:
     def executar(self):
-        processadores = Processador.mostrar_pecas()
-        placas_mae = PlacaMae.mostrar_pecas()
-        placas_video = PlacaVideo.mostrar_pecas()
-        memorias_ram = MemoriaRAM.mostrar_pecas()
-        armazenamentos = SSD.mostrar_pecas() + HD.mostrar_pecas()
-        fontes = Fonte.mostrar_pecas()
+        processadores = Processador.listar_publicadas()
+        placas_mae = PlacaMae.listar_publicadas()
+        placas_video = PlacaVideo.listar_publicadas()
+        memorias_ram = MemoriaRAM.listar_publicadas()
+        armazenamentos = SSD.listar_publicadas() + HD.listar_publicadas()
+        fontes = Fonte.listar_publicadas()
 
         pecas = {
             "processadores": [processador.to_catalogo() for processador in processadores],

@@ -10,9 +10,12 @@ class PreferenciasPerifericosService:
         return any(termo in str(utilidade).casefold() for termo in ("jogo", "gamer", "gaming", "game", "um pouco de tudo"))
 
     @staticmethod
-    def painel_permitido(peca):
+    def painel_permitido(peca, tipos_exigidos=None):
+        if tipos_exigidos is None:
+            return True
         painel = re.sub(r"[\s_-]+", "", str(peca.get("tipo_painel") or "")).upper()
-        return painel in ("IPS", "FASTIPS", "RAPIDIPS", "NANOIPS", "SSIPS", "VA", "FASTVA")
+        exigidos={re.sub(r"[\s_-]+", "", str(v)).upper() for v in tipos_exigidos}
+        return bool(painel) and painel in exigidos
 
     @staticmethod
     def numero(valor):

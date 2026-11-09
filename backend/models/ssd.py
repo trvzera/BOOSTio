@@ -5,7 +5,7 @@ class SSD(Peca):
     __tablename__ = "ssd"
 
     capacidade_gb = db.Column(db.Integer(), nullable=False)
-    tipo = db.Column(db.String(30), nullable=False)
+    tipo = db.Column(db.String(30), nullable=True)
     interface = db.Column(db.String(30), nullable=False)
     formato = db.Column(db.String(30))
     velocidade_leitura_mbps = db.Column(db.Integer())

@@ -20,7 +20,7 @@ ou relacionamentos.
   Métodos: salvar(), deletar().
 - Peca «abstract», herda ModeloBase: fabricante, modelo, part_number,
   consumo_energia, preco, preco_atualizado_em, esgotado, imagem_url, kabum_external.
-  Métodos: buscar_por_id(), mostrar_pecas(), atualizar_preco(), to_catalogo().
+  Métodos: buscar_por_id(), mostrar_pecas(), to_catalogo().
 - Periferico «abstract», herda Peca: conexao, iluminacao.
 
 ## Conta

@@ -1,10 +1,11 @@
+from services.build_service.prompt_build_service import criar_prompt
 import json
 
 import pytest
 
 from models import Usuario
 from services.build_service.criar_build_service import CriarBuildService
-from services.build_service.requisitos_armazenamento_service import RequisitosArmazenamentoService as Requisitos
+from services.validacoes_service.requisitos_armazenamento_service import RequisitosArmazenamentoService as Requisitos
 from services.build_service.seletor_inteligente_service import SeletorInteligenteService
 
 
@@ -28,7 +29,7 @@ def test_parametro_opcional_em_gb(valor):
 def test_prompt_inclui_requisito_sem_inventar_minimo_padrao():
     dados = dict(nome='PC', descricao='Teste', utilidade='Jogos')
     for valor in (None, 1000):
-        prompt = CriarBuildService._criar_prompt({**dados, 'armazenamento_minimo_gb': valor}, 8000, 2000, {})
+        prompt = criar_prompt({**dados, 'armazenamento_minimo_gb': valor}, 8000, 2000, {})
         pedido = json.loads(prompt.split('# PEDIDO\n')[1].split('\n')[0])
         if valor is None:
             assert 'armazenamento_minimo_gb' not in pedido

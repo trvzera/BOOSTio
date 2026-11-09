@@ -1,3 +1,5 @@
+from services.validacoes_service.validar_pedido_build_service import validar_prioridade_montagem
+from services.build_service.prompt_build_service import criar_prompt
 import json
 from contextlib import nullcontext
 
@@ -12,7 +14,7 @@ from services.build_service.gerar_build_service import GerarBuildService
 @pytest.mark.parametrize('prioridade', ['custo_beneficio', 'desempenho'])
 def test_escolha_do_frontend_chega_ao_pedido_do_modelo(prioridade):
     dados = dict(nome='PC', descricao='Teste', utilidade='Jogos', prioridade_montagem=prioridade)
-    prompt = CriarBuildService._criar_prompt(dados, 8000, 2000, {})
+    prompt = criar_prompt(dados, 8000, 2000, {})
     pedido = json.loads(prompt.split('# PEDIDO\n')[1].split('\n')[0])
     assert pedido['prioridade_montagem'] == prioridade
     assert '# PRIORIDADE DA MONTAGEM' in prompt
@@ -20,7 +22,7 @@ def test_escolha_do_frontend_chega_ao_pedido_do_modelo(prioridade):
 
 
 def test_cliente_antigo_mantem_compatibilidade():
-    assert CriarBuildService._validar_prioridade_montagem({}) == 'custo_beneficio'
+    assert validar_prioridade_montagem({}) == 'custo_beneficio'
 
 
 @pytest.mark.parametrize('valor', [None, '', 'custo-beneficio', 'outro', [], {}, 1, True])
