@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ICECAT-interface SYSTEM "https://data.icecat.biz/dtd/ICECAT-interface_response.dtd">
+<!--source: Icecat.biz 2026-->
+<!--Language ID: 1-->
+<!--Version: v2-->
+<ICECAT-interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://data.icecat.biz/xsd/ICECAT-interface_response.xsd">
+ <Product Code="1" HighPic="https://images.icecat.biz/img/gallery/093cb0646eed16dea0b78e6c6c4d5673a8fe3ec4.jpg" HighPicHeight="1000" HighPicSize="199484" HighPicWidth="1000" ID="107473624" LowPic="https://images.icecat.biz/img/gallery_lows/cf6a06f65f3ce53fa9d00b868843f6fb73718ca2.jpg" LowPicHeight="200" LowPicSize="20114" LowPicWidth="200" Name="16GB (2X8GB) CRAS X RGB GAMING RAM MODULE DDR4 3200MHz 1.35V 1GX8 CL16 EQV. TO CMW16GX4M2C3200C16-TUF FOR VENGEANCE RGB PRO" IntName="CMW16GX4M2C3200C16-TUF-IN" LocalName="16GB (2X8GB) CRAS X RGB GAMING RAM MODULE DDR4 3200MHz 1.35V 1GX8 CL16 EQV. TO CMW16GX4M2C3200C16-TUF FOR VENGEANCE RGB PRO" Pic500x500="https://images.icecat.biz/img/gallery_mediums/cc8b89269eceffc9fc1e3cafeeb9b58697c9fef1.jpg" Pic500x500Height="500" Pic500x500Size="91545" Pic500x500Width="500" Prod_id="CMW16GX4M2C3200C16-TUF-IN" Quality="ICECAT" ReleaseDate="" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/6733a8a7ceb252f7938c6fa622dead574a980961.jpg" ThumbPicSize="4772" Title="Integral 16GB (2X8GB) CRAS X RGB GAMING RAM MODULE DDR4 3200MHz 1.35V 1GX8 CL16 EQV. TO CMW16GX4M2C3200C16-TUF FOR VENGEANCE RGB PRO" GeneratedIntTitle="Integral CMW16GX4M2C3200C16-TUF-IN memory module" GeneratedLocalTitle="Integral CMW16GX4M2C3200C16-TUF-IN memory module 288-pin DIMM" BrandLocalTitle="Integral 16GB (2X8GB) CRAS X RGB GAMING RAM MODULE DDR4 3200MHz 1.35V 1GX8 CL16 EQV. TO CMW16GX4M2C3200C16-TUF FOR VENGEANCE RGB PRO">
+  <CategoryFeatureGroup ID="32098" No="0">
+   <FeatureGroup ID="0">
+    <Name ID="5073" langid="1" Value="Technical details"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1549" No="-1">
+   <FeatureGroup ID="14">
+    <Name ID="5023" langid="1" Value="Weight &amp; dimensions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1551" No="2">
+   <FeatureGroup ID="28">
+    <Name ID="5067" langid="1" Value="Operational conditions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="31202" No="-3">
+   <FeatureGroup ID="67">
+    <Name ID="27423" langid="1" Value="Packaging data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="41307" No="0">
+   <FeatureGroup ID="76">
+    <Name ID="28540" langid="1" Value="Certificates"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="83399" No="0">
+   <FeatureGroup ID="90">
+    <Name ID="30562" langid="1" Value="Software"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="49023" No="0">
+   <FeatureGroup ID="116">
+    <Name ID="78852" langid="1" Value="Packaging content"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="53383" No="0">
+   <FeatureGroup ID="143">
+    <Name ID="618812" langid="1" Value="Battery"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="6347" No="-5">
+   <FeatureGroup ID="146">
+    <Name ID="624346" langid="1" Value="Other features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="27909" No="5">
+   <FeatureGroup ID="185">
+    <Name ID="1219853" langid="1" Value="Features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="24500" No="-4">
+   <FeatureGroup ID="198">
+    <Name ID="1788927" langid="1" Value="Logistics data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="59864" No="0">
+   <FeatureGroup ID="232">
+    <Name ID="3464238" langid="1" Value="Supplier features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="76696" No="0">
+   <FeatureGroup ID="279">
+    <Name ID="7392238" langid="1" Value="Sustainability"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <Category ID="911">
+   <Name ID="3727686" langid="1" Value="Memory Modules"/>
+  </Category>
+  <EANCode EAN="5056103871622" Format="GTIN-13" IsApproved="1"/>
+  <ReleaseDate/>
+  <EndOfLifeDate/>
+  <ReasonsToBuy/>
+  <BulletPoints/>
+  <GeneratedBulletPoints>
+   <GeneratedBulletPoint Value="PC 16 GB DDR4" langid="1" No="1"/>
+   <GeneratedBulletPoint Value="288-pin DIMM 2 x 8 GB" langid="1" No="2"/>
+   <GeneratedBulletPoint Value="CAS latency: 16" langid="1" No="3"/>
+   <GeneratedBulletPoint Value="1.35 V" langid="1" No="4"/>
+  </GeneratedBulletPoints>
+  <ProductBundled/>
+  <ProductDescription ID="89486823" LongDesc="" ManualPDFSize="0" ManualPDFURL="" MiddleDesc="" PDFSize="0" PDFURL="" ShortDesc="16GB (2X8GB) CRAS X RGB GAMING RAM MODULE DDR4 3200MHZ PC4-25600 UNBUFFERED NON-ECC 1.35V 1GX8 CL16 KLEVV" URL="https://www.integralmemory.com/" WarrantyInfo="Lifetime warranty" langid="1"/>
+  <ProductFeature Localized="0" ID="516227198" Local_ID="0" Value="16" CategoryFeature_ID="73748" CategoryFeatureGroup_ID="27909" No="10109999" Optional="0" Presentation_Value="16 GB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="16">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="11381">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1036616" langid="1" Value="Internal memory"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="516227176" Local_ID="0" Value="2 x 8" CategoryFeature_ID="93088" CategoryFeatureGroup_ID="27909" No="10109998" Optional="0" Presentation_Value="2 x 8 GB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="2 x 8">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="16023">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1186317" langid="1" Value="Memory layout (modules x size)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="516227196" Local_ID="0" Value="DDR4" CategoryFeature_ID="6137" CategoryFeatureGroup_ID="27909" No="10109980" Optional="0" Presentation_Value="DDR4" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="DDR4">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="427">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2221" langid="1" Value="Internal memory type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="516227179" Local_ID="0" Value="PC" CategoryFeature_ID="73714" CategoryFeatureGroup_ID="27909" No="10109060" Optional="0" Presentation_Value="PC" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="PC">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9163">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="763709" langid="1" Value="Component for"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="516227188" Local_ID="0" Value="288-pin DIMM" CategoryFeature_ID="45866" CategoryFeatureGroup_ID="27909" No="10109050" Optional="0" Presentation_Value="288-pin DIMM" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="288-pin DIMM">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7696">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="595968" langid="1" Value="Memory form factor"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="516227207" Local_ID="0" Value="N" CategoryFeature_ID="6130" CategoryFeatureGroup_ID="27909" No="10109039" Optional="0" Presentation_Value="No" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1628">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5085" langid="1" Value="ECC"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="516227183" Local_ID="0" Value="16" CategoryFeature_ID="6141" CategoryFeatureGroup_ID="27909" No="10109035" Optional="0" Presentation_Value="16" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="16">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1635">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5099" langid="1" Value="CAS latency"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="516227170" Local_ID="0" Value="3200" CategoryFeature_ID="29552" CategoryFeatureGroup_ID="27909" No="109070" Optional="0" Presentation_Value="3200 MHz" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="3200">
+    <Measure ID="18">
+     <Signs>
+      <Sign ID="9" langid="1"><![CDATA[MHz]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2900">
+    <Measure ID="18" Sign="">
+     <Signs>
+      <Sign ID="9" langid="1"><![CDATA[MHz]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="27453" langid="1" Value="Memory clock speed"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="516227211" Local_ID="0" Value="Unregistered (unbuffered)" CategoryFeature_ID="301234" CategoryFeatureGroup_ID="27909" No="100994" Optional="0" Presentation_Value="Unregistered (unbuffered)" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="Unregistered (unbuffered)">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="38209">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5220375" langid="1" Value="Buffered memory type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="516227163" Local_ID="0" Value="1" CategoryFeature_ID="48946" CategoryFeatureGroup_ID="27909" No="100993" Optional="0" Presentation_Value="1" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="8216">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="633354" langid="1" Value="Memory ranking"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="516227168" Local_ID="0" Value="1.35" CategoryFeature_ID="36754" CategoryFeatureGroup_ID="27909" No="100992" Optional="0" Presentation_Value="1.35 V" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1.35">
+    <Measure ID="42">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6266">
+    <Measure ID="42" Sign="">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="154881" langid="1" Value="Memory voltage"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="516227190" Local_ID="0" Value="1024M x 64" CategoryFeature_ID="6133" CategoryFeatureGroup_ID="27909" No="100991" Optional="0" Presentation_Value="1024M x 64" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1024M x 64">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1631">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5091" langid="1" Value="Module configuration"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="516227216" Local_ID="0" Value="133.5" CategoryFeature_ID="48923" CategoryFeatureGroup_ID="1549" No="100073" Optional="0" Presentation_Value="133.5 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="133.5">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1649">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5143" langid="1" Value="Width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="516227213" Local_ID="0" Value="51" CategoryFeature_ID="48925" CategoryFeatureGroup_ID="1549" No="100071" Optional="0" Presentation_Value="51 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="51">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1464">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4625" langid="1" Value="Height"/>
+   </Feature>
+  </ProductFeature>
+  <ProductGallery>
+   <ProductPicture IsMain="Y" LowPic="https://images.icecat.biz/img/gallery_lows/cf6a06f65f3ce53fa9d00b868843f6fb73718ca2.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="20114" No="1" Original="https://images.icecat.biz/img/gallery_raw/74d15dd72e23082611ee49e0c79abdb13bcbc526.jpeg" OriginalSize="124839" Pic="https://images.icecat.biz/img/gallery/093cb0646eed16dea0b78e6c6c4d5673a8fe3ec4.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/cc8b89269eceffc9fc1e3cafeeb9b58697c9fef1.jpg" Pic500x500Height="500" Pic500x500Size="91545" Pic500x500Width="500" PicHeight="1000" PicWidth="1000" ProductPicture_ID="69750526" Size="199484" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/6733a8a7ceb252f7938c6fa622dead574a980961.jpg" ThumbSize="4772" Type="ProductImage" UpdatedDate="2024-03-12 11:37:37"/>
+  </ProductGallery>
+  <ProductMultimediaObject>
+   <MultimediaObject ContentType="application/pdf" Date="2025-05-16 15:39:38" Description="Generated PDF" KeepAsURL="0" MultimediaObject_ID="0" Type="leaflet" UUID="00000000-0000-0000-0000-000000000000" langid="1" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="0" URL="https://icecat.biz/rest/product-pdf?productId=107473624&amp;lang=en" Width="0"/>
+  </ProductMultimediaObject>
+  <ProductRelated/>
+  <SummaryDescription>
+   <ShortSummaryDescription langid="1">Integral 16GB (2X8GB) CRAS X RGB GAMING RAM MODULE DDR4 3200MHz 1.35V 1GX8 CL16 EQV. TO CMW16GX4M2C3200C16-TUF FOR VENGEANCE RGB PRO, 16 GB, 2 x 8 GB, DDR4, 3200 MHz, 288-pin DIMM</ShortSummaryDescription>
+   <LongSummaryDescription langid="1">Integral 16GB (2X8GB) CRAS X RGB GAMING RAM MODULE DDR4 3200MHz 1.35V 1GX8 CL16 EQV. TO CMW16GX4M2C3200C16-TUF FOR VENGEANCE RGB PRO. Component for: PC, Internal memory: 16 GB, Memory layout (modules x size): 2 x 8 GB, Internal memory type: DDR4, Memory clock speed: 3200 MHz, Memory form factor: 288-pin DIMM, CAS latency: 16</LongSummaryDescription>
+  </SummaryDescription>
+  <Supplier ID="1899" Name="Integral"/>
+  <CatalogObjectCloud>
+   <ProductPage QRCodeURL="https://qr.icecat.biz/coc/fe4c513c-fd3b-42ce-afed-5d987485f022" URL="https://coc.icecat.biz/fe4c513c-fd3b-42ce-afed-5d987485f022"/>
+  </CatalogObjectCloud>
+ </Product>
+</ICECAT-interface>

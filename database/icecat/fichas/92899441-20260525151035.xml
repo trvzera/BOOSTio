@@ -1,0 +1,891 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ICECAT-interface SYSTEM "https://data.icecat.biz/dtd/ICECAT-interface_response.dtd">
+<!--source: Icecat.biz 2026-->
+<!--Language ID: 1-->
+<!--Version: v2-->
+<ICECAT-interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://data.icecat.biz/xsd/ICECAT-interface_response.xsd">
+ <Product Code="1" HighPic="https://images.icecat.biz/img/gallery/7d12906b625b228f02f9435afc2253a18ca44287.jpg" HighPicHeight="642" HighPicSize="426012" HighPicWidth="2045" ID="92899441" LowPic="https://images.icecat.biz/img/gallery_lows/19657b6ad032fde0dd52dbe5e1c13f1298d8d318.jpg" LowPicHeight="63" LowPicSize="7051" LowPicWidth="200" Name="16GB 3200MT/s DDR4 CL16 DIMM 1Gx8 FURY Beast Black" IntName="Beast" LocalName="16GB 3200MT/s DDR4 CL16 DIMM 1Gx8 FURY Beast Black" Pic500x500="https://images.icecat.biz/img/gallery_mediums/751bc321ae87d3849ad273c036c6f05b74b6527d.jpg" Pic500x500Height="157" Pic500x500Size="35901" Pic500x500Width="500" Prod_id="KF432C16BB1/16" Quality="ICECAT" ReleaseDate="2021-07-19" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/6b70a58eff53ce820e6056455ec4f15187903d73.jpg" ThumbPicSize="2143" Title="Kingston Technology FURY Beast 16GB 3200MT/s DDR4 CL16 DIMM 1Gx8 Black" GeneratedIntTitle="Kingston Technology FURY Beast memory module" GeneratedLocalTitle="Kingston Technology FURY Beast memory module 1 x 16 GB 3200 MT/s 288-pin DIMM" BrandLocalTitle="Kingston Technology FURY Beast 16GB 3200MT/s DDR4 CL16 DIMM 1Gx8 Black">
+  <CategoryFeatureGroup ID="32098" No="0">
+   <FeatureGroup ID="0">
+    <Name ID="5073" langid="1" Value="Technical details"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1549" No="-1">
+   <FeatureGroup ID="14">
+    <Name ID="5023" langid="1" Value="Weight &amp; dimensions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1551" No="2">
+   <FeatureGroup ID="28">
+    <Name ID="5067" langid="1" Value="Operational conditions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="31202" No="-3">
+   <FeatureGroup ID="67">
+    <Name ID="27423" langid="1" Value="Packaging data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="41307" No="0">
+   <FeatureGroup ID="76">
+    <Name ID="28540" langid="1" Value="Certificates"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="83399" No="0">
+   <FeatureGroup ID="90">
+    <Name ID="30562" langid="1" Value="Software"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="49023" No="0">
+   <FeatureGroup ID="116">
+    <Name ID="78852" langid="1" Value="Packaging content"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="53383" No="0">
+   <FeatureGroup ID="143">
+    <Name ID="618812" langid="1" Value="Battery"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="6347" No="-5">
+   <FeatureGroup ID="146">
+    <Name ID="624346" langid="1" Value="Other features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="27909" No="5">
+   <FeatureGroup ID="185">
+    <Name ID="1219853" langid="1" Value="Features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="24500" No="-4">
+   <FeatureGroup ID="198">
+    <Name ID="1788927" langid="1" Value="Logistics data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="59864" No="0">
+   <FeatureGroup ID="232">
+    <Name ID="3464238" langid="1" Value="Supplier features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="76696" No="0">
+   <FeatureGroup ID="279">
+    <Name ID="7392238" langid="1" Value="Sustainability"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <Category ID="911">
+   <Name ID="3727686" langid="1" Value="Memory Modules"/>
+  </Category>
+  <EANCode EAN="0740617319880" Format="GTIN-13" IsApproved="1"/>
+  <EANCode EAN="740617319880" Format="GTIN-12" IsApproved="1"/>
+  <ReleaseDate>
+   <Date Value="2021-07-19" langid="0"/>
+  </ReleaseDate>
+  <EndOfLifeDate/>
+  <ReasonsToBuy/>
+  <BulletPoints>
+   <BulletPoint Value="Cost-efficient, high-performance DDR4 upgrade" langid="1" No="1"/>
+   <BulletPoint Value="Intel® XMP Ready and XMP Certified" langid="1" No="2"/>
+   <BulletPoint Value="Speeds of up to 3600MT/s and kit capacity of up to 128GB" langid="1" No="3"/>
+   <BulletPoint Value="Ready for AMD Ryzen™" langid="1" No="4"/>
+   <BulletPoint Value="Low-profile heat spreader design" langid="1" No="5"/>
+  </BulletPoints>
+  <GeneratedBulletPoints>
+   <GeneratedBulletPoint Value="PC 16 GB DDR4 3200 MT/s" langid="1" No="1"/>
+   <GeneratedBulletPoint Value="288-pin DIMM 1 x 16 GB" langid="1" No="2"/>
+   <GeneratedBulletPoint Value="CAS latency: 16" langid="1" No="3"/>
+   <GeneratedBulletPoint Value="1.35 V" langid="1" No="4"/>
+   <GeneratedBulletPoint Value="Intel Extreme Memory Profile (XMP) 2.0" langid="1" No="5"/>
+  </GeneratedBulletPoints>
+  <ProductBundled/>
+  <ProductDescription ID="81813866" LongDesc="&lt;b&gt;Kingston FURY™ Beast DDR4 Memory&lt;/b&gt;&lt;br&gt;&quot;Kingston FURY™ Beast DDR4 provides a powerful performance boost for gaming, video editing and rendering with speeds of up to 3600MT/s. This cost-effective upgrade is available in 3200MT/s–3600MT/s speeds, CL16–18 latencies, single module capacities of 8GB–32GB and kit capacities of 16GB–128GB. It is Intel® XMP Ready, XMP Certified and Ready for AMD Ryzen™. FURY Beast DDR4 stays cool with its stylish, low-profile heat spreader. 100% tested at speed and backed by a lifetime warranty, it’s an easy, worry-free upgrade for your Intel or AMD-based system.&lt;br&gt;&lt;br&gt;&lt;b&gt;High-performance, cost-effective upgrade&lt;/b&gt;&lt;br&gt;Kingston FURY Beast DDR4 is the perfect choice for a system builder, or someone looking for an upgrade to jump start their sluggish system.&lt;br&gt;&lt;br&gt;&lt;b&gt;Intel® XMP Ready and XMP Certified&lt;/b&gt;&lt;br&gt;Designed to maximise the performance of our memory modules, our engineers have predefined Intel Extreme Memory Profiles to reach speeds of up to 3600MT/s.&lt;br&gt;&lt;br&gt;&lt;b&gt;Ready for AMD Ryzen&lt;/b&gt;&lt;br&gt;Get memory that’s ready for Ryzen and will seamlessly integrate with your AMD-based system. A reliable, compatible performance boost for your build.&lt;br&gt;&lt;br&gt;&lt;b&gt;Low-profile heat spreader&lt;/b&gt;&lt;br&gt;The sleek-looking heat spreader is a great upgrade for your battle station’s style." ManualPDFSize="0" ManualPDFURL="" MiddleDesc="" PDFSize="399034" PDFURL="https://objects.icecat.biz/objects/mmo_92899441_1701706775_9169_65.pdf" ShortDesc="16GB 3200MT/s DDR4 CL16 DIMM 1Gx8 FURY Beast Black" URL="https://www.kingston.com/italy/it" WarrantyInfo="Lifetime" langid="1"/>
+  <Disclaimers>
+   <Disclaimer langid="1" value="Some legacy chipsets/processors from Intel prior to 8th Gen have not been updated to support memory modules featuring DDR4 16Gbit density DRAM. Check with your system or motherboard manufacturer for an updated BIOS to support 16Gbit DRAM."/>
+  </Disclaimers>
+  <ProductFamily ID="73011" LowPic="" ThumbPic="">
+   <Name ID="7870600" langid="1" Value="FURY"/>
+   <Series ID="8269">
+    <Name ID="8849241" langid="1" Value="Beast"/>
+   </Series>
+  </ProductFamily>
+  <ProductFeature Localized="0" ID="429070544" Local_ID="0" Value="16" CategoryFeature_ID="73748" CategoryFeatureGroup_ID="27909" No="10109999" Optional="0" Presentation_Value="16 GB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="16">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="11381">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1036616" langid="1" Value="Internal memory"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429070546" Local_ID="0" Value="1 x 16" CategoryFeature_ID="93088" CategoryFeatureGroup_ID="27909" No="10109998" Optional="0" Presentation_Value="1 x 16 GB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="1 x 16">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="16023">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1186317" langid="1" Value="Memory layout (modules x size)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429070547" Local_ID="0" Value="DDR4" CategoryFeature_ID="6137" CategoryFeatureGroup_ID="27909" No="10109980" Optional="0" Presentation_Value="DDR4" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="DDR4">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="427">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2221" langid="1" Value="Internal memory type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="618877939" Local_ID="0" Value="3200" CategoryFeature_ID="948627" CategoryFeatureGroup_ID="27909" No="10109069" Optional="0" Presentation_Value="3200 MT/s" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="3200">
+    <Measure ID="340">
+     <Signs>
+      <Sign ID="28534" langid="1"><![CDATA[MT/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="37536">
+    <Measure ID="340" Sign="">
+     <Signs>
+      <Sign ID="28534" langid="1"><![CDATA[MT/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5082622" langid="1" Value="Memory data transfer rate"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429070658" Local_ID="0" Value="PC" CategoryFeature_ID="73714" CategoryFeatureGroup_ID="27909" No="10109060" Optional="0" Presentation_Value="PC" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="PC">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9163">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="763709" langid="1" Value="Component for"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429070659" Local_ID="0" Value="288-pin DIMM" CategoryFeature_ID="45866" CategoryFeatureGroup_ID="27909" No="10109050" Optional="0" Presentation_Value="288-pin DIMM" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="288-pin DIMM">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7696">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="595968" langid="1" Value="Memory form factor"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429070660" Local_ID="0" Value="N" CategoryFeature_ID="6130" CategoryFeatureGroup_ID="27909" No="10109039" Optional="0" Presentation_Value="No" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1628">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5085" langid="1" Value="ECC"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429070553" Local_ID="0" Value="16" CategoryFeature_ID="6141" CategoryFeatureGroup_ID="27909" No="10109035" Optional="0" Presentation_Value="16" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="16">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1635">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5099" langid="1" Value="CAS latency"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="603685123" Local_ID="0" Value="Unregistered (unbuffered)" CategoryFeature_ID="301234" CategoryFeatureGroup_ID="27909" No="100994" Optional="0" Presentation_Value="Unregistered (unbuffered)" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="Unregistered (unbuffered)">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="38209">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5220375" langid="1" Value="Buffered memory type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="603685128" Local_ID="0" Value="2" CategoryFeature_ID="48946" CategoryFeatureGroup_ID="27909" No="100993" Optional="0" Presentation_Value="2" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="2">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="8216">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="633354" langid="1" Value="Memory ranking"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="603685126" Local_ID="0" Value="1.35" CategoryFeature_ID="36754" CategoryFeatureGroup_ID="27909" No="100992" Optional="0" Presentation_Value="1.35 V" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1.35">
+    <Measure ID="42">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6266">
+    <Measure ID="42" Sign="">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="154881" langid="1" Value="Memory voltage"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="603685129" Local_ID="0" Value="2048M x 64" CategoryFeature_ID="6133" CategoryFeatureGroup_ID="27909" No="100991" Optional="0" Presentation_Value="2048M x 64" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="2048M x 64">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1631">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5091" langid="1" Value="Module configuration"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429070704" Local_ID="0" Value="Y" CategoryFeature_ID="132047" CategoryFeatureGroup_ID="27909" No="100100" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="21116">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1679908" langid="1" Value="Intel Extreme Memory Profile (XMP)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="603684937" Local_ID="0" Value="2.0" CategoryFeature_ID="215340" CategoryFeatureGroup_ID="27909" No="100099" Optional="0" Presentation_Value="2.0" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="2.0">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="31816">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="3209746" langid="1" Value="Intel Extreme Memory Profile (XMP) version"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429070705" Local_ID="0" Value="Heatsink" CategoryFeature_ID="44903" CategoryFeatureGroup_ID="27909" No="99999" Optional="0" Presentation_Value="Heatsink" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Heatsink">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6392">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="169957" langid="1" Value="Cooling type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="603684963" Local_ID="0" Value="Gold" CategoryFeature_ID="6140" CategoryFeatureGroup_ID="27909" No="99998" Optional="0" Presentation_Value="Gold" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Gold">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1634">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5097" langid="1" Value="Lead plating"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429070735" Local_ID="0" Value="0 - 85" CategoryFeature_ID="6146" CategoryFeatureGroup_ID="1551" No="100095" Optional="0" Presentation_Value="0 - 85 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0 - 85">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1112">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3765" langid="1" Value="Operating temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="603684981" Local_ID="0" Value="-55 - 100" CategoryFeature_ID="48926" CategoryFeatureGroup_ID="1551" No="100092" Optional="0" Presentation_Value="-55 - 100 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="-55 - 100">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="757">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3045" langid="1" Value="Storage temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429240264" Local_ID="0" Value="7.2" CategoryFeature_ID="48923" CategoryFeatureGroup_ID="1549" No="100073" Optional="0" Presentation_Value="7.2 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="7.2">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1649">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5143" langid="1" Value="Width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429240269" Local_ID="0" Value="133.35" CategoryFeature_ID="48924" CategoryFeatureGroup_ID="1549" No="100072" Optional="0" Presentation_Value="133.3 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="133.3">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1650">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5145" langid="1" Value="Depth"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429240271" Local_ID="0" Value="34.1" CategoryFeature_ID="48925" CategoryFeatureGroup_ID="1549" No="100071" Optional="0" Presentation_Value="34.1 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="34.1">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1464">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4625" langid="1" Value="Height"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429305312" Local_ID="0" Value="34.76" CategoryFeature_ID="11702" CategoryFeatureGroup_ID="1549" No="100040" Optional="0" Presentation_Value="34.76 g" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="34.8">
+    <Measure ID="38">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="94">
+    <Measure ID="38" Sign="">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1525" langid="1" Value="Weight"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429305329" Local_ID="0" Value="57.15" CategoryFeature_ID="76669" CategoryFeatureGroup_ID="31202" No="99989" Optional="0" Presentation_Value="57.1 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="57.1">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3808">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="44095" langid="1" Value="Package width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429305325" Local_ID="0" Value="13.97" CategoryFeature_ID="76670" CategoryFeatureGroup_ID="31202" No="99988" Optional="0" Presentation_Value="14 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="14">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3806">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="44061" langid="1" Value="Package depth"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429305331" Local_ID="0" Value="171.45" CategoryFeature_ID="76671" CategoryFeatureGroup_ID="31202" No="99987" Optional="0" Presentation_Value="171.4 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="171.4">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3807">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="44078" langid="1" Value="Package height"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429305328" Local_ID="0" Value="51.58" CategoryFeature_ID="27359" CategoryFeatureGroup_ID="31202" No="99980" Optional="0" Presentation_Value="51.58 g" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="51.6">
+    <Measure ID="38">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="762">
+    <Measure ID="38" Sign="">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3055" langid="1" Value="Package weight"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494546450" Local_ID="0" Value="84733020" CategoryFeature_ID="309147" CategoryFeatureGroup_ID="24500" No="99947" Optional="1" Presentation_Value="84733020" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="84733020">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="23731">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1903598" langid="1" Value="Harmonized System (HS) code"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429305307" Local_ID="0" Value="25" CategoryFeature_ID="416901" CategoryFeatureGroup_ID="24500" No="99945" Optional="1" Presentation_Value="25 pc(s)" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="25">
+    <Measure ID="144">
+     <Signs>
+      <Sign ID="125" langid="1"><![CDATA[pc(s)]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="22664">
+    <Measure ID="144" Sign="">
+     <Signs>
+      <Sign ID="125" langid="1"><![CDATA[pc(s)]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1789642" langid="1" Value="Products per shipping (inner) case"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429305337" Local_ID="0" Value="196.85" CategoryFeature_ID="428961" CategoryFeatureGroup_ID="24500" No="99935" Optional="1" Presentation_Value="19.7 cm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="19.7">
+    <Measure ID="34">
+     <Signs>
+      <Sign ID="18" langid="1"><![CDATA[cm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="22660">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1789442" langid="1" Value="Shipping (inner) case width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429305340" Local_ID="0" Value="311.15" CategoryFeature_ID="422842" CategoryFeatureGroup_ID="24500" No="99930" Optional="1" Presentation_Value="31.1 cm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="31.1">
+    <Measure ID="34">
+     <Signs>
+      <Sign ID="18" langid="1"><![CDATA[cm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="22661">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1789492" langid="1" Value="Shipping (inner) case length"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="429305335" Local_ID="0" Value="60.96" CategoryFeature_ID="435080" CategoryFeatureGroup_ID="24500" No="99925" Optional="1" Presentation_Value="6.1 cm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="6.1">
+    <Measure ID="34">
+     <Signs>
+      <Sign ID="18" langid="1"><![CDATA[cm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="22662">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1789502" langid="1" Value="Shipping (inner) case height"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="602040009" Local_ID="0" Value="25" CategoryFeature_ID="218355" CategoryFeatureGroup_ID="24500" No="99860" Optional="1" Presentation_Value="25 pc(s)" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="25">
+    <Measure ID="144">
+     <Signs>
+      <Sign ID="125" langid="1"><![CDATA[pc(s)]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="22659">
+    <Measure ID="144" Sign="">
+     <Signs>
+      <Sign ID="125" langid="1"><![CDATA[pc(s)]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1789390" langid="1" Value="Products per master (outer) case"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="602040039" Local_ID="0" Value="196.85" CategoryFeature_ID="218350" CategoryFeatureGroup_ID="24500" No="99850" Optional="1" Presentation_Value="196.8 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="196.8">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="4457">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="60399" langid="1" Value="Master (outer) case width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="602040027" Local_ID="0" Value="311.15" CategoryFeature_ID="218351" CategoryFeatureGroup_ID="24500" No="99845" Optional="1" Presentation_Value="311.1 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="311.1">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="22658">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1789340" langid="1" Value="Master (outer) case length"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="602040021" Local_ID="0" Value="60.96" CategoryFeature_ID="218352" CategoryFeatureGroup_ID="24500" No="99840" Optional="1" Presentation_Value="61 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="61">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="4456">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="60398" langid="1" Value="Master (outer) case height"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="602040011" Local_ID="0" Value="1433.84" CategoryFeature_ID="218353" CategoryFeatureGroup_ID="24500" No="99825" Optional="1" Presentation_Value="1.43 kg" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1.43">
+    <Measure ID="17">
+     <Signs>
+      <Sign ID="15505" langid="1"><![CDATA[kg]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="19016">
+    <Measure ID="38" Sign="">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1427069" langid="1" Value="Master (outer) case gross weight"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="602040048" Local_ID="0" Value="China,Taiwan" CategoryFeature_ID="56407" CategoryFeatureGroup_ID="6347" No="100000" Optional="0" Presentation_Value="China, Taiwan" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="China, Taiwan">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3294">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="31174" langid="1" Value="Country of origin"/>
+   </Feature>
+  </ProductFeature>
+  <ProductGallery>
+   <ProductPicture IsMain="Y" LowPic="https://images.icecat.biz/img/gallery_lows/19657b6ad032fde0dd52dbe5e1c13f1298d8d318.jpg" LowPicHeight="63" LowPicWidth="200" LowSize="7051" No="1" Original="https://images.icecat.biz/img/gallery_raw/c55628fb79194a57928b41c78640e59dfff7071a.jpeg" OriginalSize="445198" Pic="https://images.icecat.biz/img/gallery/7d12906b625b228f02f9435afc2253a18ca44287.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/751bc321ae87d3849ad273c036c6f05b74b6527d.jpg" Pic500x500Height="157" Pic500x500Size="35901" Pic500x500Width="500" PicHeight="642" PicWidth="2045" ProductPicture_ID="55196514" Size="426012" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/6b70a58eff53ce820e6056455ec4f15187903d73.jpg" ThumbSize="2143" Type="ProductImage" UpdatedDate="2024-03-10 10:10:44"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/117546c5e772766897322871996c7381b43997ef.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="7359" No="2" Original="https://images.icecat.biz/img/gallery_raw/a96bd21bb84d9ae00e6c45c7d67c4e7f7f4828ba.jpeg" OriginalSize="198958" Pic="https://images.icecat.biz/img/gallery/fcc079dffe6c23880851d0f3f525fa92c764d9f5.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/7deb78ccca78b4661a800ecb3e08e3d990a1ef66.jpg" Pic500x500Height="500" Pic500x500Size="34775" Pic500x500Width="500" PicHeight="2000" PicWidth="2000" ProductPicture_ID="54575650" Size="278720" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/784a58b3a1f5e682d2b14a1ca96e7c0bea6d33fd.jpg" ThumbSize="2059" Type="ProductImage" UpdatedDate="2024-03-10 10:10:44"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/3e188c10fdfe37d2e6c097891e1850447b9d39f5.jpg" LowPicHeight="125" LowPicWidth="200" LowSize="10484" No="3" Original="https://images.icecat.biz/img/gallery_raw/3cbb9601f9454a96b774d290b6c1ab1c193d9b9b.jpeg" OriginalSize="786069" Pic="https://images.icecat.biz/img/gallery/46f9fe482b12171916dad787878cd64909043039.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/52c2252ff64f98aa10bd8c0580d37576d1b9118d.jpg" Pic500x500Height="313" Pic500x500Size="44151" Pic500x500Width="500" PicHeight="1500" PicWidth="2400" ProductPicture_ID="54575651" Size="643250" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/b7f62a21f767a5aebd38745772d0b0210d5f2da7.jpg" ThumbSize="2804" Type="ProductImage" UpdatedDate="2024-03-10 10:10:44"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/d0d02b435c099baf6c2803f295e262129c0d2d8d.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="4442" No="4" Original="https://images.icecat.biz/img/gallery_raw/0ef1c3cad6a3f517d0f3f55fd592f4b009c0abec.jpeg" OriginalSize="113100" Pic="https://images.icecat.biz/img/gallery/f5d596da477b6167ccd8bb3c39b93ccb20714525.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/8968dfb4d0e1159169e5978182b87d4ee5588352.jpg" Pic500x500Height="500" Pic500x500Size="17511" Pic500x500Width="500" PicHeight="2000" PicWidth="2000" ProductPicture_ID="54575652" Size="143918" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/a875ab72f0f4dc94dddfb4cc0de42be688842539.jpg" ThumbSize="1361" Type="ProductImage" UpdatedDate="2024-03-10 10:10:44"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/000b6601ba548fdcc81772f99c92812cefaeadf7.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="13013" No="5" Original="https://images.icecat.biz/img/gallery_raw/02f57334dd7e95d2c79c5be52a77fe781ca2dec7.jpeg" OriginalSize="186607" Pic="https://images.icecat.biz/img/gallery/37397b2193ca53793441d8c9f9448281cf353985.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/bff2412b8fdbb30f61e0e03f334643c67d66abbf.jpg" Pic500x500Height="500" Pic500x500Size="58989" Pic500x500Width="500" PicHeight="2000" PicWidth="2000" ProductPicture_ID="54575654" Size="314525" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/1d967402b31f7e6321b3dc3454f7e14f95cd7a44.jpg" ThumbSize="2897" Type="ProductImage" UpdatedDate="2024-03-10 10:10:44"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/4d4dd9d3bd5aca3fb026491f24721cbd19f1a0ba.jpg" LowPicHeight="125" LowPicWidth="200" LowSize="6525" No="6" Original="https://images.icecat.biz/img/gallery_raw/b2645f20425ae603f0fb70f1ff130ce915bdbea8.jpeg" OriginalSize="629497" Pic="https://images.icecat.biz/img/gallery/b4af84fce7a8a2c311ee6cd00add55a90191a01c.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/17cccdc97f088ac60343a8ec03e70c875577a589.jpg" Pic500x500Height="313" Pic500x500Size="31873" Pic500x500Width="500" PicHeight="1500" PicWidth="2400" ProductPicture_ID="86229982" Size="498564" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/f4f4241ee005c7ca37858322cdfd864c66573029.jpg" ThumbSize="1821" Type="ProductImage" UpdatedDate="2024-02-12 15:48:25"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/8f9c4e6019b345fa89517d4786e46c9c59f5c881.jpg" LowPicHeight="133" LowPicWidth="200" LowSize="16908" No="7" Original="https://images.icecat.biz/img/gallery_raw/b560dec5d22fa697b29959e9d6f0bb18137048c0.jpeg" OriginalSize="27487887" Pic="https://images.icecat.biz/img/gallery/dcd607c2441f7083e4078820109edd73e0d40224.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/c238ba3702eaa68c4dfae9934ff1818efca8779e.jpg" Pic500x500Height="333" Pic500x500Size="102435" Pic500x500Width="500" PicHeight="5792" PicWidth="8688" ProductPicture_ID="86229950" Size="26575205" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/439d83d31ea2e4b7827a920c129412bc17b77e8f.jpg" ThumbSize="3010" Type="ProductImage" UpdatedDate="2024-02-12 15:48:25"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/c8d4064afc320a7bd91cdf3ab426755e780512c6.jpg" LowPicHeight="125" LowPicWidth="200" LowSize="5593" No="8" Original="https://images.icecat.biz/img/gallery_raw/d8b0ac4fbd59c75e4bdde224a646d8f3c02135da.jpeg" OriginalSize="17387935" Pic="https://images.icecat.biz/img/gallery/5599613c6a17a0dc4797942c1bcf76cac747578d.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/bb5879426a957e41e1d93b0ffd0cb8a3b8dc829e.jpg" Pic500x500Height="312" Pic500x500Size="30988" Pic500x500Width="500" PicHeight="5101" PicWidth="8162" ProductPicture_ID="86229951" Size="15630693" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/af54ad555465f7063ca772a533959909ed9d1046.jpg" ThumbSize="1750" Type="ProductImage" UpdatedDate="2024-02-12 15:48:25"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/8261ee9131184a8b215b69feb63167df84e63a9d.jpg" LowPicHeight="125" LowPicWidth="200" LowSize="7318" No="9" Original="https://images.icecat.biz/img/gallery_raw/cb68f74a5af058c842e394f51e8826c3f27750da.jpeg" OriginalSize="7784229" Pic="https://images.icecat.biz/img/gallery/611ec0939f473bb5ccd6bce47b4fa8dd20708dd4.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/f815d871684c71dd7574080a216f131c430717cc.jpg" Pic500x500Height="313" Pic500x500Size="31872" Pic500x500Width="500" PicHeight="5347" PicWidth="8555" ProductPicture_ID="86229952" Size="5683000" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/52409eee4c4d2f10fe47aca0020d3a67153b3f67.jpg" ThumbSize="2328" Type="ProductImage" UpdatedDate="2024-02-12 15:48:25"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/9d934f0135d4806543957e19c40704386de354dd.jpg" LowPicHeight="133" LowPicWidth="200" LowSize="35074" No="10" Original="https://images.icecat.biz/img/gallery_raw/f310bf33b5e08baa1ca678ab85e3e54882bc3c37.jpeg" OriginalSize="33411180" Pic="https://images.icecat.biz/img/gallery/e8453186f94cce7970bedff279191ea2094bd645.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/bdac6c70f51625b81183924f5c711bdc0df65c07.jpg" Pic500x500Height="333" Pic500x500Size="174082" Pic500x500Width="500" PicHeight="5792" PicWidth="8688" ProductPicture_ID="86229953" Size="33848279" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/4c1626dccf8dca7f1e6f778ee1c014f292c68ee8.jpg" ThumbSize="7059" Type="ProductImage" UpdatedDate="2024-02-12 15:48:25"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/13c18a588c58534f264d47c74535b70bf6a4c60f.jpg" LowPicHeight="133" LowPicWidth="200" LowSize="23682" No="11" Original="https://images.icecat.biz/img/gallery_raw/a392dc90b330a2997d6115466fc71b1b1c602514.jpeg" OriginalSize="19805587" Pic="https://images.icecat.biz/img/gallery/bebb9d68ff8c2e34d132fc080856b49c803afe28.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/bf5722aa65aa040412e22dc0cfa31164653ec9e7.jpg" Pic500x500Height="333" Pic500x500Size="95487" Pic500x500Width="500" PicHeight="5792" PicWidth="8688" ProductPicture_ID="86229954" Size="18671955" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/8093054f89b71819224c4a7eb26fe25de8099690.jpg" ThumbSize="6111" Type="ProductImage" UpdatedDate="2024-02-12 15:48:25"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/260be24a433d3bd056e338ddd3d0dd610aff4d81.jpg" LowPicHeight="133" LowPicWidth="200" LowSize="24397" No="12" Original="https://images.icecat.biz/img/gallery_raw/5afd977392517c749944962ce8bf57144a5b026d.jpeg" OriginalSize="25932172" Pic="https://images.icecat.biz/img/gallery/bbabbb4edb0fefea2cd7100ab89042f67a29a3f8.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/4f7ed78fd37144ebf6e9d3dfd44c817ae0ee5066.jpg" Pic500x500Height="333" Pic500x500Size="120434" Pic500x500Width="500" PicHeight="5792" PicWidth="8688" ProductPicture_ID="86229955" Size="25567731" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/bb8bb5d157167cff5363c29b9e91ded8f191eb6f.jpg" ThumbSize="5151" Type="ProductImage" UpdatedDate="2024-02-12 15:48:25"/>
+  </ProductGallery>
+  <ProductMultimediaObject>
+   <MultimediaObject ContentType="video/mp4" Date="2023-12-04 17:34:09" Description="Unleash your performance." KeepAsURL="0" MultimediaObject_ID="36711198" Type="video/mp4" UUID="6006A75E-CA7D-4321-BB74-E6F4B063EF58" langid="1" OriginalMD5="08be5972561d445f5effa5a0585d5511" ThumbUrl="https://objects.icecat.biz/objects/thumb/92899441_36711198_thumb.png" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="https://objects.icecat.biz/objects/preview/92899441_36711198_preview.png" PreviewWidth="0" Size="61835892" URL="https://objects.icecat.biz/objects/92899441_36711198.mp4" Width="0"/>
+   <MultimediaObject ContentType="application/pdf" Date="2023-12-04 17:19:35" Description="leaflet" KeepAsURL="0" MultimediaObject_ID="36711075" Type="leaflet" UUID="16A64EAE-9FD1-44E6-9BF9-873A0DE72E50" langid="1" Source="https://www.kingston.com/datasheets/KF432C16BB1_16.pdf" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="399034" URL="https://objects.icecat.biz/objects/mmo_92899441_1701706775_9169_65.pdf" Width="0"/>
+  </ProductMultimediaObject>
+  <ProductRelated ID="295747550" Category_ID="911" Preferred="0">
+   <Product ID="92899568" Prod_id="KF432C16BBK2/16" ThumbPic="" Name="16GB 3200MT/s DDR4 CL16 DIMM (Kit of 2) FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747631" Category_ID="911" Preferred="0">
+   <Product ID="92899550" Prod_id="KF432C16BB/8" ThumbPic="" Name="8GB 3200MT/s DDR4 CL16 DIMM FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747635" Category_ID="911" Preferred="0">
+   <Product ID="92995343" Prod_id="KF432C16BBK2/32" ThumbPic="" Name="32GB 3200MT/s DDR4 CL16 DIMM (Kit of 2) FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747632" Category_ID="911" Preferred="0">
+   <Product ID="92899826" Prod_id="KF432C16BB1K2/32" ThumbPic="" Name="32GB 3200MT/s DDR4 CL16 DIMM (Kit of 2) 1Gx8 FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747644" Category_ID="911" Preferred="0">
+   <Product ID="92899819" Prod_id="KF436C18BBK2/32" ThumbPic="" Name="32GB 3600MT/s DDR4 CL18 DIMM (Kit of 2) FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747641" Category_ID="911" Preferred="0">
+   <Product ID="92900193" Prod_id="KF436C17BBK2/16" ThumbPic="" Name="16GB 3600MT/s DDR4 CL17 DIMM (Kit of 2) FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747637" Category_ID="911" Preferred="0">
+   <Product ID="92899611" Prod_id="KF432C16BB/32" ThumbPic="" Name="32GB 3200MT/s DDR4 CL16 DIMM FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747638" Category_ID="911" Preferred="0">
+   <Product ID="92995350" Prod_id="KF432C16BBK2/64" ThumbPic="" Name="64GB 3200MT/s DDR4 CL16 DIMM (Kit of 2) FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747647" Category_ID="911" Preferred="0">
+   <Product ID="92995355" Prod_id="KF436C18BBK2/64" ThumbPic="" Name="64GB 3600MT/s DDR4 CL18 DIMM (Kit of 2) FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747643" Category_ID="911" Preferred="0">
+   <Product ID="92995353" Prod_id="KF436C18BB/16" ThumbPic="" Name="16GB 3600MT/s DDR4 CL18 DIMM FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747639" Category_ID="911" Preferred="0">
+   <Product ID="92995351" Prod_id="KF432C16BBK4/128" ThumbPic="" Name="128GB 3200MT/s DDR4 CL16 DIMM (Kit of 4) FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747640" Category_ID="911" Preferred="0">
+   <Product ID="92995346" Prod_id="KF436C17BB/8" ThumbPic="" Name="8GB 3600MT/s DDR4 CL17 DIMM FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747646" Category_ID="911" Preferred="0">
+   <Product ID="92995363" Prod_id="KF436C18BB/32" ThumbPic="" Name="32GB 3600MT/s DDR4 CL18 DIMM FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747645" Category_ID="911" Preferred="0">
+   <Product ID="92995362" Prod_id="KF436C18BBK4/64" ThumbPic="" Name="64GB 3600MT/s DDR4 CL18 DIMM (Kit of 4) FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747591" Category_ID="911" Preferred="0">
+   <Product ID="92995345" Prod_id="KF432C16BBK4/32" ThumbPic="" Name="32GB 3200MT/s DDR4 CL16 DIMM (Kit of 4) FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747648" Category_ID="911" Preferred="0">
+   <Product ID="92995365" Prod_id="KF436C18BBK4/128" ThumbPic="" Name="128GB 3600MT/s DDR4 CL18 DIMM (Kit of 4) FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747636" Category_ID="911" Preferred="0">
+   <Product ID="92995357" Prod_id="KF432C16BBK4/64" ThumbPic="" Name="64GB 3200MT/s DDR4 CL16 DIMM (Kit of 4) FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747642" Category_ID="911" Preferred="0">
+   <Product ID="92995347" Prod_id="KF436C17BBK4/32" ThumbPic="" Name="32GB 3600MT/s DDR4 CL17 DIMM (Kit of 4) FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747633" Category_ID="911" Preferred="0">
+   <Product ID="92995610" Prod_id="KF432C16BB1K4/64" ThumbPic="" Name="64GB 3200MT/s DDR4 CL16 DIMM (Kit of 4) 1Gx8 FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <ProductRelated ID="295747634" Category_ID="911" Preferred="0">
+   <Product ID="92995617" Prod_id="KF432C16BB/16" ThumbPic="" Name="16GB 3200MT/s DDR4 CL16 DIMM FURY Beast Black">
+    <Supplier ID="18" Name="Kingston Technology"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="alternative"/>
+  </ProductRelated>
+  <SEOs>
+   <SEO Description="" Keywords="ddr4 ram 16gb;16 gb ram ddr4;ddr4 ram 16gb 3000MT/s;ddr4 16gb 3000;16gb ddr4 3000MT/s;ddr4 16gb;ddr4 ram;ddr4 ram 16;16gb ram;ram memory;ddr4 16 gb;ddr4 memory 16gb;16 ddr4;16 gb ram;ddr4 ram 8gb;ddr 4 16gb;ddr4;ddr4 3200 32gb;ddr4 memory;ram, 128GB" Title="" langid="1"/>
+  </SEOs>
+  <SummaryDescription>
+   <ShortSummaryDescription langid="1">Kingston Technology FURY Beast 16GB 3200MT/s DDR4 CL16 DIMM 1Gx8 Black, 16 GB, 1 x 16 GB, DDR4, 288-pin DIMM</ShortSummaryDescription>
+   <LongSummaryDescription langid="1">Kingston Technology FURY Beast 16GB 3200MT/s DDR4 CL16 DIMM 1Gx8 Black. Component for: PC, Internal memory: 16 GB, Memory layout (modules x size): 1 x 16 GB, Internal memory type: DDR4, Memory form factor: 288-pin DIMM, CAS latency: 16</LongSummaryDescription>
+  </SummaryDescription>
+  <Supplier ID="18" Name="Kingston Technology"/>
+  <CatalogObjectCloud>
+   <ProductPage QRCodeURL="https://qr.icecat.biz/coc/b19bf4d5-9a0d-4fb3-84d5-4d289f82d403" URL="https://coc.icecat.biz/b19bf4d5-9a0d-4fb3-84d5-4d289f82d403"/>
+  </CatalogObjectCloud>
+ </Product>
+</ICECAT-interface>

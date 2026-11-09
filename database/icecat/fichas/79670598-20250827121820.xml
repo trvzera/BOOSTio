@@ -1,0 +1,754 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ICECAT-interface SYSTEM "https://data.icecat.biz/dtd/ICECAT-interface_response.dtd">
+<!--source: Icecat.biz 2026-->
+<!--Language ID: 1-->
+<!--Version: v2-->
+<ICECAT-interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://data.icecat.biz/xsd/ICECAT-interface_response.xsd">
+ <Product Code="1" HighPic="https://images.icecat.biz/img/gallery/193a92f4bf300aa1869d0c1e82ccb9d1234741dc.jpg" HighPicHeight="590" HighPicSize="70051" HighPicWidth="590" ID="79670598" LowPic="https://images.icecat.biz/img/gallery_lows/d601c02e3970e061bb11c0caf553ec19dd187dca.jpg" LowPicHeight="200" LowPicSize="12816" LowPicWidth="200" Name="AX1800" IntName="AX1800" LocalName="" Pic500x500="https://images.icecat.biz/img/gallery_mediums/7bb74532933f73456ca442d16742487b2138395f.jpg" Pic500x500Height="500" Pic500x500Size="53346" Pic500x500Width="500" Prod_id="ARCHER AX1800" Quality="ICECAT" ReleaseDate="" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/627e6ec9c0753856397207f56b41dfccbd2bd422.jpg" ThumbPicSize="3262" Title="TP-Link Archer AX1800 wireless router Gigabit Ethernet Dual-band (2.4 GHz / 5 GHz) Black" GeneratedIntTitle="TP-Link Archer AX1800 wireless router" GeneratedLocalTitle="TP-Link Archer AX1800 wireless router Gigabit Ethernet Dual-band (2.4 GHz / 5 GHz) Black" BrandLocalTitle="">
+  <CategoryFeatureGroup ID="33355" No="-9">
+   <FeatureGroup ID="0">
+    <Name ID="5073" langid="1" Value="Technical details"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="14886" No="-6">
+   <FeatureGroup ID="8">
+    <Name ID="4885" langid="1" Value="System requirements"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="14873" No="5">
+   <FeatureGroup ID="12">
+    <Name ID="4995" langid="1" Value="Ports &amp; interfaces"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="14885" No="-7">
+   <FeatureGroup ID="14">
+    <Name ID="5023" langid="1" Value="Weight &amp; dimensions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="14884" No="-4">
+   <FeatureGroup ID="27">
+    <Name ID="5049" langid="1" Value="Power"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="14887" No="-5">
+   <FeatureGroup ID="28">
+    <Name ID="5067" langid="1" Value="Operational conditions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="14877" No="2">
+   <FeatureGroup ID="34">
+    <Name ID="5139" langid="1" Value="Protocols"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="14876" No="8">
+   <FeatureGroup ID="35">
+    <Name ID="5167" langid="1" Value="Network"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="32433" No="-8">
+   <FeatureGroup ID="67">
+    <Name ID="27423" langid="1" Value="Packaging data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="14882" No="3">
+   <FeatureGroup ID="75">
+    <Name ID="27867" langid="1" Value="Security"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="41499" No="0">
+   <FeatureGroup ID="76">
+    <Name ID="28540" langid="1" Value="Certificates"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="14872" No="9">
+   <FeatureGroup ID="91">
+    <Name ID="30754" langid="1" Value="Wireless LAN features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="14874" No="6">
+   <FeatureGroup ID="92">
+    <Name ID="30760" langid="1" Value="DSL features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="14880" No="4">
+   <FeatureGroup ID="93">
+    <Name ID="30784" langid="1" Value="Management features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="49127" No="0">
+   <FeatureGroup ID="116">
+    <Name ID="78852" langid="1" Value="Packaging content"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="14879" No="-2">
+   <FeatureGroup ID="125">
+    <Name ID="223412" langid="1" Value="Antenna"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="53560" No="0">
+   <FeatureGroup ID="143">
+    <Name ID="618812" langid="1" Value="Battery"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="15311" No="-10">
+   <FeatureGroup ID="146">
+    <Name ID="624346" langid="1" Value="Other features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="14893" No="1">
+   <FeatureGroup ID="148">
+    <Name ID="630457" langid="1" Value="Design"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="14875" No="7">
+   <FeatureGroup ID="175">
+    <Name ID="1114797" langid="1" Value="Mobile network"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="15309" No="-3">
+   <FeatureGroup ID="185">
+    <Name ID="1219853" langid="1" Value="Features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="25004" No="-9">
+   <FeatureGroup ID="198">
+    <Name ID="1788927" langid="1" Value="Logistics data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="16618" No="10">
+   <FeatureGroup ID="201">
+    <Name ID="2087466" langid="1" Value="WAN connection"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="60052" No="0">
+   <FeatureGroup ID="232">
+    <Name ID="3464238" langid="1" Value="Supplier features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="76344" No="0">
+   <FeatureGroup ID="279">
+    <Name ID="7392238" langid="1" Value="Sustainability"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <Category ID="3982">
+   <Name ID="3730463" langid="1" Value="Wireless Routers"/>
+  </Category>
+  <EANCode EAN="4897098685396" Format="GTIN-13" IsApproved="1"/>
+  <ReleaseDate/>
+  <EndOfLifeDate/>
+  <ReasonsToBuy/>
+  <BulletPoints>
+   <BulletPoint Value="Dual-Band Wi-Fi 6: Equipped with the latest wireless technology, Wi-Fi 6, for faster speeds, greater capacity, and reduced network congestion" langid="1" No="1"/>
+   <BulletPoint Value="Next-Gen 1.8 Gbps Speeds: Enjoy smooth streaming, downloading, and gaming all without buffering with Wi-Fi speeds of 1.8 Gbps.†" langid="1" No="2"/>
+   <BulletPoint Value="Connect More Devices: Wi-Fi 6 technology communicates more data to more devices using revolutionary OFDMA technology while simultaneously reducing lag.△§" langid="1" No="3"/>
+   <BulletPoint Value="Quad-Core Processing: The 1.5 GHz quad-core CPU ensures communications between your router and all connected devices are smooth" langid="1" No="4"/>
+   <BulletPoint Value="Extensive Coverage: Beamforming, independent FEM, and four antennas combine to deliver focused reception to devices far away" langid="1" No="5"/>
+   <BulletPoint Value="Increased Battery Life: Target Wake Time technology reduces your devices' power consumption to extend their battery life.‡" langid="1" No="6"/>
+   <BulletPoint Value="USB Easy Sharing: A USB 2.0 Port enables easy file sharing within your network or building private Cloud Storage" langid="1" No="7"/>
+   <BulletPoint Value="Easy Setup: Set up your router in minutes with the powerful TP-Link Tether App" langid="1" No="8"/>
+   <BulletPoint Value="Backward Compatible: Supports all previous 802.11 standards and all Wi-Fi devices" langid="1" No="9"/>
+  </BulletPoints>
+  <GeneratedBulletPoints>
+   <GeneratedBulletPoint Value="Tabletop router Black" langid="1" No="1"/>
+   <GeneratedBulletPoint Value="Dual-band (2.4 GHz / 5 GHz) Wi-Fi 6 (802.11ax) 1775 Mbit/s" langid="1" No="2"/>
+   <GeneratedBulletPoint Value="Gigabit Ethernet" langid="1" No="3"/>
+   <GeneratedBulletPoint Value="Ethernet WAN" langid="1" No="4"/>
+   <GeneratedBulletPoint Value="Ethernet LAN (RJ-45) ports: 5" langid="1" No="5"/>
+   <GeneratedBulletPoint Value="USB port" langid="1" No="6"/>
+  </GeneratedBulletPoints>
+  <ProductBundled/>
+  <ProductDescription ID="99886740" LongDesc="&lt;b&gt;Dual-Band Wi-Fi 6 Up to 1.8 Gbps&lt;/b&gt;&lt;br&gt;Every application feels more fluid with drastically improved WiFi speeds. Both 2.4 GHz band and 5 GHz band get upgraded to the latest generation—perfect for 4K streaming, online gaming, and fast downloading.&lt;br&gt;&lt;br&gt;&lt;b&gt;Extensive WiFi Coverage with Advanced Technologies&lt;/b&gt;&lt;br&gt;Beamforming technology, independent Front-End Module, and four high-gain antennas combine to adapt WiFi coverage to perfectly fit your home and concentrate signal strength towards your devices.&lt;br&gt;&lt;br&gt;&lt;b&gt;Connect More, Stay Fast&lt;/b&gt;&lt;br&gt;Easily handle dozens of devices streaming and gaming at the same time—OFDMA future-proofs your home networks by providing greater capacity to connect more devices.&lt;br&gt;&lt;br&gt;&lt;b&gt;OFDMA&lt;/b&gt;&lt;br&gt;OFDMA separates a single spectrum into multiple units and enables different devices to share one transmission stream, increasing efficiency and reducing latency.&lt;br&gt;&lt;br&gt;&lt;b&gt;WPA3—New Level of Cyber Security&lt;/b&gt;&lt;br&gt;The latest WiFi security protocol, WPA3, brings new capabilities to improve cybersecurity in personal networks. More secure encryption in WiFi password safety and enhanced protection against brute-force attacks combine to safeguard your home WiFi.&lt;br&gt;&lt;br&gt;&lt;b&gt;TP-Link OneMesh™ : Flexibly Create a Whole-Home Wi-Fi&lt;/b&gt;&lt;br&gt;OneMesh™ is a simple way to form a Mesh network with a single Wi-Fi name for seamless whole-home coverage. Just connect a OneMeshTM range extender to a OneMesh™ router. No more searching around for a stable connection.&lt;br&gt;&lt;br&gt;&lt;b&gt;Enjoy a Mesh Network with Your Existing Router&lt;/b&gt;&lt;br&gt;Want a Mesh network? Hesitate on whether to replace your existing router and buy a Mesh set?&lt;br&gt;TP-Link OneMesh™ resolves your dilemma." ManualPDFSize="0" ManualPDFURL="" MiddleDesc="" PDFSize="0" PDFURL="" ShortDesc="Archer AX1800 Dual-Band Wi-Fi 6 Router" URL="https://www.tp-link.com/uk/home-networking/wifi-router/archer-ax1800/" WarrantyInfo="" langid="1"/>
+  <ProductFamily ID="74984" LowPic="" ThumbPic="">
+   <Name ID="8595930" langid="1" Value="Archer"/>
+  </ProductFamily>
+  <ProductFeature Localized="0" ID="773193167" Local_ID="0" Value="Y" CategoryFeature_ID="154252" CategoryFeatureGroup_ID="16618" No="10100010" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="24921">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2080650" langid="1" Value="Ethernet WAN"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193172" Local_ID="0" Value="N" CategoryFeature_ID="154250" CategoryFeatureGroup_ID="16618" No="10100009" Optional="0" Presentation_Value="No" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="24920">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2080599" langid="1" Value="DSL WAN"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193190" Local_ID="0" Value="N" CategoryFeature_ID="154253" CategoryFeatureGroup_ID="16618" No="10100008" Optional="0" Presentation_Value="No" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="24922">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2080701" langid="1" Value="SIM card slot"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193171" Local_ID="0" Value="RJ-45" CategoryFeature_ID="257853" CategoryFeatureGroup_ID="16618" No="100005" Optional="0" Presentation_Value="RJ-45" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="RJ-45">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="22397">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1773799" langid="1" Value="WAN connection type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773116316" Local_ID="0" Value="Dual-band (2.4 GHz / 5 GHz)" CategoryFeature_ID="137103" CategoryFeatureGroup_ID="14872" No="10100100" Optional="0" Presentation_Value="Dual-band (2.4 GHz / 5 GHz)" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Dual-band (2.4 GHz / 5 GHz)">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="22517">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1781227" langid="1" Value="Wi-Fi band"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193389" Local_ID="0" Value="Wi-Fi 6 (802.11ax)" CategoryFeature_ID="154814" CategoryFeatureGroup_ID="14872" No="10100095" Optional="0" Presentation_Value="Wi-Fi 6 (802.11ax)" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="Wi-Fi 6 (802.11ax)">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="24993">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2105805" langid="1" Value="Top Wi-Fi standard"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193471" Local_ID="0" Value="1775" CategoryFeature_ID="154266" CategoryFeatureGroup_ID="14872" No="10100090" Optional="0" Presentation_Value="1775 Mbit/s" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="1775">
+    <Measure ID="23">
+     <Signs>
+      <Sign ID="4" langid="1"><![CDATA[Mbit/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="24934">
+    <Measure ID="23" Sign="">
+     <Signs>
+      <Sign ID="4" langid="1"><![CDATA[Mbit/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2081365" langid="1" Value="WLAN data transfer rate (max)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193489" Local_ID="0" Value="802.11a,802.11b,802.11g,Wi-Fi 4 (802.11n),Wi-Fi 5 (802.11ac),Wi-Fi 6 (802.11ax)" CategoryFeature_ID="183960" CategoryFeatureGroup_ID="14872" No="100050" Optional="0" Presentation_Value="802.11a, 802.11b, 802.11g, Wi-Fi 4 (802.11n), Wi-Fi 5 (802.11ac), Wi-Fi 6 (802.11ax)" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="802.11a, 802.11b, 802.11g, Wi-Fi 4 (802.11n), Wi-Fi 5 (802.11ac), Wi-Fi 6 (802.11ax)">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="432">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2231" langid="1" Value="Wi-Fi standards"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193526" Local_ID="0" Value="574" CategoryFeature_ID="154267" CategoryFeatureGroup_ID="14872" No="100045" Optional="0" Presentation_Value="574 Mbit/s" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="574">
+    <Measure ID="23">
+     <Signs>
+      <Sign ID="4" langid="1"><![CDATA[Mbit/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="24935">
+    <Measure ID="23" Sign="">
+     <Signs>
+      <Sign ID="4" langid="1"><![CDATA[Mbit/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2081419" langid="1" Value="WLAN data transfer rate (first band)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193556" Local_ID="0" Value="1201" CategoryFeature_ID="154268" CategoryFeatureGroup_ID="14872" No="100044" Optional="0" Presentation_Value="1201 Mbit/s" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1201">
+    <Measure ID="23">
+     <Signs>
+      <Sign ID="4" langid="1"><![CDATA[Mbit/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="24936">
+    <Measure ID="23" Sign="">
+     <Signs>
+      <Sign ID="4" langid="1"><![CDATA[Mbit/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2081470" langid="1" Value="WLAN data transfer rate (second band)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193192" Local_ID="0" Value="Y" CategoryFeature_ID="136978" CategoryFeatureGroup_ID="14876" No="10100300" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1347">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="4235" langid="1" Value="Ethernet LAN"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193199" Local_ID="0" Value="Gigabit Ethernet" CategoryFeature_ID="151529" CategoryFeatureGroup_ID="14876" No="10100299" Optional="0" Presentation_Value="Gigabit Ethernet" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Gigabit Ethernet">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="24562">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2026309" langid="1" Value="Ethernet LAN interface type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193226" Local_ID="0" Value="10,100,1000" CategoryFeature_ID="136979" CategoryFeatureGroup_ID="14876" No="100298" Optional="0" Presentation_Value="10,100,1000 Mbit/s" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="10,100,1000">
+    <Measure ID="23">
+     <Signs>
+      <Sign ID="4" langid="1"><![CDATA[Mbit/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3768">
+    <Measure ID="23" Sign="">
+     <Signs>
+      <Sign ID="4" langid="1"><![CDATA[Mbit/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="42597" langid="1" Value="Ethernet LAN data rates"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773192902" Local_ID="0" Value="Y" CategoryFeature_ID="257861" CategoryFeatureGroup_ID="14876" No="100035" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="22160">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1757657" langid="1" Value="Dynamic DNS (DDNS)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193261" Local_ID="0" Value="5" CategoryFeature_ID="136894" CategoryFeatureGroup_ID="14873" No="100050" Optional="0" Presentation_Value="5" Translated="0" Mandatory="1" Searchable="0">
+   <LocalValue Value="5">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2312">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="11976" langid="1" Value="Ethernet LAN (RJ-45) ports"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193262" Local_ID="0" Value="Y" CategoryFeature_ID="151137" CategoryFeatureGroup_ID="14873" No="100040" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="1" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="23798">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1953766" langid="1" Value="USB port"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193280" Local_ID="0" Value="1" CategoryFeature_ID="136896" CategoryFeatureGroup_ID="14873" No="100039" Optional="0" Presentation_Value="1" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2308">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="11964" langid="1" Value="USB 2.0 ports quantity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193017" Local_ID="0" Value="Y" CategoryFeature_ID="136916" CategoryFeatureGroup_ID="14880" No="99999" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3780">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="42892" langid="1" Value="Reset button"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193018" Local_ID="0" Value="Y" CategoryFeature_ID="136977" CategoryFeatureGroup_ID="14880" No="99998" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9272">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="770203" langid="1" Value="WPS push button"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193334" Local_ID="0" Value="WPA,WPA-Enterprise,WPA2,WPA2-Enterprise,WPA3" CategoryFeature_ID="136919" CategoryFeatureGroup_ID="14882" No="100101" Optional="0" Presentation_Value="WPA, WPA-Enterprise, WPA2, WPA2-Enterprise, WPA3" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="WPA, WPA-Enterprise, WPA2, WPA2-Enterprise, WPA3">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="454">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2439" langid="1" Value="Security algorithms"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773192920" Local_ID="0" Value="Y" CategoryFeature_ID="136905" CategoryFeatureGroup_ID="14877" No="100010" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3765">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="42526" langid="1" Value="DHCP client"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773192921" Local_ID="0" Value="Y" CategoryFeature_ID="136906" CategoryFeatureGroup_ID="14877" No="100009" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3766">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="42543" langid="1" Value="DHCP server"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193638" Local_ID="0" Value="Tabletop router" CategoryFeature_ID="151515" CategoryFeatureGroup_ID="14893" No="10100000" Optional="0" Presentation_Value="Tabletop router" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Tabletop router">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="14052">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1127664" langid="1" Value="Product type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193666" Local_ID="0" Value="Black" CategoryFeature_ID="137039" CategoryFeatureGroup_ID="14893" No="100077" Optional="0" Presentation_Value="Black" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Black">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1766">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5487" langid="1" Value="Product colour"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773192901" Local_ID="0" Value="FCC, CE, RoHS" CategoryFeature_ID="136972" CategoryFeatureGroup_ID="41499" No="99990" Optional="0" Presentation_Value="FCC, CE, RoHS" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="FCC, CE, RoHS">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="249">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1865" langid="1" Value="Certification"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773192888" Local_ID="0" Value="LAN (RJ-45)" CategoryFeature_ID="136974" CategoryFeatureGroup_ID="49127" No="100015" Optional="0" Presentation_Value="LAN (RJ-45)" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="LAN (RJ-45)">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1830">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5653" langid="1" Value="Cables included"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773192889" Local_ID="0" Value="Y" CategoryFeature_ID="136973" CategoryFeatureGroup_ID="49127" No="100014" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1230">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="4001" langid="1" Value="AC adapter included"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773192887" Local_ID="0" Value="Y" CategoryFeature_ID="234225" CategoryFeatureGroup_ID="49127" No="100004" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="4921">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="61497" langid="1" Value="Quick installation guide"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193557" Local_ID="0" Value="External" CategoryFeature_ID="928322" CategoryFeatureGroup_ID="14879" No="10100015" Optional="0" Presentation_Value="External" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="External">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="42737">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="7112440" langid="1" Value="Antenna design"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193595" Local_ID="0" Value="4" CategoryFeature_ID="137018" CategoryFeatureGroup_ID="14879" No="100012" Optional="0" Presentation_Value="4" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="4">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6737">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="277227" langid="1" Value="Antennas quantity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193603" Local_ID="0" Value="DC" CategoryFeature_ID="136938" CategoryFeatureGroup_ID="14884" No="10100050" Optional="0" Presentation_Value="DC" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="DC">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="8005">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="618771" langid="1" Value="Power source type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193613" Local_ID="0" Value="12" CategoryFeature_ID="136941" CategoryFeatureGroup_ID="14884" No="100047" Optional="0" Presentation_Value="12 V" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="12">
+    <Measure ID="42">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1467">
+    <Measure ID="42" Sign="">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4631" langid="1" Value="Output voltage"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773193614" Local_ID="0" Value="1.5" CategoryFeature_ID="136942" CategoryFeatureGroup_ID="14884" No="100046" Optional="0" Presentation_Value="1.5 A" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1.5">
+    <Measure ID="41">
+     <Signs>
+      <Sign ID="25" langid="1"><![CDATA[A]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3378">
+    <Measure ID="41" Sign="">
+     <Signs>
+      <Sign ID="25" langid="1"><![CDATA[A]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="32398" langid="1" Value="Output current"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773192894" Local_ID="0" Value="0 - 40" CategoryFeature_ID="136962" CategoryFeatureGroup_ID="14887" No="100000" Optional="0" Presentation_Value="0 - 40 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0 - 40">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1112">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3765" langid="1" Value="Operating temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773192895" Local_ID="0" Value="-40 - 70" CategoryFeature_ID="136963" CategoryFeatureGroup_ID="14887" No="100000" Optional="0" Presentation_Value="-40 - 70 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="-40 - 70">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="757">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3045" langid="1" Value="Storage temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773192896" Local_ID="0" Value="10 - 90" CategoryFeature_ID="136964" CategoryFeatureGroup_ID="14887" No="100000" Optional="0" Presentation_Value="10 - 90%" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="10 - 90">
+    <Measure ID="64">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="703">
+    <Measure ID="64" Sign="">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2937" langid="1" Value="Operating relative humidity (H-H)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773192897" Local_ID="0" Value="5 - 90" CategoryFeature_ID="136965" CategoryFeatureGroup_ID="14887" No="100000" Optional="0" Presentation_Value="5 - 90%" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="5 - 90">
+    <Measure ID="64">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1383">
+    <Measure ID="64" Sign="">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4307" langid="1" Value="Storage relative humidity (H-H)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773192891" Local_ID="0" Value="260.2" CategoryFeature_ID="136951" CategoryFeatureGroup_ID="14885" No="100000" Optional="0" Presentation_Value="260.2 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="260.2">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1649">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5143" langid="1" Value="Width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773192892" Local_ID="0" Value="135" CategoryFeature_ID="136952" CategoryFeatureGroup_ID="14885" No="100000" Optional="0" Presentation_Value="135 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="135">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1650">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5145" langid="1" Value="Depth"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="773192893" Local_ID="0" Value="38.6" CategoryFeature_ID="136953" CategoryFeatureGroup_ID="14885" No="100000" Optional="0" Presentation_Value="38.6 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="38.6">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1464">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4625" langid="1" Value="Height"/>
+   </Feature>
+  </ProductFeature>
+  <ProductGallery>
+   <ProductPicture IsMain="Y" LowPic="https://images.icecat.biz/img/gallery_lows/d601c02e3970e061bb11c0caf553ec19dd187dca.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="12816" No="1" Original="https://images.icecat.biz/img/gallery_raw/d6b6dd339cfc3deda02326c432f91374db525587.jpeg" OriginalSize="73294" Pic="https://images.icecat.biz/img/gallery/193a92f4bf300aa1869d0c1e82ccb9d1234741dc.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/7bb74532933f73456ca442d16742487b2138395f.jpg" Pic500x500Height="500" Pic500x500Size="53346" Pic500x500Width="500" PicHeight="590" PicWidth="590" ProductPicture_ID="105416476" Size="70051" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/627e6ec9c0753856397207f56b41dfccbd2bd422.jpg" ThumbSize="3262" Type="ProductImage" UpdatedDate="2025-05-05 20:42:17"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/da95d3b3235f0c28f48bdf0984f9790bd8291600.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="10068" No="2" Original="https://images.icecat.biz/img/gallery_raw/266f1b426895666d32c56b85472027cf3b118c93.jpeg" OriginalSize="59492" Pic="https://images.icecat.biz/img/gallery/77bc3fc25f26949ca8ddc1b9ba0d61ffa15b8c49.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/a97283be1bf91b9d451d4da1ab7beac96a936e54.jpg" Pic500x500Height="500" Pic500x500Size="41316" Pic500x500Width="500" PicHeight="590" PicWidth="590" ProductPicture_ID="105417200" Size="54682" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/3b92435dddda896e969e84f31309508b42357c9d.jpg" ThumbSize="2559" Type="ProductImage" UpdatedDate="2025-05-06 08:30:35"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/093d3709bdb6b843120ce8b881044bb10b2d5da9.jpg" LowPicHeight="133" LowPicWidth="200" LowSize="16566" No="3" Original="https://images.icecat.biz/img/gallery_raw/b0f90b8ce6937c593d514e817198af8791604ad0.jpeg" OriginalSize="74137" Pic="https://images.icecat.biz/img/gallery/8c732608b8ceda4a710ebc82db22eedafe037db8.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/4d8cf5ff62e32960c4b33fd647f524960f27221b.jpg" Pic500x500Height="333" Pic500x500Size="61568" Pic500x500Width="500" PicHeight="393" PicWidth="590" ProductPicture_ID="105417204" Size="77313" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/7cf43be7d24b3214c1f3e9d9a2e76a1a135a4b0c.jpg" ThumbSize="4148" Type="ProductImage" UpdatedDate="2025-05-06 08:30:52"/>
+  </ProductGallery>
+  <ProductMultimediaObject>
+   <MultimediaObject ContentType="application/pdf" Date="2025-05-06 08:31:11" Description="Generated PDF" KeepAsURL="0" MultimediaObject_ID="0" Type="leaflet" UUID="00000000-0000-0000-0000-000000000000" langid="1" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="0" URL="https://icecat.biz/rest/product-pdf?productId=79670598&amp;lang=en" Width="0"/>
+  </ProductMultimediaObject>
+  <ProductRelated/>
+  <SummaryDescription>
+   <ShortSummaryDescription langid="1">TP-Link Archer AX1800, Wi-Fi 6 (802.11ax), Dual-band (2.4 GHz / 5 GHz), Ethernet LAN, Black, Tabletop router</ShortSummaryDescription>
+   <LongSummaryDescription langid="1">TP-Link Archer AX1800. WAN connection type: RJ-45. Wi-Fi band: Dual-band (2.4 GHz / 5 GHz), Top Wi-Fi standard: Wi-Fi 6 (802.11ax), WLAN data transfer rate (max): 1775 Mbit/s. Ethernet LAN interface type: Gigabit Ethernet, Ethernet LAN data rates: 10,100,1000 Mbit/s. Security algorithms: WPA, WPA-Enterprise, WPA2, WPA2-Enterprise, WPA3. Product type: Tabletop router, Product colour: Black</LongSummaryDescription>
+  </SummaryDescription>
+  <Supplier ID="2988" Name="TP-Link"/>
+  <CatalogObjectCloud>
+   <ProductPage QRCodeURL="https://qr.icecat.biz/coc/256afa87-0533-47c4-8164-1e3e99ace586" URL="https://coc.icecat.biz/256afa87-0533-47c4-8164-1e3e99ace586"/>
+  </CatalogObjectCloud>
+ </Product>
+</ICECAT-interface>

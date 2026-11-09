@@ -1,0 +1,91 @@
+{
+  "repositorio": "https://github.com/docyx/pc-part-dataset",
+  "commit": "c52a04ca9465c83997ed335f7767b09a2005dd26",
+  "arquivos": {
+    "cpu.json": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/data/json/cpu.json",
+      "sha256": "1e3fd9ba6bf11fca4217675d67ed5edd0d60cc6cb2604418c443cf474fe58c1c",
+      "bytes": 224558
+    },
+    "cpu-cooler.json": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/data/json/cpu-cooler.json",
+      "sha256": "c06fa7387cf1accff1ed6889cfe6e9bcec358d3a6eac014448877dd2aa680798",
+      "bytes": 322978
+    },
+    "motherboard.json": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/data/json/motherboard.json",
+      "sha256": "7bf4ecb66756c40234ccc1f6e2e43ca477dea7ef3f6e5c92d9b432d5776c6a1b",
+      "bytes": 707766
+    },
+    "memory.json": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/data/json/memory.json",
+      "sha256": "2c70f628bebd31bb47ef5b46b39de52c41a417b17dfcc0c63991b2d27310de63",
+      "bytes": 2275175
+    },
+    "internal-hard-drive.json": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/data/json/internal-hard-drive.json",
+      "sha256": "0634f9c8157d649cf4e6a67ffcaa69ae22695f7a0befb1c60fdfffe921845d3b",
+      "bytes": 988514
+    },
+    "video-card.json": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/data/json/video-card.json",
+      "sha256": "bb0d199e880d02d512f312132d68dbe70b4bf7079bbc18b850b1f40513874575",
+      "bytes": 1026098
+    },
+    "case.json": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/data/json/case.json",
+      "sha256": "a925fb93039d5db492bc35ba08bde445b4d855dbd3d2c9ce9cae4f2fe35e68ac",
+      "bytes": 1096688
+    },
+    "power-supply.json": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/data/json/power-supply.json",
+      "sha256": "e9fee8572ae99f9dad5cee37d5f4bdb32e80d92e3f2783912d6e55ff62ecf261",
+      "bytes": 430651
+    },
+    "monitor.json": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/data/json/monitor.json",
+      "sha256": "57a6cdb4c1798e47160cb44596c7303e9817daecaa9ffe6a0f31072da75d8042",
+      "bytes": 818738
+    },
+    "headphones.json": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/data/json/headphones.json",
+      "sha256": "84b601bafaeb48f981eda8caa00cc58e7812465c6b89044064ab0e78327c753c",
+      "bytes": 512631
+    },
+    "keyboard.json": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/data/json/keyboard.json",
+      "sha256": "652e8d31cd2976b7b500ce445254c51d40ca71a434931cf494a42f068f11c6a1",
+      "bytes": 751324
+    },
+    "mouse.json": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/data/json/mouse.json",
+      "sha256": "7069fe6969462600bfa254cbc8049af634cdf832c129aaa91416c73c84686f96",
+      "bytes": 457492
+    },
+    "case-fan.json": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/data/json/case-fan.json",
+      "sha256": "502c52c06c13e048d503f66f0471a629ec37bf37c679cb468c7b76e4b8841f41",
+      "bytes": 378933
+    },
+    "wireless-network-card.json": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/data/json/wireless-network-card.json",
+      "sha256": "7ab4cbe4337d1a2a8833dd05e17caa94959708a54d80bdbd8ebfa6b3c5900ca9",
+      "bytes": 39287
+    },
+    "API.md": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/API.md",
+      "sha256": "48c928b05e9ded32c8a41e1d426da2c43caffa4b70ee284860ff568ee1bd689b",
+      "bytes": 18096
+    },
+    "README.md": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/README.md",
+      "sha256": "6dd0608de369a932fe53c3013365bc1cb6c2f9cadde535a976fbd5b2cb7e1b7d",
+      "bytes": 1884
+    },
+    "LICENSE": {
+      "url": "https://raw.githubusercontent.com/docyx/pc-part-dataset/c52a04ca9465c83997ed335f7767b09a2005dd26/LICENSE",
+      "sha256": "0ed75814ad6b202903d90ea1597800d2a4687cf76cb620ee0b4a91e362bf60e2",
+      "bytes": 1072
+    }
+  }
+}

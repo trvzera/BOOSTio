@@ -46,12 +46,11 @@ testes.html
 /docs/pendencias-produto.md
 
 # Snapshots, relatórios e dados locais de importação de benchmarks.
-/database/benchmarks/
+
 
 # Índice e fichas Icecat baixados localmente.
 /files.index.xml.gz
-/database/icecat/
-/database/fabricantes/
+
 
 # Snapshot público reproduzível pelo comando dataset-pecas-baixar.
-/benchmarks/pc-part-dataset/
+

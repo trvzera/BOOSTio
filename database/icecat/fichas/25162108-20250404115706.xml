@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ICECAT-interface SYSTEM "https://data.icecat.biz/dtd/ICECAT-interface_response.dtd">
+<!--source: Icecat.biz 2026-->
+<!--Language ID: 1-->
+<!--Version: v2-->
+<ICECAT-interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://data.icecat.biz/xsd/ICECAT-interface_response.xsd">
+ <Product Code="1" HighPic="https://images.icecat.biz/img/gallery/67f42bde32d3831a7766de7c6438ac807e25dd77.jpg" HighPicHeight="3000" HighPicSize="831741" HighPicWidth="3000" ID="25162108" LowPic="https://images.icecat.biz/img/gallery_lows/f7b93c175e72e64953bac4345a87734c8941b1f8.jpg" LowPicHeight="200" LowPicSize="21446" LowPicWidth="200" Name="ST2000NX0253" IntName="ST2000NX0253" LocalName="" Pic500x500="https://images.icecat.biz/img/gallery_mediums/8ea36275dac081d741e05a2c41c5421eda189cd5.jpg" Pic500x500Height="500" Pic500x500Size="73143" Pic500x500Width="500" Prod_id="ST2000NX0253" Quality="ICECAT" ReleaseDate="" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/21ed98a4e79a6379517a75d713f82ef282ee482d.jpg" ThumbPicSize="6169" Title="Seagate Enterprise ST2000NX0253 internal hard drive 2 TB 7200 RPM 128 MB 2.5&quot; Serial ATA" GeneratedIntTitle="Seagate Enterprise ST2000NX0253 internal hard drive" GeneratedLocalTitle="Seagate Enterprise ST2000NX0253 internal hard drive 2 TB 7200 RPM 128 MB 2.5&quot; Serial ATA" BrandLocalTitle="">
+  <CategoryFeatureGroup ID="33406" No="0">
+   <FeatureGroup ID="0">
+    <Name ID="5073" langid="1" Value="Technical details"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="65" No="-1">
+   <FeatureGroup ID="14">
+    <Name ID="5023" langid="1" Value="Weight &amp; dimensions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1594" No="3">
+   <FeatureGroup ID="27">
+    <Name ID="5049" langid="1" Value="Power"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1595" No="1">
+   <FeatureGroup ID="28">
+    <Name ID="5067" langid="1" Value="Operational conditions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="31116" No="-3">
+   <FeatureGroup ID="67">
+    <Name ID="27423" langid="1" Value="Packaging data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="41386" No="0">
+   <FeatureGroup ID="76">
+    <Name ID="28540" langid="1" Value="Certificates"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="49056" No="0">
+   <FeatureGroup ID="116">
+    <Name ID="78852" langid="1" Value="Packaging content"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="53449" No="0">
+   <FeatureGroup ID="143">
+    <Name ID="618812" langid="1" Value="Battery"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="9056" No="-100">
+   <FeatureGroup ID="146">
+    <Name ID="624346" langid="1" Value="Other features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="30622" No="5">
+   <FeatureGroup ID="185">
+    <Name ID="1219853" langid="1" Value="Features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="30609" No="-5">
+   <FeatureGroup ID="198">
+    <Name ID="1788927" langid="1" Value="Logistics data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="59939" No="0">
+   <FeatureGroup ID="232">
+    <Name ID="3464238" langid="1" Value="Supplier features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="79920" No="0">
+   <FeatureGroup ID="279">
+    <Name ID="7392238" langid="1" Value="Sustainability"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <Category ID="219">
+   <Name ID="3727455" langid="1" Value="Internal Hard Drives"/>
+  </Category>
+  <EANCode EAN="7636490043468" Format="GTIN-13" IsApproved="1"/>
+  <EANCode EAN="8592978040918" Format="GTIN-13" IsApproved="1"/>
+  <EANCode EAN="5415247086147" Format="GTIN-13" IsApproved="1"/>
+  <ReleaseDate/>
+  <EndOfLifeDate/>
+  <ReasonsToBuy/>
+  <BulletPoints/>
+  <GeneratedBulletPoints>
+   <GeneratedBulletPoint Value="2 TB 2.5&quot; 7200 RPM Serial ATA" langid="1" No="1"/>
+   <GeneratedBulletPoint Value="HDD" langid="1" No="2"/>
+   <GeneratedBulletPoint Value="Storage drive buffer size: 128 MB" langid="1" No="3"/>
+   <GeneratedBulletPoint Value="6 Gbit/s" langid="1" No="4"/>
+   <GeneratedBulletPoint Value="198 g" langid="1" No="5"/>
+  </GeneratedBulletPoints>
+  <ProductBundled/>
+  <ProductDescription ID="88757337" LongDesc="" ManualPDFSize="0" ManualPDFURL="" MiddleDesc="" PDFSize="0" PDFURL="" ShortDesc="2TB, 128MB, SATA 6 Gb/s, 512E" URL="http://www.seagate.com/" WarrantyInfo="2 year" langid="1"/>
+  <ProductFamily ID="65294" LowPic="" ThumbPic="">
+   <Name ID="1381071" langid="1" Value="Enterprise"/>
+   <Series ID="6550">
+    <Name ID="5213797" langid="1" Value="Exos 7E2000"/>
+   </Series>
+  </ProductFamily>
+  <ProductFeature Localized="0" ID="168626790" Local_ID="0" Value="2000" CategoryFeature_ID="3684" CategoryFeatureGroup_ID="30622" No="10100150" Optional="0" Presentation_Value="2 TB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="2">
+    <Measure ID="159">
+     <Signs>
+      <Sign ID="2983" langid="1"><![CDATA[TB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1299" langid="1" Value="HDD capacity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626792" Local_ID="0" Value="7200" CategoryFeature_ID="15510" CategoryFeatureGroup_ID="30622" No="10100120" Optional="0" Presentation_Value="7200 RPM" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="7200">
+    <Measure ID="28">
+     <Signs>
+      <Sign ID="12" langid="1"><![CDATA[RPM]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="430">
+    <Measure ID="28" Sign="">
+     <Signs>
+      <Sign ID="12" langid="1"><![CDATA[RPM]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2227" langid="1" Value="HDD speed"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626791" Local_ID="0" Value="2.5" CategoryFeature_ID="18866" CategoryFeatureGroup_ID="30622" No="10100099" Optional="0" Presentation_Value="2.5&quot;" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="2.5">
+    <Measure ID="16">
+     <Signs>
+      <Sign ID="11" langid="1"><![CDATA["]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1926">
+    <Measure ID="16" Sign="">
+     <Signs>
+      <Sign ID="11" langid="1"><![CDATA["]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5943" langid="1" Value="HDD size"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626789" Local_ID="0" Value="Serial ATA" CategoryFeature_ID="48092" CategoryFeatureGroup_ID="30622" No="10100096" Optional="0" Presentation_Value="Serial ATA" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Serial ATA">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="21">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1341" langid="1" Value="Interface"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626793" Local_ID="0" Value="HDD" CategoryFeature_ID="296233" CategoryFeatureGroup_ID="30622" No="10100094" Optional="0" Presentation_Value="HDD" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="HDD">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="31">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1375" langid="1" Value="Type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626794" Local_ID="0" Value="128" CategoryFeature_ID="296216" CategoryFeatureGroup_ID="30622" No="100100" Optional="0" Presentation_Value="128 MB" Translated="0" Mandatory="1" Searchable="0">
+   <LocalValue Value="128">
+    <Measure ID="19">
+     <Signs>
+      <Sign ID="15506" langid="1"><![CDATA[MB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="37958">
+    <Measure ID="19" Sign="">
+     <Signs>
+      <Sign ID="15506" langid="1"><![CDATA[MB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5147439" langid="1" Value="Storage drive buffer size"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626797" Local_ID="0" Value="6" CategoryFeature_ID="105055" CategoryFeatureGroup_ID="30622" No="100085" Optional="0" Presentation_Value="6 Gbit/s" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="6">
+    <Measure ID="68">
+     <Signs>
+      <Sign ID="51" langid="1"><![CDATA[Gbit/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="17979">
+    <Measure ID="68" Sign="">
+     <Signs>
+      <Sign ID="51" langid="1"><![CDATA[Gbit/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1325795" langid="1" Value="HDD interface transfer rate"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626795" Local_ID="0" Value="4.16" CategoryFeature_ID="5540" CategoryFeatureGroup_ID="30622" No="100075" Optional="0" Presentation_Value="4.16 ms" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="4.16">
+    <Measure ID="27">
+     <Signs>
+      <Sign ID="1" langid="1"><![CDATA[ms]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1548">
+    <Measure ID="27" Sign="">
+     <Signs>
+      <Sign ID="1" langid="1"><![CDATA[ms]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4817" langid="1" Value="Average latency"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626796" Local_ID="0" Value="512" CategoryFeature_ID="20237" CategoryFeatureGroup_ID="30622" No="100000" Optional="1" Presentation_Value="512" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="512">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3100">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="29518" langid="1" Value="Bytes per sector"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626798" Local_ID="0" Value="1400000" CategoryFeature_ID="17346" CategoryFeatureGroup_ID="30622" No="99990" Optional="0" Presentation_Value="1400000 h" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1400000">
+    <Measure ID="46">
+     <Signs>
+      <Sign ID="30" langid="1"><![CDATA[h]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="533">
+    <Measure ID="46" Sign="">
+     <Signs>
+      <Sign ID="30" langid="1"><![CDATA[h]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2597" langid="1" Value="Mean time between failures (MTBF)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626799" Local_ID="0" Value="5.22" CategoryFeature_ID="13699" CategoryFeatureGroup_ID="1594" No="100008" Optional="0" Presentation_Value="5.22 W" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="5.22">
+    <Measure ID="44">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="445">
+    <Measure ID="44" Sign="">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2257" langid="1" Value="Power consumption (typical)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626800" Local_ID="0" Value="1.14" CategoryFeature_ID="17108" CategoryFeatureGroup_ID="1594" No="100006" Optional="0" Presentation_Value="1.14 W" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1.14">
+    <Measure ID="44">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2036">
+    <Measure ID="44" Sign="">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="9104" langid="1" Value="Power consumption (standby)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626801" Local_ID="0" Value="3.87" CategoryFeature_ID="40632" CategoryFeatureGroup_ID="1594" No="100000" Optional="0" Presentation_Value="3.87 W" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="3.87">
+    <Measure ID="44">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6467">
+    <Measure ID="44" Sign="">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="177065" langid="1" Value="Power consumption (idle)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="302318168" Local_ID="0" Value="5" CategoryFeature_ID="1085500" CategoryFeatureGroup_ID="1594" No="99999" Optional="0" Presentation_Value="5 V" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="5">
+    <Measure ID="42">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="48762">
+    <Measure ID="42" Sign="">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="9307140" langid="1" Value="Operating voltage"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626802" Local_ID="0" Value="5 - 55" CategoryFeature_ID="5577" CategoryFeatureGroup_ID="1595" No="99989" Optional="0" Presentation_Value="5 - 55 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="5 - 55">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1112">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3765" langid="1" Value="Operating temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626805" Local_ID="0" Value="0.5" CategoryFeature_ID="26731" CategoryFeatureGroup_ID="1595" No="99983" Optional="0" Presentation_Value="0.5 G" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0.5">
+    <Measure ID="72">
+     <Signs>
+      <Sign ID="55" langid="1"><![CDATA[G]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3336">
+    <Measure ID="72" Sign="">
+     <Signs>
+      <Sign ID="55" langid="1"><![CDATA[G]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="31906" langid="1" Value="Operating vibration"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626806" Local_ID="0" Value="3" CategoryFeature_ID="26732" CategoryFeatureGroup_ID="1595" No="99982" Optional="0" Presentation_Value="3 G" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="3">
+    <Measure ID="72">
+     <Signs>
+      <Sign ID="55" langid="1"><![CDATA[G]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3335">
+    <Measure ID="72" Sign="">
+     <Signs>
+      <Sign ID="55" langid="1"><![CDATA[G]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="31900" langid="1" Value="Non-operating vibration"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626803" Local_ID="0" Value="25" CategoryFeature_ID="17247" CategoryFeatureGroup_ID="1595" No="99975" Optional="0" Presentation_Value="25 G" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="25">
+    <Measure ID="72">
+     <Signs>
+      <Sign ID="55" langid="1"><![CDATA[G]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1637">
+    <Measure ID="72" Sign="">
+     <Signs>
+      <Sign ID="55" langid="1"><![CDATA[G]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5103" langid="1" Value="Operating shock"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626804" Local_ID="0" Value="400" CategoryFeature_ID="17249" CategoryFeatureGroup_ID="1595" No="99974" Optional="0" Presentation_Value="400 G" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="400">
+    <Measure ID="72">
+     <Signs>
+      <Sign ID="55" langid="1"><![CDATA[G]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2965">
+    <Measure ID="72" Sign="">
+     <Signs>
+      <Sign ID="55" langid="1"><![CDATA[G]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="28258" langid="1" Value="Non-operating shock"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626807" Local_ID="0" Value="70.1" CategoryFeature_ID="16567" CategoryFeatureGroup_ID="65" No="100040" Optional="0" Presentation_Value="70.1 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="70.1">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1649">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5143" langid="1" Value="Width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626808" Local_ID="0" Value="15" CategoryFeature_ID="8681" CategoryFeatureGroup_ID="65" No="100000" Optional="0" Presentation_Value="15 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="15">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1464">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4625" langid="1" Value="Height"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626809" Local_ID="0" Value="100.45" CategoryFeature_ID="16569" CategoryFeatureGroup_ID="65" No="100000" Optional="0" Presentation_Value="100.5 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="100.5">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1650">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5145" langid="1" Value="Depth"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626810" Local_ID="0" Value="198" CategoryFeature_ID="3853" CategoryFeatureGroup_ID="65" No="99999" Optional="0" Presentation_Value="198 g" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="198">
+    <Measure ID="38">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="94">
+    <Measure ID="38" Sign="">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1525" langid="1" Value="Weight"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626811" Local_ID="0" Value="1" CategoryFeature_ID="323655" CategoryFeatureGroup_ID="31116" No="100000" Optional="0" Presentation_Value="1 pc(s)" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1">
+    <Measure ID="144">
+     <Signs>
+      <Sign ID="125" langid="1"><![CDATA[pc(s)]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="20228">
+    <Measure ID="144" Sign="">
+     <Signs>
+      <Sign ID="125" langid="1"><![CDATA[pc(s)]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1498423" langid="1" Value="Quantity per pack"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494624425" Local_ID="0" Value="84717050" CategoryFeature_ID="905377" CategoryFeatureGroup_ID="30609" No="100000" Optional="0" Presentation_Value="84717050" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="84717050">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="23731">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1903598" langid="1" Value="Harmonized System (HS) code"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626812" Local_ID="0" Value="Y" CategoryFeature_ID="16" CategoryFeatureGroup_ID="9056" No="100000" Optional="1" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="22">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1345" langid="1" Value="Internal"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="168626813" Local_ID="0" Value="6" CategoryFeature_ID="6889" CategoryFeatureGroup_ID="9056" No="100000" Optional="1" Presentation_Value="6 Gbit/s" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="6">
+    <Measure ID="68">
+     <Signs>
+      <Sign ID="51" langid="1"><![CDATA[Gbit/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1551">
+    <Measure ID="68" Sign="">
+     <Signs>
+      <Sign ID="51" langid="1"><![CDATA[Gbit/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4825" langid="1" Value="Data transfer rate"/>
+   </Feature>
+  </ProductFeature>
+  <ProductGallery>
+   <ProductPicture IsMain="Y" LowPic="https://images.icecat.biz/img/gallery_lows/f7b93c175e72e64953bac4345a87734c8941b1f8.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="21446" No="1" Original="https://images.icecat.biz/img/gallery_raw/8964732e0d6786a48d1197335c909479290c46fa.png" OriginalSize="921115" Pic="https://images.icecat.biz/img/gallery/67f42bde32d3831a7766de7c6438ac807e25dd77.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/8ea36275dac081d741e05a2c41c5421eda189cd5.jpg" Pic500x500Height="500" Pic500x500Size="73143" Pic500x500Width="500" PicHeight="3000" PicWidth="3000" ProductPicture_ID="78311731" Size="831741" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/21ed98a4e79a6379517a75d713f82ef282ee482d.jpg" ThumbSize="6169" Type="ProductImage" UpdatedDate="2023-07-21 20:47:57"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/fc5814f53701b2aab5f0aadc98ea7b6cf07d18e9.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="19241" No="2" Original="https://images.icecat.biz/img/gallery_raw/f90636a9420d4df40a79043bf43f8fed56d052bf.png" OriginalSize="1169038" Pic="https://images.icecat.biz/img/gallery/e8327165c925026890df096af6ce19b7b860810e.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/4b45e37d5983d4f6aaedf27ff0e27691b68cf7d4.jpg" Pic500x500Height="500" Pic500x500Size="67193" Pic500x500Width="500" PicHeight="3000" PicWidth="3000" ProductPicture_ID="78311730" Size="815065" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/0c693ca943d263ae9d134b0d870c751381f03e8e.jpg" ThumbSize="5321" Type="ProductImage" UpdatedDate="2023-07-21 20:47:57"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/0bc88e6f96bb5dfb9245fe8fbb1b66be1340ab9e.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="19447" No="3" Original="https://images.icecat.biz/img/gallery_raw/65fb5a0cc7827b09d0d36b38fb2f895f3dc6aa2c.png" OriginalSize="1223354" Pic="https://images.icecat.biz/img/gallery/4f1eb15690feb10b6611bf4e1eddbf85b8506552.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/484fb4ba01f22445314315d7378cc4d728f95357.jpg" Pic500x500Height="500" Pic500x500Size="67496" Pic500x500Width="500" PicHeight="3000" PicWidth="3000" ProductPicture_ID="78311733" Size="832417" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/fb920792c75c57a7558ce14bd6e7fe795e3cccf7.jpg" ThumbSize="5423" Type="ProductImage" UpdatedDate="2023-07-21 20:47:59"/>
+  </ProductGallery>
+  <ProductMultimediaObject>
+   <MultimediaObject ContentType="application/pdf" Date="2023-10-03 12:24:08" Description="Generated PDF" KeepAsURL="0" MultimediaObject_ID="0" Type="leaflet" UUID="00000000-0000-0000-0000-000000000000" langid="1" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="0" URL="https://icecat.biz/rest/product-pdf?productId=25162108&amp;lang=en" Width="0"/>
+  </ProductMultimediaObject>
+  <ProductRelated/>
+  <SummaryDescription>
+   <ShortSummaryDescription langid="1">Seagate Enterprise ST2000NX0253, 2 TB, 7200 RPM, 128 MB, 2.5&quot;, Serial ATA</ShortSummaryDescription>
+   <LongSummaryDescription langid="1">Seagate Enterprise ST2000NX0253. HDD capacity: 2 TB, HDD speed: 7200 RPM, Storage drive buffer size: 128 MB, HDD size: 2.5&quot;, Interface: Serial ATA</LongSummaryDescription>
+  </SummaryDescription>
+  <Supplier ID="27" Name="Seagate"/>
+  <CatalogObjectCloud>
+   <ProductPage QRCodeURL="https://qr.icecat.biz/coc/aa314287-cdf6-4ba3-b822-2a08ddc10829" URL="https://coc.icecat.biz/aa314287-cdf6-4ba3-b822-2a08ddc10829"/>
+  </CatalogObjectCloud>
+  <Reviews>
+   <Review ID="1584159" langid="9" Score="0" Published="2015-07-25">
+    <URL IsActive="1">https://www.nikktech.com/main/articles/pc-hardware/storage/hard-disk-drives/5420-seagate-enterprise-capacity-2-5-hdd-v3-2tb-sata-iii-review</URL>
+    <Comment>When it comes to storage media it's no secret that laptop/notebook owners have been getting the short end of the stick for over a decade now something which is about to change since manufacturers have finally begun to focus in the development of 2.5&quot; driv...</Comment>
+    <Good>Build Quality (Enterprise Grade / 2.000.000 Hours MTBF), Excellent Performance (SATA III), Large Storage Capacity (2TB), Also Available In 12Gb/s-6Gb/s SAS Connectivity, Temperatures, Size Factor (2.5&quot;), Power Choice Technology (1.14W Idle</Good>
+    <Bad>Price (For Some),</Bad>
+    <Bottomline>2.5” hard disk drives are aimed primarily towards enterprise use since they offer reduced power consumption (energy cost) and temperature levels and require less space compared to the quite larger 3.5” drives. Of course the 2nd target group is...</Bottomline>
+   </Review>
+  </Reviews>
+ </Product>
+</ICECAT-interface>
