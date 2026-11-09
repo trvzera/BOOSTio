@@ -4,6 +4,9 @@ Todos rodam a partir de `backend/`: `python -m flask --app app <comando>`. Na VP
 scripts de `deploy/` já fazem isso. A maioria **simula por padrão** e só grava com `--aplicar`. Os comandos
 `*-preparar` criam ou ajustam tabelas, são seguros para repetir e pedem backup em banco já existente.
 
+Para executar a sequência de aprovação da amostra, busca nas duas lojas, worker
+e análise por IA, use o [passo a passo com um comando por bloco](rotina-catalogo-ofertas.md).
+
 ## 1. Os do dia a dia (atualizar preços e ofertas)
 
 | Comando | Para que serve |
@@ -63,7 +66,7 @@ scripts de `deploy/` já fazem isso. A maioria **simula por padrão** e só grav
 | --- | --- |
 | `mercadolivre-descobrir` | Busca anúncios no Mercado Livre e guarda como pendências. |
 | `mercadolivre-classificar` | Compara cada pendência com o catálogo e decide: confirmada, ambígua ou rejeitada. |
-| `admin-pendencias-sugerir` | A IA sugere a peça de cada pendência aberta (simula por padrão; `--aplicar` grava). Só sugere, não aceita. |
+| `admin-pendencias-sugerir` | A IA sugere a peça de cada pendência aberta (simula por padrão; `--aplicar` chama a IA e grava). Com `--decidir`, também aceita ou rejeita quando a confiança alcança o mínimo, 90 por padrão. |
 | `catalogo-aprovar-lote` | Aprova em lote as peças importadas que passam nas regras (identidade, ficha mínima, sem duplicata). Simula por padrão; `--limite` sorteia uma amostra, `--reverter` desfaz. |
 | `mercadolivre-enriquecer` | Completa a ficha técnica das pendências (Icecat, fabricante, base técnica). |
 | `mercadolivre-importar-pendencias` | Cria a oferta (e a peça, se permitido) a partir das pendências aprovadas. |
