@@ -1,4 +1,5 @@
 """Formato de uma pendência para o painel de administração; não decide nada."""
+from models import VinculoMercadoLivre
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 
 
@@ -19,7 +20,8 @@ def apresentar_pendencia(pendencia, *, detalhado=False):
         "sugestao_ia": _sugestao(pendencia, detalhado),
     }
     if detalhado:
-        dados["candidatos"] = [_candidato(c) for c in candidatos]
+        catalogo = ((pendencia.dados_originais or {}).get("catalogo") or {}).get("id")
+        dados["candidatos"] = [_candidato(c, catalogo) for c in candidatos]
         dados["decisao"] = (pendencia.evidencias or {}).get("revisao_manual")
     return dados
 
@@ -62,13 +64,14 @@ def resumir_ficha(peca):
             if peca is not None and getattr(peca, campo, None) not in (None, "")]
 
 
-def _candidato(candidato):
+def _candidato(candidato, catalogo_da_pendencia=None):
     referencia = str(candidato.get("peca", ""))
     categoria, _, identificador = referencia.partition(":")
     modelo = next((m for m in MODELOS_PECAS if m.__tablename__ == categoria), None)
     peca = modelo.buscar_por_id(int(identificador)) if modelo and identificador.isdecimal() else None
     return {
         "peca": referencia,
+        "vinculada_a_outro_catalogo": _catalogo_ja_vinculado(categoria, peca, catalogo_da_pendencia),
         "percentual": candidato.get("percentual"),
         "conflitos": candidato.get("conflitos", []),
         "pendencias": candidato.get("pendencias", []),
@@ -77,3 +80,11 @@ def _candidato(candidato):
         "part_number": peca.part_number if peca else None,
         "ficha": resumir_ficha(peca),
     }
+
+
+def _catalogo_ja_vinculado(categoria, peca, catalogo_da_pendencia):
+    """Catálogo do Mercado Livre que a peça já tem, quando difere do da pendência (uma peça, um catálogo)."""
+    if peca is None or not catalogo_da_pendencia:
+        return None
+    vinculo = VinculoMercadoLivre.buscar(categoria, peca.id)
+    return vinculo.catalogo_id if vinculo and vinculo.catalogo_id != catalogo_da_pendencia else None

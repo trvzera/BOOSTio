@@ -524,3 +524,14 @@ def test_aceitar_mercado_livre_peca_ja_vinculada_a_outro_catalogo_explica_o_que_
     r = entrar(app, admin).post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{disco.id}'})
     assert r.status_code == 400 and 'MLB11' in r.get_json()['erro'] and 'rejeite' in r.get_json()['erro']
     assert cliente_ml._consultar.call_count == 0 and Oferta.query.count() == 0  # nem consultou a loja
+
+
+def test_detalhe_marca_candidata_ja_vinculada_a_outro_catalogo(banco):
+    app, admin, *_ = banco
+    ocupado, livre = hd(), hd(part_number='ST8000NM0000', modelo='Exos 8TB X')
+    db.session.add(VinculoMercadoLivre(tabela_peca='hd', peca_id=ocupado.id, catalogo_id='MLB11', assinatura_peca='a' * 64,
+                                       assinatura_catalogo='b' * 64, criterio='revisao_manual'))
+    p = pendencia_ml([dict(peca=f'hd:{ocupado.id}', percentual=72, conflitos=[], pendencias=[]),
+                      dict(peca=f'hd:{livre.id}', percentual=70, conflitos=[], pendencias=[])])
+    candidatos = entrar(app, admin).get(f'/admin/pendencias/{p.id}').get_json()['candidatos']
+    assert {c['peca']: c['vinculada_a_outro_catalogo'] for c in candidatos} == {f'hd:{ocupado.id}': 'MLB11', f'hd:{livre.id}': None}

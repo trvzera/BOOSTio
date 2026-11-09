@@ -65,6 +65,7 @@ test('candidato com conflito não pode ser escolhido', () => {
   assert.equal(candidatoSelecionavel({conflitos: []}), true);
   assert.equal(candidatoSelecionavel({conflitos: ['marca_divergente']}), false);
   assert.equal(candidatoSelecionavel({}), false);
+  assert.equal(candidatoSelecionavel({conflitos: [], vinculada_a_outro_catalogo: 'MLB44455598'}), false);
   assert.equal(descreverCandidato({fabricante: 'AMD', modelo: 'Ryzen 5 5500', part_number: 'X1', peca: 'processador:1'}), 'AMD Ryzen 5 5500 · X1');
   assert.equal(descreverCandidato({peca: 'processador:1'}), 'processador:1');
   assert.deepEqual(textoRestricoes({conflitos: ['modelo_divergente'], pendencias: ['cor_nao_comprovada']}),
