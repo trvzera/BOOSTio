@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from models import ProdutoPendente
+from models import ProdutoPendente, VinculoMercadoLivre
 from repositories.ofertas_repository import atualizar_ofertas_validadas
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
 from services.mercadolivre_service.controle_requisicoes_service import ControleRequisicoesService
@@ -43,9 +43,19 @@ class AceitarPendenciaService:
                                            simular=False, revisao_manual=revisao)
 
     def _aceitar_mercado_livre(self, pendencia, peca, revisao):
+        self._recusar_peca_ja_vinculada_a_outro_catalogo(pendencia, peca)
         # O anúncio é reconsultado na API do Mercado Livre (poucas requisições, antes da transação).
         importador = self._importador_mercado_livre or ImportarProdutoService(controle=ControleRequisicoesService(8, 0.5))
         return importador.aceitar_revisado(pendencia.id, peca, revisao)
+
+    @staticmethod
+    def _recusar_peca_ja_vinculada_a_outro_catalogo(pendencia, peca):
+        """Cada peça tem um único catálogo do Mercado Livre; avisa antes de tentar gravar."""
+        catalogo = ((pendencia.dados_originais or {}).get("catalogo") or {}).get("id")
+        vinculo = VinculoMercadoLivre.buscar(peca.__tablename__, peca.id)
+        if catalogo and vinculo and vinculo.catalogo_id != catalogo:
+            raise ValueError(f"Esta peça já está vinculada a outro catálogo do Mercado Livre ({vinculo.catalogo_id}). "
+                             "Escolha outra peça ou rejeite esta pendência.")
 
     @staticmethod
     def _peca_candidata(pendencia, referencia):
