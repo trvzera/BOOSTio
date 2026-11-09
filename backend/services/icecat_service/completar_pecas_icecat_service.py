@@ -44,8 +44,12 @@ class CompletarPecasIcecatService:
                       nao_encontrada=0, ambigua=0, interrompido=False, ultima_peca_id=depois_id, detalhes=[])
         for peca in modelo.lote_para_identificadores(depois_id, limite):
             resumo['ultima_peca_id'] = peca.id
-            if peca.status_validacao != 'em_revisao' or not pendencias_para_montagem(peca):
+            if peca.status_validacao != 'em_revisao':
                 resumo['ignoradas'] += 1
+                continue
+            if not pendencias_para_montagem(peca):
+                # Já completa (por exemplo, preenchida antes): só falta liberar a marca de ficha reprovada.
+                resumo['ficha_liberada' if self._reavaliar_ficha(peca, simular) else 'ignoradas'] += 1
                 continue
             if not peca.part_number:
                 resumo['sem_part_number'] += 1
