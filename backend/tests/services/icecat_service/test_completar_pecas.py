@@ -156,3 +156,16 @@ def test_normalizador_le_conexao_do_fone_e_portas_do_monitor():
     portas = {'HDMI ports quantity': '2', 'DisplayPorts quantity': '1', 'VGA (D-Sub) ports quantity': '0'}
     assert normalizar(xml_monitor(portas), 'monitor', '222')['conexao'] == 'displayport, hdmi'
     assert 'conexao' not in normalizar(xml_monitor({'HDMI ports quantity': '0'}), 'monitor', '222')
+
+
+def test_peca_ja_completa_com_ficha_reprovada_so_tem_a_marca_liberada(banco):
+    fone = fone_em_revisao()
+    fone.microfone, fone.tipo, fone.conexao = True, 'headset', 'wired'
+    fone.ficha_montagem_validada = False
+    db.session.commit()
+    icecat = IcecatSimulado(FICHA_FONE)
+    resumo = completar(icecat, simular=False)
+    assert resumo['ficha_liberada'] == 1 and resumo['analisadas'] == 0 and icecat.consultados == []
+    db.session.refresh(fone)
+    assert fone.ficha_montagem_validada is True and fone.status_validacao == 'em_revisao'
+    assert completar(icecat, simular=False)['ficha_liberada'] == 0  # reexecutar não muda nada
