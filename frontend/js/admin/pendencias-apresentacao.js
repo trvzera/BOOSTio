@@ -30,7 +30,8 @@ export function linkSeguro(url) {
 
 // Um candidato com conflito contradiz o anúncio; o backend também recusa, aqui só desabilitamos a escolha.
 export function candidatoSelecionavel(candidato) {
-  return Array.isArray(candidato?.conflitos) && candidato.conflitos.length === 0;
+  // Uma peça só pode ter um catálogo do Mercado Livre: quem já tem outro não pode receber este.
+  return Array.isArray(candidato?.conflitos) && candidato.conflitos.length === 0 && !candidato.vinculada_a_outro_catalogo;
 }
 
 export function descreverCandidato(candidato) {

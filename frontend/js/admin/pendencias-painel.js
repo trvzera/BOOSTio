@@ -196,6 +196,10 @@ export function iniciarPendencias(raiz) {
     if (sugestao?.peca && sugestao.peca === dados.peca) {
       texto.append(elemento("span", "admin-ia font-2-s", `Sugerida pela IA (${sugestao.confianca}%)${sugestao.justificativa ? ": " + sugestao.justificativa : ""}`));
     }
+    if (dados.vinculada_a_outro_catalogo) {
+      texto.append(elemento("span", "admin-alert font-2-s",
+        `Já vinculada a outro catálogo do Mercado Livre (${dados.vinculada_a_outro_catalogo}): escolha outra peça ou rejeite a pendência.`));
+    }
     if (conflitos.length) texto.append(elemento("span", "admin-alert font-2-s", "Conflito: " + conflitos.join(", ")));
     if (pendencias.length) texto.append(elemento("span", "admin-note font-2-s", "Falta comprovar: " + pendencias.join(", ")));
     rotulo.append(radio, texto);

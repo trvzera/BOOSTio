@@ -36,6 +36,9 @@ class EnriquecerPecaExistenteService:
             locais = locais | {codigo(peca.part_number)}
         remotos = set().union(*(extrator.extrair(v,peca.__tablename__) for v in
             (produto.modelo or '', *produto.modelos_alternativos, *valores(produto.identificadores.get('mpn')))))
+        if produto.contexto.get('mpn_confirmado_na_fonte'):
+            # O MPN exato foi comprovado no índice da fonte (ex.: Icecat); vale mesmo sem parecer "código de modelo".
+            remotos |= {codigo(v) for v in valores(produto.identificadores.get('mpn'))}
         comuns = locais & remotos
         origem_confirmada = False
         if (produto.contexto.get('finalidade') == 'especificacoes'
