@@ -1,0 +1,882 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ICECAT-interface SYSTEM "https://data.icecat.biz/dtd/ICECAT-interface_response.dtd">
+<!--source: Icecat.biz 2026-->
+<!--Language ID: 1-->
+<!--Version: v2-->
+<ICECAT-interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://data.icecat.biz/xsd/ICECAT-interface_response.xsd">
+ <Product Code="1" HighPic="https://images.icecat.biz/img/gallery/10a646ebfe4ad7bc71c11b648a6fbd715a88ae98.jpg" HighPicHeight="829" HighPicSize="239589" HighPicWidth="1304" ID="14532212" LowPic="https://images.icecat.biz/img/gallery_lows/c9f6878c0673ed9b6b2c9e908a4e22db7b0b1e40.jpg" LowPicHeight="127" LowPicSize="18465" LowPicWidth="200" Name="ValueRAM" IntName="ValueRAM" LocalName="" Pic500x500="https://images.icecat.biz/img/gallery_mediums/e58bdd839c2b5fe57462d44f925cc682be1faa7c.jpg" Pic500x500Height="317" Pic500x500Size="85133" Pic500x500Width="500" Prod_id="KVR16N11/8" Quality="ICECAT" ReleaseDate="" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/4563398a8be3576f673439146eae288ada7bb4a3.jpg" ThumbPicSize="4141" Title="Kingston Technology ValueRAM memory module 8 GB 1 x 8 GB DDR3 1600 MT/s 240-pin DIMM" GeneratedIntTitle="Kingston Technology ValueRAM memory module" GeneratedLocalTitle="Kingston Technology ValueRAM memory module 8 GB 1 x 8 GB DDR3 1600 MT/s 240-pin DIMM" BrandLocalTitle="">
+  <CategoryFeatureGroup ID="32098" No="0">
+   <FeatureGroup ID="0">
+    <Name ID="5073" langid="1" Value="Technical details"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1549" No="-1">
+   <FeatureGroup ID="14">
+    <Name ID="5023" langid="1" Value="Weight &amp; dimensions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1551" No="2">
+   <FeatureGroup ID="28">
+    <Name ID="5067" langid="1" Value="Operational conditions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="31202" No="-3">
+   <FeatureGroup ID="67">
+    <Name ID="27423" langid="1" Value="Packaging data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="41307" No="0">
+   <FeatureGroup ID="76">
+    <Name ID="28540" langid="1" Value="Certificates"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="83399" No="0">
+   <FeatureGroup ID="90">
+    <Name ID="30562" langid="1" Value="Software"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="49023" No="0">
+   <FeatureGroup ID="116">
+    <Name ID="78852" langid="1" Value="Packaging content"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="53383" No="0">
+   <FeatureGroup ID="143">
+    <Name ID="618812" langid="1" Value="Battery"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="6347" No="-5">
+   <FeatureGroup ID="146">
+    <Name ID="624346" langid="1" Value="Other features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="27909" No="5">
+   <FeatureGroup ID="185">
+    <Name ID="1219853" langid="1" Value="Features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="24500" No="-4">
+   <FeatureGroup ID="198">
+    <Name ID="1788927" langid="1" Value="Logistics data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="59864" No="0">
+   <FeatureGroup ID="232">
+    <Name ID="3464238" langid="1" Value="Supplier features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="76696" No="0">
+   <FeatureGroup ID="279">
+    <Name ID="7392238" langid="1" Value="Sustainability"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <Category ID="911">
+   <Name ID="3727686" langid="1" Value="Memory Modules"/>
+  </Category>
+  <EANCode EAN="0740617206937" Format="GTIN-13" IsApproved="1"/>
+  <EANCode EAN="740617206937" Format="GTIN-12" IsApproved="1"/>
+  <EANCode EAN="5054533429925" Format="GTIN-13" IsApproved="1"/>
+  <ReleaseDate/>
+  <EndOfLifeDate>
+   <Date Value="2024-02-08" langid="0"/>
+  </EndOfLifeDate>
+  <ReasonsToBuy/>
+  <BulletPoints>
+   <BulletPoint Value="JEDEC standard 1.5V Power Supply" langid="1" No="1"/>
+   <BulletPoint Value="VDDQ = 1.5V" langid="1" No="2"/>
+   <BulletPoint Value="800MT/s fCK for 1600Mb/sec/pin" langid="1" No="3"/>
+   <BulletPoint Value="8 independent internal banks" langid="1" No="4"/>
+   <BulletPoint Value="Programmable CAS latency: 11, 10, 9, 8, 7, 6" langid="1" No="5"/>
+   <BulletPoint Value="Programmable Additive Latency: 0, CL - 2, or CL - 1 clock" langid="1" No="6"/>
+   <BulletPoint Value="8-bit pre-fetch" langid="1" No="7"/>
+   <BulletPoint Value="Burst Length: 8 (interleave without any limit, sequential with starting address “000” only), 4 with tCCD = 4 which does not allow seamless read or write (either on the fly using A12 or MRS)" langid="1" No="8"/>
+   <BulletPoint Value="Bi-directional Differential Data Strobe" langid="1" No="9"/>
+   <BulletPoint Value="Internal (self) calibration: Internal self calibration through ZQ pin (RZQ: 240 ohm ± 1%)" langid="1" No="10"/>
+   <BulletPoint Value="On Die Termination using ODT pin" langid="1" No="11"/>
+   <BulletPoint Value="Average Refresh Period 7.8us at lower than TCASE 85°C, 3.9us at 85°C &lt; TCASE &lt; 95°Cº" langid="1" No="12"/>
+   <BulletPoint Value="Asynchronous Reset" langid="1" No="13"/>
+   <BulletPoint Value="PCB: Height 0.740” (18.75mm) or 1.180” (30.00mm)" langid="1" No="14"/>
+  </BulletPoints>
+  <GeneratedBulletPoints>
+   <GeneratedBulletPoint Value="8 GB DDR3 1600 MT/s" langid="1" No="1"/>
+   <GeneratedBulletPoint Value="240-pin DIMM 1 x 8 GB" langid="1" No="2"/>
+   <GeneratedBulletPoint Value="CAS latency: 11" langid="1" No="3"/>
+   <GeneratedBulletPoint Value="1.5 V" langid="1" No="4"/>
+  </GeneratedBulletPoints>
+  <ProductBundled/>
+  <ProductDescription ID="35358453" LongDesc="Kingston Technology is the world&amp;apos;s independent memory leader and is well-known for providing high quality memory products at an attractive price. Kingston ValueRAM is your best source for industry-standard memory to maximise the performance and productivity of your system. Built with A-grade components only, Kingston ValueRAM memory modules come with a lifetime warranty." ManualPDFSize="0" ManualPDFURL="" MiddleDesc="" PDFSize="0" PDFURL="" ShortDesc="ValueRam" URL="https://www.kingston.com/en" WarrantyInfo="lifetime" langid="1"/>
+  <ProductFamily ID="1027" LowPic="" ThumbPic="">
+   <Name ID="242294" langid="1" Value="ValueRAM"/>
+  </ProductFamily>
+  <ProductFeature Localized="0" ID="122448940" Local_ID="0" Value="8" CategoryFeature_ID="73748" CategoryFeatureGroup_ID="27909" No="10109999" Optional="0" Presentation_Value="8 GB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="8">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="11381">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1036616" langid="1" Value="Internal memory"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="122448945" Local_ID="0" Value="1 x 8" CategoryFeature_ID="93088" CategoryFeatureGroup_ID="27909" No="10109998" Optional="0" Presentation_Value="1 x 8 GB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="1 x 8">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="16023">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1186317" langid="1" Value="Memory layout (modules x size)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="122448941" Local_ID="0" Value="DDR3" CategoryFeature_ID="6137" CategoryFeatureGroup_ID="27909" No="10109980" Optional="0" Presentation_Value="DDR3" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="DDR3">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="427">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2221" langid="1" Value="Internal memory type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="859283120" Local_ID="0" Value="1600" CategoryFeature_ID="948627" CategoryFeatureGroup_ID="27909" No="10109069" Optional="0" Presentation_Value="1600 MT/s" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="1600">
+    <Measure ID="340">
+     <Signs>
+      <Sign ID="28534" langid="1"><![CDATA[MT/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="37536">
+    <Measure ID="340" Sign="">
+     <Signs>
+      <Sign ID="28534" langid="1"><![CDATA[MT/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5082622" langid="1" Value="Memory data transfer rate"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="122448946" Local_ID="0" Value="240-pin DIMM" CategoryFeature_ID="45866" CategoryFeatureGroup_ID="27909" No="10109050" Optional="0" Presentation_Value="240-pin DIMM" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="240-pin DIMM">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7696">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="595968" langid="1" Value="Memory form factor"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="122448944" Local_ID="0" Value="N" CategoryFeature_ID="6130" CategoryFeatureGroup_ID="27909" No="10109039" Optional="0" Presentation_Value="No" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1628">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5085" langid="1" Value="ECC"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="122448947" Local_ID="0" Value="11" CategoryFeature_ID="6141" CategoryFeatureGroup_ID="27909" No="10109035" Optional="0" Presentation_Value="11" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="11">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1635">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5099" langid="1" Value="CAS latency"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="123507937" Local_ID="0" Value="64" CategoryFeature_ID="6131" CategoryFeatureGroup_ID="27909" No="100999" Optional="1" Presentation_Value="64 bit" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="64">
+    <Measure ID="50">
+     <Signs>
+      <Sign ID="34" langid="1"><![CDATA[bit]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1630">
+    <Measure ID="50" Sign="">
+     <Signs>
+      <Sign ID="34" langid="1"><![CDATA[bit]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5089" langid="1" Value="Memory bus"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="123509625" Local_ID="0" Value="Unregistered (unbuffered)" CategoryFeature_ID="301234" CategoryFeatureGroup_ID="27909" No="100994" Optional="0" Presentation_Value="Unregistered (unbuffered)" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="Unregistered (unbuffered)">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="38209">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5220375" langid="1" Value="Buffered memory type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="122448953" Local_ID="0" Value="1.5" CategoryFeature_ID="36754" CategoryFeatureGroup_ID="27909" No="100992" Optional="0" Presentation_Value="1.5 V" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1.5">
+    <Measure ID="42">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6266">
+    <Measure ID="42" Sign="">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="154881" langid="1" Value="Memory voltage"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="122448949" Local_ID="0" Value="1024M x 64" CategoryFeature_ID="6133" CategoryFeatureGroup_ID="27909" No="100991" Optional="0" Presentation_Value="1024M x 64" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1024M x 64">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1631">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5091" langid="1" Value="Module configuration"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="122448950" Local_ID="0" Value="PC-12800" CategoryFeature_ID="29554" CategoryFeatureGroup_ID="27909" No="100000" Optional="1" Presentation_Value="PC-12800" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="PC-12800">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="642">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2815" langid="1" Value="Memory type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="122448948" Local_ID="0" Value="Gold" CategoryFeature_ID="6140" CategoryFeatureGroup_ID="27909" No="99998" Optional="0" Presentation_Value="Gold" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Gold">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1634">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5097" langid="1" Value="Lead plating"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="212626091" Local_ID="0" Value="133.35" CategoryFeature_ID="48923" CategoryFeatureGroup_ID="1549" No="100073" Optional="0" Presentation_Value="133.3 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="133.3">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1649">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5143" langid="1" Value="Width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="122448951" Local_ID="0" Value="DIMM" CategoryFeature_ID="36755" CategoryFeatureGroup_ID="31202" No="99900" Optional="0" Presentation_Value="DIMM" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="DIMM">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="4463">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="60405" langid="1" Value="Package type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494548973" Local_ID="0" Value="84733020" CategoryFeature_ID="309147" CategoryFeatureGroup_ID="24500" No="99947" Optional="1" Presentation_Value="84733020" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="84733020">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="23731">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1903598" langid="1" Value="Harmonized System (HS) code"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="150327293" Local_ID="0" Value="X8" CategoryFeature_ID="33153" CategoryFeatureGroup_ID="6347" No="100111" Optional="1" Presentation_Value="X8" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="X8">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6579">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="224077" langid="1" Value="Chips organisation"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="122448954" Local_ID="0" Value="240" CategoryFeature_ID="15515" CategoryFeatureGroup_ID="6347" No="100000" Optional="1" Presentation_Value="240" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="240">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1274">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="4089" langid="1" Value="Number of pins"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="497249479" Local_ID="0" Value="Taiwan" CategoryFeature_ID="56407" CategoryFeatureGroup_ID="6347" No="100000" Optional="0" Presentation_Value="Taiwan" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Taiwan">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3294">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="31174" langid="1" Value="Country of origin"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="123508621" Local_ID="0" Value="1600" CategoryFeature_ID="56409" CategoryFeatureGroup_ID="6347" No="100000" Optional="1" Presentation_Value="1600 MHz" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1600">
+    <Measure ID="18">
+     <Signs>
+      <Sign ID="9" langid="1"><![CDATA[MHz]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1626">
+    <Measure ID="18" Sign="">
+     <Signs>
+      <Sign ID="9" langid="1"><![CDATA[MHz]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5081" langid="1" Value="Bus clock rate"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="136975256" Local_ID="0" Value="N" CategoryFeature_ID="56413" CategoryFeatureGroup_ID="6347" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="4248">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="59867" langid="1" Value="Error indication"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="137079734" Local_ID="0" Value="1 x 8192" CategoryFeature_ID="79244" CategoryFeatureGroup_ID="6347" No="100000" Optional="1" Presentation_Value="1 x 8192 MB" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1 x 8192">
+    <Measure ID="19">
+     <Signs>
+      <Sign ID="15506" langid="1"><![CDATA[MB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2014">
+    <Measure ID="19" Sign="">
+     <Signs>
+      <Sign ID="15506" langid="1"><![CDATA[MB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="9035" langid="1" Value="Memory layout"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="137144900" Local_ID="0" Value="8192" CategoryFeature_ID="79245" CategoryFeatureGroup_ID="6347" No="100000" Optional="1" Presentation_Value="8192 MB" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="8192">
+    <Measure ID="19">
+     <Signs>
+      <Sign ID="15506" langid="1"><![CDATA[MB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6">
+    <Measure ID="19" Sign="">
+     <Signs>
+      <Sign ID="15506" langid="1"><![CDATA[MB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1295" langid="1" Value="Internal memory"/>
+   </Feature>
+  </ProductFeature>
+  <ProductGallery>
+   <ProductPicture IsMain="Y" LowPic="https://images.icecat.biz/img/gallery_lows/c9f6878c0673ed9b6b2c9e908a4e22db7b0b1e40.jpg" LowPicHeight="127" LowPicWidth="200" LowSize="18465" No="1" Original="https://images.icecat.biz/img/gallery_raw/227a99c4291e624e0c0d661525877a3a9eb1b988.jpeg" OriginalSize="179105" Pic="https://images.icecat.biz/img/gallery/10a646ebfe4ad7bc71c11b648a6fbd715a88ae98.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/e58bdd839c2b5fe57462d44f925cc682be1faa7c.jpg" Pic500x500Height="317" Pic500x500Size="85133" Pic500x500Width="500" PicHeight="829" PicWidth="1304" ProductPicture_ID="23065226" Size="239589" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/4563398a8be3576f673439146eae288ada7bb4a3.jpg" ThumbSize="4141" Type="ProductImage" UpdatedDate="2017-11-15 14:53:13"/>
+  </ProductGallery>
+  <ProductMultimediaObject>
+   <MultimediaObject ContentType="application/pdf" Date="2025-10-23 19:32:56" Description="Generated PDF" KeepAsURL="0" MultimediaObject_ID="0" Type="leaflet" UUID="00000000-0000-0000-0000-000000000000" langid="1" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="0" URL="https://icecat.biz/rest/product-pdf?productId=14532212&amp;lang=en&amp;AccessKey=pDCxuAWTSXus9RjamUk3D_3m4NXXS7wE" Width="0"/>
+  </ProductMultimediaObject>
+  <ProductRelated ID="151734966" Category_ID="932" Preferred="0">
+   <Product ID="25559291" Prod_id="TVS-EC1080-E3-16G" ThumbPic="" Name="TVS-EC1080-E3-16G">
+    <Supplier ID="2797" Name="QNAP"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="151734964" Category_ID="932" Preferred="0">
+   <Product ID="25559284" Prod_id="TVS-EC1080-E3-8G" ThumbPic="" Name="TVS-EC1080-E3-8G">
+    <Supplier ID="2797" Name="QNAP"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="151734965" Category_ID="932" Preferred="0">
+   <Product ID="25559285" Prod_id="TVS-EC1080-I3-8G" ThumbPic="" Name="TVS-EC1080-I3-8G">
+    <Supplier ID="2797" Name="QNAP"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838982" Category_ID="153" Preferred="0">
+   <Product ID="18402750" Prod_id="M51AC-US002S" ThumbPic="" Name="M51AC-US002S">
+    <Supplier ID="161" Name="ASUS"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838984" Category_ID="164" Preferred="0">
+   <Product ID="19188126" Prod_id="H87ITX-A-E" ThumbPic="" Name="H87-ITX">
+    <Supplier ID="2592" Name="Zotac"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838983" Category_ID="164" Preferred="0">
+   <Product ID="18663701" Prod_id="MBD-C7Z87-O" ThumbPic="" Name="C7Z87">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="148103503" Category_ID="1508" Preferred="0">
+   <Product ID="24242128" Prod_id="SSG-5018A-AR12L" ThumbPic="" Name="5018A-AR12L">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838981" Category_ID="164" Preferred="0">
+   <Product ID="17381656" Prod_id="132-SE-E775-K2" ThumbPic="" Name="X79 SLI">
+    <Supplier ID="2853" Name="EVGA"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838991" Category_ID="1508" Preferred="0">
+   <Product ID="20118589" Prod_id="SYS-5038AD-T" ThumbPic="" Name="SYS-5038AD-T">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838977" Category_ID="164" Preferred="0">
+   <Product ID="14552243" Prod_id="151-IB-E699-KR" ThumbPic="" Name="Z77 FTW">
+    <Supplier ID="2853" Name="EVGA"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838974" Category_ID="1508" Preferred="0">
+   <Product ID="13528168" Prod_id="SYS-5037A-I" ThumbPic="" Name="SuperWorkstation 5037A-i">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838976" Category_ID="164" Preferred="0">
+   <Product ID="13707205" Prod_id="H77ITX-A-E" ThumbPic="" Name="H77-ITX WiFi A Series ">
+    <Supplier ID="2592" Name="Zotac"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="151019273" Category_ID="164" Preferred="0">
+   <Product ID="26734015" Prod_id="MBD-X10SLQ-L-B" ThumbPic="" Name="X10SLQ-L">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="146460566" Category_ID="164" Preferred="0">
+   <Product ID="23118260" Prod_id="MBD-A1SRM-2558F-O" ThumbPic="" Name="A1SRM-2558F">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838978" Category_ID="164" Preferred="0">
+   <Product ID="16280970" Prod_id="H77ITX-B-E" ThumbPic="" Name="H77ITX-B-E">
+    <Supplier ID="2592" Name="Zotac"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838987" Category_ID="164" Preferred="0">
+   <Product ID="19340698" Prod_id="MBD-C7H61-L-O" ThumbPic="" Name="C7H61-L">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="145998292" Category_ID="164" Preferred="0">
+   <Product ID="22578792" Prod_id="MBD-C7H61-B" ThumbPic="" Name="C7H61">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838986" Category_ID="164" Preferred="0">
+   <Product ID="19308893" Prod_id="MBD-X10SLQ-B" ThumbPic="" Name="X10SLQ">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838990" Category_ID="1062" Preferred="0">
+   <Product ID="19453145" Prod_id="SYS-5038A-IL" ThumbPic="" Name="SYS-5038A-IL">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="136363216" Category_ID="164" Preferred="0">
+   <Product ID="21807433" Prod_id="MBD-A1SRM-2758F-O" ThumbPic="" Name="A1SRM-2758F">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838973" Category_ID="164" Preferred="0">
+   <Product ID="13527566" Prod_id="MBD-X9SRA-B" ThumbPic="" Name="MBD-X9SRA-B">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838988" Category_ID="164" Preferred="0">
+   <Product ID="19404130" Prod_id="H87MAT-A-E" ThumbPic="" Name="H87MAT-A-E">
+    <Supplier ID="2592" Name="Zotac"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="136363215" Category_ID="164" Preferred="0">
+   <Product ID="21735053" Prod_id="MBD-A1SAM-2550F-O" ThumbPic="" Name="A1SAM-2550F">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="148115208" Category_ID="164" Preferred="0">
+   <Product ID="24312471" Prod_id="MBD-A1SRM-2558F-B" ThumbPic="" Name="A1SRM-2558F">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="136363214" Category_ID="164" Preferred="0">
+   <Product ID="21614025" Prod_id="MBD-A1SAM-2750F-O" ThumbPic="" Name="A1SAM-2750F">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="136363218" Category_ID="1508" Preferred="0">
+   <Product ID="21941042" Prod_id="SYS-5018A-MLTN4" ThumbPic="" Name="SuperServer 5018A-MLTN4">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="147810286" Category_ID="164" Preferred="0">
+   <Product ID="24219387" Prod_id="MBD-C7Z97-OCE-O" ThumbPic="" Name="C7Z97-OCE">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="148115209" Category_ID="164" Preferred="0">
+   <Product ID="24312473" Prod_id="MBD-A1SRM-2758F-B" ThumbPic="" Name="A1SRM-2758F">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="150824677" Category_ID="164" Preferred="0">
+   <Product ID="26302224" Prod_id="MBD-C7B75-B" ThumbPic="" Name="C7B75">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838975" Category_ID="164" Preferred="0">
+   <Product ID="13571106" Prod_id="PB-CI7X79N" ThumbPic="" Name="Pure Black X79N">
+    <Supplier ID="231" Name="Sapphire"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="151602575" Category_ID="1508" Preferred="0">
+   <Product ID="25173747" Prod_id="SYS-5018A-TN7B" ThumbPic="" Name="SuperServer 5018A-TN7B">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838980" Category_ID="164" Preferred="0">
+   <Product ID="16754192" Prod_id="MBD-C7H61-O" ThumbPic="" Name="C7H61">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838989" Category_ID="164" Preferred="0">
+   <Product ID="19414398" Prod_id="MBD-C7Z87-OCE-O" ThumbPic="" Name="C7Z87-OCE">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838979" Category_ID="164" Preferred="0">
+   <Product ID="16754190" Prod_id="MBD-C7B75-O" ThumbPic="" Name="C7B75">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838972" Category_ID="1508" Preferred="0">
+   <Product ID="9607388" Prod_id="AS-1022TC-TF" ThumbPic="" Name="1022TC-TF">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="136028884" Category_ID="1508" Preferred="0">
+   <Product ID="21932566" Prod_id="SYS-5018A-MHN4" ThumbPic="" Name="SuperServer 5018A-MHN4">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="136714497" Category_ID="164" Preferred="0">
+   <Product ID="22202181" Prod_id="MBD-A1SAM-2750F-B" ThumbPic="" Name="A1SAM-2750F">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="152513170" Category_ID="164" Preferred="0">
+   <Product ID="25087245" Prod_id="MBD-C7Z97-M-O" ThumbPic="" Name="C7Z97-M">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="148115210" Category_ID="164" Preferred="0">
+   <Product ID="24312474" Prod_id="MBD-A1SAM-2550F-B" ThumbPic="" Name="A1SAM-2550F">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="146837683" Category_ID="164" Preferred="0">
+   <Product ID="23166408" Prod_id="MBD-C7H61-L-B" ThumbPic="" Name="C7H61-L">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838970" Category_ID="164" Preferred="0">
+   <Product ID="9497074" Prod_id="Z68ITX-A-E" ThumbPic="" Name="Z68ITX-A-E">
+    <Supplier ID="2592" Name="Zotac"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="136363217" Category_ID="1508" Preferred="0">
+   <Product ID="21941041" Prod_id="SYS-5018A-MLHN4" ThumbPic="" Name="SuperServer 5018A-MLHN4">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="135838971" Category_ID="1508" Preferred="0">
+   <Product ID="9607387" Prod_id="AS-1022TC-IBQF" ThumbPic="" Name="A+ Server 1022TC-IBQF">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="156245832" Category_ID="1508" Preferred="0">
+   <Product ID="20172756" Prod_id="AS-2122TC-DL6RF4" ThumbPic="" Name="A+ Server 2122TC-DL6RF4">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="479580410" Category_ID="164" Preferred="0">
+   <Product ID="37983468" Prod_id="MBD-A1SAM-2750F-O-3YR" ThumbPic="" Name="A1SAM-2750F">
+    <Supplier ID="253" Name="Supermicro"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+   <RelationType Code="compatible"/>
+  </ProductRelated>
+  <ProductRelated ID="146837684" Category_ID="1170" Preferred="0">
+   <Product ID="23185548" Prod_id="S5535AG2NR-HE" ThumbPic="" Name="S5535 - MICRO ATX - INTEL CORE I3/ I5/ I7 (22NM/HASWELL) SERIES PROCESSORS">
+    <Supplier ID="137" Name="Tyan"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+  </ProductRelated>
+  <ProductRelated ID="136564918" Category_ID="1170" Preferred="0">
+   <Product ID="20091545" Prod_id="GA-H87N-B" ThumbPic="" Name="GA-H87N-B">
+    <Supplier ID="739" Name="GIGABYTE"/>
+   </Product>
+   <ProductRelatedLocales>
+    <ProductRelatedLocale ID="0" langid="0" Preferred="0" StartDate="" EndDate=""/>
+   </ProductRelatedLocales>
+  </ProductRelated>
+  <SummaryDescription>
+   <ShortSummaryDescription langid="1">Kingston Technology ValueRAM , 8 GB, 1 x 8 GB, DDR3, 240-pin DIMM</ShortSummaryDescription>
+   <LongSummaryDescription langid="1">Kingston Technology ValueRAM . Internal memory: 8 GB, Memory layout (modules x size): 1 x 8 GB, Internal memory type: DDR3, Memory form factor: 240-pin DIMM, CAS latency: 11</LongSummaryDescription>
+  </SummaryDescription>
+  <Supplier ID="18" Name="Kingston Technology"/>
+  <CatalogObjectCloud>
+   <ProductPage QRCodeURL="https://qr.icecat.biz/coc/bf0144a8-e000-4a88-8b3e-ce5db172bdad" URL="https://coc.icecat.biz/bf0144a8-e000-4a88-8b3e-ce5db172bdad"/>
+  </CatalogObjectCloud>
+ </Product>
+</ICECAT-interface>

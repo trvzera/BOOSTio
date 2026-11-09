@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ICECAT-interface SYSTEM "https://data.icecat.biz/dtd/ICECAT-interface_response.dtd">
+<!--source: Icecat.biz 2026-->
+<!--Language ID: 1-->
+<!--Version: v2-->
+<ICECAT-interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://data.icecat.biz/xsd/ICECAT-interface_response.xsd">
+ <Product Code="1" HighPic="https://images.icecat.biz/img/gallery/073ca62b1a74ad805e009059d688662bea6d4303.jpg" HighPicHeight="1500" HighPicSize="952616" HighPicWidth="2400" ID="36132124" LowPic="https://images.icecat.biz/img/gallery_lows/e296223c8c4eb3841b05846411623125f66e2079.jpg" LowPicHeight="125" LowPicSize="17129" LowPicWidth="200" Name="HX426C16FB2/8" IntName="HX426C16FB2/8" LocalName="" Pic500x500="https://images.icecat.biz/img/gallery_mediums/80d726efe0e0b08cc3737e3476c94ca9946926a5.jpg" Pic500x500Height="312" Pic500x500Size="80577" Pic500x500Width="500" Prod_id="HX426C16FB2/8" Quality="ICECAT" ReleaseDate="" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/3348da73603fd50f3103c3dc417fe192f4ebffd0.jpg" ThumbPicSize="1649" Title="HyperX FURY HX426C16FB2/8 memory module 8 GB 1 x 8 GB DDR4 288-pin DIMM" GeneratedIntTitle="HyperX FURY HX426C16FB2/8 memory module" GeneratedLocalTitle="HyperX FURY HX426C16FB2/8 memory module 8 GB 1 x 8 GB DDR4 288-pin DIMM" BrandLocalTitle="">
+  <CategoryFeatureGroup ID="32098" No="0">
+   <FeatureGroup ID="0">
+    <Name ID="5073" langid="1" Value="Technical details"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1549" No="-1">
+   <FeatureGroup ID="14">
+    <Name ID="5023" langid="1" Value="Weight &amp; dimensions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1551" No="2">
+   <FeatureGroup ID="28">
+    <Name ID="5067" langid="1" Value="Operational conditions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="31202" No="-3">
+   <FeatureGroup ID="67">
+    <Name ID="27423" langid="1" Value="Packaging data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="41307" No="0">
+   <FeatureGroup ID="76">
+    <Name ID="28540" langid="1" Value="Certificates"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="83399" No="0">
+   <FeatureGroup ID="90">
+    <Name ID="30562" langid="1" Value="Software"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="49023" No="0">
+   <FeatureGroup ID="116">
+    <Name ID="78852" langid="1" Value="Packaging content"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="53383" No="0">
+   <FeatureGroup ID="143">
+    <Name ID="618812" langid="1" Value="Battery"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="6347" No="-5">
+   <FeatureGroup ID="146">
+    <Name ID="624346" langid="1" Value="Other features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="27909" No="5">
+   <FeatureGroup ID="185">
+    <Name ID="1219853" langid="1" Value="Features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="24500" No="-4">
+   <FeatureGroup ID="198">
+    <Name ID="1788927" langid="1" Value="Logistics data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="59864" No="0">
+   <FeatureGroup ID="232">
+    <Name ID="3464238" langid="1" Value="Supplier features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="76696" No="0">
+   <FeatureGroup ID="279">
+    <Name ID="7392238" langid="1" Value="Sustainability"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <Category ID="911">
+   <Name ID="3727686" langid="1" Value="Memory Modules"/>
+  </Category>
+  <EANCode EAN="0740617266283" Format="GTIN-13" IsApproved="1"/>
+  <EANCode EAN="740617266283" Format="GTIN-12" IsApproved="1"/>
+  <ReleaseDate/>
+  <EndOfLifeDate>
+   <Date Value="2024-03-07" langid="0"/>
+  </EndOfLifeDate>
+  <ReasonsToBuy/>
+  <BulletPoints>
+   <BulletPoint Value="Automatic overclocking – Up to 3466MHz1" langid="1" No="1"/>
+   <BulletPoint Value="Cost-efficient, high-performance DDR4 upgrade" langid="1" No="2"/>
+   <BulletPoint Value="Intel XMP support for the latest processor technologies" langid="1" No="3"/>
+   <BulletPoint Value="Run cool with energy-efficient 1.2V DDR4" langid="1" No="4"/>
+   <BulletPoint Value="Signature asymmetrical FURY design with low-profile heat spreader" langid="1" No="5"/>
+   <BulletPoint Value="Backed by a lifetime warranty" langid="1" No="6"/>
+  </BulletPoints>
+  <GeneratedBulletPoints>
+   <GeneratedBulletPoint Value="PC/Server 8 GB DDR4" langid="1" No="1"/>
+   <GeneratedBulletPoint Value="288-pin DIMM 1 x 8 GB" langid="1" No="2"/>
+   <GeneratedBulletPoint Value="CAS latency: 16" langid="1" No="3"/>
+   <GeneratedBulletPoint Value="1.2 V" langid="1" No="4"/>
+   <GeneratedBulletPoint Value="Intel Extreme Memory Profile (XMP)" langid="1" No="5"/>
+  </GeneratedBulletPoints>
+  <ProductBundled/>
+  <ProductDescription ID="54541953" LongDesc="&lt;b&gt;HyperX® FURY DDR4 &lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;An easy Plug N Play performance boost for your PC.&lt;/b&gt;&lt;br&gt;&lt;br&gt;HyperX® FURY DDR4 detects your system’s components and automatically overclocks itself to the highest published frequency, up to 3466MHz, for a Plug N Play performance boost. This cost-effective upgrade will let you crank up the settings on your favourite FPS, MMO and MOBA games and provide better video editing and rendering performance. It’s available in speeds from 2400MHz–3466MHz, CL15–19 latencies, single module capacities of 4GB–16GB and kit capacities of 16GB–64GB. HyperX FURY DDR4 looks and stays cool, thanks to its stylish, low-profile heat spreader and DDR4’s low 1.2V power consumption. One hundred per cent tested at speed and backed by a lifetime warranty, HyperX FURY DDR4 is your worry-free upgrade of choice.&lt;br&gt;&lt;br&gt;*HyperX PnP memory will run in most DDR4 systems up to the speed allowed by the manufacturer's system BIOS. PnP cannot increase the system memory speed faster than is allowed by the manufacturer's BIOS." ManualPDFSize="0" ManualPDFURL="" MiddleDesc="" PDFSize="406281" PDFURL="https://objects.icecat.biz/objects/mmo_36132124_1521204559_4078_15214.pdf" ShortDesc="FURY Memory Black 8GB Module DDR4 2666MHz CL16 DIMM" URL="http://www.hyperxgaming.com/en/memory/fury-ddr4" WarrantyInfo="Lifetime" langid="1"/>
+  <ProductFamily ID="66565" LowPic="" ThumbPic="">
+   <Name ID="1844028" langid="1" Value="FURY"/>
+  </ProductFamily>
+  <ProductFeature Localized="0" ID="240813219" Local_ID="0" Value="8" CategoryFeature_ID="73748" CategoryFeatureGroup_ID="27909" No="10109999" Optional="0" Presentation_Value="8 GB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="8">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="11381">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1036616" langid="1" Value="Internal memory"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813228" Local_ID="0" Value="1 x 8" CategoryFeature_ID="93088" CategoryFeatureGroup_ID="27909" No="10109998" Optional="0" Presentation_Value="1 x 8 GB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="1 x 8">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="16023">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1186317" langid="1" Value="Memory layout (modules x size)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813220" Local_ID="0" Value="DDR4" CategoryFeature_ID="6137" CategoryFeatureGroup_ID="27909" No="10109980" Optional="0" Presentation_Value="DDR4" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="DDR4">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="427">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2221" langid="1" Value="Internal memory type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813226" Local_ID="0" Value="PC/Server" CategoryFeature_ID="73714" CategoryFeatureGroup_ID="27909" No="10109060" Optional="0" Presentation_Value="PC/Server" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="PC/Server">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9163">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="763709" langid="1" Value="Component for"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813227" Local_ID="0" Value="288-pin DIMM" CategoryFeature_ID="45866" CategoryFeatureGroup_ID="27909" No="10109050" Optional="0" Presentation_Value="288-pin DIMM" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="288-pin DIMM">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7696">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="595968" langid="1" Value="Memory form factor"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813229" Local_ID="0" Value="16" CategoryFeature_ID="6141" CategoryFeatureGroup_ID="27909" No="10109035" Optional="0" Presentation_Value="16" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="16">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1635">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5099" langid="1" Value="CAS latency"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813221" Local_ID="0" Value="2666" CategoryFeature_ID="29552" CategoryFeatureGroup_ID="27909" No="109070" Optional="0" Presentation_Value="2666 MHz" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="2666">
+    <Measure ID="18">
+     <Signs>
+      <Sign ID="9" langid="1"><![CDATA[MHz]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2900">
+    <Measure ID="18" Sign="">
+     <Signs>
+      <Sign ID="9" langid="1"><![CDATA[MHz]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="27453" langid="1" Value="Memory clock speed"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240829146" Local_ID="0" Value="Unregistered (unbuffered)" CategoryFeature_ID="301234" CategoryFeatureGroup_ID="27909" No="100994" Optional="0" Presentation_Value="Unregistered (unbuffered)" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="Unregistered (unbuffered)">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="38209">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5220375" langid="1" Value="Buffered memory type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813230" Local_ID="0" Value="1.2" CategoryFeature_ID="36754" CategoryFeatureGroup_ID="27909" No="100992" Optional="0" Presentation_Value="1.2 V" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1.2">
+    <Measure ID="42">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6266">
+    <Measure ID="42" Sign="">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="154881" langid="1" Value="Memory voltage"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240829027" Local_ID="0" Value="Y" CategoryFeature_ID="132047" CategoryFeatureGroup_ID="27909" No="100100" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="21116">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1679908" langid="1" Value="Intel Extreme Memory Profile (XMP)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240829026" Local_ID="0" Value="Y" CategoryFeature_ID="41687" CategoryFeatureGroup_ID="27909" No="100005" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7333">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="410960" langid="1" Value="SPD profile"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813246" Local_ID="0" Value="PC4-21300" CategoryFeature_ID="29554" CategoryFeatureGroup_ID="27909" No="100000" Optional="1" Presentation_Value="PC4-21300" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="PC4-21300">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="642">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2815" langid="1" Value="Memory type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813242" Local_ID="0" Value="Black" CategoryFeature_ID="94137" CategoryFeatureGroup_ID="27909" No="100000" Optional="0" Presentation_Value="Black" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Black">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1766">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5487" langid="1" Value="Product colour"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813238" Local_ID="0" Value="Intel X99" CategoryFeature_ID="127364" CategoryFeatureGroup_ID="27909" No="100000" Optional="1" Presentation_Value="Intel® X99" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Intel® X99">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7974">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="616940" langid="1" Value="Compatible chipsets"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240830097" Local_ID="0" Value="Heatsink" CategoryFeature_ID="44903" CategoryFeatureGroup_ID="27909" No="99999" Optional="0" Presentation_Value="Heatsink" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Heatsink">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6392">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="169957" langid="1" Value="Cooling type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813237" Local_ID="0" Value="Gold" CategoryFeature_ID="6140" CategoryFeatureGroup_ID="27909" No="99998" Optional="0" Presentation_Value="Gold" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Gold">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1634">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5097" langid="1" Value="Lead plating"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813231" Local_ID="0" Value="0 - 85" CategoryFeature_ID="6146" CategoryFeatureGroup_ID="1551" No="100095" Optional="0" Presentation_Value="0 - 85 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0 - 85">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1112">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3765" langid="1" Value="Operating temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813232" Local_ID="0" Value="-55 - 100" CategoryFeature_ID="48926" CategoryFeatureGroup_ID="1551" No="100092" Optional="0" Presentation_Value="-55 - 100 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="-55 - 100">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="757">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3045" langid="1" Value="Storage temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813233" Local_ID="0" Value="Y" CategoryFeature_ID="48930" CategoryFeatureGroup_ID="83399" No="99915" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7986">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="617692" langid="1" Value="Windows operating systems supported"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813234" Local_ID="0" Value="Y" CategoryFeature_ID="48931" CategoryFeatureGroup_ID="83399" No="99914" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7987">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="617733" langid="1" Value="Mac operating systems supported"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813235" Local_ID="0" Value="Y" CategoryFeature_ID="48932" CategoryFeatureGroup_ID="83399" No="99913" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7988">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="617774" langid="1" Value="Linux operating systems supported"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813240" Local_ID="0" Value="133.35" CategoryFeature_ID="48923" CategoryFeatureGroup_ID="1549" No="100073" Optional="0" Presentation_Value="133.3 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="133.3">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1649">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5143" langid="1" Value="Width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240829167" Local_ID="0" Value="7.08" CategoryFeature_ID="48924" CategoryFeatureGroup_ID="1549" No="100072" Optional="0" Presentation_Value="7.08 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="7.08">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1650">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5145" langid="1" Value="Depth"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813241" Local_ID="0" Value="34.04" CategoryFeature_ID="48925" CategoryFeatureGroup_ID="1549" No="100071" Optional="0" Presentation_Value="34 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="34">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1464">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4625" langid="1" Value="Height"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813247" Local_ID="0" Value="DIMM" CategoryFeature_ID="36755" CategoryFeatureGroup_ID="31202" No="99900" Optional="0" Presentation_Value="DIMM" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="DIMM">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="4463">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="60405" langid="1" Value="Package type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="240813249" Local_ID="0" Value="288" CategoryFeature_ID="15515" CategoryFeatureGroup_ID="6347" No="100000" Optional="1" Presentation_Value="288" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="288">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1274">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="4089" langid="1" Value="Number of pins"/>
+   </Feature>
+  </ProductFeature>
+  <ProductGallery>
+   <ProductPicture IsMain="Y" LowPic="https://images.icecat.biz/img/gallery_lows/e296223c8c4eb3841b05846411623125f66e2079.jpg" LowPicHeight="125" LowPicWidth="200" LowSize="17129" No="1" Original="https://images.icecat.biz/img/gallery_raw/55bc337d1efff2433ab76b93fd827217cd3546ef.jpeg" OriginalSize="1059083" Pic="https://images.icecat.biz/img/gallery/073ca62b1a74ad805e009059d688662bea6d4303.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/80d726efe0e0b08cc3737e3476c94ca9946926a5.jpg" Pic500x500Height="312" Pic500x500Size="80577" Pic500x500Width="500" PicHeight="1500" PicWidth="2400" ProductPicture_ID="20698545" Size="952616" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/3348da73603fd50f3103c3dc417fe192f4ebffd0.jpg" ThumbSize="1649" Type="ProductImage" UpdatedDate="2024-03-07 15:34:52"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/61174504976fe6382530f55c5f7770b59ace8afb.jpg" LowPicHeight="125" LowPicWidth="200" LowSize="13580" No="2" Original="https://images.icecat.biz/img/gallery_raw/bbc82017ef2037af3f5c5a36a45aa360af7313c3.jpeg" OriginalSize="892168" Pic="https://images.icecat.biz/img/gallery/0491b54d120b92c30e6deee01b344283d414bd52.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/9e36a3c2f58e70c8ca98b1e9dd0641bdaebc00aa.jpg" Pic500x500Height="312" Pic500x500Size="70976" Pic500x500Width="500" PicHeight="1500" PicWidth="2400" ProductPicture_ID="20698546" Size="791227" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/fe0d0d3d1b1f9b99eb9b7f5580a309cbd1fe955d.jpg" ThumbSize="1384" Type="ProductImage" UpdatedDate="2024-03-07 15:34:52"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/06de351789faadf087d98971d6a6719f7feac5a0.jpg" LowPicHeight="125" LowPicWidth="200" LowSize="9971" No="3" Original="https://images.icecat.biz/img/gallery_raw/9446a16421f37d837d238d9993941b9d2e632f84.jpeg" OriginalSize="740961" Pic="https://images.icecat.biz/img/gallery/0c86aeec216a8309e43d310ecddf4d792de3b245.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/37856d27c0b48c5cb6e36355d5fbff11de4e9d9e.jpg" Pic500x500Height="312" Pic500x500Size="54227" Pic500x500Width="500" PicHeight="1500" PicWidth="2400" ProductPicture_ID="20698547" Size="615160" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/886345e8472c03fd35cf9c8bd5400df53bf156a8.jpg" ThumbSize="1114" Type="ProductImage" UpdatedDate="2024-03-07 15:34:52"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/b22f7def60111e32460b344fa22a25ad6b2ddffe.jpg" LowPicHeight="125" LowPicWidth="200" LowSize="9071" No="4" Original="https://images.icecat.biz/img/gallery_raw/1441084fc8114e17b79e012cea272c66289f64a2.jpeg" OriginalSize="683657" Pic="https://images.icecat.biz/img/gallery/55672d452459823489d6bb9ad5c57d3cd47971e6.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/203c58f61bd2036aaf49a69adabaa08e3aaeada4.jpg" Pic500x500Height="312" Pic500x500Size="44851" Pic500x500Width="500" PicHeight="1500" PicWidth="2400" ProductPicture_ID="20698548" Size="559470" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/2fd5cc16366992912d1e42a4d23e5314fc40776b.jpg" ThumbSize="1033" Type="ProductImage" UpdatedDate="2024-03-07 15:34:52"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/21c2101c11cf4a297fdd526cace66d5bac8b35cd.jpg" LowPicHeight="125" LowPicWidth="200" LowSize="8392" No="5" Original="https://images.icecat.biz/img/gallery_raw/5026ad670aeb49d5908e7cd17116de6786a193f9.jpeg" OriginalSize="662861" Pic="https://images.icecat.biz/img/gallery/10288cb5cef00861851fee07b9d170a055887a54.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/dbe66a951b12a40bdbf212fa75319019d3f76d83.jpg" Pic500x500Height="312" Pic500x500Size="40750" Pic500x500Width="500" PicHeight="1500" PicWidth="2400" ProductPicture_ID="20698549" Size="531799" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/7e7d0cc40def20821fcae51f217251b03b3b10f6.jpg" ThumbSize="1063" Type="ProductImage" UpdatedDate="2024-03-07 15:34:52"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/79033b02e591f7d46f703a7304dee174fa182a00.jpg" LowPicHeight="167" LowPicWidth="200" LowSize="31643" No="6" Original="https://images.icecat.biz/img/gallery_raw/fb513ffaf79f2828431865e8fa880a7c0dfc39a4.jpeg" OriginalSize="2038449" Pic="https://images.icecat.biz/img/gallery/8483025a6a0b88d375a8c70e5cef85484c5dd5fe.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/0698661e5ab59b2c953157e651f943f28443ca94.jpg" Pic500x500Height="418" Pic500x500Size="141841" Pic500x500Width="500" PicHeight="2260" PicWidth="2700" ProductPicture_ID="20698550" Size="1920514" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/8b57b66bbb02ffd9d18b85df7b7ece3633782fac.jpg" ThumbSize="2564" Type="ProductImage" UpdatedDate="2024-03-07 15:34:52"/>
+  </ProductGallery>
+  <ProductMultimediaObject>
+   <MultimediaObject ContentType="application/pdf" Date="2018-03-16 13:49:19" Description="leaflet" KeepAsURL="0" MultimediaObject_ID="5230928" Type="leaflet" UUID="2274ee76-f7e7-428e-8153-61576073eefb" langid="1" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="406281" URL="https://objects.icecat.biz/objects/mmo_36132124_1521204559_4078_15214.pdf" Width="0"/>
+  </ProductMultimediaObject>
+  <ProductRelated/>
+  <SummaryDescription>
+   <ShortSummaryDescription langid="1">HyperX FURY HX426C16FB2/8, 8 GB, 1 x 8 GB, DDR4, 2666 MHz, 288-pin DIMM, Black</ShortSummaryDescription>
+   <LongSummaryDescription langid="1">HyperX FURY HX426C16FB2/8. Component for: PC/Server, Internal memory: 8 GB, Memory layout (modules x size): 1 x 8 GB, Internal memory type: DDR4, Memory clock speed: 2666 MHz, Memory form factor: 288-pin DIMM, CAS latency: 16, Product colour: Black</LongSummaryDescription>
+  </SummaryDescription>
+  <Supplier ID="14629" Name="HyperX"/>
+  <CatalogObjectCloud/>
+ </Product>
+</ICECAT-interface>

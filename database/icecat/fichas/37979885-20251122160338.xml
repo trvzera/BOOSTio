@@ -1,0 +1,556 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ICECAT-interface SYSTEM "https://data.icecat.biz/dtd/ICECAT-interface_response.dtd">
+<!--source: Icecat.biz 2026-->
+<!--Language ID: 1-->
+<!--Version: v2-->
+<ICECAT-interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://data.icecat.biz/xsd/ICECAT-interface_response.xsd">
+ <Product Code="1" HighPic="https://images.icecat.biz/img/gallery/c0992ceac40f739dfaec93e6f3f01dbf1faff2a2.jpg" HighPicHeight="1312" HighPicSize="294418" HighPicWidth="1050" ID="37979885" LowPic="https://images.icecat.biz/img/gallery_lows/cebe04937eb5c884ce746b3cfdbf6d8b30856461.jpg" LowPicHeight="200" LowPicSize="21260" LowPicWidth="160" Name="ST8000DM004" IntName="ST8000DM004" LocalName="" Pic500x500="https://images.icecat.biz/img/gallery_mediums/70905570f59e62a2381f4455a6f97046ad0fe931.jpg" Pic500x500Height="500" Pic500x500Size="73131" Pic500x500Width="400" Prod_id="ST8000DM004" Quality="ICECAT" ReleaseDate="" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/a3c686d42fb640d33aa67befddacdff21fe919b7.jpg" ThumbPicSize="5858" Title="Seagate Barracuda ST8000DM004 internal hard drive 8 TB 5400 RPM 256 MB 3.5&quot; Serial ATA III" GeneratedIntTitle="Seagate Barracuda ST8000DM004 internal hard drive" GeneratedLocalTitle="Seagate Barracuda ST8000DM004 internal hard drive 8 TB 5400 RPM 256 MB 3.5&quot; Serial ATA III" BrandLocalTitle="">
+  <CategoryFeatureGroup ID="33406" No="0">
+   <FeatureGroup ID="0">
+    <Name ID="5073" langid="1" Value="Technical details"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="65" No="-1">
+   <FeatureGroup ID="14">
+    <Name ID="5023" langid="1" Value="Weight &amp; dimensions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1594" No="3">
+   <FeatureGroup ID="27">
+    <Name ID="5049" langid="1" Value="Power"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1595" No="1">
+   <FeatureGroup ID="28">
+    <Name ID="5067" langid="1" Value="Operational conditions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="31116" No="-3">
+   <FeatureGroup ID="67">
+    <Name ID="27423" langid="1" Value="Packaging data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="41386" No="0">
+   <FeatureGroup ID="76">
+    <Name ID="28540" langid="1" Value="Certificates"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="49056" No="0">
+   <FeatureGroup ID="116">
+    <Name ID="78852" langid="1" Value="Packaging content"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="53449" No="0">
+   <FeatureGroup ID="143">
+    <Name ID="618812" langid="1" Value="Battery"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="9056" No="-100">
+   <FeatureGroup ID="146">
+    <Name ID="624346" langid="1" Value="Other features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="30622" No="5">
+   <FeatureGroup ID="185">
+    <Name ID="1219853" langid="1" Value="Features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="30609" No="-5">
+   <FeatureGroup ID="198">
+    <Name ID="1788927" langid="1" Value="Logistics data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="59939" No="0">
+   <FeatureGroup ID="232">
+    <Name ID="3464238" langid="1" Value="Supplier features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="79920" No="0">
+   <FeatureGroup ID="279">
+    <Name ID="7392238" langid="1" Value="Sustainability"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <Category ID="219">
+   <Name ID="3727455" langid="1" Value="Internal Hard Drives"/>
+  </Category>
+  <EANCode EAN="0763649094419" Format="GTIN-13" IsApproved="1"/>
+  <EANCode EAN="763649094419" Format="GTIN-12" IsApproved="1"/>
+  <EANCode EAN="8719706003766" Format="GTIN-13" IsApproved="1"/>
+  <EANCode EAN="0691046629722" Format="GTIN-13" IsApproved="1"/>
+  <EANCode EAN="691046629722" Format="GTIN-12" IsApproved="1"/>
+  <EANCode EAN="0763649129548" Format="GTIN-13" IsApproved="1"/>
+  <EANCode EAN="763649129548" Format="GTIN-12" IsApproved="1"/>
+  <ReleaseDate/>
+  <EndOfLifeDate/>
+  <ReasonsToBuy/>
+  <BulletPoints/>
+  <GeneratedBulletPoints>
+   <GeneratedBulletPoint Value="8 TB 3.5&quot; 5400 RPM Serial ATA III" langid="1" No="1"/>
+   <GeneratedBulletPoint Value="Server/workstation HDD" langid="1" No="2"/>
+   <GeneratedBulletPoint Value="Storage drive buffer size: 256 MB" langid="1" No="3"/>
+   <GeneratedBulletPoint Value="630 g" langid="1" No="4"/>
+  </GeneratedBulletPoints>
+  <ProductBundled/>
+  <ProductDescription ID="59043909" LongDesc="&lt;b&gt;Laptop and Mobile Storage&lt;/b&gt;&lt;br&gt;Experience the highest capacity, and the thinnest 2.5-inch hard drive you’ve ever seen. Choose from 500 GB to 2 TB of massive storage for all of your application and data needs along with a slim 7 mm form factor drive that makes system upgrades very easy.&lt;br&gt;&lt;br&gt;&lt;b&gt;External and All-in-One PC Storage&lt;/b&gt;&lt;br&gt;You also have the option of a 2.5-inch, 15 mm form factor drive — in 3 TB, 4 TB and 5 TB capacities — which provides amazing storage for your important and critical work files, as well as those you personally treasure the most. This drive is an excellent solution for taking your external hard drive to the next level or bumping up the storage on your all-in-one or slim PC.&lt;br&gt;&lt;br&gt;&lt;b&gt;3.5-Inch BarraCuda Hard Drives Deliver!&lt;/b&gt;&lt;br&gt;Rock-solid reliability built on over 20 years of BarraCuda innovation. Versatile mix of capacity and price point options to fit any budget. Multi-Tier Caching Technology™ for excellent hard drive performance.&lt;br&gt;&lt;br&gt;&lt;b&gt;Multi-Tier Caching Technology&lt;/b&gt;&lt;br&gt;All hard drives in the BarraCuda family come equipped with Multi-Tier Caching Technology (MTC). MTC takes your PC to new performance levels, so you can load applications and files faster than ever before. By applying intelligent layers of NAND Flash, DRAM and media cache technologies, BarraCuda delivers improved read and write performance by optimising data flow.&lt;br&gt;&lt;br&gt;&lt;b&gt;BarraCuda Pro Comes With 2-year Rescue Data Recovery Service1&lt;/b&gt;&lt;br&gt;Your data matters. And you rely on it. Rescue Data Recovery Plans provide peace of mind for creative pros and performance PC users alike, and now they come standard on BarraCuda Pro. Whether there is a hard drive mechanical issue or something accidently happened to your drive, Seagate has got you covered.&lt;br&gt;&lt;br&gt;Purchase and register an BarraCuda Pro drive to activate your free Rescue plan and you are covered for 2 years. Extended coverage options available at registration.&lt;br&gt;&lt;br&gt;&lt;b&gt;Trusted Dependability&lt;/b&gt;&lt;br&gt;The BarraCuda family of reliable hard drives is here to stay, for years to come.&lt;br&gt;&lt;br&gt;- Experience — For more than 20 years, Seagate has manufactured and delivered the super-reliable BarraCuda family of drives&lt;br&gt;- BarraCuda — Seagate's drive-reliability data simply speaks for itself, and the BarraCuda family is often recognised by leading publications and customers" ManualPDFSize="824959" ManualPDFURL="https://objects.icecat.biz/objects/mmo_37979885_1507135018_2933_426.pdf" MiddleDesc="Versatile. Fast. Dependable. Seagate’s BarraCuda hard drives are perfect for laptop storage, mobile storage, all-in-one storage and more." PDFSize="0" PDFURL="" ShortDesc="Barracuda 8TB, SATA3, 5400RPM, 256MB" URL="http://www.seagate.com" WarrantyInfo="2 year" langid="1"/>
+  <ProductFamily ID="24" LowPic="" ThumbPic="">
+   <Name ID="9771" langid="1" Value="Barracuda"/>
+  </ProductFamily>
+  <ProductFeature Localized="0" ID="255597394" Local_ID="0" Value="8000" CategoryFeature_ID="3684" CategoryFeatureGroup_ID="30622" No="10100150" Optional="0" Presentation_Value="8 TB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="8">
+    <Measure ID="159">
+     <Signs>
+      <Sign ID="2983" langid="1"><![CDATA[TB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1299" langid="1" Value="HDD capacity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188753" Local_ID="0" Value="5400" CategoryFeature_ID="15510" CategoryFeatureGroup_ID="30622" No="10100120" Optional="0" Presentation_Value="5400 RPM" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="5400">
+    <Measure ID="28">
+     <Signs>
+      <Sign ID="12" langid="1"><![CDATA[RPM]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="430">
+    <Measure ID="28" Sign="">
+     <Signs>
+      <Sign ID="12" langid="1"><![CDATA[RPM]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2227" langid="1" Value="HDD speed"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188754" Local_ID="0" Value="3.5" CategoryFeature_ID="18866" CategoryFeatureGroup_ID="30622" No="10100099" Optional="0" Presentation_Value="3.5&quot;" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="3.5">
+    <Measure ID="16">
+     <Signs>
+      <Sign ID="11" langid="1"><![CDATA["]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1926">
+    <Measure ID="16" Sign="">
+     <Signs>
+      <Sign ID="11" langid="1"><![CDATA["]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5943" langid="1" Value="HDD size"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256175724" Local_ID="0" Value="Serial ATA III" CategoryFeature_ID="48092" CategoryFeatureGroup_ID="30622" No="10100096" Optional="0" Presentation_Value="Serial ATA III" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Serial ATA III">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="21">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1341" langid="1" Value="Interface"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188759" Local_ID="0" Value="HDD" CategoryFeature_ID="296233" CategoryFeatureGroup_ID="30622" No="10100094" Optional="0" Presentation_Value="HDD" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="HDD">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="31">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1375" langid="1" Value="Type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188755" Local_ID="0" Value="Server/Workstation" CategoryFeature_ID="194638" CategoryFeatureGroup_ID="30622" No="10100093" Optional="0" Presentation_Value="Server/workstation" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Server/workstation">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9163">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="763709" langid="1" Value="Component for"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188756" Local_ID="0" Value="256" CategoryFeature_ID="296216" CategoryFeatureGroup_ID="30622" No="100100" Optional="0" Presentation_Value="256 MB" Translated="0" Mandatory="1" Searchable="0">
+   <LocalValue Value="256">
+    <Measure ID="19">
+     <Signs>
+      <Sign ID="15506" langid="1"><![CDATA[MB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="37958">
+    <Measure ID="19" Sign="">
+     <Signs>
+      <Sign ID="15506" langid="1"><![CDATA[MB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5147439" langid="1" Value="Storage drive buffer size"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188769" Local_ID="0" Value="220" CategoryFeature_ID="105056" CategoryFeatureGroup_ID="30622" No="100084" Optional="0" Presentation_Value="220 MiB/s" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="220">
+    <Measure ID="266">
+     <Signs>
+      <Sign ID="16025" langid="1"><![CDATA[MiB/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="17980">
+    <Measure ID="266" Sign="">
+     <Signs>
+      <Sign ID="16025" langid="1"><![CDATA[MiB/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1325841" langid="1" Value="HDD sustained transfer rate"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188774" Local_ID="0" Value="6.8" CategoryFeature_ID="13699" CategoryFeatureGroup_ID="1594" No="100008" Optional="0" Presentation_Value="6.8 W" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="6.8">
+    <Measure ID="44">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="445">
+    <Measure ID="44" Sign="">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2257" langid="1" Value="Power consumption (typical)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188776" Local_ID="0" Value="0.8" CategoryFeature_ID="17108" CategoryFeatureGroup_ID="1594" No="100006" Optional="0" Presentation_Value="0.8 W" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0.8">
+    <Measure ID="44">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2036">
+    <Measure ID="44" Sign="">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="9104" langid="1" Value="Power consumption (standby)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188777" Local_ID="0" Value="0.8" CategoryFeature_ID="17250" CategoryFeatureGroup_ID="1594" No="100004" Optional="0" Presentation_Value="0.8 W" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0.8">
+    <Measure ID="44">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2035">
+    <Measure ID="44" Sign="">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="9101" langid="1" Value="Power consumption (PowerSave)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188780" Local_ID="0" Value="4.5" CategoryFeature_ID="40632" CategoryFeatureGroup_ID="1594" No="100000" Optional="0" Presentation_Value="4.5 W" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="4.5">
+    <Measure ID="44">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6467">
+    <Measure ID="44" Sign="">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="177065" langid="1" Value="Power consumption (idle)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="302340021" Local_ID="0" Value="5 / 12" CategoryFeature_ID="1085500" CategoryFeatureGroup_ID="1594" No="99999" Optional="0" Presentation_Value="5 / 12 V" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="5 / 12">
+    <Measure ID="42">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="48762">
+    <Measure ID="42" Sign="">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="9307140" langid="1" Value="Operating voltage"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188786" Local_ID="0" Value="1.8" CategoryFeature_ID="17246" CategoryFeatureGroup_ID="1594" No="99998" Optional="0" Presentation_Value="1.8 A" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1.8">
+    <Measure ID="41">
+     <Signs>
+      <Sign ID="25" langid="1"><![CDATA[A]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2964">
+    <Measure ID="41" Sign="">
+     <Signs>
+      <Sign ID="25" langid="1"><![CDATA[A]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="28252" langid="1" Value="Start-up current"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188757" Local_ID="0" Value="0 - 60" CategoryFeature_ID="5577" CategoryFeatureGroup_ID="1595" No="99989" Optional="0" Presentation_Value="0 - 60 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0 - 60">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1112">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3765" langid="1" Value="Operating temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188758" Local_ID="0" Value="-40 - 70" CategoryFeature_ID="17248" CategoryFeatureGroup_ID="1595" No="99988" Optional="0" Presentation_Value="-40 - 70 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="-40 - 70">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="757">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3045" langid="1" Value="Storage temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188760" Local_ID="0" Value="101.85" CategoryFeature_ID="16567" CategoryFeatureGroup_ID="65" No="100040" Optional="0" Presentation_Value="101.8 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="101.8">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1649">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5143" langid="1" Value="Width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188762" Local_ID="0" Value="26.11" CategoryFeature_ID="8681" CategoryFeatureGroup_ID="65" No="100000" Optional="0" Presentation_Value="26.1 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="26.1">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1464">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4625" langid="1" Value="Height"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188763" Local_ID="0" Value="146.99" CategoryFeature_ID="16569" CategoryFeatureGroup_ID="65" No="100000" Optional="0" Presentation_Value="147 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="147">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1650">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5145" langid="1" Value="Depth"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="256188766" Local_ID="0" Value="630" CategoryFeature_ID="3853" CategoryFeatureGroup_ID="65" No="99999" Optional="0" Presentation_Value="630 g" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="630">
+    <Measure ID="38">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="94">
+    <Measure ID="38" Sign="">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1525" langid="1" Value="Weight"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494624816" Local_ID="0" Value="84717050" CategoryFeature_ID="905377" CategoryFeatureGroup_ID="30609" No="100000" Optional="0" Presentation_Value="84717050" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="84717050">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="23731">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1903598" langid="1" Value="Harmonized System (HS) code"/>
+   </Feature>
+  </ProductFeature>
+  <ProductGallery>
+   <ProductPicture IsMain="Y" LowPic="https://images.icecat.biz/img/gallery_lows/cebe04937eb5c884ce746b3cfdbf6d8b30856461.jpg" LowPicHeight="200" LowPicWidth="160" LowSize="21260" No="1" Original="https://images.icecat.biz/img/gallery_raw/30d813b9f0ec2af3c7d0ec8185a82feba13c45b2.jpeg" OriginalSize="291929" Pic="https://images.icecat.biz/img/gallery/c0992ceac40f739dfaec93e6f3f01dbf1faff2a2.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/70905570f59e62a2381f4455a6f97046ad0fe931.jpg" Pic500x500Height="500" Pic500x500Size="73131" Pic500x500Width="400" PicHeight="1312" PicWidth="1050" ProductPicture_ID="35169365" Size="294418" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/a3c686d42fb640d33aa67befddacdff21fe919b7.jpg" ThumbSize="5858" Type="ProductImage" UpdatedDate="2019-11-11 12:59:26"/>
+  </ProductGallery>
+  <ProductMultimediaObject>
+   <MultimediaObject ContentType="application/pdf" Date="2017-10-04 18:36:58" Description="manual pdf" KeepAsURL="0" MultimediaObject_ID="6188037" Type="manual pdf" UUID="5BC6A1D3-E931-477C-BF41-8CEA1C536D2E" langid="1" Source="http://www.seagate.com/www-content/product-content/barracuda-fam/barracuda-new/en-us/docs/100805918d.pdf" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="824959" URL="https://objects.icecat.biz/objects/mmo_37979885_1507135018_2933_426.pdf" Width="0"/>
+   <MultimediaObject ContentType="application/pdf" Date="2023-10-03 13:06:09" Description="Generated PDF" KeepAsURL="0" MultimediaObject_ID="0" Type="leaflet" UUID="00000000-0000-0000-0000-000000000000" langid="1" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="0" URL="https://icecat.biz/rest/product-pdf?productId=37979885&amp;lang=en" Width="0"/>
+  </ProductMultimediaObject>
+  <ProductRelated/>
+  <SummaryDescription>
+   <ShortSummaryDescription langid="1">Seagate Barracuda ST8000DM004, 8 TB, 5400 RPM, 256 MB, 3.5&quot;, Serial ATA III</ShortSummaryDescription>
+   <LongSummaryDescription langid="1">Seagate Barracuda ST8000DM004. HDD capacity: 8 TB, HDD speed: 5400 RPM, Storage drive buffer size: 256 MB, HDD size: 3.5&quot;, Interface: Serial ATA III</LongSummaryDescription>
+  </SummaryDescription>
+  <Supplier ID="27" Name="Seagate"/>
+  <CatalogObjectCloud>
+   <ProductPage QRCodeURL="https://qr.icecat.biz/coc/79c783ed-ea4b-4e5b-a56e-f25828aaef1a" URL="https://coc.icecat.biz/79c783ed-ea4b-4e5b-a56e-f25828aaef1a"/>
+  </CatalogObjectCloud>
+  <Reviews>
+   <Review ID="1785267" langid="1" Score="0" Published="2018-12-01" Author="Bohs">
+    <URL IsActive="1">https://www.eteknix.com/seagate-barracuda-pro-14tb-desktop-hdd-review/</URL>
+    <Comment>Today it is time to take a look at the next Guardian-series drive, Seagate‘s new 14TB BarraCuda Pro (product flyer) desktop HDD. This is just one of the many new 14TB Seagate drives. We've already had a look at the IronWolf Pro, and there are more to come...</Comment>
+    <Good>Impressive Performance, Large 14TB Capacity, 5-year Warranty, Included 2-Year Recovery Service, Rated for 300TB/year workload and 24/7 usage,</Good>
+    <Bad>Not having one, “Seagate shows us that traditional desktop drives aren’t dead. The BarraCuda Pro delivers performance, endurance, and safety – and now it does so with 14TB capacity.”, Seagate BarraCuda Pro 14TB Desktop HDD Review, We would like to thank,...</Bad>
+    <Bottomline>I always enter a desktop HDD review with mixed feelings. Not because I expect something bad, but rather because I'm used to dealing with blazing fast NVMe drives and RAID setups daily. That said, the Seagate BarraCuda Pro 14TB doesn't need to hide from an...</Bottomline>
+   </Review>
+   <Review ID="1785268" langid="1" Score="0" Published="2018-04-11" Author="Tomas">
+    <URL IsActive="0">http://uk.hardware.info/reviews/7982/64-35-inch-hard-drive-round-up-storage-wars</URL>
+    <Comment>For storage of lots of data, a hard drive is the best option for the time being, especially now that SSD prices are rising rather than falling. Luckily there is still enough innovation in the hard disk field. Time for a new comparative test with no less t...</Comment>
+    <Good></Good>
+    <Bad></Bad>
+    <Bottomline>Despite the fact that there are only three hard disk drive manufacturers left, you have a lot to choose from when you're looking for a new drive. It is not just about prices either. Though SSDs have outperformed hard drives for a long time now, there are...</Bottomline>
+   </Review>
+   <Review ID="1785269" langid="1" Score="0" Published="2018-04-11" Author="Tomas">
+    <URL IsActive="0">http://uk.hardware.info/reviews/7982/64-35-inch-hard-drive-round-up-storage-wars</URL>
+    <Comment>For storage of lots of data, a hard drive is the best option for the time being, especially now that SSD prices are rising rather than falling. Luckily there is still enough innovation in the hard disk field. Time for a new comparative test with no less t...</Comment>
+    <Good></Good>
+    <Bad></Bad>
+    <Bottomline>Despite the fact that there are only three hard disk drive manufacturers left, you have a lot to choose from when you're looking for a new drive. It is not just about prices either. Though SSDs have outperformed hard drives for a long time now, there are...</Bottomline>
+   </Review>
+   <Review ID="1785270" langid="1" Score="0" Published="2018-04-11" Author="Tomas">
+    <URL IsActive="0">http://uk.hardware.info/reviews/7982/64-35-inch-hard-drive-round-up-storage-wars</URL>
+    <Comment>For storage of lots of data, a hard drive is the best option for the time being, especially now that SSD prices are rising rather than falling. Luckily there is still enough innovation in the hard disk field. Time for a new comparative test with no less t...</Comment>
+    <Good></Good>
+    <Bad></Bad>
+    <Bottomline>Despite the fact that there are only three hard disk drive manufacturers left, you have a lot to choose from when you're looking for a new drive. It is not just about prices either. Though SSDs have outperformed hard drives for a long time now, there are...</Bottomline>
+   </Review>
+   <Review ID="1785271" langid="1" Score="0" Published="2018-01-30" Author="Chris">
+    <URL IsActive="1">https://www.tomshardware.com/uk/reviews/seagate-barracuda-pro-10tb-hdd,5210.html</URL>
+    <Comment>Seagate released the Guardian Series in mid-2016 with a focus on high performance, capacity, and reliability. Seagate designed its flagship desktop HDD for creative professionals, enthusiasts, and gamers. It features a speedy 7,200-RPM design with up to 1...</Comment>
+    <Good></Good>
+    <Bad></Bad>
+    <Bottomline>Seagate gained a bad reputation for disk failures over the last few years, but the failures weren't entirely Seagate's fault. For many years large retailers shipped drives in substandard packaging. It was common to wrap a drive with bubble wrap and toss i...</Bottomline>
+   </Review>
+   <Review ID="1785272" langid="1" Score="0" Published="2017-12-13" Author="Tomas">
+    <URL IsActive="0">https://uk.hardware.info/reviews/7732/seagate-barracuda-pro-12tb-review-the-biggest-hard-drive-ever</URL>
+    <Comment>In the summer of last year we finally went into the double digits in terms of storage capacity of 3.5&quot;-hard disks. At the last moment of 2017 Seagate takes the next step, because the manufacturer sent us the first hard drive with a storage capacity of 12T...</Comment>
+    <Good></Good>
+    <Bad></Bad>
+    <Bottomline>It is always a race for who can deliver the first hard drive with a higher capacity to the Hardware.Info test lab. This time it is Seagate to win it and they do it with style. The Barracuda Pro 12TB is not only the biggest, but also the fastest hard drive...</Bottomline>
+   </Review>
+   <Review ID="1785273" langid="1" Score="80" Published="2017-11-08" Author="Simon">
+    <URL IsActive="1">https://www.kitguru.net/components/hard-drives/simon-crisp/seagate-barracuda-pro-12tb-hdd-review/</URL>
+    <Comment>Seagate's BarraCuda Pro line of hard drives are designed for high-performance desktop and gaming use. The new flagship drive of the range is recently released 12TB model and while there are larger capacity drives in the enterprise segment, this is the hig...</Comment>
+    <Good>Huge capacity, 5-year warranty</Good>
+    <Bad>Expensive, Kitguru says: The demand for cheap storage shows no sign of slowing down and Seagate's new 12TB BarraCuda Pro may not be that cheap at first glance for a standard hard drive but it is offering a huge amount of capacity in a single drive, Rati...</Bad>
+    <Bottomline>Seagate's standard BarraCuda desktop hard drive range ends at 4TB, the BarraCuda Pro range however, goes way past this to the new flagship of the lineup, the leviathan 12TB drive. Although there are even bigger drives to be had in the enterprise segment...</Bottomline>
+   </Review>
+   <Review ID="1785274" langid="1" Score="0" Published="2017-07-21" Author="Tomas">
+    <URL IsActive="0">https://uk.hardware.info/reviews/7457/seagate-barracuda-4tb-st4000dm005-review</URL>
+    <Comment>Last year, both WD and Seagate refreshed their hard drive series for desktop use. Back then we were positive about the new WD Blue 4TB, but we did not have to wait long for Seagate to answer. Today we test the Seagate Barracuda 4TB (ST4000DM005): how doe...</Comment>
+    <Good></Good>
+    <Bad></Bad>
+    <Bottomline>The latest iteration of the Seagate Barracuda 4TB leaves a good impression. The latest model is faster than its predecessor, but still not noisy. The WD Blue 4TB is just as quiet but clearly slower, while the Toshiba drives offer similar performance at hi...</Bottomline>
+   </Review>
+   <Review ID="1785275" langid="1" Score="0" Published="2017-03-31" Author="Farzin">
+    <URL IsActive="0">https://uk.hardware.info/reviews/7208/10tb-hdd-review-five-models-compared</URL>
+    <Comment>The highest capacity of currently available hard drives is 10 TB, that are suited for those who want to put a single hard drive in their system despite their high price- or if you are using a NAS with a limited amount of bays. In this article we compare f...</Comment>
+    <Good></Good>
+    <Bad></Bad>
+    <Bottomline>Hard drives of 10 TB are very expensive, with prices that start at an average of about 372 pounds / 430 euros, but the test results are excellent. All drives in the test are fast, and in part thanks to the used helium they are primarily quiet in idle – an...</Bottomline>
+   </Review>
+   <Review ID="1785276" langid="1" Score="0" Published="2016-10-31" Author="Farzin">
+    <URL IsActive="0">http://uk.hardware.info/reviews/6975/22-6-10tb-hard-drives-review-one-drive-a-lot-of-storage</URL>
+    <Comment>While the price of SSDs continues to drop, the ‘old' hard drive is still the cheapest way to store a lot of data. Especially in a NAS or Mini-ITX system, where there is limited physical space you probably want a drive with as much capacity as possible...</Comment>
+    <Good></Good>
+    <Bad></Bad>
+    <Bottomline>We are starting this conclusion with the 6TB-drives. The Toshiba MD04ACA 6TB and X300 6TB offer good performance in this segment for a relatively low price, but are clearly audible with noise levels that are nearly at 40 dB(A) when idle. Nevertheless th...</Bottomline>
+   </Review>
+   <Review ID="1785277" langid="1" Score="0" Published="2015-06-16">
+    <URL IsActive="0">https://uk.hardware.info/reviews/6101/54-hdds-and-sshds-reviewed-the-best-drives-for-your-desktop-laptop-and-nas</URL>
+    <Comment>Now that the prices of SSDs have dropped to well below 50 cents per GB, we expect that only few Hardware.Info readers will still want to use a conventional hard drive as their primary storage device. We still can't quite live without them, however, beca...</Comment>
+    <Good></Good>
+    <Bad></Bad>
+    <Bottomline></Bottomline>
+   </Review>
+   <Review ID="1785278" langid="1" Score="0" Published="2013-10-11" Author="Koen">
+    <URL IsActive="0">https://uk.hardware.info/reviews/4884/42x-35-inch-and-25-inch-hard-disk-group-test-lots-of-affordable-storage</URL>
+    <Comment>Most of our avid readers of course have at least one SSD in their desktop and laptop, but for large volume storage you're still relegated to conventional hard disks. It's almost become a negative connotation - 'conventional' - and it really doesn't do t...</Comment>
+    <Good></Good>
+    <Bad></Bad>
+    <Bottomline></Bottomline>
+   </Review>
+   <Review ID="1785279" langid="1" Score="0" Published="2012-12-06" Author="Koen">
+    <URL IsActive="0">https://uk.hardware.info/reviews/3558/25-35-inch-hard-disk-round-up-battle-of-the-terabytes</URL>
+    <Comment>SSDs are of course the hippest and fastest form of storage, but if you want lots of storage capacity without breaking the bank, you're still relegated to the familiar realm of the hard disk. There's still some choice out there in this category, and pric...</Comment>
+    <Good></Good>
+    <Bad></Bad>
+    <Bottomline></Bottomline>
+   </Review>
+   <Review ID="1785280" langid="1" Score="0" Published="2012-08-13" Author="Koen">
+    <URL IsActive="0">https://uk.hardware.info/reviews/2997/seagate-barracuda-720014-2tb-hard-disk-review-extremely-fast-7200-rpm-hard-drive</URL>
+    <Comment>At the start of 2012 Seagate launched a new series of 3.5-inch hard drives, called the Barracuda 7200.14. These are interesting because they have 1 TB platters, which is a new milestone. The high data-density has two advantages, more MB per square centi...</Comment>
+    <Good></Good>
+    <Bad></Bad>
+    <Bottomline>The performance of the Barracuda 7200.14 is simply outstanding. It belongs to the fastest 7200rpm hard drives that are currently available. Not only that, the disk is also more affordable than the high-end 7200rpm 2TB drives from other brands. In a fut...</Bottomline>
+   </Review>
+  </Reviews>
+ </Product>
+</ICECAT-interface>

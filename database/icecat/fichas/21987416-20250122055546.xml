@@ -1,0 +1,1802 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ICECAT-interface SYSTEM "https://data.icecat.biz/dtd/ICECAT-interface_response.dtd">
+<!--source: Icecat.biz 2026-->
+<!--Language ID: 1-->
+<!--Version: v2-->
+<ICECAT-interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://data.icecat.biz/xsd/ICECAT-interface_response.xsd">
+ <Product Code="1" HighPic="https://images.icecat.biz/img/gallery/a293ad5849346de1b27c717b6b26fa0d2108548f.jpg" HighPicHeight="506" HighPicSize="93227" HighPicWidth="819" ID="21987416" LowPic="https://images.icecat.biz/img/gallery_lows/2481b6545d2b65db23b50dfe4887f5618a20eaf8.jpg" LowPicHeight="124" LowPicSize="11657" LowPicWidth="200" Name="X45U" IntName="X45U" LocalName="" Pic500x500="https://images.icecat.biz/img/gallery_mediums/29cd5acbb0f76eb4e05cf4b5c5fe1f0cb501c6d3.jpg" Pic500x500Height="309" Pic500x500Size="45155" Pic500x500Width="500" Prod_id="X45U-MPR4-H" Quality="ICECAT" ReleaseDate="" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/eeb35fe2a00a68dc2ae60069ef1eaf247d812a75.jpg" ThumbPicSize="3098" Title="ASUS X45U AMD E E2-1800 Laptop 35.6 cm (14&quot;) HD 4 GB DDR3-SDRAM 500 GB HDD Windows 8 Black" GeneratedIntTitle="ASUS X45U" GeneratedLocalTitle="ASUS X45U AMD E E2-1800 Laptop 35.6 cm (14&quot;) HD 4 GB DDR3-SDRAM 500 GB HDD Windows 8 Black" BrandLocalTitle="">
+  <CategoryFeatureGroup ID="269" No="-100">
+   <FeatureGroup ID="0">
+    <Name ID="5073" langid="1" Value="Technical details"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="35" No="200">
+   <FeatureGroup ID="1">
+    <Name ID="1222500" langid="1" Value="Processor"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="107" No="0">
+   <FeatureGroup ID="2">
+    <Name ID="1222498" langid="1" Value="Hard drive"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="106" No="190">
+   <FeatureGroup ID="3">
+    <Name ID="4863" langid="1" Value="Memory"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="32" No="125">
+   <FeatureGroup ID="4">
+    <Name ID="4865" langid="1" Value="Optical drive"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="33" No="300">
+   <FeatureGroup ID="5">
+    <Name ID="4867" langid="1" Value="Display"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="110" No="140">
+   <FeatureGroup ID="9">
+    <Name ID="4977" langid="1" Value="Audio"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="36" No="110">
+   <FeatureGroup ID="12">
+    <Name ID="4995" langid="1" Value="Ports &amp; interfaces"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="108" No="30">
+   <FeatureGroup ID="14">
+    <Name ID="5023" langid="1" Value="Weight &amp; dimensions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="109" No="55">
+   <FeatureGroup ID="27">
+    <Name ID="5049" langid="1" Value="Power"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1403" No="33">
+   <FeatureGroup ID="28">
+    <Name ID="5067" langid="1" Value="Operational conditions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="762" No="90">
+   <FeatureGroup ID="31">
+    <Name ID="5075" langid="1" Value="Keyboard"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1711" No="120">
+   <FeatureGroup ID="35">
+    <Name ID="5167" langid="1" Value="Network"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="2684" No="0">
+   <FeatureGroup ID="45">
+    <Name ID="5641" langid="1" Value="Video"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="4124" No="178">
+   <FeatureGroup ID="47">
+    <Name ID="8858" langid="1" Value="Storage"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="6416" No="25">
+   <FeatureGroup ID="67">
+    <Name ID="27423" langid="1" Value="Packaging data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="2686" No="50">
+   <FeatureGroup ID="75">
+    <Name ID="27867" langid="1" Value="Security"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="2687" No="32">
+   <FeatureGroup ID="76">
+    <Name ID="28540" langid="1" Value="Certificates"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="2933" No="80">
+   <FeatureGroup ID="90">
+    <Name ID="30562" langid="1" Value="Software"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="3024" No="130">
+   <FeatureGroup ID="95">
+    <Name ID="31282" langid="1" Value="Camera"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="26489" No="-5">
+   <FeatureGroup ID="116">
+    <Name ID="78852" langid="1" Value="Packaging content"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="7946" No="60">
+   <FeatureGroup ID="143">
+    <Name ID="618812" langid="1" Value="Battery"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="26477" No="63">
+   <FeatureGroup ID="144">
+    <Name ID="619994" langid="1" Value="Brand-specific features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="6417" No="-100">
+   <FeatureGroup ID="146">
+    <Name ID="624346" langid="1" Value="Other features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="10674" No="1000">
+   <FeatureGroup ID="148">
+    <Name ID="630457" langid="1" Value="Design"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="8602" No="150">
+   <FeatureGroup ID="163">
+    <Name ID="764413" langid="1" Value="Graphics"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="10385" No="65">
+   <FeatureGroup ID="183">
+    <Name ID="1210971" langid="1" Value="Processor special features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="10675" No="100">
+   <FeatureGroup ID="184">
+    <Name ID="1218765" langid="1" Value="Performance"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="20050" No="6">
+   <FeatureGroup ID="185">
+    <Name ID="1219853" langid="1" Value="Features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="12758" No="40">
+   <FeatureGroup ID="189">
+    <Name ID="1423897" langid="1" Value="Docking station"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="26515" No="-10">
+   <FeatureGroup ID="198">
+    <Name ID="1788927" langid="1" Value="Logistics data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="32213" No="0">
+   <FeatureGroup ID="232">
+    <Name ID="3464238" langid="1" Value="Supplier features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="26889" No="28">
+   <FeatureGroup ID="241">
+    <Name ID="3659372" langid="1" Value="Additional design features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="26890" No="27">
+   <FeatureGroup ID="242">
+    <Name ID="3660182" langid="1" Value="Tests &amp; awards"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="27530" No="24">
+   <FeatureGroup ID="247">
+    <Name ID="4089916" langid="1" Value="Recycling data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="72246" No="31">
+   <FeatureGroup ID="279">
+    <Name ID="7392238" langid="1" Value="Sustainability"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="77985" No="0">
+   <FeatureGroup ID="305">
+    <Name ID="8837290" langid="1" Value="Carbon footprint"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="78321" No="198">
+   <FeatureGroup ID="306">
+    <Name ID="9064014" langid="1" Value="Neural processor unit (NPU)"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <Category ID="151">
+   <Name ID="3727418" langid="1" Value="Laptops"/>
+  </Category>
+  <EANCode/>
+  <FeatureLogo ID="1241" Feature_ID="1230" Value="y" LogoPic="https://images.icecat.biz/img/feature_logo/1241-3059.png" Width="0" Height="0" Size="0">
+   <Descriptions>
+    <Description ID="5807" langid="1">DIRECTIVE (EU) 2022/2380 OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL of 23 November 2022 (Part III)</Description>
+   </Descriptions>
+   <FeatureLogoFeatures>
+    <FeatureLogoFeature ID="1230">
+     <FeatureLogoValues>
+      <FeatureLogoValue ID="5863">y</FeatureLogoValue>
+     </FeatureLogoValues>
+    </FeatureLogoFeature>
+   </FeatureLogoFeatures>
+  </FeatureLogo>
+  <ReleaseDate/>
+  <EndOfLifeDate/>
+  <ReasonsToBuy/>
+  <BulletPoints/>
+  <GeneratedBulletPoints>
+   <GeneratedBulletPoint Value="Laptop Clamshell Black" langid="1" No="1"/>
+   <GeneratedBulletPoint Value="AMD E E2-1800 1.7 GHz Processor cores: 2" langid="1" No="2"/>
+   <GeneratedBulletPoint Value="35.6 cm (14&quot;) HD 1366 x 768 pixels LED backlight 16:9" langid="1" No="3"/>
+   <GeneratedBulletPoint Value="4 GB DDR3-SDRAM 1333 MHz 1 x 4 GB" langid="1" No="4"/>
+   <GeneratedBulletPoint Value="500 GB HDD DVD Super Multi" langid="1" No="5"/>
+   <GeneratedBulletPoint Value="AMD Radeon HD 7340" langid="1" No="6"/>
+   <GeneratedBulletPoint Value="Ethernet LAN 10,100,1000 Mbit/s" langid="1" No="7"/>
+   <GeneratedBulletPoint Value="Lithium-Ion (Li-Ion) 47 Wh 65 W" langid="1" No="8"/>
+   <GeneratedBulletPoint Value="Windows 8 64-bit" langid="1" No="9"/>
+  </GeneratedBulletPoints>
+  <ProductBundled/>
+  <ProductDescription ID="41024805" LongDesc="&lt;b&gt;Classic cover design&lt;/b&gt;&lt;br&gt;The ASUS X45U features an indigo color with a square-wave glossy pattern on cover and palm rest areas for a truly personal style.&lt;br&gt;&lt;br&gt;&lt;b&gt;Stay comfortable with IceCool technology&lt;/b&gt;&lt;br&gt;Exclusive ASUS engineering has created a unique internal layout that keeps heat away from palm rests and from users. Always below body temperature, palm rests feel cool to the touch, and are therefore more comfortable to use even during long sessions.&lt;br&gt;&lt;br&gt;&lt;b&gt;Smartphone-like responsiveness with instant on*&lt;/b&gt;&lt;br&gt;Only ASUS notebooks offer you true 2-second instant on resume from sleep or hibernate, cutting out long reboot times and putting you back to work or enjoyment right where you left off. Thanks to ASUS Super Hybrid Engine II technology, you also get up to 10 days of standby, with auto data backup should battery charge drop to 5% or less.&lt;br&gt;&lt;br&gt;&lt;b&gt;SonicMaster Lite audio amazement&lt;/b&gt;&lt;br&gt;Exclusive ASUS sound enhancement turns the new X Series into highly capable multimedia notebooks, with the best sound in their class: more power, wider range, and improved clarity combine to offer a more satisfying multimedia experience.&lt;br&gt;&lt;br&gt;&lt;b&gt;Powerful performance&lt;/b&gt;&lt;br&gt;Equipped with new AMD Brazos technology, the ASUS X45U delivers the best mobile performance and multitasking capabilities in its class for both work and play.&lt;br&gt;&lt;br&gt;&lt;b&gt;SonicMaster Lite audio amazement&lt;/b&gt;&lt;br&gt;Now standard on X Series notebooks, USB 3.0 transfers data up to ten times faster than USB 2.0, leading to quicker backups and access. When even a 25GB Blu-ray HD movie takes just 70 seconds to transfer, you can really say goodbye to long-wait frustrations." ManualPDFSize="0" ManualPDFURL="" MiddleDesc="" PDFSize="0" PDFURL="" ShortDesc="14&quot;, AMD Dual Core E2-1800 1.7 GHz, 4GB DDR3 RAM, 500GB HDD, Wi-Fi, Gigabit Lan, Windows 8 64 bit" URL="http://www.asus.com/Notebooks_Ultrabooks/X45U/#specifications" WarrantyInfo="" langid="1"/>
+  <ProductFeature Localized="0" ID="153939054" Local_ID="0" Value="Notebook" CategoryFeature_ID="101037" CategoryFeatureGroup_ID="10674" No="10100100" Optional="0" Presentation_Value="Laptop" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Laptop">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="14052">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1127664" langid="1" Value="Product type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939055" Local_ID="0" Value="Black" CategoryFeature_ID="29776" CategoryFeatureGroup_ID="10674" No="10100021" Optional="0" Presentation_Value="Black" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Black">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1766">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5487" langid="1" Value="Product colour"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939056" Local_ID="0" Value="Clamshell" CategoryFeature_ID="4692" CategoryFeatureGroup_ID="10674" No="100018" Optional="0" Presentation_Value="Clamshell" Translated="1" Mandatory="1" Searchable="0">
+   <LocalValue Value="Clamshell">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="771">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="3073" langid="1" Value="Form factor"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939081" Local_ID="0" Value="14" CategoryFeature_ID="2787" CategoryFeatureGroup_ID="33" No="10100085" Optional="0" Presentation_Value="35.6 cm (14&quot;)" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="35.6">
+    <Measure ID="34">
+     <Signs>
+      <Sign ID="18" langid="1"><![CDATA[cm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="944">
+    <Measure ID="16" Sign="">
+     <Signs>
+      <Sign ID="11" langid="1"><![CDATA["]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3429" langid="1" Value="Display diagonal"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939082" Local_ID="0" Value="1366 x 768" CategoryFeature_ID="9350" CategoryFeatureGroup_ID="33" No="10100084" Optional="0" Presentation_Value="1366 x 768 pixels" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="1366 x 768">
+    <Measure ID="39">
+     <Signs>
+      <Sign ID="23" langid="1"><![CDATA[pixels]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1585">
+    <Measure ID="39" Sign="">
+     <Signs>
+      <Sign ID="23" langid="1"><![CDATA[pixels]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4927" langid="1" Value="Display resolution"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939083" Local_ID="0" Value="N" CategoryFeature_ID="36303" CategoryFeatureGroup_ID="33" No="10100083" Optional="0" Presentation_Value="No" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="4963">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="61603" langid="1" Value="Touchscreen"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939085" Local_ID="0" Value="HD" CategoryFeature_ID="149038" CategoryFeatureGroup_ID="33" No="100081" Optional="0" Presentation_Value="HD" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="HD">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="11424">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1045472" langid="1" Value="HD type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939084" Local_ID="0" Value="Y" CategoryFeature_ID="36493" CategoryFeatureGroup_ID="33" No="100041" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6784">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="294044" langid="1" Value="LED backlight"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939086" Local_ID="0" Value="16:9" CategoryFeature_ID="684414" CategoryFeatureGroup_ID="33" No="100041" Optional="0" Presentation_Value="16:9" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="16:9">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="11417">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1045266" langid="1" Value="Native aspect ratio"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939058" Local_ID="0" Value="AMD E" CategoryFeature_ID="11560" CategoryFeatureGroup_ID="35" No="10102040" Optional="0" Presentation_Value="AMD E" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="AMD E">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2196">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="11271" langid="1" Value="Processor family"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="357286693" Local_ID="0" Value="AMD" CategoryFeature_ID="2721" CategoryFeatureGroup_ID="35" No="100102050" Optional="0" Presentation_Value="AMD" Translated="0" Mandatory="1" Searchable="0">
+   <LocalValue Value="AMD">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1013">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="3567" langid="1" Value="Processor manufacturer"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939059" Local_ID="0" Value="E2-1800" CategoryFeature_ID="49" CategoryFeatureGroup_ID="35" No="102020" Optional="0" Presentation_Value="E2-1800" Translated="0" Mandatory="1" Searchable="0">
+   <LocalValue Value="E2-1800">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="47">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1431" langid="1" Value="Processor model"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939057" Local_ID="0" Value="1.7" CategoryFeature_ID="73715" CategoryFeatureGroup_ID="35" No="100095" Optional="0" Presentation_Value="1.7 GHz" Translated="0" Mandatory="1" Searchable="0">
+   <LocalValue Value="1.7">
+    <Measure ID="37">
+     <Signs>
+      <Sign ID="21" langid="1"><![CDATA[GHz]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="11379">
+    <Measure ID="37" Sign="">
+     <Signs>
+      <Sign ID="21" langid="1"><![CDATA[GHz]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1036524" langid="1" Value="Processor frequency"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939060" Local_ID="0" Value="2" CategoryFeature_ID="57809" CategoryFeatureGroup_ID="35" No="100098" Optional="0" Presentation_Value="2" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="2">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6089">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="138113" langid="1" Value="Processor cores"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939061" Local_ID="0" Value="2" CategoryFeature_ID="71259" CategoryFeatureGroup_ID="35" No="100097" Optional="0" Presentation_Value="2" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="2">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7337">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="451013" langid="1" Value="Processor threads"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939062" Local_ID="0" Value="1" CategoryFeature_ID="95853" CategoryFeatureGroup_ID="35" No="100037" Optional="0" Presentation_Value="1 MB" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1">
+    <Measure ID="19">
+     <Signs>
+      <Sign ID="15506" langid="1"><![CDATA[MB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="10041">
+    <Measure ID="19" Sign="">
+     <Signs>
+      <Sign ID="15506" langid="1"><![CDATA[MB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="852539" langid="1" Value="Processor cache"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939064" Local_ID="0" Value="L2" CategoryFeature_ID="135207" CategoryFeatureGroup_ID="35" No="100036" Optional="0" Presentation_Value="L2" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="L2">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="21716">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1732769" langid="1" Value="Processor cache type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939063" Local_ID="0" Value="Socket FM1 uPGA" CategoryFeature_ID="31183" CategoryFeatureGroup_ID="35" No="100033" Optional="0" Presentation_Value="Socket FM1 uPGA" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Socket FM1 uPGA">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2325">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="12015" langid="1" Value="Processor socket"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939066" Local_ID="0" Value="4" CategoryFeature_ID="73753" CategoryFeatureGroup_ID="106" No="10100077" Optional="0" Presentation_Value="4 GB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="4">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="11381">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1036616" langid="1" Value="Internal memory"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939071" Local_ID="0" Value="4" CategoryFeature_ID="10354" CategoryFeatureGroup_ID="106" No="100032" Optional="0" Presentation_Value="4 GB" Translated="0" Mandatory="1" Searchable="0">
+   <LocalValue Value="4">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1452">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4561" langid="1" Value="Maximum internal memory"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939067" Local_ID="0" Value="DDR3-SDRAM" CategoryFeature_ID="12693" CategoryFeatureGroup_ID="106" No="100076" Optional="0" Presentation_Value="DDR3-SDRAM" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="DDR3-SDRAM">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="427">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2221" langid="1" Value="Internal memory type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939068" Local_ID="0" Value="1333" CategoryFeature_ID="25759" CategoryFeatureGroup_ID="106" No="100046" Optional="0" Presentation_Value="1333 MHz" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1333">
+    <Measure ID="18">
+     <Signs>
+      <Sign ID="9" langid="1"><![CDATA[MHz]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2900">
+    <Measure ID="18" Sign="">
+     <Signs>
+      <Sign ID="9" langid="1"><![CDATA[MHz]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="27453" langid="1" Value="Memory clock speed"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939072" Local_ID="0" Value="SO-DIMM" CategoryFeature_ID="76682" CategoryFeatureGroup_ID="106" No="100046" Optional="0" Presentation_Value="SO-DIMM" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="SO-DIMM">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7696">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="595968" langid="1" Value="Memory form factor"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939069" Local_ID="0" Value="1 x 4" CategoryFeature_ID="73736" CategoryFeatureGroup_ID="106" No="100040" Optional="0" Presentation_Value="1 x 4 GB" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1 x 4">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="11380">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1036572" langid="1" Value="Memory layout (slots x size)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939070" Local_ID="0" Value="1x SO-DIMM" CategoryFeature_ID="2549" CategoryFeatureGroup_ID="106" No="100038" Optional="0" Presentation_Value="1x SO-DIMM" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1x SO-DIMM">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="672">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2875" langid="1" Value="Memory slots"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939073" Local_ID="0" Value="500" CategoryFeature_ID="30921" CategoryFeatureGroup_ID="4124" No="10100074" Optional="0" Presentation_Value="500 GB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="500">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3318">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="31696" langid="1" Value="Total storage capacity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939074" Local_ID="0" Value="HDD" CategoryFeature_ID="74320" CategoryFeatureGroup_ID="4124" No="10100073" Optional="0" Presentation_Value="HDD" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="HDD">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="11441">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1046575" langid="1" Value="Storage media"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939089" Local_ID="0" Value="DVD Super Multi" CategoryFeature_ID="2828" CategoryFeatureGroup_ID="4124" No="100002" Optional="0" Presentation_Value="DVD Super Multi" Translated="1" Mandatory="1" Searchable="0">
+   <LocalValue Value="DVD Super Multi">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1120">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="3781" langid="1" Value="Optical drive type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939075" Local_ID="0" Value="1" CategoryFeature_ID="30920" CategoryFeatureGroup_ID="4124" No="100040" Optional="0" Presentation_Value="1" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3319">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="31702" langid="1" Value="Number of HDDs installed"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939076" Local_ID="0" Value="500" CategoryFeature_ID="33265" CategoryFeatureGroup_ID="4124" No="100038" Optional="0" Presentation_Value="500 GB" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="500">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1299" langid="1" Value="HDD capacity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939077" Local_ID="0" Value="SATA" CategoryFeature_ID="2705" CategoryFeatureGroup_ID="4124" No="100036" Optional="0" Presentation_Value="SATA" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="SATA">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="982">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="3505" langid="1" Value="HDD interface"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939078" Local_ID="0" Value="5400" CategoryFeature_ID="1198" CategoryFeatureGroup_ID="4124" No="100034" Optional="0" Presentation_Value="5400 RPM" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="5400">
+    <Measure ID="28">
+     <Signs>
+      <Sign ID="12" langid="1"><![CDATA[RPM]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="430">
+    <Measure ID="28" Sign="">
+     <Signs>
+      <Sign ID="12" langid="1"><![CDATA[RPM]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2227" langid="1" Value="HDD speed"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939079" Local_ID="0" Value="Y" CategoryFeature_ID="19149" CategoryFeatureGroup_ID="4124" No="100001" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3374">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="32254" langid="1" Value="Card reader integrated"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939080" Local_ID="0" Value="MMC,SD" CategoryFeature_ID="9470" CategoryFeatureGroup_ID="4124" No="100000" Optional="0" Presentation_Value="MMC, SD" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="MMC, SD">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="730">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2991" langid="1" Value="Compatible memory cards"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="226153550" Local_ID="0" Value="Y" CategoryFeature_ID="74327" CategoryFeatureGroup_ID="8602" No="10100045" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9997">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="850071" langid="1" Value="On-board graphics card"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="226437343" Local_ID="0" Value="N" CategoryFeature_ID="178874" CategoryFeatureGroup_ID="8602" No="10100044" Optional="0" Presentation_Value="No" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="27905">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2473691" langid="1" Value="Discrete graphics card"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939088" Local_ID="0" Value="Not available" CategoryFeature_ID="53948" CategoryFeatureGroup_ID="8602" No="100051" Optional="0" Presentation_Value="Not available" Translated="1" Mandatory="1" Searchable="0">
+   <LocalValue Value="Not available">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9018">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="757434" langid="1" Value="Discrete graphics card model"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939087" Local_ID="0" Value="AMD Radeon HD 7340" CategoryFeature_ID="53952" CategoryFeatureGroup_ID="8602" No="100043" Optional="0" Presentation_Value="AMD Radeon HD 7340" Translated="0" Mandatory="1" Searchable="0">
+   <LocalValue Value="AMD Radeon HD 7340">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9016">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="757352" langid="1" Value="On-board graphics card model"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="234068324" Local_ID="0" Value="AMD Radeon HD 7000" CategoryFeature_ID="192527" CategoryFeatureGroup_ID="8602" No="100044" Optional="0" Presentation_Value="AMD Radeon HD 7000" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="AMD Radeon HD 7000">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="29455">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2752902" langid="1" Value="On-board graphics card family"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939091" Local_ID="0" Value="HD" CategoryFeature_ID="1195" CategoryFeatureGroup_ID="110" No="100045" Optional="0" Presentation_Value="HD" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="HD">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="442">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2251" langid="1" Value="Audio system"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939092" Local_ID="0" Value="Y" CategoryFeature_ID="2731" CategoryFeatureGroup_ID="110" No="100002" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1025">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="3591" langid="1" Value="Built-in microphone"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939093" Local_ID="0" Value="Y" CategoryFeature_ID="91102" CategoryFeatureGroup_ID="3024" No="100024" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="12436">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1089291" langid="1" Value="Front camera"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939094" Local_ID="0" Value="0.3" CategoryFeature_ID="91103" CategoryFeatureGroup_ID="3024" No="100022" Optional="0" Presentation_Value="0.3 MP" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0.3">
+    <Measure ID="165">
+     <Signs>
+      <Sign ID="3126" langid="1"><![CDATA[MP]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="12437">
+    <Measure ID="165" Sign="">
+     <Signs>
+      <Sign ID="3126" langid="1"><![CDATA[MP]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1089335" langid="1" Value="Front camera resolution (numeric)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939090" Local_ID="0" Value="N" CategoryFeature_ID="12480" CategoryFeatureGroup_ID="32" No="100095" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2262">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="11589" langid="1" Value="LightScribe"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939097" Local_ID="0" Value="Y" CategoryFeature_ID="41678" CategoryFeatureGroup_ID="1711" No="10100040" Optional="1" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3239">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="30766" langid="1" Value="Wi-Fi"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939098" Local_ID="0" Value="802.11b,802.11g,Wi-Fi 4 (802.11n)" CategoryFeature_ID="1193" CategoryFeatureGroup_ID="1711" No="100049" Optional="0" Presentation_Value="802.11b, 802.11g, Wi-Fi 4 (802.11n)" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="802.11b, 802.11g, Wi-Fi 4 (802.11n)">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="432">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2231" langid="1" Value="Wi-Fi standards"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939099" Local_ID="0" Value="Y" CategoryFeature_ID="43547" CategoryFeatureGroup_ID="1711" No="100046" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1347">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="4235" langid="1" Value="Ethernet LAN"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939100" Local_ID="0" Value="10,100,1000" CategoryFeature_ID="57701" CategoryFeatureGroup_ID="1711" No="100045" Optional="0" Presentation_Value="10,100,1000 Mbit/s" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="10,100,1000">
+    <Measure ID="23">
+     <Signs>
+      <Sign ID="4" langid="1"><![CDATA[Mbit/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3768">
+    <Measure ID="23" Sign="">
+     <Signs>
+      <Sign ID="4" langid="1"><![CDATA[Mbit/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="42597" langid="1" Value="Ethernet LAN data rates"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939095" Local_ID="0" Value="N" CategoryFeature_ID="18579" CategoryFeatureGroup_ID="1711" No="100042" Optional="0" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2183">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="11148" langid="1" Value="Bluetooth"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939102" Local_ID="0" Value="1" CategoryFeature_ID="12819" CategoryFeatureGroup_ID="36" No="100150" Optional="0" Presentation_Value="1" Translated="0" Mandatory="1" Searchable="0">
+   <LocalValue Value="1">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2308">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="11964" langid="1" Value="USB 2.0 ports quantity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939103" Local_ID="0" Value="1" CategoryFeature_ID="138249" CategoryFeatureGroup_ID="36" No="100130" Optional="0" Presentation_Value="1" Translated="0" Mandatory="1" Searchable="0">
+   <LocalValue Value="1">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="22701">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1791608" langid="1" Value="USB 3.2 Gen 1 (3.1 Gen 1) Type-A ports quantity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939108" Local_ID="0" Value="1" CategoryFeature_ID="26456" CategoryFeatureGroup_ID="36" No="100078" Optional="0" Presentation_Value="1" Translated="0" Mandatory="1" Searchable="0">
+   <LocalValue Value="1">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3566">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="39496" langid="1" Value="HDMI ports quantity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939104" Local_ID="0" Value="0" CategoryFeature_ID="38729" CategoryFeatureGroup_ID="36" No="100096" Optional="1" Presentation_Value="0" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6821">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="324008" langid="1" Value="eSATA/USB 2.0 ports quantity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939105" Local_ID="0" Value="0" CategoryFeature_ID="46109" CategoryFeatureGroup_ID="36" No="100095" Optional="1" Presentation_Value="0" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7783">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="601317" langid="1" Value="eSATA/USB 3.2 Gen 1 (3.1 Gen 1) ports quantity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939106" Local_ID="0" Value="0" CategoryFeature_ID="26457" CategoryFeatureGroup_ID="36" No="100090" Optional="1" Presentation_Value="0" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2830">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="26811" langid="1" Value="eSATA ports quantity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939111" Local_ID="0" Value="1" CategoryFeature_ID="12827" CategoryFeatureGroup_ID="36" No="100089" Optional="0" Presentation_Value="1" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2312">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="11976" langid="1" Value="Ethernet LAN (RJ-45) ports"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939109" Local_ID="0" Value="0" CategoryFeature_ID="35644" CategoryFeatureGroup_ID="36" No="100076" Optional="0" Presentation_Value="0" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6611">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="240711" langid="1" Value="DisplayPorts quantity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939110" Local_ID="0" Value="N" CategoryFeature_ID="12837" CategoryFeatureGroup_ID="36" No="100074" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2319">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="11997" langid="1" Value="DVI port"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939107" Local_ID="0" Value="1" CategoryFeature_ID="12844" CategoryFeatureGroup_ID="36" No="100073" Optional="0" Presentation_Value="1" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2323">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="12009" langid="1" Value="VGA (D-Sub) ports quantity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939112" Local_ID="0" Value="0" CategoryFeature_ID="12823" CategoryFeatureGroup_ID="36" No="100070" Optional="1" Presentation_Value="0" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2310">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="11970" langid="1" Value="Firewire (IEEE 1394) ports"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939113" Local_ID="0" Value="0" CategoryFeature_ID="46289" CategoryFeatureGroup_ID="36" No="100068" Optional="1" Presentation_Value="0" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7804">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="602809" langid="1" Value="Thunderbolt ports quantity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939114" Local_ID="0" Value="1" CategoryFeature_ID="12828" CategoryFeatureGroup_ID="36" No="100059" Optional="0" Presentation_Value="1" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2313">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="11979" langid="1" Value="Headphone outputs"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939116" Local_ID="0" Value="N" CategoryFeature_ID="12830" CategoryFeatureGroup_ID="36" No="100059" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2315">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="11985" langid="1" Value="S/PDIF out port"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939115" Local_ID="0" Value="Y" CategoryFeature_ID="12829" CategoryFeatureGroup_ID="36" No="100058" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2314">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="11982" langid="1" Value="Microphone in"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939117" Local_ID="0" Value="N" CategoryFeature_ID="42480" CategoryFeatureGroup_ID="36" No="100051" Optional="0" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="4143">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="58894" langid="1" Value="Docking connector"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939119" Local_ID="0" Value="N" CategoryFeature_ID="20422" CategoryFeatureGroup_ID="36" No="100030" Optional="0" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3548">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="39370" langid="1" Value="ExpressCard slot"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939120" Local_ID="0" Value="0" CategoryFeature_ID="12839" CategoryFeatureGroup_ID="36" No="100029" Optional="1" Presentation_Value="0" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2320">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="12000" langid="1" Value="CardBus PCMCIA slots quantity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939121" Local_ID="0" Value="N" CategoryFeature_ID="12846" CategoryFeatureGroup_ID="36" No="100028" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2321">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="12003" langid="1" Value="CardBus PCMCIA slot type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939122" Local_ID="0" Value="N" CategoryFeature_ID="12840" CategoryFeatureGroup_ID="36" No="100027" Optional="0" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2322">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="12006" langid="1" Value="SmartCard slot"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939065" Local_ID="0" Value="Intel HM70 Express" CategoryFeature_ID="47168" CategoryFeatureGroup_ID="10675" No="100025" Optional="0" Presentation_Value="Intel® HM70 Express" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Intel® HM70 Express">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="436">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2239" langid="1" Value="Motherboard chipset"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939125" Local_ID="0" Value="N" CategoryFeature_ID="2718" CategoryFeatureGroup_ID="762" No="100076" Optional="0" Presentation_Value="No" Translated="1" Mandatory="1" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1006">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="3553" langid="1" Value="Numeric keypad"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939123" Local_ID="0" Value="Touchpad" CategoryFeature_ID="1201" CategoryFeatureGroup_ID="762" No="100100" Optional="0" Presentation_Value="Touchpad" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Touchpad">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="440">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2247" langid="1" Value="Pointing device"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939126" Local_ID="0" Value="Windows 8" CategoryFeature_ID="12350" CategoryFeatureGroup_ID="2933" No="10100049" Optional="0" Presentation_Value="Windows 8" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="Windows 8">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3233">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="30700" langid="1" Value="Operating system installed"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939127" Local_ID="0" Value="64-bit" CategoryFeature_ID="45085" CategoryFeatureGroup_ID="2933" No="103000" Optional="0" Presentation_Value="64-bit" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="64-bit">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7563">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="581101" langid="1" Value="Operating system architecture"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939128" Local_ID="0" Value="N" CategoryFeature_ID="74045" CategoryFeatureGroup_ID="10385" No="100010" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="10111">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="874750" langid="1" Value="Intel® Wireless Display (Intel® WiDi)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939129" Local_ID="0" Value="N" CategoryFeature_ID="56925" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9664">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="792450" langid="1" Value="Intel® My WiFi Technology (Intel® MWT)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939130" Local_ID="0" Value="N" CategoryFeature_ID="56926" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9669">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="792655" langid="1" Value="Intel Smart Connect Technology"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939131" Local_ID="0" Value="N" CategoryFeature_ID="56927" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9666">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="792532" langid="1" Value="Intel® Anti-Theft Technology (Intel® AT)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939132" Local_ID="0" Value="N" CategoryFeature_ID="56928" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9667">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="792573" langid="1" Value="Intel® Rapid Start Technology"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939133" Local_ID="0" Value="N" CategoryFeature_ID="56929" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9668">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="792614" langid="1" Value="Intel® Smart Response Technology"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939134" Local_ID="0" Value="N" CategoryFeature_ID="56930" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9665">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="792491" langid="1" Value="Intel® Identity Protection Technology (Intel® IPT)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939137" Local_ID="0" Value="N" CategoryFeature_ID="56933" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9672">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="792778" langid="1" Value="Intel® Hyper Threading Technology (Intel® HT Technology)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939138" Local_ID="0" Value="N" CategoryFeature_ID="57383" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9733">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="811392" langid="1" Value="Intel® Turbo Boost Technology"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939139" Local_ID="0" Value="N" CategoryFeature_ID="79279" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="11779">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1071058" langid="1" Value="Intel® Small Business Advantage (Intel® SBA)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939140" Local_ID="0" Value="N" CategoryFeature_ID="90912" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="10272">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="884399" langid="1" Value="Intel® Matrix Storage Technology (Intel® MST)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939141" Local_ID="0" Value="N" CategoryFeature_ID="90915" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="10321">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="897513" langid="1" Value="Intel® High Definition Audio (Intel® HD Audio)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939142" Local_ID="0" Value="N" CategoryFeature_ID="90918" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="10260">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="883888" langid="1" Value="Intel® Active Management Technology (Intel® AMT)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="208812232" Local_ID="0" Value="N" CategoryFeature_ID="130273" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="10113">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="874834" langid="1" Value="Intel® Clear Video HD Technology (Intel® CVT HD)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="208818483" Local_ID="0" Value="N" CategoryFeature_ID="130274" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="21539">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1717708" langid="1" Value="Intel Clear Video Technology"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="208824904" Local_ID="0" Value="N" CategoryFeature_ID="130275" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="10109">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="874666" langid="1" Value="Intel® InTru™ 3D Technology"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="208837958" Local_ID="0" Value="N" CategoryFeature_ID="130276" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="10187">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="879619" langid="1" Value="Intel® Insider™"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="208844223" Local_ID="0" Value="N" CategoryFeature_ID="130284" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="10108">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="874624" langid="1" Value="Intel® Quick Sync Video Technology"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="208831219" Local_ID="0" Value="N" CategoryFeature_ID="132852" CategoryFeatureGroup_ID="10385" No="100000" Optional="1" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="10277">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="884609" langid="1" Value="Intel® Clear Video Technology for Mobile Internet Devices (Intel CVT for MID)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939147" Local_ID="0" Value="47" CategoryFeature_ID="50479" CategoryFeatureGroup_ID="7946" No="100097" Optional="0" Presentation_Value="47 Wh" Translated="0" Mandatory="1" Searchable="0">
+   <LocalValue Value="47">
+    <Measure ID="211">
+     <Signs>
+      <Sign ID="10077" langid="1"><![CDATA[Wh]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="8519">
+    <Measure ID="211" Sign="">
+     <Signs>
+      <Sign ID="10077" langid="1"><![CDATA[Wh]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="715649" langid="1" Value="Battery capacity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939143" Local_ID="0" Value="Lithium-Ion (Li-Ion)" CategoryFeature_ID="1187" CategoryFeatureGroup_ID="7946" No="100100" Optional="0" Presentation_Value="Lithium-Ion (Li-Ion)" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Lithium-Ion (Li-Ion)">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="434">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2235" langid="1" Value="Battery technology"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939144" Local_ID="0" Value="6" CategoryFeature_ID="16197" CategoryFeatureGroup_ID="7946" No="100098" Optional="0" Presentation_Value="6" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="6">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1226">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="3993" langid="1" Value="Number of battery cells"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939146" Local_ID="0" Value="4400" CategoryFeature_ID="2655" CategoryFeatureGroup_ID="7946" No="100097" Optional="0" Presentation_Value="4400 mAh" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="4400">
+    <Measure ID="51">
+     <Signs>
+      <Sign ID="35" langid="1"><![CDATA[mAh]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="909">
+    <Measure ID="51" Sign="">
+     <Signs>
+      <Sign ID="35" langid="1"><![CDATA[mAh]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3359" langid="1" Value="Battery capacity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939148" Local_ID="0" Value="65" CategoryFeature_ID="2652" CategoryFeatureGroup_ID="109" No="100055" Optional="0" Presentation_Value="65 W" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="65">
+    <Measure ID="44">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="906">
+    <Measure ID="44" Sign="">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3353" langid="1" Value="AC adapter power"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939149" Local_ID="0" Value="50 - 60" CategoryFeature_ID="2649" CategoryFeatureGroup_ID="109" No="100050" Optional="0" Presentation_Value="50 - 60 Hz" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="50 - 60">
+    <Measure ID="36">
+     <Signs>
+      <Sign ID="20" langid="1"><![CDATA[Hz]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="903">
+    <Measure ID="36" Sign="">
+     <Signs>
+      <Sign ID="20" langid="1"><![CDATA[Hz]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3347" langid="1" Value="AC adapter frequency"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939150" Local_ID="0" Value="100 - 240" CategoryFeature_ID="2648" CategoryFeatureGroup_ID="109" No="100048" Optional="0" Presentation_Value="100 - 240 V" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="100 - 240">
+    <Measure ID="42">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="902">
+    <Measure ID="42" Sign="">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3345" langid="1" Value="AC adapter input voltage"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939151" Local_ID="0" Value="3.42" CategoryFeature_ID="2651" CategoryFeatureGroup_ID="109" No="100046" Optional="0" Presentation_Value="3.42 A" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="3.42">
+    <Measure ID="41">
+     <Signs>
+      <Sign ID="25" langid="1"><![CDATA[A]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="905">
+    <Measure ID="41" Sign="">
+     <Signs>
+      <Sign ID="25" langid="1"><![CDATA[A]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3351" langid="1" Value="AC adapter output current"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939152" Local_ID="0" Value="19" CategoryFeature_ID="2650" CategoryFeatureGroup_ID="109" No="100044" Optional="0" Presentation_Value="19 V" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="19">
+    <Measure ID="42">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="904">
+    <Measure ID="42" Sign="">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3349" langid="1" Value="AC adapter output voltage"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="728286221" Local_ID="0" Value="Y" CategoryFeature_ID="1083464" CategoryFeatureGroup_ID="109" No="100006" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2316">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="11988" langid="1" Value="DC-in jack"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939153" Local_ID="0" Value="N" CategoryFeature_ID="16306" CategoryFeatureGroup_ID="2686" No="100050" Optional="0" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1352">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="4245" langid="1" Value="Cable lock slot"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939154" Local_ID="0" Value="2200" CategoryFeature_ID="4922" CategoryFeatureGroup_ID="108" No="10100000" Optional="0" Presentation_Value="2.2 kg" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="2.2">
+    <Measure ID="17">
+     <Signs>
+      <Sign ID="15505" langid="1"><![CDATA[kg]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="94">
+    <Measure ID="38" Sign="">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1525" langid="1" Value="Weight"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939155" Local_ID="0" Value="347" CategoryFeature_ID="6240" CategoryFeatureGroup_ID="108" No="100020" Optional="0" Presentation_Value="347 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="347">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1649">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5143" langid="1" Value="Width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939156" Local_ID="0" Value="245" CategoryFeature_ID="6237" CategoryFeatureGroup_ID="108" No="100019" Optional="0" Presentation_Value="245 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="245">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1650">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5145" langid="1" Value="Depth"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939157" Local_ID="0" Value="31.9" CategoryFeature_ID="6239" CategoryFeatureGroup_ID="108" No="100018" Optional="0" Presentation_Value="31.9 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="31.9">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1464">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4625" langid="1" Value="Height"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939160" Local_ID="0" Value="Y" CategoryFeature_ID="57811" CategoryFeatureGroup_ID="26489" No="100100" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="1" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1230">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="4001" langid="1" Value="AC adapter included"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939158" Local_ID="0" Value="AC" CategoryFeature_ID="57719" CategoryFeatureGroup_ID="26489" No="100030" Optional="0" Presentation_Value="AC" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="AC">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1830">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5653" langid="1" Value="Cables included"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939159" Local_ID="0" Value="Y" CategoryFeature_ID="57720" CategoryFeatureGroup_ID="26489" No="100000" Optional="1" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3965">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="56040" langid="1" Value="Manual"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="153939161" Local_ID="0" Value="Y" CategoryFeature_ID="59776" CategoryFeatureGroup_ID="26489" No="100000" Optional="1" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="4023">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="56154" langid="1" Value="Warranty card"/>
+   </Feature>
+  </ProductFeature>
+  <ProductGallery>
+   <ProductPicture IsMain="Y" LowPic="https://images.icecat.biz/img/gallery_lows/2481b6545d2b65db23b50dfe4887f5618a20eaf8.jpg" LowPicHeight="124" LowPicWidth="200" LowSize="11657" No="1" Original="https://images.icecat.biz/img/gallery_raw/a293ad5849346de1b27c717b6b26fa0d2108548f.jpg" OriginalSize="257717" Pic="https://images.icecat.biz/img/gallery/a293ad5849346de1b27c717b6b26fa0d2108548f.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/29cd5acbb0f76eb4e05cf4b5c5fe1f0cb501c6d3.jpg" Pic500x500Height="309" Pic500x500Size="45155" Pic500x500Width="500" PicHeight="506" PicWidth="819" ProductPicture_ID="15526479" Size="93227" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/eeb35fe2a00a68dc2ae60069ef1eaf247d812a75.jpg" ThumbSize="3098" Type="ProductImage" UpdatedDate="2016-11-16 10:35:55"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/5be5979853f834c575e9b45a8337721614c902e1.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="8052" No="2" Original="https://images.icecat.biz/img/gallery_raw/adc5e42343bd1cd46389c2fe1696d493f032f4fd.jpg" OriginalSize="21536" Pic="https://images.icecat.biz/img/gallery/adc5e42343bd1cd46389c2fe1696d493f032f4fd.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/60b1297e36ae28c93fb4c2f9d1435c65b9fe282b.jpg" Pic500x500Height="500" Pic500x500Size="21253" Pic500x500Width="500" PicHeight="500" PicWidth="500" ProductPicture_ID="5372536" Size="19516" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/aa5e70f0e502058726b592a856825d1b38d6eaed.jpg" ThumbSize="2315" Type="ProductImage" UpdatedDate="2024-03-07 15:34:52"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/f52f9b4656c8eba65b3f52233759e2cfeb44dc92.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="29945" No="3" Original="https://images.icecat.biz/img/gallery_raw/c26fd612e10fd48ceab5940b3943c06b3794e3cb.jpg" OriginalSize="58685" Pic="https://images.icecat.biz/img/gallery/c26fd612e10fd48ceab5940b3943c06b3794e3cb.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/680aa807c76411154e905bc950fbd885f37e5542.jpg" Pic500x500Height="500" Pic500x500Size="92221" Pic500x500Width="500" PicHeight="500" PicWidth="500" ProductPicture_ID="5372537" Size="81373" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/f9d128908a97e1b56f2c8fcfdf6bec251b10f229.jpg" ThumbSize="6214" Type="ProductImage" UpdatedDate="2024-03-07 15:34:52"/>
+   <ProductPicture LowPic="" LowPicHeight="0" LowPicWidth="0" LowSize="0" No="999" Original="" OriginalSize="0" Pic="https://images.icecat.biz/img/feature_logo/1241-3059.png" Pic500x500="" Pic500x500Height="0" Pic500x500Size="0" Pic500x500Width="0" PicHeight="0" PicWidth="0" ProductPicture_ID="4307268536" Size="0" ThumbPic="https://images.icecat.biz/img/feature_logo_thumbs/1241-3059.png" ThumbSize="0" Type="FeatureLogo" UpdatedDate="" langid="1"/>
+  </ProductGallery>
+  <ProductMultimediaObject>
+   <MultimediaObject ContentType="application/pdf" Date="2018-06-02 22:28:13" Description="Generated PDF" KeepAsURL="0" MultimediaObject_ID="0" Type="leaflet" UUID="00000000-0000-0000-0000-000000000000" langid="1" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="0" URL="https://icecat.biz/rest/product-pdf?productId=21987416&amp;lang=en" Width="0"/>
+  </ProductMultimediaObject>
+  <ProductRelated/>
+  <SummaryDescription>
+   <ShortSummaryDescription langid="1">ASUS X45U, AMD E, 1.7 GHz, 35.6 cm (14&quot;), 1366 x 768 pixels, 4 GB, 500 GB</ShortSummaryDescription>
+   <LongSummaryDescription langid="1">ASUS X45U. Product type: Laptop, Form factor: Clamshell. Processor family: AMD E, Processor model: E2-1800, Processor frequency: 1.7 GHz. Display diagonal: 35.6 cm (14&quot;), HD type: HD, Display resolution: 1366 x 768 pixels. Internal memory: 4 GB, Internal memory type: DDR3-SDRAM. Total storage capacity: 500 GB, Storage media: HDD, Optical drive type: DVD Super Multi. Operating system installed: Windows 8. Product colour: Black</LongSummaryDescription>
+  </SummaryDescription>
+  <Supplier ID="161" Name="ASUS"/>
+  <CatalogObjectCloud>
+   <ProductPage QRCodeURL="https://qr.icecat.biz/coc/62dba057-940e-490a-8715-e1ce256eeb7a" URL="https://coc.icecat.biz/62dba057-940e-490a-8715-e1ce256eeb7a"/>
+  </CatalogObjectCloud>
+ </Product>
+</ICECAT-interface>

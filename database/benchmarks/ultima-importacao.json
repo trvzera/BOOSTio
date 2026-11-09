@@ -1,0 +1,117 @@
+{
+  "banco": "/Users/gustavoazevedo/Documents/Projetos/BOOSTio/database/banco.db",
+  "backup": "/Users/gustavoazevedo/Documents/Projetos/BOOSTio/database/backups/banco.antes-passmark-20261102T113616731428Z.db",
+  "relatorios": "/Users/gustavoazevedo/Documents/Projetos/BOOSTio/database/benchmarks/20261102T113616731428Z",
+  "cobertura_anterior": {
+    "cpu": 0,
+    "gpu": 0
+  },
+  "atualizadas": 190,
+  "por_tipo": {
+    "cpu": {
+      "atualizadas": 99,
+      "propostas": 99,
+      "inalteradas": 0,
+      "nao_encontradas": 1,
+      "ambiguas": 0,
+      "invalidas": 0
+    },
+    "gpu": {
+      "atualizadas": 91,
+      "propostas": 91,
+      "inalteradas": 0,
+      "nao_encontradas": 9,
+      "ambiguas": 0,
+      "invalidas": 0
+    }
+  },
+  "cobertura_final": {
+    "cpu": {
+      "total": 100,
+      "com_benchmark": 99
+    },
+    "gpu": {
+      "total": 100,
+      "com_benchmark": 91
+    }
+  },
+  "reexecucao": {
+    "propostas": 0,
+    "inalteradas": 190,
+    "atualizadas": 0
+  },
+  "dados_nao_benchmark_preservados": true,
+  "tabelas_conferidas": 25,
+  "pendentes": [
+    {
+      "tipo": "cpu",
+      "id": 83,
+      "modelo": "Ryzen 5 4655g, 3.7ghz (4.2ghz Max Turbo), Cache 11mb, Am4, Vídeo Integrado",
+      "status": "nao_encontradas",
+      "motivo": "sem referência única revisada ou exata"
+    },
+    {
+      "tipo": "gpu",
+      "id": 24,
+      "modelo": "GeForce RTX5050 8GB GDDR6",
+      "status": "nao_encontradas",
+      "motivo": "sem referência única revisada ou exata"
+    },
+    {
+      "tipo": "gpu",
+      "id": 40,
+      "modelo": "RX 9070 Challenger Radeon",
+      "status": "nao_encontradas",
+      "motivo": "sem referência única revisada ou exata"
+    },
+    {
+      "tipo": "gpu",
+      "id": 53,
+      "modelo": "AMD Radeon R7200 Series R7240, 2GB DDR5",
+      "status": "nao_encontradas",
+      "motivo": "sem referência única revisada ou exata"
+    },
+    {
+      "tipo": "gpu",
+      "id": 55,
+      "modelo": "Geforce GTX 750, 4GB, 128 Bits",
+      "status": "nao_encontradas",
+      "motivo": "sem referência única revisada ou exata"
+    },
+    {
+      "tipo": "gpu",
+      "id": 60,
+      "modelo": "Amd Pcyes Radeon R7 240 4gb Ddr5 128 Bits - Pj7r240dr5",
+      "status": "nao_encontradas",
+      "motivo": "sem referência única revisada ou exata"
+    },
+    {
+      "tipo": "gpu",
+      "id": 76,
+      "modelo": "Gamer Nvidia Gtx 1060 6gb 192bits GDDR5 HDMI",
+      "status": "nao_encontradas",
+      "motivo": "sem referência única revisada ou exata"
+    },
+    {
+      "tipo": "gpu",
+      "id": 80,
+      "modelo": "Gpu Nvidia Geforce Gtx 1060 6gb GDDR5 192 Bits Vinik Gpuvk10606gb2fv02",
+      "status": "nao_encontradas",
+      "motivo": "sem referência única revisada ou exata"
+    },
+    {
+      "tipo": "gpu",
+      "id": 82,
+      "modelo": "Vxpro Radeon Rx 580, 8GB - Rx580-8gd5 Oem",
+      "status": "nao_encontradas",
+      "motivo": "sem referência única revisada ou exata"
+    },
+    {
+      "tipo": "gpu",
+      "id": 97,
+      "modelo": "Gpu Nvidia Geforce Gtx 1060 6gb GDDR5 192 Bits Vinik  Gpuvk10606gb2f",
+      "status": "nao_encontradas",
+      "motivo": "sem referência única revisada ou exata"
+    }
+  ]
+}
