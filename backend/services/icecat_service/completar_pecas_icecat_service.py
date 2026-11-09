@@ -2,6 +2,7 @@
 import os
 from dataclasses import replace
 
+from models import db
 from services.catalogo_service.enriquecer_peca_existente_service import EnriquecerPecaExistenteService
 from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
@@ -39,7 +40,7 @@ class CompletarPecasIcecatService:
         if type(limite) is not int or not 1 <= limite <= 500:
             raise ValueError('Limite entre 1 e 500 peças')
         resumo = dict(simulacao=simular, categoria=categoria, analisadas=0, ignoradas=0, sem_part_number=0,
-                      proposta=0, atualizada=0, inalterada=0, revisao=0, sem_correspondencia=0,
+                      proposta=0, atualizada=0, inalterada=0, ficha_liberada=0, revisao=0, sem_correspondencia=0,
                       nao_encontrada=0, ambigua=0, interrompido=False, ultima_peca_id=depois_id, detalhes=[])
         for peca in modelo.lote_para_identificadores(depois_id, limite):
             resumo['ultima_peca_id'] = peca.id
@@ -58,8 +59,20 @@ class CompletarPecasIcecatService:
                 resumo['motivo_interrupcao'] = str(erro)
                 break
             resumo[resultado['status']] = resumo.get(resultado['status'], 0) + 1
+            if resultado['status'] in ('atualizada', 'inalterada') and self._reavaliar_ficha(peca, simular):
+                resumo['ficha_liberada'] += 1
             resumo['detalhes'].append(dict(peca_id=peca.id, **{k: v for k, v in resultado.items() if k != 'fontes'}))
         return resumo
+
+    @staticmethod
+    def _reavaliar_ficha(peca, simular):
+        """Recalcula a marca de ficha de montagem (gravada reprovada na importação) com os campos já preenchidos."""
+        if pendencias_para_montagem(peca) or peca.ficha_montagem_validada is True:
+            return False
+        if not simular:
+            peca.ficha_montagem_validada = True
+            db.session.commit()
+        return True
 
     def _completar(self, peca, simular):
         base = ProdutoNormalizado(loja='icecat', id_externo=f'{peca.__tablename__}:{peca.id}',
