@@ -23,3 +23,17 @@ Os pacotes de distribuição ficam em
 O pacote já existente foi preservado. Os roteiros de origem devem ser revisados
 antes de gerar uma nova versão; organizar os arquivos não atualiza o conteúdo
 embutido no PowerPoint ou no PDF.
+
+## Vídeo das funcionalidades — pendente
+
+A demonstração deve mostrar o sistema em funcionamento: navegação, cliques e
+resultados reais, em vez de apenas capturas estáticas. O roteiro reserva 1min50
+para quatro funcionalidades não CRUD, dentro do limite de dois minutos.
+
+Falta gravar, editar, incorporar o vídeo ao PowerPoint e incluir uma cópia MP4
+offline no pacote final. Testar a reprodução no computador da apresentação;
+PDFs e imagens exportadas dos slides não substituem o vídeo.
+
+Acompanhar a preparação no
+[checklist da rubrica](2026-11-10/roteiros/pendencias-da-rubrica.md#checklist-atualizado--09112026)
+e as cenas no [roteiro do pitch](2026-11-10/roteiros/roteiro-do-pitch.md).
