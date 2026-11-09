@@ -9,7 +9,7 @@ class VinculoMercadoLivre(ModeloBase):
     catalogo_id = db.Column(db.String(80), nullable=False, unique=True)
     assinatura_peca = db.Column(db.String(64), nullable=False)
     assinatura_catalogo = db.Column(db.String(64), nullable=False)
-    criterio = db.Column(db.String(20), nullable=False)
+    criterio = db.Column(db.String(100), nullable=False)
     especificacoes_revisadas = db.Column(db.JSON, nullable=True)
     __table_args__ = (db.UniqueConstraint('tabela_peca', 'peca_id', name='uq_vinculo_ml_peca'),)
 
