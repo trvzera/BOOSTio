@@ -236,13 +236,13 @@ A configuração de produção publica URLs como `/builds`, `/formulario` e
 
 ## Desempenho esperado
 
-Ao selecionar **Testar build**, a consulta de renderização no **Blender** está
-disponível. A opção **Jogos · FPS** permanece desativada, com o aviso
-**Em desenvolvimento**.
+Ao selecionar **Testar build**, o usuário escolhe entre **Jogos · FPS** e
+**Blender · Renderização**. As consultas passam pela API Python da BOOSTio e
+exigem uma sessão autenticada.
 
 ### Jogos · FPSHQ
 
-A integração em desenvolvimento prevê escolha de jogo, resolução e qualidade
+A integração permite escolher jogo, resolução e qualidade
 gráfica, com **FPS médio** e **1% low** quando disponíveis. Falhas e ausência de
 dados não geram FPS inventados.
 
@@ -257,8 +257,15 @@ HTML com HTTP 200 também é tratado como resposta inválida, nunca como FPS.
 O teste direto no Chrome, sem cache da aplicação, também falhou em 24/10:
 o navegador registrou bloqueio por ausência do cabeçalho de CORS. O endereço
 consultado é o mesmo do primeiro protótipo. Isso não comprova a causa interna
-da indisponibilidade nem descarta diferenças entre redes, mas a falha atual não
-se limita à integração Python: nesta consulta, o serviço não entregou JSON.
+da indisponibilidade nem descarta diferenças entre redes. Naquela checagem, a
+falha não se limitava à integração Python: o serviço não entregou JSON.
+
+Em **09/11/2026**, o provedor voltou a retornar JSON válido, inclusive na consulta
+por Python de Valorant com Ryzen 5 5600 e RTX 3060. A opção de jogos foi reativada
+e conferida no editor com uma build de teste de 16 GB de RAM, usando as rotas
+autenticadas da BOOSTio e a resposta real do provedor.
+Também houve timeout nessa checagem: a disponibilidade continua dependente da
+FPSHQ, com tratamento de falhas e cache das respostas previamente validadas.
 
 Nas builds salvas, **Verificar requisitos** usa o catálogo Python para comparar RAM,
 VRAM dedicada e capacidade/tipo de armazenamento quando há um mínimo oficial

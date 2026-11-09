@@ -110,8 +110,11 @@ test("montagem e benchmark usam os ícones correspondentes sem alterar ações e
   for (const [nome,rotulo] of [["handsparkle","Formulário inteligente"],["normalhand","Montagem manual"]])
     assert.ok(builds.includes('iconeAnimado("' + nome + '") + \'<strong>' + rotulo + '</strong>'));
   assert.match(acoes,/iconeAnimado\("microchip"\) \+ '<span>Blender · Renderização<\/span>/);
-  assert.match(acoes,/data-benchmark-type="games" disabled/);
-  assert.match(acoes,/iconeAnimado\("gamepad"\).*Jogos · FPS<small>Em desenvolvimento<\/small>/);
+  const jogos = acoes.match(/<button\b[^>]*data-benchmark-type="games"[^>]*>/)?.[0];
+  assert.ok(jogos);
+  assert.doesNotMatch(jogos,/\bdisabled(?:\s|=|>)/);
+  assert.match(jogos,/aria-label="Selecionar teste de desempenho em jogos"/);
+  assert.match(acoes,/iconeAnimado\("gamepad"\) \+ '<span>Jogos · FPS<\/span>/);
   assert.match(css,/\.build-create-option:is\(:hover,:focus-visible\)/);
   assert.match(css,/\.build-create-option > \.ui-lottie \{[^}]*color: var\(--cor-p1\)/);
   assert.match(css,/span:not\(\.build-create-option-action\):not\(\.ui-lottie\)/);
