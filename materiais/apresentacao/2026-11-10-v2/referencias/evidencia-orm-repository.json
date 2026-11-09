@@ -1,0 +1,37 @@
+{
+  "ambiente": "SQLite em memória, isolado. Sem rede, conta ou banco de produção.",
+  "dados": "Dados de demonstração criados exclusivamente para conferir o código.",
+  "consulta_real": "backend/repositories/ofertas_kabum_repository.py:buscar_ativa",
+  "criterio": "Oferta KaBuM ativa de maior ID para a peça e categoria informadas. Não equivale à oferta de menor preço.",
+  "entrada": {
+    "categoria": "processador",
+    "peca_id": 7
+  },
+  "retorno_consulta": {
+    "id": 12,
+    "loja": "kabum",
+    "preco": "189.90",
+    "ativa": true
+  },
+  "controle": "A oferta 13 está inativa e a 14 pertence a outra categoria; ambas ficam fora do resultado.",
+  "crud_orm": {
+    "criar": "ModeloBase.salvar: inserção confirmada",
+    "ler": {
+      "id": 12,
+      "loja": "kabum",
+      "preco": "189.90",
+      "ativa": true
+    },
+    "atualizar": {
+      "id": 12,
+      "preco": "194.90"
+    },
+    "excluir": {
+      "id_removido": 12,
+      "proxima_oferta_ativa": 11
+    }
+  },
+  "codigo_repository": "def buscar_ativa(peca, *, bloquear=False):\n    consulta = Oferta.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id, loja=LOJA, ativa=True)\n    consulta = consulta.order_by(Oferta.id.desc())\n    return (consulta.populate_existing().with_for_update() if bloquear else consulta).first()\n",
+  "sql_gerado_pelo_orm": "SELECT oferta.tabela_peca, oferta.peca_id, oferta.loja, oferta.produto_id_loja, oferta.vendedor_id, oferta.vendedor_nome, oferta.url, oferta.url_afiliado, oferta.preco, oferta.condicao_pagamento, oferta.esgotado, oferta.ativa, oferta.preco_atualizado_em, oferta.consultado_em, oferta.id, oferta.criado_em, oferta.atualizado_em \nFROM oferta \nWHERE oferta.tabela_peca = 'processador' AND oferta.peca_id = 7 AND oferta.loja = 'kabum' AND oferta.ativa = 1 ORDER BY oferta.id DESC\n LIMIT 1 OFFSET 0",
+  "observacao": "O SQL foi compilado a partir da consulta ORM, não copiado como SQL literal do Repository. Não comprova MySQL ou uma integração com loja."
+}

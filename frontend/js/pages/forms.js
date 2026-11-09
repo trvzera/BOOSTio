@@ -30,7 +30,7 @@ const perguntas = [
     tag: "Etapa 01",
     titulo: "Para que você vai usar o computador?",
     descricao:
-      "Escolha o uso principal. Ao selecionar uma opção, você verá quais peças terão mais atenção na montagem.",
+      "Escolha o uso principal para direcionar a montagem ao que você mais precisa.",
     opcoes: opcoesUso,
   },
   {
@@ -39,7 +39,7 @@ const perguntas = [
     tag: "Etapa 02",
     titulo: "Quanto você pode gastar no computador?",
     descricao:
-      "Informe o máximo que pode gastar. A montagem inteligente exige pelo menos R$ 2.000 para o PC, além da reserva para periféricos novos, se incluídos.",
+      "Defina o limite de gasto. Reserve ao menos R$ 2.000 para o PC, além do valor para novos periféricos.",
     opcoes: [
       ["ate-3000", "Até R$ 3.000", "Configuração essencial e econômica."],
       [
@@ -60,7 +60,7 @@ const perguntas = [
     tag: "Etapa 03",
     titulo: "O que você já possui?",
     descricao:
-      "Marque o que pretende reaproveitar e informe o modelo. Se começar do zero, escolha a primeira opção. As ventoinhas que já vêm com o gabinete ou o resfriador também serão consideradas.",
+      "Selecione as peças que vai reaproveitar e informe os modelos. Começando do zero? Marque a primeira opção.",
     multipla: true,
     opcoes: [
       ["nenhuma", "Ainda não tenho peças"],
@@ -90,13 +90,13 @@ const perguntas = [
   {
     chave:"rede",etapa:"Conexão",tag:"Etapa 05",
     titulo:"Como seu PC vai se conectar à internet?",
-    descricao:"Escolha cabo de internet ou Wi-Fi e diga se já possui o necessário para conectar o computador.",
+    descricao:"Escolha cabo de internet ou Wi-Fi e diga se quer incluir esse acessório na montagem.",
     opcoes:[],
   },
   {
     chave:"aparencia",etapa:"Aparência",tag:"Etapa 06",
     titulo:"Como você quer o visual do computador?",
-    descricao:"Escolha o tamanho, o visual e a cor de que gosta, ou deixe sem preferência. Primeiro, as peças precisam funcionar juntas, caber e ficar dentro do seu orçamento.",
+    descricao:"Escolha tamanho, estilo e cor, ou deixe sem preferência. As escolhas precisam caber no orçamento e combinar com as peças.",
     opcoes:[],
   },
 ];
@@ -124,6 +124,7 @@ const exemplosPecas = {
 document.addEventListener("DOMContentLoaded", async () => {
   const conteudo = document.querySelector("#question-content");
   const painel = document.querySelector("#question-info");
+  const telaCompacta = window.matchMedia("(max-width: 850px)");
   await acompanharCarregamento(carregarPerfil().catch(() => null));
   const planejamento = planejamentoLocal();
   const respostas = {rede:normalizarRede(),aparencia:normalizarAparencia()};
@@ -175,12 +176,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     painel.classList.remove("question-enter");
     void painel.offsetWidth;
     painel.classList.add("question-enter");
-    const ajuda = pergunta.chave === "objetivo"
-      ? '<details class="usage-priority" data-knowledge-guide open><summary class="font-1-xs">O que vamos priorizar</summary><p id="usage-priority-copy" class="font-2-xs" aria-live="polite"></p></details>'
-      : orientacoesEtapas[pergunta.chave] ? `<details class="usage-priority" data-knowledge-guide open><summary class="font-1-xs">Como essa escolha ajuda</summary><p class="font-2-xs">${orientacoesEtapas[pergunta.chave]}</p></details>` : "";
-    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Montagem inteligente · ${pergunta.tag}</span><h1 class="font-1-xl">${pergunta.titulo}</h1><p class="font-2-s">${pergunta.descricao}</p>${ajuda}</div><div class="manual-build"><h2 class="font-1-m-b">Deseja montar manualmente?</h2><p class="font-2-s">Escolha os componentes da sua build por conta própria no editor.</p><a href="./configuracao-build.html" class="btn-primary-form" aria-label="Montar manualmente no editor de build">Montar manualmente</a></div>`;
-    ajustarGuiasConhecimento(painel);
+    painel.innerHTML = `<div class="question-intro"><span class="question-tag font-1-xs">Montagem inteligente · ${pergunta.tag}</span><h1 class="font-1-xl">${pergunta.titulo}</h1><p class="font-2-s">${pergunta.descricao}</p></div><div class="manual-build"><a href="./configuracao-build.html" class="btn-ghost" aria-label="Montar manualmente no editor de build">Prefere escolher as peças? Montar manualmente</a></div>`;
   }
+
+  function ajudaEtapaHtml(pergunta) {
+    const titulo = pergunta.chave === "objetivo" ? "O que vamos priorizar" : "Como essa escolha ajuda";
+    const texto = pergunta.chave === "objetivo" ? prioridadesUso[respostas.objetivo] || "Escolha um uso para entender como vamos selecionar as peças, respeitando seu limite de gasto." : orientacoesEtapas[pergunta.chave];
+    return texto ? `<details class="usage-priority" data-knowledge-guide data-knowledge-beginner open><summary class="font-1-xs">${titulo}</summary><p${pergunta.chave === "objetivo" ? ' id="usage-priority-copy" aria-live="polite"' : ""} class="font-2-xs">${texto}</p></details>` : "";
+  }
+
+  function posicionarAcessoManual() {
+    const acesso = document.querySelector("#questions .manual-build");
+    const destino = telaCompacta.matches ? conteudo.querySelector(".question-options-scroll") : painel;
+    if (acesso && destino) destino.append(acesso);
+  }
+  telaCompacta.addEventListener("change", posicionarAcessoManual);
 
   function opcoesHtml(pergunta) {
     const selecionadas = pergunta.multipla
@@ -197,7 +207,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           ? detalhePecaHtml(valor, titulo)
           : "";
 
-        return `<div class="option-card${detalhe ? " has-piece-detail" : ""}"${atributosPeca}><input type="${tipo}" name="${pergunta.chave}" id="${valor}" value="${valor}" ${selecionada ? "checked" : ""}><label for="${valor}"><span class="choice-control ${pergunta.multipla ? "choice-control-lottie" : ""}" ${pergunta.multipla ? `id="check-${valor}"` : ""} aria-hidden="true"></span><span><span class="option-title font-1-m-b">${titulo}</span>${descricao ? `<span class="option-desc font-2-xs">${descricao}</span>` : ""}</span></label>${detalhe}</div>`;
+        return `<div class="option-card${detalhe ? " has-piece-detail" : ""}"${atributosPeca}><input type="${tipo}" name="${pergunta.chave}" id="${valor}" value="${valor}" ${selecionada ? "checked" : ""}><label for="${valor}"><span class="choice-control ${pergunta.multipla ? "choice-control-lottie" : ""}" ${pergunta.multipla ? `id="check-${valor}"` : ""} aria-hidden="true"></span><span><span class="option-title font-1-m-b">${titulo}</span>${descricao ? `<span class="option-desc font-2-xs"${pergunta.chave === "pecas" ? " data-knowledge-beginner" : ""}>${descricao}</span>` : ""}</span></label>${detalhe}</div>`;
       })
       .join("");
   }
@@ -296,15 +306,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p class="font-1-m-b">${pergunta.chave === "aparencia" ? "Preferências opcionais" : pergunta.chave === "rede" ? "Planeje sua conexão" : pergunta.multipla ? "Selecione as opções aplicáveis" : "Escolha uma opção"}</p>
         <span class="font-2-xs">${indiceAtual + 1} de ${perguntas.length}</span>
       </div>
-      <div class="question-options-scroll" role="region" aria-label="Respostas da etapa ${indiceAtual + 1}" tabindex="0">
+      ${pergunta.chave === "aparencia" ? '<p class="question-scroll-cue font-2-xs" id="appearance-scroll-help"><span aria-hidden="true">↓</span> Role nesta área para ver todas as opções de cor, tamanho e estilo.</p>' : ""}
+      <div class="question-options-scroll" role="region" aria-label="Respostas da etapa ${indiceAtual + 1}"${pergunta.chave === "aparencia" ? ' aria-describedby="appearance-scroll-help"' : ""} tabindex="0">
       ${pergunta.chave === "orcamento" ? `<div class="budget-fields">${campos}${rangeHtml()}</div>` : campos}
       ${pergunta.chave === "perifericos" ? '<div id="perifericos-fields"></div>' : ""}
+      ${ajudaEtapaHtml(pergunta)}
       </div>
       <div id="form-navigation">
         <button type="button" class="btn-ghost" id="previous-question" aria-label="Voltar à etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}>${iconeAnimado("arrow","back")}<span>Voltar</span></button>
         <button type="button" class="btn-primary-form" id="next-question" aria-label="${rotuloAvancar}" ${podeAvancar() ? "" : "disabled"}><span>${rotuloAvancar}</span>${iconeAnimado("arrow")}</button>
       </div>`;
-    if (pergunta.chave === "rede") vincularRede(conteudo.querySelector("#form-network"),respostas.rede,{prefixo:"form-rede",aoRenderizar:iniciarControlesNumericos,aoAlterar:rede => {
+    if (pergunta.chave === "rede") vincularRede(conteudo.querySelector("#form-network"),respostas.rede,{prefixo:"form-rede",aoRenderizar:raiz => {
+      iniciarControlesNumericos(raiz);
+      ajustarGuiasConhecimento(raiz);
+    },aoAlterar:rede => {
       respostas.rede = rede;
       conteudo.querySelector("#next-question").disabled = !podeAvancar();
     }});
@@ -331,10 +346,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     iniciarControlesNumericos(conteudo);
     iniciarIcones(conteudo);
+    posicionarAcessoManual();
+    ajustarGuiasConhecimento(conteudo);
   }
 
   function atualizarPrioridadeUso() {
-    const texto=painel.querySelector("#usage-priority-copy");
+    const texto=conteudo.querySelector("#usage-priority-copy");
     if(texto)texto.textContent=prioridadesUso[respostas.objetivo]||"Escolha um uso para entender como vamos selecionar as peças, respeitando seu limite de gasto.";
   }
 
@@ -682,6 +699,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         navegarPara(Number(botao.dataset.step)),
       ),
     );
+  document.addEventListener("boostio:experience-changed", () => ajustarGuiasConhecimento(conteudo));
   atualizarMenu();
   renderizarPergunta();
 });

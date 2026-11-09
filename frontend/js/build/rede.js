@@ -51,8 +51,8 @@ export function vincularRedeBuild(container,valor,{bloqueado = false,aoAlterar =
     aoAlterar(rede);
   };
 }
-function ajudaWifi(rede) {
-  return 'O adaptador é um acessório que permite usar Wi-Fi no computador. Alguns PCs já têm essa função. Se você já usa Wi-Fi nesse PC, pode marcar que já possui o necessário.';
+function ajudaWifi() {
+  return 'O adaptador permite usar Wi-Fi no computador. Se seu PC já tem Wi-Fi, escolha “Não incluir”.';
 }
 // Padrões apenas deste formulário. Importações e builds antigas preservam suas medidas.
 export function redeFormulario(valor = {}) {
@@ -67,9 +67,9 @@ export function camposRede(valor,{prefixo = "rede",bloqueado = false} = {}) {
   return '<div class="network-fields">' +
     campo("tipo","Como você pretende conectar o PC?",'<select id="' + prefixo + '-tipo" data-network="tipo"' + disabled + '>' + op("indefinido",rede.tipo,"Ainda não sei") + op("cabo",rede.tipo,"Cabo de rede") + op("wifi",rede.tipo,"Wi-Fi (sem fio)") + '</select>') +
     (rede.tipo === "indefinido" ? '<p class="planning-help">Você pode decidir depois. Essa escolha não altera a conclusão da build.</p>' :
-      campo("possuiAcessorio",rede.tipo === "wifi" ? "Seu PC já consegue se conectar ao Wi-Fi?" : "Já possui um cabo de rede?",'<select id="' + prefixo + '-possuiAcessorio" data-network="possuiAcessorio"' + disabled + '>' + op("confirmar",rede.possuiAcessorio === null ? "confirmar" : String(rede.possuiAcessorio),"Não sei dizer") + op("true",String(rede.possuiAcessorio),rede.tipo === "cabo" ? "Sim, já possuo um cabo de rede" : "Sim, já tenho Wi-Fi no PC") + op("false",String(rede.possuiAcessorio),rede.tipo === "cabo" ? "Não, preciso de um cabo de rede" : "Não, preciso de um adaptador") + '</select>') +
+      campo("possuiAcessorio",rede.tipo === "wifi" ? "Quer incluir um adaptador Wi-Fi na montagem?" : "Quer incluir um cabo de rede na montagem?",'<select id="' + prefixo + '-possuiAcessorio" data-network="possuiAcessorio"' + disabled + '>' + op("confirmar",rede.possuiAcessorio === null ? "confirmar" : String(rede.possuiAcessorio),"Vou decidir depois") + op("false",String(rede.possuiAcessorio),rede.tipo === "cabo" ? "Sim, incluir um cabo de rede" : "Sim, incluir um adaptador Wi-Fi") + op("true",String(rede.possuiAcessorio),rede.tipo === "cabo" ? "Não incluir — já tenho um cabo" : "Não incluir — já tenho Wi-Fi no PC") + '</select>') +
       (rede.tipo === "cabo" && rede.possuiAcessorio === false ? campo("comprimentoCaboM","Quantos metros de cabo você precisa?",input("comprimentoCaboM",1000,"Ex.: 10")) + '<p class="planning-help">Meça o caminho do roteador até o computador, incluindo curvas, para escolher um cabo que chegue até ele.</p>' : "") +
-      (rede.tipo === "wifi" ? '<p class="planning-help" data-network-wifi-help>' + ajudaWifi(rede) + '</p>' : "") +
+      (rede.tipo === "wifi" ? '<p class="planning-help" data-network-wifi-help data-knowledge-beginner>' + ajudaWifi() + '</p>' : "") +
       (rede.possuiAcessorio === false ? '<p class="planning-help">Se não houver um acessório adequado no catálogo, avisaremos para você comprar esse item separadamente.</p>' : "")) + '</div>';
 }
 export function vincularRede(container,valor,{prefixo = "rede",bloqueado = false,aoRenderizar = () => {},aoAlterar = () => {}} = {}) {
@@ -86,7 +86,7 @@ export function vincularRede(container,valor,{prefixo = "rede",bloqueado = false
     // Só as escolhas estruturais recriam os campos: digitar ou usar as setas não perde o foco.
     if (evento.type === "change" && evento.target.tagName === "SELECT") desenhar();
     const ajuda = container.querySelector("[data-network-wifi-help]");
-    if (ajuda) ajuda.textContent = ajudaWifi(rede);
+    if (ajuda) ajuda.textContent = ajudaWifi();
     aoAlterar(rede);
   };
   container.onchange = alterar;

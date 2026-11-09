@@ -38,7 +38,7 @@ export function iniciarNavegacao() {
     iconeAnimado("profile") + '</button><nav id="profile-options" class="profile-panel" aria-label="Menu do perfil" aria-hidden="true" inert>' +
     '<div class="site-menu-group" data-profile-guest>' + links(linksVisitante, true) + '</div>' +
     '<div class="site-menu-group" data-profile-user hidden>' + links(conta, true) +
-    '<a class="profile-link font-1-s" href="' + pagina("admin.html") + '" data-menu-admin hidden aria-label="Ir para a administração"><span class="site-menu-link-label">' + iconeAnimado("user") + '<span>Administração</span></span></a>' +
+    '<a class="profile-link profile-admin font-1-s" href="' + pagina("admin.html") + '" data-menu-admin hidden aria-label="Ir para a administração"><span class="site-menu-link-label">' + iconeAnimado("admin") + '<span>Administração</span></span></a>' +
     '<div class="site-menu-divider"></div><button type="button" class="profile-link font-1-s profile-logout" id="btn-logout" aria-label="Sair da conta">' +
     '<span class="site-menu-link-label">' + iconeAnimado("logout") + '<span>Sair</span></span></button></div></nav></div>' +
     '<div class="site-menu" data-site-menu' + (preview ? "" : " hidden") + '><nav id="site-menu-panel" class="site-menu-panel" aria-label="Navegação entre páginas" aria-hidden="true" inert>' +

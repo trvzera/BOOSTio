@@ -16,9 +16,9 @@ export const prioridadesUso = {
 
 export const orientacoesEtapas = {
   orcamento:"Este valor é o máximo da montagem. Vamos dividir o dinheiro entre as peças necessárias, sem ultrapassar o limite. Reserve também um valor para o frete, que não está incluído.",
-  pecas:"Vamos manter as peças que você já tem e escolher o que falta para funcionar com elas. Não sabe o nome? Veja o modelo na caixa, na nota fiscal ou no próprio produto.",
+  pecas:"Vamos manter suas peças e escolher o que falta. As ventoinhas inclusas no gabinete ou no resfriador também contam. Não sabe o nome da peça? Procure o modelo na caixa, na nota fiscal ou no produto.",
   perifericos:"Periféricos são os itens usados junto do PC, como monitor, teclado, mouse e fone. O percentual é um limite para os novos itens; não precisamos gastar tudo nem usar a sobra no PC.",
-  rede:"O cabo liga o computador ao roteador. O adaptador permite usar Wi-Fi sem cabo. Se a placa-mãe já tiver Wi-Fi, você pode marcar que já possui o necessário.",
+  rede:"O cabo liga o computador ao roteador. O adaptador permite usar Wi-Fi sem cabo. Escolha “Sim, incluir” se precisar comprar o acessório, ou “Não incluir” se já tiver o necessário.",
   aparencia:"O gabinete é a caixa do computador. Escolha um visual de que gosta; vamos conferir o espaço das peças. Cor e estilo são preferências e podem limitar as opções dentro do orçamento.",
 };
 
