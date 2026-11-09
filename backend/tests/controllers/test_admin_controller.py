@@ -221,8 +221,8 @@ def importador_ml(monkeypatch, erro=None):
     return cliente
 
 
-def pendencia_ml(candidatos, loja='mercado_livre'):
-    p = ProdutoPendente(loja=loja, produto_id_loja='MLB10', vendedor_id='7', titulo='Seagate Exos 8TB',
+def pendencia_ml(candidatos, loja='mercado_livre', item='MLB10'):
+    p = ProdutoPendente(loja=loja, produto_id_loja=item, vendedor_id='7', titulo='Seagate Exos 8TB',
                         url='https://produto.mercadolivre.com.br/MLB-10-_JM', categoria_sugerida='hd',
                         coletado_em=datetime(2026, 11, 7), status='em_revisao', motivo='Matching ambigua',
                         dados_originais={'catalogo': {'id': 'MLB99'}, 'anuncio': {'price': 1, 'available_quantity': 1}},
@@ -535,3 +535,31 @@ def test_detalhe_marca_candidata_ja_vinculada_a_outro_catalogo(banco):
                       dict(peca=f'hd:{livre.id}', percentual=70, conflitos=[], pendencias=[])])
     candidatos = entrar(app, admin).get(f'/admin/pendencias/{p.id}').get_json()['candidatos']
     assert {c['peca']: c['vinculada_a_outro_catalogo'] for c in candidatos} == {f'hd:{ocupado.id}': 'MLB11', f'hd:{livre.id}': None}
+
+
+def test_ia_nao_escolhe_candidata_ocupada_e_rejeita_quando_todas_estao_ocupadas(banco, monkeypatch):
+    from services.admin_service.sugerir_pendencia_service import EnviarPendenciasParaIAService
+    app, admin, *_ = banco
+    ocupado, livre = hd(), hd(part_number='ST8000NM0000', modelo='Exos 8TB X')
+    db.session.add(VinculoMercadoLivre(tabela_peca='hd', peca_id=ocupado.id, catalogo_id='MLB11', assinatura_peca='a' * 64,
+                                       assinatura_catalogo='b' * 64, criterio='revisao_manual'))
+    db.session.commit()
+    candidato = lambda peca: dict(peca=f'hd:{peca.id}', percentual=72, conflitos=[], pendencias=[])
+    # todas as candidatas ocupadas: com "deixar a IA decidir", rejeita sem nem perguntar à IA
+    so_ocupada = pendencia_ml([candidato(ocupado)])
+    _ia(monkeypatch, {'peca': f'hd:{ocupado.id}', 'confianca': 99, 'justificativa': 'não deveria ser consultada'})
+    r = EnviarPendenciasParaIAService().executar([so_ocupada.id], decidir=True)
+    assert r['rejeitadas'] == 1 and r['requisicoes_ia'] == 0
+    db.session.refresh(so_ocupada)
+    assert so_ocupada.status == 'rejeitado' and 'outro catálogo' in so_ocupada.motivo
+    assert so_ocupada.evidencias['revisao_manual']['origem'] == 'ia'
+    # sem decidir (só "Enviar"), a pendência fica aberta
+    aberta = pendencia_ml([candidato(ocupado)], item='MLB20')
+    EnviarPendenciasParaIAService().executar([aberta.id])
+    db.session.refresh(aberta)
+    assert aberta.status == 'em_revisao'
+    # há uma candidata livre: a IA só enxerga a livre
+    mista = pendencia_ml([candidato(ocupado), candidato(livre)], item='MLB30')
+    from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
+    contexto = SugerirPendenciaService._contexto(mista)
+    assert [c['peca'] for c in contexto['candidatas']] == [f'hd:{livre.id}']

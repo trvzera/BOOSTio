@@ -11,6 +11,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from models import ProdutoPendente
 from services.llm_service.llm_service import LLMService
 from services.peca_service.modelos_pecas import MODELOS_PECAS
+from .catalogo_ocupado import catalogo_que_ocupa_a_peca
 from .apresentar_pendencia_service import preco_do_anuncio, resumir_ficha
 from .pendencias_acionaveis import ABERTAS, ids_acionaveis
 
@@ -53,7 +54,10 @@ class SugerirPendenciaService:
             pendencia = ProdutoPendente.buscar_por_id(pendencia_id)
             contexto = self._contexto(pendencia) if pendencia is not None and pendencia.status in ABERTAS else None
             if contexto is None:
-                if ids is not None:
+                if decidir and not simular and pendencia is not None and pendencia.status in ABERTAS \
+                        and self._todas_as_candidatas_ocupadas(pendencia):
+                    self._rejeitar_sem_candidata_livre(pendencia_id, resumo, rejeitador)
+                elif ids is not None:
                     resumo["ignoradas"] += 1
                 continue
             impressao = self._impressao(contexto)
@@ -190,8 +194,32 @@ class SugerirPendenciaService:
         return sorted(ids)
 
     @staticmethod
+    def _todas_as_candidatas_ocupadas(pendencia):
+        """Há candidatas aprovadas e sem conflito, mas todas já têm outro catálogo: nenhuma serve."""
+        elegiveis = []
+        for c in pendencia.candidatos or []:
+            categoria, _, identificador = str(c.get("peca", "")).partition(":")
+            modelo = next((m for m in MODELOS_PECAS if m.__tablename__ == categoria), None)
+            peca = modelo.buscar_por_id(int(identificador)) if modelo and identificador.isdecimal() else None
+            if peca is not None and peca.publicavel and not c.get("conflitos"):
+                elegiveis.append(catalogo_que_ocupa_a_peca(pendencia, peca))
+        return bool(elegiveis) and all(elegiveis)
+
+    @staticmethod
+    def _rejeitar_sem_candidata_livre(pendencia_id, resumo, rejeitador):
+        from sqlalchemy.exc import SQLAlchemyError
+        from .rejeitar_pendencia_service import RejeitarPendenciaService
+        motivo = "IA: sem correspondência segura. Todas as candidatas já têm outro catálogo do Mercado Livre."
+        try:
+            (rejeitador or RejeitarPendenciaService()).executar(pendencia_id, None, motivo, origem="ia")
+            resumo["rejeitadas"] += 1
+            resumo["detalhes"].append({"pendencia_id": pendencia_id, "peca": None, "confianca": 100, "decisao": "rejeitada"})
+        except (ValueError, LookupError, SQLAlchemyError):
+            resumo["decisoes_falhas"] += 1
+
+    @staticmethod
     def _contexto(pendencia):
-        """Candidatas aprovadas e sem conflito; sem elas não há o que sugerir."""
+        """Candidatas aprovadas, sem conflito e livres de outro catálogo; sem elas não há o que sugerir."""
         candidatas = []
         for c in pendencia.candidatos or []:
             if c.get("conflitos"):
@@ -199,7 +227,7 @@ class SugerirPendenciaService:
             categoria, _, identificador = str(c.get("peca", "")).partition(":")
             modelo = next((m for m in MODELOS_PECAS if m.__tablename__ == categoria), None)
             peca = modelo.buscar_por_id(int(identificador)) if modelo and identificador.isdecimal() else None
-            if peca is None or not peca.publicavel:
+            if peca is None or not peca.publicavel or catalogo_que_ocupa_a_peca(pendencia, peca):
                 continue
             candidatas.append({"peca": c["peca"], "fabricante": peca.fabricante, "modelo": peca.modelo,
                                "part_number": peca.part_number, "ficha": resumir_ficha(peca),
