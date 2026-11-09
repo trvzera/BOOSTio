@@ -11,7 +11,7 @@ trap 'rm -f "$temporario"' EXIT
 
 docker compose --env-file .env.production exec -T db sh -c \
   'exec mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" --single-transaction --routines --triggers "$MYSQL_DATABASE"' \
-  | gzip > "$temporario"
+  </dev/null | gzip > "$temporario"
 gzip -t "$temporario"
 mv "$temporario" "$arquivo"
 printf '%s\n' "$arquivo"

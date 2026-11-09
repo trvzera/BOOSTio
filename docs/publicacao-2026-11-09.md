@@ -15,6 +15,17 @@ foi incorporado à `main`, mas preparar a imagem não atualiza os contêineres e
 - O checkout de produção `/opt/BOOSTio` foi preservado. Na inspeção anterior,
   estava em `62258e4`, com alterações locais em páginas HTML e arquivos não
   rastreados. Essas alterações precisam ser revisadas e preservadas ao atualizar.
+- O preflight do MySQL identificou colunas de validação do catálogo e outras
+  tabelas ainda ausentes. A migração de benchmarks recusou avançar antes delas.
+- O backup terminou em `/root/boostio-backups/boostio-20261109T130922Z.sql.gz`.
+  O script verifica a integridade gzip antes de publicar o arquivo.
+- A primeira rotina parou depois do backup, sem confirmar as migrações. API e
+  frontend foram reiniciados, e os endereços públicos voltaram a responder HTTP 200.
+- O responsável confirmou `boostio-precos.timer` ativo. Isso comprova o
+  agendamento antigo, não uma nova coleta nem o funcionamento do worker.
+- `marketplaces-fila-preparar --aplicar` criou `tarefa_marketplace` e
+  `limite_marketplace`. A repetição retornou `tabelas: []`, e o resumo retornou
+  `[]`: fila preparada, ainda sem tarefas.
 
 O console web perdeu repetidamente o foco de digitação e deixou de confirmar
 novos comandos, mesmo após abrir outra sessão e receber foco manualmente.
@@ -35,27 +46,40 @@ não comprovam a migração do MySQL de produção nem a disponibilidade dos pro
 externos. A consulta pública `GET https://api.boostio.com.br/health` respondeu
 `{"status":"ok"}`; ela verifica o serviço que já estava publicado.
 
-## Ainda não executado na VPS
+## Ainda pendente na VPS
 
-- Inspeção do esquema real do MySQL com a imagem nova e definição das migrações necessárias.
-- Backup do MySQL antes das alterações.
-- Aplicação das migrações, repetição dos preflights e conferência dos dados preservados.
+- Aplicação das demais migrações, repetição dos preflights e conferência dos dados preservados.
 - Atualização do checkout de produção, reconstrução/publicação de API e frontend.
 - Homologação dos fluxos com a versão publicada.
 - Rotina de aprovação da amostra, enfileiramento de ofertas, worker e sugestões de IA.
 
-Não foram apagados volumes, restaurados bancos, substituídos serviços nem
-executadas sugestões de IA na VPS nesta preparação.
+Não foram apagados volumes, restaurados bancos, publicadas novas imagens de
+API/frontend nem executadas sugestões de IA na VPS nesta preparação.
+
+## Correção da entrada do backup
+
+O `docker compose exec -T` do backup herdava a entrada padrão. Quando chamado
+de uma rotina lida pelo stdin, podia consumir os comandos seguintes. O problema
+foi reproduzido localmente com um executável Docker simulado; a correção redireciona
+a entrada para `/dev/null`. Os dois testes verificam que o comando posterior é
+executado, tanto no sucesso quanto na falha, e que uma falha não publica o dump.
+
+Essa correção no repositório ainda precisa ser publicada na VPS. Até lá, ao
+chamar o backup existente em um bloco, redirecionar explicitamente a entrada:
+
+```bash
+BOOSTIO_BACKUP_DIR=/root/boostio-backups bash /opt/BOOSTio/deploy/backup_mysql.sh </dev/null
+```
 
 ## Retomada
 
 Primeiro, restabelecer uma sessão do console com entrada e saída confiáveis.
 Conferir novamente o estado do repositório, dos contêineres e de qualquer tarefa
-em execução. O comando abaixo é um **preflight ainda não executado** e usa a
+em execução. O comando abaixo repete o **preflight, sem aplicar alterações**, e usa a
 imagem já construída, com a configuração de produção existente no servidor:
 
 ```bash
-docker run --rm --network container:boostio-api-1 --env-file /opt/BOOSTio/.env.production -e APP_ENV=producao -w /app/backend boostio-catalogo:20261109 python -m flask --app app banco-atualizar-mysql
+docker run --rm --network boostio_backend --env-file /opt/BOOSTio/.env.production -e APP_ENV=producao -w /app/backend boostio-catalogo:20261109 python -m flask --app app banco-atualizar-mysql
 ```
 
 Esse comando simula a migração de benchmarks; não cobre automaticamente todas
