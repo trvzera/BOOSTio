@@ -6,6 +6,7 @@ from defusedxml.common import DefusedXmlException
 from xml.etree.ElementTree import ParseError
 from services.icecat_service.indice_icecat_service import IndiceIcecatService
 from services.icecat_service.completar_ficha_icecat_service import CompletarFichaIcecatService
+from services.icecat_service.completar_pecas_icecat_service import CompletarPecasIcecatService
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
 from services.peca_service.modelos_pecas import MODELOS_PECAS
 
@@ -43,3 +44,19 @@ def registrar_comandos_icecat(app):
             click.echo(json.dumps(resultado, ensure_ascii=False, default=str))
         except (ValueError, OSError, ParseError, DefusedXmlException):
             raise click.ClickException('Consulta não concluída; confira acesso Icecat, índice e ficha') from None
+
+    @app.cli.command('icecat-completar-pecas')
+    @click.option('--categoria', required=True, type=click.Choice([m.__tablename__ for m in MODELOS_PECAS]))
+    @click.option('--limite', default=100, type=click.IntRange(1, 500), help='Peças por execução.')
+    @click.option('--depois-id', default=0, type=click.IntRange(min=0), help='Retoma depois desta peça.')
+    @click.option('--aplicar', is_flag=True, help='Grava; sem esta opção só simula e mostra os números.')
+    def completar_pecas(categoria, limite, depois_id, aplicar):
+        """Completa campos vazios das peças em revisão com a ficha do Icecat (casa por part number)."""
+        try:
+            resumo = CompletarPecasIcecatService().executar(categoria=categoria, limite=limite,
+                                                            depois_id=depois_id, simular=not aplicar)
+        except (ValueError, OSError) as erro:
+            raise click.ClickException(str(erro)) from None
+        click.echo(json.dumps(resumo, ensure_ascii=False, default=str))
+        if resumo['interrompido']:
+            raise click.ClickException('Lote interrompido; retome com --depois-id ' + str(resumo['ultima_peca_id']))
