@@ -47,6 +47,7 @@ services:
       IMAGENS_COLETADAS_DIR: /dados/coletados
     volumes:
       - imagens_coletadas:/dados/coletados
+      - icecat_dados:/dados/icecat
     depends_on:
       db:
         condition: service_healthy
@@ -88,6 +89,7 @@ services:
     command: ["python", "-m", "flask", "--app", "app", "catalogo-worker", "--plano", "/app/plano-catalogo.json", "--aplicar"]
     volumes:
       - ${CATALOGO_PLANO:-./backend/data/catalogo/plano-exemplo.json}:/app/plano-catalogo.json:ro
+      - icecat_dados:/dados/icecat
     depends_on:
       db:
         condition: service_healthy
@@ -112,6 +114,8 @@ services:
     environment:
       APP_ENV: producao
     command: ["python", "-m", "flask", "--app", "app", "marketplaces-worker"]
+    volumes:
+      - icecat_dados:/dados/icecat
     depends_on:
       db:
         condition: service_healthy
@@ -160,6 +164,7 @@ volumes:
   mysql_data:
   redis_data:
   imagens_coletadas:
+  icecat_dados:
 
 networks:
   marketplaces-egress:
