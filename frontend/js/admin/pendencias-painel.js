@@ -22,6 +22,7 @@ export function iniciarPendencias(raiz) {
   const filtros = raiz.querySelector("[data-pendencias-filtros]");
   const lista = raiz.querySelector("[data-pendencias-lista]");
   const detalhe = raiz.querySelector("[data-pendencias-detalhe]");
+  const placeholder = raiz.querySelector("[data-pendencias-placeholder]");
   const resumo = raiz.querySelector("[data-pendencias-resumo]");
   const status = raiz.querySelector("[data-pendencias-status]");
   const maisBotao = raiz.querySelector("[data-pendencias-mais]");
@@ -34,7 +35,22 @@ export function iniciarPendencias(raiz) {
   const selects = {
     status: filtros.elements.status, loja: filtros.elements.loja, categoria: filtros.elements.categoria,
   };
-  let proximo = null, selecionada = null, requisicao = 0;
+  let proximo = null, selecionada = null, requisicao = 0, requisicaoDetalhe = 0;
+
+  function atualizarSelecao() {
+    lista.querySelectorAll(".admin-pending-item").forEach(item => {
+      const atual = Number(item.dataset.pendingId) === selecionada;
+      item.toggleAttribute("data-selected", atual);
+      item.querySelector(".admin-pending-open").setAttribute("aria-expanded", String(atual));
+    });
+  }
+  function fecharDetalhe() {
+    selecionada = null;
+    requisicaoDetalhe++;
+    detalhe.hidden = true;
+    placeholder.hidden = false;
+    atualizarSelecao();
+  }
 
   const avisar = (mensagem, erro = false) => {
     status.textContent = mensagem;
@@ -44,6 +60,7 @@ export function iniciarPendencias(raiz) {
 
   function cartao(pendencia) {
     const item = elemento("li", "admin-pending-item");
+    item.dataset.pendingId = String(pendencia.id);
     if (pendencia.id === selecionada) item.dataset.selected = "";
     const cabecalho = elemento("div", "admin-pending-head");
     const marcar = elemento("input", "admin-pending-check");
@@ -58,11 +75,14 @@ export function iniciarPendencias(raiz) {
       cabecalho.append(elemento("span", "admin-badge admin-badge-ia", textoSugestao(pendencia.sugestao_ia)));
     }
     const titulo = elemento("h3", "admin-pending-title font-1-m", pendencia.titulo);
-    const meta = elemento("p", "admin-pending-meta font-2-s",
-      `${formatarFaixaPreco(pendencia.preco)} · ${pendencia.total_candidatos} candidato(s) · ${rotuloSituacao(pendencia.status)}`);
-    const botao = elemento("button", "btn-ghost admin-pending-open", "Analisar");
+    const meta = elemento("p", "admin-pending-meta font-2-s");
+    meta.append(elemento("strong", "admin-pending-price", formatarFaixaPreco(pendencia.preco)),
+      elemento("span", "", `${pendencia.total_candidatos} candidato(s) · ${rotuloSituacao(pendencia.status)}`));
+    const botao = elemento("button", "btn-ghost admin-pending-open", "Analisar anúncio →");
     botao.type = "button";
     botao.setAttribute("aria-label", `Analisar pendência: ${pendencia.titulo}`);
+    botao.setAttribute("aria-controls", detalhe.id);
+    botao.setAttribute("aria-expanded", String(pendencia.id === selecionada));
     botao.addEventListener("click", () => abrir(pendencia.id));
     item.append(cabecalho, titulo, meta, botao);
     return item;
@@ -152,12 +172,20 @@ export function iniciarPendencias(raiz) {
     : enviarParaIA(marcadas().map(c => Number(c.value)), {decidir: decidirIA.checked, refazer: true});
 
   function mostrarResumo(porStatus) {
-    resumo.replaceChildren(...Object.entries(porStatus || {}).map(([situacao, total]) =>
-      elemento("li", "admin-count", `${rotuloSituacao(situacao)}: ${total}`)));
+    const titulos = {em_revisao: "Em revisão", pendente: "Pendentes", importado: "Aceitas", rejeitado: "Rejeitadas"};
+    const situacoes = new Set(["em_revisao", "pendente", "importado", "rejeitado", ...Object.keys(porStatus || {})]);
+    resumo.replaceChildren(...[...situacoes].map(situacao => {
+      const cartao = elemento("li", "admin-count");
+      cartao.dataset.status = situacao;
+      cartao.append(elemento("strong", "", new Intl.NumberFormat("pt-BR").format(porStatus?.[situacao] ?? 0)),
+        elemento("span", "", titulos[situacao] || rotuloSituacao(situacao)));
+      return cartao;
+    }));
   }
 
   async function carregar({anexar = false} = {}) {
     const minha = ++requisicao;
+    lista.setAttribute("aria-busy", "true");
     avisar("Carregando…");
     try {
       const dados = await listarPendencias({...filtrosAtuais(), depoisId: anexar ? proximo : 0});
@@ -169,6 +197,12 @@ export function iniciarPendencias(raiz) {
       const itens = dados.pendencias.map(cartao);
       if (!anexar) todasSelecionadas = false;
       if (anexar) lista.append(...itens); else lista.replaceChildren(...itens);
+      if (!lista.children.length) {
+        const vazio = elemento("li", "admin-empty");
+        vazio.append(elemento("h3", "", "Sem pendências por aqui"),
+          elemento("p", "", "Altere os filtros para revisar outros anúncios."));
+        lista.append(vazio);
+      }
       proximo = dados.proximo;
       maisBotao.hidden = proximo === null;
       mostrarResumo(dados.por_status);
@@ -176,6 +210,8 @@ export function iniciarPendencias(raiz) {
       avisar(dados.total ? `${dados.total} pendência(s) neste filtro.` : "Nenhuma pendência neste filtro.");
     } catch (erro) {
       if (minha === requisicao) avisar(erro.message, true);
+    } finally {
+      if (minha === requisicao) lista.setAttribute("aria-busy", "false");
     }
   }
 
@@ -222,26 +258,45 @@ export function iniciarPendencias(raiz) {
   }
 
   async function abrir(id) {
+    const minha = ++requisicaoDetalhe;
     selecionada = id;
     avisar("Carregando detalhes…");
     try {
       const dados = await detalharPendencia(id);
+      if (minha !== requisicaoDetalhe) return;
       desenharDetalhe(dados);
-      lista.querySelectorAll(".admin-pending-item").forEach(i => i.removeAttribute("data-selected"));
+      atualizarSelecao();
+      detalhe.querySelector("h2").focus({preventScroll: true});
+      if (window.matchMedia("(max-width: 1100px)").matches) detalhe.scrollIntoView({block: "start"});
       avisar("");
-    } catch (erro) { avisar(erro.message, true); }
+    } catch (erro) { if (minha === requisicaoDetalhe) avisar(erro.message, true); }
   }
 
   function desenharDetalhe(dados) {
     detalhe.hidden = false;
+    placeholder.hidden = true;
     detalhe.replaceChildren();
+    const cabecalho = elemento("div", "admin-detail-heading");
+    const identificacao = elemento("div");
+    identificacao.append(elemento("span", "admin-detail-kicker", "Revisão do anúncio"));
     const titulo = elemento("h2", "admin-detail-title font-1-m", dados.titulo);
     titulo.id = "admin-detalhe-titulo";
+    titulo.tabIndex = -1;
+    identificacao.append(titulo);
+    const fechar = elemento("button", "admin-detail-close", "×");
+    fechar.type = "button";
+    fechar.setAttribute("aria-label", "Fechar análise e voltar à lista de anúncios");
+    fechar.addEventListener("click", () => {
+      const origem = lista.querySelector(`[data-pending-id="${selecionada}"] .admin-pending-open`);
+      fecharDetalhe();
+      origem?.focus();
+    });
+    cabecalho.append(identificacao, fechar);
     detalhe.setAttribute("aria-labelledby", titulo.id);
     const link = linkSeguro(dados.url);
     const origem = link ? elemento("a", "admin-link font-2-s", "Abrir anúncio na loja") : elemento("span", "font-2-s", "Link indisponível");
     if (link) { origem.href = link; origem.target = "_blank"; origem.rel = "noopener noreferrer"; }
-    detalhe.append(titulo,
+    detalhe.append(cabecalho,
       elemento("p", "font-2-s", `${rotuloLoja(dados.loja)} · ${rotuloCategoria(dados.categoria)} · ${formatarFaixaPreco(dados.preco)}`),
       origem);
     if (dados.motivo) detalhe.append(elemento("p", "admin-note font-2-s", dados.motivo));
@@ -261,7 +316,7 @@ export function iniciarPendencias(raiz) {
     motivo.type = "text"; motivo.maxLength = 200; motivo.placeholder = "Motivo da rejeição (opcional)";
     motivo.setAttribute("aria-label", "Motivo da rejeição");
     const aceitar = elemento("button", "btn-primary", "Aceitar peça selecionada");
-    const rejeitar = elemento("button", "btn-ghost", "Rejeitar anúncio");
+    const rejeitar = elemento("button", "btn-ghost admin-action-reject", "Rejeitar anúncio");
     aceitar.type = rejeitar.type = "button";
     aceitar.disabled = true;
     grupo.addEventListener("change", () => { aceitar.disabled = !grupo.querySelector("input:checked"); });
@@ -277,8 +332,7 @@ export function iniciarPendencias(raiz) {
     avisar("Salvando decisão…");
     try {
       await acao();
-      detalhe.hidden = true;
-      selecionada = null;
+      fecharDetalhe();
       await carregar();
       avisar(sucesso);
     } catch (erro) {
@@ -289,7 +343,7 @@ export function iniciarPendencias(raiz) {
     }
   }
 
-  filtros.addEventListener("submit", evento => { evento.preventDefault(); detalhe.hidden = true; carregar(); });
+  filtros.addEventListener("submit", evento => { evento.preventDefault(); fecharDetalhe(); carregar(); });
   todas.addEventListener("change", selecionarTodas);
   vinte.addEventListener("change", selecionarVinte);
   enviarIA.addEventListener("click", enviarSelecionadasParaIA);

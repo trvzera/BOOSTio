@@ -1,0 +1,138 @@
+[
+  {
+    "slide": 1,
+    "title": "BOOSTio",
+    "tempo": 20,
+    "apresentador": "Arthur Ferreira Raymundo",
+    "fala": "Boa tarde! Somos Arthur, Gustavo Azevedo, Gustavo Horta, Giovanni e Kayky, da turma 3A2. A BOOSTio ajuda quem vai montar ou melhorar um computador a escolher as peças de acordo com o uso, o orçamento e o que já possui.",
+    "notas_tecnicas": "Os nomes completos estão no slide e não precisam ser lidos. Fonte: README.md, apresentação do projeto. Data do pitch: 10/11/2026."
+  },
+  {
+    "slide": 2,
+    "title": "O diferencial da BOOSTio",
+    "tempo": 15,
+    "apresentador": "Arthur Ferreira Raymundo",
+    "fala": "Quem monta o primeiro PC precisa decidir onde investir e quais peças combinam. A plataforma reúne sugestão por uso e orçamento, reaproveitamento de peças, diagnóstico e comparação. Nosso público inclui estudantes, jogadores e profissionais.",
+    "notas_tecnicas": "Recursos da plataforma, sem alegação de exclusividade. Fontes: README.md, RF03, RF04, RF06, RF07 e RF13."
+  },
+  {
+    "slide": 3,
+    "title": "Montagem inteligente",
+    "tempo": 8,
+    "apresentador": "Arthur Ferreira Raymundo",
+    "fala": "O formulário transforma uso, orçamento e peças já possuídas em uma sugestão de configuração.",
+    "notas_tecnicas": "README.md: RF04; frontend/pages/formulario.html; backend/services/build_service/gerar_build_service.py. Usar gravação real; não há vídeo incorporado. Trecho silencioso de 6 a 8 segundos; inserir no mesmo bloco de 8s, sem aumentar a duração."
+  },
+  {
+    "slide": 4,
+    "title": "Compatibilidade e consumo",
+    "tempo": 8,
+    "apresentador": "Arthur Ferreira Raymundo",
+    "fala": "O diagnóstico mostra conflitos e consumo estimado. Dados insuficientes deixam a verificação pendente.",
+    "notas_tecnicas": "README.md: RF13; frontend/js/build/compatibilidade.js; backend/services/validacoes_service/avaliar_compatibilidade_service.py. Consumo é estimativa. Trecho silencioso de 6 a 8 segundos; inserir no mesmo bloco de 8s, sem aumentar a duração."
+  },
+  {
+    "slide": 5,
+    "title": "Comparação de builds",
+    "tempo": 8,
+    "apresentador": "Arthur Ferreira Raymundo",
+    "fala": "Duas builds lado a lado mostram diferenças de peças, preço e consumo estimado.",
+    "notas_tecnicas": "README.md: RF07; frontend/js/build/comparacao.js. Cálculo básico ocorre no navegador com dados carregados pela API. Preços dependem da última consulta e não incluem frete. Trecho silencioso de 6 a 8 segundos; inserir no mesmo bloco de 8s, sem aumentar a duração."
+  },
+  {
+    "slide": 6,
+    "title": "Compartilhamento de configurações",
+    "tempo": 8,
+    "apresentador": "Arthur Ferreira Raymundo",
+    "fala": "O link público permite consultar sem login. Só o proprietário pode alterar a configuração original.",
+    "notas_tecnicas": "README.md: RF08; backend/services/build_service/buscar_build_publica_service.py; frontend/js/build/compartilhamento.js. A demonstração completa deve evidenciar controle de acesso. Trecho silencioso de 6 a 8 segundos; inserir no mesmo bloco de 8s, sem aumentar a duração."
+  },
+  {
+    "slide": 7,
+    "title": "Configurações prontas",
+    "tempo": 8,
+    "apresentador": "Arthur Ferreira Raymundo",
+    "fala": "Os modelos prontos são pontos de partida para escolher e personalizar conforme a necessidade.",
+    "notas_tecnicas": "README.md: RF10; frontend/pages/configuracoes-prontas.html; frontend/js/build/modelos.js. Não contar abertura/listagem como uma das quatro funções não CRUD. Trecho silencioso de 6 a 8 segundos; inserir no mesmo bloco de 8s, sem aumentar a duração."
+  },
+  {
+    "slide": 8,
+    "title": "Modelo de domínio",
+    "tempo": 30,
+    "apresentador": "Gustavo Azevedo Oliveira",
+    "fala": "Este é um recorte do domínio revisado no código. Usuario possui configurações. Build referencia modelos do catálogo, como Processador, que herda de Peca. BuildSalva guarda o estado em JSON e pode existir sem uma Build original. Ofertas concentram preço e disponibilidade; a referência à peça usa categoria e ID. O conteúdo JSON não cria relações SQL com cada componente.",
+    "notas_tecnicas": "Fontes: backend/models/{usuario,build,build_salva,peca,processador,oferta,preco_oferta}.py. Diagrama docs/diagrama-classes.png revisado: preço, disponibilidade e data de preço são derivados das ofertas; não são apresentados como colunas físicas de Peca neste recorte. Todas as entidades do recorte herdam de ModeloBase, diretamente ou via Peca; a base e outros componentes foram omitidos para leitura. Usuario–Build e Usuario–BuildSalva: 1 para 0..*. Build original–BuildSalva: 0..1 em ambos os lados. Build–Processador: 0..* para 1. Peca é abstrata, e Oferta usa referência lógica tabela_peca+peca_id sem FK para uma tabela Peca. Limite de negócio de três configurações salvas por conta. Sem composição."
+  },
+  {
+    "slide": 9,
+    "title": "Recuperação de dados",
+    "tempo": 25,
+    "apresentador": "Gustavo Azevedo Oliveira",
+    "fala": "A consulta do histórico começa com categoria e ID da peça. O Controller chama o Service, que procura a oferta ativa no Repository. Este consulta Oferta via SQLAlchemy e banco. O Service também lê o histórico diretamente na Model. O Controller devolve JSON.",
+    "notas_tecnicas": "Fluxo real: GET /build/catalogo/<categoria>/<peca_id>/historico-precos → historico_precos_peca() → ConsultarHistoricoPrecosService.executar() → repositories.ofertas_kabum_repository.buscar_ativa() → Oferta.query → banco. O mesmo Service também chama HistoricoOferta.listar(oferta.id) diretamente, fora do Repository. Fontes: backend/controllers/build_controller.py; backend/services/peca_service/consultar_historico_precos_service.py; backend/repositories/ofertas_kabum_repository.py. O Controller é função de módulo, não uma classe BuildController. Respostas: 200; entrada inválida 400, peça ausente 404, falha SQL 503."
+  },
+  {
+    "slide": 10,
+    "title": "Entrada de dados",
+    "tempo": 25,
+    "apresentador": "Gustavo Azevedo Oliveira",
+    "fala": "Na criação manual, o frontend envia o estado da configuração. criar_build_manual chama o Service, que valida o JSON e aplica o orçamento. BuildSalva verifica e-mail e limite da conta, persiste e confirma a transação. O Controller retorna 201. Entrada inválida retorna 400; limite, 409; falha de banco faz rollback. Neste fluxo, a gravação ainda não passa por Repository.",
+    "notas_tecnicas": "Fluxo real: POST /build/manual → criar_build_manual() → CriarBuildManualService.executar() → validar_estado() → BuildSalva.criar_limitada() → db.session.add/commit. Sem Repository na escrita deste caso de uso. Não inserir uma etapa fictícia. Falhas: 400 ValueError, 403 e-mail não verificado via handler, 409 LimiteBuildsError via handler, 500 SQLAlchemyError com rollback. Fontes: backend/controllers/build_controller.py; backend/services/build_service/criar_build_manual_service.py; backend/services/validacoes_service/validar_estado_build_service.py; backend/models/build_salva.py. Adequação pendente à exigência de Repository neste fluxo de escrita."
+  },
+  {
+    "slide": 11,
+    "title": "Arquitetura e organização",
+    "tempo": 25,
+    "apresentador": "Gustavo Lopes Horta",
+    "fala": "O frontend tem páginas, estilos e módulos de consumo da API. No backend, funções em Controllers recebem HTTP; Services executam as regras; Repositories concentram consultas específicas, como a oferta ativa. Models representam os dados e ainda executam parte do CRUD. Por isso, a estrutura existe, mas nem todos os fluxos usam Repository.",
+    "notas_tecnicas": "Fontes: árvore real frontend/ e backend/; controllers/build_controller.py; services/peca_service/consultar_historico_precos_service.py; repositories/ofertas_kabum_repository.py; models/base.py. O README descreve Controllers como classes, mas o Controller de build atual contém funções de módulo. Não repetir essa descrição desatualizada. A escrita de BuildSalva e a leitura de HistoricoOferta continuam nas Models."
+  },
+  {
+    "slide": 12,
+    "title": "Frontend e API separados",
+    "tempo": 30,
+    "apresentador": "Gustavo Lopes Horta",
+    "fala": "A interface está em boostio.com.br e a API em outro domínio, api.boostio.com.br. O navegador envia HTTP e recebe JSON. Nesta checagem, o health respondeu 200 com status ok e permitiu a origem do frontend. O vídeo de Network deve mostrar também uma ação de negócio, o status e a resposta, com cookies e tokens ocultos.",
+    "notas_tecnicas": "Evidência real de 09/11/2026: GET https://api.boostio.com.br/health → HTTP 200, Content-Type application/json, corpo {\"status\":\"ok\"}; Access-Control-Allow-Origin: https://boostio.com.br e credenciais permitidas. GET do health não comprova sozinho o funcionamento de todos os endpoints de negócio. HTTPS do site também respondeu 200. Arquivos: referencias/api-health.json; compose.yaml; frontend/js/api/_shared/fetchComErro.js. Inserir gravação real de Network, sem abrir headers sensíveis."
+  },
+  {
+    "slide": 13,
+    "title": "Demonstração funcional",
+    "tempo": 110,
+    "apresentador": "Giovanni de Castro Morais Trivellato",
+    "fala": "00:00–00:35 — Aqui confirmamos as últimas respostas do formulário e enviamos a solicitação. A configuração retornada considera o objetivo, o orçamento e as peças informadas. [Mostrar o resultado real.]\n\n00:35–01:00 — Agora o editor aplica uma regra a componentes com dados conhecidos. [Apontar o motivo exibido.] O consumo é uma estimativa; verificações sem dados ficam pendentes.\n\n01:00–01:25 — Na comparação, estas duas builds diferem em [peça, preço ou consumo observado]. [Apontar a diferença real, sem decorar um valor inventado.]\n\n01:25–01:50 — Tornamos esta build pública e copiamos o link. Abrindo sem login, a configuração fica disponível para consulta, sem alterar a original. [Mostrar os controles de edição ausentes/bloqueados. Se couber, tornar privada e mostrar o bloqueio de acesso.]",
+    "notas_tecnicas": "Vídeo ainda não fornecido; este slide contém uma área editável, sem gravação simulada. Vídeo final: 110 segundos, RF04 35s + RF13 25s + RF07 25s + RF08 25s. Pode cortar espera de rede preservando a execução e os resultados reais. Preferir MP4 H.264 1920×1080. No PowerPoint, inserir dentro da área e definir início automático, sem repetir; avanço manual ao término. Manter a duração total deste slide em 110s. Desativar áudio se o apresentador narrar. Gravar com conta de demonstração verificada e espaço livre (máximo 3 builds). Não usar cadastro/listagem/edição isolada como as quatro funções. FPS e integrações não homologadas ficam fora deste bloco."
+  },
+  {
+    "slide": 14,
+    "title": "Persistência com ORM",
+    "tempo": 17,
+    "apresentador": "Kayky Luiz Ferreira de Paula da Silva",
+    "fala": "O SQLAlchemy persiste as entidades pela sessão. Em SQLite temporário, conferimos criação, leitura, atualização e exclusão com o código real. A oferta 12 foi alterada e removida. São dados de demonstração, sem acessar a produção.",
+    "notas_tecnicas": "Código literal de backend/models/base.py. Evidência executada em 09/11/2026: scripts/conferir-evidencia.py, com Flask e Models reais em SQLite em memória. Resultado: oferta 12 consultada por 189.90; atualizada para 194.90; após exclusão, buscar_ativa retorna oferta 11. Arquivo referencias/evidencia-orm-repository.json. Não é comprovação de MySQL em produção nem cotação atual. Nenhuma credencial, conta ou registro de produção foi usado. A evidência textual no slide é real; o vídeo opcional ainda não foi fornecido."
+  },
+  {
+    "slide": 15,
+    "title": "Consultas na camada Repository",
+    "tempo": 18,
+    "apresentador": "Kayky Luiz Ferreira de Paula da Silva",
+    "fala": "buscar_ativa filtra categoria, peça, loja e estado ativo, escolhendo o maior ID. Nos dados de demonstração, retornou a oferta 12 e excluiu a inativa e a de outra categoria. A consulta ORM fica no Repository.",
+    "notas_tecnicas": "Código literal, apenas quebrado em linhas para leitura: backend/repositories/ofertas_kabum_repository.py:buscar_ativa. Não é SQL escrito manualmente. SQL compilado pelo ORM e resultados completos em referencias/evidencia-orm-repository.json. Entrada: processador id7; oferta11 ativa199.90, 12 ativa189.90, 13 inativa99.90, 14 categoriaSSD49.90. Retorno12; critério maior ID ativo. SQLite isolado, sem loja ou rede. O parâmetro opcional bloquear usa populate_existing/with_for_update; não dizer que o teste SQLite comprova lock MySQL."
+  },
+  {
+    "slide": 16,
+    "title": "Tecnologias e documentação",
+    "tempo": 25,
+    "apresentador": "Kayky Luiz Ferreira de Paula da Silva",
+    "fala": "A API usa Python, Flask e SQLAlchemy; o frontend, HTML, CSS e JavaScript. MySQL persiste os dados; Redis apoia os limites de requisição; Docker separa os serviços. O README documenta vinte requisitos e seus escopos. A hospedagem foi verificada; IA funcional e consentimento exigem suas próprias evidências.",
+    "notas_tecnicas": "Fontes: README.md; requirements.txt; compose.yaml; backend/config.py. MySQL8.4 e Redis7 definidos no Compose, imagens separadas para API/frontend, além de proxy. A integração de geração por IA existe; só reivindicar bônus funcional depois da gravação real de RF04. Hospedagem HTTP verificada em 09/11/2026; autenticação e demais funções de produção não foram homologadas neste trabalho. Não foi localizado registro persistido de consentimento no fluxo criarUsuario; checkbox não comprova bônus. FPS e integrações ainda não homologadas devem ser tratados como desenvolvimento. Não ler os vinte RF em voz alta."
+  },
+  {
+    "slide": 17,
+    "title": "Encerramento",
+    "tempo": 10,
+    "apresentador": "Kayky Luiz Ferreira de Paula da Silva",
+    "fala": "A BOOSTio ajuda a planejar o próximo computador com escolhas compatíveis com o uso e o orçamento. Vocês podem conhecer o projeto em boostio.com.br. Obrigado!",
+    "notas_tecnicas": "Encerrar sem abrir novas funções. Tempo total planejado: 390 segundos, incluindo vídeo de 110 segundos. Margem até o limite de 7min: 30 segundos."
+  }
+]

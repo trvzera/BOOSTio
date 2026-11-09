@@ -1,0 +1,13 @@
+Esta pasta está preparada para receber as gravações reais.
+
+03-rf04-formulario.mp4          6-8s
+04-rf13-compatibilidade.mp4     6-8s
+05-rf07-comparacao.mp4          6-8s
+06-rf08-compartilhamento.mp4    6-8s
+07-rf10-prontas.mp4             6-8s
+12-rede-api.mp4                8-12s
+13-demonstracao-1m50.mp4        110s
+16-readme.mp4                  6-8s
+
+Os cinco primeiros podem ser GIFs. Não há gravações incluídas nesta entrega.
+Consulte o guia de gravação e o manifesto de áreas antes de inserir no PowerPoint.

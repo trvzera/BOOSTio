@@ -63,6 +63,10 @@
 .profile-link:hover .ui-lottie, .profile-link:focus-visible .ui-lottie { color: inherit; }
 .site-menu-link[aria-current="page"], .profile-link[aria-current="page"] { color: var(--cor-p1); background: transparent; cursor: default; }
 .profile-link[aria-current="page"] .ui-lottie { color: inherit; }
+.profile-link.profile-admin { margin-top: 4px; border: 1px solid #c4a0ff38; color: #d4b8ff; background: #b58aff14; }
+.profile-link.profile-admin .ui-lottie { color: inherit; }
+.profile-link.profile-admin:not([aria-current="page"]):is(:hover,:focus-visible) { color: #eadbff; border-color: #c4a0ff; background: #b58aff24; }
+.profile-link.profile-admin:focus-visible { outline: 2px solid #c4a0ff; outline-offset: 2px; }
 .profile-logout, .profile-logout .ui-lottie { color: var(--status-error); }
 .profile-logout:hover, .profile-logout:focus-visible { color: var(--status-error); background: var(--status-error-bg); }
 @media (prefers-reduced-motion: reduce) { .site-profile * { transition: none !important; } }
