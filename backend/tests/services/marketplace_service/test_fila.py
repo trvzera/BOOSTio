@@ -203,3 +203,19 @@ def test_enfileirar_sem_categoria_percorre_todas_e_so_pecas_aprovadas_e_completa
     uma = json.loads(runner.invoke(args=['marketplaces-enfileirar-ofertas', '--loja', 'shopee', '--categoria', 'processador', '--execucao', 'so-cpu']).output)
     assert uma['tarefas'] == 2 and list(uma['por_categoria']) == ['processador']
     assert runner.invoke(args=['marketplaces-enfileirar-ofertas', '--loja', 'shopee', '--peca-id', '1', '--execucao', 'x']).exit_code != 0
+
+
+def test_404_nao_envenena_as_proximas_chamadas_da_tarefa(banco):
+    _, repo = banco
+    agora = datetime.now(timezone.utc).replace(tzinfo=None)+timedelta(seconds=1)
+    controle = ControleRequisicoesMarketplaceService('mercado_livre', repo, relogio=lambda: agora, dormir=lambda _: None)
+    with pytest.raises(FalhaMarketplace) as erro:
+        controle.executar(Mock(side_effect=FalhaMarketplace(404)))
+    assert erro.value.status == 404 and controle.erro is None
+    agora += timedelta(seconds=2)
+    assert controle.executar(Mock(return_value={'ok': True})) == {'ok': True}
+    # Outros erros HTTP continuam interrompendo a tarefa.
+    agora += timedelta(seconds=2)
+    with pytest.raises(FalhaMarketplace):
+        controle.executar(Mock(side_effect=FalhaMarketplace(400)))
+    assert controle.erro is not None

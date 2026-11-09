@@ -10,6 +10,7 @@ from utils.identidade_peca import assinatura_peca, assinatura_catalogo
 from .associar_catalogo_service import AssociarCatalogoService
 from .buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
 from .controle_requisicoes_service import ControleRequisicoesService, OrcamentoRequisicoesEsgotado, ErroMercadoLivre
+from services.marketplace_service.erros import FalhaMarketplace
 from .token_mercado_livre_service import TokenMercadoLivreService
 from .cliente_catalogo_cache_service import ClienteCatalogoCacheService
 from .registrar_ambiguos_service import RegistrarAmbiguosMercadoLivreService
@@ -140,8 +141,9 @@ class AtualizarOfertasMercadoLivreService:
                     catalogo_id=vinculo['catalogo_id'], ofertas=propostas,
                     busca_remota_completa=busca.get('busca_remota_completa'),
                     buscas=busca.get('buscas', []))
-            except ErroMercadoLivre as erro:
-                if erro.status not in (403,404):raise
+            except (ErroMercadoLivre, FalhaMarketplace) as erro:
+                # Na fila o 404 chega como FalhaMarketplace; 403 ali é autorização e interrompe.
+                if erro.status not in ((403,404) if isinstance(erro, ErroMercadoLivre) else (404,)):raise
                 indisponiveis.append(dict(catalogo_id=vinculo['catalogo_id'], http=erro.status))
         return dict(contador='revisao' if indisponiveis else 'sem_ofertas',
             status='revisao' if indisponiveis else 'sem_ofertas', catalogos_indisponiveis=indisponiveis)
