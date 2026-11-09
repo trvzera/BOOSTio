@@ -1,0 +1,608 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ICECAT-interface SYSTEM "https://data.icecat.biz/dtd/ICECAT-interface_response.dtd">
+<!--source: Icecat.biz 2026-->
+<!--Language ID: 1-->
+<!--Version: v2-->
+<ICECAT-interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://data.icecat.biz/xsd/ICECAT-interface_response.xsd">
+ <Product Code="1" HighPic="https://images.icecat.biz/img/gallery/56a547591d6e23cc7d58d2c9ce760fd602145683.jpg" HighPicHeight="667" HighPicSize="121663" HighPicWidth="1000" ID="125110830" LowPic="https://images.icecat.biz/img/gallery_lows/4db7e50beab93e203f34df0c9d99193f6628fff4.jpg" LowPicHeight="133" LowPicSize="12701" LowPicWidth="200" Name="500 GB V Series SATA III 2.5&quot; SSD Version 2 for CRUCIAL CT500BX500SSD1 and INSSD500GS625V2" IntName="CT500BX500SSD1-IN" LocalName="500 GB V Series SATA III 2.5&quot; SSD Version 2 for CRUCIAL CT500BX500SSD1 and INSSD500GS625V2" Pic500x500="https://images.icecat.biz/img/gallery_mediums/f8e01a50694d75fae7aff30d6456cd831e85d4b3.jpg" Pic500x500Height="334" Pic500x500Size="59573" Pic500x500Width="500" Prod_id="CT500BX500SSD1-IN" Quality="ICECAT" ReleaseDate="" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/11f13148aec6cb77bd1766fac3212ea1b72f3197.jpg" ThumbPicSize="3048" Title="Integral 500 GB V Series SATA III 2.5&quot; SSD Version 2 for CRUCIAL CT500BX500SSD1 and INSSD500GS625V2" GeneratedIntTitle="Integral CT500BX500SSD1-IN internal solid state drive" GeneratedLocalTitle="Integral CT500BX500SSD1-IN internal solid state drive 2.5&quot; Serial ATA III TLC" BrandLocalTitle="Integral 500 GB V Series SATA III 2.5&quot; SSD Version 2 for CRUCIAL CT500BX500SSD1 and INSSD500GS625V2">
+  <CategoryFeatureGroup ID="32097" No="-5">
+   <FeatureGroup ID="0">
+    <Name ID="5073" langid="1" Value="Technical details"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="4231" No="10">
+   <FeatureGroup ID="14">
+    <Name ID="5023" langid="1" Value="Weight &amp; dimensions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="4235" No="40">
+   <FeatureGroup ID="27">
+    <Name ID="5049" langid="1" Value="Power"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="4233" No="1">
+   <FeatureGroup ID="28">
+    <Name ID="5067" langid="1" Value="Operational conditions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="6208" No="8">
+   <FeatureGroup ID="67">
+    <Name ID="27423" langid="1" Value="Packaging data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="41387" No="0">
+   <FeatureGroup ID="76">
+    <Name ID="28540" langid="1" Value="Certificates"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="49057" No="6">
+   <FeatureGroup ID="116">
+    <Name ID="78852" langid="1" Value="Packaging content"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="53450" No="0">
+   <FeatureGroup ID="143">
+    <Name ID="618812" langid="1" Value="Battery"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="27918" No="20">
+   <FeatureGroup ID="144">
+    <Name ID="619994" langid="1" Value="Brand-specific features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="10726" No="-2">
+   <FeatureGroup ID="146">
+    <Name ID="624346" langid="1" Value="Other features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="30690" No="50">
+   <FeatureGroup ID="185">
+    <Name ID="1219853" langid="1" Value="Features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="20675" No="-50">
+   <FeatureGroup ID="198">
+    <Name ID="1788927" langid="1" Value="Logistics data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="59940" No="0">
+   <FeatureGroup ID="232">
+    <Name ID="3464238" langid="1" Value="Supplier features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="79940" No="0">
+   <FeatureGroup ID="279">
+    <Name ID="7392238" langid="1" Value="Sustainability"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <Category ID="1563">
+   <Name ID="3728180" langid="1" Value="Internal Solid State Drives"/>
+  </Category>
+  <EANCode EAN="5056103880785" Format="GTIN-13" IsApproved="1"/>
+  <ReleaseDate/>
+  <EndOfLifeDate/>
+  <ReasonsToBuy/>
+  <BulletPoints/>
+  <GeneratedBulletPoints>
+   <GeneratedBulletPoint Value="500 GB 2.5&quot; Serial ATA III" langid="1" No="1"/>
+   <GeneratedBulletPoint Value="Read speed: 520 MB/s" langid="1" No="2"/>
+   <GeneratedBulletPoint Value="Write speed: 470 MB/s" langid="1" No="3"/>
+   <GeneratedBulletPoint Value="TLC" langid="1" No="4"/>
+   <GeneratedBulletPoint Value="S.M.A.R.T. support TRIM support" langid="1" No="5"/>
+   <GeneratedBulletPoint Value="Component for: PC/Laptop" langid="1" No="6"/>
+  </GeneratedBulletPoints>
+  <ProductBundled/>
+  <ProductDescription ID="98179845" LongDesc="The Integral SATA III 2.5″ SSD V Series Version is an excellent choice for increasing storage and boosting performance for your desktop or laptop PC. With a fantastic combination of fast data read/write and reliability, along with low power operation, the Integral V Series 2.5″ form factor SATA SSDs offers excellent value." ManualPDFSize="0" ManualPDFURL="" MiddleDesc="" PDFSize="0" PDFURL="" ShortDesc="500 GB V Series SATA III 2.5&quot; SSD Version 2" URL="https://www.integralmemory.com/product/v-series-sata-iii-2-5-ssd-version-2/" WarrantyInfo="3 years" langid="1"/>
+  <ProductFeature Localized="0" ID="730270673" Local_ID="0" Value="500" CategoryFeature_ID="32368" CategoryFeatureGroup_ID="30690" No="10101010" Optional="0" Presentation_Value="500 GB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="500">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="5586">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="92192" langid="1" Value="SSD capacity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270713" Local_ID="0" Value="2.5&quot;" CategoryFeature_ID="131586" CategoryFeatureGroup_ID="30690" No="10101000" Optional="0" Presentation_Value="2.5&quot;" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="2.5&quot;">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="21731">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1733049" langid="1" Value="SSD form factor"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270575" Local_ID="0" Value="Serial ATA III" CategoryFeature_ID="296483" CategoryFeatureGroup_ID="30690" No="10100980" Optional="0" Presentation_Value="Serial ATA III" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Serial ATA III">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="21">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1341" langid="1" Value="Interface"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270718" Local_ID="0" Value="N" CategoryFeature_ID="191927" CategoryFeatureGroup_ID="30690" No="10100550" Optional="0" Presentation_Value="No" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="29388">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2748345" langid="1" Value="NVMe"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270595" Local_ID="0" Value="TLC" CategoryFeature_ID="35583" CategoryFeatureGroup_ID="30690" No="10100500" Optional="0" Presentation_Value="TLC" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="TLC">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="642">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2815" langid="1" Value="Memory type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270699" Local_ID="0" Value="PC/Notebook" CategoryFeature_ID="194639" CategoryFeatureGroup_ID="30690" No="10100297" Optional="0" Presentation_Value="PC/Laptop" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="PC/Laptop">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9163">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="763709" langid="1" Value="Component for"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270703" Local_ID="0" Value="N" CategoryFeature_ID="65789" CategoryFeatureGroup_ID="30690" No="10100295" Optional="0" Presentation_Value="No" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="10340">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="898428" langid="1" Value="Hardware encryption"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270629" Local_ID="0" Value="6" CategoryFeature_ID="35279" CategoryFeatureGroup_ID="30690" No="100268" Optional="0" Presentation_Value="6 Gbit/s" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="6">
+    <Measure ID="68">
+     <Signs>
+      <Sign ID="51" langid="1"><![CDATA[Gbit/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1551">
+    <Measure ID="68" Sign="">
+     <Signs>
+      <Sign ID="51" langid="1"><![CDATA[Gbit/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4825" langid="1" Value="Data transfer rate"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270635" Local_ID="0" Value="520" CategoryFeature_ID="32365" CategoryFeatureGroup_ID="30690" No="100263" Optional="0" Presentation_Value="520 MB/s" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="520">
+    <Measure ID="40">
+     <Signs>
+      <Sign ID="24" langid="1"><![CDATA[MB/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1644">
+    <Measure ID="40" Sign="">
+     <Signs>
+      <Sign ID="24" langid="1"><![CDATA[MB/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5125" langid="1" Value="Read speed"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270639" Local_ID="0" Value="470" CategoryFeature_ID="32366" CategoryFeatureGroup_ID="30690" No="100262" Optional="0" Presentation_Value="470 MB/s" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="470">
+    <Measure ID="40">
+     <Signs>
+      <Sign ID="24" langid="1"><![CDATA[MB/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1645">
+    <Measure ID="40" Sign="">
+     <Signs>
+      <Sign ID="24" langid="1"><![CDATA[MB/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5127" langid="1" Value="Write speed"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270677" Local_ID="0" Value="Y" CategoryFeature_ID="32375" CategoryFeatureGroup_ID="30690" No="100226" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6466">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="177041" langid="1" Value="S.M.A.R.T. support"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270693" Local_ID="0" Value="Y" CategoryFeature_ID="48379" CategoryFeatureGroup_ID="30690" No="100226" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="8098">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="625110" langid="1" Value="TRIM support"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270590" Local_ID="0" Value="1500000" CategoryFeature_ID="32372" CategoryFeatureGroup_ID="30690" No="100019" Optional="0" Presentation_Value="1500000 h" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1500000">
+    <Measure ID="46">
+     <Signs>
+      <Sign ID="30" langid="1"><![CDATA[h]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="533">
+    <Measure ID="46" Sign="">
+     <Signs>
+      <Sign ID="30" langid="1"><![CDATA[h]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2597" langid="1" Value="Mean time between failures (MTBF)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270689" Local_ID="0" Value="Shock resistant" CategoryFeature_ID="48370" CategoryFeatureGroup_ID="30690" No="100018" Optional="0" Presentation_Value="Shock resistant" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Shock resistant">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="8072">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="622852" langid="1" Value="Protection features"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270709" Local_ID="0" Value="160" CategoryFeature_ID="99060" CategoryFeatureGroup_ID="30690" No="99978" Optional="0" Presentation_Value="160" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="160">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="17534">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1245964" langid="1" Value="TBW rating"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270587" Local_ID="0" Value="CE, FCC, UKCA" CategoryFeature_ID="32386" CategoryFeatureGroup_ID="30690" No="99944" Optional="0" Presentation_Value="CE, FCC, UKCA" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="CE, FCC, UKCA">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="249">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1865" langid="1" Value="Certification"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270675" Local_ID="0" Value="5" CategoryFeature_ID="32374" CategoryFeatureGroup_ID="4235" No="100020" Optional="0" Presentation_Value="5 V" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="5">
+    <Measure ID="42">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="5610">
+    <Measure ID="42" Sign="">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="100732" langid="1" Value="Operating voltage"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270682" Local_ID="0" Value="1.65" CategoryFeature_ID="32384" CategoryFeatureGroup_ID="4235" No="100018" Optional="0" Presentation_Value="1.65 W" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1.65">
+    <Measure ID="44">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6468">
+    <Measure ID="44" Sign="">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="177089" langid="1" Value="Power consumption (read)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270686" Local_ID="0" Value="1.8" CategoryFeature_ID="32385" CategoryFeatureGroup_ID="4235" No="100017" Optional="0" Presentation_Value="1.8 W" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1.8">
+    <Measure ID="44">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6469">
+    <Measure ID="44" Sign="">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="177113" langid="1" Value="Power consumption (write)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270644" Local_ID="0" Value="69.8" CategoryFeature_ID="32362" CategoryFeatureGroup_ID="4231" No="100010" Optional="0" Presentation_Value="69.8 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="69.8">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1649">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5143" langid="1" Value="Width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270649" Local_ID="0" Value="100.2" CategoryFeature_ID="32361" CategoryFeatureGroup_ID="4231" No="100009" Optional="0" Presentation_Value="100.2 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="100.2">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1650">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5145" langid="1" Value="Depth"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270623" Local_ID="0" Value="7" CategoryFeature_ID="32363" CategoryFeatureGroup_ID="4231" No="100008" Optional="0" Presentation_Value="7 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="7">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1464">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4625" langid="1" Value="Height"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270579" Local_ID="0" Value="45" CategoryFeature_ID="32360" CategoryFeatureGroup_ID="4231" No="100000" Optional="0" Presentation_Value="45 g" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="45">
+    <Measure ID="38">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="94">
+    <Measure ID="38" Sign="">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1525" langid="1" Value="Weight"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270672" Local_ID="0" Value="107" CategoryFeature_ID="76657" CategoryFeatureGroup_ID="6208" No="99989" Optional="0" Presentation_Value="107 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="107">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3808">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="44095" langid="1" Value="Package width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270661" Local_ID="0" Value="13" CategoryFeature_ID="76658" CategoryFeatureGroup_ID="6208" No="99988" Optional="0" Presentation_Value="13 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="13">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3806">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="44061" langid="1" Value="Package depth"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270668" Local_ID="0" Value="133" CategoryFeature_ID="76659" CategoryFeatureGroup_ID="6208" No="99987" Optional="0" Presentation_Value="133 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="133">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3807">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="44078" langid="1" Value="Package height"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270614" Local_ID="0" Value="64" CategoryFeature_ID="48366" CategoryFeatureGroup_ID="6208" No="99980" Optional="0" Presentation_Value="64 g" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="64">
+    <Measure ID="38">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="762">
+    <Measure ID="38" Sign="">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3055" langid="1" Value="Package weight"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270618" Local_ID="0" Value="0 - 70" CategoryFeature_ID="32369" CategoryFeatureGroup_ID="4233" No="100010" Optional="0" Presentation_Value="0 - 70 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0 - 70">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1112">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3765" langid="1" Value="Operating temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270609" Local_ID="0" Value="-40 - 85" CategoryFeature_ID="32370" CategoryFeatureGroup_ID="4233" No="100009" Optional="0" Presentation_Value="-40 - 85 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="-40 - 85">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="757">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3045" langid="1" Value="Storage temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270604" Local_ID="0" Value="5 - 85" CategoryFeature_ID="32379" CategoryFeatureGroup_ID="4233" No="100007" Optional="0" Presentation_Value="5 - 85%" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="5 - 85">
+    <Measure ID="64">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="703">
+    <Measure ID="64" Sign="">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2937" langid="1" Value="Operating relative humidity (H-H)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730270654" Local_ID="0" Value="3.08" CategoryFeature_ID="48374" CategoryFeatureGroup_ID="4233" No="100005" Optional="0" Presentation_Value="3.08 G" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="3.08">
+    <Measure ID="72">
+     <Signs>
+      <Sign ID="55" langid="1"><![CDATA[G]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3336">
+    <Measure ID="72" Sign="">
+     <Signs>
+      <Sign ID="55" langid="1"><![CDATA[G]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="31906" langid="1" Value="Operating vibration"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="730275637" Local_ID="0" Value="RoHS" CategoryFeature_ID="953299" CategoryFeatureGroup_ID="10726" No="100000" Optional="0" Presentation_Value="RoHS" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="RoHS">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="48024">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="9134228" langid="1" Value="Compliance certificates"/>
+   </Feature>
+  </ProductFeature>
+  <ProductGallery>
+   <ProductPicture IsMain="Y" LowPic="https://images.icecat.biz/img/gallery_lows/4db7e50beab93e203f34df0c9d99193f6628fff4.jpg" LowPicHeight="133" LowPicWidth="200" LowSize="12701" No="1" Original="https://images.icecat.biz/img/gallery_raw/19d554d6bb45ce87ad634505c33fc98377e7341e.jpeg" OriginalSize="77252" Pic="https://images.icecat.biz/img/gallery/56a547591d6e23cc7d58d2c9ce760fd602145683.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/f8e01a50694d75fae7aff30d6456cd831e85d4b3.jpg" Pic500x500Height="334" Pic500x500Size="59573" Pic500x500Width="500" PicHeight="667" PicWidth="1000" ProductPicture_ID="100456955" Size="121663" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/11f13148aec6cb77bd1766fac3212ea1b72f3197.jpg" ThumbSize="3048" Type="ProductImage" UpdatedDate="2025-01-23 09:27:38"/>
+  </ProductGallery>
+  <ProductMultimediaObject>
+   <MultimediaObject ContentType="application/pdf" Date="2025-01-23 09:40:52" Description="Generated PDF" KeepAsURL="0" MultimediaObject_ID="0" Type="leaflet" UUID="00000000-0000-0000-0000-000000000000" langid="1" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="0" URL="https://icecat.biz/rest/product-pdf?productId=125110830&amp;lang=en" Width="0"/>
+  </ProductMultimediaObject>
+  <ProductRelated/>
+  <SummaryDescription>
+   <ShortSummaryDescription langid="1">Integral 500 GB V Series SATA III 2.5&quot; SSD Version 2 for CRUCIAL CT500BX500SSD1 and INSSD500GS625V2, 500 GB, 2.5&quot;, 520 MB/s, 6 Gbit/s</ShortSummaryDescription>
+   <LongSummaryDescription langid="1">Integral 500 GB V Series SATA III 2.5&quot; SSD Version 2 for CRUCIAL CT500BX500SSD1 and INSSD500GS625V2. SSD capacity: 500 GB, SSD form factor: 2.5&quot;, Read speed: 520 MB/s, Write speed: 470 MB/s, Data transfer rate: 6 Gbit/s, Component for: PC/Laptop</LongSummaryDescription>
+  </SummaryDescription>
+  <Supplier ID="1899" Name="Integral"/>
+  <CatalogObjectCloud>
+   <ProductPage QRCodeURL="https://qr.icecat.biz/coc/39f8072e-271d-437d-b9ad-688d24a3ff78" URL="https://coc.icecat.biz/39f8072e-271d-437d-b9ad-688d24a3ff78"/>
+  </CatalogObjectCloud>
+ </Product>
+</ICECAT-interface>

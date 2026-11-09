@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ICECAT-interface SYSTEM "https://data.icecat.biz/dtd/ICECAT-interface_response.dtd">
+<!--source: Icecat.biz 2026-->
+<!--Language ID: 1-->
+<!--Version: v2-->
+<ICECAT-interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://data.icecat.biz/xsd/ICECAT-interface_response.xsd">
+ <Product Code="1" HighPic="https://images.icecat.biz/img/gallery/3d3dc12ea45ee2963ff32dd7a8871105331afaa1.jpg" HighPicHeight="201" HighPicSize="7454" HighPicWidth="200" ID="72545839" LowPic="https://images.icecat.biz/img/gallery_lows/92118967e684b483d6b05035255d2c6c7871ffc4.jpg" LowPicHeight="200" LowPicSize="7137" LowPicWidth="199" Name="ValueRAM" IntName="ValueRAM" LocalName="" Pic500x500="" Pic500x500Height="0" Pic500x500Size="0" Pic500x500Width="0" Prod_id="KVR32N22S8/8" Quality="ICECAT" ReleaseDate="" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/5a21b7d08d2e13b2bc5ed137c560046bb82861eb.jpg" ThumbPicSize="1978" Title="Kingston Technology ValueRAM memory module 8 GB 1 x 8 GB DDR4 3200 MT/s 288-pin DIMM" GeneratedIntTitle="Kingston Technology ValueRAM memory module" GeneratedLocalTitle="Kingston Technology ValueRAM memory module 8 GB 1 x 8 GB DDR4 3200 MT/s 288-pin DIMM" BrandLocalTitle="">
+  <CategoryFeatureGroup ID="32098" No="0">
+   <FeatureGroup ID="0">
+    <Name ID="5073" langid="1" Value="Technical details"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1549" No="-1">
+   <FeatureGroup ID="14">
+    <Name ID="5023" langid="1" Value="Weight &amp; dimensions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1551" No="2">
+   <FeatureGroup ID="28">
+    <Name ID="5067" langid="1" Value="Operational conditions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="31202" No="-3">
+   <FeatureGroup ID="67">
+    <Name ID="27423" langid="1" Value="Packaging data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="41307" No="0">
+   <FeatureGroup ID="76">
+    <Name ID="28540" langid="1" Value="Certificates"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="83399" No="0">
+   <FeatureGroup ID="90">
+    <Name ID="30562" langid="1" Value="Software"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="49023" No="0">
+   <FeatureGroup ID="116">
+    <Name ID="78852" langid="1" Value="Packaging content"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="53383" No="0">
+   <FeatureGroup ID="143">
+    <Name ID="618812" langid="1" Value="Battery"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="6347" No="-5">
+   <FeatureGroup ID="146">
+    <Name ID="624346" langid="1" Value="Other features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="27909" No="5">
+   <FeatureGroup ID="185">
+    <Name ID="1219853" langid="1" Value="Features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="24500" No="-4">
+   <FeatureGroup ID="198">
+    <Name ID="1788927" langid="1" Value="Logistics data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="59864" No="0">
+   <FeatureGroup ID="232">
+    <Name ID="3464238" langid="1" Value="Supplier features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="76696" No="0">
+   <FeatureGroup ID="279">
+    <Name ID="7392238" langid="1" Value="Sustainability"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <Category ID="911">
+   <Name ID="3727686" langid="1" Value="Memory Modules"/>
+  </Category>
+  <EANCode EAN="0740617296068" Format="GTIN-13" IsApproved="1"/>
+  <EANCode EAN="740617296068" Format="GTIN-12" IsApproved="1"/>
+  <ReleaseDate/>
+  <EndOfLifeDate>
+   <Date Value="2024-02-08" langid="0"/>
+  </EndOfLifeDate>
+  <ReasonsToBuy/>
+  <BulletPoints>
+   <BulletPoint Value="Nominal and dynamic on-die termination (ODT) for data, strobe, and mask signals" langid="1" No="1"/>
+   <BulletPoint Value="Low-power auto self refresh (LPASR)" langid="1" No="2"/>
+   <BulletPoint Value="Data bus inversion (DBI) for data bus" langid="1" No="3"/>
+   <BulletPoint Value="On-die VREFDQ generation and calibration" langid="1" No="4"/>
+   <BulletPoint Value="Single-rank" langid="1" No="5"/>
+   <BulletPoint Value="On-board I2 serial presence-detect (SPD) EEPROM" langid="1" No="6"/>
+   <BulletPoint Value="16 internal banks; 4 groups of 4 banks each" langid="1" No="7"/>
+   <BulletPoint Value="Fixed burst chop (BC) of 4 and burst length (BL) of 8 via the mode register set (MRS)" langid="1" No="8"/>
+   <BulletPoint Value="Selectable BC4 or BL8 on-the-fly (OTF)" langid="1" No="9"/>
+   <BulletPoint Value="Fly-by topology" langid="1" No="10"/>
+   <BulletPoint Value="Terminated control command and address bus" langid="1" No="11"/>
+   <BulletPoint Value="RoHS Compliant and Halogen-Free" langid="1" No="12"/>
+  </BulletPoints>
+  <GeneratedBulletPoints>
+   <GeneratedBulletPoint Value="PC/Server 8 GB DDR4 3200 MT/s" langid="1" No="1"/>
+   <GeneratedBulletPoint Value="288-pin DIMM 1 x 8 GB" langid="1" No="2"/>
+   <GeneratedBulletPoint Value="CAS latency: 22" langid="1" No="3"/>
+   <GeneratedBulletPoint Value="1.2 V" langid="1" No="4"/>
+  </GeneratedBulletPoints>
+  <ProductBundled/>
+  <ProductDescription ID="70355311" LongDesc="ValueRAM's KVR32N22S8/8 is a 1G x 64-bit (8GB) DDR4-3200 CL22 SDRAM (Synchronous DRAM), 1Rx8, memory module, based on eight 1G x 8-bit FBGA components. The SPD is programmed to JEDEC standard latency DDR4-3200 timing of 22-22-22 at 1.2V. Each 288-pin DIMM uses gold contact fingers." ManualPDFSize="0" ManualPDFURL="" MiddleDesc="" PDFSize="131795" PDFURL="https://objects.icecat.biz/objects/mmo_72545839_1571221851_1605_22895.pdf" ShortDesc="8GB, DDR4, 3200MT/s, Non-ECC, CL22, 1.2V, 288-pin, JEDEC" URL="https://www.kingston.com/en" WarrantyInfo="Lifetime" langid="1"/>
+  <ProductFamily ID="1027" LowPic="" ThumbPic="">
+   <Name ID="242294" langid="1" Value="ValueRAM"/>
+  </ProductFamily>
+  <ProductFeature Localized="0" ID="336188680" Local_ID="0" Value="8" CategoryFeature_ID="73748" CategoryFeatureGroup_ID="27909" No="10109999" Optional="0" Presentation_Value="8 GB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="8">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="11381">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1036616" langid="1" Value="Internal memory"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188682" Local_ID="0" Value="1 x 8" CategoryFeature_ID="93088" CategoryFeatureGroup_ID="27909" No="10109998" Optional="0" Presentation_Value="1 x 8 GB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="1 x 8">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="16023">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1186317" langid="1" Value="Memory layout (modules x size)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188692" Local_ID="0" Value="DDR4" CategoryFeature_ID="6137" CategoryFeatureGroup_ID="27909" No="10109980" Optional="0" Presentation_Value="DDR4" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="DDR4">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="427">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2221" langid="1" Value="Internal memory type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="863769160" Local_ID="0" Value="3200" CategoryFeature_ID="948627" CategoryFeatureGroup_ID="27909" No="10109069" Optional="0" Presentation_Value="3200 MT/s" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="3200">
+    <Measure ID="340">
+     <Signs>
+      <Sign ID="28534" langid="1"><![CDATA[MT/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="37536">
+    <Measure ID="340" Sign="">
+     <Signs>
+      <Sign ID="28534" langid="1"><![CDATA[MT/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5082622" langid="1" Value="Memory data transfer rate"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188752" Local_ID="0" Value="PC/Server" CategoryFeature_ID="73714" CategoryFeatureGroup_ID="27909" No="10109060" Optional="0" Presentation_Value="PC/Server" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="PC/Server">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9163">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="763709" langid="1" Value="Component for"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188766" Local_ID="0" Value="288-pin DIMM" CategoryFeature_ID="45866" CategoryFeatureGroup_ID="27909" No="10109050" Optional="0" Presentation_Value="288-pin DIMM" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="288-pin DIMM">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7696">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="595968" langid="1" Value="Memory form factor"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188771" Local_ID="0" Value="N" CategoryFeature_ID="6130" CategoryFeatureGroup_ID="27909" No="10109039" Optional="0" Presentation_Value="No" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1628">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5085" langid="1" Value="ECC"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188785" Local_ID="0" Value="22" CategoryFeature_ID="6141" CategoryFeatureGroup_ID="27909" No="10109035" Optional="0" Presentation_Value="22" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="22">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1635">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5099" langid="1" Value="CAS latency"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188783" Local_ID="0" Value="Unregistered (unbuffered)" CategoryFeature_ID="301234" CategoryFeatureGroup_ID="27909" No="100994" Optional="0" Presentation_Value="Unregistered (unbuffered)" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="Unregistered (unbuffered)">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="38209">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5220375" langid="1" Value="Buffered memory type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188800" Local_ID="0" Value="1" CategoryFeature_ID="48946" CategoryFeatureGroup_ID="27909" No="100993" Optional="0" Presentation_Value="1" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="8216">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="633354" langid="1" Value="Memory ranking"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188803" Local_ID="0" Value="1.2" CategoryFeature_ID="36754" CategoryFeatureGroup_ID="27909" No="100992" Optional="0" Presentation_Value="1.2 V" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1.2">
+    <Measure ID="42">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6266">
+    <Measure ID="42" Sign="">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="154881" langid="1" Value="Memory voltage"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188828" Local_ID="0" Value="1024M x 64" CategoryFeature_ID="6133" CategoryFeatureGroup_ID="27909" No="100991" Optional="0" Presentation_Value="1024M x 64" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1024M x 64">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1631">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5091" langid="1" Value="Module configuration"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188853" Local_ID="0" Value="45.75" CategoryFeature_ID="18992" CategoryFeatureGroup_ID="27909" No="100990" Optional="1" Presentation_Value="45.75 ns" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="45.75">
+    <Measure ID="63">
+     <Signs>
+      <Sign ID="46" langid="1"><![CDATA[ns]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3347">
+    <Measure ID="63" Sign="">
+     <Signs>
+      <Sign ID="46" langid="1"><![CDATA[ns]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="31972" langid="1" Value="Row cycle time"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188858" Local_ID="0" Value="350" CategoryFeature_ID="18993" CategoryFeatureGroup_ID="27909" No="100989" Optional="1" Presentation_Value="350 ns" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="350">
+    <Measure ID="63">
+     <Signs>
+      <Sign ID="46" langid="1"><![CDATA[ns]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3348">
+    <Measure ID="63" Sign="">
+     <Signs>
+      <Sign ID="46" langid="1"><![CDATA[ns]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="31978" langid="1" Value="Refresh row cycle time"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188861" Local_ID="0" Value="32" CategoryFeature_ID="18994" CategoryFeatureGroup_ID="27909" No="100988" Optional="1" Presentation_Value="32 ns" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="32">
+    <Measure ID="63">
+     <Signs>
+      <Sign ID="46" langid="1"><![CDATA[ns]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3350">
+    <Measure ID="63" Sign="">
+     <Signs>
+      <Sign ID="46" langid="1"><![CDATA[ns]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="31990" langid="1" Value="Row active time"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188843" Local_ID="0" Value="2.5" CategoryFeature_ID="232820" CategoryFeatureGroup_ID="27909" No="100005" Optional="1" Presentation_Value="2.5 V" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="2.5">
+    <Measure ID="42">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="34175">
+    <Measure ID="42" Sign="">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3503128" langid="1" Value="Programming power voltage (VPP)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188816" Local_ID="0" Value="Gold" CategoryFeature_ID="6140" CategoryFeatureGroup_ID="27909" No="99998" Optional="0" Presentation_Value="Gold" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Gold">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1634">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5097" langid="1" Value="Lead plating"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188904" Local_ID="0" Value="Y" CategoryFeature_ID="232818" CategoryFeatureGroup_ID="27909" No="99901" Optional="1" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="34174">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="3503074" langid="1" Value="JEDEC standard"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188884" Local_ID="0" Value="0 - 85" CategoryFeature_ID="6146" CategoryFeatureGroup_ID="1551" No="100095" Optional="0" Presentation_Value="0 - 85 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0 - 85">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1112">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3765" langid="1" Value="Operating temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188886" Local_ID="0" Value="-55 - 100" CategoryFeature_ID="48926" CategoryFeatureGroup_ID="1551" No="100092" Optional="0" Presentation_Value="-55 - 100 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="-55 - 100">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="757">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3045" langid="1" Value="Storage temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="651728366" Local_ID="0" Value="RoHS" CategoryFeature_ID="953206" CategoryFeatureGroup_ID="76696" No="100000" Optional="0" Presentation_Value="RoHS" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="RoHS">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="48024">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="9134228" langid="1" Value="Compliance certificates"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188881" Local_ID="0" Value="133.35" CategoryFeature_ID="48923" CategoryFeatureGroup_ID="1549" No="100073" Optional="0" Presentation_Value="133.3 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="133.3">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1649">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5143" langid="1" Value="Width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188882" Local_ID="0" Value="31.25" CategoryFeature_ID="48925" CategoryFeatureGroup_ID="1549" No="100071" Optional="0" Presentation_Value="31.2 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="31.2">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1464">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4625" langid="1" Value="Height"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494549123" Local_ID="0" Value="84733020" CategoryFeature_ID="309147" CategoryFeatureGroup_ID="24500" No="99947" Optional="1" Presentation_Value="84733020" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="84733020">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="23731">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1903598" langid="1" Value="Harmonized System (HS) code"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="497221910" Local_ID="0" Value="Taiwan" CategoryFeature_ID="56407" CategoryFeatureGroup_ID="6347" No="100000" Optional="0" Presentation_Value="Taiwan" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Taiwan">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3294">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="31174" langid="1" Value="Country of origin"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="336188897" Local_ID="0" Value="Halogen" CategoryFeature_ID="630167" CategoryFeatureGroup_ID="6347" No="100000" Optional="1" Presentation_Value="Halogen" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Halogen">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="42516">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="6876321" langid="1" Value="Doesn't contain"/>
+   </Feature>
+  </ProductFeature>
+  <ProductGallery>
+   <ProductPicture IsMain="Y" LowPic="https://images.icecat.biz/img/gallery_lows/92118967e684b483d6b05035255d2c6c7871ffc4.jpg" LowPicHeight="200" LowPicWidth="199" LowSize="7137" No="1" Original="https://images.icecat.biz/img/gallery_raw/fcb7bd688e89f53970241cb501aa0b34b318d3ca.png" OriginalSize="7721" Pic="https://images.icecat.biz/img/gallery/3d3dc12ea45ee2963ff32dd7a8871105331afaa1.jpg" Pic500x500="" Pic500x500Height="0" Pic500x500Size="0" Pic500x500Width="0" PicHeight="201" PicWidth="200" ProductPicture_ID="34798407" Size="7454" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/5a21b7d08d2e13b2bc5ed137c560046bb82861eb.jpg" ThumbSize="1978" Type="ProductImage" UpdatedDate="2019-10-16 12:30:33"/>
+  </ProductGallery>
+  <ProductMultimediaObject>
+   <MultimediaObject ContentType="application/pdf" Date="2019-10-16 12:30:51" Description="leaflet" KeepAsURL="0" MultimediaObject_ID="16335842" Type="leaflet" UUID="3076113A-4116-4D65-A844-A643155ED63A" langid="1" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="131795" URL="https://objects.icecat.biz/objects/mmo_72545839_1571221851_1605_22895.pdf" Width="0"/>
+  </ProductMultimediaObject>
+  <ProductRelated/>
+  <SummaryDescription>
+   <ShortSummaryDescription langid="1">Kingston Technology ValueRAM , 8 GB, 1 x 8 GB, DDR4, 288-pin DIMM</ShortSummaryDescription>
+   <LongSummaryDescription langid="1">Kingston Technology ValueRAM . Component for: PC/Server, Internal memory: 8 GB, Memory layout (modules x size): 1 x 8 GB, Internal memory type: DDR4, Memory form factor: 288-pin DIMM, CAS latency: 22</LongSummaryDescription>
+  </SummaryDescription>
+  <Supplier ID="18" Name="Kingston Technology"/>
+  <CatalogObjectCloud>
+   <ProductPage QRCodeURL="https://qr.icecat.biz/coc/74ff1624-2262-4879-9234-d42421d9cd9f" URL="https://coc.icecat.biz/74ff1624-2262-4879-9234-d42421d9cd9f"/>
+  </CatalogObjectCloud>
+ </Product>
+</ICECAT-interface>

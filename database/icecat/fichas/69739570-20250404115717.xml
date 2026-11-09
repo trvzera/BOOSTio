@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ICECAT-interface SYSTEM "https://data.icecat.biz/dtd/ICECAT-interface_response.dtd">
+<!--source: Icecat.biz 2026-->
+<!--Language ID: 1-->
+<!--Version: v2-->
+<ICECAT-interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://data.icecat.biz/xsd/ICECAT-interface_response.xsd">
+ <Product Code="1" HighPic="https://images.icecat.biz/img/gallery/6a38aedff5a17f67521e91792d3f470243de8583.jpg" HighPicHeight="467" HighPicSize="52454" HighPicWidth="457" ID="69739570" LowPic="https://images.icecat.biz/img/gallery_lows/544a6c714b5d5ab712a3537121a3269f2e15a79e.jpg" LowPicHeight="200" LowPicSize="21123" LowPicWidth="196" Name="ST8000DM004" IntName="ST8000DM004" LocalName="" Pic500x500="" Pic500x500Height="0" Pic500x500Size="0" Pic500x500Width="0" Prod_id="ST8000DM004-20PK" Quality="ICECAT" ReleaseDate="" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/0bb7a7b3b808869c4f4ceb69fd791299fb9f2679.jpg" ThumbPicSize="5771" Title="Seagate Barracuda ST8000DM004 internal hard drive 8 TB 5400 RPM 256 MB 3.5&quot; Serial ATA III" GeneratedIntTitle="Seagate Barracuda ST8000DM004 internal hard drive" GeneratedLocalTitle="Seagate Barracuda ST8000DM004 internal hard drive 8 TB 5400 RPM 256 MB 3.5&quot; Serial ATA III" BrandLocalTitle="">
+  <CategoryFeatureGroup ID="33406" No="0">
+   <FeatureGroup ID="0">
+    <Name ID="5073" langid="1" Value="Technical details"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="65" No="-1">
+   <FeatureGroup ID="14">
+    <Name ID="5023" langid="1" Value="Weight &amp; dimensions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1594" No="3">
+   <FeatureGroup ID="27">
+    <Name ID="5049" langid="1" Value="Power"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1595" No="1">
+   <FeatureGroup ID="28">
+    <Name ID="5067" langid="1" Value="Operational conditions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="31116" No="-3">
+   <FeatureGroup ID="67">
+    <Name ID="27423" langid="1" Value="Packaging data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="41386" No="0">
+   <FeatureGroup ID="76">
+    <Name ID="28540" langid="1" Value="Certificates"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="49056" No="0">
+   <FeatureGroup ID="116">
+    <Name ID="78852" langid="1" Value="Packaging content"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="53449" No="0">
+   <FeatureGroup ID="143">
+    <Name ID="618812" langid="1" Value="Battery"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="9056" No="-100">
+   <FeatureGroup ID="146">
+    <Name ID="624346" langid="1" Value="Other features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="30622" No="5">
+   <FeatureGroup ID="185">
+    <Name ID="1219853" langid="1" Value="Features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="30609" No="-5">
+   <FeatureGroup ID="198">
+    <Name ID="1788927" langid="1" Value="Logistics data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="59939" No="0">
+   <FeatureGroup ID="232">
+    <Name ID="3464238" langid="1" Value="Supplier features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="79920" No="0">
+   <FeatureGroup ID="279">
+    <Name ID="7392238" langid="1" Value="Sustainability"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <Category ID="219">
+   <Name ID="3727455" langid="1" Value="Internal Hard Drives"/>
+  </Category>
+  <EANCode/>
+  <ReleaseDate/>
+  <EndOfLifeDate/>
+  <ReasonsToBuy/>
+  <BulletPoints/>
+  <GeneratedBulletPoints>
+   <GeneratedBulletPoint Value="8 TB 3.5&quot; 5400 RPM Serial ATA III" langid="1" No="1"/>
+   <GeneratedBulletPoint Value="Server/workstation HDD" langid="1" No="2"/>
+   <GeneratedBulletPoint Value="Storage drive buffer size: 256 MB" langid="1" No="3"/>
+   <GeneratedBulletPoint Value="630 g" langid="1" No="4"/>
+  </GeneratedBulletPoints>
+  <ProductBundled/>
+  <ProductDescription ID="93185527" LongDesc="&lt;b&gt;Laptop and Mobile Storage&lt;/b&gt;&lt;br&gt;Experience the highest capacity, and the thinnest 2.5-inch hard drive you’ve ever seen. Choose from 500 GB to 2 TB of massive storage for all of your application and data needs along with a slim 7 mm form factor drive that makes system upgrades very easy.&lt;br&gt;&lt;br&gt;&lt;b&gt;External and All-in-One PC Storage&lt;/b&gt;&lt;br&gt;You also have the option of a 2.5-inch, 15 mm form factor drive — in 3 TB, 4 TB and 5 TB capacities — which provides amazing storage for your important and critical work files, as well as those you personally treasure the most. This drive is an excellent solution for taking your external hard drive to the next level or bumping up the storage on your all-in-one or slim PC.&lt;br&gt;&lt;br&gt;&lt;b&gt;3.5-Inch BarraCuda Hard Drives Deliver!&lt;/b&gt;&lt;br&gt;Rock-solid reliability built on over 20 years of BarraCuda innovation. Versatile mix of capacity and price point options to fit any budget. Multi-Tier Caching Technology™ for excellent hard drive performance.&lt;br&gt;&lt;br&gt;&lt;b&gt;Multi-Tier Caching Technology&lt;/b&gt;&lt;br&gt;All hard drives in the BarraCuda family come equipped with Multi-Tier Caching Technology (MTC). MTC takes your PC to new performance levels, so you can load applications and files faster than ever before. By applying intelligent layers of NAND Flash, DRAM and media cache technologies, BarraCuda delivers improved read and write performance by optimising data flow.&lt;br&gt;&lt;br&gt;&lt;b&gt;BarraCuda Pro Comes With 2-year Rescue Data Recovery Service1&lt;/b&gt;&lt;br&gt;Your data matters. And you rely on it. Rescue Data Recovery Plans provide peace of mind for creative pros and performance PC users alike, and now they come standard on BarraCuda Pro. Whether there is a hard drive mechanical issue or something accidently happened to your drive, Seagate has got you covered.&lt;br&gt;&lt;br&gt;Purchase and register an BarraCuda Pro drive to activate your free Rescue plan and you are covered for 2 years. Extended coverage options available at registration.&lt;br&gt;&lt;br&gt;&lt;b&gt;Trusted Dependability&lt;/b&gt;&lt;br&gt;The BarraCuda family of reliable hard drives is here to stay, for years to come.&lt;br&gt;&lt;br&gt;- Experience — For more than 20 years, Seagate has manufactured and delivered the super-reliable BarraCuda family of drives&lt;br&gt;- BarraCuda — Seagate's drive-reliability data simply speaks for itself, and the BarraCuda family is often recognised by leading publications and customers" ManualPDFSize="0" ManualPDFURL="" MiddleDesc="" PDFSize="0" PDFURL="" ShortDesc="Barracuda 8TB, SATA3, 20pk" URL="http://www.seagate.com" WarrantyInfo="" langid="1"/>
+  <ProductFamily ID="24" LowPic="" ThumbPic="">
+   <Name ID="9771" langid="1" Value="Barracuda"/>
+  </ProductFamily>
+  <ProductFeature Localized="0" ID="596223610" Local_ID="0" Value="8000" CategoryFeature_ID="3684" CategoryFeatureGroup_ID="30622" No="10100150" Optional="0" Presentation_Value="8 TB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="8">
+    <Measure ID="159">
+     <Signs>
+      <Sign ID="2983" langid="1"><![CDATA[TB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1299" langid="1" Value="HDD capacity"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021666" Local_ID="0" Value="5400" CategoryFeature_ID="15510" CategoryFeatureGroup_ID="30622" No="10100120" Optional="0" Presentation_Value="5400 RPM" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="5400">
+    <Measure ID="28">
+     <Signs>
+      <Sign ID="12" langid="1"><![CDATA[RPM]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="430">
+    <Measure ID="28" Sign="">
+     <Signs>
+      <Sign ID="12" langid="1"><![CDATA[RPM]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2227" langid="1" Value="HDD speed"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021665" Local_ID="0" Value="3.5" CategoryFeature_ID="18866" CategoryFeatureGroup_ID="30622" No="10100099" Optional="0" Presentation_Value="3.5&quot;" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="3.5">
+    <Measure ID="16">
+     <Signs>
+      <Sign ID="11" langid="1"><![CDATA["]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1926">
+    <Measure ID="16" Sign="">
+     <Signs>
+      <Sign ID="11" langid="1"><![CDATA["]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5943" langid="1" Value="HDD size"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021671" Local_ID="0" Value="Serial ATA III" CategoryFeature_ID="48092" CategoryFeatureGroup_ID="30622" No="10100096" Optional="0" Presentation_Value="Serial ATA III" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Serial ATA III">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="21">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1341" langid="1" Value="Interface"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021672" Local_ID="0" Value="HDD" CategoryFeature_ID="296233" CategoryFeatureGroup_ID="30622" No="10100094" Optional="0" Presentation_Value="HDD" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="HDD">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="31">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1375" langid="1" Value="Type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021677" Local_ID="0" Value="Server/workstation" CategoryFeature_ID="194638" CategoryFeatureGroup_ID="30622" No="10100093" Optional="0" Presentation_Value="Server/workstation" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Server/workstation">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9163">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="763709" langid="1" Value="Component for"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021681" Local_ID="0" Value="256" CategoryFeature_ID="296216" CategoryFeatureGroup_ID="30622" No="100100" Optional="0" Presentation_Value="256 MB" Translated="0" Mandatory="1" Searchable="0">
+   <LocalValue Value="256">
+    <Measure ID="19">
+     <Signs>
+      <Sign ID="15506" langid="1"><![CDATA[MB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="37958">
+    <Measure ID="19" Sign="">
+     <Signs>
+      <Sign ID="15506" langid="1"><![CDATA[MB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5147439" langid="1" Value="Storage drive buffer size"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021688" Local_ID="0" Value="220" CategoryFeature_ID="105056" CategoryFeatureGroup_ID="30622" No="100084" Optional="0" Presentation_Value="220 MiB/s" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="220">
+    <Measure ID="266">
+     <Signs>
+      <Sign ID="16025" langid="1"><![CDATA[MiB/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="17980">
+    <Measure ID="266" Sign="">
+     <Signs>
+      <Sign ID="16025" langid="1"><![CDATA[MiB/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1325841" langid="1" Value="HDD sustained transfer rate"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021696" Local_ID="0" Value="6.8" CategoryFeature_ID="13699" CategoryFeatureGroup_ID="1594" No="100008" Optional="0" Presentation_Value="6.8 W" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="6.8">
+    <Measure ID="44">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="445">
+    <Measure ID="44" Sign="">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2257" langid="1" Value="Power consumption (typical)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021701" Local_ID="0" Value="0.8" CategoryFeature_ID="17108" CategoryFeatureGroup_ID="1594" No="100006" Optional="0" Presentation_Value="0.8 W" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0.8">
+    <Measure ID="44">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2036">
+    <Measure ID="44" Sign="">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="9104" langid="1" Value="Power consumption (standby)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021702" Local_ID="0" Value="0.8" CategoryFeature_ID="17250" CategoryFeatureGroup_ID="1594" No="100004" Optional="0" Presentation_Value="0.8 W" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0.8">
+    <Measure ID="44">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2035">
+    <Measure ID="44" Sign="">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="9101" langid="1" Value="Power consumption (PowerSave)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021718" Local_ID="0" Value="4.5" CategoryFeature_ID="40632" CategoryFeatureGroup_ID="1594" No="100000" Optional="0" Presentation_Value="4.5 W" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="4.5">
+    <Measure ID="44">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6467">
+    <Measure ID="44" Sign="">
+     <Signs>
+      <Sign ID="28" langid="1"><![CDATA[W]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="177065" langid="1" Value="Power consumption (idle)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021722" Local_ID="0" Value="5 / 12" CategoryFeature_ID="1085500" CategoryFeatureGroup_ID="1594" No="99999" Optional="0" Presentation_Value="5 / 12 V" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="5 / 12">
+    <Measure ID="42">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="48762">
+    <Measure ID="42" Sign="">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="9307140" langid="1" Value="Operating voltage"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021724" Local_ID="0" Value="1.8" CategoryFeature_ID="17246" CategoryFeatureGroup_ID="1594" No="99998" Optional="0" Presentation_Value="1.8 A" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1.8">
+    <Measure ID="41">
+     <Signs>
+      <Sign ID="25" langid="1"><![CDATA[A]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2964">
+    <Measure ID="41" Sign="">
+     <Signs>
+      <Sign ID="25" langid="1"><![CDATA[A]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="28252" langid="1" Value="Start-up current"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021729" Local_ID="0" Value="0 - 60" CategoryFeature_ID="5577" CategoryFeatureGroup_ID="1595" No="99989" Optional="0" Presentation_Value="0 - 60 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0 - 60">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1112">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3765" langid="1" Value="Operating temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021731" Local_ID="0" Value="-40 - 70" CategoryFeature_ID="17248" CategoryFeatureGroup_ID="1595" No="99988" Optional="0" Presentation_Value="-40 - 70 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="-40 - 70">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="757">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3045" langid="1" Value="Storage temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021742" Local_ID="0" Value="101.85" CategoryFeature_ID="16567" CategoryFeatureGroup_ID="65" No="100040" Optional="0" Presentation_Value="101.8 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="101.8">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1649">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5143" langid="1" Value="Width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021745" Local_ID="0" Value="26.11" CategoryFeature_ID="8681" CategoryFeatureGroup_ID="65" No="100000" Optional="0" Presentation_Value="26.1 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="26.1">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1464">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4625" langid="1" Value="Height"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021752" Local_ID="0" Value="146.99" CategoryFeature_ID="16569" CategoryFeatureGroup_ID="65" No="100000" Optional="0" Presentation_Value="147 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="147">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1650">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5145" langid="1" Value="Depth"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021748" Local_ID="0" Value="630" CategoryFeature_ID="3853" CategoryFeatureGroup_ID="65" No="99999" Optional="0" Presentation_Value="630 g" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="630">
+    <Measure ID="38">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="94">
+    <Measure ID="38" Sign="">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1525" langid="1" Value="Weight"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="601021740" Local_ID="0" Value="20" CategoryFeature_ID="323655" CategoryFeatureGroup_ID="31116" No="100000" Optional="0" Presentation_Value="20 pc(s)" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="20">
+    <Measure ID="144">
+     <Signs>
+      <Sign ID="125" langid="1"><![CDATA[pc(s)]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="20228">
+    <Measure ID="144" Sign="">
+     <Signs>
+      <Sign ID="125" langid="1"><![CDATA[pc(s)]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1498423" langid="1" Value="Quantity per pack"/>
+   </Feature>
+  </ProductFeature>
+  <ProductGallery>
+   <ProductPicture IsMain="Y" LowPic="https://images.icecat.biz/img/gallery_lows/544a6c714b5d5ab712a3537121a3269f2e15a79e.jpg" LowPicHeight="200" LowPicWidth="196" LowSize="21123" No="1" Original="https://images.icecat.biz/img/gallery_raw/7967663864b77cf3f33d5aeb67822e2afd428de6.jpeg" OriginalSize="26718" Pic="https://images.icecat.biz/img/gallery/6a38aedff5a17f67521e91792d3f470243de8583.jpg" Pic500x500="" Pic500x500Height="0" Pic500x500Size="0" Pic500x500Width="0" PicHeight="467" PicWidth="457" ProductPicture_ID="83172646" Size="52454" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/0bb7a7b3b808869c4f4ceb69fd791299fb9f2679.jpg" ThumbSize="5771" Type="ProductImage" UpdatedDate="2023-11-16 11:06:11"/>
+  </ProductGallery>
+  <ProductMultimediaObject>
+   <MultimediaObject ContentType="application/pdf" Date="2023-12-18 10:12:44" Description="Generated PDF" KeepAsURL="0" MultimediaObject_ID="0" Type="leaflet" UUID="00000000-0000-0000-0000-000000000000" langid="1" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="0" URL="https://icecat.biz/rest/product-pdf?productId=69739570&amp;lang=en" Width="0"/>
+  </ProductMultimediaObject>
+  <ProductRelated/>
+  <SummaryDescription>
+   <ShortSummaryDescription langid="1">Seagate Barracuda ST8000DM004, 8 TB, 5400 RPM, 256 MB, 3.5&quot;, Serial ATA III</ShortSummaryDescription>
+   <LongSummaryDescription langid="1">Seagate Barracuda ST8000DM004. HDD capacity: 8 TB, HDD speed: 5400 RPM, Storage drive buffer size: 256 MB, HDD size: 3.5&quot;, Interface: Serial ATA III</LongSummaryDescription>
+  </SummaryDescription>
+  <Supplier ID="27" Name="Seagate"/>
+  <CatalogObjectCloud>
+   <ProductPage QRCodeURL="https://qr.icecat.biz/coc/005fc656-a521-4a3b-868c-92452a83d631" URL="https://coc.icecat.biz/005fc656-a521-4a3b-868c-92452a83d631"/>
+  </CatalogObjectCloud>
+ </Product>
+</ICECAT-interface>

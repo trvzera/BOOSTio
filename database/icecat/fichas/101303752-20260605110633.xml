@@ -1,0 +1,647 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ICECAT-interface SYSTEM "https://data.icecat.biz/dtd/ICECAT-interface_response.dtd">
+<!--source: Icecat.biz 2026-->
+<!--Language ID: 1-->
+<!--Version: v2-->
+<ICECAT-interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://data.icecat.biz/xsd/ICECAT-interface_response.xsd">
+ <Product Code="1" HighPic="https://images.icecat.biz/img/gallery/b2273aab3585d9ac6310f05ee5628399d2dde3e3.jpg" HighPicHeight="657" HighPicSize="155977" HighPicWidth="514" ID="101303752" LowPic="https://images.icecat.biz/img/gallery_lows/41f1219cc378f1eb4e1dfbfe02f058f44b69f65d.jpg" LowPicHeight="200" LowPicSize="20622" LowPicWidth="156" Name="WU650" IntName="WU650" LocalName="" Pic500x500="https://images.icecat.biz/img/gallery_mediums/f4296afdc5498d48537341a9f26090bca3da94d4.jpg" Pic500x500Height="500" Pic500x500Size="96584" Pic500x500Width="391" Prod_id="WU650" Quality="ICECAT" ReleaseDate="" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/f96d2a29099eb87c844c934a62c569ac1a2794a2.jpg" ThumbPicSize="4790" Title="Cudy WU650 network card WLAN 433 Mbit/s" GeneratedIntTitle="Cudy WU650 network card" GeneratedLocalTitle="Cudy WU650 network card WLAN 433 Mbit/s" BrandLocalTitle="">
+  <CategoryFeatureGroup ID="31707" No="-10">
+   <FeatureGroup ID="0">
+    <Name ID="5073" langid="1" Value="Technical details"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1044" No="18">
+   <FeatureGroup ID="8">
+    <Name ID="4885" langid="1" Value="System requirements"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1046" No="30">
+   <FeatureGroup ID="12">
+    <Name ID="4995" langid="1" Value="Ports &amp; interfaces"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1045" No="10">
+   <FeatureGroup ID="14">
+    <Name ID="5023" langid="1" Value="Weight &amp; dimensions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1638" No="20">
+   <FeatureGroup ID="27">
+    <Name ID="5049" langid="1" Value="Power"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1047" No="16">
+   <FeatureGroup ID="28">
+    <Name ID="5067" langid="1" Value="Operational conditions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1043" No="26">
+   <FeatureGroup ID="35">
+    <Name ID="5167" langid="1" Value="Network"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="31656" No="8">
+   <FeatureGroup ID="67">
+    <Name ID="27423" langid="1" Value="Packaging data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="41309" No="15">
+   <FeatureGroup ID="76">
+    <Name ID="28540" langid="1" Value="Certificates"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="34706" No="6">
+   <FeatureGroup ID="116">
+    <Name ID="78852" langid="1" Value="Packaging content"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="53385" No="0">
+   <FeatureGroup ID="143">
+    <Name ID="618812" langid="1" Value="Battery"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="78112" No="0">
+   <FeatureGroup ID="144">
+    <Name ID="619994" langid="1" Value="Brand-specific features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="6648" No="-30">
+   <FeatureGroup ID="146">
+    <Name ID="624346" langid="1" Value="Other features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="11067" No="24">
+   <FeatureGroup ID="148">
+    <Name ID="630457" langid="1" Value="Design"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="70328" No="0">
+   <FeatureGroup ID="185">
+    <Name ID="1219853" langid="1" Value="Features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="24993" No="-20">
+   <FeatureGroup ID="198">
+    <Name ID="1788927" langid="1" Value="Logistics data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="59866" No="0">
+   <FeatureGroup ID="232">
+    <Name ID="3464238" langid="1" Value="Supplier features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="72293" No="14">
+   <FeatureGroup ID="279">
+    <Name ID="7392238" langid="1" Value="Sustainability"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <Category ID="182">
+   <Name ID="3727431" langid="1" Value="Network Cards"/>
+  </Category>
+  <EANCode EAN="6971690790851" Format="GTIN-13" IsApproved="1"/>
+  <ReleaseDate/>
+  <EndOfLifeDate/>
+  <ReasonsToBuy/>
+  <BulletPoints>
+   <BulletPoint Value="433 Mbps + 200 Mbps WiFi" langid="1" No="1"/>
+   <BulletPoint Value="1× USB 2.0" langid="1" No="2"/>
+   <BulletPoint Value="Works on Win7+/macOS 10.x/Linux" langid="1" No="3"/>
+   <BulletPoint Value="20×15×8mm 0.79×0.59×0.31''" langid="1" No="4"/>
+  </BulletPoints>
+  <GeneratedBulletPoints>
+   <GeneratedBulletPoint Value="Wireless" langid="1" No="1"/>
+   <GeneratedBulletPoint Value="USB 2.0 WLAN" langid="1" No="2"/>
+   <GeneratedBulletPoint Value="433 Mbit/s" langid="1" No="3"/>
+   <GeneratedBulletPoint Value="Wi-Fi Dual-band (2.4 GHz / 5 GHz)" langid="1" No="4"/>
+   <GeneratedBulletPoint Value="Component for: PC/Laptop" langid="1" No="5"/>
+  </GeneratedBulletPoints>
+  <ProductBundled/>
+  <ProductDescription ID="87829506" LongDesc="&lt;b&gt;Dual-Band Wi-Fi for Faster, Smoother Connections&lt;/b&gt;&lt;br&gt;Experience faster connections with dual-band Wi-Fi. The 2.4GHz band ensures stable, long-range signals for daily tasks, while the 5GHz band delivers up to 433 Mbps for smooth gaming and HD streaming.&lt;br&gt;&lt;br&gt;&lt;b&gt;Compact Design, Easy to Carry&lt;/b&gt;&lt;br&gt;The WU650's sleek, compact design makes it easy to carry anywhere. Its small size won't block neighboring USB ports, providing hassle-free compatibility for all your needs.&lt;br&gt;&lt;br&gt;&lt;b&gt;Plug &amp; Play&lt;/b&gt;&lt;br&gt;With built-in drivers, the network card automatically adapts to your system and installs itself. Simply plug in, and enjoy seamless internet access with ease.&lt;br&gt;&lt;br&gt;&lt;b&gt;Share Wi-Fi Anywhere with AP Mode&lt;/b&gt;&lt;br&gt;With the WU650, you can turn your desktop or laptop's wired internet connection into a Wi-Fi hotspot, allowing devices like smartphones and tablets to easily connect and get online.&lt;br&gt;&lt;br&gt;&lt;b&gt;Broad System Compatibility for Every User&lt;/b&gt;&lt;br&gt;The Wi-Fi adapter supports a wide range of operating systems, including Windows, macOS, and Linux, catering to the needs of all users. Enjoy stable and fast internet connections across various platforms." ManualPDFSize="0" ManualPDFURL="" MiddleDesc="" PDFSize="494074" PDFURL="https://objects.icecat.biz/objects/mmo_101303752_1659453044_5456_4583.pdf" ShortDesc="650Mbps, Wi-Fi, Dual Band, USB Adapter, Model: WU650, Black" URL="https://www.cudy.com/en-eu/products/wu650-2-0?_pos=2&amp;_psq=WU650&amp;_ss=e&amp;_v=1.0#features" WarrantyInfo="" langid="1"/>
+  <ProductFeature Localized="0" ID="494459997" Local_ID="0" Value="Wireless" CategoryFeature_ID="8067" CategoryFeatureGroup_ID="1046" No="10101000" Optional="0" Presentation_Value="Wireless" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="Wireless">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1655">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5169" langid="1" Value="Connectivity technology"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494459999" Local_ID="0" Value="USB" CategoryFeature_ID="8076" CategoryFeatureGroup_ID="1046" No="10100890" Optional="0" Presentation_Value="USB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="USB">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2377">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="12228" langid="1" Value="Host interface"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460000" Local_ID="0" Value="WLAN" CategoryFeature_ID="12403" CategoryFeatureGroup_ID="1046" No="10100889" Optional="0" Presentation_Value="WLAN" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="WLAN">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="21">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1341" langid="1" Value="Interface"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460001" Local_ID="0" Value="Straight" CategoryFeature_ID="707710" CategoryFeatureGroup_ID="1046" No="100010" Optional="0" Presentation_Value="Straight" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Straight">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="43133">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="7390525" langid="1" Value="USB connector form factor"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460002" Local_ID="0" Value="2.0" CategoryFeature_ID="115738" CategoryFeatureGroup_ID="1046" No="100009" Optional="0" Presentation_Value="2.0" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="2.0">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="8541">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="718602" langid="1" Value="USB version"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460005" Local_ID="0" Value="433" CategoryFeature_ID="7991" CategoryFeatureGroup_ID="1043" No="10100850" Optional="0" Presentation_Value="433 Mbit/s" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="433">
+    <Measure ID="23">
+     <Signs>
+      <Sign ID="4" langid="1"><![CDATA[Mbit/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1165">
+    <Measure ID="23" Sign="">
+     <Signs>
+      <Sign ID="4" langid="1"><![CDATA[Mbit/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3871" langid="1" Value="Maximum data transfer rate"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460007" Local_ID="0" Value="IEEE 802.11a,IEEE 802.11ac,IEEE 802.11b,IEEE 802.11g,IEEE 802.11n" CategoryFeature_ID="45761" CategoryFeatureGroup_ID="1043" No="100845" Optional="0" Presentation_Value="IEEE 802.11a, IEEE 802.11ac, IEEE 802.11b, IEEE 802.11g, IEEE 802.11n" Translated="0" Mandatory="1" Searchable="0">
+   <LocalValue Value="IEEE 802.11a, IEEE 802.11ac, IEEE 802.11b, IEEE 802.11g, IEEE 802.11n">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1802">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5587" langid="1" Value="Networking standards"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460009" Local_ID="0" Value="Y" CategoryFeature_ID="24779" CategoryFeatureGroup_ID="1043" No="100820" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3239">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="30766" langid="1" Value="Wi-Fi"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460012" Local_ID="0" Value="Dual-band (2.4 GHz / 5 GHz)" CategoryFeature_ID="143399" CategoryFeatureGroup_ID="1043" No="100819" Optional="0" Presentation_Value="Dual-band (2.4 GHz / 5 GHz)" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Dual-band (2.4 GHz / 5 GHz)">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="22517">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1781227" langid="1" Value="Wi-Fi band"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460014" Local_ID="0" Value="2.4 - 5.8" CategoryFeature_ID="50533" CategoryFeatureGroup_ID="1043" No="100818" Optional="0" Presentation_Value="2.4 - 5.8 GHz" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="2.4 - 5.8">
+    <Measure ID="37">
+     <Signs>
+      <Sign ID="21" langid="1"><![CDATA[GHz]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="5713">
+    <Measure ID="37" Sign="">
+     <Signs>
+      <Sign ID="21" langid="1"><![CDATA[GHz]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="118730" langid="1" Value="Frequency range"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460016" Local_ID="0" Value="Wi-Fi 5 (802.11ac)" CategoryFeature_ID="168634" CategoryFeatureGroup_ID="1043" No="100818" Optional="0" Presentation_Value="Wi-Fi 5 (802.11ac)" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="Wi-Fi 5 (802.11ac)">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="24993">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2105805" langid="1" Value="Top Wi-Fi standard"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460018" Local_ID="0" Value="802.11a,802.11b,802.11g,Wi-Fi 4 (802.11n),Wi-Fi 5 (802.11ac)" CategoryFeature_ID="183958" CategoryFeatureGroup_ID="1043" No="100817" Optional="0" Presentation_Value="802.11a, 802.11b, 802.11g, Wi-Fi 4 (802.11n), Wi-Fi 5 (802.11ac)" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="802.11a, 802.11b, 802.11g, Wi-Fi 4 (802.11n), Wi-Fi 5 (802.11ac)">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="432">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2231" langid="1" Value="Wi-Fi standards"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460020" Local_ID="0" Value="200,433" CategoryFeature_ID="26132" CategoryFeatureGroup_ID="1043" No="100815" Optional="0" Presentation_Value="200,433 Mbit/s" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="200,433">
+    <Measure ID="23">
+     <Signs>
+      <Sign ID="4" langid="1"><![CDATA[Mbit/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3261">
+    <Measure ID="23" Sign="">
+     <Signs>
+      <Sign ID="4" langid="1"><![CDATA[Mbit/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="30922" langid="1" Value="WLAN data transfer rates supported"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460031" Local_ID="0" Value="WEP,WPA,WPA-PSK,WPA2,WPA2-PSK" CategoryFeature_ID="8074" CategoryFeatureGroup_ID="1043" No="100769" Optional="0" Presentation_Value="WEP, WPA, WPA-PSK, WPA2, WPA2-PSK" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="WEP, WPA, WPA-PSK, WPA2, WPA2-PSK">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="454">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2439" langid="1" Value="Security algorithms"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460032" Local_ID="0" Value="N" CategoryFeature_ID="12400" CategoryFeatureGroup_ID="11067" No="10100900" Optional="0" Presentation_Value="No" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="22">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1345" langid="1" Value="Internal"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460033" Local_ID="0" Value="PC/Notebook" CategoryFeature_ID="595674" CategoryFeatureGroup_ID="11067" No="100998" Optional="0" Presentation_Value="PC/Laptop" Translated="1" Mandatory="1" Searchable="0">
+   <LocalValue Value="PC/Laptop">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9163">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="763709" langid="1" Value="Component for"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460035" Local_ID="0" Value="Black" CategoryFeature_ID="27195" CategoryFeatureGroup_ID="11067" No="100997" Optional="0" Presentation_Value="Black" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Black">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1766">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5487" langid="1" Value="Product colour"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460037" Local_ID="0" Value="Y" CategoryFeature_ID="39775" CategoryFeatureGroup_ID="11067" No="100090" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="4114">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="58865" langid="1" Value="Antenna"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460038" Local_ID="0" Value="Internal" CategoryFeature_ID="684705" CategoryFeatureGroup_ID="11067" No="100090" Optional="0" Presentation_Value="Internal" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Internal">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="42737">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="7112440" langid="1" Value="Antenna design"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460040" Local_ID="0" Value="2" CategoryFeature_ID="799994" CategoryFeatureGroup_ID="11067" No="100086" Optional="0" Presentation_Value="2 dBi" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="2">
+    <Measure ID="99">
+     <Signs>
+      <Sign ID="81" langid="1"><![CDATA[dBi]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1804">
+    <Measure ID="99" Sign="">
+     <Signs>
+      <Sign ID="81" langid="1"><![CDATA[dBi]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5591" langid="1" Value="Antenna gain level (max)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460051" Local_ID="0" Value="Y" CategoryFeature_ID="18065" CategoryFeatureGroup_ID="1638" No="99999" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2337">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="12093" langid="1" Value="USB powered"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460058" Local_ID="0" Value="Windows 10,Windows 7,Windows 8,Windows 8.1,Windows Vista,Windows XP" CategoryFeature_ID="50523" CategoryFeatureGroup_ID="1044" No="99979" Optional="0" Presentation_Value="Windows 10, Windows 7, Windows 8, Windows 8.1, Windows Vista, Windows XP" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="Windows 10, Windows 7, Windows 8, Windows 8.1, Windows Vista, Windows XP">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7986">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="617692" langid="1" Value="Windows operating systems supported"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460097" Local_ID="0" Value="Mac OS X 10.10 Yosemite,Mac OS X 10.11 El Capitan,Mac OS X 10.12 Sierra,Mac OS X 10.13 High Sierra,Mac OS X 10.14 Mojave,Mac OS X 10.15 Catalina,Mac OS X 10.15.3 Catalina,Mac OS X 10.6 Snow Leopard,Mac OS X 10.7 Lion,Mac OS X 10.8 Mountain Lion,Mac OS X 10.9 Mavericks" CategoryFeature_ID="50524" CategoryFeatureGroup_ID="1044" No="99978" Optional="0" Presentation_Value="Mac OS X 10.10 Yosemite, Mac OS X 10.11 El Capitan, Mac OS X 10.12 Sierra, Mac OS X 10.13 High Sierra, Mac OS X 10.14 Mojave, Mac OS X 10.15 Catalina, Mac OS X 10.15.3 Catalina, Mac OS X 10.6 Snow Leopard, Mac OS X 10.7 Lion, Mac OS X 10.8 Mountain Lion, Mac OS X 10.9 Mavericks" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Mac OS X 10.10 Yosemite, Mac OS X 10.11 El Capitan, Mac OS X 10.12 Sierra, Mac OS X 10.13 High Sierra, Mac OS X 10.14 Mojave, Mac OS X 10.15 Catalina, Mac OS X 10.15.3 Catalina, Mac OS X 10.6 Snow Leopard, Mac OS X 10.7 Lion, Mac OS X 10.8 Mountain Lion, Mac OS X 10.9 Mavericks">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7987">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="617733" langid="1" Value="Mac operating systems supported"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460103" Local_ID="0" Value="0 - 40" CategoryFeature_ID="8083" CategoryFeatureGroup_ID="1047" No="100040" Optional="0" Presentation_Value="0 - 40 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0 - 40">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1112">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3765" langid="1" Value="Operating temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460104" Local_ID="0" Value="-40 - 70" CategoryFeature_ID="10855" CategoryFeatureGroup_ID="1047" No="100035" Optional="0" Presentation_Value="-40 - 70 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="-40 - 70">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="757">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3045" langid="1" Value="Storage temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460105" Local_ID="0" Value="10 - 90" CategoryFeature_ID="8082" CategoryFeatureGroup_ID="1047" No="100030" Optional="0" Presentation_Value="10 - 90%" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="10 - 90">
+    <Measure ID="64">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="703">
+    <Measure ID="64" Sign="">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="2937" langid="1" Value="Operating relative humidity (H-H)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460106" Local_ID="0" Value="5 - 90" CategoryFeature_ID="14434" CategoryFeatureGroup_ID="1047" No="100025" Optional="0" Presentation_Value="5 - 90%" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="5 - 90">
+    <Measure ID="64">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1383">
+    <Measure ID="64" Sign="">
+     <Signs>
+      <Sign ID="47" langid="1"><![CDATA[%]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4307" langid="1" Value="Storage relative humidity (H-H)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460108" Local_ID="0" Value="20" CategoryFeature_ID="17367" CategoryFeatureGroup_ID="1045" No="100098" Optional="0" Presentation_Value="20 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="20">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1649">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5143" langid="1" Value="Width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460109" Local_ID="0" Value="15" CategoryFeature_ID="17368" CategoryFeatureGroup_ID="1045" No="100097" Optional="0" Presentation_Value="15 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="15">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1650">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5145" langid="1" Value="Depth"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="972494650" Local_ID="0" Value="8" CategoryFeature_ID="17372" CategoryFeatureGroup_ID="1045" No="100096" Optional="0" Presentation_Value="8 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="8">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1464">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4625" langid="1" Value="Height"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460110" Local_ID="0" Value="3" CategoryFeature_ID="3518" CategoryFeatureGroup_ID="1045" No="100000" Optional="0" Presentation_Value="3 g" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="3">
+    <Measure ID="38">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="94">
+    <Measure ID="38" Sign="">
+     <Signs>
+      <Sign ID="22" langid="1"><![CDATA[g]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1525" langid="1" Value="Weight"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460119" Local_ID="0" Value="1" CategoryFeature_ID="323591" CategoryFeatureGroup_ID="31656" No="100000" Optional="1" Presentation_Value="1 pc(s)" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1">
+    <Measure ID="144">
+     <Signs>
+      <Sign ID="125" langid="1"><![CDATA[pc(s)]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="20228">
+    <Measure ID="144" Sign="">
+     <Signs>
+      <Sign ID="125" langid="1"><![CDATA[pc(s)]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1498423" langid="1" Value="Quantity per pack"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460121" Local_ID="0" Value="Box" CategoryFeature_ID="131349" CategoryFeatureGroup_ID="31656" No="99990" Optional="1" Presentation_Value="Box" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Box">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="4463">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="60405" langid="1" Value="Package type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460114" Local_ID="0" Value="Y" CategoryFeature_ID="338012" CategoryFeatureGroup_ID="34706" No="100010" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="21943">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1744690" langid="1" Value="Resource CD"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494460115" Local_ID="0" Value="Y" CategoryFeature_ID="131345" CategoryFeatureGroup_ID="34706" No="100005" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="4921">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="61497" langid="1" Value="Quick installation guide"/>
+   </Feature>
+  </ProductFeature>
+  <ProductGallery>
+   <ProductPicture IsMain="Y" LowPic="https://images.icecat.biz/img/gallery_lows/41f1219cc378f1eb4e1dfbfe02f058f44b69f65d.jpg" LowPicHeight="200" LowPicWidth="156" LowSize="20622" No="1" Original="https://images.icecat.biz/img/gallery_raw/41cb110c2fc5c81337ca9a1e2d9f425106fadbd8.png" OriginalSize="275420" Pic="https://images.icecat.biz/img/gallery/b2273aab3585d9ac6310f05ee5628399d2dde3e3.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/f4296afdc5498d48537341a9f26090bca3da94d4.jpg" Pic500x500Height="500" Pic500x500Size="96584" Pic500x500Width="391" PicHeight="657" PicWidth="514" ProductPicture_ID="147124681" Size="155977" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/f96d2a29099eb87c844c934a62c569ac1a2794a2.jpg" ThumbSize="4790" Type="ProductImage" UpdatedDate="2026-06-05 11:06:33"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/63205ede099dfa4332d2f065d2d0b26d64076eed.jpg" LowPicHeight="200" LowPicWidth="150" LowSize="16020" No="2" Original="https://images.icecat.biz/img/gallery_raw/eb49b500e29a98cbdcd96e12c15c14b9848d4caf.png" OriginalSize="234680" Pic="https://images.icecat.biz/img/gallery/cbf493a5ea77e5529a105ba2c3e6a8a5422fc7a7.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/3699c620938d883ba4d8c51c23626bfbb34c1347.jpg" Pic500x500Height="500" Pic500x500Size="84166" Pic500x500Width="374" PicHeight="584" PicWidth="437" ProductPicture_ID="147124680" Size="112758" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/97235d7b5f6d022c7206072a8a8697842b0629ad.jpg" ThumbSize="4217" Type="ProductImage" UpdatedDate="2026-06-05 11:06:22"/>
+   <ProductPicture LowPic="https://images.icecat.biz/img/gallery_lows/3a1df71042cf05ce4ca0d62942d7c54be3d95229.jpg" LowPicHeight="200" LowPicWidth="166" LowSize="13348" No="3" Original="https://images.icecat.biz/img/gallery_raw/2cbd3d2962a3c2de16493af47d747d6507965e46.jpeg" OriginalSize="56775" Pic="https://images.icecat.biz/img/gallery/536500ecb2d0466eb84de987458e87daa534fa06.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/73beff059d8b1cff683e32ca1251246bbfdc6ac4.jpg" Pic500x500Height="500" Pic500x500Size="52229" Pic500x500Width="414" PicHeight="974" PicWidth="807" ProductPicture_ID="147124678" Size="137216" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/f63160af1283b6d656264e515886c4678b703483.jpg" ThumbSize="3725" Type="ProductImage" UpdatedDate="2026-06-05 11:06:08"/>
+  </ProductGallery>
+  <ProductMultimediaObject>
+   <MultimediaObject ContentType="application/pdf" Date="2022-08-02 17:10:36" Description="manual pdf" KeepAsURL="0" MultimediaObject_ID="21982649" Type="manual pdf" UUID="A4DB7A4A-3EE4-4648-A479-EDFBFD10F1BA" langid="0" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="1262737" URL="https://objects.icecat.biz/objects/mmo_101303752_1659453036_6435_14405.pdf" Width="0"/>
+   <MultimediaObject ContentType="application/pdf" Date="2026-06-05 10:07:58" Description="EU Declaration of Conformity" KeepAsURL="0" MultimediaObject_ID="76188224" Type="other digital assets" UUID="D36C40A7-87B4-4125-9AB6-5F8992848810" langid="0" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="280994" URL="https://objects.icecat.biz/objects/mmo_101303752_1780646878_8599_3788578.pdf" Width="0"/>
+   <MultimediaObject ContentType="application/pdf" Date="2022-08-02 17:10:44" Description="leaflet" KeepAsURL="0" MultimediaObject_ID="21982650" Type="leaflet" UUID="591649DB-2661-4B13-A85D-442AD5ACF411" langid="1" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="494074" URL="https://objects.icecat.biz/objects/mmo_101303752_1659453044_5456_4583.pdf" Width="0"/>
+  </ProductMultimediaObject>
+  <ProductRelated/>
+  <SummaryDescription>
+   <ShortSummaryDescription langid="1">Cudy WU650, Wireless, USB, WLAN, Wi-Fi 5 (802.11ac), 433 Mbit/s, Black</ShortSummaryDescription>
+   <LongSummaryDescription langid="1">Cudy WU650. Connectivity technology: Wireless, Host interface: USB, Interface: WLAN. Maximum data transfer rate: 433 Mbit/s, Top Wi-Fi standard: Wi-Fi 5 (802.11ac), Wi-Fi band: Dual-band (2.4 GHz / 5 GHz). USB powered. Product colour: Black</LongSummaryDescription>
+  </SummaryDescription>
+  <Supplier ID="37597" Name="Cudy"/>
+  <CatalogObjectCloud>
+   <ProductPage QRCodeURL="https://qr.icecat.biz/coc/bc825446-e3ba-47b5-892a-da9fc4d7311c" URL="https://coc.icecat.biz/bc825446-e3ba-47b5-892a-da9fc4d7311c"/>
+  </CatalogObjectCloud>
+ </Product>
+</ICECAT-interface>

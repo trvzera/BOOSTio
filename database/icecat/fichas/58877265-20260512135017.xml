@@ -1,0 +1,619 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ICECAT-interface SYSTEM "https://data.icecat.biz/dtd/ICECAT-interface_response.dtd">
+<!--source: Icecat.biz 2026-->
+<!--Language ID: 1-->
+<!--Version: v2-->
+<ICECAT-interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://data.icecat.biz/xsd/ICECAT-interface_response.xsd">
+ <Product Code="1" HighPic="https://images.icecat.biz/img/gallery/c12400de7661e8460a836a0985bf8f757766899d.jpg" HighPicHeight="600" HighPicSize="136706" HighPicWidth="600" ID="58877265" LowPic="https://images.icecat.biz/img/gallery_lows/584761e62ea056b4a5b31ec681c53300854dc5d0.jpg" LowPicHeight="200" LowPicSize="17653" LowPicWidth="200" Name="ValueRAM" IntName="ValueRAM" LocalName="" Pic500x500="https://images.icecat.biz/img/gallery_mediums/0359d13428dbfe41e7ed7aa494437e49577021e1.jpg" Pic500x500Height="500" Pic500x500Size="95018" Pic500x500Width="500" Prod_id="KVR26N19S6/4" Quality="ICECAT" ReleaseDate="" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/28b3b8382b78aa8d6e0d7a24126891dc9e3cf9c9.jpg" ThumbPicSize="3769" Title="Kingston Technology ValueRAM memory module 4 GB 1 x 4 GB DDR4 2666 MT/s 288-pin DIMM" GeneratedIntTitle="Kingston Technology ValueRAM memory module" GeneratedLocalTitle="Kingston Technology ValueRAM memory module 4 GB 1 x 4 GB DDR4 2666 MT/s 288-pin DIMM" BrandLocalTitle="">
+  <CategoryFeatureGroup ID="32098" No="0">
+   <FeatureGroup ID="0">
+    <Name ID="5073" langid="1" Value="Technical details"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1549" No="-1">
+   <FeatureGroup ID="14">
+    <Name ID="5023" langid="1" Value="Weight &amp; dimensions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="1551" No="2">
+   <FeatureGroup ID="28">
+    <Name ID="5067" langid="1" Value="Operational conditions"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="31202" No="-3">
+   <FeatureGroup ID="67">
+    <Name ID="27423" langid="1" Value="Packaging data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="41307" No="0">
+   <FeatureGroup ID="76">
+    <Name ID="28540" langid="1" Value="Certificates"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="83399" No="0">
+   <FeatureGroup ID="90">
+    <Name ID="30562" langid="1" Value="Software"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="49023" No="0">
+   <FeatureGroup ID="116">
+    <Name ID="78852" langid="1" Value="Packaging content"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="53383" No="0">
+   <FeatureGroup ID="143">
+    <Name ID="618812" langid="1" Value="Battery"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="6347" No="-5">
+   <FeatureGroup ID="146">
+    <Name ID="624346" langid="1" Value="Other features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="27909" No="5">
+   <FeatureGroup ID="185">
+    <Name ID="1219853" langid="1" Value="Features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="24500" No="-4">
+   <FeatureGroup ID="198">
+    <Name ID="1788927" langid="1" Value="Logistics data"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="59864" No="0">
+   <FeatureGroup ID="232">
+    <Name ID="3464238" langid="1" Value="Supplier features"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <CategoryFeatureGroup ID="76696" No="0">
+   <FeatureGroup ID="279">
+    <Name ID="7392238" langid="1" Value="Sustainability"/>
+   </FeatureGroup>
+  </CategoryFeatureGroup>
+  <Category ID="911">
+   <Name ID="3727686" langid="1" Value="Memory Modules"/>
+  </Category>
+  <EANCode EAN="0740617282733" Format="GTIN-13" IsApproved="1"/>
+  <EANCode EAN="740617282733" Format="GTIN-12" IsApproved="1"/>
+  <ReleaseDate/>
+  <EndOfLifeDate>
+   <Date Value="2024-02-08" langid="0"/>
+  </EndOfLifeDate>
+  <ReasonsToBuy/>
+  <BulletPoints>
+   <BulletPoint Value="Power Supply: VDD = 1.2V Typical" langid="1" No="1"/>
+   <BulletPoint Value="VDDQ = 1.2V Typical" langid="1" No="2"/>
+   <BulletPoint Value="VPP = 2.5V Typical" langid="1" No="3"/>
+   <BulletPoint Value="VDDSPD = 2.2V to 3.6V" langid="1" No="4"/>
+   <BulletPoint Value="Nominal and dynamic on-die termination (ODT) for data, strobe, and mask signals" langid="1" No="5"/>
+   <BulletPoint Value="Low-power auto self refresh (LPASR)" langid="1" No="6"/>
+   <BulletPoint Value="Data bus inversion (DBI) for data bus" langid="1" No="7"/>
+   <BulletPoint Value="On-die VREFDQ generation and calibration" langid="1" No="8"/>
+   <BulletPoint Value="Single-rank" langid="1" No="9"/>
+   <BulletPoint Value="On-board I2 serial presence-detect (SPD) EEPROM" langid="1" No="10"/>
+   <BulletPoint Value="8 internal banks; 2 groups of 4 banks each" langid="1" No="11"/>
+   <BulletPoint Value="Fixed burst chop (BC) of 4 and burst length (BL) of 8 via the mode register set (MRS)" langid="1" No="12"/>
+   <BulletPoint Value="Selectable BC4 or BL8 on-the-fly (OTF)" langid="1" No="13"/>
+   <BulletPoint Value="Fly-by topology" langid="1" No="14"/>
+   <BulletPoint Value="Terminated control command and address bus" langid="1" No="15"/>
+   <BulletPoint Value="PCB: Height 1.23” (31.25mm)" langid="1" No="16"/>
+   <BulletPoint Value="RoHS Compliant and Halogen-Free" langid="1" No="17"/>
+  </BulletPoints>
+  <GeneratedBulletPoints>
+   <GeneratedBulletPoint Value="PC/Server 4 GB DDR4 2666 MT/s Single-channel" langid="1" No="1"/>
+   <GeneratedBulletPoint Value="288-pin DIMM 1 x 4 GB" langid="1" No="2"/>
+   <GeneratedBulletPoint Value="CAS latency: 19" langid="1" No="3"/>
+   <GeneratedBulletPoint Value="1.2 V" langid="1" No="4"/>
+  </GeneratedBulletPoints>
+  <ProductBundled/>
+  <ProductDescription ID="63817667" LongDesc="ValueRAM's KVR26N19S6/4 is a 512M x 64-bit (4GB) DDR4-2666 CL19 SDRAM (Synchronous DRAM), 1Rx16, memory module, based on four 512M x 16-bit FBGA components. The SPD is programmed to JEDEC standard latency DDR4-2666 timing of 19-19-19 at 1.2V. Each 288-pin DIMM uses gold contact fingers." ManualPDFSize="0" ManualPDFURL="" MiddleDesc="" PDFSize="98715" PDFURL="https://objects.icecat.biz/objects/mmo_58877265_1533294804_3755_27152.pdf" ShortDesc="4GB DDR4, 2666MT/s, Non-ECC, CL19, 1.2V, Unbuffered, DIMM" URL="https://www.kingston.com/en" WarrantyInfo="Lifetime" langid="1"/>
+  <ProductFamily ID="1027" LowPic="" ThumbPic="">
+   <Name ID="242294" langid="1" Value="ValueRAM"/>
+  </ProductFamily>
+  <ProductFeature Localized="0" ID="284530578" Local_ID="0" Value="4" CategoryFeature_ID="73748" CategoryFeatureGroup_ID="27909" No="10109999" Optional="0" Presentation_Value="4 GB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="4">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="11381">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1036616" langid="1" Value="Internal memory"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530717" Local_ID="0" Value="1 x 4" CategoryFeature_ID="93088" CategoryFeatureGroup_ID="27909" No="10109998" Optional="0" Presentation_Value="1 x 4 GB" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="1 x 4">
+    <Measure ID="20">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="16023">
+    <Measure ID="20" Sign="">
+     <Signs>
+      <Sign ID="7" langid="1"><![CDATA[GB]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="1186317" langid="1" Value="Memory layout (modules x size)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530579" Local_ID="0" Value="DDR4" CategoryFeature_ID="6137" CategoryFeatureGroup_ID="27909" No="10109980" Optional="0" Presentation_Value="DDR4" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="DDR4">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="427">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="2221" langid="1" Value="Internal memory type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="863721187" Local_ID="0" Value="2666" CategoryFeature_ID="948627" CategoryFeatureGroup_ID="27909" No="10109069" Optional="0" Presentation_Value="2666 MT/s" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="2666">
+    <Measure ID="340">
+     <Signs>
+      <Sign ID="28534" langid="1"><![CDATA[MT/s]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="37536">
+    <Measure ID="340" Sign="">
+     <Signs>
+      <Sign ID="28534" langid="1"><![CDATA[MT/s]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5082622" langid="1" Value="Memory data transfer rate"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530586" Local_ID="0" Value="PC/Server" CategoryFeature_ID="73714" CategoryFeatureGroup_ID="27909" No="10109060" Optional="0" Presentation_Value="PC/Server" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="PC/Server">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="9163">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="763709" langid="1" Value="Component for"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530712" Local_ID="0" Value="288-pin DIMM" CategoryFeature_ID="45866" CategoryFeatureGroup_ID="27909" No="10109050" Optional="0" Presentation_Value="288-pin DIMM" Translated="0" Mandatory="1" Searchable="1">
+   <LocalValue Value="288-pin DIMM">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7696">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="595968" langid="1" Value="Memory form factor"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530736" Local_ID="0" Value="N" CategoryFeature_ID="6130" CategoryFeatureGroup_ID="27909" No="10109039" Optional="0" Presentation_Value="No" Translated="1" Mandatory="1" Searchable="1">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1628">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5085" langid="1" Value="ECC"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530719" Local_ID="0" Value="19" CategoryFeature_ID="6141" CategoryFeatureGroup_ID="27909" No="10109035" Optional="0" Presentation_Value="19" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="19">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1635">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5099" langid="1" Value="CAS latency"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="635817808" Local_ID="0" Value="Single-channel" CategoryFeature_ID="48929" CategoryFeatureGroup_ID="27909" No="100994" Optional="0" Presentation_Value="Single-channel" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="Single-channel">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7788">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="601574" langid="1" Value="Memory channels"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530742" Local_ID="0" Value="Unregistered (unbuffered)" CategoryFeature_ID="301234" CategoryFeatureGroup_ID="27909" No="100994" Optional="0" Presentation_Value="Unregistered (unbuffered)" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="Unregistered (unbuffered)">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="38209">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5220375" langid="1" Value="Buffered memory type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530827" Local_ID="0" Value="1" CategoryFeature_ID="48946" CategoryFeatureGroup_ID="27909" No="100993" Optional="0" Presentation_Value="1" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="8216">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="633354" langid="1" Value="Memory ranking"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530721" Local_ID="0" Value="1.2" CategoryFeature_ID="36754" CategoryFeatureGroup_ID="27909" No="100992" Optional="0" Presentation_Value="1.2 V" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1.2">
+    <Measure ID="42">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6266">
+    <Measure ID="42" Sign="">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="154881" langid="1" Value="Memory voltage"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530758" Local_ID="0" Value="512M x 64" CategoryFeature_ID="6133" CategoryFeatureGroup_ID="27909" No="100991" Optional="0" Presentation_Value="512M x 64" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="512M x 64">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1631">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5091" langid="1" Value="Module configuration"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530894" Local_ID="0" Value="45.75" CategoryFeature_ID="18992" CategoryFeatureGroup_ID="27909" No="100990" Optional="1" Presentation_Value="45.75 ns" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="45.75">
+    <Measure ID="63">
+     <Signs>
+      <Sign ID="46" langid="1"><![CDATA[ns]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3347">
+    <Measure ID="63" Sign="">
+     <Signs>
+      <Sign ID="46" langid="1"><![CDATA[ns]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="31972" langid="1" Value="Row cycle time"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530901" Local_ID="0" Value="350" CategoryFeature_ID="18993" CategoryFeatureGroup_ID="27909" No="100989" Optional="1" Presentation_Value="350 ns" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="350">
+    <Measure ID="63">
+     <Signs>
+      <Sign ID="46" langid="1"><![CDATA[ns]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3348">
+    <Measure ID="63" Sign="">
+     <Signs>
+      <Sign ID="46" langid="1"><![CDATA[ns]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="31978" langid="1" Value="Refresh row cycle time"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530903" Local_ID="0" Value="32" CategoryFeature_ID="18994" CategoryFeatureGroup_ID="27909" No="100988" Optional="1" Presentation_Value="32 ns" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="32">
+    <Measure ID="63">
+     <Signs>
+      <Sign ID="46" langid="1"><![CDATA[ns]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3350">
+    <Measure ID="63" Sign="">
+     <Signs>
+      <Sign ID="46" langid="1"><![CDATA[ns]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="31990" langid="1" Value="Row active time"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530819" Local_ID="0" Value="1.2" CategoryFeature_ID="232820" CategoryFeatureGroup_ID="27909" No="100005" Optional="1" Presentation_Value="1.2 V" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="1.2">
+    <Measure ID="42">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="34175">
+    <Measure ID="42" Sign="">
+     <Signs>
+      <Sign ID="26" langid="1"><![CDATA[V]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3503128" langid="1" Value="Programming power voltage (VPP)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="635817831" Local_ID="0" Value="Berry,Green" CategoryFeature_ID="94137" CategoryFeatureGroup_ID="27909" No="100000" Optional="0" Presentation_Value="Berry, Green" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Berry, Green">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1766">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5487" langid="1" Value="Product colour"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="635817848" Local_ID="0" Value="Heatsink" CategoryFeature_ID="44903" CategoryFeatureGroup_ID="27909" No="99999" Optional="0" Presentation_Value="Heatsink" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Heatsink">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="6392">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="169957" langid="1" Value="Cooling type"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530807" Local_ID="0" Value="Gold" CategoryFeature_ID="6140" CategoryFeatureGroup_ID="27909" No="99998" Optional="0" Presentation_Value="Gold" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Gold">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1634">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="5097" langid="1" Value="Lead plating"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="635817854" Local_ID="0" Value="N" CategoryFeature_ID="215332" CategoryFeatureGroup_ID="27909" No="99998" Optional="0" Presentation_Value="No" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="No">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3709">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="41357" langid="1" Value="Backlight"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530688" Local_ID="0" Value="370  ROG STRIX H370-F GAMING&#10;D840MA Desktop Series&#10;D840MB Desktop Series&#10;D840SA Desktop Series&#10;PRIME B350 - PLUS &#10;PRIME B350-PLUS&#10;PRIME B350M - A &#10;PRIME B350M-A&#10;PRIME B350M-A/CSM&#10;PRIME B360-PLUS/CSM&#10;PRIME B360M-A&#10;PRIME B360M-C/CSM&#10;PRIME B360M-K&#10;PRIME B450-PLUS&#10;PRIME B450M-A&#10;PRIME B450M-A/CSM&#10;PRIME H310-PLUS&#10;PRIME H310I-PLUS/CSM&#10;PRIME H310M-A&#10;PRIME H310M-A/CSM&#10;PRIME H310M-C/CSM&#10;PRIME H310M-D&#10;PRIME H310M-E&#10;PRIME H310M-K&#10;PRIME H370-A/CSM&#10;PRIME H370-PLUS&#10;PRIME H370-PLUS/CSM&#10;PRIME H370M-PLUS&#10;PRIME H370M-PLUS/CSM&#10;PRIME X370-A&#10;PRIME X470-PRO&#10;ROG CROSSHAIR VI EXTREME&#10;ROG CROSSHAIR VI HERO &#10;ROG CROSSHAIR VII HERO&#10;ROG CROSSHAIR VII HERO (WI-FI AC)&#10;ROG CROSSHAIR VII HERO (WI-FI)&#10;ROG MAXIMUS X CODE &#10;ROG MAXIMUS X FORMULA &#10;ROG MAXIMUS X HERO (WI-FI AC) &#10;ROG MAXIMUS X HERO &#10;ROG STRIX B360-F GAMING &#10;ROG STRIX B360-G GAMING &#10;ROG STRIX B360-H GAMING &#10;ROG STRIX B360-H GAMING/OPTANE &#10;ROG STRIX B360-I GAMING&#10;ROG STRIX B450-F GAMING&#10;ROG STRIX GL12CM&#10;ROG STRIX GL12CP&#10;ROG STRIX H370-I GAMING&#10;ROG STRIX X470-F GAMING&#10;ROG STRIX X470-I GAMING&#10;TUF B350M-PLUS GAMING&#10;TUF B360-PLUS GAMING &#10;TUF B360-PRO GAMING (WI-FI) &#10;TUF B360M-PLUS GAMING &#10;TUF B450M-PLUS GAMING&#10;TUF H310-PLUS GAMING&#10;TUF H310M-PLUS GAMING&#10;TUF H370-PRO GAMING (WI-FI) &#10;TUF X470-PLUS GAMING&#10;X370  PRIME X370-A&#10;X370  PRIME X370-PRO&#10;X370  STRIX X370-F GAMING&#10;Z370 PRIME Z370-A&#10;Z370  PRIME Z370-P&#10;Z370  ROG MAXIMUS X APEX&#10;Z370  ROG STRIX Z370-E GAMING&#10;Z370  ROG STRIX Z370-F GAMING&#10;Z370  ROG STRIX Z370-G GAMING&#10;Z370  ROG STRIX Z370-G GAMING (WI-FI AC)&#10;Z370  ROG STRIX Z370-H GAMING&#10;Z370  ROG STRIX Z370-I GAMING&#10;Z370  TUF Z370-PLUS GAMING&#10;Z370  TUF Z370-PRO GAMING&#10;B360 AORUS GAMING 3 &#10;B360 AORUS GAMING 3 WIFI &#10;B360 HD3 &#10;B360 HD3P &#10;B360M AORUS GAMING 3 &#10;B360M D3H &#10;B360M D3P &#10;B360M DS3H &#10;B360M HD3 &#10;H370 AORUS GAMING 3 &#10;H370 AORUS GAMING 3 WIFI &#10;H370 HD3 &#10;H370M D3H GSM &#10;H370M D3H &#10;H370M DS3H &#10;H370N WIFI &#10;Z370 AORUS Gaming 3 &#10;Z370 AORUS Gaming 5 &#10;Z370 AORUS Gaming 7 &#10;Z370 AORUS Gaming 7-OP &#10;Z370 AORUS Gaming K3 &#10;Z370 AORUS GAMING WIFI &#10;Z370 AORUS Ultra Gaming 2.0 &#10;Z370 AORUS Ultra Gaming 2.0-OP &#10;Z370 AORUS Ultra Gaming &#10;Z370 AORUS Ultra Gaming WIFI &#10;Z370 AORUS Ultra Gaming WIFI-OP &#10;Z370M D3H &#10;Z370M DS3H &#10;Z370P D3 &#10;Z370XP SLI &#10;XPC SH370R6" CategoryFeature_ID="106406" CategoryFeatureGroup_ID="27909" No="99950" Optional="0" Presentation_Value="370  ROG STRIX H370-F GAMING&#10;D840MA Desktop Series&#10;D840MB Desktop Series&#10;D840SA Desktop Series&#10;PRIME B350 - PLUS &#10;PRIME B350-PLUS&#10;PRIME B350M - A &#10;PRIME B350M-A&#10;PRIME B350M-A/CSM&#10;PRIME B360-PLUS/CSM&#10;PRIME B360M-A&#10;PRIME B360M-C/CSM&#10;PRIME B360M-K&#10;PRIME B450-PLUS&#10;PRIME B450M-A&#10;PRIME B450M-A/CSM&#10;PRIME H310-PLUS&#10;PRIME H310I-PLUS/CSM&#10;PRIME H310M-A&#10;PRIME H310M-A/CSM&#10;PRIME H310M-C/CSM&#10;PRIME H310M-D&#10;PRIME H310M-E&#10;PRIME H310M-K&#10;PRIME H370-A/CSM&#10;PRIME H370-PLUS&#10;PRIME H370-PLUS/CSM&#10;PRIME H370M-PLUS&#10;PRIME H370M-PLUS/CSM&#10;PRIME X370-A&#10;PRIME X470-PRO&#10;ROG CROSSHAIR VI EXTREME&#10;ROG CROSSHAIR VI HERO &#10;ROG CROSSHAIR VII HERO&#10;ROG CROSSHAIR VII HERO (WI-FI AC)&#10;ROG CROSSHAIR VII HERO (WI-FI)&#10;ROG MAXIMUS X CODE &#10;ROG MAXIMUS X FORMULA &#10;ROG MAXIMUS X HERO (WI-FI AC) &#10;ROG MAXIMUS X HERO &#10;ROG STRIX B360-F GAMING &#10;ROG STRIX B360-G GAMING &#10;ROG STRIX B360-H GAMING &#10;ROG STRIX B360-H GAMING/OPTANE &#10;ROG STRIX B360-I GAMING&#10;ROG STRIX B450-F GAMING&#10;ROG STRIX GL12CM&#10;ROG STRIX GL12CP&#10;ROG STRIX H370-I GAMING&#10;ROG STRIX X470-F GAMING&#10;ROG STRIX X470-I GAMING&#10;TUF B350M-PLUS GAMING&#10;TUF B360-PLUS GAMING &#10;TUF B360-PRO GAMING (WI-FI) &#10;TUF B360M-PLUS GAMING &#10;TUF B450M-PLUS GAMING&#10;TUF H310-PLUS GAMING&#10;TUF H310M-PLUS GAMING&#10;TUF H370-PRO GAMING (WI-FI) &#10;TUF X470-PLUS GAMING&#10;X370  PRIME X370-A&#10;X370  PRIME X370-PRO&#10;X370  STRIX X370-F GAMING&#10;Z370 PRIME Z370-A&#10;Z370  PRIME Z370-P&#10;Z370  ROG MAXIMUS X APEX&#10;Z370  ROG STRIX Z370-E GAMING&#10;Z370  ROG STRIX Z370-F GAMING&#10;Z370  ROG STRIX Z370-G GAMING&#10;Z370  ROG STRIX Z370-G GAMING (WI-FI AC)&#10;Z370  ROG STRIX Z370-H GAMING&#10;Z370  ROG STRIX Z370-I GAMING&#10;Z370  TUF Z370-PLUS GAMING&#10;Z370  TUF Z370-PRO GAMING&#10;B360 AORUS GAMING 3 &#10;B360 AORUS GAMING 3 WIFI &#10;B360 HD3 &#10;B360 HD3P &#10;B360M AORUS GAMING 3 &#10;B360M D3H &#10;B360M D3P &#10;B360M DS3H &#10;B360M HD3 &#10;H370 AORUS GAMING 3 &#10;H370 AORUS GAMING 3 WIFI &#10;H370 HD3 &#10;H370M D3H GSM &#10;H370M D3H &#10;H370M DS3H &#10;H370N WIFI &#10;Z370 AORUS Gaming 3 &#10;Z370 AORUS Gaming 5 &#10;Z370 AORUS Gaming 7 &#10;Z370 AORUS Gaming 7-OP &#10;Z370 AORUS Gaming K3 &#10;Z370 AORUS GAMING WIFI &#10;Z370 AORUS Ultra Gaming 2.0 &#10;Z370 AORUS Ultra Gaming 2.0-OP &#10;Z370 AORUS Ultra Gaming &#10;Z370 AORUS Ultra Gaming WIFI &#10;Z370 AORUS Ultra Gaming WIFI-OP &#10;Z370M D3H &#10;Z370M DS3H &#10;Z370P D3 &#10;Z370XP SLI &#10;XPC SH370R6" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="370  ROG STRIX H370-F GAMING&#10;D840MA Desktop Series&#10;D840MB Desktop Series&#10;D840SA Desktop Series&#10;PRIME B350 - PLUS &#10;PRIME B350-PLUS&#10;PRIME B350M - A &#10;PRIME B350M-A&#10;PRIME B350M-A/CSM&#10;PRIME B360-PLUS/CSM&#10;PRIME B360M-A&#10;PRIME B360M-C/CSM&#10;PRIME B360M-K&#10;PRIME B450-PLUS&#10;PRIME B450M-A&#10;PRIME B450M-A/CSM&#10;PRIME H310-PLUS&#10;PRIME H310I-PLUS/CSM&#10;PRIME H310M-A&#10;PRIME H310M-A/CSM&#10;PRIME H310M-C/CSM&#10;PRIME H310M-D&#10;PRIME H310M-E&#10;PRIME H310M-K&#10;PRIME H370-A/CSM&#10;PRIME H370-PLUS&#10;PRIME H370-PLUS/CSM&#10;PRIME H370M-PLUS&#10;PRIME H370M-PLUS/CSM&#10;PRIME X370-A&#10;PRIME X470-PRO&#10;ROG CROSSHAIR VI EXTREME&#10;ROG CROSSHAIR VI HERO &#10;ROG CROSSHAIR VII HERO&#10;ROG CROSSHAIR VII HERO (WI-FI AC)&#10;ROG CROSSHAIR VII HERO (WI-FI)&#10;ROG MAXIMUS X CODE &#10;ROG MAXIMUS X FORMULA &#10;ROG MAXIMUS X HERO (WI-FI AC) &#10;ROG MAXIMUS X HERO &#10;ROG STRIX B360-F GAMING &#10;ROG STRIX B360-G GAMING &#10;ROG STRIX B360-H GAMING &#10;ROG STRIX B360-H GAMING/OPTANE &#10;ROG STRIX B360-I GAMING&#10;ROG STRIX B450-F GAMING&#10;ROG STRIX GL12CM&#10;ROG STRIX GL12CP&#10;ROG STRIX H370-I GAMING&#10;ROG STRIX X470-F GAMING&#10;ROG STRIX X470-I GAMING&#10;TUF B350M-PLUS GAMING&#10;TUF B360-PLUS GAMING &#10;TUF B360-PRO GAMING (WI-FI) &#10;TUF B360M-PLUS GAMING &#10;TUF B450M-PLUS GAMING&#10;TUF H310-PLUS GAMING&#10;TUF H310M-PLUS GAMING&#10;TUF H370-PRO GAMING (WI-FI) &#10;TUF X470-PLUS GAMING&#10;X370  PRIME X370-A&#10;X370  PRIME X370-PRO&#10;X370  STRIX X370-F GAMING&#10;Z370 PRIME Z370-A&#10;Z370  PRIME Z370-P&#10;Z370  ROG MAXIMUS X APEX&#10;Z370  ROG STRIX Z370-E GAMING&#10;Z370  ROG STRIX Z370-F GAMING&#10;Z370  ROG STRIX Z370-G GAMING&#10;Z370  ROG STRIX Z370-G GAMING (WI-FI AC)&#10;Z370  ROG STRIX Z370-H GAMING&#10;Z370  ROG STRIX Z370-I GAMING&#10;Z370  TUF Z370-PLUS GAMING&#10;Z370  TUF Z370-PRO GAMING&#10;B360 AORUS GAMING 3 &#10;B360 AORUS GAMING 3 WIFI &#10;B360 HD3 &#10;B360 HD3P &#10;B360M AORUS GAMING 3 &#10;B360M D3H &#10;B360M D3P &#10;B360M DS3H &#10;B360M HD3 &#10;H370 AORUS GAMING 3 &#10;H370 AORUS GAMING 3 WIFI &#10;H370 HD3 &#10;H370M D3H GSM &#10;H370M D3H &#10;H370M DS3H &#10;H370N WIFI &#10;Z370 AORUS Gaming 3 &#10;Z370 AORUS Gaming 5 &#10;Z370 AORUS Gaming 7 &#10;Z370 AORUS Gaming 7-OP &#10;Z370 AORUS Gaming K3 &#10;Z370 AORUS GAMING WIFI &#10;Z370 AORUS Ultra Gaming 2.0 &#10;Z370 AORUS Ultra Gaming 2.0-OP &#10;Z370 AORUS Ultra Gaming &#10;Z370 AORUS Ultra Gaming WIFI &#10;Z370 AORUS Ultra Gaming WIFI-OP &#10;Z370M D3H &#10;Z370M DS3H &#10;Z370P D3 &#10;Z370XP SLI &#10;XPC SH370R6">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="2190">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="11196" langid="1" Value="Compatible products"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530791" Local_ID="0" Value="Y" CategoryFeature_ID="232818" CategoryFeatureGroup_ID="27909" No="99901" Optional="1" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="26">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="34174">
+    <Measure ID="26" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="3503074" langid="1" Value="JEDEC standard"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530921" Local_ID="0" Value="0 - 85" CategoryFeature_ID="6146" CategoryFeatureGroup_ID="1551" No="100095" Optional="0" Presentation_Value="0 - 85 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="0 - 85">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1112">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3765" langid="1" Value="Operating temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530923" Local_ID="0" Value="-55 - 100" CategoryFeature_ID="48926" CategoryFeatureGroup_ID="1551" No="100092" Optional="0" Presentation_Value="-55 - 100 °C" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="-55 - 100">
+    <Measure ID="65">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="757">
+    <Measure ID="65" Sign="">
+     <Signs>
+      <Sign ID="48" langid="1"><![CDATA[°C]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="3045" langid="1" Value="Storage temperature (T-T)"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="651736549" Local_ID="0" Value="RoHS" CategoryFeature_ID="953206" CategoryFeatureGroup_ID="76696" No="100000" Optional="0" Presentation_Value="RoHS" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="RoHS">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="48024">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="9134228" langid="1" Value="Compliance certificates"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530929" Local_ID="0" Value="Y" CategoryFeature_ID="48930" CategoryFeatureGroup_ID="83399" No="99915" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7986">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="617692" langid="1" Value="Windows operating systems supported"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530930" Local_ID="0" Value="Y" CategoryFeature_ID="48931" CategoryFeatureGroup_ID="83399" No="99914" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7987">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="617733" langid="1" Value="Mac operating systems supported"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530931" Local_ID="0" Value="Y" CategoryFeature_ID="48932" CategoryFeatureGroup_ID="83399" No="99913" Optional="0" Presentation_Value="Yes" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Yes">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="7988">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="617774" langid="1" Value="Linux operating systems supported"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530940" Local_ID="0" Value="133.35" CategoryFeature_ID="48923" CategoryFeatureGroup_ID="1549" No="100073" Optional="0" Presentation_Value="133.3 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="133.3">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1649">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="5143" langid="1" Value="Width"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530945" Local_ID="0" Value="31.25" CategoryFeature_ID="48925" CategoryFeatureGroup_ID="1549" No="100071" Optional="0" Presentation_Value="31.2 mm" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="31.2">
+    <Measure ID="24">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+   </LocalValue>
+   <Feature ID="1464">
+    <Measure ID="24" Sign="">
+     <Signs>
+      <Sign ID="3" langid="1"><![CDATA[mm]]></Sign>
+     </Signs>
+    </Measure>
+    <Name ID="4625" langid="1" Value="Height"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="494549042" Local_ID="0" Value="84733020" CategoryFeature_ID="309147" CategoryFeatureGroup_ID="24500" No="99947" Optional="1" Presentation_Value="84733020" Translated="0" Mandatory="0" Searchable="0">
+   <LocalValue Value="84733020">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="23731">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="1903598" langid="1" Value="Harmonized System (HS) code"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="497222110" Local_ID="0" Value="Taiwan" CategoryFeature_ID="56407" CategoryFeatureGroup_ID="6347" No="100000" Optional="0" Presentation_Value="Taiwan" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Taiwan">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="3294">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="31174" langid="1" Value="Country of origin"/>
+   </Feature>
+  </ProductFeature>
+  <ProductFeature Localized="0" ID="284530886" Local_ID="0" Value="Halogen" CategoryFeature_ID="630167" CategoryFeatureGroup_ID="6347" No="100000" Optional="1" Presentation_Value="Halogen" Translated="1" Mandatory="0" Searchable="0">
+   <LocalValue Value="Halogen">
+    <Measure ID="29">
+     <Signs/>
+    </Measure>
+   </LocalValue>
+   <Feature ID="42516">
+    <Measure ID="29" Sign="">
+     <Signs/>
+    </Measure>
+    <Name ID="6876321" langid="1" Value="Doesn't contain"/>
+   </Feature>
+  </ProductFeature>
+  <ProductGallery>
+   <ProductPicture IsMain="Y" LowPic="https://images.icecat.biz/img/gallery_lows/584761e62ea056b4a5b31ec681c53300854dc5d0.jpg" LowPicHeight="200" LowPicWidth="200" LowSize="17653" No="1" Original="https://images.icecat.biz/img/gallery_raw/a0753fbd663d1dfd853808c3a74d43828664f88e.jpeg" OriginalSize="136720" Pic="https://images.icecat.biz/img/gallery/c12400de7661e8460a836a0985bf8f757766899d.jpg" Pic500x500="https://images.icecat.biz/img/gallery_mediums/0359d13428dbfe41e7ed7aa494437e49577021e1.jpg" Pic500x500Height="500" Pic500x500Size="95018" Pic500x500Width="500" PicHeight="600" PicWidth="600" ProductPicture_ID="52624420" Size="136706" ThumbPic="https://images.icecat.biz/img/gallery_thumbs/28b3b8382b78aa8d6e0d7a24126891dc9e3cf9c9.jpg" ThumbSize="3769" Type="ProductImage" UpdatedDate="2024-03-10 10:10:44"/>
+  </ProductGallery>
+  <ProductMultimediaObject>
+   <MultimediaObject ContentType="application/pdf" Date="2018-08-03 13:13:24" Description="leaflet" KeepAsURL="0" MultimediaObject_ID="7608236" Type="leaflet" UUID="A55B7951-F29D-42F5-BB9C-D45B08C0494C" langid="1" Source="https://www.kingston.com/dataSheets/KVR26N19S6_4.pdf" Height="0" PreviewHeight="0" PreviewSize="0" PreviewUrl="" PreviewWidth="0" Size="98715" URL="https://objects.icecat.biz/objects/mmo_58877265_1533294804_3755_27152.pdf" Width="0"/>
+  </ProductMultimediaObject>
+  <ProductRelated/>
+  <SummaryDescription>
+   <ShortSummaryDescription langid="1">Kingston Technology ValueRAM , 4 GB, 1 x 4 GB, DDR4, 288-pin DIMM, Berry, Green</ShortSummaryDescription>
+   <LongSummaryDescription langid="1">Kingston Technology ValueRAM . Component for: PC/Server, Internal memory: 4 GB, Memory layout (modules x size): 1 x 4 GB, Internal memory type: DDR4, Memory form factor: 288-pin DIMM, CAS latency: 19, Product colour: Berry, Green</LongSummaryDescription>
+  </SummaryDescription>
+  <Supplier ID="18" Name="Kingston Technology"/>
+  <CatalogObjectCloud>
+   <ProductPage QRCodeURL="https://qr.icecat.biz/coc/a4541a18-2d7d-4cc3-bafc-4fc580401c8d" URL="https://coc.icecat.biz/a4541a18-2d7d-4cc3-bafc-4fc580401c8d"/>
+  </CatalogObjectCloud>
+ </Product>
+</ICECAT-interface>
