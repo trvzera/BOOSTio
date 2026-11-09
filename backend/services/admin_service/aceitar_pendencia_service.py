@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from models import ProdutoPendente, VinculoMercadoLivre
+from models import ProdutoPendente
 from repositories.ofertas_repository import atualizar_ofertas_validadas
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
 from services.mercadolivre_service.controle_requisicoes_service import ControleRequisicoesService
@@ -9,6 +9,7 @@ from services.peca_service.modelos_pecas import MODELOS_PECAS
 from services.shopee_service.normalizar_produto_service import NormalizarProdutoShopeeService
 from utils.identidade_peca import assinatura_peca
 from .apresentar_pendencia_service import apresentar_pendencia
+from .catalogo_ocupado import catalogo_que_ocupa_a_peca
 
 
 class ConflitoPendencia(ValueError):
@@ -50,11 +51,10 @@ class AceitarPendenciaService:
 
     @staticmethod
     def _recusar_peca_ja_vinculada_a_outro_catalogo(pendencia, peca):
-        """Cada peça tem um único catálogo do Mercado Livre; avisa antes de tentar gravar."""
-        catalogo = ((pendencia.dados_originais or {}).get("catalogo") or {}).get("id")
-        vinculo = VinculoMercadoLivre.buscar(peca.__tablename__, peca.id)
-        if catalogo and vinculo and vinculo.catalogo_id != catalogo:
-            raise ValueError(f"Esta peça já está vinculada a outro catálogo do Mercado Livre ({vinculo.catalogo_id}). "
+        """Avisa antes de tentar gravar: cada peça tem um único catálogo do Mercado Livre."""
+        ocupante = catalogo_que_ocupa_a_peca(pendencia, peca)
+        if ocupante:
+            raise ValueError(f"Esta peça já está vinculada a outro catálogo do Mercado Livre ({ocupante}). "
                              "Escolha outra peça ou rejeite esta pendência.")
 
     @staticmethod

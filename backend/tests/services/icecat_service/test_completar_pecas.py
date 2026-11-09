@@ -112,10 +112,24 @@ def test_monitor_ganha_conexao_pelas_portas_de_video(banco):
     db.session.add(monitor)
     db.session.commit()
     ficha = {'fabricante': 'LG', 'modelo': '27GP850-B', 'conexao': 'displayport, hdmi'}
+    monitor.ficha_montagem_validada = False  # a importação reprovou a ficha por falta da conexão
+    db.session.commit()
     resumo = completar(IcecatSimulado(ficha, mpn='27GP850-B'), simular=False, categoria='monitor')
-    assert resumo['atualizada'] == 1
+    assert resumo['atualizada'] == 1 and resumo['ficha_liberada'] == 1
     db.session.refresh(monitor)
-    assert monitor.conexao == 'displayport, hdmi'
+    assert monitor.conexao == 'displayport, hdmi' and monitor.ficha_montagem_validada is True
+    # reexecutar não duplica nem altera: a marca já está certa
+    assert completar(IcecatSimulado(ficha, mpn='27GP850-B'), simular=False, categoria='monitor')['ficha_liberada'] == 0
+
+
+def test_peca_que_ainda_tem_campo_faltando_continua_com_a_ficha_reprovada(banco):
+    fone = fone_em_revisao()
+    fone.ficha_montagem_validada = False
+    db.session.commit()
+    resumo = completar(IcecatSimulado({'fabricante': 'HyperX', 'modelo': 'Cloud II', 'tipo': 'Headset'}), simular=False)
+    assert resumo['atualizada'] == 1 and resumo['ficha_liberada'] == 0  # faltam microfone e conexão
+    db.session.refresh(fone)
+    assert fone.ficha_montagem_validada is False
 
 
 def xml_monitor(portas):
