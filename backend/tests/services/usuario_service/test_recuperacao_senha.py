@@ -27,8 +27,7 @@ def app(tmp_path):
     app.register_blueprint(usuario_bp)
     with app.app_context():
         db.create_all()
-        db.session.add(Usuario(nome="Teste", email="teste@example.com", senha=generate_password_hash("Original.123")))
-        db.session.commit()
+        Usuario(nome="Teste", email="teste@example.com", senha=generate_password_hash("Original.123")).salvar()
     yield app
     with app.app_context():
         db.session.remove()

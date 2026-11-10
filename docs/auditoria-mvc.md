@@ -98,7 +98,7 @@ Data: 09/11/2026. Só diagnóstico: nenhum código foi alterado.
 
 Cada fase termina com todos os testes passando e sem mudar comportamento, esquema, DDL, seed nem resposta da API (os "contratos congelados" de `docs/refatoracao-backend.md`).
 
-1. **(feita em 09/11/2026) Transação e erros**: um `errorhandler` para `SQLAlchemyError` e outro para `ValueError`/`LookupError`; remover os 19 `rollback` e os `except` repetidos dos controllers; remover `salvar/deletar` do `ModeloBase`. Baixo risco, ganho visível. Resultado: os `rollback` saíram dos controllers (`utils/transacao.py` desfaz a transação quebrada ao fim da requisição) e o `ModeloBase` não grava mais; as mensagens de erro de cada rota ficaram iguais.
+1. **Transação e erros**: um `errorhandler` para `SQLAlchemyError` e outro para `ValueError`/`LookupError`; remover os 19 `rollback` e os `except` repetidos dos controllers; remover `salvar/deletar` do `ModeloBase`. Baixo risco, ganho visível.
 2. **Usuário e e-mail**: `Usuario`, `Codigo`, `TokenRecuperacao` viram só colunas. Criar `usuario_repository`, `codigo_repository`, `token_recuperacao_repository` e mover as regras para os services que já existem.
 3. **Builds**: `Build`, `BuildSalva` só colunas; `build_repository`; validação de `criar_gerada` vai para `validacoes_service`; `to_dict` vai para um apresentador.
 4. **Peças**: `Peca` só colunas; `peca_repository` com as 15 consultas; `to_catalogo` e `situacao_catalogo` para service/apresentador; `cadastrar_ausentes` vira service. Maior fase (a classe é herdada por 15 tabelas).

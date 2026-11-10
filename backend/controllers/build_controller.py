@@ -2,6 +2,7 @@ from services.peca_service.consultar_historico_precos_service import ConsultarHi
 from flask import Blueprint,request,jsonify
 from flask_login import login_required,current_user
 from utils.limite_requisicoes import limiter, chave_usuario
+from models import db
 from models.build_salva import LimiteBuildsError, EmailNaoVerificadoError
 from sqlalchemy.exc import SQLAlchemyError
 from requests.exceptions import RequestException, HTTPError, Timeout, ConnectionError
@@ -95,6 +96,7 @@ def criar_build():
     return jsonify({"erro": "Não foi possível consultar o serviço de montagem. Tente novamente em alguns instantes.", "codigo": "ia-provedor"}),502
 
   except SQLAlchemyError:
+    db.session.rollback()
     return jsonify({"erro": "Erro ao salvar a build"}),500
 
   except Exception:
@@ -115,6 +117,7 @@ def historico_precos_oferta(categoria, peca_id, oferta_id):
   except LookupError:
     return jsonify({"erro": "Oferta não encontrada", "codigo": "nao-encontrada"}), 404
   except SQLAlchemyError:
+    db.session.rollback()
     return jsonify({"erro": "Histórico de ofertas indisponível", "codigo": "indisponivel"}), 503
 
 
@@ -133,6 +136,7 @@ def historico_precos_peca(categoria, peca_id):
   except LookupError:
     return jsonify({"erro": "Peça não encontrada", "codigo": "nao-encontrada"}), 404
   except SQLAlchemyError:
+    db.session.rollback()
     return jsonify({"erro": "Histórico de preços indisponível no momento", "codigo": "indisponivel"}), 503
 
 
@@ -152,6 +156,7 @@ def criar_build_manual():
   except ValueError as erro:
     return jsonify({"erro": str(erro)}),400
   except SQLAlchemyError:
+    db.session.rollback()
     return jsonify({"erro": "Erro ao salvar a build"}),500
 
 
@@ -173,6 +178,7 @@ def atualizar_build(build_id):
   except ValueError as erro:
     return jsonify({"erro": str(erro)}),400
   except SQLAlchemyError:
+    db.session.rollback()
     return jsonify({"erro": "Erro ao atualizar a build"}),500
 
 
@@ -186,6 +192,7 @@ def duplicar_build(build_id):
   except ValueError as erro:
     return jsonify({"erro": str(erro)}),400
   except SQLAlchemyError:
+    db.session.rollback()
     return jsonify({"erro": "Erro ao duplicar a build"}),500
 
 
@@ -198,6 +205,7 @@ def definir_setup_atual(build_id):
   except ValueError as erro:
     return jsonify({"erro": str(erro)}),404
   except SQLAlchemyError:
+    db.session.rollback()
     return jsonify({"erro": "Erro ao definir o setup atual"}),500
 
 
@@ -210,6 +218,7 @@ def excluir_build(build_id):
   except ValueError as erro:
     return jsonify({"erro": str(erro)}),400
   except SQLAlchemyError:
+    db.session.rollback()
     return jsonify({"erro": "Erro ao excluir a build"}),500
 
 
@@ -235,4 +244,5 @@ def copiar_build_publica(build_id):
   except ValueError as erro:
     return jsonify({"erro": str(erro)}),404
   except SQLAlchemyError:
+    db.session.rollback()
     return jsonify({"erro": "Não foi possível salvar a cópia. Tente novamente."}),500

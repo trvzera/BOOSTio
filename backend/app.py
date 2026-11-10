@@ -30,7 +30,6 @@ from commands.catalogo import registrar_comandos_catalogo
 from commands.banco import registrar_comandos_banco
 from commands.benchmarks import registrar_comandos_benchmarks
 from utils.csrf import configurar_csrf
-from utils.transacao import configurar_transacao
 from utils.limite_requisicoes import configurar_limites
 
 load_dotenv()
@@ -52,7 +51,6 @@ if ambiente == 'producao':
 ConfigurarAcessoService().executar(app, producao=ambiente == 'producao')
 
 configurar_csrf(app)
-configurar_transacao(app)
 configurar_limites(app, producao=ambiente == 'producao')
 #Iniciar o login manager e passar o app como parametro
 lm.init_app(app)

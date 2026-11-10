@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
 from sqlalchemy.exc import SQLAlchemyError
 
+from models import db
 from services.admin_service.aceitar_pendencia_service import AceitarPendenciaService, ConflitoPendencia
 from services.admin_service.descartar_candidato_service import DescartarCandidatoService
 from services.admin_service.detalhar_pendencia_service import DetalharPendenciaService
@@ -30,6 +31,7 @@ def _responder(funcao):
     except LookupError as erro:
         return jsonify({"erro": str(erro), "codigo": "nao-encontrada"}), 404
     except SQLAlchemyError:
+        db.session.rollback()
         return jsonify({"erro": "Painel indisponível no momento", "codigo": "indisponivel"}), 503
 
 

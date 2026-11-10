@@ -21,10 +21,8 @@ def app_experiencia(tmp_path):
     registrar_comandos_banco(app)
     with app.app_context():
         db.create_all()
-        db.session.add(Usuario(nome="Antigo", email="antigo@example.com", budget=5000, usar_budget=True))
-        db.session.commit()
-        db.session.add(Usuario(nome="Outro", email="outro@example.com"))
-        db.session.commit()
+        Usuario(nome="Antigo", email="antigo@example.com", budget=5000, usar_budget=True).salvar()
+        Usuario(nome="Outro", email="outro@example.com").salvar()
     yield app
     with app.app_context():
         db.session.remove(); db.engine.dispose()

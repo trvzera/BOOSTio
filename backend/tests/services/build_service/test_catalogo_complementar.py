@@ -72,8 +72,7 @@ def test_cli_idempotente_simula_sem_gravar_e_preserva_anuncio_existente(tmp_path
         antiga = Fan(fabricante="ARCTIC", modelo="Nome interno", part_number="KABUM-464964",
                      tamanho_mm=120, quantidade=1, consumo_energia=2, preco=123, esgotado=False,
                      kabum_external="https://www.kabum.com.br/produto/464964/outro-slug")
-        db.session.add(antiga)
-        db.session.commit()
+        antiga.salvar()
         runner = app.test_cli_runner()
         resultado = runner.invoke(args=["pecas-complementares", "--simular"])
         assert resultado.exit_code == 0, resultado.output
