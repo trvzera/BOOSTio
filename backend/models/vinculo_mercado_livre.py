@@ -48,7 +48,7 @@ class VinculoMercadoLivre(ModeloBase):
         from utils.identidade_peca import assinatura_peca
         try:
             db.session.refresh(peca, with_for_update=True)
-            if assinatura_peca(peca) != assinatura or not IdentidadeFabricante._conferem(peca, especificacoes):
+            if assinatura_peca(peca) != assinatura or not IdentidadeFabricante.conferem(peca, especificacoes):
                 raise ValueError('Ficha local mudou ou diverge da revisão')
             existente = cls.buscar(peca.__tablename__, peca.id, bloquear=True)
             if existente:
@@ -76,4 +76,4 @@ class VinculoMercadoLivre(ModeloBase):
 
     def especificacoes_compativeis(self, peca):
         from .identidade_fabricante import IdentidadeFabricante
-        return self.especificacoes_revisadas is None or IdentidadeFabricante._conferem(peca, self.especificacoes_revisadas)
+        return self.especificacoes_revisadas is None or IdentidadeFabricante.conferem(peca, self.especificacoes_revisadas)

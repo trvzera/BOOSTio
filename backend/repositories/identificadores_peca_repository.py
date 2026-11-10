@@ -59,7 +59,7 @@ def separar_identificadores(peca, *, simular=True, ids_ambiguos=None):
             from types import SimpleNamespace
             anterior = SimpleNamespace(**{c.name: getattr(peca, c.name) for c in peca.__table__.columns})
             anterior.part_number = numero
-            if (not codigo_interno(registro['mpn']) and IdentidadeFabricante._conferem(anterior, specs)
+            if (not codigo_interno(registro['mpn']) and IdentidadeFabricante.conferem(anterior, specs)
                     and (not numero or codigo_interno(numero))):
                 peca.part_number = registro['mpn']
         reassinar_vinculos(peca, vinculos, antiga, numero)

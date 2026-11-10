@@ -188,38 +188,6 @@ class Peca(ModeloBase):
     db.session.commit()
 
   @classmethod
-  def cadastrar_ausentes(cls, itens):
-    from utils.codigos_peca import separar_codigos
-    novos = []
-    try:
-      for original in itens:
-        original = dict(original)
-        oferta = {campo: original.pop(campo, None) for campo in cls.CAMPOS_DA_OFERTA}
-        item = separar_codigos(original)
-        referencia, numero = item.get('referencia_interna'), item.get('part_number')
-        if referencia:
-          existente = cls.query.filter(db.or_(cls.referencia_interna == referencia, cls.part_number == referencia)).first()
-        elif numero:
-          existente = cls.query.filter_by(part_number=numero, fabricante=item['fabricante']).first()
-        else:
-          raise ValueError('Cadastro sem identificador estável')
-        if existente is None:
-          existente = cls(status_validacao='legado', **{k:v for k,v in item.items() if k != 'status_validacao'})
-          db.session.add(existente)
-          db.session.flush()
-          if oferta['kabum_external']:
-            from repositories.ofertas_kabum_repository import gravar_cotacao_inicial
-            gravar_cotacao_inicial(existente, oferta['kabum_external'], oferta['preco'],
-                                   oferta['esgotado'], oferta['preco_atualizado_em'])
-          novos.append(existente)
-      db.session.commit()
-    except Exception:
-      db.session.rollback()
-      raise
-    return len(novos)
-  
-
-  @classmethod
   def mostrar_pecas(cls):
     return cls.query.all()
 

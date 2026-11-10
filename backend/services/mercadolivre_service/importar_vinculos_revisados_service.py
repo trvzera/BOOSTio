@@ -44,8 +44,8 @@ class ImportarVinculosRevisadosService:
                 peca=pecas[0]
                 if ValidarLinkService().codigo_produto(peca.kabum_external)!=ValidarLinkService().codigo_produto(item['url_peca']):
                     raise ValueError('Produto de origem difere da revisão')
-                if not IdentidadeFabricante._conferem(peca,item['especificacoes']):
-                    divergentes=[k for k,v in item['especificacoes'].items() if not IdentidadeFabricante._conferem(peca,{k:v})]
+                if not IdentidadeFabricante.conferem(peca,item['especificacoes']):
+                    divergentes=[k for k,v in item['especificacoes'].items() if not IdentidadeFabricante.conferem(peca,{k:v})]
                     raise ValueError('Especificações divergentes: '+', '.join(divergentes))
                 acao=VinculoMercadoLivre.aplicar_revisado(peca,produto['id'],assinatura_peca(peca),
                     assinatura_catalogo(produto),item['especificacoes'],simular=simular)

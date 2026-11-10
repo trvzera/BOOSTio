@@ -9,7 +9,7 @@ from collections import defaultdict
 from types import SimpleNamespace
 from copy import deepcopy
 
-from models import IdentidadeFabricante
+from .identidades_para_matching_service import IdentidadesParaMatchingService
 from .associacao_inteligente_service import AssociacaoInteligenteService
 from .comparar_nomes_service import marca
 from .conferir_especificacoes_service import valores
@@ -55,11 +55,11 @@ class IndiceCandidatosService:
         for peca in modelo.iterar_para_matching():
             lote.append(peca)
             if len(lote) == 500:
-                identidades.update(IdentidadeFabricante.para_matching(lote))
+                identidades.update(IdentidadesParaMatchingService().executar(lote))
                 pecas.extend(lote)
                 lote = []
         if lote:
-            identidades.update(IdentidadeFabricante.para_matching(lote))
+            identidades.update(IdentidadesParaMatchingService().executar(lote))
             pecas.extend(lote)
         return cls(pecas, identidades)
 

@@ -4,6 +4,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from models import IdentidadeFabricante
+from .registrar_identidade_fabricante_service import RegistrarIdentidadeFabricanteService
 from models.modelos_pecas import MODELOS_PECAS
 from services.preco_service.validar_link_service import ValidarLinkService
 
@@ -52,7 +53,7 @@ class ImportarIdentidadesService:
                 peca = pecas[0]
                 if ValidarLinkService().codigo_produto(peca.kabum_external) != ValidarLinkService().codigo_produto(item['url_peca']):
                     raise ValueError('Produto da loja diverge do registro revisado')
-                acao = IdentidadeFabricante.registrar(peca, item['mpn'], item['fonte'], item['especificacoes'], simular=simular, gtin=item.get('gtin'))
+                acao = RegistrarIdentidadeFabricanteService().executar(peca, item['mpn'], item['fonte'], item['especificacoes'], simular=simular, gtin=item.get('gtin'))
                 resumo[{'proposta': 'propostas', 'cadastrada': 'cadastradas', 'inalterada': 'inalteradas'}[acao]] += 1
                 detalhe['status'] = acao
             except ValueError as erro:

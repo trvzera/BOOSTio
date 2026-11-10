@@ -145,6 +145,7 @@ def test_ofertas_para_catalogo_no_mysql(banco):
 
 def test_identidade_fabricante_preserva_referencia_e_valida_especificacoes(banco):
     from models import IdentidadeFabricante
+    from services.mercadolivre_service.registrar_identidade_fabricante_service import RegistrarIdentidadeFabricanteService
     from migrations.identidades_fabricante import preparar_identidades_fabricante
     _, p = banco
     original = p.part_number
@@ -153,10 +154,10 @@ def test_identidade_fabricante_preserva_referencia_e_valida_especificacoes(banco
     # A CLI executa migração e importação em processos separados.
     db.session.rollback()
     specs = {'soquete': 'AM4', 'nucleo': 6}
-    assert IdentidadeFabricante.registrar(p, original, 'https://www.amd.com/', specs, simular=True) == 'proposta'
+    assert RegistrarIdentidadeFabricanteService().executar(p, original, 'https://www.amd.com/', specs, simular=True) == 'proposta'
     assert IdentidadeFabricante.query.count() == 0
-    assert IdentidadeFabricante.registrar(p, original, 'https://www.amd.com/', specs, simular=False) == 'cadastrada'
-    assert IdentidadeFabricante.registrar(p, original, 'https://www.amd.com/', specs, simular=False) == 'inalterada'
+    assert RegistrarIdentidadeFabricanteService().executar(p, original, 'https://www.amd.com/', specs, simular=False) == 'cadastrada'
+    assert RegistrarIdentidadeFabricanteService().executar(p, original, 'https://www.amd.com/', specs, simular=False) == 'inalterada'
     assert p.part_number == original and IdentidadeFabricante.buscar(p).mpn == original
     p.soquete = 'AM5'; db.session.commit()
     assert IdentidadeFabricante.buscar(p) is None

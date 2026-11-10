@@ -1,4 +1,5 @@
 from models.medidas_fisicas import produto_kabum
+from .cadastrar_pecas_ausentes_service import CadastrarPecasAusentesService
 from .pecas_complementares import pecas_complementares
 
 
@@ -12,7 +13,7 @@ class CadastrarComplementaresService:
             novos = [item for item in itens if item["part_number"] not in numeros
                      and (produto_kabum(item["kabum_external"]) is None
                           or produto_kabum(item["kabum_external"]) not in produtos)]
-            inseridas = len(novos) if simular else classe.cadastrar_ausentes(novos)
+            inseridas = len(novos) if simular else CadastrarPecasAusentesService().executar(classe, novos)
             resumo["categorias"][classe.__tablename__] = {
                 "a_inserir" if simular else "inseridas": inseridas,
                 "existentes": len(itens) - len(novos),
