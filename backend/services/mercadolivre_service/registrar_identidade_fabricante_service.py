@@ -23,7 +23,7 @@ class RegistrarIdentidadeFabricanteService:
                 peca.referencia_interna = peca.referencia_interna or numero
             peca.part_number = mpn.strip()
             reassinar_vinculos(peca, vinculos, antiga, numero)
-            atual = IdentidadeFabricante.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id).with_for_update().first()
+            atual = IdentidadeFabricante.buscar_com_trava(peca)
             dados = dict(assinatura_peca=assinatura_peca(peca), mpn=mpn, fonte=fonte, especificacoes=especificacoes, gtin=gtin)
             if atual:
                 if any(getattr(atual, k) != v for k, v in dados.items()):

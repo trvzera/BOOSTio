@@ -21,13 +21,8 @@ def _referencias(candidatos):
 
 
 def ids_acionaveis(status, loja=None, categoria=None):
-    consulta = ProdutoPendente.query.with_entities(ProdutoPendente.id, ProdutoPendente.candidatos)
-    consulta = consulta.filter(ProdutoPendente.status == status)
-    if loja is not None:
-        consulta = consulta.filter(ProdutoPendente.loja == loja)
-    if categoria is not None:
-        consulta = consulta.filter(ProdutoPendente.categoria_sugerida == categoria)
-    linhas = [(i, list(_referencias(c))) for i, c in consulta.order_by(ProdutoPendente.id).all()]
+    pendencias = ProdutoPendente.listar_ids_e_candidatos(status=status, loja=loja, categoria=categoria)
+    linhas = [(i, list(_referencias(c))) for i, c in pendencias]
     pedidas = defaultdict(set)
     for _, referencias in linhas:
         for categoria_peca, identificador in referencias:

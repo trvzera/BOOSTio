@@ -17,11 +17,7 @@ class VincularGoogleService:
   @staticmethod
   def _vincular(usuario, sub):
     try:
-      atualizados = Usuario.query.filter_by(id=usuario.id, ativo=True, google_sub=None,
-                                            versao_sessao=usuario.versao_sessao).update({
-        Usuario.google_sub: sub, Usuario.login_google: True,
-        Usuario.versao_sessao: Usuario.versao_sessao + 1,
-      }, synchronize_session=False)
+      atualizados = Usuario.gravar_google_sub(usuario, sub)
       if atualizados != 1:
         raise ValueError("Sua conta mudou. Atualize a página antes de vincular o Google")
       db.session.commit()

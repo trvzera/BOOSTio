@@ -102,6 +102,15 @@ class Usuario(ModeloBase,UserMixin):
     return Usuario.query.filter_by(administrador=True, ativo=True).order_by(Usuario.id).all()
 
   @staticmethod
+  def gravar_google_sub(usuario: "Usuario", google_sub: str) -> int:
+    # Só vincula se a conta continua ativa, sem Google e na mesma versão de sessão.
+    return Usuario.query.filter_by(id=usuario.id, ativo=True, google_sub=None,
+                                   versao_sessao=usuario.versao_sessao).update({
+      Usuario.google_sub: google_sub, Usuario.login_google: True,
+      Usuario.versao_sessao: Usuario.versao_sessao + 1,
+    }, synchronize_session=False)
+
+  @staticmethod
   def buscar_por_google_sub(google_sub: str) -> "Usuario | None":
     return Usuario.query.filter_by(google_sub=google_sub).first()
 

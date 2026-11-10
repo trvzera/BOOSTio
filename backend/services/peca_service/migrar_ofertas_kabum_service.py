@@ -69,7 +69,7 @@ class MigrarOfertasKabumService:
         if preco is None and esgotado is False:
             esgotado = None
         atualizado = _data(linha['preco_atualizado_em']) if preco is not None else None
-        oferta = Oferta.query.filter_by(loja='kabum', produto_id_loja=produto).first()
+        oferta = Oferta.buscar_por_anuncio('kabum', produto)
         if oferta is not None and (oferta.tabela_peca, oferta.peca_id) != (tabela, linha['id']):
             resumo['conflitos'].append(f'{tabela}:{linha["id"]} -> anúncio {produto} pertence a {oferta.tabela_peca}:{oferta.peca_id}')
             return
@@ -101,7 +101,7 @@ class MigrarOfertasKabumService:
                 "AND loja='kabum' AND produto_id_loja=:a AND preco IS NOT NULL ORDER BY coletado_em, id"),
                 {'t': tabela, 'p': peca_id, 'a': produto}).mappings():
             coletado = _data(obs['coletado_em'])
-            if HistoricoOferta.query.filter_by(oferta_id=oferta.id, coletado_em=coletado).first() is None:
+            if not HistoricoOferta.existe_coleta(oferta.id, coletado):
                 db.session.add(HistoricoOferta(oferta_id=oferta.id, preco=_preco(obs['preco']),
                                                esgotado=None if obs['esgotado'] is None else bool(obs['esgotado']),
                                                coletado_em=coletado))

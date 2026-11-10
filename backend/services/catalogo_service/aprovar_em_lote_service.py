@@ -51,7 +51,7 @@ class AprovarEmLoteService:
         return resumo
 
     def _avaliar(self, modelo, exigir_identificador):
-        todas = modelo.query.all()
+        todas = modelo.mostrar_pecas()
         por_nome = Counter(self._nome(p) for p in todas if self._nome(p)[0] and self._nome(p)[1])
         por_codigo = Counter(normalizar_identidade(p.part_number) for p in todas if normalizar_identidade(p.part_number))
         aprovaveis, recusas = [], {}
@@ -97,9 +97,7 @@ class AprovarEmLoteService:
         try:
             for inicio in range(0, len(ids), LOTE_GRAVACAO):
                 lote = ids[inicio:inicio + LOTE_GRAVACAO]
-                total += modelo.query.filter(modelo.id.in_(lote), modelo.status_validacao == "em_revisao").update(
-                    {"status_validacao": "aprovado", "validacao_motivo": MOTIVO, "validado_em": agora},
-                    synchronize_session=False)
+                total += modelo.aprovar_ids(lote, MOTIVO, agora)
                 db.session.commit()
         except Exception:
             db.session.rollback()
@@ -108,15 +106,12 @@ class AprovarEmLoteService:
 
     def reverter(self, *, categoria=None, simular=True):
         """Volta para revisão as aprovadas por esta regra que ainda não têm nenhuma oferta."""
-        from models import Oferta
         modelos = [m for m in MODELOS_PECAS if categoria is None or m.__tablename__ == categoria]
         if not modelos:
             raise ValueError("Categoria inválida")
         resumo = {"simulacao": simular, "categorias": {}}
         for modelo in modelos:
-            com_oferta = db.session.query(Oferta.peca_id).filter(Oferta.tabela_peca == modelo.__tablename__)
-            consulta = modelo.query.filter(modelo.status_validacao == "aprovado", modelo.validacao_motivo == MOTIVO,
-                                           ~modelo.id.in_(com_oferta))
+            consulta = modelo.consultar_aprovadas_sem_oferta(MOTIVO)
             quantidade = consulta.count()
             if not simular and quantidade:
                 try:

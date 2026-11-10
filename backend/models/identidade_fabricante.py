@@ -28,6 +28,14 @@ class IdentidadeFabricante(ModeloBase):
             return None
         return obj
 
+    @classmethod
+    def buscar_com_trava(cls, peca):
+        return cls.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id).with_for_update().first()
+
+    @classmethod
+    def listar_das_pecas(cls, tabela, ids):
+        return cls.query.filter(cls.tabela_peca == tabela, cls.peca_id.in_(ids)).all()
+
     @staticmethod
     def localizar(modelo, referencia, fabricante, nome):
         return modelo.query.filter(db.or_(modelo.part_number == referencia, modelo.referencia_interna == referencia),

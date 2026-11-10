@@ -21,7 +21,7 @@ class GravarImportacaoBuildcoresService:
     def _carregar(self):
         self.indice=defaultdict(set);self.origens=defaultdict(set);self.mpns=defaultdict(set);self.tokens=defaultdict(set);self.registros={};self.guarda=defaultdict(set);self.codigos_nome=defaultdict(set);self.gpus=defaultdict(set);self.chaves=defaultdict(set)
         for cat,m in self.modelos.items():
-            for p in m.query.yield_per(500):self._indexar(self._dados(p,cat))
+            for p in m.iterar_todas():self._indexar(self._dados(p,cat))
 
     @staticmethod
     def _dados(p,cat):

@@ -11,7 +11,7 @@ class GravarEnriquecimentoBuildcoresService:
     def listar(self):
         saida=[]
         for cat,modelo in self.modelos.items():
-            for p in modelo.query.yield_per(500):
+            for p in modelo.iterar_todas():
                 fontes=p.fontes_especificacoes or {}
                 if '_pc_part_dataset' not in fontes:continue
                 dados={c.name:getattr(p,c.name) for c in modelo.__table__.columns if c.name not in ('fontes_especificacoes','criado_em','atualizado_em')}

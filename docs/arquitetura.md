@@ -30,7 +30,7 @@ A primeira versão desta auditoria dizia que Model não pode consultar nem grava
 
 ## O que foge da regra (a corrigir)
 
-1. **Service consultando o banco direto** (`db.session`/`Model.query`) em 19 arquivos, em vez de chamar a Model ou o Repository: `completar_pecas_icecat`, `autorizar_conta`, `descobrir_produtos`, `processar_catalogo`, `importar_produto`, `aprovar_em_lote`, `preencher_especificacoes`, `importar_benchmarks`, `atualizar_preferencias_uso`, `vincular_google`, `configurar_acesso`, `salvar_peca`, `restaurar_links_kabum`, `migrar_ofertas_kabum`, `importar_base_tecnica`, `revisar_ficha`, `converter_referencias_gpu`, `preencher_fichas_originais`, `pendencias_acionaveis`.
+1. **Service consultando o banco direto** (quase resolvido em 09/11/2026): as consultas (`.query`) dos services passaram para métodos das Models (`Peca.buscar_por_codigo`, `Oferta.buscar_por_anuncio`, `Usuario.gravar_google_sub`, `ProdutoPendente.listar_ids_e_candidatos`…). Commit, rollback, add e flush continuam nos services (uma transação por caso de uso). Restam SQL puro em `migrar_ofertas_kabum_service` (migração de dados antigos) e um `UPDATE` por tabela refletida em `importar_benchmarks_service`.
 2. ~~Model importando service ou repository~~ (resolvido em 09/11/2026): `Peca.cadastrar_ausentes`, `PlacaRede.atualizar_links_antigos`, `IdentidadeFabricante.registrar/para_matching` e `RevisaoIdentidadePeca.aplicar` viraram services; `MODELOS_PECAS` foi para `models/` e `validar_url_shopee` para `utils/`. Nenhum model importa `services` ou `repositories`.
 3. ~~Repository importando service e com regra de negócio~~ (resolvido em 09/11/2026): os 8 arquivos que decidiam o que gravar (`importacao_buildcores`, `importacao_catalogo`, `catalogo_tecnico`, `dataset_pecas`, `enriquecimento_buildcores`, `especificacoes_peca`, `reavaliacao_montagem`, `ofertas`) passaram para `services/` com nome `gravar_*_service`. Em `repositories/` ficaram só os de acesso (fila, tokens, ofertas da KaBuM, identificadores, controle do catálogo, saúde, migração de links), e nenhum importa `services`.
 4. **Controller com lógica de protocolo**: `auth_controller` lê o `state` do OAuth (`parse_qs`) na rota; `build_controller` trata 429/`Retry-After` da IA dentro da rota. Isso vai para o service.
@@ -44,7 +44,7 @@ A primeira versão desta auditoria dizia que Model não pode consultar nem grava
 1. (feito) Código morto (`peca_controller`).
 2. (feito) Models que importam service/repository.
 3. (feito) Repositories que importam service e têm regra.
-4. Services que consultam direto (item 1): passar a chamar Model/Repository.
+4. (feito) Services que consultam direto.
 5. Lógica de protocolo nos controllers (item 4).
 6. Arquivos de domínio em `models/` (item 6).
 

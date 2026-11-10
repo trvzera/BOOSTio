@@ -17,7 +17,7 @@ class GravarImportacaoCatalogoService:
             db.session.rollback()
             if not ControleColeta.bloquear():
                 raise ValueError('Prepare o controle de coleta antes de importar')
-            p = ProdutoPendente.query.filter_by(id=pendencia_id).populate_existing().with_for_update().first()
+            p = ProdutoPendente.buscar_por_id_com_trava(pendencia_id)
             if p is None or p.status == 'rejeitado':
                 raise ValueError('Pendência ausente ou rejeitada')
             yield p
@@ -57,7 +57,7 @@ class GravarImportacaoCatalogoService:
         return peca
 
     def concluir(self, pendencia, peca, ficha, anuncio, propostas, agora, decisao=None):
-        oferta=Oferta.query.filter_by(loja=pendencia.loja,produto_id_loja=anuncio['produto_id_loja']).one()
+        oferta=Oferta.buscar_unica_por_anuncio(pendencia.loja,anuncio['produto_id_loja'])
         pendencia.oferta_id=oferta.id;pendencia.status='importado';pendencia.revisado_em=agora
         pendencia.motivo='Importação validada e concluída'
         # Evidência e resultado são confirmados na mesma transação da peça/oferta/histórico.
@@ -87,13 +87,13 @@ class GravarImportacaoCatalogoService:
 
 
     def validar_referencia(self,pendencia,peca,ficha):
-        existente=Oferta.query.filter_by(loja=pendencia.loja,produto_id_loja=pendencia.produto_id_loja).with_for_update().first()
+        existente=Oferta.buscar_por_anuncio(pendencia.loja,pendencia.produto_id_loja,bloquear=True)
         if existente and (peca is None or existente.tabela_peca!=peca.__tablename__ or existente.peca_id!=peca.id):
             return 'Anúncio já associado a outra peça; avaliar'
         if pendencia.loja=='mercado_livre':
             from models import VinculoMercadoLivre
             catalogo=ficha['produto']['id']
-            vinculado=VinculoMercadoLivre.query.filter_by(catalogo_id=catalogo).with_for_update().first()
+            vinculado=VinculoMercadoLivre.buscar_por_catalogo(catalogo,bloquear=True)
             if vinculado and (peca is None or vinculado.tabela_peca!=peca.__tablename__ or vinculado.peca_id!=peca.id):
                 return 'Produto de catálogo já vinculado; avaliar ficha local'
             if peca is not None:

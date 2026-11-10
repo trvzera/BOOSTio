@@ -7,7 +7,7 @@ class AtualizarLinksPlacaRedeService:
     def executar(self, trocas):
         alteradas = 0
         for antigo, novo in trocas.items():
-            for peca in PlacaRede.query.filter(PlacaRede.kabum_external == antigo).all():
+            for peca in PlacaRede.listar_por_link_kabum(antigo):
                 definir_link(peca, novo)
                 peca.imagem_url = None
                 alteradas += 1

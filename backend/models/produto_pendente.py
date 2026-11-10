@@ -33,6 +33,10 @@ class ProdutoPendente(ModeloBase):
         return db.session.get(cls, identificador)
 
     @classmethod
+    def buscar_por_id_com_trava(cls, identificador):
+        return cls.query.filter_by(id=identificador).populate_existing().with_for_update().first()
+
+    @classmethod
     def buscar_por_anuncio(cls, loja, produto_id_loja):
         return cls.query.filter_by(loja=loja, produto_id_loja=produto_id_loja).first()
 
@@ -44,6 +48,15 @@ class ProdutoPendente(ModeloBase):
         if categoria is not None:consulta=consulta.filter(cls.categoria_sugerida==categoria)
         return consulta.order_by(cls.id).limit(limite).all()
 
+
+    @classmethod
+    def listar_ids_e_candidatos(cls, *, status, loja=None, categoria=None):
+        consulta = cls.query.with_entities(cls.id, cls.candidatos).filter(cls.status == status)
+        if loja is not None:
+            consulta = consulta.filter(cls.loja == loja)
+        if categoria is not None:
+            consulta = consulta.filter(cls.categoria_sugerida == categoria)
+        return consulta.order_by(cls.id).all()
 
     @classmethod
     def listar_para_admin(cls, *, status, loja=None, categoria=None, depois_id=0, limite=20, ids=None):

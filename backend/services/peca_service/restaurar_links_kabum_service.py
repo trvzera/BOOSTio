@@ -14,7 +14,7 @@ class RestaurarLinksKabumService:
 
     @staticmethod
     def _restaurar(modelo, links):
-        pecas = modelo.query.filter(db.or_(modelo.part_number.in_(links), modelo.referencia_interna.in_(links))).all()
+        pecas = modelo.listar_por_codigos(links)
         atualizadas = 0
         for peca in pecas:
             if not peca.kabum_external:

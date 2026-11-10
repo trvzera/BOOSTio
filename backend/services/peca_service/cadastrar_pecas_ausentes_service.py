@@ -14,9 +14,9 @@ class CadastrarPecasAusentesService:
           item = separar_codigos(original)
           referencia, numero = item.get('referencia_interna'), item.get('part_number')
           if referencia:
-            existente = classe.query.filter(db.or_(classe.referencia_interna == referencia, classe.part_number == referencia)).first()
+            existente = classe.buscar_por_codigo(referencia)
           elif numero:
-            existente = classe.query.filter_by(part_number=numero, fabricante=item['fabricante']).first()
+            existente = classe.buscar_por_part_number(numero, item['fabricante'])
           else:
             raise ValueError('Cadastro sem identificador estável')
           if existente is None:

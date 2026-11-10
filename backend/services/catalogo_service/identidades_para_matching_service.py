@@ -12,7 +12,7 @@ class IdentidadesParaMatchingService:
         tabela=pecas[0].__tablename__;locais={p.id:p for p in pecas}
         registros=[]
         if inspect(db.session.connection()).has_table(IdentidadeFabricante.__tablename__):
-            registros=IdentidadeFabricante.query.filter(IdentidadeFabricante.tabela_peca==tabela,IdentidadeFabricante.peca_id.in_(locais)).all()
+            registros=IdentidadeFabricante.listar_das_pecas(tabela,locais)
         resultado={r.peca_id:{'mpn':r.mpn,'gtin':r.gtin} for r in registros
             if r.assinatura_peca==assinatura_peca(locais[r.peca_id]) and IdentidadeFabricante.conferem(locais[r.peca_id],r.especificacoes)}
         for p in pecas:

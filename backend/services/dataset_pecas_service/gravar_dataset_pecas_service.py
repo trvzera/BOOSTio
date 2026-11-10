@@ -15,7 +15,7 @@ class GravarDatasetPecasService:
     def _carregar(self):
         self.indice=defaultdict(list);self.origens={};self.virtuais={}
         for categoria,modelo in self.modelos.items():
-            for p in modelo.query.yield_per(500):
+            for p in modelo.iterar_todas():
                 fonte=(p.fontes_especificacoes or {}).get('_pc_part_dataset',{})
                 if fonte.get('identidade'):self.origens[(categoria,fonte['identidade'])]=p.id
                 self.indice[(categoria,nome(p.fabricante+' '+p.modelo))].append(p.id)

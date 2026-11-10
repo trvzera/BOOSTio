@@ -22,6 +22,13 @@ class VinculoMercadoLivre(ModeloBase):
 
 
     @classmethod
+    def buscar_por_catalogo(cls, catalogo_id, *, bloquear=False, recarregar=False):
+        consulta = cls.query.filter_by(catalogo_id=catalogo_id)
+        if recarregar:
+            consulta = consulta.populate_existing()
+        return (consulta.with_for_update() if bloquear else consulta).first()
+
+    @classmethod
     def registrar_revisado(cls, peca, catalogo_id, assinatura, assinatura_catalogo):
         try:
             existente = cls.buscar(peca.__tablename__, peca.id)

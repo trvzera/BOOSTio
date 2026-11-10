@@ -20,12 +20,10 @@ def aplicar_lote_mercado_livre(peca, catalogo_id, assinatura, assinatura_catalog
             raise ValueError('Especificações da peça mudaram desde a revisão')
         if vinculo and (vinculo.catalogo_id != catalogo_id or vinculo.assinatura_peca != assinatura or vinculo.assinatura_catalogo != assinatura_catalogo):
             raise ValueError('Vínculo existente divergente; revisão necessária')
-        consulta_vinculo = VinculoMercadoLivre.query.filter_by(catalogo_id=catalogo_id)
-        ocupante = (consulta_vinculo.populate_existing().with_for_update() if not simular else consulta_vinculo).first()
+        ocupante = VinculoMercadoLivre.buscar_por_catalogo(catalogo_id, bloquear=not simular, recarregar=not simular)
         if ocupante and (ocupante.tabela_peca, ocupante.peca_id) != (peca.__tablename__, peca.id):
             raise ValueError('Catálogo já associado a outra peça')
-        consulta_ofertas = Oferta.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id, loja='mercado_livre')
-        existentes = (consulta_ofertas.populate_existing().with_for_update() if not simular else consulta_ofertas).all()
+        existentes = Oferta.listar_da_peca(peca, 'mercado_livre', bloquear=not simular, recarregar=not simular)
         selecionadas = set()
         if not simular and vinculo is None:
             db.session.add(VinculoMercadoLivre(tabela_peca=peca.__tablename__, peca_id=peca.id,
@@ -34,8 +32,7 @@ def aplicar_lote_mercado_livre(peca, catalogo_id, assinatura, assinatura_catalog
             anuncio, vendedor = dados['produto_id_loja'], dados['vendedor_id']
             identidade = (anuncio, vendedor)
             selecionadas.add(identidade)
-            consulta_anuncio = Oferta.query.filter_by(loja='mercado_livre', produto_id_loja=anuncio)
-            registro = (consulta_anuncio.populate_existing().with_for_update() if not simular else consulta_anuncio).first()
+            registro = Oferta.buscar_por_anuncio('mercado_livre', anuncio, bloquear=not simular, recarregar=not simular)
             if registro and registro.vendedor_id != vendedor:
                 raise ValueError('Vendedor do anúncio mudou; revisão necessária')
             if registro and (registro.tabela_peca, registro.peca_id) != (peca.__tablename__, peca.id):
@@ -95,7 +92,7 @@ def aplicar_ofertas_loja(peca,loja,ofertas,agora):
         if url.scheme!='https' or not url.hostname or url.username or url.password:raise ValueError('URL da oferta inválida')
         chave=str(dados['produto_id_loja'])
         if not loja or len(loja)>20 or not chave or len(chave)>80:raise ValueError('Identidade de anúncio inválida')
-        registro=Oferta.query.filter_by(loja=loja,produto_id_loja=chave).with_for_update().first()
+        registro=Oferta.buscar_por_anuncio(loja,chave,bloquear=True)
         if registro and (registro.tabela_peca!=peca.__tablename__ or registro.peca_id!=peca.id):raise ValueError('Anúncio já pertence a outra peça')
         if registro and registro.vendedor_id!=str(dados.get('vendedor_id') or ''):raise ValueError('Vendedor mudou; avaliar')
         novo=registro is None
@@ -170,7 +167,7 @@ def _registrar_vinculos_shopee(peca, itens, agora, revisao_manual=None):
     from models import ProdutoPendente
     from utils.identidade_peca import assinatura_peca, assinatura_tecnica
     for oferta, produto in itens:
-        registro = Oferta.query.filter_by(loja='shopee', produto_id_loja=produto.id_externo).one()
+        registro = Oferta.buscar_unica_por_anuncio('shopee', produto.id_externo)
         pendente = ProdutoPendente.buscar_por_anuncio('shopee', produto.id_externo)
         if pendente is None:
             pendente = ProdutoPendente(loja='shopee', produto_id_loja=produto.id_externo,
@@ -189,8 +186,7 @@ def _registrar_vinculos_shopee(peca, itens, agora, revisao_manual=None):
 
 def _desativar_ausentes(peca, loja, mantidas):
     propostas = []
-    ativas = Oferta.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id, loja=loja, ativa=True)
-    for registro in ativas.with_for_update().all():
+    for registro in Oferta.listar_da_peca(peca, loja, apenas_ativas=True, bloquear=True):
         if registro.produto_id_loja not in mantidas:
             registro.ativa = False
             propostas.append(dict(anuncio=registro.produto_id_loja, acao='desativada', historico=False))

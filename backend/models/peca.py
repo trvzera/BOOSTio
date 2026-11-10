@@ -186,6 +186,40 @@ class Peca(ModeloBase):
     return cls.query.all()
 
   @classmethod
+  def aprovar_ids(cls, ids, motivo, validado_em):
+    # Aprova só as que ainda estão em revisão; quem confirma a transação é o service.
+    return cls.query.filter(cls.id.in_(ids), cls.status_validacao == "em_revisao").update(
+      {"status_validacao": "aprovado", "validacao_motivo": motivo, "validado_em": validado_em},
+      synchronize_session=False)
+
+  @classmethod
+  def consultar_aprovadas_sem_oferta(cls, motivo):
+    from models import Oferta
+    com_oferta = db.session.query(Oferta.peca_id).filter(Oferta.tabela_peca == cls.__tablename__)
+    return cls.query.filter(cls.status_validacao == "aprovado", cls.validacao_motivo == motivo,
+                            ~cls.id.in_(com_oferta))
+
+  @classmethod
+  def iterar_todas(cls, lote=500):
+    return cls.query.yield_per(lote)
+
+  @classmethod
+  def buscar_por_codigo(cls, codigo):
+    return cls.query.filter(db.or_(cls.referencia_interna == codigo, cls.part_number == codigo)).first()
+
+  @classmethod
+  def buscar_por_part_number(cls, part_number, fabricante):
+    return cls.query.filter_by(part_number=part_number, fabricante=fabricante).first()
+
+  @classmethod
+  def listar_por_codigos(cls, codigos):
+    return cls.query.filter(db.or_(cls.part_number.in_(codigos), cls.referencia_interna.in_(codigos))).all()
+
+  @classmethod
+  def listar_por_link_kabum(cls, url):
+    return cls.query.filter(cls.kabum_external == url).all()
+
+  @classmethod
   def listar_disponiveis_ate(cls, preco_maximo: float, limite: int = 30):
     pecas = cls.listar_candidatos_disponiveis(preco_maximo)
     if len(pecas) <= limite:

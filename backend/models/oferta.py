@@ -42,6 +42,26 @@ class Oferta(ModeloBase):
     )
 
     @classmethod
+    def buscar_por_anuncio(cls, loja, produto_id_loja, *, bloquear=False, recarregar=False):
+        consulta = cls.query.filter_by(loja=loja, produto_id_loja=produto_id_loja)
+        if recarregar:
+            consulta = consulta.populate_existing()
+        return (consulta.with_for_update() if bloquear else consulta).first()
+
+    @classmethod
+    def buscar_unica_por_anuncio(cls, loja, produto_id_loja):
+        return cls.query.filter_by(loja=loja, produto_id_loja=produto_id_loja).one()
+
+    @classmethod
+    def listar_da_peca(cls, peca, loja, *, apenas_ativas=False, bloquear=False, recarregar=False):
+        consulta = cls.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id, loja=loja)
+        if apenas_ativas:
+            consulta = consulta.filter_by(ativa=True)
+        if recarregar:
+            consulta = consulta.populate_existing()
+        return (consulta.with_for_update() if bloquear else consulta).all()
+
+    @classmethod
     def corresponde_origem(cls, peca, loja, identificador, *, bloquear=False):
         consulta = cls.query.filter_by(loja=loja, produto_id_loja=identificador)
         registro = (consulta.with_for_update() if bloquear else consulta).first()

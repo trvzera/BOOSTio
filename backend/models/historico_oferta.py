@@ -14,6 +14,10 @@ class HistoricoOferta(ModeloBase):
     )
 
     @classmethod
+    def existe_coleta(cls, oferta_id, coletado_em):
+        return cls.query.filter_by(oferta_id=oferta_id, coletado_em=coletado_em).first() is not None
+
+    @classmethod
     def ultimo(cls, oferta_id, *, bloquear=False):
         consulta = cls.query.filter_by(oferta_id=oferta_id).order_by(cls.coletado_em.desc(), cls.id.desc())
         if bloquear:

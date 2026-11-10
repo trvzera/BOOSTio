@@ -16,7 +16,7 @@ class AplicarRevisaoIdentidadeService:
             if (not codigo or codigo != produto_kabum(peca.kabum_external)
                     or not Oferta.corresponde_origem(peca, 'kabum', codigo, bloquear=True)):
                 raise ValueError('Oferta original mudou ou não foi comprovada')
-            if _vinculos(peca) or Oferta.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id, loja='mercado_livre').first():
+            if _vinculos(peca) or Oferta.listar_da_peca(peca, 'mercado_livre'):
                 raise ValueError('Peça já possui identidade ou oferta externa; exige revisão do vínculo')
             campos = proposta['dados']
             permitidos = {'fabricante','modelo','fabricante_chip','modelo_referencia','codigo_modelo_fabricante','tipo_memoria'}
