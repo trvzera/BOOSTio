@@ -67,8 +67,9 @@ commits nem redução equivalente de `.git`.
   referência direta atual, mas é imagem pessoal e foi preservada.
 - **`backend/models/setup.py`**: Model legada ainda importada pelo pacote de
   Models. Removê-la sem revisar registro de tabelas e banco pode afetar dados.
-- **`backend/controllers/peca_controller.py`**: blueprint legado fora do app
-  principal, mas preservado por contratos/testes. Remoção exige decisão de API.
+- **`backend/controllers/peca_controller.py`**: removido em 09/11/2026. Nunca
+  foi registrado no app (a rota `/pecas/` respondia 404 em produção) e o front
+  usa as rotas de `/build/catalogo`.
 - **`backend/repositories/base.txt`**: placeholder vazio; candidato a remoção
   futura, sem impacto relevante no tamanho do repositório.
 
