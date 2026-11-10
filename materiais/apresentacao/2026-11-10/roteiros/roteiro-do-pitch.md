@@ -2,7 +2,7 @@
 
 Apresentação de terça-feira, 10/11/2026. Turma 3A2.
 
-**Meta: 6min30. Limite: 7 minutos.** A demonstração ocupa 1min50 e já está incluída nos 6min30. Os slides 18, 19 e 20 são apoio e ficam ocultos na apresentação.
+**Meta: 6min30. Limite: 7 minutos.** A demonstração ocupa 1min50 e já está incluída nos 6min30. A versão revisada em 09/11/2026 tem **17 slides** e segue a rubrica do professor (gleisonbt/RoteiroApresentacaoPS2026): abertura 20s, projeto e casos de uso 55s, domínio 35s, fluxogramas 55s, arquitetura 1min, demonstração até 2min, persistência 35s, tecnologias/README/bônus 30s e encerramento 10s.
 
 As falas abaixo são uma base de ensaio. Os intervalos são metas, não uma medição de apresentação já realizada. A divisão entre integrantes é uma sugestão.
 
