@@ -3,12 +3,12 @@ import hashlib
 import json
 from pathlib import Path
 from sqlalchemy.exc import SQLAlchemyError
-from repositories.dataset_pecas_repository import RepositorioDatasetPecas
+from services.dataset_pecas_service.gravar_dataset_pecas_service import GravarDatasetPecasService
 from .normalizar_peca_service import ARQUIVOS, NormalizarPecaDatasetService
 
 
 class ImportarDatasetService:
-    def __init__(self, repositorio=None):self.repositorio=repositorio or RepositorioDatasetPecas()
+    def __init__(self, repositorio=None):self.repositorio=repositorio or GravarDatasetPecasService()
 
     def executar(self,pasta,*,simular=True,tamanho_lote=250,progresso=None):
         if type(simular) is not bool or type(tamanho_lote) is not int or not 1<=tamanho_lote<=1000:raise ValueError('Opções inválidas')

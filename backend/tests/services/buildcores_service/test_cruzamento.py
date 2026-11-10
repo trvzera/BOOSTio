@@ -6,7 +6,7 @@ import pytest
 from flask import Flask
 from sqlalchemy import null
 from models import db,ControleColeta,Processador,Oferta
-from repositories.enriquecimento_buildcores_repository import RepositorioEnriquecimentoBuildcores
+from services.buildcores_service.gravar_enriquecimento_buildcores_service import GravarEnriquecimentoBuildcoresService
 from services.buildcores_service.cruzar_catalogo_service import CruzarCatalogoBuildcoresService
 from services.buildcores_service.normalizar_ficha_service import NormalizarFichaBuildcoresService
 from services.buildcores_service.comparar_fichas_service import CompararFichasBuildcoresService,chave_modelo
@@ -91,7 +91,7 @@ def test_identificadores_e_zeros_nao_viram_fatos():
 
 
 def test_nao_perde_atualizacao_concorrente(banco,tmp_path):
-    snapshot(tmp_path);repo=RepositorioEnriquecimentoBuildcores();p=repo.listar()[0]
+    snapshot(tmp_path);repo=GravarEnriquecimentoBuildcoresService();p=repo.listar()[0]
     banco.nucleo=8;db.session.commit()
     r=repo.aplicar_lote([dict(**{k:p[k] for k in ('id','categoria','assinatura')},alteracoes={'thread':12},fontes={'thread':{'url':'https://example.org'}})],simular=False)
     assert r[0]['acao']=='conflito_concorrencia' and banco.thread is None
@@ -115,7 +115,7 @@ def test_ram_preserva_kit_cor_e_frequencia():
 
 
 def test_falha_no_lote_reverte_campos_e_proveniencia(banco,tmp_path):
-    snapshot(tmp_path);repo=RepositorioEnriquecimentoBuildcores();p=repo.listar()[0]
+    snapshot(tmp_path);repo=GravarEnriquecimentoBuildcoresService();p=repo.listar()[0]
     inicial=deepcopy(banco.fontes_especificacoes)
     primeira=dict(id=p['id'],categoria=p['categoria'],assinatura=p['assinatura'],alteracoes={'thread':12},fontes={'thread':{'url':'https://example.org'}})
     segunda={**primeira,'assinatura':p['assinatura']}

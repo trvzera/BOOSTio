@@ -1,4 +1,4 @@
-from repositories.especificacoes_peca_repository import preencher_especificacoes
+from services.catalogo_service.gravar_especificacoes_peca_service import preencher_especificacoes
 from dataclasses import replace, asdict
 from datetime import datetime
 import pytest

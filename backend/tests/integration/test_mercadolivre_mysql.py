@@ -1,4 +1,4 @@
-from repositories.ofertas_repository import aplicar_lote_mercado_livre
+from services.marketplace_service.gravar_ofertas_service import aplicar_lote_mercado_livre
 from repositories.identificadores_peca_repository import separar_identificadores
 """Somente banco MySQL descartável local; rede Mercado Livre simulada."""
 import os

@@ -1,6 +1,6 @@
 from copy import deepcopy
 from models import db, FichaTecnicaCatalogo
-from repositories.catalogo_tecnico_repository import RepositorioCatalogoTecnico
+from services.catalogo_tecnico_service.gravar_catalogo_tecnico_service import GravarCatalogoTecnicoService
 from .importar_base_tecnica_service import ImportarBaseTecnicaService
 
 
@@ -9,7 +9,7 @@ class RevisarFichaService:
         if not isinstance(responsavel,str) or not responsavel.strip() or len(responsavel)>120:raise ValueError('Informe o responsável')
         if not isinstance(motivo,str) or not motivo.strip() or len(motivo)>1000:raise ValueError('Informe o motivo')
         if acao not in ('aprovar','rejeitar','reabrir'):raise ValueError('Ação inválida')
-        repo=RepositorioCatalogoTecnico()
+        repo=GravarCatalogoTecnicoService()
         if acao=='aprovar':
             ficha=FichaTecnicaCatalogo.buscar(identificador)
             if ficha is None:raise ValueError('Ficha não encontrada')

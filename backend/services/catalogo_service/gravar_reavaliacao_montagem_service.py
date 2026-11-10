@@ -5,7 +5,7 @@ from models import db,ControleColeta
 from models.modelos_pecas import MODELOS_PECAS
 
 
-class RepositorioReavaliacaoMontagem:
+class GravarReavaliacaoMontagemService:
     def __init__(self):self.modelos={m.__tablename__:m for m in MODELOS_PECAS}
 
     def categorias(self):return list(self.modelos)

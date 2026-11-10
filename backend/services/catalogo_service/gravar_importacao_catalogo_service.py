@@ -1,5 +1,5 @@
-from repositories.ofertas_repository import aplicar_lote_mercado_livre
-from repositories.ofertas_repository import aplicar_ofertas_loja
+from services.marketplace_service.gravar_ofertas_service import aplicar_lote_mercado_livre
+from services.marketplace_service.gravar_ofertas_service import aplicar_ofertas_loja
 from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 """Unidade de trabalho por anúncio, reaproveitando o bloqueio de coleta."""
 from contextlib import contextmanager
@@ -9,7 +9,7 @@ from models import db, ProdutoPendente, ControleColeta, Oferta, IdentidadeFabric
 from utils.identidade_peca import assinatura_peca
 
 
-class RepositorioImportacaoCatalogo:
+class GravarImportacaoCatalogoService:
     @contextmanager
     def transacao(self, pendencia_id, *, simular):
         try:

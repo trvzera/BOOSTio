@@ -6,7 +6,7 @@ from models import db, ControleColeta, FichaTecnicaCatalogo
 from utils.identidade_peca import assinatura_documento, assinatura_peca, assinatura_tecnica
 
 
-class RepositorioCatalogoTecnico:
+class GravarCatalogoTecnicoService:
     @contextmanager
     def transacao(self, *, simular):
         db.session.rollback()
@@ -43,7 +43,7 @@ class RepositorioCatalogoTecnico:
             if c.nullable and c.default is not None and c.name not in valores:valores[c.name]=null()
         p=modelo(**valores);db.session.add(p);db.session.flush();db.session.refresh(p)
         p.ficha_montagem_validada=not pendencias_para_montagem(p)
-        RepositorioCatalogoTecnico.registrar_fontes(p,fontes,identidade,ficha)
+        GravarCatalogoTecnicoService.registrar_fontes(p,fontes,identidade,ficha)
         return p
 
     @staticmethod

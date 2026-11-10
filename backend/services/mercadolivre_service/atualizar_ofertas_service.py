@@ -1,4 +1,4 @@
-from repositories.ofertas_repository import aplicar_lote_mercado_livre
+from services.marketplace_service.gravar_ofertas_service import aplicar_lote_mercado_livre
 from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 from datetime import datetime, timezone
 

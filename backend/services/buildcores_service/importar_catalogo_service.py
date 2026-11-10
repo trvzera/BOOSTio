@@ -3,14 +3,14 @@
 from decimal import Decimal,InvalidOperation
 from sqlalchemy import Integer,Numeric,Float,Boolean,String
 from sqlalchemy.exc import SQLAlchemyError
-from repositories.importacao_buildcores_repository import RepositorioImportacaoBuildcores
+from services.buildcores_service.gravar_importacao_buildcores_service import GravarImportacaoBuildcoresService
 from models.modelos_pecas import MODELOS_PECAS
 from services.catalogo_service.normalizar_produto import codigo
 from .ler_snapshot_service import LerSnapshotBuildcoresService
 
 
 class ImportarCatalogoBuildcoresService:
-    def __init__(self,repositorio=None):self.repositorio=repositorio or RepositorioImportacaoBuildcores()
+    def __init__(self,repositorio=None):self.repositorio=repositorio or GravarImportacaoBuildcoresService()
 
     @staticmethod
     def preparar(r):

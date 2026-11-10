@@ -7,7 +7,7 @@ from models.modelos_pecas import MODELOS_PECAS
 from services.catalogo_service.indice_candidatos_service import IndiceCandidatosService
 from services.catalogo_service.importar_catalogo_service import ImportarCatalogoService
 from services.catalogo_service.enriquecer_normalizado_service import EnriquecerNormalizadoService
-from repositories.ofertas_repository import atualizar_ofertas_validadas
+from services.marketplace_service.gravar_ofertas_service import atualizar_ofertas_validadas
 from services.catalogo_service.consultas_peca_service import consultas_da_peca
 from utils.identidade_peca import assinatura_documento, assinatura_peca
 from .cliente_service import ClienteShopeeService

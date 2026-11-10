@@ -32,7 +32,7 @@ A primeira versão desta auditoria dizia que Model não pode consultar nem grava
 
 1. **Service consultando o banco direto** (`db.session`/`Model.query`) em 19 arquivos, em vez de chamar a Model ou o Repository: `completar_pecas_icecat`, `autorizar_conta`, `descobrir_produtos`, `processar_catalogo`, `importar_produto`, `aprovar_em_lote`, `preencher_especificacoes`, `importar_benchmarks`, `atualizar_preferencias_uso`, `vincular_google`, `configurar_acesso`, `salvar_peca`, `restaurar_links_kabum`, `migrar_ofertas_kabum`, `importar_base_tecnica`, `revisar_ficha`, `converter_referencias_gpu`, `preencher_fichas_originais`, `pendencias_acionaveis`.
 2. ~~Model importando service ou repository~~ (resolvido em 09/11/2026): `Peca.cadastrar_ausentes`, `PlacaRede.atualizar_links_antigos`, `IdentidadeFabricante.registrar/para_matching` e `RevisaoIdentidadePeca.aplicar` viraram services; `MODELOS_PECAS` foi para `models/` e `validar_url_shopee` para `utils/`. Nenhum model importa `services` ou `repositories`.
-3. **Repository importando service** (25 pontos) e com regra de negócio (`importacao_buildcores`, `ofertas`, `identificadores_peca`, `especificacoes_peca`, `catalogo_tecnico`, `dataset_pecas`, `enriquecimento_buildcores`, `importacao_catalogo`). Repository só consulta; a decisão vai para o service.
+3. ~~Repository importando service e com regra de negócio~~ (resolvido em 09/11/2026): os 8 arquivos que decidiam o que gravar (`importacao_buildcores`, `importacao_catalogo`, `catalogo_tecnico`, `dataset_pecas`, `enriquecimento_buildcores`, `especificacoes_peca`, `reavaliacao_montagem`, `ofertas`) passaram para `services/` com nome `gravar_*_service`. Em `repositories/` ficaram só os de acesso (fila, tokens, ofertas da KaBuM, identificadores, controle do catálogo, saúde, migração de links), e nenhum importa `services`.
 4. **Controller com lógica de protocolo**: `auth_controller` lê o `state` do OAuth (`parse_qs`) na rota; `build_controller` trata 429/`Retry-After` da IA dentro da rota. Isso vai para o service.
 5. ~~Código morto: `controllers/peca_controller.py`~~ (removido em 09/11/2026, com o `MostrarPecasService` e seus testes).
 6. **Arquivos que não são Model dentro de `models/`**: `medidas_fisicas`, `imagens_referencia`, `campos_tecnicos` (regra e dados de domínio) e `preco_oferta` (colunas calculadas injetadas).
@@ -43,7 +43,7 @@ A primeira versão desta auditoria dizia que Model não pode consultar nem grava
 
 1. (feito) Código morto (`peca_controller`).
 2. (feito) Models que importam service/repository.
-3. Repositories que importam service e têm regra (item 3).
+3. (feito) Repositories que importam service e têm regra.
 4. Services que consultam direto (item 1): passar a chamar Model/Repository.
 5. Lógica de protocolo nos controllers (item 4).
 6. Arquivos de domínio em `models/` (item 6).

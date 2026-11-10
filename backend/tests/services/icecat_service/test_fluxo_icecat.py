@@ -110,9 +110,9 @@ def test_sem_permissao_nao_consulta_icecat(banco,base):
 
 
 def test_falha_historico_reverte_peca_e_oferta(banco,base,monkeypatch):
-    from repositories.importacao_catalogo_repository import RepositorioImportacaoCatalogo
+    from services.catalogo_service.gravar_importacao_catalogo_service import GravarImportacaoCatalogoService
     def falhar(*a,**k):raise ValueError('Falha de persistência')
-    monkeypatch.setattr(RepositorioImportacaoCatalogo,'concluir',falhar)
+    monkeypatch.setattr(GravarImportacaoCatalogoService,'concluir',falhar)
     with pytest.raises(ValueError):importar(base).executar(banco.id,simular=False,permitir_novos=True)
     assert HD.query.count()==Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==0
 

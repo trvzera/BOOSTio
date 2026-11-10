@@ -7,7 +7,7 @@ from models.modelos_pecas import MODELOS_PECAS
 from services.catalogo_service.normalizar_produto import nome
 
 
-class RepositorioDatasetPecas:
+class GravarDatasetPecasService:
     def __init__(self):
         self.modelos={m.__tablename__:m for m in MODELOS_PECAS}
         self.indice=None;self.versao=None

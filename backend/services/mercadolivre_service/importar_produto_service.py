@@ -3,7 +3,7 @@ from services.icecat_service.obter_ficha_icecat_service import ErroConsultaIceca
 from datetime import datetime, timezone
 from sqlalchemy.exc import SQLAlchemyError
 from models import db, ProdutoPendente
-from repositories.importacao_catalogo_repository import RepositorioImportacaoCatalogo
+from services.catalogo_service.gravar_importacao_catalogo_service import GravarImportacaoCatalogoService
 from models.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_peca, assinatura_catalogo, assinatura_documento
 
@@ -22,7 +22,7 @@ class ImportarProdutoService:
         from services.fabricante_service.completar_ficha_service import CompletarFichaFabricanteService
         self.fabricantes=fabricantes if fabricantes is not None else CompletarFichaFabricanteService.configurado()
         self.base_icecat=base_icecat if base_icecat is not None else CompletarFichaIcecatService.configurado()
-        self.repositorio=repositorio or RepositorioImportacaoCatalogo()
+        self.repositorio=repositorio or GravarImportacaoCatalogoService()
         self.verificar_execucao=verificar_execucao or (lambda: None)
 
     def executar(self, pendencia_id, *, simular=True, permitir_novos=False):

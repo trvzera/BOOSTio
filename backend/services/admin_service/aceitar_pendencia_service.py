@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from models import ProdutoPendente
-from repositories.ofertas_repository import atualizar_ofertas_validadas
+from services.marketplace_service.gravar_ofertas_service import atualizar_ofertas_validadas
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
 from services.mercadolivre_service.controle_requisicoes_service import ControleRequisicoesService
 from services.mercadolivre_service.importar_produto_service import ImportarProdutoService

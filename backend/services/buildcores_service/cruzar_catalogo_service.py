@@ -5,13 +5,13 @@ import hashlib
 import json
 import re
 from sqlalchemy.exc import SQLAlchemyError
-from repositories.enriquecimento_buildcores_repository import RepositorioEnriquecimentoBuildcores
+from services.buildcores_service.gravar_enriquecimento_buildcores_service import GravarEnriquecimentoBuildcoresService
 from .normalizar_ficha_service import NormalizarFichaBuildcoresService, CATEGORIAS, fabricante
 from .comparar_fichas_service import CompararFichasBuildcoresService
 
 
 class CruzarCatalogoBuildcoresService:
-    def __init__(self,repositorio=None):self.repositorio=repositorio or RepositorioEnriquecimentoBuildcores()
+    def __init__(self,repositorio=None):self.repositorio=repositorio or GravarEnriquecimentoBuildcoresService()
 
     def executar(self,pasta,*,simular=True,tamanho_lote=100,progresso=None):
         if type(simular) is not bool or type(tamanho_lote) is not int or not 1<=tamanho_lote<=1000:raise ValueError('Opções inválidas')

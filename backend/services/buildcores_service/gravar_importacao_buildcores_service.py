@@ -13,7 +13,7 @@ from services.buildcores_service.normalizar_ficha_service import fabricante
 from services.buildcores_service.comparar_fichas_service import CompararFichasBuildcoresService,chave_modelo,equivalente
 
 
-class RepositorioImportacaoBuildcores:
+class GravarImportacaoBuildcoresService:
     def __init__(self):
         self.modelos={m.__tablename__:m for m in MODELOS_PECAS}
         self.indice=None;self.versao=None;self.motor=CompararFichasBuildcoresService()

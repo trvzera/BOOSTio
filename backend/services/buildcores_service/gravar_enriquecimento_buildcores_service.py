@@ -5,7 +5,7 @@ from models.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_documento
 
 
-class RepositorioEnriquecimentoBuildcores:
+class GravarEnriquecimentoBuildcoresService:
     def __init__(self):self.modelos={m.__tablename__:m for m in MODELOS_PECAS}
 
     def listar(self):
