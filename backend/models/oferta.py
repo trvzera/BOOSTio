@@ -34,6 +34,14 @@ class Oferta(ModeloBase):
     )
 
     @classmethod
+    def _das_pecas(cls, referencias):
+        # Um IN por tabela de peça usa o índice (tabela_peca, peca_id); o IN de pares é lento no MySQL.
+        ids = {}
+        for tabela, identificador in referencias:
+            ids.setdefault(tabela, []).append(identificador)
+        return db.or_(*[db.and_(cls.tabela_peca == tabela, cls.peca_id.in_(lista)) for tabela, lista in ids.items()])
+
+    @classmethod
     def buscar_por_anuncio(cls, loja, produto_id_loja, *, bloquear=False, recarregar=False):
         consulta = cls.query.filter_by(loja=loja, produto_id_loja=produto_id_loja)
         if recarregar:
@@ -126,7 +134,7 @@ class Oferta(ModeloBase):
 
     @classmethod
     def anexar_a_catalogo(cls, pecas):
-        from sqlalchemy import inspect, tuple_, and_
+        from sqlalchemy import inspect, and_
         from . import VinculoMercadoLivre
         from utils.identidade_peca import assinatura_campos
         if not pecas or not inspect(db.engine).has_table(cls.__tablename__):
@@ -141,7 +149,7 @@ class Oferta(ModeloBase):
             return pecas
         registros = db.session.query(cls, VinculoMercadoLivre).join(VinculoMercadoLivre, and_(
             VinculoMercadoLivre.tabela_peca == cls.tabela_peca, VinculoMercadoLivre.peca_id == cls.peca_id)).filter(cls.loja == 'mercado_livre', cls.ativa.is_(True),
-            tuple_(cls.tabela_peca, cls.peca_id).in_(referencias)).order_by(cls.preco.asc(), cls.id.asc()).all()
+            cls._das_pecas(referencias)).order_by(cls.preco.asc(), cls.id.asc()).all()
         por_peca = {}
         fichas = dict(zip(referencias, pecas))
         for registro, vinculo in registros:
@@ -161,10 +169,9 @@ class Oferta(ModeloBase):
 
     @classmethod
     def _anexar_shopee(cls, fichas, referencias):
-        from sqlalchemy import tuple_
         from . import ProdutoPendente
         ofertas = cls.query.filter(cls.loja == 'shopee', cls.ativa.is_(True),
-                tuple_(cls.tabela_peca, cls.peca_id).in_(referencias)).order_by(cls.preco, cls.id).all()
+                cls._das_pecas(referencias)).order_by(cls.preco, cls.id).all()
         ids_por_tabela = {}
         for oferta in ofertas:
             ids_por_tabela.setdefault(oferta.tabela_peca, set()).add(oferta.peca_id)
@@ -181,10 +188,9 @@ class Oferta(ModeloBase):
 
     @classmethod
     def _anexar_kabum(cls, pecas, referencias):
-        from sqlalchemy import tuple_
         fichas = dict(zip(referencias, pecas))
         for oferta in cls.query.filter(cls.loja == 'kabum', cls.ativa.is_(True),
-                tuple_(cls.tabela_peca, cls.peca_id).in_(referencias)).order_by(cls.id).all():
+                cls._das_pecas(referencias)).order_by(cls.id).all():
             dados = oferta.para_exibicao()
             if dados is not None:
                 fichas[(oferta.tabela_peca, oferta.peca_id)]['ofertas'].append(dados)
