@@ -103,7 +103,6 @@ export function validarEncaixe({gpu,air,water,fans = [],gabinete,placa,fonte,dis
 
 // Slots/SATA: complemento somente demonstrativo. Medidas: manifesto compartilhado
 // com Peca.to_catalogo(), sem alterar registros ou o esquema do banco.
-// Documentação das revisões de referência: docs/frontend-build.md.
 export function completarCatalogoDemo(catalogo,manifesto = {pecas:[]}) {
   const placas = {
     "ASUS|Prime A520M-K": {quantidade_slots_m2:1,quantidade_portas_sata:4,quantidade_slots_m2_sata:1},

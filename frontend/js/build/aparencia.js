@@ -5,7 +5,7 @@ export const estilosGabinete=[['sem-preferencia','Sem preferência'],['discreto'
 export const portesGabinete=[['sem-preferencia','Sem preferência'],['mini-tower','Pequeno'],['mid-tower','Médio'],['full-tower','Grande']];
 export const coresSetup=[['sem-preferencia','Sem preferência'],['preto','Preto'],['branco','Branco'],['misto','Preto e branco']];
 
-// Exemplos visuais, não ofertas. As fontes/modelos estão em docs/geracao-build.md.
+// Exemplos visuais, não ofertas.
 const exemplos={
   'mini-tower':{modelo:'Cooler Master MasterBox Q300L',imagem:'../imgs/produtos/gabinete-1.webp',descricao:'Mini Tower · ocupa menos espaço. Costuma usar placas-mãe menores.',preco:'Geralmente tem opções econômicas. Modelos muito compactos podem custar mais.',
     medidas:'387 × 230 × 381 mm',placas:'Micro-ATX e Mini-ITX.',fans:'120 mm; na frente também aceita 140 mm.',radiador:'Até 240 mm na frente.'},

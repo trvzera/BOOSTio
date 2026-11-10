@@ -1,4 +1,40 @@
-# Ajustes de produção
+# Publicação e operação na VPS
+
+## Instalação (Hostinger, Docker)
+
+O Traefik da Hostinger roda em outra stack e recebe as portas 80/443; o `compose.yaml` sobe MySQL, Redis, API,
+frontend estático e os workers, ligados à rede externa `traefik-proxy` (confirme com
+`docker network inspect traefik-proxy`). Aponte o DNS de `boostio.com.br` e `api.boostio.com.br` para a VPS e não
+publique portas de API, banco ou Redis no host.
+
+1. Copie `.env.production.example` para `.env.production` (`chmod 600`) e preencha os segredos. Use a mesma senha em
+   `MYSQL_PASSWORD` e na `URL_DATABASE` (caracteres especiais codificados). O backend recusa iniciar em produção sem
+   `SECRET_KEY` de 32+ caracteres, `URL_DATABASE`, credenciais Google, chave Gemini, e-mail e Redis.
+2. Com o MySQL vazio:
+
+   ```bash
+   docker compose --env-file .env.production up -d --build db redis
+   docker compose --env-file .env.production run --rm api python -m flask --app app banco-preparar
+   docker compose --env-file .env.production run --rm api python -m flask --app app pecas-popular
+   docker compose --env-file .env.production up -d --build api web
+   ```
+
+   `banco-preparar` só aceita MySQL vazio. Em versões que mudam o esquema, faça backup e use os comandos
+   `*-preparar` de [docs/comandos.md](../docs/comandos.md). Nunca apague o volume `mysql_data`.
+3. Confira `docker compose ps` e `/health` da API (200 com MySQL e Redis acessíveis, 503 caso contrário).
+4. Agende `deploy/atualizar_precos.sh` (ver abaixo) e `deploy/backup_mysql.sh` (com `BOOSTIO_BACKUP_DIR` em pasta
+   privada fora do projeto; guarde cópias fora da VPS e teste a restauração).
+
+## Administradores
+
+Só pelo terminal do servidor; a conta precisa estar ativa e com e-mail verificado, e a mudança encerra as sessões dela:
+
+```bash
+docker compose --env-file .env.production run --rm --no-deps api python -m flask --app app usuario-promover-admin --email pessoa@exemplo.com
+```
+
+Também existem `usuario-remover-admin` e `usuario-listar-admins`. Em MySQL antigo, rode antes
+`usuarios-admin-preparar --aplicar` (cria `usuario.administrador`); sem a coluna, o login quebra.
 
 ## URLs das páginas
 
@@ -43,13 +79,39 @@ alterar a integração. Nenhuma pontuação é inventada para substituir uma fal
 Use `bash deploy/atualizar_ofertas_mercadolivre.sh` para simular. A gravação exige
 `--aplicar`. O wrapper verifica a integração e impede jobs simultâneos no mesmo
 host com `flock`. Ele adiciona ofertas a componentes existentes; não cria peças.
-A preparação de tabelas e tokens é explícita. Veja
-[execução e publicação](../docs/ofertas-mercado-livre.md#execução-na-vps).
+A preparação de tabelas e tokens é explícita (ver abaixo).
 
 Para autorizar o Mercado Livre diretamente no servidor, use
 `mercadolivre-autorizacao-preparar` e depois `mercadolivre-conectar`.
 O link administrativo expira em dez minutos e não deve ser compartilhado.
-Instruções e configuração do callback em `docs/ofertas-mercado-livre.md`.
+Cadastre o callback OAuth no aplicativo do Mercado Livre.
+
+Variáveis do backend para o Mercado Livre (o par de tokens vive no banco, não no `.env`):
+
+```dotenv
+MERCADO_LIVRE_CLIENT_ID=
+MERCADO_LIVRE_CLIENT_SECRET=
+MERCADO_LIVRE_CONTA_ID=
+INTEGRACOES_TOKEN_CHAVE=   # chave Fernet, gerada uma vez, fora do Git e do banco
+```
+
+Primeira instalação na VPS (com backup antes):
+
+```bash
+cd /opt/BOOSTio
+BOOSTIO_BACKUP_DIR="$HOME/backups/boostio" bash deploy/backup_mysql.sh
+docker compose --env-file .env.production build api
+docker compose --env-file .env.production run --rm --no-deps api python -m flask --app app integracoes-tokens-preparar
+docker compose --env-file .env.production run --rm --no-deps api python -m flask --app app mercadolivre-ofertas-preparar
+docker compose --env-file .env.production run --rm --no-deps api python -m flask --app app mercadolivre-tokens-configurar
+```
+
+Simule um lote pequeno e só então aplique:
+
+```bash
+bash deploy/atualizar_ofertas_mercadolivre.sh --categoria processador --limite-pecas 5 --max-requisicoes 20
+bash deploy/atualizar_ofertas_mercadolivre.sh --aplicar --categoria processador --limite-pecas 5 --max-requisicoes 20
+```
 
 ## Atualização diária de preços na VPS
 
