@@ -166,11 +166,6 @@ class AssociarCatalogoService:
         return CompararProdutosService().avaliar(peca, produto, identidade=identidade)
 
     @staticmethod
-    def comprova_mpn(peca, produto):
-        resultado = AssociarCatalogoService.comparar(peca, produto)
-        return resultado['classificacao'] == 'confirmada' and 'mpn' in resultado['evidencias']
-
-    @staticmethod
     def comprova_identidade(peca, produto):
         return AssociarCatalogoService.comparar(peca, produto)['classificacao'] == 'confirmada'
 

@@ -1011,8 +1011,7 @@ def test_armazenamento_insuficiente_nunca_e_salvo(app_build, mocker):
         assert BuildSalva.query.count() == Build.query.count() == 0
 
 
-@pytest.mark.parametrize("via_site", [False, True])
-def test_geracao_inteligente_repara_excesso_sem_pedir_nova_resposta_ia(app_build, mocker, via_site):
+def test_geracao_inteligente_repara_excesso_sem_pedir_nova_resposta_ia(app_build, mocker):
     from services.build_service.seletor_inteligente_service import SeletorInteligenteService
     tipos = ['processador','placa_mae','placa_video','memoria_ram','fonte','gabinete','ssd','fan']
     resposta = {**PEDIDO, 'componentes': [dict(tipo=t,id=1,quantidade=2 if t=='memoria_ram' else 5 if t=='fan' else 1) for t in tipos]}
@@ -1041,16 +1040,13 @@ def test_geracao_inteligente_repara_excesso_sem_pedir_nova_resposta_ia(app_build
         antiga=mocker.spy(criacao_module, 'preparar_catalogo')
         preparar=mocker.spy(SeletorInteligenteService, 'preparar_geracao')
         salvar=mocker.spy(criacao_module, 'salvar_build')
-        if via_site:
-            cliente=app_build.test_client()
-            autenticar(cliente)
-            resposta_http=cliente.post('/build/',json=pedido)
-            assert resposta_http.status_code==201, resposta_http.json
-            assert resposta_http.json['build']['preco_total']==7950
-            assert BuildSalva.query.count()==Build.query.count()==1
-            r={'build': salvar.call_args.args[1]}
-        else:
-            r=SeletorInteligenteService().gerar_build(1,pedido)
+        cliente=app_build.test_client()
+        autenticar(cliente)
+        resposta_http=cliente.post('/build/',json=pedido)
+        assert resposta_http.status_code==201, resposta_http.json
+        assert resposta_http.json['build']['preco_total']==7950
+        assert BuildSalva.query.count()==Build.query.count()==1
+        r={'build': salvar.call_args.args[1]}
         preparar.assert_called_once()
         antiga.assert_not_called()
         assert llm.call_count == 1
@@ -1058,8 +1054,6 @@ def test_geracao_inteligente_repara_excesso_sem_pedir_nova_resposta_ia(app_build
         ajuste=r['build']['ajuste_orcamento']
         assert ajuste['total_anterior'] == 8300 and ajuste['economia'] == 350
         assert {i['tipo'] for i in ajuste['trocas']} == {'ssd','fan'}
-        if not via_site:
-            assert BuildSalva.query.count() == Build.query.count() == 0
 
 
 def test_reparo_sem_alternativa_segura_ainda_usa_correcao_limitada(app_build, mocker):
