@@ -36,7 +36,6 @@ from .mouse import Mouse
 from .monitor import Monitor
 from .placa_rede import PlacaRede
 from .cabo_rede import CaboRede
-from .setup import Setup
 from .codigo import Codigo
 from .build import Build
 from .build_salva import BuildSalva
@@ -73,5 +72,5 @@ __all__ = [
     'Processador','PlacaMae','PlacaVideo','MemoriaRAM','SSD','HD',
     'Gabinete','WaterCooler','AirCooler','Fan','Fone','Teclado','Mouse','Monitor',
     'PlacaRede','CaboRede','RevisaoIdentidadePeca','FichaTecnicaCatalogo','RevisaoFichaTecnica',
-    'Setup','Codigo','TokenRecuperacao','Build','BuildSalva','ConsultaPreco','ControleColeta','HistoricoPreco','Oferta','ProdutoPendente','ExecucaoDescoberta','EstadoCatalogo','TokenIntegracao','VinculoMercadoLivre','HistoricoOferta','IdentidadeFabricante','AutorizacaoMercadoLivre'
+    'Codigo','TokenRecuperacao','Build','BuildSalva','ConsultaPreco','ControleColeta','HistoricoPreco','Oferta','ProdutoPendente','ExecucaoDescoberta','EstadoCatalogo','TokenIntegracao','VinculoMercadoLivre','HistoricoOferta','IdentidadeFabricante','AutorizacaoMercadoLivre'
 ]
