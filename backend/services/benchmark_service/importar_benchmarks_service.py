@@ -22,7 +22,6 @@ CONFIG = {
 
 
 def normalizar_nome(nome):
-    # Remover somente diferenças ortográficas; nunca retirar clock, variante ou sufixo.
     nome = re.sub(r"[®™℠]|\((?:r|tm)\)", "", nome, flags=re.I).casefold()
     nome = re.sub(r"(?<=\w)[‐‑–—-](?=\w)", " ", nome)
     nome = re.sub(r"\b(i[3579])\s+(?=\d)", r"\1", nome)
@@ -51,7 +50,6 @@ class ImportarBenchmarksService:
             raise ValueError("Informe ao menos um CSV de CPU ou GPU")
         if type(lote) is not int or lote < 1:
             raise ValueError("O lote deve ser positivo")
-        # Formato novo é o padrão documentado; snapshots antigos seguem reproduzíveis.
         formatos = []
         for caminho in (cpu, gpu):
             if caminho:
@@ -63,7 +61,6 @@ class ImportarBenchmarksService:
                 raise ValueError("Não misture formatos de fontes diferentes na mesma importação")
             from .importar_referencias_passmark_service import ImportarReferenciasPassmarkService
             return ImportarReferenciasPassmarkService().executar(cpu, gpu, simular, lote)
-        # Ler e validar os dois arquivos antes de qualquer persistência.
         fontes = [(tipo, *self._ler(caminho, tipo)) for tipo, caminho in (("cpu", cpu), ("gpu", gpu)) if caminho]
         resumo = {"simulacao": simular, "atualizadas": 0, "propostas": 0, "inalteradas": 0,
                   "nao_encontradas": 0, "ambiguas": 0, "invalidas": 0, "duplicadas": 0,
@@ -111,7 +108,6 @@ class ImportarBenchmarksService:
                     resumo[status] += 1
                     resumo["detalhes"].append({**detalhe, "status": status, "ids": sorted(ids)})
                     continue
-                # Escolha estável para duplicatas equivalentes, independente da ordem do CSV.
                 nome = min(linha["name"] for _, linha in grupo)
                 dados = {k: v for k, v in valores[0].items() if v is not None}
                 dados.update(benchmark_teste=teste, benchmark_versao=None, benchmark_nome_fonte=nome,
@@ -145,7 +141,6 @@ class ImportarBenchmarksService:
 
     @staticmethod
     def _persistir(planos, resumo, lote):
-        # Um commit por lote; falha reverte o lote atual, lotes anteriores permanecem.
         for inicio in range(0, len(planos), lote):
             batch = planos[inicio:inicio + lote]
             try:

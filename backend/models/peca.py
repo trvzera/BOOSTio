@@ -21,8 +21,6 @@ class Peca(ModeloBase):
 
   ficha_montagem_validada = db.Column(db.Boolean(), nullable=True)
 
-  # NULL identifica exclusivamente os registros anteriores à migração.
-  # Legado preserva publicação sem afirmar que a ficha já foi auditada.
   status_validacao = db.Column(db.String(20), nullable=True, default='pendente', server_default='pendente')
   validacao_motivo = db.Column(db.Text, nullable=True)
   validado_em = db.Column(db.DateTime, nullable=True)
@@ -114,8 +112,6 @@ class Peca(ModeloBase):
       raise ValueError('Tamanho do lote entre 1 e 1000')
     ultimo_id = 0
     while True:
-      # Materializa e fecha o cursor antes de consultar identidades. MySQL
-      # não permite outra consulta durante a leitura de cursor não bufferizado.
       lote = cls.query.filter(cls.id > ultimo_id).order_by(cls.id).limit(tamanho_lote).all()
       if not lote:
         return
@@ -169,7 +165,6 @@ class Peca(ModeloBase):
     dados["categoria"] = self.__tablename__
     dados["link"] = self.kabum_external
     data = self.preco_atualizado_em
-    # As coletas gravam UTC sem tzinfo no SQLite; o contrato explicita o fuso.
     if data and data.tzinfo is None:
       data = data.replace(tzinfo=timezone.utc)
     dados["preco_atualizado_em"] = data.isoformat() if data else None
@@ -187,7 +182,6 @@ class Peca(ModeloBase):
 
   @classmethod
   def aprovar_ids(cls, ids, motivo, validado_em):
-    # Aprova só as que ainda estão em revisão; quem confirma a transação é o service.
     return cls.query.filter(cls.id.in_(ids), cls.status_validacao == "em_revisao").update(
       {"status_validacao": "aprovado", "validacao_motivo": motivo, "validado_em": validado_em},
       synchronize_session=False)
@@ -228,7 +222,6 @@ class Peca(ModeloBase):
     pecas = cls.listar_candidatos_disponiveis(preco_maximo)
     if len(pecas) <= limite:
       return pecas
-    # Distribui as opções pela faixa de preços, sem enviar o catálogo inteiro ao LLM.
     return [pecas[indice * (len(pecas) - 1) // (limite - 1)] for indice in range(limite)]
 
 

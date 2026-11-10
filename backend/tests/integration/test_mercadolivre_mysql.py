@@ -108,7 +108,6 @@ def test_revalida_identidade_alterada_por_outra_conexao(banco):
     from sqlalchemy.orm import Session
     _,p=banco;preparar()
     identidade=assinatura_peca(p)
-    # A sessão do job já fez leituras antes da chamada HTTP.
     VinculoMercadoLivre.buscar('processador',p.id)
     with Session(db.engine) as outra:
         outra.query(Processador).filter_by(id=p.id).update({'modelo':'Modelo alterado'})
@@ -129,7 +128,6 @@ def test_duas_escritas_concorrentes_nao_duplicam_oferta_ou_historico(banco):
     with ThreadPoolExecutor(max_workers=2) as pool:
         resultados=list(pool.map(gravar,range(2)))
     assert len(resultados)==2
-    # A sessão principal estava no snapshot anterior às gravações dos workers.
     db.session.rollback()
     assert Oferta.query.count()==HistoricoOferta.query.count()==VinculoMercadoLivre.query.count()==1
 
@@ -151,7 +149,6 @@ def test_identidade_fabricante_preserva_referencia_e_valida_especificacoes(banco
     original = p.part_number
     assert preparar_identidades_fabricante()['criadas'] == ['identidade_fabricante']
     assert preparar_identidades_fabricante()['criadas'] == []
-    # A CLI executa migração e importação em processos separados.
     db.session.rollback()
     specs = {'soquete': 'AM4', 'nucleo': 6}
     assert RegistrarIdentidadeFabricanteService().executar(p, original, 'https://www.amd.com/', specs, simular=True) == 'proposta'
@@ -230,7 +227,7 @@ def test_catalogo_aditivo_preserva_legado_e_define_novos_como_pendentes(banco):
     assert ProdutoPendente.query.count() == 0
     with db.engine.begin() as conn:
         conn.execute(text("INSERT INTO processador (fabricante, modelo, soquete, nucleo, thread, clockbase, clockmax, consumo_energia, preco, esgotado, criado_em, atualizado_em) VALUES ('Teste','Novo','AM4',6,12,3,4,65,100,0,NOW(),NOW())"))
-    db.session.remove()  # Encerra o snapshot REPEATABLE READ anterior à inserção externa.
+    db.session.remove()
     assert Processador.query.order_by(Processador.id.desc()).first().status_validacao == 'pendente'
     assert len(Processador.listar_publicadas()) == 1
 

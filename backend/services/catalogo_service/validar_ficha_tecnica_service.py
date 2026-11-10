@@ -32,7 +32,6 @@ class ValidarFichaTecnicaService:
                 conflitos.append('campo_protegido:'+campo)
                 continue
             if campo in classe.CAMPOS_DA_OFERTA:
-                # Preço e disponibilidade do anúncio seguem para a oferta, não para a ficha da peça.
                 if campo=='preco' and valor is not None and (type(valor) is bool or not isinstance(valor,(int,float,Decimal)) or not 0<valor<10**12):
                     conflitos.append('numero_invalido:'+campo)
                 continue

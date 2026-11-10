@@ -17,8 +17,6 @@ class MesclarFichaTecnicaService:
                 dados[campo] = valor
                 fontes[campo] = tecnica['fontes'][campo]
         fontes['mpn'] = tecnica['fontes']['mpn']
-        # Mantém as especificações do anúncio para a última verificação de duplicatas.
-        # Os dados da fonte permanecem em ficha['dados'], com origem individual.
         identidade = tecnica['identidade']
         identificadores = dict(produto.identificadores)
         for campo, valor in identidade.items():
@@ -38,8 +36,6 @@ class MesclarFichaTecnicaService:
     @staticmethod
     def _equivalentes(categoria, campo, a, b):
         if campo in ('fabricante', 'modelo'):
-            # Nome de catálogo e nome comercial podem diferir com MPN comprovado.
-            # Marca continua exigindo equivalência explícita.
             if campo == 'modelo':
                 return True
             from services.catalogo_service.comparar_nomes_service import marca

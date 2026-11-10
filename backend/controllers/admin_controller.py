@@ -22,7 +22,6 @@ def _responder(funcao):
         resposta.headers["Cache-Control"] = "no-store"
         return resposta, 200
     except (ErroMercadoLivre, OrcamentoRequisicoesEsgotado):
-        # Antes de ValueError, de que ambos herdam: é falha da loja, não da entrada do administrador.
         return jsonify({"erro": "O Mercado Livre não respondeu agora. Tente novamente em instantes.", "codigo": "loja-indisponivel"}), 502
     except ConflitoPendencia as erro:
         return jsonify({"erro": str(erro), "codigo": "conflito"}), 409

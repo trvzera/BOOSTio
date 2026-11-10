@@ -160,7 +160,7 @@ def callback_google():
         login_user(usuario)
 
         base_url = current_app.config['FRONTEND_URL'].rstrip('/')
-        return redirect(f'{base_url}/pages/index.html') #Redirect obrigatorio, o google espera um retorno desse tipo
+        return redirect(f'{base_url}/pages/index.html')
     except ValueError as erro:
         base_url = current_app.config['FRONTEND_URL'].rstrip('/')
         if vinculando:

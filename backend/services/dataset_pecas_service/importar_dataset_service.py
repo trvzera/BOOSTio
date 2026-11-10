@@ -17,7 +17,6 @@ class ImportarDatasetService:
         if not isinstance(manifesto,dict) or not isinstance(manifesto.get('arquivos'),dict):raise ValueError('Manifesto inválido')
         if manifesto.get('repositorio')!='https://github.com/docyx/pc-part-dataset' or not isinstance(manifesto.get('commit'),str) or not re.fullmatch('[0-9a-f]{40}',manifesto['commit']):raise ValueError('Manifesto de origem inválido')
         arquivos=[]
-        # Preflight de todos os hashes/formatos antes da primeira alteração.
         for arquivo in ARQUIVOS:
             caminho=pasta/(arquivo+'.json')
             if not caminho.exists():continue

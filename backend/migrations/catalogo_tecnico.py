@@ -30,8 +30,6 @@ def preparar_catalogo_tecnico(*, simular=True, campos_por_tabela=None):
     resultado=dict(simulacao=simular,alteracoes=alteracoes,tabelas_criadas=fila['criadas'])
     if simular:return resultado
     if dialecto=='mysql':
-        # MySQL confirma DDL implicitamente; preflight integral acima e reexecução
-        # repetível protegem uma execução parcialmente concluída. Backup é externo.
         with db.engine.begin() as conn:
             quote=conn.dialect.identifier_preparer.quote
             for nome,mudar,flag in tabelas:

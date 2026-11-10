@@ -56,11 +56,9 @@ def aplicar_lote_mercado_livre(peca, catalogo_id, assinatura, assinatura_catalog
             registro.consultado_em = agora
             if mudou:
                 registro.preco_atualizado_em = agora
-            # url_afiliado e nome do vendedor cadastrados manualmente são preservados.
             db.session.flush()
             if registrar_historico:
                 db.session.add(HistoricoOferta(oferta_id=registro.id, preco=registro.preco, esgotado=dados.get('esgotado'), coletado_em=agora))
-        # Fora das cinco selecionadas não significa esgotado; apenas sai da seleção ativa.
         for registro in existentes:
             if desativar_ausentes and registro.ativa and (registro.produto_id_loja, registro.vendedor_id) not in selecionadas:
                 propostas.append({'anuncio': registro.produto_id_loja, 'acao': 'desativada'})

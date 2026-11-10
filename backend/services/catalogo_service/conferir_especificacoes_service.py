@@ -52,7 +52,6 @@ def converter(campo, valor):
             n=numero(s,'ghz')
             if n is not None:n*=1000
         if n is None:return None
-        # Campos de clock de CPU são armazenados em GHz no projeto.
         if campo in ('clockbase','clockmax'):
             return n/1000 if re.search(r'(?:ghz|mhz)',s) else numero(s)
         return n
@@ -118,8 +117,6 @@ def extrair_titulo(categoria,titulo):
         kit=re.search(r'\b(\d+)\s*[x×]\s*(\d+)\s*gb',texto)
         if categoria=='memoria_ram' and kit:
             dados['quantidade_pentes']=[kit[1]];dados['capacidade_gb']=[str(int(kit[1])*int(kit[2]))+' gb']
-            # Capacidade do módulo não é a capacidade total. Outros totais
-            # explícitos, porém, também precisam concordar com o kit anunciado.
             restante = texto[:kit.start()] + texto[kit.end():]
             extras = re.findall(r'\b(\d+(?:[.,]\d+)?)\s*(gb|tb)\b(?!\s*(?:/|ps\b))', restante)
             dados['capacidade_gb'].extend(''.join(v) for v in extras)

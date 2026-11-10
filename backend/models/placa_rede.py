@@ -2,7 +2,6 @@ from . import db, Peca
 
 
 class PlacaRede(Peca):
-    # O editor já usa adaptador_wifi como identificador desta categoria.
     __tablename__ = "adaptador_wifi"
 
     interface = db.Column(db.String(20), nullable=False)

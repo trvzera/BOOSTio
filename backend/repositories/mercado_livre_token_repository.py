@@ -64,7 +64,6 @@ class MercadoLivreTokenRepository:
 
     @contextmanager
     def bloquear(self):
-        # CAS no model reserva a renovação antes da rede, sem manter locks HTTP.
         self.lido = False
         yield
 

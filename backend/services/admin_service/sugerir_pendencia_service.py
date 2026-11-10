@@ -35,7 +35,6 @@ INSTRUCAO = (
 
 class SugerirPendenciaService:
     def __init__(self, llm=None, *, tentativas_transitorias=0, espera=30, dormir=time.sleep):
-        # Limite de requisições (429) ou instabilidade (5xx): espera e repete antes de desistir do grupo.
         self.tentativas_transitorias, self.espera, self.dormir = tentativas_transitorias, espera, dormir
         self.llm = llm or (lambda prompt, modelo: LLMService().executar(prompt, modelo, reservar_cota=False))
         self.modelo = os.getenv("IA_ANALISE_MODELO", MODELO_PADRAO)
@@ -49,7 +48,7 @@ class SugerirPendenciaService:
         resumo = {"simulacao": simular, "analisadas": 0, "sugeridas": 0, "sem_sugestao": 0, "ja_analisadas": 0,
                   "falhas": 0, "ignoradas": 0, "aceitas": 0, "rejeitadas": 0, "decisoes_falhas": 0,
                   "requisicoes_ia": 0, "ids_falhos": [], "detalhes": []}
-        fila, prontas = [], []   # fila: vai à IA; prontas: já têm sugestão atual
+        fila, prontas = [], []
         for pendencia_id in (self._ids(loja, categoria) if ids is None else ids):
             pendencia = ProdutoPendente.buscar_por_id(pendencia_id)
             contexto = self._contexto(pendencia) if pendencia is not None and pendencia.status in ABERTAS else None
@@ -143,7 +142,6 @@ class SugerirPendenciaService:
                     raise ValueError("A IA não respondeu esta pendência")
                 sugestoes.append((pendencia_id, self._validar(item, contexto, impressao)))
             except ValueError:
-                # Item inválido ou ausente: só ele fica sem sugestão; os demais valem.
                 invalidas += 1
                 resumo["ids_falhos"].append(pendencia_id)
         if not sugestoes:
@@ -169,7 +167,6 @@ class SugerirPendenciaService:
             resumo["rejeitadas"] += 1
             return "rejeitada"
         except (ValueError, LookupError, ConflitoPendencia, SQLAlchemyError, OSError):
-            # Falha de rede, anúncio fora do ar ou peça alterada: a pendência segue aberta para uma pessoa.
             resumo["decisoes_falhas"] += 1
             return "falhou"
 

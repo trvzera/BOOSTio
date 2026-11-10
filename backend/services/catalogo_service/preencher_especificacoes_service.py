@@ -28,8 +28,6 @@ class PreencherEspecificacoesService:
                     raise ValueError('Categoria desconhecida')
                 indice = IndiceCandidatosService.carregar(modelo)
                 produtos = tuple(self.normalizar(pendencia))
-                # União das fichas normalizadas: divergência entre anúncio e
-                # catálogo não pode ocultar um candidato antes da conferência.
                 pecas = {p.id:p for produto in produtos for p in indice.candidatos(produto)}
                 candidatos = []
                 for peca in pecas.values():

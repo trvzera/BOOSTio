@@ -44,10 +44,6 @@ class GravarDatasetPecasService:
         base=(cat,nome(r['titulo']))
         ids=set(self.indice.get(chave,[]) + self.indice.get(base,[]))
         if ids:
-            # Uma identidade comercial já presente nunca gera outra peça automaticamente.
-            # Mesmo nome com variantes/especificações desconhecidas exige revisão.
-            # A projeção em nossas colunas não distingue todos os SKUs (por exemplo,
-            # clocks de fábrica da GPU). Sem a mesma identidade de origem, não fundir.
             return dict(acao='revisao',categoria=cat,motivo='Nome existente com variantes ou especificações não comprovadas',ids=sorted(ids))
         valores={**dados,'part_number':null(),
             'status_validacao':'em_revisao','ficha_montagem_validada':False,

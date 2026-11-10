@@ -8,26 +8,19 @@ from utils.url_shopee import validar_url_shopee
 class Oferta(ModeloBase):
     __tablename__ = "oferta"
 
-    # Peca é abstrato; o vínculo segue a referência usada por ConsultaPreco.
     tabela_peca = db.Column(db.String(40), nullable=False)
     peca_id = db.Column(db.Integer, nullable=False)
     loja = db.Column(db.String(20), nullable=False)
     produto_id_loja = db.Column(db.String(80), nullable=False)
-    # Vazio identifica venda direta. Em marketplace, informar o ID do vendedor.
-    # Metadado: a identidade única do anúncio é loja + produto_id_loja.
     vendedor_id = db.Column(db.String(80), nullable=False, default="")
     vendedor_nome = db.Column(db.String(120), nullable=True)
-    # Endereço original do anúncio para consultar preço e disponibilidade.
     url = db.Column(db.Text, nullable=False)
-    # Link de divulgação; permanece None enquanto não houver afiliação configurada.
     url_afiliado = db.Column(db.Text, nullable=True, default=None)
 
     preco = db.Column(db.Numeric(14, 2), nullable=True)
     condicao_pagamento = db.Column(db.String(120), nullable=True)
-    # NULL: disponibilidade ainda desconhecida; não assumir estoque sem coleta.
     esgotado = db.Column(db.Boolean, nullable=True)
     ativa = db.Column(db.Boolean, nullable=False, default=True)
-    # UTC sem tzinfo, seguindo as datas de cotação do projeto.
     preco_atualizado_em = db.Column(db.DateTime, nullable=True)
     consultado_em = db.Column(db.DateTime, nullable=True)
 
@@ -138,7 +131,6 @@ class Oferta(ModeloBase):
         from sqlalchemy import inspect, tuple_, and_
         from . import VinculoMercadoLivre
         from utils.identidade_peca import assinatura_campos
-        # Leitura opcional: catálogo anterior continua funcionando antes da migration.
         if not pecas or not inspect(db.engine).has_table(cls.__tablename__):
             return pecas
         referencias = []
@@ -175,7 +167,6 @@ class Oferta(ModeloBase):
         from . import ProdutoPendente
         ofertas = cls.query.filter(cls.loja == 'shopee', cls.ativa.is_(True),
                 tuple_(cls.tabela_peca, cls.peca_id).in_(referencias)).order_by(cls.preco, cls.id).all()
-        # Peças e pendências de todas as ofertas são lidas de uma vez, não uma consulta por oferta.
         ids_por_tabela = {}
         for oferta in ofertas:
             ids_por_tabela.setdefault(oferta.tabela_peca, set()).add(oferta.peca_id)
@@ -187,7 +178,6 @@ class Oferta(ModeloBase):
             peca = pecas.get((oferta.tabela_peca, oferta.peca_id))
             pendencia = pendencias.get(oferta.produto_id_loja)
             dados = oferta.para_exibicao()
-            # Sem pendência importada não há prova de associação: a oferta não é exibida.
             if peca and pendencia and dados and oferta.shopee_validada(peca, pendencia):
                 fichas[(oferta.tabela_peca, oferta.peca_id)]['ofertas'].append(dados)
 

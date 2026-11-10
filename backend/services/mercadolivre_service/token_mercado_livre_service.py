@@ -49,7 +49,6 @@ class TokenMercadoLivreService:
         secret = self._credencial(current_app.config.get('MERCADO_LIVRE_CLIENT_SECRET'))
         inicio = self.relogio()
         executar_requisicao(lambda: None)
-        # Refresh tokens são de uso único. Após resultado incerto, não repetir às cegas.
         self.repository.salvar({**dados, 'renovacao_pendente': True})
         try:
             resposta = requests.post(

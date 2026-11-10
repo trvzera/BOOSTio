@@ -16,7 +16,6 @@ class RevisarFichaService:
             if ficha.estado=='rejeitada':raise ValueError('Reabra explicitamente a ficha antes de aprovar')
             documento=deepcopy(ficha.documento);assinatura=ficha.assinatura_documento
             db.session.rollback()
-            # O importador relê e valida a origem sob a mesma trava global.
             return ImportarBaseTecnicaService(repo).processar(documento,simular=simular,responsavel=responsavel,assinatura_esperada=assinatura)
         with repo.transacao(simular=simular):
             ficha=FichaTecnicaCatalogo.buscar(identificador,bloquear=True)

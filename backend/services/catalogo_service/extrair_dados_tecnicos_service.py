@@ -8,7 +8,6 @@ from .normalizar_especificacoes import CONJUNTOS, agregar
 
 
 class ExtrairDadosTecnicosService:
-    # Lista explícita: dados comerciais, identificadores e benchmarks não entram.
     CAMPOS = {
         'capacidade_gb', 'memoria_gb', 'ddr', 'tipo_memoria', 'frequencia_mhz',
         'quantidade_pentes', 'latencia', 'formato_ram', 'formato', 'tipo',

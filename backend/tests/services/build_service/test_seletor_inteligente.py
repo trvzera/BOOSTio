@@ -100,7 +100,6 @@ def test_teto_usa_margem_da_montagem_em_vez_do_orcamento_total(banco):
 def test_reserva_perifericos_limita_pc_sem_transferir_sobra(banco):
     dentro = inserir(2000, 10000)
     inserir(2000.01, 50000)
-    # 60% de 5000 ficam reservados aos periféricos; PC tem teto de 2000.
     assert ids(dict(orcamento=5000, percentual_perifericos=60, preferencias='desempenho')) == [dentro]
 
 
@@ -118,10 +117,10 @@ def test_mesmas_validacoes_de_orcamento_da_montagem_antes_da_consulta(dados):
 
 @pytest.mark.parametrize('gpu', [False, True])
 def test_custo_beneficio_ordena_pontos_por_real_antes_de_aplicar_limite(banco, gpu):
-    alto = inserir(1000, 15000, gpu)  # 15 pontos por real
-    melhor = inserir(800, 20000, gpu)  # 25 pontos por real
-    intermediario = inserir(500, 10000, gpu)  # 20 pontos por real
-    inserir(1201, 100000, gpu)  # Acima do teto de 1200, mesmo com ótima relação.
+    alto = inserir(1000, 15000, gpu)
+    melhor = inserir(800, 20000, gpu)
+    intermediario = inserir(500, 10000, gpu)
+    inserir(1201, 100000, gpu)
     resultado = ids(dict(orcamento=2000, prioridade_montagem='custo_beneficio', limite=3))
     assert resultado == [melhor, intermediario, alto]
 
@@ -147,7 +146,7 @@ def test_demais_categorias_reutilizam_amostragem_sem_substituir_benchmarks(banco
     from models import MemoriaRAM, Fonte, PlacaMae
     cpu = inserir(500, 12000)
     salvar_modelo(PlacaMae, 300, socket="AM4", tipo_memoria="DDR4")
-    inserir(500, None)  # CPU sem benchmark não pode voltar pelo catálogo geral.
+    inserir(500, None)
     for n in range(20):
         salvar_modelo(MemoriaRAM, 100 + n, capacidade_gb=16, ddr='DDR4', frequencia_mhz=3200,
                       quantidade_pentes=1)
@@ -208,7 +207,7 @@ def test_placas_distribuem_24_vagas_por_socket_e_reaproveitam_sobras(banco, quan
     from models import PlacaMae
     from utils.sockets import normalizar_socket
     inserir(500, 10000, soquete='AM4')
-    inserir(500, 9000, soquete='AM4')  # Duas CPUs AM4 não dão peso duplo ao grupo.
+    inserir(500, 9000, soquete='AM4')
     inserir(500, 8000, soquete='AM5')
     for socket, quantidade in zip(('AMD AM4', 'Socket AM5'), quantidades):
         for n in range(quantidade):
@@ -266,7 +265,6 @@ def test_ram_distribui_vagas_por_ddr_das_placas_e_reaproveita_sobras(banco, quan
     from models import PlacaMae, MemoriaRAM
     from utils.memorias import normalizar_ddr
     inserir(500, 10000, soquete='LGA1700')
-    # Mesmo socket com placas DDR diferentes: o padrão vem da placa, não da CPU.
     for ddr in ('DDR4', 'DDR 5'):
         salvar_modelo(PlacaMae, 300, socket='LGA1700', tipo_memoria=ddr)
     for ddr, quantidade in zip(('ddr-4', 'DDR5'), quantidades):
@@ -427,7 +425,6 @@ def test_reserva_independente_de_perifericos_nao_recebe_teto_do_pc(banco):
 
 def test_plataforma_pendente_nao_e_confundida_com_inviabilidade_comprovada(banco):
     from models import Fonte, Gabinete, SSD
-    # Uma AM4 tem plataforma conhecida, mas seu custo mínimo não cabe no PC+GPU.
     conhecida = cadastrar_plataforma('AM4', 'DDR4', 5000, 50000)
     desconhecida = inserir(1000, 15000, soquete='LGA1700')
     from models import Processador

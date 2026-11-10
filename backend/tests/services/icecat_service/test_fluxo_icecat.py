@@ -143,7 +143,6 @@ def test_indice_bloqueia_entidades_externas(tmp_path):
 
 
 def test_ram_representacoes_gb_mb_observadas_na_ficha_real():
-    # Estrutura e rótulos conferidos na ficha oficial Icecat 14532212.
     corpo=b'''<ICECAT-interface><Product ID="14532212" Name="ValueRAM" Prod_id="KVR16N11/8">
     <Supplier Name="Kingston Technology"/><Category ID="911"><Name Value="Memory Modules"/></Category>
     <ProductFeature Presentation_Value="8 GB"><Feature><Name Value="Internal memory"/></Feature></ProductFeature>

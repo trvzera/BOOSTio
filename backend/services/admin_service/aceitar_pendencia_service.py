@@ -31,7 +31,6 @@ class AceitarPendenciaService:
         peca = self._peca_candidata(pendencia, referencia_peca)
         revisao = {"acao": "aceitar", "peca": referencia_peca, "administrador_id": administrador_id,
                    "origem": origem, "em": datetime.now(timezone.utc).replace(tzinfo=None).isoformat()}
-        # A gravação é a mesma da busca automática: trava, posse do anúncio, histórico e vínculo.
         propostas = (self._aceitar_shopee if pendencia.loja == "shopee" else self._aceitar_mercado_livre)(
             pendencia, peca, revisao)
         return {"pendencia": apresentar_pendencia(ProdutoPendente.buscar_por_id(pendencia_id)), "ofertas": propostas}
@@ -45,7 +44,6 @@ class AceitarPendenciaService:
 
     def _aceitar_mercado_livre(self, pendencia, peca, revisao):
         self._recusar_peca_ja_vinculada_a_outro_catalogo(pendencia, peca)
-        # O anúncio é reconsultado na API do Mercado Livre (poucas requisições, antes da transação).
         importador = self._importador_mercado_livre or ImportarProdutoService(controle=ControleRequisicoesService(8, 0.5))
         return importador.aceitar_revisado(pendencia.id, peca, revisao)
 

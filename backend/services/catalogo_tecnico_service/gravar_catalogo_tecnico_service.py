@@ -38,7 +38,6 @@ class GravarCatalogoTecnicoService:
         valores={**dados,'part_number':identidade.get('mpn'),'status_validacao':'aprovado',
             'validacao_motivo':'Identidade e ficha técnica validadas, sem presumir oferta',
             'validado_em':datetime.now(timezone.utc).replace(tzinfo=None)}
-        # Ausência é NULL explícito: defaults booleanos antigos não viram evidência.
         for c in modelo.__table__.columns:
             if c.nullable and c.default is not None and c.name not in valores:valores[c.name]=null()
         p=modelo(**valores);db.session.add(p);db.session.flush();db.session.refresh(p)

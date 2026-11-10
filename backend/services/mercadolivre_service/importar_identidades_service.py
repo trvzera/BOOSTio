@@ -22,7 +22,6 @@ class ImportarIdentidadesService:
             raise ValueError('Manifesto deve conter uma lista de até 5000 identidades')
         modelos = {m.__tablename__: m for m in MODELOS_PECAS}
         vistos = set()
-        # Valida todo o formato e duplicatas antes da primeira gravação.
         for item in dados:
             if not isinstance(item, dict) or not all(isinstance(item.get(k), str) and item[k].strip() for k in
                     ('categoria', 'referencia', 'fabricante', 'modelo', 'mpn', 'fonte', 'url_peca')):

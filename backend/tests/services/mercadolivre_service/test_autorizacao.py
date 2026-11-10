@@ -19,7 +19,6 @@ from utils.limite_requisicoes import limiter
 @pytest.fixture
 def contexto():
     app = Flask(__name__, template_folder='../../../templates')
-    # Caminho absoluto evita depender de onde pytest é chamado.
     from pathlib import Path
     app.template_folder = str(Path(__file__).resolve().parents[3] / 'templates')
     app.config.update(SECRET_KEY='teste', SQLALCHEMY_DATABASE_URI='sqlite:///:memory:',

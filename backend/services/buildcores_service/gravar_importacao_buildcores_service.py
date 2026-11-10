@@ -67,7 +67,6 @@ class GravarImportacaoBuildcoresService:
         propria=p['fontes'].get('_buildcores_importacao',{})
         if propria.get('id_externo'):self.origens[(cat,propria['id_externo'])].add(ident)
         for id_externo in propria.get('origens',{}):self.origens[(cat,id_externo)].add(ident)
-        # O cruzamento prévio também deixou evidência por campo da ficha original.
         for v in p['fontes'].values():
             if isinstance(v,dict) and v.get('provedor')=='BuildCores OpenDB' and v.get('id_externo'):
                 self.origens[(cat,v['id_externo'])].add(ident)
@@ -87,7 +86,6 @@ class GravarImportacaoBuildcoresService:
             raise
 
     def _proximos(self,r,chave):
-        # Semelhança serve somente para impedir duplicação, nunca para associar.
         cat=r['categoria'];marca=r['fabricante'];proximos=set()
         aliases=[r['nome'],*r['mpns'],*(r['bruto'].get('metadata',{}).get('part_numbers') or [])]
         for alias in aliases:
@@ -101,8 +99,6 @@ class GravarImportacaoBuildcoresService:
         grupos=[self.tokens[(r['categoria'],r['fabricante'],t)] for t in chave.split('|') if len(t)>=3 and re.search(r'\d',t)]
         grupos=[g for g in grupos if g]
         if not grupos:return set()
-        # A união é monotônica: acrescentar peças não pode fazer desaparecer um
-        # candidato que antes bloqueava duplicação. Não trocar pelo token mais raro.
         candidatos=set().union(*grupos)
         comparador=SequenceMatcher(None,'',chave)
         for ident in sorted(candidatos):
@@ -114,8 +110,6 @@ class GravarImportacaoBuildcoresService:
 
     @staticmethod
     def _chave_guarda(cat,titulo,marca):
-        # Esta chave intencionalmente abrangente só bloqueia possíveis duplicatas.
-        # Nunca constitui prova para associação/preenchimento.
         s=nome(titulo)
         s=re.split(r'\bwith\b',s,maxsplit=1)[0]
         s=re.sub(r'\b\d+(?:[.,]\d+)?[- ]inch\b',' ',s)
@@ -150,8 +144,6 @@ class GravarImportacaoBuildcoresService:
             for campo,v in r['dados'].items():
                 if p['dados'].get(campo) is not None and equivalente(r['categoria'],campo,p['dados'][campo],v) is False:conflitos.append(campo)
             return not conflitos and fabricante(p['dados']['fabricante'])==r['fabricante']
-        # O matcher atual usa o DTO docyx. Registros nativos só são associados
-        # automaticamente por identidade persistida/MPN ou igualdade integral.
         if '_buildcores_importacao' in p['fontes']:return False
         return self.motor.avaliar(p,r)['confirmada']
 

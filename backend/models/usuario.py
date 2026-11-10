@@ -47,7 +47,6 @@ class Usuario(ModeloBase,UserMixin):
       "administrador": bool(self.administrador),
       "criado_em":self.criado_em
     }
-    # A listagem geral de usuários não deve expor o orçamento de cada conta.
     if incluir_budget:
       dados.update(budget=float(self.budget) if self.budget is not None else None,
                    usar_budget=bool(self.usar_budget))
@@ -103,7 +102,6 @@ class Usuario(ModeloBase,UserMixin):
 
   @staticmethod
   def gravar_google_sub(usuario: "Usuario", google_sub: str) -> int:
-    # Só vincula se a conta continua ativa, sem Google e na mesma versão de sessão.
     return Usuario.query.filter_by(id=usuario.id, ativo=True, google_sub=None,
                                    versao_sessao=usuario.versao_sessao).update({
       Usuario.google_sub: google_sub, Usuario.login_google: True,

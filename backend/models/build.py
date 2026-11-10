@@ -93,7 +93,6 @@ class Build(ModeloBase):
         "cabo_rede",
     )
  
-    # Multiplicadores por peça — usados no preço total.
     QUANTIDADES = {
         "memoria_ram": "quantidade_ram",
         "ssd": "quantidade_ssd",

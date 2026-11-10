@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from configs import ambientes,configurar_oauth #Antes por esta com secret_key(IMPORTANTE)
+from configs import ambientes,configurar_oauth
 from flask import Flask, jsonify
 from werkzeug.exceptions import RequestEntityTooLarge
 from services.configuracao_service.configurar_acesso_service import ConfigurarAcessoService
@@ -36,8 +36,6 @@ from utils.limite_requisicoes import configurar_limites
 load_dotenv()
 
 
-#Inicio o app e passo as configurações do app.
-#O instance_path é fixado ao lado do app.py: sem isso o flask usa a pasta atual (cwd) e o caminho relativo do sqlite (URL_DATABASE) quebra dependendo de onde o app é executado.
 app = Flask(__name__, instance_path=os.path.join(os.path.dirname(os.path.abspath(__file__))))
 
 @app.errorhandler(RequestEntityTooLarge)
@@ -54,7 +52,6 @@ ConfigurarAcessoService().executar(app, producao=ambiente == 'producao')
 configurar_csrf(app)
 configurar_compressao(app)
 configurar_limites(app, producao=ambiente == 'producao')
-#Iniciar o login manager e passar o app como parametro
 lm.init_app(app)
 db.init_app(app)
 mail.init_app(app)

@@ -15,7 +15,6 @@ class TokenIntegracao(ModeloBase):
     conta_id = db.Column(db.String(80), nullable=False)
     _access_token = db.Column('access_token_cifrado', db.Text, nullable=False)
     _refresh_token = db.Column('refresh_token_cifrado', db.Text, nullable=False)
-    # UTC sem tzinfo: compatível com MySQL DATETIME e as datas de coleta.
     expira_em = db.Column(db.DateTime, nullable=False)
     versao = db.Column(db.Integer, nullable=False, default=0)
     renovacao_pendente = db.Column(db.Boolean, nullable=False, default=False)
@@ -51,7 +50,6 @@ class TokenIntegracao(ModeloBase):
         expiracao = self._utc(expira_em)
         renovacao = self._utc(renovado_em) if renovado_em is not None else None
         cifra = self._cifra()
-        # Cifrar ambos antes de modificar a instância evita um par parcialmente alterado.
         access = cifra.encrypt(access_token.encode()).decode('ascii')
         refresh = cifra.encrypt(refresh_token.encode()).decode('ascii')
         self._access_token, self._refresh_token = access, refresh

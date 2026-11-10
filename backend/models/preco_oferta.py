@@ -19,7 +19,6 @@ def _da_melhor_oferta(modelo, coluna, *, so_kabum=False):
     filtros = [Oferta.tabela_peca == modelo.__tablename__, Oferta.peca_id == modelo.id, Oferta.ativa.is_(True)]
     if so_kabum:
         filtros += [Oferta.loja == 'kabum', Oferta.url != '']
-    # Disponível, depois estoque desconhecido, depois esgotado; dentro de cada grupo, o mais barato.
     disponibilidade = case((_disponivel(), 0), (Oferta.esgotado.is_(None), 1), else_=2)
     ordem = (disponibilidade, Oferta.preco.is_(None), Oferta.preco, Oferta.id)
     return (select(coluna).where(*filtros).order_by(*ordem).limit(1)
@@ -28,7 +27,6 @@ def _da_melhor_oferta(modelo, coluna, *, so_kabum=False):
 
 def instalar_precos_derivados():
     for modelo in _modelos(Peca):
-        # type_coerce (e não CAST): o MySQL ignora CAST para FLOAT e devolveria Decimal.
         modelo.preco = column_property(type_coerce(_da_melhor_oferta(modelo, Oferta.preco), Float), deferred=False)
         disponivel = case((_disponivel(), False), else_=Oferta.esgotado)
         modelo.esgotado = column_property(type_coerce(_da_melhor_oferta(modelo, disponivel), Boolean), deferred=False)

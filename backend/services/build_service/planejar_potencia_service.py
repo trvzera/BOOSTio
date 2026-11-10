@@ -4,7 +4,6 @@ from decimal import Decimal, InvalidOperation
 
 class PlanejarPotenciaService:
     VERSAO='reserva_auxiliares_v1'
-    # W por produto, exceto RAM/fans (por módulo/fan físico).
     RESERVAS={'placa_mae':50,'memoria_ram':10,'ssd':15,'hd':30,'fan':10,
               'air_cooler':30,'water_cooler':60,'gabinete':20}
     EXTERNOS={'fonte','monitor','teclado','mouse','fone','cabo_rede','adaptador_wifi','webcam','microfone'}

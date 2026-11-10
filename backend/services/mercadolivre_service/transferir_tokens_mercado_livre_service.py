@@ -37,7 +37,6 @@ class TransferirTokensMercadoLivreService:
 
     @staticmethod
     def _mesmos(a, b):
-        # DATETIME mantém microssegundos no SQLite; MySQL pode manter só segundos.
         return (a is not None and all(a.get(k) == b.get(k) for k in
                 ('access_token', 'refresh_token', 'renovacao_pendente'))
                 and abs(a['expires_at'] - b['expires_at']) < 1)

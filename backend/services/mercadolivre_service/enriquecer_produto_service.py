@@ -9,7 +9,6 @@ from services.catalogo_service.normalizar_produto import atributos, numero, gtin
 from .buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
 from services.catalogo_service.consultar_benchmark_catalogo_service import ConsultarBenchmarkCatalogoService
 
-# IDs efetivamente observados nas respostas oficiais preservadas.
 ATRIBUTOS = {
  'processador': {'soquete':('COMPATIBLE_SOCKETS',None),'nucleo':('CPU_CORES_NUMBER','inteiro'),
     'thread':('CPU_THREADS_NUMBER','inteiro'),'clockbase':('MIN_CLOCK_FREQUENCY','ghz'),

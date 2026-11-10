@@ -44,7 +44,6 @@ def conectar():
 @mercadolivre_auth_bp.get('/callback')
 @limiter.limit('20 per minute')
 def callback():
-    # Parâmetros repetidos não podem selecionar um código ou state arbitrariamente.
     if any(len(request.args.getlist(k)) > 1 for k in ('state', 'code', 'error')):
         return 'Retorno de autorização inválido. Gere outro convite no terminal.', 400
     navegador = session.get('ml_oauth_navegador')

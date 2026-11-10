@@ -55,7 +55,6 @@ def separar_identificadores(peca, *, simular=True, ids_ambiguos=None):
             if tabela.name != 'identidade_fabricante' or registro['assinatura_peca'] != antiga:
                 continue
             specs = registro['especificacoes']
-            # Conferir contra a identidade anterior, antes de mover sua referência.
             from types import SimpleNamespace
             anterior = SimpleNamespace(**{c.name: getattr(peca, c.name) for c in peca.__table__.columns})
             anterior.part_number = numero

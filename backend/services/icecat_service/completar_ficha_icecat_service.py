@@ -73,7 +73,6 @@ class CompletarFichaIcecatService:
                                      conflitos=decisao['conflitos'], pendencias=decisao['pendencias']))
             if decisao['classificacao'] == 'confirmada' and not tecnica['conflitos']:
                 candidatos.append(tecnica)
-        # Mesmo um candidato não confirmado pode ser uma variante concorrente.
         if len(candidatos) != 1 or any(d['classificacao']=='ambigua' for d in diagnosticos):
             return produto, {**ficha, 'icecat': {'status':'revisao', 'candidatos':diagnosticos}}
         from services.catalogo_service.mesclar_ficha_tecnica_service import MesclarFichaTecnicaService
@@ -94,7 +93,5 @@ class CompletarFichaIcecatService:
         except ErroConsultaIcecat as erro:
             if erro.status != 404:
                 raise
-            # Não aprovar outro candidato enquanto esta identidade não foi lida.
-            # Autenticação, rate limit e indisponibilidade geral ainda interrompem.
             return None, dict(id=referencia['id'], classificacao='ambigua',
                               conflitos=[], pendencias=['ficha_icecat_indisponivel'], http=404)

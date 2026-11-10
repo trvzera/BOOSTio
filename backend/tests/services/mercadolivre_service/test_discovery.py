@@ -225,7 +225,6 @@ def test_100_produtos_por_busca_sem_concentrar_nos_vendedores_e_retoma(banco, ca
             break
     assert r['concluido'] and r['produtos_percorridos'] == 100
     assert len(consultados) == len(set(consultados)) == ProdutoPendente.query.count() == 100
-    # Outra consulta que encontra os mesmos produtos não cria pendências duplicadas.
     antes = ProdutoPendente.query.count()
     r = s.executar(categoria=categoria, consulta=consulta+' outro termo', max_produtos=3,
                    max_ofertas_por_produto=1, max_paginas=20, simular=False)

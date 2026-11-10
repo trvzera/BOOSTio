@@ -13,7 +13,6 @@ class GravarImportacaoCatalogoService:
     @contextmanager
     def transacao(self, pendencia_id, *, simular):
         try:
-            # Encerra o snapshot de leitura anterior à rede (REPEATABLE READ no MySQL).
             db.session.rollback()
             if not ControleColeta.bloquear():
                 raise ValueError('Prepare o controle de coleta antes de importar')
@@ -34,7 +33,6 @@ class GravarImportacaoCatalogoService:
         dados={**ficha['dados'],'part_number':ficha.get('identidade',{}).get('mpn'),'status_validacao':'aprovado',
                'validacao_motivo':'Identidade e ficha estruturada verificadas na importação',
                'validado_em':datetime.now(timezone.utc).replace(tzinfo=None)}
-        # Um default False não é evidência. NULL explícito mantém campos opcionais desconhecidos.
         for c in modelo.__table__.columns:
             if c.nullable and c.default is not None and c.name not in dados and c.name!='atualizado_em':
                 dados[c.name]=null()
@@ -60,7 +58,6 @@ class GravarImportacaoCatalogoService:
         oferta=Oferta.buscar_unica_por_anuncio(pendencia.loja,anuncio['produto_id_loja'])
         pendencia.oferta_id=oferta.id;pendencia.status='importado';pendencia.revisado_em=agora
         pendencia.motivo='Importação validada e concluída'
-        # Evidência e resultado são confirmados na mesma transação da peça/oferta/histórico.
         import json
         pendencia.evidencias={**(pendencia.evidencias or {}),
             'enriquecimento':json.loads(json.dumps(ficha,default=str)),

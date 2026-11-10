@@ -13,7 +13,6 @@ from .obter_ficha_icecat_service import ErroConsultaIcecat, ObterFichaIcecatServ
 
 FICHA_VAZIA = dict(dados={}, fontes={}, identidade={}, conflitos=[], pronto=False)
 
-# O Icecat chama de "tipo" o que a validação de montagem chama de "tipo_fone" (e assim por diante).
 NOME_NA_VALIDACAO = {('fone', 'tipo'): 'tipo_fone', ('memoria_ram', 'formato'): 'formato_ram',
                      ('cabo_rede', 'categoria'): 'categoria_cabo'}
 
@@ -48,7 +47,6 @@ class CompletarPecasIcecatService:
                 resumo['ignoradas'] += 1
                 continue
             if not pendencias_para_montagem(peca):
-                # Já completa (por exemplo, preenchida antes): só falta liberar a marca de ficha reprovada.
                 resumo['ficha_liberada' if self._reavaliar_ficha(peca, simular) else 'ignoradas'] += 1
                 continue
             if not peca.part_number:
@@ -58,7 +56,6 @@ class CompletarPecasIcecatService:
             try:
                 resultado = self._completar(peca, simular)
             except ErroConsultaIcecat as erro:
-                # Limite, autenticação ou indisponibilidade: para o lote; o cursor permite retomar.
                 resumo['interrompido'] = True
                 resumo['motivo_interrupcao'] = str(erro)
                 break
@@ -81,7 +78,7 @@ class CompletarPecasIcecatService:
     def _completar(self, peca, simular):
         base = ProdutoNormalizado(loja='icecat', id_externo=f'{peca.__tablename__}:{peca.id}',
                                   categoria=peca.__tablename__, categoria_confirmada=True,
-                                  ativo=True,  # a fonte é uma ficha de catálogo, não um anúncio que possa ter saído do ar
+                                  ativo=True,
                                   titulo=f'{peca.fabricante} {peca.modelo}', marca=peca.fabricante,
                                   modelo=peca.modelo, identificadores={'mpn': peca.part_number})
         _, ficha = self.icecat.executar(base, FICHA_VAZIA)

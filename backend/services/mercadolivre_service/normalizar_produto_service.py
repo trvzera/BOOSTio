@@ -61,17 +61,12 @@ class NormalizarProdutoService:
         if categoria=='memoria_ram':specs['formato_ram']=specs.pop('formato',[])
         if categoria in ('ssd','hd'):
             specs['tecnologia_armazenamento']=valores(('DRIVE_STORAGE_TYPE',))
-            # INTERFACES pode misturar protocolo (NVMe), barramento e formato.
-            # CONNECTIVITY também contém interfaces explícitas nos dados reais.
-            # VERSION só é interface quando explicita o protocolo; não interpretar
-            # revisões arbitrárias do produto como barramento.
             versoes = [v for v in valores(('VERSION',)) if re.fullmatch(r'sata\s*(?:iii|ii|i|[123](?:\.0)?)', v)]
             armazenamento = sorted({parte.strip() for v in [*valores(('INTERFACES','CONNECTIVITY')), *versoes]
                 for parte in re.split(r'[,;]\s*(?=[a-z])', v) if parte.strip()})
             specs['interface'] = [v for v in armazenamento
                 if re.search(r'\b(?:sata|pcie|pci[ -]?(?:e|express)|usb|sas)', v)]
         if categoria=='ssd':
-            # SSD/SATA/NVMe são conceitos distintos. O tipo interno vem da interface explícita.
             interfaces=armazenamento
             specs['tecnologia_armazenamento']=specs.pop('tipo',[])
             specs['tipo']=[v for v in interfaces if 'nvme' in v or 'sata' in v]

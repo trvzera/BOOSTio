@@ -23,7 +23,6 @@ class MigrarOfertasKabumService:
         resumo = {'simulacao': simular, 'criadas': 0, 'atualizadas': 0, 'inalteradas': 0,
                   'sem_link': 0, 'link_invalido': 0, 'conflitos': [], 'historicos': 0}
         inspetor = inspect(db.engine)
-        # Verificado uma vez, fora da transação: consultar o esquema no meio dela pode descartá-la.
         self.historico_antigo = inspetor.has_table('historico_preco')
         if not simular and db.engine.dialect.name == 'mysql':
             self._tornar_colunas_antigas_opcionais(inspetor)

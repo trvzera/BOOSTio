@@ -98,7 +98,6 @@ class SeletorInteligenteService:
         for tipo in AjustarOrcamentoBuildService.AJUSTAVEIS:
             if tipo in excluidas:
                 continue
-            # Não enviar o pool inteiro à IA; usá-lo só para reparar a resposta concreta.
             fichas = [ficha_catalogo(p) for p in contexto["pools"].get(tipo, [])]
             catalogo[tipo] = list({p["id"]: p for p in [*catalogo.get(tipo, []), *fichas]}.values())
         return catalogo
@@ -259,9 +258,8 @@ class SeletorInteligenteService:
             return viaveis
         if any(estimativas.get(p["id"]) is not None for p in pecas):
             plano["avisos"].append("Nenhuma plataforma confirmável cabe com as reservas mínimas do conjunto.")
-            # Ausência de ficha não prova inviabilidade: manter as alternativas pendentes.
             return [p for p in pecas if estimativas.get(p["id"]) is None]
-        return pecas  # Dados incompletos: preservar alternativas, sem afirmar viabilidade.
+        return pecas
 
 
     def _selecionar_demais_pecas(self, contexto, excluidas, selecionados):

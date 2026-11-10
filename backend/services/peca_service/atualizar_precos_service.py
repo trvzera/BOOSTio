@@ -104,7 +104,6 @@ class AtualizarPrecosService:
             consulta.status = "falha"
             consulta.erro = str(erro)[:300]
             resumo["falhas"] += 1
-        # A peça, o histórico e o resultado da tentativa são confirmados juntos.
         consulta.confirmar()
         if alteracoes is not None:
             resumo["historicos"] += 1

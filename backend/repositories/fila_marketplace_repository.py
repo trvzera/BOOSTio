@@ -26,7 +26,7 @@ class RepositorioFilaMarketplace:
                     if s.execute(select(Limite.id).filter_by(loja=loja)).first() is None:
                         s.add(Limite(loja=loja))
             except IntegrityError:
-                pass  # Outro preparador inseriu a mesma identidade única.
+                pass
 
     def enfileirar(self, loja, chave, tipo, dados):
         try:
@@ -44,8 +44,6 @@ class RepositorioFilaMarketplace:
             limite = self._limite(s, loja, agora)
             if limite.bloqueado or limite.pausado_ate > agora:
                 return None
-            # Chamador mantém uma trava exclusiva por marketplace. Executando é
-            # recuperável assim que o processo anterior libera a trava ou encerra.
             tarefa = s.execute(select(Tarefa).where(Tarefa.loja == loja,
                 ((Tarefa.status == 'pendente') & (Tarefa.disponivel_em <= agora)) |
                 (Tarefa.status == 'executando')).order_by(Tarefa.id).limit(1)).scalar_one_or_none()
@@ -83,7 +81,6 @@ class RepositorioFilaMarketplace:
     def suspender(self, loja, agora, *, espera=0, bloquear=False, rate_limit=False):
         with Session(db.engine) as s, s.begin():
             limite = self._limite(s, loja, agora)
-            # UPDATE condicional impede que concorrentes encurtem uma pausa longa.
             ate = agora + timedelta(seconds=espera)
             s.execute(update(Limite).where(Limite.id == limite.id, Limite.pausado_ate < ate).values(pausado_ate=ate))
             if rate_limit:

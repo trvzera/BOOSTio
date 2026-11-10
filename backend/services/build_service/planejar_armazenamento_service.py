@@ -10,7 +10,6 @@ class PlanejarArmazenamentoService:
 
     @staticmethod
     def _fronteira(pecas):
-        # Somente para estimar custo de capacidade, não para remover peças do catálogo.
         validas = [p for p in pecas if type(p.get('capacidade_gb')) is int and p['capacidade_gb'] > 0]
         validas.sort(key=lambda p: (Decimal(str(p['preco'])), -p['capacidade_gb'], str(p['id'])))
         fronteira, maior = [], 0

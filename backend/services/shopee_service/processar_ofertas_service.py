@@ -70,7 +70,6 @@ class ProcessarOfertasShopeeService:
                     self._classificar(bruto, categoria, identificador, indice, confirmados, ambiguos, resumo)
                 tem_mais = resposta['pageInfo']['hasNextPage']
                 completa = not tem_mais
-                # Identidade comprovada basta; nunca repetir páginas sem novidade nem paginar sem fim.
                 if confirmados or not novos or not tem_mais or len(nos) < self.POR_PAGINA:
                     break
                 pagina += 1
@@ -100,7 +99,6 @@ class ProcessarOfertasShopeeService:
             confirmados.append((oferta, produto))
         else:
             resumo['revisao'] += 1
-            # Ambígua que envolve esta peça: guardar para revisão, em vez de perder na próxima busca.
             if decisao['classificacao'] == 'ambigua' and any(c['peca'] == identificador for c in decisao['candidatos']):
                 ambiguos.append((bruto, produto, oferta, decisao))
 
@@ -119,7 +117,7 @@ class ProcessarOfertasShopeeService:
                 ProdutoPendente.registrar_matching(pendente.id, decisao, assinatura_documento(pendente.dados_originais), simular=False)
                 registradas += 1
             except ValueError:
-                continue  # já importada ou rejeitada: a decisão anterior vale
+                continue
         return registradas
 
     @staticmethod
@@ -168,7 +166,6 @@ class ProcessarOfertasShopeeService:
         if produto.contexto.get('variantes_nao_resolvidas'):
             return dict(acao='revisao', motivo='Variantes sem identificação de preço individual')
         produto, ficha = EnriquecerNormalizadoService().executar(produto)
-        # Preço e disponibilidade são da oferta; entram na ficha só para a validação comercial.
         ficha['dados'].setdefault('preco', float(oferta['preco']))
         ficha['dados'].setdefault('esgotado', False)
         for campo in ('preco', 'esgotado'):

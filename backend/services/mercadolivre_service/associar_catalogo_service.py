@@ -67,10 +67,7 @@ class AssociarCatalogoService:
                         catalogos.append(dict(catalogo_id=produto['id'], assinatura=assinatura,
                             criterio=comparacao['criterio'], percentual=comparacao['percentual']))
                     elif decisao['classificacao'] == 'ambigua' and any(c['peca'] == referencia for c in decisao['candidatos']):
-                        # Como na Shopee: dúvida real que envolve esta peça vira pendência para revisão.
                         ambiguos.append(dict(produto=produto, normal=normal, decisao=decisao))
-                # Uma identidade comprovada já basta. Nunca paginar indefinidamente
-                # nem repetir páginas ignoradas pelo servidor.
                 if catalogos or not novos or len(linhas) < 20 or offset + len(linhas) >= total or offset >= 20:
                     break
                 offset += len(linhas)
@@ -121,7 +118,6 @@ class AssociarCatalogoService:
             return {'status': 'encontrada', 'catalogo_id': existente.catalogo_id,
                     'assinatura': assinatura, 'criterio': existente.criterio,
                     'assinatura_catalogo': existente.assinatura_catalogo}
-        # Busca textual produz candidatos, nunca prova identidade por si só.
         consulta = self._mpn(peca) or f'{peca.fabricante} {peca.modelo}'
         parametros = {'site_id': 'MLB', 'status': 'active', 'q': consulta, 'limit': 20}
         if peca.__tablename__ == 'processador':

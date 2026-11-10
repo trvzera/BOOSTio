@@ -51,7 +51,6 @@ class ImportarReferenciasPassmarkService:
         termos = ('2048sp','mobile','laptop','max q','max-q','oem','es','qs') + (('pro',) if tipo == 'cpu' else ())
         variante = tuple(termo for termo in termos
                          if re.search(r'(?<!\w)' + re.escape(termo) + r'(?!\w)', nome))
-        # OEM de embalagem em CPU não muda o modelo; GPU OEM pode ser outra variante.
         if tipo == 'cpu':
             variante = tuple(x for x in variante if x != 'oem')
         return next(iter(identidades)), variante
@@ -88,10 +87,8 @@ class ImportarReferenciasPassmarkService:
                 continue
             achados.add(ident)
         if len(achados) > 1:
-            # Vários da mesma família (ex.: RX 5700 XT e RX 5700 XT 50th Anniversary): vale o que tem exatamente o nome do cadastro.
             exatos = {i for i in achados if cls._nome_basico(ids[i][0]['nome']) == cls._nome_basico(nome)}
             if len(exatos) > 1 and tipo == 'gpu':
-                # Entre cópias do mesmo nome, vale a que cita a mesma memória do cadastro.
                 exatos = {i for i in exatos if {int(x) for x in re.findall(r'\b(\d+)\s*gb\b', ids[i][0]['nome'], re.I)} == {peca.memoria_gb}}
             if len(exatos) == 1:
                 return exatos
@@ -154,7 +151,6 @@ class ImportarReferenciasPassmarkService:
         if type(lote) is not int or lote < 1:
             raise ValueError('O lote deve ser positivo')
         aliases, sha_alias = self._associacoes()
-        # Todos os arquivos e associações são lidos antes de confirmar qualquer lote.
         fontes = [(t,*self._ler(p,t)) for t,p in (('cpu',cpu),('gpu',gpu)) if p]
         contadores = ('atualizadas','propostas','inalteradas','nao_encontradas','ambiguas','invalidas')
         resumo = dict(simulacao=simular, fonte=FONTE, associacoes_sha256=sha_alias,

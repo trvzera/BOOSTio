@@ -18,7 +18,6 @@ class IdentidadeFabricante(ModeloBase):
 
     @classmethod
     def buscar(cls, peca):
-        # Compatível com instalações que ainda não fizeram esta migração.
         if not inspect(db.session.connection()).has_table(cls.__tablename__):
             return None
         obj = cls.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id).first()

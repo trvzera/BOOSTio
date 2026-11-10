@@ -30,8 +30,6 @@ class CompararCodigoModeloService:
     @staticmethod
     def extrair(texto, categoria):
         normalizado = nome(texto)
-        # A normalização de nomes separa RTX4060 para comparar chips. Dentro
-        # de um SKU hifenizado, preserve DUAL-RTX4060-O8G-EVO inteiro.
         normalizado = re.sub(r'(?<=[/-])(rtx|gtx|rx)\s+(?=\d)', r'\1', normalizado)
         tokens = set(re.findall(r'(?<![a-z0-9/_.-])[a-z][a-z0-9]*(?:[-./][a-z0-9]+)*(?![a-z0-9/_.-])', normalizado))
         resultado = set()
@@ -41,7 +39,7 @@ class CompararCodigoModeloService:
             if re.match(r'^(?:ddr|gddr|wifi|cl\d|lga|am[2345]|cat[5678]|usb|pcie|nvme|sata|gen\d|pc[345]-|seed-|kabum-|rede-)', token):
                 continue
             if re.fullmatch(r'[a-z]{1,4}\d{0,2}\.\d{1,2}', token):
-                continue  # Versão de linha/protocolo não identifica um SKU completo.
+                continue
             if categoria == 'placa_mae' and re.fullmatch(r'[abhxzwq]\d{3}[a-z]?', token):
                 continue
             if re.fullmatch(r'(?:rtx|gtx|rx|arc)\d+[a-z]*|(?:ryzen|corei|i)[3579]|[a-z]*\d+(?:gb|tb|mhz|hz|mm|cm|mbps)', token):

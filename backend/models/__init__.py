@@ -3,17 +3,13 @@ from flask_login import LoginManager
 from flask_mail import Mail
 
 
-#Importante iniciar antes de importar
 db = SQLAlchemy()
 
-#Iniciar o flask_login
 lm = LoginManager()
 
-#Iniciar o flask_mail
 mail = Mail()
 
 
-#Importar em ordem de heranca
 from .base import ModeloBase
 from .peca import Peca
 from .perifericos import Periferico
@@ -56,11 +52,9 @@ from .ficha_tecnica_catalogo import FichaTecnicaCatalogo, RevisaoFichaTecnica
 
 from .tarefa_marketplace import TarefaMarketplace, LimiteMarketplace
 
-# Preço e link das peças vêm das ofertas; depende de todos os models acima.
 from .preco_oferta import instalar_precos_derivados
 instalar_precos_derivados()
 
-#Funcão obrigatória para o login buscar informações do usuario pelo id
 @lm.user_loader
 def user_loader(id: str) -> Usuario | None:
     usuario = Usuario.buscar_por_sessao(id)

@@ -79,12 +79,12 @@ def test_associa_menor_preco_de_cada_loja_e_grava_oferta(banco):
     r = rodar(s, p5500, simular=False, limite_ofertas=2)
     assert r['associadas'] == 2 and r['peca'] == f'processador:{p5500.id}'
     ofertas = {o.produto_id_loja: o for o in Oferta.query.filter_by(loja='shopee')}
-    assert set(ofertas) == {'10:2', '11:3'}  # um anúncio por loja: o mais barato
+    assert set(ofertas) == {'10:2', '11:3'}
     assert ofertas['10:2'].preco == Decimal('800.00') and ofertas['10:2'].ativa
     assert HistoricoOferta.query.count() == 2
     assert all(pend.status == 'importado' for pend in ProdutoPendente.query.all())
     db.session.refresh(p5500)
-    assert p5500.preco == 800  # o menor preço entre as ofertas passa a ser o da peça
+    assert p5500.preco == 800
 
 
 def test_simulacao_nao_grava_nada(banco):
@@ -136,11 +136,9 @@ def test_desativa_ofertas_ausentes_somente_com_busca_completa(banco):
     p5500, _ = banco
     q = consultas(p5500)[0]
     rodar(servico(((q, 1), ([anuncio(1, 10, CPU, '900.00')], False))), p5500, simular=False)
-    # busca completa sem o anúncio antigo: o novo menor preço entra e o antigo é desativado
     r = rodar(servico(((q, 1), ([anuncio(2, 11, CPU, '800.00')], False))), p5500, simular=False)
     antigo = Oferta.query.filter_by(produto_id_loja='10:1').one()
     assert antigo.ativa is False and any(d['acao'] == 'desativada' for d in r['detalhes'])
-    # busca incompleta (há mais páginas): nada é desativado
     rodar(servico(((q, 1), ([anuncio(3, 12, CPU, '700.00')], True))), p5500, simular=False)
     assert Oferta.query.filter_by(produto_id_loja='11:2').one().ativa is True
 
@@ -261,7 +259,7 @@ def test_nao_cadastra_quando_o_titulo_nao_prova_a_quantidade_de_pentes(banco, mo
 
 def test_anuncio_ambiguo_vai_para_pendencias_em_revisao_sem_criar_oferta(banco):
     p5500, p5600 = banco
-    titulo = 'Processador AMD Ryzen 5 AM4 6 Núcleos 12 Threads'  # serve para as duas peças
+    titulo = 'Processador AMD Ryzen 5 AM4 6 Núcleos 12 Threads'
     s = servico(((consultas(p5500)[0], 1), ([anuncio(1, 10, titulo)], False)))
     simulado = rodar(s, p5500, simular=True)
     assert simulado['ambiguas'] == 1 and ProdutoPendente.query.count() == 0
@@ -271,7 +269,6 @@ def test_anuncio_ambiguo_vai_para_pendencias_em_revisao_sem_criar_oferta(banco):
     assert pendente.status == 'em_revisao' and pendente.loja == 'shopee' and pendente.produto_id_loja == '10:1'
     assert pendente.motivo.startswith('Matching') and {c['peca'] for c in pendente.candidatos} >= {
         f'processador:{p5500.id}', f'processador:{p5600.id}'}
-    # nova busca não duplica nem reabre uma pendência já decidida
     rodar(s, p5500, simular=False)
     assert ProdutoPendente.query.count() == 1
     pendente.status = 'rejeitado'

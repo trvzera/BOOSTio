@@ -11,7 +11,6 @@ from services.catalogo_service.normalizar_produto import nome as normalizar_nome
 from utils.url_shopee import validar_url_shopee
 
 
-# Títulos da Shopee são escritos pelo vendedor: retirar propaganda sem tocar em modelo, capacidade ou sufixo.
 _RUIDO = re.compile(
     r'[\U0001F000-\U0001FAFF\u2600-\u27BF\u3010\u3011\u300A\u300B\u2B50]|'
     r'\b(?:frete\s+gr[aá]tis|envio\s+(?:imediato|r[aá]pido|em\s+24\s*h)|pronta\s+entrega|entrega\s+r[aá]pida|'
@@ -36,7 +35,6 @@ def identificar_marca(titulo, marcas):
         chave = normalizar_marca(original)
         if chave and re.search(r'(?<!\w)' + re.escape(chave) + r'(?!\w)', texto):
             achadas.setdefault(chave, original)
-    # "kingston" e "kingston technology" são a mesma marca citada; vale a mais específica.
     finais = {c: o for c, o in achadas.items() if not any(c != d and c in d for d in achadas)}
     return finais
 
@@ -69,8 +67,6 @@ class NormalizarProdutoShopeeService:
         original, titulo = titulo, limpar_titulo(titulo) or titulo
         contexto = {'variantes_nao_resolvidas': self._variantes(titulo, categoria),
                     'titulo_original': original, 'usado': bool(_USADO.search(original))}
-        # Categorias observadas na API oficial. Demais categorias permanecem
-        # não confirmadas até existir evidência, nunca inferidas do termo buscado.
         confirmada = self.CATEGORIAS_OBSERVADAS.get(categoria) in anuncio.get('productCatIds', [])
         contexto['variantes_nao_resolvidas'] |= bool(re.search(
             r'\b(organizador|adaptador|conversor|suporte|reposição|reposicao)\b', titulo, re.I))

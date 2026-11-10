@@ -52,7 +52,6 @@ class NormalizarFichaFabricanteService:
         pares={k:next(iter(v)) for k,v in parser.pares.items() if len(v)==1}
         candidatos=[]
         procurados={codigo(v) for v in valores(produto.identificadores.get('mpn')) if isinstance(v,str)}
-        # Um modelo comercial também ajuda a escolher variantes estruturadas.
         if produto.modelo:procurados.add(codigo(produto.modelo))
         gtins={gtin(v) for v in valores(produto.identificadores.get('gtin')) if gtin(v)}
         for script in parser.scripts:
@@ -84,12 +83,9 @@ class NormalizarFichaFabricanteService:
                 if pares.get(origem):dados[destino]=pares[origem]
             if pares.get('Lighting') in ('RGB','None'):
                 dados['iluminacao']=pares['Lighting']=='RGB'
-            # O modelo legado armazena MHz. MT/s exige tratamento próprio e
-            # permanece como evidência, sem conversão silenciosa para frequência.
             velocidade=re.fullmatch(r'(\d+)\s*MHz',pares.get('Tested Speed',''),re.I)
             if velocidade:dados['frequencia_mhz']=int(velocidade[1])
         elif fabricante=='logitech' and produto.categoria=='mouse':
-            # Apenas atributos explicitamente estruturados da variante escolhida.
             for campo in item.get('additionalProperty',[]):
                 if campo.get('name')=='Resolution':
                     m=re.fullmatch(r'(\d+)\s*DPI',str(campo.get('value','')),re.I)

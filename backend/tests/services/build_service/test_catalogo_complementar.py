@@ -68,7 +68,6 @@ def test_cli_idempotente_simula_sem_gravar_e_preserva_anuncio_existente(tmp_path
     registrar_comandos_precos(app)
     with app.app_context():
         db.create_all()
-        # Mesmo anúncio já cadastrado com ID interno: não duplicar por mudar PN.
         antiga = Fan(fabricante="ARCTIC", modelo="Nome interno", part_number="KABUM-464964",
                      tamanho_mm=120, quantidade=1, consumo_energia=2, preco=123, esgotado=False,
                      kabum_external="https://www.kabum.com.br/produto/464964/outro-slug")

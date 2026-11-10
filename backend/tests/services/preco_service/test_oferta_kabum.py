@@ -123,7 +123,6 @@ def test_shopee_conta_como_disponivel_mesmo_sem_informar_estoque(banco):
     banco.session.refresh(p)
     assert p.preco == 700 and p.esgotado is False
     assert PlacaVideo.listar_candidatos_disponiveis(800) == [p]
-    # Mercado Livre sem estoque conhecido continua não entrando nas builds.
     banco.session.add(Oferta(tabela_peca='placa_video', peca_id=p.id, loja='mercado_livre', produto_id_loja='MLB9',
                              vendedor_id='1', url='https://produto.mercadolivre.com.br/MLB-9-x', preco=Decimal('500'), esgotado=None))
     banco.session.commit()
@@ -150,7 +149,6 @@ def test_peca_sem_oferta_com_preco_nao_existe_para_o_usuario(banco):
     assert PlacaVideo.buscar_publicada_por_id(com_preco.id) is not None
     catalogo = ListarCatalogoBuildService().executar()
     assert [p['id'] for p in catalogo] == [f'placa_video:{com_preco.id}']
-    # A marca continua conhecida para reconhecer anúncios, mesmo sem preço.
     assert PlacaVideo.fabricantes_para_descoberta() == ['Marca']
 
 
@@ -181,5 +179,4 @@ def test_cooler_sem_socket_identificavel_nao_e_candidato_a_montagem(banco):
     assert [c.id for c in AirCooler.listar_candidatos_disponiveis(1000)] == [claro.id]
     assert [c.id for c in WaterCooler.listar_candidatos_disponiveis(1000)] == [agua.id]
     assert [c.id for c in AirCooler.listar_disponiveis_ate(1000)] == [claro.id]
-    # continuam no catálogo do site: só deixam de ser oferecidos à montagem automática
     assert {c.id for c in AirCooler.listar_publicadas()} == {vago.id, claro.id}

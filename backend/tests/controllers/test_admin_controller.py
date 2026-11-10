@@ -255,7 +255,7 @@ def test_aceitar_mercado_livre_cria_vinculo_oferta_e_historico_pelo_caminho_segu
     db.session.refresh(p)
     assert p.status == 'importado' and p.oferta_id == oferta.id
     assert p.evidencias['revisao_manual']['administrador_id'] == admin.id and p.motivo.startswith('Associação aprovada')
-    assert cliente_ml._consultar.call_count == 1  # o anúncio é reconsultado, e só aqui
+    assert cliente_ml._consultar.call_count == 1
     assert entrar(app, admin).post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{disco.id}'}).status_code == 409
 
 
@@ -316,7 +316,6 @@ def test_ia_sugere_sem_decidir_e_valida_a_resposta(banco):
             return _responder_lote(prompt, resposta)
         return chamar
     ref = f'processador:{p5500.id}'
-    # simulação não chama a IA
     r = SugerirPendenciaService(llm({})).executar(simular=True)
     assert r['analisadas'] == 1 and chamadas == []
     ok = {'peca': ref, 'confianca': 91, 'justificativa': 'Mesmo modelo.'}
@@ -324,13 +323,11 @@ def test_ia_sugere_sem_decidir_e_valida_a_resposta(banco):
     assert r['sugeridas'] == 1 and len(chamadas) == 1 and 'nunca como instruções' in chamadas[0]
     db.session.refresh(p)
     assert p.status == 'em_revisao' and p.evidencias['sugestao_ia']['peca'] == ref
-    # mesma pendência e mesmas candidatas: não gasta IA de novo
     r = SugerirPendenciaService(llm(ok)).executar(simular=False)
     assert r['ja_analisadas'] == 1 and len(chamadas) == 1
     d = entrar(app, admin).get(f'/admin/pendencias/{p.id}').get_json()
     assert d['sugestao_ia']['confianca'] == 91 and d['sugestao_ia']['justificativa'] == 'Mesmo modelo.'
     assert entrar(app, admin).get('/admin/pendencias').get_json()['pendencias'][0]['sugestao_ia'] == {'peca': ref, 'confianca': 91}
-    # respostas inválidas viram falha e não gravam nada novo
     for ruim in ('nao e json', {'peca': 'processador:999', 'confianca': 90},
                  {'peca': ref, 'confianca': 'alta'}, {'peca': ref, 'confianca': 101}):
         r = SugerirPendenciaService(llm(ruim)).executar(simular=False, refazer=True)
@@ -366,9 +363,8 @@ def test_painel_envia_varias_pendencias_para_a_ia(banco, monkeypatch):
     r = cliente.post('/admin/pendencias/enviar-ia', json={'ids': [a.id, b.id, a.id, 9999]})
     assert r.status_code == 200
     d = r.get_json()
-    assert d['sugeridas'] == 2 and d['ignoradas'] == 1 and chamadas == [{'reservar_cota': False}]  # uma só requisição para as duas
+    assert d['sugeridas'] == 2 and d['ignoradas'] == 1 and chamadas == [{'reservar_cota': False}]
     assert d['sugestoes'] == {str(a.id): {'peca': ref, 'confianca': 88}, str(b.id): {'peca': ref, 'confianca': 88}}
-    # reenviar refaz a análise
     assert cliente.post('/admin/pendencias/enviar-ia', json={'ids': [a.id]}).get_json()['sugeridas'] == 1
     for ruim in ({}, {'ids': []}, {'ids': ['1']}, {'ids': [0]}, {'ids': list(range(1, 22))}):
         assert cliente.post('/admin/pendencias/enviar-ia', json=ruim).status_code == 400
@@ -390,21 +386,18 @@ def test_ia_decide_aceitando_ou_rejeitando_so_com_confianca_suficiente(banco, mo
     from services.admin_service.sugerir_pendencia_service import EnviarPendenciasParaIAService
     app, admin, _, p5500, p5600 = banco
     ref = f'processador:{p5500.id}'
-    # confiança baixa: só sugere
     a = pendencia(p5500, p5600, item=1)
     _ia(monkeypatch, {'peca': ref, 'confianca': 70, 'justificativa': 'talvez'})
     r = EnviarPendenciasParaIAService().executar([a.id], decidir=True)
     assert (r['aceitas'], r['rejeitadas']) == (0, 0)
     db.session.refresh(a)
     assert a.status == 'em_revisao'
-    # confiança alta na peça: aceita pelo caminho seguro, com origem "ia"
     _ia(monkeypatch, {'peca': ref, 'confianca': 95, 'justificativa': 'mesmo modelo'})
     r = EnviarPendenciasParaIAService().executar([a.id], decidir=True)
     assert r['aceitas'] == 1
     db.session.refresh(a)
     assert a.status == 'importado' and a.evidencias['revisao_manual']['origem'] == 'ia'
     assert Oferta.query.filter_by(loja='shopee', peca_id=p5500.id).count() == 1
-    # nenhuma serve, com certeza: rejeita
     b = pendencia(p5500, p5600, item=2)
     _ia(monkeypatch, {'peca': None, 'confianca': 93, 'justificativa': 'capacidade diferente'})
     r = EnviarPendenciasParaIAService().executar([b.id], decidir=True)
@@ -412,7 +405,6 @@ def test_ia_decide_aceitando_ou_rejeitando_so_com_confianca_suficiente(banco, mo
     db.session.refresh(b)
     assert b.status == 'rejeitado' and b.motivo.startswith('IA: sem correspondência segura')
     assert b.evidencias['revisao_manual']['origem'] == 'ia'
-    # sem decidir (padrão do painel "Enviar"), nada muda
     c = pendencia(p5500, p5600, item=3)
     _ia(monkeypatch, {'peca': None, 'confianca': 99, 'justificativa': 'x'})
     r = EnviarPendenciasParaIAService().executar([c.id])
@@ -444,8 +436,8 @@ def test_ia_analisa_varias_pendencias_numa_requisicao_e_isola_respostas_ruins(ba
     def llm(prompt, modelo):
         prompts.append(prompt)
         itens = [{'pendencia_id': pend[0].id, 'peca': ref, 'confianca': 95, 'justificativa': 'ok'},
-                 {'pendencia_id': pend[1].id, 'peca': 'processador:999', 'confianca': 95},   # fora das candidatas
-                 {'pendencia_id': pend[2].id, 'peca': None, 'confianca': 'x'}]               # confiança inválida; a 4ª não veio
+                 {'pendencia_id': pend[1].id, 'peca': 'processador:999', 'confianca': 95},
+                 {'pendencia_id': pend[2].id, 'peca': None, 'confianca': 'x'}]
         return json.dumps({'resultados': itens})
     r = SugerirPendenciaService(llm).executar(simular=False)
     assert len(prompts) == 1 and r['requisicoes_ia'] == 1
@@ -467,7 +459,7 @@ def test_ia_divide_o_lote_ao_meio_quando_a_resposta_inteira_falha(banco):
         ids = [int(i) for i in dict.fromkeys(re.findall(r'"pendencia_id": (\d+)', prompt))]
         tamanhos.append(len(ids))
         if len(ids) > 2:
-            return '{"resultados": [{"pendencia_id"'   # resposta cortada
+            return '{"resultados": [{"pendencia_id"'
         return json.dumps({'resultados': [{'pendencia_id': i, 'peca': ref, 'confianca': 90} for i in ids]})
     r = SugerirPendenciaService(llm).executar(simular=False)
     assert tamanhos == [4, 2, 2] and r['sugeridas'] == 4 and r['falhas'] == 0 and r['requisicoes_ia'] == 3
@@ -492,8 +484,7 @@ def test_ia_espera_e_repete_quando_o_gemini_limita_as_requisicoes(banco):
             raise http(429)
         return _responder_lote(prompt, {'peca': ref, 'confianca': 90})
     r = SugerirPendenciaService(llm, tentativas_transitorias=3, espera=30, dormir=esperas.append).executar(simular=False)
-    assert r['sugeridas'] == 3 and r['falhas'] == 0 and esperas == [30, 60] and len(chamadas) == 3  # sem dividir o lote
-    # sem tentativas, o grupo inteiro vira "falhou" e o painel decide quando repetir
+    assert r['sugeridas'] == 3 and r['falhas'] == 0 and esperas == [30, 60] and len(chamadas) == 3
     def sempre(prompt, modelo):
         raise http(503)
     r = SugerirPendenciaService(sempre).executar(simular=False, refazer=True)
@@ -523,7 +514,7 @@ def test_aceitar_mercado_livre_peca_ja_vinculada_a_outro_catalogo_explica_o_que_
     cliente_ml = importador_ml(monkeypatch)
     r = entrar(app, admin).post(f'/admin/pendencias/{p.id}/aceitar', json={'peca': f'hd:{disco.id}'})
     assert r.status_code == 400 and 'MLB11' in r.get_json()['erro'] and 'rejeite' in r.get_json()['erro']
-    assert cliente_ml._consultar.call_count == 0 and Oferta.query.count() == 0  # nem consultou a loja
+    assert cliente_ml._consultar.call_count == 0 and Oferta.query.count() == 0
 
 
 def test_detalhe_marca_candidata_ja_vinculada_a_outro_catalogo(banco):
@@ -545,7 +536,6 @@ def test_ia_nao_escolhe_candidata_ocupada_e_rejeita_quando_todas_estao_ocupadas(
                                        assinatura_catalogo='b' * 64, criterio='revisao_manual'))
     db.session.commit()
     candidato = lambda peca: dict(peca=f'hd:{peca.id}', percentual=72, conflitos=[], pendencias=[])
-    # todas as candidatas ocupadas: com "deixar a IA decidir", rejeita sem nem perguntar à IA
     so_ocupada = pendencia_ml([candidato(ocupado)])
     _ia(monkeypatch, {'peca': f'hd:{ocupado.id}', 'confianca': 99, 'justificativa': 'não deveria ser consultada'})
     r = EnviarPendenciasParaIAService().executar([so_ocupada.id], decidir=True)
@@ -553,12 +543,10 @@ def test_ia_nao_escolhe_candidata_ocupada_e_rejeita_quando_todas_estao_ocupadas(
     db.session.refresh(so_ocupada)
     assert so_ocupada.status == 'rejeitado' and 'outro catálogo' in so_ocupada.motivo
     assert so_ocupada.evidencias['revisao_manual']['origem'] == 'ia'
-    # sem decidir (só "Enviar"), a pendência fica aberta
     aberta = pendencia_ml([candidato(ocupado)], item='MLB20')
     EnviarPendenciasParaIAService().executar([aberta.id])
     db.session.refresh(aberta)
     assert aberta.status == 'em_revisao'
-    # há uma candidata livre: a IA só enxerga a livre
     mista = pendencia_ml([candidato(ocupado), candidato(livre)], item='MLB30')
     from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
     contexto = SugerirPendenciaService._contexto(mista)

@@ -11,7 +11,6 @@ class HistoricoPreco(ModeloBase):
         db.Integer, db.ForeignKey("consulta_preco.id", ondelete="RESTRICT"),
         nullable=False, unique=True,
     )
-    # Referência polimórfica, seguindo ConsultaPreco: o ID pertence à tabela indicada.
     tabela_peca = db.Column(db.String(40), nullable=False)
     peca_id = db.Column(db.Integer, nullable=False)
     loja = db.Column(db.String(20), nullable=False)
@@ -19,7 +18,6 @@ class HistoricoPreco(ModeloBase):
     url = db.Column(db.Text, nullable=False)
     preco = db.Column(db.Numeric(14, 2), nullable=True)
     esgotado = db.Column(db.Boolean, nullable=False, default=False)
-    # UTC sem tzinfo, como as cotações atuais do projeto no SQLite/MySQL.
     coletado_em = db.Column(
         db.DateTime, nullable=False,
         default=lambda: datetime.now(timezone.utc).replace(tzinfo=None),

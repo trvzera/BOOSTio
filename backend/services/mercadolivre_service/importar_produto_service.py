@@ -36,7 +36,6 @@ class ImportarProdutoService:
         if p.categoria_sugerida not in modelos:raise ValueError('Categoria precisa de revisão')
         categoria=p.categoria_sugerida;bruto=p.dados_originais;assinatura=assinatura_documento(bruto)
         produto,anuncio=self._consultar_anuncio(p)
-        # Somente preço e estoque atuais; nunca reutilizar a cotação antiga da descoberta.
         entrada={'price':anuncio['preco'],'available_quantity':anuncio.get('quantidade_disponivel')}
         if (bruto.get('anuncio') or {}).get('title'):entrada['title']=bruto['anuncio']['title']
         ficha=self.enriquecedor.executar(categoria,produto,entrada)
@@ -50,8 +49,6 @@ class ImportarProdutoService:
         if permitir_novos and (self.base_icecat is not None or self.fabricantes is not None):
             from services.catalogo_service.indice_candidatos_service import IndiceCandidatosService
             decisao=IndiceCandidatosService.carregar(modelos[categoria]).avaliar(normalizado)
-            # Uma ficha técnica também pode resolver lacunas de uma associação
-            # ambígua. A decisão é refeita sob bloqueio depois do enriquecimento.
             if decisao['classificacao']!='confirmada':
                 if self.base_icecat is not None:
                     normalizado,ficha=self.base_icecat.executar(normalizado,ficha)

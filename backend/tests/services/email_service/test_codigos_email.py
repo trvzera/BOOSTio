@@ -37,7 +37,6 @@ class TestCodigosEmail(unittest.TestCase):
         with self.cliente.session_transaction() as sessao:
             sessao["_user_id"] = usuario.get_id()
             sessao["_fresh"] = True
-        # O blueprint de autenticação não é necessário neste teste; a sessão é preparada diretamente.
         with self.cliente.session_transaction() as sessao:
             sessao["csrf_token"] = "token-para-testes"
         self.cabecalhos = {"X-CSRF-Token": "token-para-testes"}

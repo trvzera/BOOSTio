@@ -72,7 +72,6 @@ def test_busca_por_tokens_nao_perde_duplicata_quando_catalogo_cresce():
     ficha = dict(categoria='processador', fabricante='amd', nome='Novo nome', mpns=[], bruto={})
 
     assert repo._proximos(ficha, chave) == {existente}
-    # O token compartilhado deixa de ser o mais raro. A revisão deve permanecer.
     repo.tokens[('processador', 'amd', '1234')].add(outro)
     assert repo._proximos(ficha, chave) == {existente}
 

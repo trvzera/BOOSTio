@@ -58,6 +58,5 @@ def test_robots_bloqueia_antes_de_buscar_pagina(tmp_path,monkeypatch):
 
 def test_dois_skus_confirmados_da_mesma_familia_exigem_revisao():
     h=html()+html('CMW16GX4M2C3200C16W')
-    # O anúncio mantém o SKU preto exato: a variante branca não participa.
     r=NormalizarFichaFabricanteService().executar(h,'https://www.corsair.com/p','corsair',produto())
     assert r['identidade']['mpn']=='CMW16GX4M2C3200C16'

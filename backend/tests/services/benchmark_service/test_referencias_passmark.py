@@ -242,19 +242,18 @@ def test_gpu_casa_pelo_chip_do_modelo_referencia_e_nao_pelo_nome_do_anuncio(banc
                                     gpu_fonte(3, 'GeForce RTX 4060', '19000')])
     ImportarBenchmarksService().executar(gpu=arq)
     assert ok.benchmark_g3d == Decimal('7000') and ok.benchmark_nome_fonte == 'GeForce GTX 1650'
-    # Ti não vira a 4060 comum, e "8 GB" do cadastro não impede o casamento com o nome sem memória.
     assert ti.benchmark_g3d == Decimal('22000')
 
 
 def test_gpu_sem_chip_unico_ou_com_memoria_diferente_fica_sem_benchmark(banco, tmp_path):
-    a = inserir_gpu('Anúncio A', 'GeForce RTX 3060 12GB', 8)       # fonte cita 12GB; cadastro tem 8
-    b = inserir_gpu('Anúncio B', 'GeForce GTX 1060', 3)             # duas entradas iguais na fonte
-    c = inserir_gpu('Anúncio C', None, 8)                           # sem referência
+    a = inserir_gpu('Anúncio A', 'GeForce RTX 3060 12GB', 8)
+    b = inserir_gpu('Anúncio B', 'GeForce GTX 1060', 3)
+    c = inserir_gpu('Anúncio C', None, 8)
     arq = arquivo(tmp_path, 'gpu', [gpu_fonte(1, 'GeForce RTX 3060 12GB'), gpu_fonte(2, 'GeForce GTX 1060', '9000'),
                                     gpu_fonte(3, 'GeForce GTX 1060 3GB', '8000'), gpu_fonte(4, 'GeForce GTX 1060 6GB', '9500')])
     resumo = ImportarBenchmarksService().executar(gpu=arq)
     assert a.benchmark_g3d is None and c.benchmark_g3d is None
-    assert b.benchmark_g3d == Decimal('8000')  # a cópia que cita 3 GB, a memória do cadastro
+    assert b.benchmark_g3d == Decimal('8000')
     assert resumo['por_tipo']['gpu']['atualizadas'] == 1
 
 

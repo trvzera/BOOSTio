@@ -42,7 +42,6 @@ def iterar_paginas(cliente, parametros, resumo, max_paginas, tokens=None):
                     if not isinstance(p,dict):raise ValueError('Produto inválido')
                     cliente._validar_id(p.get('id'),'catálogo')
                     if not isinstance(p.get('name'),str) or not p['name'].strip():raise ValueError('Nome ausente')
-                # Checkpoint pequeno: fichas completas serão consultadas novamente no enriquecimento.
                 estado['produtos']=json.loads(json.dumps([{k:p[k] for k in ('id','name','status','domain_id','attributes') if k in p} for p in produtos],default=str))
                 estado['total_busca']=total;estado['indice']=0;estado['ofertas_offset']=0
                 if not produtos:
@@ -60,9 +59,6 @@ def iterar_paginas(cliente, parametros, resumo, max_paginas, tokens=None):
             except ErroMercadoLivre as erro:
                 if erro.status not in (404, 206):
                     raise
-                # Catálogos removidos ou respostas parciais não fornecem ofertas
-                # confiáveis. Registrar a lacuna sem aceitar o conteúdo parcial.
-                # 401/403/429 continuam interrompendo, sem contornar restrições.
                 if erro.status == 206:
                     resumo['catalogos_incompletos'] += 1
                     resumo['leituras_pendentes'].append({'catalogo_id':produto['id'], 'http':206,

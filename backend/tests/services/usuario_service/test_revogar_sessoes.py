@@ -50,7 +50,6 @@ def test_revoga_dois_dispositivos_e_cookie_remember_sem_afetar_outro_usuario(app
     entrar(primeiro)
     entrar(segundo)
     entrar(outro, email="outro@example.com")
-    # Simula o segundo dispositivo dependendo apenas do cookie de lembrar login.
     segundo.delete_cookie(app.config["SESSION_COOKIE_NAME"])
     with app.app_context():
         usuario = Usuario.buscar_por_id(1)

@@ -25,7 +25,6 @@ class ImportarVinculosRevisadosService:
             raise ValueError('Manifesto deve conter até 5000 vínculos')
         modelos={m.__tablename__:m for m in MODELOS_PECAS}
         vistos, catalogos=set(),set()
-        # Validar todo o formato antes de gravar a primeira peça.
         for item in dados:
             self._validar(item, modelos)
             chave=(item['categoria'],item['referencia'])

@@ -11,7 +11,6 @@ class RegistrarIdentidadeFabricanteService:
         try:
             if not isinstance(mpn, str) or not mpn.strip() or len(mpn) > 100 or codigo_interno(mpn):
                 raise ValueError('Informe um código real do fabricante')
-            # Releitura bloqueada protege contra mudança da peça durante a importação.
             db.session.refresh(peca, with_for_update=True)
             if not IdentidadeFabricante.conferem(peca, especificacoes):
                 raise ValueError('Especificações locais divergem da fonte revisada')
@@ -37,6 +36,5 @@ class RegistrarIdentidadeFabricanteService:
             db.session.rollback()
             raise
         finally:
-            # Encerra também transações de leitura e simulações.
             db.session.rollback()
 

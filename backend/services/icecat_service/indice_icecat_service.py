@@ -90,7 +90,6 @@ class IndiceIcecatService:
                            'SELECT p.* FROM produto p JOIN identificador i ON i.produto_id=p.id WHERE i.gtin=? LIMIT 21')
                     grupos.append({r['id']:dict(r) for r in banco.execute(sql, (chave,))})
             if grupos:
-                # Identificadores contraditórios nunca cedem a uma busca por nome.
                 ids = set(grupos[0])
                 for grupo in grupos[1:]:
                     ids.intersection_update(grupo)
@@ -108,7 +107,6 @@ class IndiceIcecatService:
         import re
         chaves = [*valores(produto.identificadores.get('mpn')), produto.modelo,
                   *produto.modelos_alternativos]
-        # Códigos no título são candidatos, nunca evidência de identidade.
         chaves.extend(re.findall(r'[A-Za-z0-9][A-Za-z0-9/_.-]{5,99}', produto.titulo))
         chaves = sorted({codigo(v) for v in chaves if v and len(codigo(v)) >= 6
                          and re.search(r'[a-z]', codigo(v)) and re.search(r'\d', codigo(v))})

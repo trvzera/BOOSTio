@@ -15,7 +15,6 @@ def preparar_catalogo_automatizado(*, simular=True):
     if dialecto not in ('sqlite', 'mysql'):
         raise ValueError('Banco não suportado para catálogo automatizado')
     insp = inspect(db.engine)
-    # Toda a verificação precede o primeiro DDL, inclusive a detecção de duplicatas.
     for modelo in TABELAS:
         tabela = modelo.__table__
         if insp.has_table(tabela.name):
@@ -34,7 +33,7 @@ def preparar_catalogo_automatizado(*, simular=True):
     for modelo in MODELOS_PECAS:
         nome = modelo.__tablename__
         if not insp.has_table(nome):
-            continue  # A criação inicial de componentes continua no comando já existente.
+            continue
         cols = {c['name'] for c in insp.get_columns(nome)} - COLUNAS_ANTIGAS_DA_PECA
         esperadas = set(modelo.__table__.columns.keys())
         novos = CAMPOS | {'referencia_interna','fontes_especificacoes','codigo_modelo_fabricante','ficha_montagem_validada'} | ({'formato'} if nome=='memoria_ram' else set())
@@ -53,7 +52,6 @@ def preparar_catalogo_automatizado(*, simular=True):
         if nome=='placa_video':campos.extend([('fabricante_chip','VARCHAR(30)'),('modelo_referencia','VARCHAR(120)')])
         for campo, tipo in campos:
             if campo not in cols:
-                # Sem DEFAULT nesta adição: registros antigos permanecem NULL (legado).
                 ddl = f'ALTER TABLE `{nome}` ADD COLUMN `{campo}` {tipo} NULL'
                 if campo == 'status_validacao' and dialecto == 'sqlite':
                     ddl += f" CONSTRAINT ck_{nome}_validacao CHECK (status_validacao IS NULL OR status_validacao IN ({ESTADOS}))"
@@ -83,8 +81,6 @@ def preparar_catalogo_automatizado(*, simular=True):
             if indice.name not in nomes:
                 plano.append({'acao': 'sql', 'sql': str(CreateIndex(indice).compile(db.engine))})
     if not simular:
-        # Escritores devem estar parados. MySQL faz commit implícito de DDL;
-        # operações são aditivas e repetíveis, mas não há rollback global de DDL.
         with db.engine.begin() as conn:
             for item in plano:
                 if item['acao'] == 'criar_tabela':

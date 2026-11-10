@@ -10,7 +10,6 @@ def preparar_ofertas_mercado_livre():
     if not inspetor.has_table(ControleColeta.__tablename__):
         raise ValueError('Prepare as tabelas de coleta antes das ofertas')
     tabelas = (Oferta, VinculoMercadoLivre, HistoricoOferta)
-    # Validar todas antes de criar qualquer uma.
     for modelo in tabelas:
         if inspetor.has_table(modelo.__tablename__):
             colunas = {c['name'] for c in inspetor.get_columns(modelo.__tablename__)}

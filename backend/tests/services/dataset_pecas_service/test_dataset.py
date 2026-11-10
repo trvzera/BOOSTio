@@ -96,7 +96,6 @@ def test_hash_preflight_simulacao_lotes_e_idempotencia(banco,tmp_path):
 
 
 def test_migracao_preserva_registros_indices_e_reexecucao(banco):
-    # Reconstrói uma tabela com as antigas restrições para testar o upgrade real.
     db.session.remove()
     with db.engine.begin() as conn:
         conn.exec_driver_sql('DROP TABLE processador')

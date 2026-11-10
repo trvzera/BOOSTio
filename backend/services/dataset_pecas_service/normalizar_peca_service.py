@@ -35,7 +35,6 @@ class NormalizarPecaDatasetService:
             categoria='ssd' if tipo=='SSD' else 'hd' if isinstance(tipo,(int,float)) and not isinstance(tipo,bool) and tipo>0 else None
         if arquivo=='cpu-cooler':
             tamanho=linha.get('size')
-            # size é definido pela fonte como tamanho do radiador, não altura do cooler.
             categoria='water_cooler' if isinstance(tamanho,(int,float)) and tamanho>0 else 'air_cooler' if tamanho is None else None
         if categoria is None:raise ValueError('Tipo de componente não comprovado')
         dados={'fabricante':fabricante,'modelo':modelo}
@@ -65,9 +64,7 @@ class NormalizarPecaDatasetService:
             interface=str(linha.get('interface') or '')
             if 'sata' in interface.casefold():dados['tipo']='SATA'
             elif 'nvme' in interface.casefold():dados['tipo']='NVMe'
-            # PCIe não comprova NVMe (existem SSDs PCIe AHCI).
         if categoria in ('ssd','hd'):
-            # Muitos nomes da fonte omitem capacidade e interface, que distinguem SKUs.
             dados['modelo']+=' ['+' '.join(str(v) for v in (linha.get('capacity'), 'GB',linha.get('interface')) if v is not None)+']'
         if categoria=='memoria_ram':
             speed=linha.get('speed');modulos=linha.get('modules')
@@ -88,7 +85,6 @@ class NormalizarPecaDatasetService:
             tipos={'Circumaural':'over-ear','Supra-aural':'on-ear','Earbud':'earbud','In Ear':'in-ear'}
             if linha.get('type') in tipos:dados['tipo']=tipos[linha['type']]
             if type(linha.get('wireless')) is bool:dados['conexao']='Wireless' if linha['wireless'] else 'Wired'
-        # Quantidade só quando explicitamente identificada; ausência não significa 1.
         if categoria=='fan':
             m=re.search(r'\b(\d+)[ -]Pack\b',titulo,re.I)
             if m:dados['quantidade']=int(m[1])

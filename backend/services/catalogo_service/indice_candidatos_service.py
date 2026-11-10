@@ -30,8 +30,6 @@ class IndiceCandidatosService:
             dados = ({c.name:deepcopy(getattr(peca, c.name)) for c in tabela.columns
                       if c.name != 'fontes_especificacoes'}
                      if tabela is not None else deepcopy(vars(peca)))
-            # O comparador só usa esta evidência. Não duplique os JSONs brutos
-            # das bases técnicas para cada peça do catálogo na memória da VPS.
             fonte_codigo = (getattr(peca, 'fontes_especificacoes', None) or {}).get('codigo_modelo_fabricante')
             dados['fontes_especificacoes'] = ({'codigo_modelo_fabricante':deepcopy(fonte_codigo)}
                                              if fonte_codigo else {})
@@ -49,8 +47,6 @@ class IndiceCandidatosService:
     def carregar(cls, modelo):
         pecas = []
         identidades = {}
-        # SQL e validação das identidades permanecem nos models; INs pequenos
-        # funcionam também no SQLite e evitam uma consulta por componente.
         lote = []
         for peca in modelo.iterar_para_matching():
             lote.append(peca)
@@ -79,9 +75,6 @@ class IndiceCandidatosService:
         return [self.pecas[posicao] for posicao in self._posicoes(produto)]
 
     def avaliar(self, produto):
-        # Snapshot da classificação: commits de diagnósticos expiram objetos
-        # SQLAlchemy. Não faça uma consulta por peça a cada anúncio do lote.
-        # A importação monta outro índice dentro da transação e revalida tudo.
         candidatos = [self.comparaveis[posicao] for posicao in self._posicoes(produto)]
         decisao = AssociacaoInteligenteService().selecionar(
             candidatos, produto, identidades=self.identidades, completo=self.completo)

@@ -55,7 +55,6 @@ class AtualizarOfertasMercadoLivreService:
                     if not esquema_verificado:
                         Oferta.verificar_esquema_mercado_livre()
                         esquema_verificado = True
-                    # O token pode precisar de renovação entre lotes; não manter um token por horas.
                     token = TokenMercadoLivreService().executar()
                     resultado = self._processar_peca(peca, cliente, associador, token, limite_ofertas, simular)
                     chave = resultado.pop('contador')
@@ -142,8 +141,6 @@ class AtualizarOfertasMercadoLivreService:
                     busca_remota_completa=busca.get('busca_remota_completa'),
                     buscas=busca.get('buscas', []))
             except (ErroMercadoLivre, FalhaMarketplace) as erro:
-                # 404/206 (sem ofertas ou resposta parcial) não são falha da peça. Na fila o erro chega
-                # como FalhaMarketplace, onde 403 é autorização e interrompe.
                 if erro.status not in ((403,404,206) if isinstance(erro, ErroMercadoLivre) else (404,206)):raise
                 indisponiveis.append(dict(catalogo_id=vinculo['catalogo_id'], http=erro.status))
         return dict(contador='revisao' if indisponiveis else 'sem_ofertas',

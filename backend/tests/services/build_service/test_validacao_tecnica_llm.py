@@ -100,7 +100,6 @@ def test_exige_gpu_ou_cooler_quando_cpu_precisa(sugestao, campo, pendente):
 def test_nao_bloqueia_sugestao_so_por_especificacoes_ausentes(sugestao):
     for itens in sugestao[1].values():
         itens[0] = {k: v for k, v in itens[0].items() if k in ("id", "fabricante", "modelo", "preco")}
-    # A presença obrigatória de ventilação é independente das medidas incompletas.
     sugestao[1]["gabinete"][0]["fans_inclusos"] = 1
     with pytest.raises(ValueError, match="placa_video|cooler"):
         validar(sugestao)

@@ -96,7 +96,6 @@ class BuscarOfertasMercadoLivreService:
         except requests.RequestException:
             if controle_em_execucao.get() is not None:
                 raise FalhaMarketplace(temporaria=True) from None
-            # Não propagar objetos de request, cabeçalhos ou credenciais para logs.
             raise ValueError("Falha de rede na consulta ao Mercado Livre") from None
 
     @staticmethod

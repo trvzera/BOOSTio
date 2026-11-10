@@ -47,7 +47,7 @@ def test_simulacao_aplicacao_repeticao_sem_publicar_ou_criar(banco,tmp_path):
     r=s.executar(tmp_path,simular=False)
     assert r['atualizadas']==1 and banco.thread==12 and banco.soquete=='AM4'
     assert banco.videointegrado is False
-    assert banco.cooler is banco.part_number is None  # Box/Tray não identificado no docyx.
+    assert banco.cooler is banco.part_number is None
     assert banco.preco is None and banco.status_validacao=='em_revisao' and banco.ficha_montagem_validada is True
     assert Processador.query.count()==1 and Oferta.query.filter(Oferta.loja!='kabum').count()==0
     fontes=deepcopy(banco.fontes_especificacoes)
@@ -119,7 +119,6 @@ def test_falha_no_lote_reverte_campos_e_proveniencia(banco,tmp_path):
     inicial=deepcopy(banco.fontes_especificacoes)
     primeira=dict(id=p['id'],categoria=p['categoria'],assinatura=p['assinatura'],alteracoes={'thread':12},fontes={'thread':{'url':'https://example.org'}})
     segunda={**primeira,'assinatura':p['assinatura']}
-    # Falha deliberada antes de confirmar o lote, após a primeira alteração.
     from unittest.mock import patch
     with patch.object(db.session,'flush',side_effect=ValueError('Falha de persistência')):
         with pytest.raises(ValueError):repo.aplicar_lote([primeira,segunda],simular=False)

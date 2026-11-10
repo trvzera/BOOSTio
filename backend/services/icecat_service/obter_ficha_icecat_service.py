@@ -56,7 +56,6 @@ class ObterFichaIcecatService:
                         raise ValueError('Ficha Icecat excede 2 MB')
         except requests.RequestException:
             raise ErroConsultaIcecat('Falha de comunicação com Icecat') from None
-        # Valida XML e entidades antes de manter no cache.
         from defusedxml.ElementTree import fromstring
         from defusedxml.common import DefusedXmlException
         from xml.etree.ElementTree import ParseError
