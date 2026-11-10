@@ -1,5 +1,5 @@
-// Uso: node gerar-slides.mjs <pasta-de-saida>
-// Gera BOOSTio-Pitch-3A2.pptx e slide-01.png ... slide-20.png a partir de autor-slides.mjs.
+
+
 import fs from 'node:fs/promises';
 import {createRequire} from 'node:module';
 import {homedir} from 'node:os';
