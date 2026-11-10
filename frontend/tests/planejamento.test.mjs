@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { normalizarRede, custoRede, selecionarAcessorioRede, redeFormulario, camposRede } from "../js/build/rede.js";
+import { normalizarRede, custoRede, selecionarAcessorioRede, redeFormulario, camposRede, vincularRede } from "../js/build/rede.js";
 import { normalizarBuild, abrirBuild } from "../js/build/estado.js";
 import { planejamentoLocal, salvarPlanejamento, sincronizarBudgetPerfil } from "../js/build/planejamento.js";
 import { avaliarBuild } from "../js/build/compatibilidade.js";
@@ -21,6 +21,24 @@ test("formulário simplifica rede sem reescrever medidas de builds importadas",(
   assert.doesNotMatch(html,/data-network="velocidadeMbps"/);
   assert.match(html,/data-network="comprimentoCaboM"/);
   assert.equal(antiga.velocidadeMbps,1000);
+});
+
+test("responder sim para incluir rede preserva o contrato de peça ainda não possuída",() => {
+  for(const tipo of ["wifi","cabo"]) {
+    const container={innerHTML:"",querySelector:()=>null};
+    let resposta;
+    vincularRede(container,{tipo},{aoAlterar:rede=>{resposta=rede;}});
+    assert.match(container.innerHTML,/<option value="false">Sim, incluir/);
+    assert.match(container.innerHTML,/<option value="true">Não incluir/);
+    const escolher=value=>container.onchange({type:"change",target:{tagName:"SELECT",dataset:{network:"possuiAcessorio"},value}});
+    escolher("false");
+    assert.equal(resposta.possuiAcessorio,false);
+    assert.equal(resposta.velocidadeMbps,tipo === "wifi" ? 500 : null);
+    escolher("true");
+    assert.equal(resposta.possuiAcessorio,true);
+    escolher("confirmar");
+    assert.equal(resposta.possuiAcessorio,null);
+  }
 });
 function armazenamento() {
   const dados = new Map();

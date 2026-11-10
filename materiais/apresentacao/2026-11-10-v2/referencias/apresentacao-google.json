@@ -1,0 +1,186 @@
+{
+  "url": "https://docs.google.com/presentation/d/1v7uBdnImOjQyGoJw894cq6zYIyeRh4UGZs4FQOSNMck/edit",
+  "presentationId": "1v7uBdnImOjQyGoJw894cq6zYIyeRh4UGZs4FQOSNMck",
+  "slides": 17,
+  "tempoSegundos": 390,
+  "videoSegundos": 110,
+  "midiasInseridas": false,
+  "slots": [
+    {
+      "slide": 3,
+      "arquivo": "03-rf04-formulario.mp4",
+      "tempo": "6–8 segundos · sem áudio",
+      "conteudo": "Últimas respostas → build gerada",
+      "area": {
+        "x": 500,
+        "y": 208,
+        "largura": 1020,
+        "altura": 574
+      },
+      "proporcao": "16:9",
+      "objeto": "MIDIA_03_rf04_formulario_mp4",
+      "googleSlideId": "p3",
+      "googlePlaceholderObjectIds": [
+        "p3_i8",
+        "p3_i9",
+        "p3_i10",
+        "p3_i11",
+        "p3_i12"
+      ]
+    },
+    {
+      "slide": 4,
+      "arquivo": "04-rf13-compatibilidade.mp4",
+      "tempo": "6–8 segundos · sem áudio",
+      "conteudo": "Editor → regra aplicada → consumo",
+      "area": {
+        "x": 500,
+        "y": 208,
+        "largura": 1020,
+        "altura": 574
+      },
+      "proporcao": "16:9",
+      "objeto": "MIDIA_04_rf13_compatibilidade_mp4",
+      "googleSlideId": "p4",
+      "googlePlaceholderObjectIds": [
+        "p4_i8",
+        "p4_i9",
+        "p4_i10",
+        "p4_i11",
+        "p4_i12"
+      ]
+    },
+    {
+      "slide": 5,
+      "arquivo": "05-rf07-comparacao.mp4",
+      "tempo": "6–8 segundos · sem áudio",
+      "conteudo": "Comparação entre duas configurações",
+      "area": {
+        "x": 500,
+        "y": 208,
+        "largura": 1020,
+        "altura": 574
+      },
+      "proporcao": "16:9",
+      "objeto": "MIDIA_05_rf07_comparacao_mp4",
+      "googleSlideId": "p5",
+      "googlePlaceholderObjectIds": [
+        "p5_i8",
+        "p5_i9",
+        "p5_i10",
+        "p5_i11",
+        "p5_i12"
+      ]
+    },
+    {
+      "slide": 6,
+      "arquivo": "06-rf08-compartilhamento.mp4",
+      "tempo": "6–8 segundos · sem áudio",
+      "conteudo": "Link público → visualização sem login",
+      "area": {
+        "x": 500,
+        "y": 208,
+        "largura": 1020,
+        "altura": 574
+      },
+      "proporcao": "16:9",
+      "objeto": "MIDIA_06_rf08_compartilhamento_mp4",
+      "googleSlideId": "p6",
+      "googlePlaceholderObjectIds": [
+        "p6_i8",
+        "p6_i9",
+        "p6_i10",
+        "p6_i11",
+        "p6_i12"
+      ]
+    },
+    {
+      "slide": 7,
+      "arquivo": "07-rf10-prontas.mp4",
+      "tempo": "6–8 segundos · sem áudio",
+      "conteudo": "Filtro → configuração pronta",
+      "area": {
+        "x": 500,
+        "y": 208,
+        "largura": 1020,
+        "altura": 574
+      },
+      "proporcao": "16:9",
+      "objeto": "MIDIA_07_rf10_prontas_mp4",
+      "googleSlideId": "p7",
+      "googlePlaceholderObjectIds": [
+        "p7_i8",
+        "p7_i9",
+        "p7_i10",
+        "p7_i11",
+        "p7_i12"
+      ]
+    },
+    {
+      "slide": 12,
+      "arquivo": "12-rede-api.mp4",
+      "tempo": "8–12 segundos · durante a fala",
+      "conteudo": "Network: ação → status → JSON",
+      "area": {
+        "x": 690,
+        "y": 300,
+        "largura": 830,
+        "altura": 467
+      },
+      "proporcao": "16:9",
+      "objeto": "MIDIA_12_rede_api_mp4",
+      "googleSlideId": "p12",
+      "googlePlaceholderObjectIds": [
+        "p12_i11",
+        "p12_i12",
+        "p12_i13",
+        "p12_i14",
+        "p12_i15"
+      ]
+    },
+    {
+      "slide": 13,
+      "arquivo": "13-demonstracao-1m50.mp4",
+      "tempo": "1min50 · execução real do sistema",
+      "conteudo": "RF04 → RF13 → RF07 → RF08",
+      "area": {
+        "x": 224,
+        "y": 169,
+        "largura": 1152,
+        "altura": 648
+      },
+      "proporcao": "16:9",
+      "objeto": "MIDIA_13_demonstracao_1m50_mp4",
+      "googleSlideId": "p13",
+      "googlePlaceholderObjectIds": [
+        "p13_i5",
+        "p13_i6",
+        "p13_i7",
+        "p13_i8",
+        "p13_i9"
+      ]
+    },
+    {
+      "slide": 16,
+      "arquivo": "16-readme.mp4",
+      "tempo": "6–8 segundos · durante a fala",
+      "conteudo": "README: 20 requisitos e seus escopos",
+      "area": {
+        "x": 780,
+        "y": 394,
+        "largura": 740,
+        "altura": 416
+      },
+      "proporcao": "16:9",
+      "objeto": "MIDIA_16_readme_mp4",
+      "googleSlideId": "p16",
+      "googlePlaceholderObjectIds": [
+        "p16_i13",
+        "p16_i14",
+        "p16_i15",
+        "p16_i16",
+        "p16_i17"
+      ]
+    }
+  ]
+}
