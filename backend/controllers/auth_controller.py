@@ -1,12 +1,13 @@
 from services.usuario_service.validar_retorno_google_service import validar_vinculo, validar_confirmacao
 import time
-from urllib.parse import parse_qs, urlsplit, urlencode
+from urllib.parse import urlencode
 from flask import session
 from authlib.integrations.base_client.errors import OAuthError
 from flask import Blueprint,request,jsonify,redirect,url_for,current_app
 from flask_login import login_user,logout_user, login_required, current_user
 from configs import oauth
 from services.usuario_service.entrar_usuario_service import EntrarUsuarioService
+from services.usuario_service.estado_oauth_service import estado_da_autorizacao
 from services.usuario_service.entrar_google_usuario_service import EntrarGoogleService
 from services.usuario_service.vincular_google_service import VincularGoogleService
 from services.usuario_service.confirmar_identidade_service import ConfirmarIdentidadeService
@@ -101,7 +102,7 @@ def confirmar_google():
     session["confirmacao_google_pendente"] = {
         "sessao": current_user.get_id(), "sub": current_user.google_sub,
         "instante": time.time(),
-        "state": parse_qs(urlsplit(resposta.location).query)["state"][0],
+        "state": estado_da_autorizacao(resposta.location),
     }
     return jsonify({"url": resposta.location})
 
@@ -121,7 +122,7 @@ def vincular_google():
     resposta = oauth.google.authorize_redirect(_url_callback_google(), prompt="select_account consent")
     session["vinculo_google_pendente"] = {
         "sessao": current_user.get_id(), "email": current_user.email, "instante": time.time(),
-        "state": parse_qs(urlsplit(resposta.location).query)["state"][0],
+        "state": estado_da_autorizacao(resposta.location),
     }
     return jsonify({"url": resposta.location})
 

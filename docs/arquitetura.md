@@ -33,7 +33,7 @@ A primeira versão desta auditoria dizia que Model não pode consultar nem grava
 1. **Service consultando o banco direto** (quase resolvido em 09/11/2026): as consultas (`.query`) dos services passaram para métodos das Models (`Peca.buscar_por_codigo`, `Oferta.buscar_por_anuncio`, `Usuario.gravar_google_sub`, `ProdutoPendente.listar_ids_e_candidatos`…). Commit, rollback, add e flush continuam nos services (uma transação por caso de uso). Restam SQL puro em `migrar_ofertas_kabum_service` (migração de dados antigos) e um `UPDATE` por tabela refletida em `importar_benchmarks_service`.
 2. ~~Model importando service ou repository~~ (resolvido em 09/11/2026): `Peca.cadastrar_ausentes`, `PlacaRede.atualizar_links_antigos`, `IdentidadeFabricante.registrar/para_matching` e `RevisaoIdentidadePeca.aplicar` viraram services; `MODELOS_PECAS` foi para `models/` e `validar_url_shopee` para `utils/`. Nenhum model importa `services` ou `repositories`.
 3. ~~Repository importando service e com regra de negócio~~ (resolvido em 09/11/2026): os 8 arquivos que decidiam o que gravar (`importacao_buildcores`, `importacao_catalogo`, `catalogo_tecnico`, `dataset_pecas`, `enriquecimento_buildcores`, `especificacoes_peca`, `reavaliacao_montagem`, `ofertas`) passaram para `services/` com nome `gravar_*_service`. Em `repositories/` ficaram só os de acesso (fila, tokens, ofertas da KaBuM, identificadores, controle do catálogo, saúde, migração de links), e nenhum importa `services`.
-4. **Controller com lógica de protocolo**: `auth_controller` lê o `state` do OAuth (`parse_qs`) na rota; `build_controller` trata 429/`Retry-After` da IA dentro da rota. Isso vai para o service.
+4. ~~Controller com lógica de protocolo~~ (resolvido em 09/11/2026): a leitura do `state` do OAuth foi para `estado_oauth_service` e a validação do `Retry-After` da IA para `espera_ia_service`. Os controllers só traduzem as exceções em resposta HTTP.
 5. ~~Código morto: `controllers/peca_controller.py`~~ (removido em 09/11/2026, com o `MostrarPecasService` e seus testes).
 6. **Arquivos que não são Model dentro de `models/`**: `medidas_fisicas`, `imagens_referencia`, `campos_tecnicos` (regra e dados de domínio) e `preco_oferta` (colunas calculadas injetadas).
 7. **Dados em `services/`**: `dados_seed.py` (1.247 linhas) e os arquivos `pecas_*` que ele junta. Mantidos onde estão por enquanto: mover só um deles separaria a seed de seus dados e não muda a arquitetura.
@@ -45,7 +45,7 @@ A primeira versão desta auditoria dizia que Model não pode consultar nem grava
 2. (feito) Models que importam service/repository.
 3. (feito) Repositories que importam service e têm regra.
 4. (feito) Services que consultam direto.
-5. Lógica de protocolo nos controllers (item 4).
+5. (feito) Lógica de protocolo nos controllers.
 6. Arquivos de domínio em `models/` (item 6).
 
 Cada passo em um commit, sem mudar resposta da API, esquema, seed nem DDL, com a suíte inteira passando.
