@@ -75,7 +75,6 @@ def selecionar_memorias(contexto, placas):
 def _amostrar_grupos(contexto, tipo, grupos):
     for grupo, pecas in grupos.items():
         pecas = aplicar_teto(contexto, tipo, pecas)
-        # Preservar alternativas de cor dentro das cotas, sem ultrapassá-las.
         pecas.sort(key=lambda p: (PreferenciasCoresService.prioridade(p, contexto["aparencia"]["cor"]),
                                   p["preco"], id_numerico(p["id"])))
         grupos[grupo] = pecas
@@ -89,7 +88,6 @@ def _sockets_processadores(contexto, selecionados):
         cpu = Processador.buscar_por_nome(nome_proprio)
         valores = [cpu.soquete] if cpu else []
     elif contexto["categoria"] in ("placa_mae", "memoria_ram"):
-        # Seleciona CPUs como dependência, mas não as inclui na resposta desta categoria.
         valores = [cpu.get("soquete") for cpu in contexto.get("cpus_candidatas", [])]
     else:
         valores = [p.get("soquete") for p in selecionados if p["categoria"] == "processador"]
@@ -97,7 +95,6 @@ def _sockets_processadores(contexto, selecionados):
 
 
 def _distribuir_vagas(grupos, limite):
-    # Rodadas por grupo (socket ou DDR), com redistribuição automática de sobras.
     escolhidas, ids = [], set()
     ativos = [iter(grupos[socket]) for socket in sorted(grupos) if grupos[socket]]
     while ativos and len(escolhidas) < limite:

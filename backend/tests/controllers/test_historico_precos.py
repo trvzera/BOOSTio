@@ -58,7 +58,6 @@ def test_sem_historico_nao_fabrica_preco_atual(banco):
     _,client,p=banco
     assert client.get(url(p)).get_json()['historico_precos']==[]
     Oferta.query.update({'ativa':False});db.session.commit()
-    # Sem oferta ativa a peça não existe para o usuário: nem catálogo nem histórico.
     assert client.get(url(p)).status_code==404
 
 
@@ -85,7 +84,6 @@ def test_banco_indisponivel_nao_parece_historico_vazio(banco):
 
 def test_limite_e_ordem_deterministica(banco):
     _,client,p=banco
-    # Mesmo instante: IDs desempatem, sem perder a indicação de recorte.
     o=Oferta.query.filter_by(loja='kabum',produto_id_loja='123').one()
     for i in range(1001):
         db.session.add(HistoricoOferta(oferta_id=o.id,preco=i+1,esgotado=False,coletado_em=datetime(2026,11,2)))

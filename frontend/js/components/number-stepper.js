@@ -1,4 +1,4 @@
-// Mantém o input numérico nativo e acrescenta controles visíveis em qualquer navegador.
+
 export function ajustarNumero(valor, {minimo = -Infinity, maximo = Infinity, passo = 1, direcao = 1} = {}) {
   const atual = valor !== "" && Number.isFinite(Number(valor)) ? Number(valor) : 0;
   const incremento = Number.isFinite(passo) && passo > 0 ? passo : 1;

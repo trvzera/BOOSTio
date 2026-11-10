@@ -18,7 +18,7 @@ export function tutorialPendente(usuario) {
 }
 export function ajustarGuiasConhecimento(raiz = document) {
   const nivel = document.documentElement.dataset.hardwareLevel;
-  // Sem uma preferência definida, mantenha a orientação para quem está começando.
+
   const ajudaInicial = !["intermediario","experiente"].includes(nivel);
   raiz.querySelectorAll("[data-knowledge-beginner]").forEach(ajuda => {
     ajuda.hidden = !ajudaInicial;

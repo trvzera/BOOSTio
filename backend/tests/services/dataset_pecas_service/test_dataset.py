@@ -5,7 +5,7 @@ import pytest
 from flask import Flask
 from sqlalchemy import text, inspect
 from models import db, ControleColeta, Processador, MemoriaRAM, Oferta, Mouse
-from repositories.dataset_pecas_repository import RepositorioDatasetPecas
+from services.dataset_pecas_service.gravar_dataset_pecas_service import GravarDatasetPecasService
 from services.dataset_pecas_service.normalizar_peca_service import NormalizarPecaDatasetService
 from services.dataset_pecas_service.importar_dataset_service import ImportarDatasetService
 from services.catalogo_service.validar_ficha_tecnica_service import ValidarFichaTecnicaService
@@ -28,7 +28,7 @@ def normalizar(linha,arquivo='cpu'):
 
 
 def test_sem_inferir_socket_threads_mpn_preco_ou_estoque(banco):
-    r=normalizar(cpu());repo=RepositorioDatasetPecas()
+    r=normalizar(cpu());repo=GravarDatasetPecasService()
     assert repo.executar_lote([r],simular=True)[0]['acao']=='proposta'
     assert Processador.query.count()==0
     assert repo.executar_lote([r],simular=False)[0]['acao']=='criada'
@@ -37,7 +37,7 @@ def test_sem_inferir_socket_threads_mpn_preco_ou_estoque(banco):
     assert p.soquete is p.thread is p.part_number is p.preco is p.esgotado is p.cooler is None
     assert p.status_validacao=='em_revisao' and p.ficha_montagem_validada is False
     assert Processador.consulta_para_montagem().count()==Oferta.query.count()==0
-    assert RepositorioDatasetPecas().executar_lote([normalizar(cpu(price=900))],simular=False)[0]['acao']=='inalterada'
+    assert GravarDatasetPecasService().executar_lote([normalizar(cpu(price=900))],simular=False)[0]['acao']=='inalterada'
     assert Processador.query.count()==1
 
 
@@ -45,7 +45,7 @@ def test_variantes_ram_cores_e_kits_preservados(banco):
     rows=[{'name':'Corsair Vengeance 32 GB','speed':[5,6000],'modules':[2,16],'cas_latency':36,'color':cor} for cor in ('Black','White')]
     rows.append({**rows[0],'modules':[1,32]})
     rs=[normalizar(r,'memory') for r in rows]
-    resultados=RepositorioDatasetPecas().executar_lote(rs,simular=False)
+    resultados=GravarDatasetPecasService().executar_lote(rs,simular=False)
     assert all(r['acao']=='criada' for r in resultados)
     assert MemoriaRAM.query.count()==3
     assert {p.quantidade_pentes for p in MemoriaRAM.query}=={1,2}
@@ -54,7 +54,7 @@ def test_variantes_ram_cores_e_kits_preservados(banco):
 
 def test_nome_legado_ambiguo_nao_duplica_nem_sobrescreve(banco):
     db.session.add(Processador(fabricante='AMD',modelo='Ryzen 5 5500',nucleo=8,clockbase=3.6,preco=999,esgotado=False));db.session.commit()
-    r=RepositorioDatasetPecas().executar_lote([normalizar(cpu())],simular=False)[0]
+    r=GravarDatasetPecasService().executar_lote([normalizar(cpu())],simular=False)[0]
     assert r['acao']=='revisao' and Processador.query.count()==1
     p=Processador.query.one();assert p.nucleo==8 and p.preco==999
 
@@ -96,7 +96,6 @@ def test_hash_preflight_simulacao_lotes_e_idempotencia(banco,tmp_path):
 
 
 def test_migracao_preserva_registros_indices_e_reexecucao(banco):
-    # Reconstrói uma tabela com as antigas restrições para testar o upgrade real.
     db.session.remove()
     with db.engine.begin() as conn:
         conn.exec_driver_sql('DROP TABLE processador')

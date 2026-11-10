@@ -1,10 +1,9 @@
-"""Reavalia completude técnica, sem mudar status de identidade, oferta ou preço."""
 from collections import Counter
-from repositories.reavaliacao_montagem_repository import RepositorioReavaliacaoMontagem
+from services.catalogo_service.gravar_reavaliacao_montagem_service import GravarReavaliacaoMontagemService
 
 
 class ReavaliarMontagemService:
-    def __init__(self,repositorio=None):self.repositorio=repositorio or RepositorioReavaliacaoMontagem()
+    def __init__(self,repositorio=None):self.repositorio=repositorio or GravarReavaliacaoMontagemService()
 
     def executar(self,*,simular=True,tamanho_lote=250):
         if type(simular) is not bool or type(tamanho_lote) is not int or not 1<=tamanho_lote<=1000:raise ValueError('Opções inválidas')

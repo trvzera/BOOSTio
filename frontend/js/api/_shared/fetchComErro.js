@@ -15,7 +15,7 @@ function mensagemInformada(dados) {
   return typeof texto==="string" && texto.trim() && !/^(?:internal server error|bad gateway|service unavailable|unknown error)$/i.test(texto.trim()) ? texto : null;
 }
 
-// Somente os campos de diagnóstico conhecidos, sem corpo/headers de terceiros.
+
 function diagnosticoSeguro(valor) {
   if(!valor || typeof valor!=="object")return undefined;
   const dados={};

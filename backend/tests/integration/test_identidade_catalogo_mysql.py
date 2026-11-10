@@ -1,3 +1,4 @@
+from services.especificacoes_service.aplicar_revisao_identidade_service import AplicarRevisaoIdentidadeService
 """Migração e auditoria somente em MySQL local explicitamente descartável."""
 import os
 from dataclasses import replace
@@ -39,9 +40,9 @@ def test_migracao_e_auditoria_preservam_catalogo_mysql():
             p=db.session.get(PlacaVideo,ident)
             d=ProdutoNormalizado(loja='kabum',id_externo='123',categoria='placa_video',categoria_confirmada=True,titulo='Placa Marca RTX 4060 8GB GDDR6 - GV-N4060-8GD',marca='Marca',modelo='GV-N4060-8GD',modelos_alternativos=('GV-N4060-8GD',),ativo=True,fonte=p.kabum_external,especificacoes={'memoria_gb':8,'tipo_memoria':'GDDR6'},contexto={'finalidade':'especificacoes','origem_peca':f'placa_video:{ident}'})
             s=ConverterReferenciasGpuService();proposta=s.preparar(p,d)
-            RevisaoIdentidadePeca.aplicar(p,proposta,simular=True)
+            AplicarRevisaoIdentidadeService().executar(p,proposta,simular=True)
             assert p.fabricante=='NVIDIA' and RevisaoIdentidadePeca.query.count()==0
-            RevisaoIdentidadePeca.aplicar(p,proposta,simular=False)
+            AplicarRevisaoIdentidadeService().executar(p,proposta,simular=False)
             assert p.fabricante=='Marca' and p.preco==1500 and p.id==ident
             assert RevisaoIdentidadePeca.query.count()==1
             assert s.preparar(p,d)['status']=='inalterada'

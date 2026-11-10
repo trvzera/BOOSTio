@@ -6,8 +6,7 @@ const lerValor = elemento => ({texto:elemento.textContent, numero:elemento.datas
 
 observarMovimento(reduzido => { if (reduzido) for (const animacao of ativas) animacao.cancel(); });
 
-// O número correto aparece imediatamente. Só sua apresentação é animada;
-// não interpola preços nem duplica o texto lido por leitores de tela.
+
 export function atualizarValor(elemento, texto, numero, anterior = elemento && lerValor(elemento)) {
   if (!elemento) return;
   elemento.classList.add("value-transition");
@@ -17,7 +16,7 @@ export function atualizarValor(elemento, texto, numero, anterior = elemento && l
   if (movimentoReduzido()) { animacoes.get(elemento)?.cancel(); return; }
   if (!anterior || anterior.texto === String(texto) || !numeroValido(anterior.numero) ||
       !numeroValido(numero) || anterior.numero === numero || typeof elemento.animate !== "function") return;
-  // Arrastar o slider não reinicia/empilha uma animação a cada evento de input.
+
   if (animacoes.has(elemento)) return;
   const distancia = numero > anterior.numero ? ".45em" : "-.45em";
   const animacao = elemento.animate([
@@ -32,7 +31,7 @@ export function atualizarValor(elemento, texto, numero, anterior = elemento && l
   animacao.finished.then(limpar,limpar);
 }
 
-// Chaves estáveis preservam o valor anterior quando o editor recria seus cards.
+
 export function capturarValores(raiz) {
   return new Map([...raiz.querySelectorAll("[data-value-key]")].map(elemento => [elemento.dataset.valueKey,lerValor(elemento)]));
 }

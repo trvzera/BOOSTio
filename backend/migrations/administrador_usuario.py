@@ -1,4 +1,3 @@
-"""Adiciona usuario.administrador sem alterar contas: todas começam sem o papel."""
 from sqlalchemy import inspect, text
 
 from models import db

@@ -1,4 +1,3 @@
-"""Observações de marketplace; disponibilidade não informada permanece NULL."""
 from . import db, ModeloBase
 
 
@@ -12,6 +11,10 @@ class HistoricoOferta(ModeloBase):
         db.CheckConstraint('preco > 0', name='ck_historico_oferta_preco'),
         db.Index('ix_historico_oferta_data', 'oferta_id', 'coletado_em'),
     )
+
+    @classmethod
+    def existe_coleta(cls, oferta_id, coletado_em):
+        return cls.query.filter_by(oferta_id=oferta_id, coletado_em=coletado_em).first() is not None
 
     @classmethod
     def ultimo(cls, oferta_id, *, bloquear=False):

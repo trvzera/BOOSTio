@@ -1,7 +1,6 @@
-"""Importação reutilizável. A consulta externa pertence ao adaptador de cada loja."""
 from datetime import datetime, timezone
-from repositories.importacao_catalogo_repository import RepositorioImportacaoCatalogo
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from services.catalogo_service.gravar_importacao_catalogo_service import GravarImportacaoCatalogoService
+from models.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_documento
 from .indice_candidatos_service import IndiceCandidatosService
 from .validar_ficha_tecnica_service import ValidarFichaTecnicaService
@@ -9,7 +8,7 @@ from .validar_ficha_tecnica_service import ValidarFichaTecnicaService
 
 class ImportarCatalogoService:
     def __init__(self,repositorio=None,verificar_execucao=None):
-        self.repositorio=repositorio or RepositorioImportacaoCatalogo()
+        self.repositorio=repositorio or GravarImportacaoCatalogoService()
         self.verificar_execucao=verificar_execucao or (lambda:None)
 
     def executar(self,pendencia_id,produto,ficha,anuncio,assinatura_original,*,simular=True,permitir_novos=False):

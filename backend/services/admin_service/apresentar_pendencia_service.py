@@ -1,5 +1,4 @@
-"""Formato de uma pendência para o painel de administração; não decide nada."""
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from .catalogo_ocupado import catalogo_que_ocupa_a_peca
 
 
@@ -58,7 +57,6 @@ _FICHA = (("capacidade_gb", "{} GB"), ("tipo", "{}"), ("interface", "{}"), ("for
 
 
 def resumir_ficha(peca):
-    """Resumo do que a peça já tem na ficha; o que falta simplesmente não aparece."""
     return [texto.format(getattr(peca, campo)) for campo, texto in _FICHA
             if peca is not None and getattr(peca, campo, None) not in (None, "")]
 

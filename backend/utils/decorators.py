@@ -13,7 +13,6 @@ def apenas_proprio_usuario(func):
 
 
 def apenas_administrador(func):
-    """Usar depois de @login_required: quem não é administrador recebe 403, mesmo que digite a rota."""
     @wraps(func)
     def wrapper(*args, **kwargs):
         if not getattr(current_user, "administrador", False):

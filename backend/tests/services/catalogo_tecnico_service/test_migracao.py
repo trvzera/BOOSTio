@@ -3,7 +3,7 @@ from flask import Flask
 from sqlalchemy import MetaData, inspect, text, event
 from models import db, SSD, Usuario, Build
 from migrations.catalogo_tecnico import preparar_catalogo_tecnico
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 
 @pytest.fixture
@@ -20,13 +20,9 @@ def legado():
             c.exec_driver_sql('CREATE TABLE teste_auditoria (peca INTEGER)')
             c.exec_driver_sql('CREATE TRIGGER teste_trigger AFTER UPDATE OF modelo ON ssd BEGIN INSERT INTO teste_auditoria VALUES (NEW.id); END')
             c.exec_driver_sql('CREATE INDEX teste_indice ON ssd(modelo) WHERE consumo_energia > 0')
-        # A fixture usa SQL para inserir antes da migração, pois o model novo
-        # inclui a coluna que propositalmente não existe no esquema antigo.
         with db.engine.begin() as c:
             c.execute(text("INSERT INTO ssd (id,fabricante,modelo,consumo_energia,capacidade_gb,tipo,interface,criado_em) VALUES (1,'Marca','Original',5,500,'NVMe','PCIe 3.0',CURRENT_TIMESTAMP)"))
         db.session.add(Usuario(nome='Preservado',email='teste@example.test',senha='hash'));db.session.commit()
-        # Registro externo que referencia a peça, sem precisar construir uma
-        # montagem artificial: comprova preservação de FKs e dos seus valores.
         with db.engine.begin() as c:
             c.exec_driver_sql('CREATE TABLE referencia_teste (id INTEGER PRIMARY KEY, ssd_id INTEGER REFERENCES ssd(id))')
             c.exec_driver_sql('INSERT INTO referencia_teste VALUES (1,1)')
@@ -38,7 +34,7 @@ def legado():
 
 def test_migracao_preserva_dados_referencias_indices_e_triggers(legado):
     assert preparar_catalogo_tecnico()['alteracoes']
-    assert not inspect(db.engine).get_columns('ssd')[0].get('nullable')  # PK não muda.
+    assert not inspect(db.engine).get_columns('ssd')[0].get('nullable')
     preparar_catalogo_tecnico(simular=False)
     assert preparar_catalogo_tecnico()['alteracoes']==[]
     p=db.session.get(SSD,1)

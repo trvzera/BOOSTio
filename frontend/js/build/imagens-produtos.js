@@ -15,7 +15,7 @@ export function carregarManifestoImagens() {
 export function enderecoImagem(valor) {
   if (typeof valor !== "string" || !valor.trim()) return "";
   const caminho = valor.trim();
-  // Apenas imagens HTTP(S) ou caminhos locais. Nunca inserir URLs executáveis.
+
   if (/^[a-z][a-z\d+.-]*:/i.test(caminho) && !/^https?:/i.test(caminho)) return "";
   try {
     const base = new URL("../../pages/",import.meta.url), destino = new URL(caminho,base);

@@ -1,4 +1,4 @@
-// Apenas laboratório. A montagem e os cards continuam usando a API Python.
+
 import { criarClienteFPSHQ } from "./fpshq.js";
 import { criarClienteBenchmark } from "../api/benchmark/consultarBenchmark.js";
 import { fetchComErro } from "../api/_shared/fetchComErro.js";
@@ -12,7 +12,7 @@ export function criarDiagnosticoBenchmark({modo = () => "backend",fetcher = (...
     const inicio = relogio();
     const registro = {via,operacao:metodo === "consultar" ? "fps" : "jogos",http:null,url:null,cache:null,redirecionado:null};
     aoOcupar(true);
-    // Cliente novo e sem sessionStorage: uma resposta antiga não mascara o teste direto.
+
     const cliente = via === "direto" ? criarClienteFPSHQ({timeoutMs,fetcher:async (url,config) => {
       registro.url = url;
       const resposta = await fetcher(url,{...config,cache:"no-store"});

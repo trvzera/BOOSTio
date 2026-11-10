@@ -1,4 +1,3 @@
-"""Snapshots ehan03/passmark com associações explícitas e auditáveis, sem fuzzy match."""
 import csv
 import hashlib
 import io
@@ -43,15 +42,14 @@ class ImportarReferenciasPassmarkService:
     def _identidade(tipo, nome):
         nome = normalizar_nome(nome)
         nome = re.sub(r"\b(i[3579])\s*-\s*(?=\d)", r"\1", nome)
-        padrao = (r"\b(?:core (?:i[3579]\d{3,5}[a-z0-9]*|ultra [3579] \d{3}[a-z0-9]*)|ryzen [3579] (?:pro )?\d{4,5}[a-z0-9]*|athlon \d{4}[a-z0-9]*)\b"
-                  if tipo == 'cpu' else r"\b(?:rtx|gtx|gt|rx|r[579]|arc a)\s*\d{3,4}(?:\s*(?:ti|super|xtx|xt))?\b")
+        padrao = (r"\b(?:core (?:i[3579]\d{3,5}[a-z0-9]*|ultra [3579] \d{3}[a-z0-9]*)|ryzen [3579] (?:pro )?\d{4,5}[a-z0-9]*|athlon \d{4}[a-z0-9]*|ryzen threadripper (?:pro )?\d{4}[a-z0-9]*|(?:pentium|celeron) [a-z]\d{3,4}[a-z]*)\b"
+                  if tipo == 'cpu' else r"\b(?:rtx|gtx|gt|rx|r[579]|arc a|hd|quadro [a-z]?|firepro [a-z]?)\s*\d{3,4}(?:\s*(?:ti|super|xtx|xt|x))?\b")
         identidades = {re.sub(r'\s+', '', x) for x in re.findall(padrao, nome)}
         if len(identidades) != 1:
             return None
         termos = ('2048sp','mobile','laptop','max q','max-q','oem','es','qs') + (('pro',) if tipo == 'cpu' else ())
         variante = tuple(termo for termo in termos
                          if re.search(r'(?<!\w)' + re.escape(termo) + r'(?!\w)', nome))
-        # OEM de embalagem em CPU não muda o modelo; GPU OEM pode ser outra variante.
         if tipo == 'cpu':
             variante = tuple(x for x in variante if x != 'oem')
         return next(iter(identidades)), variante
@@ -67,6 +65,37 @@ class ImportarReferenciasPassmarkService:
             if capacidades and set(map(int, capacidades)) != {peca.memoria_gb}:
                 return False
         return True
+
+    @classmethod
+    def _por_identidade(cls, tipo, peca, ids):
+        nome = peca.modelo_referencia if tipo == 'gpu' else peca.modelo
+        identidade = cls._identidade(tipo, nome) if nome else None
+        if identidade is None:
+            return set()
+        achados = set()
+        for ident, grupo in ids.items():
+            fonte = cls._identidade(tipo, grupo[0]['nome'])
+            if fonte != identidade:
+                continue
+            capacidades = re.findall(r'\b(\d+)\s*gb\b', grupo[0]['nome'], re.I)
+            if tipo == 'gpu' and capacidades and set(map(int, capacidades)) != {peca.memoria_gb}:
+                continue
+            achados.add(ident)
+        if len(achados) > 1:
+            exatos = {i for i in achados if cls._nome_basico(ids[i][0]['nome']) == cls._nome_basico(nome)}
+            if len(exatos) > 1 and tipo == 'gpu':
+                exatos = {i for i in exatos if {int(x) for x in re.findall(r'\b(\d+)\s*gb\b', ids[i][0]['nome'], re.I)} == {peca.memoria_gb}}
+            if len(exatos) == 1:
+                return exatos
+        return achados
+
+    @staticmethod
+    def _nome_basico(nome):
+        nome = normalizar_nome(nome)
+        nome = re.sub(r'@.*$', '', nome)
+        nome = re.sub(r'\b\d+\s*gb\b', '', nome)
+        nome = re.sub(r'\b(?:geforce|radeon|nvidia|amd|intel)\b', '', nome)
+        return re.sub(r'[^a-z0-9]', '', nome)
 
     @staticmethod
     def _chave(tipo, fabricante, modelo):
@@ -117,7 +146,6 @@ class ImportarReferenciasPassmarkService:
         if type(lote) is not int or lote < 1:
             raise ValueError('O lote deve ser positivo')
         aliases, sha_alias = self._associacoes()
-        # Todos os arquivos e associações são lidos antes de confirmar qualquer lote.
         fontes = [(t,*self._ler(p,t)) for t,p in (('cpu',cpu),('gpu',gpu)) if p]
         contadores = ('atualizadas','propostas','inalteradas','nao_encontradas','ambiguas','invalidas')
         resumo = dict(simulacao=simular, fonte=FONTE, associacoes_sha256=sha_alias,
@@ -140,7 +168,7 @@ class ImportarReferenciasPassmarkService:
                     parcial[status] += 1
                     resumo['detalhes'].append({**detalhe,'status':status,**({'motivo':motivo} if motivo else {})})
                 associadas = aliases.get(chave, [])
-                if len(catalogo[chave]) != 1 or len(associadas) > 1:
+                if len(associadas) > 1 or (associadas and len(catalogo[chave]) != 1):
                     registrar('ambiguas','múltiplos cadastros ou associações para o mesmo nome comercial')
                     continue
                 if associadas:
@@ -161,16 +189,22 @@ class ImportarReferenciasPassmarkService:
                         registrar('ambiguas','nome da referência mudou; revisar associação')
                         continue
                 else:
-                    # Sem associação revisada, não extrair chip de nomes comerciais.
                     candidatos = set()
                     for nome in (p.modelo, f'{p.fabricante} {p.modelo}'):
                         candidatos |= nomes.get(normalizar_nome(nome), set())
+                    associacao = 'nome_exato_normalizado'
+                    if candidatos and len(catalogo[chave]) != 1:
+                        registrar('ambiguas','múltiplos cadastros com o mesmo nome comercial')
+                        continue
+                    if not candidatos:
+                        candidatos = self._por_identidade(tipo, p, ids)
+                        associacao = 'identidade_do_modelo'
                     if len(candidatos) != 1:
                         registrar('ambiguas' if candidatos else 'nao_encontradas', 'sem referência única revisada ou exata')
                         continue
                     ident = next(iter(candidatos))
                     grupo = ids[ident]
-                    detalhe.update(fonte_id=ident,associacao='nome_exato_normalizado')
+                    detalhe.update(fonte_id=ident,associacao=associacao)
                 r = grupo[0]
                 if any(x['erro'] for x in grupo):
                     registrar('invalidas','entrada de origem inválida; benchmark anterior preservado')

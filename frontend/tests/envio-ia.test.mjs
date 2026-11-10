@@ -44,7 +44,7 @@ test('erro de rede repete o lote e, esgotadas as tentativas, segue para o próxi
       return {sugeridas: 1, ids_falhos: []};
     },
   });
-  assert.equal(n, 4); // lote 1: 3 tentativas; lote 2: 1
+  assert.equal(n, 4);
   assert.deepEqual(r.falharam, [1]);
   assert.equal(r.sugeridas, 1);
 });

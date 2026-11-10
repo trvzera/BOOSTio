@@ -43,7 +43,7 @@ def fone_em_revisao(**campos):
     fone = Fone(**{**dados, **campos})
     db.session.add(fone)
     db.session.commit()
-    fone.microfone = fone.tipo = None  # na produção a ficha chega vazia; o padrão da coluna não se aplica
+    fone.microfone = fone.tipo = None
     db.session.commit()
     return fone
 
@@ -67,12 +67,12 @@ def test_aplicar_preenche_so_campos_vazios_com_a_origem_e_nao_aprova(banco):
     db.session.refresh(fone)
     assert (fone.tipo, fone.microfone, fone.conexao) == ('headset', True, 'bluetooth')
     assert fone.fontes_especificacoes['microfone']['url'] == URL
-    assert fone.status_validacao == 'em_revisao'  # aprovar é outro passo
+    assert fone.status_validacao == 'em_revisao'
 
 
 def test_ficha_que_contradiz_a_peca_vai_para_revisao_sem_gravar(banco):
     fone = fone_em_revisao()
-    fone.microfone = False  # a peça diz que não tem microfone; a ficha diz que tem
+    fone.microfone = False
     db.session.commit()
     resumo = completar(IcecatSimulado(FICHA_FONE), simular=False)
     assert resumo['revisao'] == 1 and resumo['atualizada'] == 0
@@ -88,7 +88,7 @@ def test_ignora_sem_part_number_aprovada_e_ja_completa(banco):
     icecat = IcecatSimulado(FICHA_FONE)
     resumo = completar(icecat)
     assert (resumo['sem_part_number'], resumo['ignoradas'], resumo['analisadas']) == (1, 1, 0)
-    assert icecat.consultados == []  # nem consulta o Icecat
+    assert icecat.consultados == []
 
 
 def test_limite_do_icecat_interrompe_e_informa_de_onde_retomar(banco):
@@ -112,13 +112,12 @@ def test_monitor_ganha_conexao_pelas_portas_de_video(banco):
     db.session.add(monitor)
     db.session.commit()
     ficha = {'fabricante': 'LG', 'modelo': '27GP850-B', 'conexao': 'displayport, hdmi'}
-    monitor.ficha_montagem_validada = False  # a importação reprovou a ficha por falta da conexão
+    monitor.ficha_montagem_validada = False
     db.session.commit()
     resumo = completar(IcecatSimulado(ficha, mpn='27GP850-B'), simular=False, categoria='monitor')
     assert resumo['atualizada'] == 1 and resumo['ficha_liberada'] == 1
     db.session.refresh(monitor)
     assert monitor.conexao == 'displayport, hdmi' and monitor.ficha_montagem_validada is True
-    # reexecutar não duplica nem altera: a marca já está certa
     assert completar(IcecatSimulado(ficha, mpn='27GP850-B'), simular=False, categoria='monitor')['ficha_liberada'] == 0
 
 
@@ -127,7 +126,7 @@ def test_peca_que_ainda_tem_campo_faltando_continua_com_a_ficha_reprovada(banco)
     fone.ficha_montagem_validada = False
     db.session.commit()
     resumo = completar(IcecatSimulado({'fabricante': 'HyperX', 'modelo': 'Cloud II', 'tipo': 'Headset'}), simular=False)
-    assert resumo['atualizada'] == 1 and resumo['ficha_liberada'] == 0  # faltam microfone e conexão
+    assert resumo['atualizada'] == 1 and resumo['ficha_liberada'] == 0
     db.session.refresh(fone)
     assert fone.ficha_montagem_validada is False
 
@@ -168,4 +167,4 @@ def test_peca_ja_completa_com_ficha_reprovada_so_tem_a_marca_liberada(banco):
     assert resumo['ficha_liberada'] == 1 and resumo['analisadas'] == 0 and icecat.consultados == []
     db.session.refresh(fone)
     assert fone.ficha_montagem_validada is True and fone.status_validacao == 'em_revisao'
-    assert completar(icecat, simular=False)['ficha_liberada'] == 0  # reexecutar não muda nada
+    assert completar(icecat, simular=False)['ficha_liberada'] == 0

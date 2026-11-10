@@ -22,7 +22,7 @@ const base = (alteracoes = {}) => ({
   }),rede:{...rede},orcamento:6500.75,...alteracoes,
 });
 const gravarCelula = valor => '"' + String(valor).replaceAll('"','""') + '"';
-// Escrita independente do exportador: testa também arquivos editados externamente.
+
 const csv = (linhas = [],metadados = {},fim = "\r\n") => [
   ["boostio-build","1"],["metadados",JSON.stringify(metadados)],
   ["categoria","id","proprio","quantidade","nome"],...linhas,
@@ -94,7 +94,7 @@ for (const [extensao,exportar] of formatos) {
   test(extensao + ": ignora totais e custos de componentes importados; avaliação usa catálogo",() => {
     const peca = catalogo.find(p => p.categoria === "processador");
     const build = base({componentes:{processador:{id:peca.id,quantidade:1,preco:999999,consumo:999999,consumo_energia:999999}},rede:{...rede,possuiAcessorio:true},preco:999999,consumo:999999,watts:999999});
-    // JSON legado permite verificar os campos transitórios antes de qualquer exportação.
+
     const texto = extensao === "json" ? JSON.stringify(build) : csv([
       ["processador",peca.id,"","1","Preço e consumo devem vir do catálogo"],
     ],{...build,componentes:undefined});
@@ -298,7 +298,7 @@ test("rejeita extensões desconhecidas, tipos de entrada inválidos e arquivos v
 test("limite inclusivo de 1 MiB conta bytes UTF-8 antes de remover o BOM",() => {
   for (const [extensao,exportar] of formatos) {
     const texto = exportar(base({componentes:{}})), tamanho = new TextEncoder().encode(texto).length;
-    // Espaço JSON é um sufixo válido; no CSV vai dentro da célula nome.
+
     const cabeca = extensao === "json" ? texto : csv([["fan","","Fan","1",""]]);
     const bytes = new TextEncoder().encode(cabeca).length;
     const completar = n => extensao === "json" ? cabeca + " ".repeat(n) : cabeca.replace('"Fan","1",""','"Fan","1","' + " ".repeat(n) + '"');

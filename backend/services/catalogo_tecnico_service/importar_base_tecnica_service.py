@@ -4,12 +4,12 @@ import re
 import json
 from datetime import datetime
 from models import db
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
 from services.catalogo_service.validar_ficha_tecnica_service import ValidarFichaTecnicaService
 from services.catalogo_service.conferir_especificacoes_service import converter
 from services.catalogo_service.normalizar_produto import codigo, gtin
-from repositories.catalogo_tecnico_repository import RepositorioCatalogoTecnico
+from services.catalogo_tecnico_service.gravar_catalogo_tecnico_service import GravarCatalogoTecnicoService
 from utils.codigos_peca import codigo_interno
 from utils.identidade_peca import assinatura_tecnica
 
@@ -19,7 +19,7 @@ PROTEGIDOS={'id','criado_em','atualizado_em','preco','esgotado','preco_atualizad
 
 
 class ImportarBaseTecnicaService:
-    def __init__(self, repositorio=None):self.repositorio=repositorio or RepositorioCatalogoTecnico()
+    def __init__(self, repositorio=None):self.repositorio=repositorio or GravarCatalogoTecnicoService()
 
     @staticmethod
     def normalizar(documento):

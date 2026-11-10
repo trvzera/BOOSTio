@@ -1,4 +1,3 @@
-"""A IA recomenda qual candidata corresponde ao anúncio e, se o administrador autorizar, decide os casos claros."""
 import hashlib
 import json
 import os
@@ -10,7 +9,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from models import ProdutoPendente
 from services.llm_service.llm_service import LLMService
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from .catalogo_ocupado import catalogo_que_ocupa_a_peca
 from .apresentar_pendencia_service import preco_do_anuncio, resumir_ficha
 from .pendencias_acionaveis import ABERTAS, ids_acionaveis
@@ -35,21 +34,16 @@ INSTRUCAO = (
 
 class SugerirPendenciaService:
     def __init__(self, llm=None, *, tentativas_transitorias=0, espera=30, dormir=time.sleep):
-        # Limite de requisições (429) ou instabilidade (5xx): espera e repete antes de desistir do grupo.
         self.tentativas_transitorias, self.espera, self.dormir = tentativas_transitorias, espera, dormir
         self.llm = llm or (lambda prompt, modelo: LLMService().executar(prompt, modelo, reservar_cota=False))
         self.modelo = os.getenv("IA_ANALISE_MODELO", MODELO_PADRAO)
 
     def executar(self, *, limite=20, loja=None, categoria=None, refazer=False, simular=True, ids=None,
                  decidir=False, confianca_minima=CONFIANCA_MINIMA, aceitador=None, rejeitador=None):
-        """decidir=True: a IA aceita (peça indicada) ou rejeita (nenhuma serve) quando a confiança alcança o mínimo.
-
-        As pendências a analisar vão juntas, em poucas requisições (IA_ANALISE_LOTE por chamada), porque o
-        plano gratuito do Gemini limita requisições por minuto."""
         resumo = {"simulacao": simular, "analisadas": 0, "sugeridas": 0, "sem_sugestao": 0, "ja_analisadas": 0,
                   "falhas": 0, "ignoradas": 0, "aceitas": 0, "rejeitadas": 0, "decisoes_falhas": 0,
                   "requisicoes_ia": 0, "ids_falhos": [], "detalhes": []}
-        fila, prontas = [], []   # fila: vai à IA; prontas: já têm sugestão atual
+        fila, prontas = [], []
         for pendencia_id in (self._ids(loja, categoria) if ids is None else ids):
             pendencia = ProdutoPendente.buscar_por_id(pendencia_id)
             contexto = self._contexto(pendencia) if pendencia is not None and pendencia.status in ABERTAS else None
@@ -101,7 +95,6 @@ class SugerirPendenciaService:
         return isinstance(erro, (requests.ConnectionError, requests.Timeout))
 
     def _analisar_grupo(self, grupo, resumo):
-        """Uma requisição para o grupo. Limite/instabilidade: espera e repete. Resposta ruim: divide ao meio."""
         for tentativa in range(self.tentativas_transitorias + 1):
             resumo["requisicoes_ia"] += 1
             try:
@@ -143,7 +136,6 @@ class SugerirPendenciaService:
                     raise ValueError("A IA não respondeu esta pendência")
                 sugestoes.append((pendencia_id, self._validar(item, contexto, impressao)))
             except ValueError:
-                # Item inválido ou ausente: só ele fica sem sugestão; os demais valem.
                 invalidas += 1
                 resumo["ids_falhos"].append(pendencia_id)
         if not sugestoes:
@@ -169,7 +161,6 @@ class SugerirPendenciaService:
             resumo["rejeitadas"] += 1
             return "rejeitada"
         except (ValueError, LookupError, ConflitoPendencia, SQLAlchemyError, OSError):
-            # Falha de rede, anúncio fora do ar ou peça alterada: a pendência segue aberta para uma pessoa.
             resumo["decisoes_falhas"] += 1
             return "falhou"
 
@@ -195,7 +186,6 @@ class SugerirPendenciaService:
 
     @staticmethod
     def _todas_as_candidatas_ocupadas(pendencia):
-        """Há candidatas aprovadas e sem conflito, mas todas já têm outro catálogo: nenhuma serve."""
         elegiveis = []
         for c in pendencia.candidatos or []:
             categoria, _, identificador = str(c.get("peca", "")).partition(":")
@@ -219,7 +209,6 @@ class SugerirPendenciaService:
 
     @staticmethod
     def _contexto(pendencia):
-        """Candidatas aprovadas, sem conflito e livres de outro catálogo; sem elas não há o que sugerir."""
         candidatas = []
         for c in pendencia.candidatos or []:
             if c.get("conflitos"):
@@ -254,7 +243,6 @@ LIMITE_ENVIO = 20
 
 
 class EnviarPendenciasParaIAService:
-    """Envio manual pelo painel: um lote pequeno por pedido, sempre refazendo a análise."""
 
     def __init__(self, sugeridor=None):
         self.sugeridor = sugeridor or SugerirPendenciaService()
@@ -277,7 +265,6 @@ class EnviarPendenciasParaIAService:
 
 
 def listar_ids_para_ia(*, status="em_revisao", loja=None, categoria=None):
-    """Todas as pendências abertas do filtro que a IA consegue analisar (têm candidata aprovada)."""
     if status not in ABERTAS:
         raise ValueError("Só pendências abertas podem ir para a IA")
     ids = ids_acionaveis(status, loja, categoria)

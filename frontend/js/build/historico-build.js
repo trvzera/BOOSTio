@@ -4,7 +4,7 @@ const ordenar=valor=>Array.isArray(valor)?valor.map(ordenar):valor&&typeof valor
   ?Object.fromEntries(Object.keys(valor).sort().map(k=>[k,ordenar(valor[k])])):valor;
 const chave=valor=>JSON.stringify(ordenar(valor));
 
-// Histórico limitado à aba/editor, sem gravar snapshots no storage.
+
 export function criarHistoricoBuild({limite = 25} = {}) {
   const maximo = Number.isInteger(limite) && limite > 0 ? Math.min(limite,100) : 25;
   let anteriores = [], proximas = [];

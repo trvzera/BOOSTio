@@ -32,7 +32,7 @@ def test_reparo_combina_trocas_preserva_core_capacidades_e_recalcula_catalogo():
     catalogo['fan'].append(dict(catalogo['fan'][0], id=2, preco=10))
     original = deepcopy(build)
     for item in build['componentes']:
-        item['preco'] = .01  # Preço não confiável da IA não entra no cálculo.
+        item['preco'] = .01
     r = executar(build, catalogo)
     assert r['diagnostico']['total_anterior'] == 6000
     assert r['diagnostico']['total_final'] == 5650

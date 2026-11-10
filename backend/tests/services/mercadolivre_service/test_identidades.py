@@ -43,9 +43,9 @@ def test_simulacao_importacao_idempotencia_e_associacao(contexto):
     assert AssociarCatalogoService._mpn(p) == 'KF432C16BB/8'
     produto = dict(id='MLB123', name='Kingston Fury Beast 8GB', domain_id='MLB-RAM_MEMORY_MODULES', status='active', attributes=[dict(id='BRAND', value_name='Kingston'),
                     dict(id='MPN', value_name='KF432C16BB/8')])
-    assert AssociarCatalogoService.comprova_mpn(p, produto)
+    assert AssociarCatalogoService.comprova_identidade(p, produto)
     produto['attributes'][1]['value_name'] = 'KF432C16BB/16'
-    assert not AssociarCatalogoService.comprova_mpn(p, produto)
+    assert not AssociarCatalogoService.comprova_identidade(p, produto)
     p.ddr = 'DDR5'; db.session.commit()
     assert IdentidadeFabricante.buscar(p) is None
 

@@ -1,4 +1,3 @@
-"""Pontuação explicável e independente de loja. Percentual não é probabilidade."""
 import re
 from heapq import nsmallest
 from .produto_normalizado import ProdutoNormalizado
@@ -129,7 +128,7 @@ class AssociacaoInteligenteService:
         codigo_no_titulo = bool(codigo_fabricante and re.search(r'(?<![a-z0-9/_.-])' + re.escape(codigo(codigo_fabricante)) + r'(?![a-z0-9/_.-])', nome(produto.titulo)))
         if codigo_fabricante and (codigo_no_titulo or any(codigo(codigo_fabricante) == codigo(v) for v in codigos_remotos)):
             from utils.identidade_peca import assinatura_peca
-            from models.medidas_fisicas import produto_kabum
+            from utils.medidas_fisicas import produto_kabum
             origem_local = produto_kabum(getattr(peca, 'kabum_external', None))
             if (comprovacao.get('criterio') == 'anuncio_original_e_especificacoes_compativeis'
                     and comprovacao.get('valor') == codigo_fabricante

@@ -27,7 +27,7 @@ def test_duas_lojas_mesma_peca_sem_mpn_sem_transporte_mercadolivre():
             assert r['acao']=='importada' and r['criterio']=='modelo_especificacoes'
             assert s.executar(pend.id,dto,ficha,anuncio,assinatura_documento(bruto),simular=False)['acao']=='inalterada'
         assert Processador.query.count()==1 and Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==2
-        assert p.preco==450  # a menor oferta ativa e disponível define o preço da peça
+        assert p.preco==450
         db.session.remove();db.engine.dispose()
 
 

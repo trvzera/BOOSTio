@@ -20,7 +20,6 @@ def criar_prompt_correcao(prompt, erro, resposta, build, catalogo, orcamento,
                           percentual=0, armazenamento_minimo_gb=None):
   teto_pc, teto_perifericos = dividir_orcamento(orcamento, percentual)
   custos = resumo_custos(build, catalogo)
-  # Limitar campos individuais mantém o diagnóstico como JSON válido.
   anterior = resposta if isinstance(resposta, str) else json.dumps(resposta, ensure_ascii=False, default=str)
   revisao = {
     "codigo_falha": codigo_falha(erro),

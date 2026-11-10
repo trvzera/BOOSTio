@@ -1,16 +1,11 @@
-"""Copia preço, estoque e link da KaBuM das tabelas de peças para a tabela oferta.
-
-As colunas antigas não são alteradas nem apagadas: ficam como cópia de segurança até a fase 2.
-Repetir o comando não duplica ofertas nem sobrescreve cotações mais novas já gravadas na oferta.
-"""
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
 from sqlalchemy import inspect, text
 
 from models import db, Oferta, HistoricoOferta
-from models.medidas_fisicas import produto_kabum
-from .modelos_pecas import MODELOS_PECAS
+from utils.medidas_fisicas import produto_kabum
+from models.modelos_pecas import MODELOS_PECAS
 
 COLUNAS_ANTIGAS = {'kabum_external', 'preco', 'esgotado', 'preco_atualizado_em'}
 
@@ -23,7 +18,6 @@ class MigrarOfertasKabumService:
         resumo = {'simulacao': simular, 'criadas': 0, 'atualizadas': 0, 'inalteradas': 0,
                   'sem_link': 0, 'link_invalido': 0, 'conflitos': [], 'historicos': 0}
         inspetor = inspect(db.engine)
-        # Verificado uma vez, fora da transação: consultar o esquema no meio dela pode descartá-la.
         self.historico_antigo = inspetor.has_table('historico_preco')
         if not simular and db.engine.dialect.name == 'mysql':
             self._tornar_colunas_antigas_opcionais(inspetor)
@@ -42,7 +36,6 @@ class MigrarOfertasKabumService:
 
     @staticmethod
     def comandos_colunas_opcionais(dialeto, tabela, colunas):
-        """ALTER TABLE para as colunas antigas ainda NOT NULL: peças novas não as preenchem mais."""
         nome = dialeto.identifier_preparer.quote(tabela)
         return [f'ALTER TABLE {nome} MODIFY {dialeto.identifier_preparer.quote(c["name"])} {c["type"].compile(dialect=dialeto)} NULL'
                 for c in colunas if c['name'] in COLUNAS_ANTIGAS and not c['nullable']]
@@ -69,7 +62,7 @@ class MigrarOfertasKabumService:
         if preco is None and esgotado is False:
             esgotado = None
         atualizado = _data(linha['preco_atualizado_em']) if preco is not None else None
-        oferta = Oferta.query.filter_by(loja='kabum', produto_id_loja=produto).first()
+        oferta = Oferta.buscar_por_anuncio('kabum', produto)
         if oferta is not None and (oferta.tabela_peca, oferta.peca_id) != (tabela, linha['id']):
             resumo['conflitos'].append(f'{tabela}:{linha["id"]} -> anúncio {produto} pertence a {oferta.tabela_peca}:{oferta.peca_id}')
             return
@@ -101,7 +94,7 @@ class MigrarOfertasKabumService:
                 "AND loja='kabum' AND produto_id_loja=:a AND preco IS NOT NULL ORDER BY coletado_em, id"),
                 {'t': tabela, 'p': peca_id, 'a': produto}).mappings():
             coletado = _data(obs['coletado_em'])
-            if HistoricoOferta.query.filter_by(oferta_id=oferta.id, coletado_em=coletado).first() is None:
+            if not HistoricoOferta.existe_coleta(oferta.id, coletado):
                 db.session.add(HistoricoOferta(oferta_id=oferta.id, preco=_preco(obs['preco']),
                                                esgotado=None if obs['esgotado'] is None else bool(obs['esgotado']),
                                                coletado_em=coletado))

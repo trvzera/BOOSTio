@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from .modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 
 def pecas_basicas_medias():

@@ -1,10 +1,10 @@
-"""Importação de um manifesto revisado, sem inferência de códigos por nome."""
 import json
 from pathlib import Path
 from urllib.parse import urlsplit
 
 from models import IdentidadeFabricante
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from .registrar_identidade_fabricante_service import RegistrarIdentidadeFabricanteService
+from models.modelos_pecas import MODELOS_PECAS
 from services.preco_service.validar_link_service import ValidarLinkService
 
 
@@ -21,7 +21,6 @@ class ImportarIdentidadesService:
             raise ValueError('Manifesto deve conter uma lista de até 5000 identidades')
         modelos = {m.__tablename__: m for m in MODELOS_PECAS}
         vistos = set()
-        # Valida todo o formato e duplicatas antes da primeira gravação.
         for item in dados:
             if not isinstance(item, dict) or not all(isinstance(item.get(k), str) and item[k].strip() for k in
                     ('categoria', 'referencia', 'fabricante', 'modelo', 'mpn', 'fonte', 'url_peca')):
@@ -52,7 +51,7 @@ class ImportarIdentidadesService:
                 peca = pecas[0]
                 if ValidarLinkService().codigo_produto(peca.kabum_external) != ValidarLinkService().codigo_produto(item['url_peca']):
                     raise ValueError('Produto da loja diverge do registro revisado')
-                acao = IdentidadeFabricante.registrar(peca, item['mpn'], item['fonte'], item['especificacoes'], simular=simular, gtin=item.get('gtin'))
+                acao = RegistrarIdentidadeFabricanteService().executar(peca, item['mpn'], item['fonte'], item['especificacoes'], simular=simular, gtin=item.get('gtin'))
                 resumo[{'proposta': 'propostas', 'cadastrada': 'cadastradas', 'inalterada': 'inalteradas'}[acao]] += 1
                 detalhe['status'] = acao
             except ValueError as erro:

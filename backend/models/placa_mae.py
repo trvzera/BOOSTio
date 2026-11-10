@@ -13,7 +13,6 @@ class PlacaMae(Peca):
     quantidade_slots_m2 = db.Column(db.Integer())
     @classmethod
     def listar_disponiveis_por_sockets(cls, preco_maximo, sockets, limite_por_socket=24):
-        """Agrupa sockets equivalentes sem cortar o catálogo antes de filtrá-los."""
         from utils.sockets import normalizar_socket
 
         grupos = {socket: [] for valor in sockets if (socket := normalizar_socket(valor))}

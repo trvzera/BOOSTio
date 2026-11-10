@@ -1,4 +1,3 @@
-"""Auditoria da descoberta; sem credenciais ou respostas HTTP completas."""
 from datetime import datetime, timezone
 from . import db, ModeloBase
 

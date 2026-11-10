@@ -1,11 +1,10 @@
-"""Aplica decisões humanas versionadas, sem descoberta por semelhança."""
 import json
 import re
 from pathlib import Path
 from urllib.parse import urlsplit
 
 from models import IdentidadeFabricante, VinculoMercadoLivre
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from services.preco_service.validar_link_service import ValidarLinkService
 from utils.identidade_peca import assinatura_peca, assinatura_catalogo
 
@@ -25,7 +24,6 @@ class ImportarVinculosRevisadosService:
             raise ValueError('Manifesto deve conter até 5000 vínculos')
         modelos={m.__tablename__:m for m in MODELOS_PECAS}
         vistos, catalogos=set(),set()
-        # Validar todo o formato antes de gravar a primeira peça.
         for item in dados:
             self._validar(item, modelos)
             chave=(item['categoria'],item['referencia'])
@@ -44,8 +42,8 @@ class ImportarVinculosRevisadosService:
                 peca=pecas[0]
                 if ValidarLinkService().codigo_produto(peca.kabum_external)!=ValidarLinkService().codigo_produto(item['url_peca']):
                     raise ValueError('Produto de origem difere da revisão')
-                if not IdentidadeFabricante._conferem(peca,item['especificacoes']):
-                    divergentes=[k for k,v in item['especificacoes'].items() if not IdentidadeFabricante._conferem(peca,{k:v})]
+                if not IdentidadeFabricante.conferem(peca,item['especificacoes']):
+                    divergentes=[k for k,v in item['especificacoes'].items() if not IdentidadeFabricante.conferem(peca,{k:v})]
                     raise ValueError('Especificações divergentes: '+', '.join(divergentes))
                 acao=VinculoMercadoLivre.aplicar_revisado(peca,produto['id'],assinatura_peca(peca),
                     assinatura_catalogo(produto),item['especificacoes'],simular=simular)

@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# Rodar no checkout atualizado da VPS. Copia link, preço e estoque da KaBuM das peças para a tabela oferta.
-# Não apaga colunas nem dados: as colunas antigas continuam como cópia de segurança.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 : "${BOOSTIO_BACKUP_DIR:?Defina BOOSTIO_BACKUP_DIR fora do projeto}"
@@ -16,9 +14,7 @@ fi
 "${compose[@]}" build api
 "${compose[@]}" run --rm --no-deps api "${comando[@]}"
 trap '"${compose[@]}" stop web api || true; echo "Migração interrompida; API e web permanecem paradas. Confira o backup e o banco antes de reiniciar. Não restaure automaticamente sobre dados novos." >&2' ERR
-# Sem as ofertas, as peças ficam sem preço: a API para antes e só volta depois da cópia.
 "${compose[@]}" stop web api
-# Pare também cron/jobs externos que gravam (precos-atualizar, ofertas, worker) antes de executar.
 bash deploy/backup_mysql.sh
 "${compose[@]}" run --rm --no-deps api "${comando[@]}" --aplicar
 "${compose[@]}" run --rm --no-deps api "${comando[@]}"   # repetir não deve criar nada

@@ -1,4 +1,4 @@
-// Entry point da página inicial (index.html).
+
 import "../header.js";
 import "../services-carousel.js";
 import "../auth/auth.js";
@@ -35,8 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { threshold: 0.05 },
   );
 
-  // Retoma quando volta à tela; fora dela não consome reprodução. O menu permite
-  // manter apenas os posters, inclusive nos próximos acessos.
+
   videos.forEach((video) => {
     video.loop = true;
     observador.observe(video);
@@ -48,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
         source.dataset.src = source.getAttribute("src");
         source.removeAttribute("src");
       });
-      video.load(); // Retira os frames e mantém a imagem estática do poster.
+      video.load();
     });
     atualizarReproducao();
   });

@@ -5,7 +5,7 @@ from decimal import Decimal
 from math import isfinite
 
 from models.build_salva import MODELOS
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from services.build_service.planejar_perifericos_service import PlanejarPerifericosService
 from services.build_service.amostrar_catalogo_service import AmostrarCatalogoService
 from services.build_service.preferencias_perifericos_service import PreferenciasPerifericosService

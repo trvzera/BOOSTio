@@ -1,4 +1,3 @@
-"""Verifica o snapshot inteiro antes de permitir qualquer gravação."""
 import hashlib
 import json
 from pathlib import Path

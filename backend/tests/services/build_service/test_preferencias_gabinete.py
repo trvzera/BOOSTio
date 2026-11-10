@@ -54,7 +54,7 @@ def test_gpu_troca_cor_so_com_chip_e_memoria_confirmados():
 
 
 def test_ficha_de_cor_da_gpu_exige_anuncio_e_variante_exatos():
-    from models.medidas_fisicas import completar_medidas
+    from utils.medidas_fisicas import completar_medidas
     dados = {"categoria": "placa_video", "fabricante": "Gigabyte", "modelo": "RTX 5060 AERO OC 8G GeForce",
              "part_number": "SEED-GPU-14", "link": "https://www.kabum.com.br/produto/777072/placa"}
     assert completar_medidas(dados)["cor"] == "branco"

@@ -1,4 +1,3 @@
-"""Campos opcionais compartilhados somente por CPU e GPU."""
 from . import db
 
 
@@ -12,7 +11,6 @@ class BenchmarkMixin:
 
     @classmethod
     def listar_por_benchmark(cls, preco_maximo, prioridade, limite=12):
-        """Candidatos comparáveis por pontuação ou pontos por real, sem gravar."""
         pontuacao = getattr(cls, cls.BENCHMARK_CAMPO)
         criterio = pontuacao / cls.preco if prioridade == "custo_beneficio" else pontuacao
         return (cls._consulta_benchmark(preco_maximo)
@@ -20,7 +18,6 @@ class BenchmarkMixin:
 
     @classmethod
     def listar_pool_benchmark(cls, preco_maximo):
-        """Carrega todos os elegíveis antes de Pareto, faixas e diversidade."""
         return cls._consulta_benchmark(preco_maximo).order_by(cls.preco.asc(), cls.id.asc()).all()
 
     @classmethod

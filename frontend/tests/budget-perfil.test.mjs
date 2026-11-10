@@ -92,7 +92,7 @@ test("salvar budget envia apenas valor e autorização à rota do dono, com cook
     return json({usuario:usuario(42,1234.56)});
   };
   assert.equal((await atualizarBudgetUsuario(42,1234.56,true)).usuario.budget,1234.56);
-  // A API não faz salvamento otimista na projeção de perfil.
+
   assert.equal(planejamentoLocal().budget,null);
 });
 

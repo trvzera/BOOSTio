@@ -1,4 +1,3 @@
-"""Adiciona o budget ao SQLite sem recriar tabelas nem alterar usuários existentes."""
 import sqlite3
 from contextlib import closing
 from datetime import datetime, timezone
@@ -10,13 +9,11 @@ import click
 
 def migrar_budget(caminho):
     caminho = Path(caminho).resolve()
-    # mode=rw não cria um banco vazio se o caminho estiver incorreto.
     with closing(sqlite3.connect(caminho.as_uri() + "?mode=rw", uri=True, timeout=10)) as conexao:
         colunas = {linha[1] for linha in conexao.execute("PRAGMA table_info(usuario)")}
         if not colunas:
             raise ValueError("Tabela usuario não encontrada. Inicialize o banco antes de migrar.")
         alteracoes = {
-            # Bancos anteriores ao login Google também precisam deste campo do modelo.
             "login_google": "ALTER TABLE usuario ADD COLUMN login_google BOOLEAN NOT NULL DEFAULT 0",
             "budget": "ALTER TABLE usuario ADD COLUMN budget NUMERIC(12, 2)",
             "usar_budget": "ALTER TABLE usuario ADD COLUMN usar_budget BOOLEAN NOT NULL DEFAULT 0",
@@ -30,7 +27,6 @@ def migrar_budget(caminho):
         backup.touch(mode=0o600, exist_ok=False)
         with closing(sqlite3.connect(backup)) as destino:
             conexao.backup(destino)
-        # Transação explícita: ou todas as colunas são adicionadas, ou nenhuma.
         conexao.execute("BEGIN IMMEDIATE")
         try:
             for nome in pendentes:
@@ -45,7 +41,6 @@ def migrar_budget(caminho):
 def registrar_migracao_budget(app, db):
     @app.cli.command("migrar-budget")
     def comando():
-        """Atualiza um SQLite existente, criando backup antes da alteração."""
         if db.engine.dialect.name != "sqlite" or not db.engine.url.database or db.engine.url.database == ":memory:":
             raise click.ClickException("Esta migração atende apenas bancos SQLite em arquivo.")
         try:

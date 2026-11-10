@@ -13,7 +13,6 @@ class MemoriaRAM(Peca):
     iluminacao = db.Column(db.Boolean(), default=False)
     @classmethod
     def listar_disponiveis_por_ddrs(cls, preco_maximo, ddrs, limite_por_ddr=24):
-        """Filtra preço/disponibilidade e agrupa os padrões explicitamente informados."""
         from utils.memorias import normalizar_ddr
 
         grupos = {ddr: [] for valor in ddrs if (ddr := normalizar_ddr(valor))}

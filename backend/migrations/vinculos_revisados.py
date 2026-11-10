@@ -1,4 +1,3 @@
-"""Acrescenta a ficha revisada sem apagar vínculos ou ofertas existentes."""
 from sqlalchemy import inspect, text
 from models import db, VinculoMercadoLivre
 

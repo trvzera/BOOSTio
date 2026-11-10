@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from sqlalchemy.exc import SQLAlchemyError
 from models import db, ProdutoPendente, ExecucaoDescoberta
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from .buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
 from .controle_requisicoes_service import ControleRequisicoesService, OrcamentoRequisicoesEsgotado, ErroMercadoLivre
 from .normalizar_produto_service import DOMINIOS
@@ -103,7 +103,6 @@ class DescobrirProdutosService:
         except (ValueError, SQLAlchemyError) as erro:
             db.session.rollback()
             resumo['interrompido'] = True
-            # Não incluir corpo de resposta, URL OAuth nem detalhes de SQL nos logs.
             if isinstance(erro, ErroMercadoLivre):
                 motivo = f'Mercado Livre HTTP {erro.status}; verifique acesso ou limite antes de repetir'
                 resumo['http_status'] = erro.status
@@ -136,7 +135,7 @@ class DescobrirProdutosService:
             raise ValueError('Anúncio inválido')
         if origem == 'catalogo':
             normal = cliente._normalizar(linha, produto['id'])
-            titulo = produto['name']  # Nome do catálogo, não título individual do vendedor.
+            titulo = produto['name']
         else:
             seller = linha.get('seller')
             normal = cliente._normalizar({**linha, 'item_id': linha.get('id'),
@@ -144,7 +143,6 @@ class DescobrirProdutosService:
             titulo = linha.get('title')
         if not isinstance(titulo, str) or not 1 <= len(titulo.strip()) <= 255:
             raise ValueError('Título inválido')
-        # JSON monetário permanece decimal exato em texto, sem conversão para float.
         def _decimal_json(valor):
             if isinstance(valor, Decimal):
                 return str(valor)

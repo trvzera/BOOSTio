@@ -58,7 +58,7 @@ def cadastrar_pecas(tipos):
         modelo = MODELOS[tipo]
         dados = {"status_validacao": "aprovado", "fabricante": "Teste", "modelo": tipo, "preco": 100, "consumo_energia": 1}
         for coluna in modelo.__table__.columns:
-            from models.campos_tecnicos import CAMPOS_TECNICOS_OBRIGATORIOS
+            from utils.campos_tecnicos import CAMPOS_TECNICOS_OBRIGATORIOS
             obrigatoria = not coluna.nullable or coluna.name in CAMPOS_TECNICOS_OBRIGATORIOS.get(tipo, ())
             if coluna.name not in dados and obrigatoria and not coluna.primary_key and not coluna.default and not coluna.server_default:
                 dados[coluna.name] = "Teste" if coluna.type.python_type is str else 1
@@ -98,7 +98,6 @@ def test_referencia_gabinete_so_enriquece_amostra_se_disponivel_dentro_do_teto(a
         gabinete=MODELOS["gabinete"].query.first()
         gabinete.esgotado=False
         db.session.commit()
-        # Força a referência a ficar de fora da amostra normal.
         mocker.patch("services.build_service.catalogo_geracao_service.MODELOS_PECAS",())
         assert gerar_catalogo(200,referencia_gabinete=gabinete.id)["gabinete"][0]["id"] == gabinete.id
         assert not gerar_catalogo(50,referencia_gabinete=gabinete.id)
@@ -126,7 +125,6 @@ def test_limite_em_manual_importacao_duplicacao_e_llm(app_build, mocker):
         assert resposta.json["codigo"] == "limite-builds"
     llm.assert_not_called()
     assert cliente.get("/build/").json["limite"] == 3
-    # Edição continua disponível; liberar uma vaga permite criar novamente.
     assert cliente.put(f"/build/{identificador}", json={**ESTADO, "titulo": "Editada"}).status_code == 200
     assert cliente.delete(f"/build/{identificador}").status_code == 204
     assert cliente.post("/build/manual", json=ESTADO).status_code == 201
@@ -266,7 +264,7 @@ def test_rotas_recalculam_diagnostico_por_id_sem_confiar_no_front_e_preservam_ra
     estado = {**ESTADO, "visibilidade": "publico", "componentes": {"processador": {"id": 1}, "placa_mae": {"id": 1}},
               "compatibilidade": {"status": "sem_conflitos"}}
     resposta = cliente.post("/build/manual", json=estado)
-    assert resposta.status_code == 201  # Rascunho com conflito continua podendo ser salvo.
+    assert resposta.status_code == 201
     identificador = resposta.json["build"]["id"]
     for build in (resposta.json["build"], cliente.get(f"/build/{identificador}").json["build"],
                   cliente.get("/build/").json["builds"][0], cliente.get(f"/build/{identificador}/publica").json["build"]):
@@ -277,7 +275,7 @@ def test_rotas_recalculam_diagnostico_por_id_sem_confiar_no_front_e_preservam_ra
         db.session.commit()
     resposta = cliente.put(f"/build/{identificador}", json=estado)
     assert resposta.status_code == 200
-    assert resposta.json["build"]["compatibilidade"]["status"] == "nao_verificado"  # BIOS/encaixes ainda pendentes.
+    assert resposta.json["build"]["compatibilidade"]["status"] == "nao_verificado"
 
 
 def resposta_com_perifericos():
@@ -337,11 +335,9 @@ def test_geracao_rejeita_transferencia_de_sobra_antes_de_salvar(app_build, mocke
         cadastrar_pecas(tipos)
         if excesso == "perifericos":
             MODELOS["monitor"].buscar_por_id(1).preco = 750
-            # Existe uma alternativa viável; a saída da IA escolhe a que excede o conjunto.
             db.session.add(MODELOS["monitor"](status_validacao="aprovado", fabricante="Teste", modelo="Alternativa", preco=400,
                 consumo_energia=1, tamanho_polegadas=24, resolucao="1920x1080", taxa_atualizacao_hz=60, conexao="HDMI",tipo_painel="IPS"))
         else:
-            # Cada peça cabe no filtro individual, mas o subtotal do PC excede R$ 4.000.
             MODELOS["processador"].buscar_por_id(1).preco = 3000
             MODELOS["placa_mae"].buscar_por_id(1).preco = 700
         db.session.commit()
@@ -352,7 +348,6 @@ def test_geracao_rejeita_transferencia_de_sobra_antes_de_salvar(app_build, mocke
     autenticar(cliente)
     resposta = cliente.post("/build/", json={**PEDIDO, "percentual_perifericos": 20})
     if excesso == "pc":
-        # O seletor agora detecta a plataforma inviável antes de consumir IA.
         assert resposta.status_code == 400
         assert resposta.json["codigo"] == "planejamento-invalido"
         llm.assert_not_called()
@@ -482,7 +477,7 @@ def test_geracao_rejeita_conflito_antes_de_gravar_build(app_build, mocker):
     resposta = cliente.post("/build/", json=PEDIDO)
     assert resposta.status_code == 400
     assert resposta.json["codigo"] == "planejamento-invalido"
-    llm.assert_not_called()  # Nenhuma placa AM4 pode ser oferecida neste catálogo.
+    llm.assert_not_called()
     with app_build.app_context():
         assert Build.query.count() == BuildSalva.query.count() == 0
 
@@ -827,7 +822,7 @@ def test_revisao_do_pc_nao_usa_a_verba_reservada_para_perifericos(mocker):
     llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value=build)
     resultado = gerar_candidata(1, "Pedido", "teste", catalogo, 8000, 80, {}, {}, {}, revisar_investimento=True)
     assert resultado["preco_total"] == 1100
-    llm.assert_called_once()  # A alternativa caberia no total, mas não no teto de R$ 1.600 do PC.
+    llm.assert_called_once()
 
 
 def test_revisao_considera_preco_por_quantidade_dos_pentes(mocker):
@@ -879,7 +874,7 @@ def test_uso_misto_com_gpu_propria_e_perifericos_melhora_so_as_compras_pendentes
     with app_build.app_context():
         resposta = CriarBuildService().executar(1, {**primeira, "orcamento": 8000, "percentual_perifericos": 20,
                                                    "pecas_proprias": {"placa_video": "placa_video"}})
-        assert resposta["preco_total"] == 6400  # PC R$ 6.000 + periféricos R$ 400; sobra reservada R$ 1.200.
+        assert resposta["preco_total"] == 6400
         assert resposta["estado"]["componentes"]["placa_video"] == {"proprio": "placa_video", "quantidade": 1}
         assert resposta["estado"]["componentes"]["processador"]["id"] == 2
         assert BuildSalva.query.count() == 1
@@ -1011,8 +1006,7 @@ def test_armazenamento_insuficiente_nunca_e_salvo(app_build, mocker):
         assert BuildSalva.query.count() == Build.query.count() == 0
 
 
-@pytest.mark.parametrize("via_site", [False, True])
-def test_geracao_inteligente_repara_excesso_sem_pedir_nova_resposta_ia(app_build, mocker, via_site):
+def test_geracao_inteligente_repara_excesso_sem_pedir_nova_resposta_ia(app_build, mocker):
     from services.build_service.seletor_inteligente_service import SeletorInteligenteService
     tipos = ['processador','placa_mae','placa_video','memoria_ram','fonte','gabinete','ssd','fan']
     resposta = {**PEDIDO, 'componentes': [dict(tipo=t,id=1,quantidade=2 if t=='memoria_ram' else 5 if t=='fan' else 1) for t in tipos]}
@@ -1041,16 +1035,13 @@ def test_geracao_inteligente_repara_excesso_sem_pedir_nova_resposta_ia(app_build
         antiga=mocker.spy(criacao_module, 'preparar_catalogo')
         preparar=mocker.spy(SeletorInteligenteService, 'preparar_geracao')
         salvar=mocker.spy(criacao_module, 'salvar_build')
-        if via_site:
-            cliente=app_build.test_client()
-            autenticar(cliente)
-            resposta_http=cliente.post('/build/',json=pedido)
-            assert resposta_http.status_code==201, resposta_http.json
-            assert resposta_http.json['build']['preco_total']==7950
-            assert BuildSalva.query.count()==Build.query.count()==1
-            r={'build': salvar.call_args.args[1]}
-        else:
-            r=SeletorInteligenteService().gerar_build(1,pedido)
+        cliente=app_build.test_client()
+        autenticar(cliente)
+        resposta_http=cliente.post('/build/',json=pedido)
+        assert resposta_http.status_code==201, resposta_http.json
+        assert resposta_http.json['build']['preco_total']==7950
+        assert BuildSalva.query.count()==Build.query.count()==1
+        r={'build': salvar.call_args.args[1]}
         preparar.assert_called_once()
         antiga.assert_not_called()
         assert llm.call_count == 1
@@ -1058,8 +1049,6 @@ def test_geracao_inteligente_repara_excesso_sem_pedir_nova_resposta_ia(app_build
         ajuste=r['build']['ajuste_orcamento']
         assert ajuste['total_anterior'] == 8300 and ajuste['economia'] == 350
         assert {i['tipo'] for i in ajuste['trocas']} == {'ssd','fan'}
-        if not via_site:
-            assert BuildSalva.query.count() == Build.query.count() == 0
 
 
 def test_reparo_sem_alternativa_segura_ainda_usa_correcao_limitada(app_build, mocker):

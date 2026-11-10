@@ -59,9 +59,9 @@
 .icon-back { display: inline-grid; place-items: center; width: 44px; height: 44px; padding: 0; font-size: 1.3rem; }
 .store-brand { display: flex; align-items: center; gap: 10px; min-height: 64px; }
 .store-logo { width: 116px; height: 40px; object-fit: contain; object-position: left center; filter: saturate(0); }
-/* O SVG KaBuM tem uma prancheta quadrada com margens; o recorte é só visual. */
+
 .store-logo[src$="/kabum-logo.svg"] { object-fit: cover; object-position: center; }
-/* As versões escuras precisam de contraste no fundo glass, mantendo saturação zero. */
+
 .store-logo[src$="/pichau.png"] { filter: saturate(0) brightness(2.8); }
 .store-price { font: 600 1.25rem/1.4 var(--font-heading); color: var(--cor-6); }
 .store-price-unavailable { color: var(--text-secondary); font-size: var(--text-small); }

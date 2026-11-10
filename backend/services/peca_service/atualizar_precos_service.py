@@ -7,7 +7,7 @@ from sqlalchemy import inspect
 
 from models import db, ConsultaPreco, ControleColeta, HistoricoOferta, Oferta
 from repositories.ofertas_kabum_repository import aplicar_cotacao, buscar_ativa, validar_cotacao
-from .modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from services.preco_service.buscar_preco_kabum_service import BuscarPrecoKabumService
 from services.preco_service.reservar_consulta_service import ReservarConsultaService
 from services.preco_service.validar_link_service import ValidarLinkService
@@ -104,7 +104,6 @@ class AtualizarPrecosService:
             consulta.status = "falha"
             consulta.erro = str(erro)[:300]
             resumo["falhas"] += 1
-        # A peça, o histórico e o resultado da tentativa são confirmados juntos.
         consulta.confirmar()
         if alteracoes is not None:
             resumo["historicos"] += 1

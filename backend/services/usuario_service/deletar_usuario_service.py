@@ -1,4 +1,4 @@
-from models import Usuario,Codigo,db
+from models import Usuario, Codigo
 from .confirmar_identidade_service import ConfirmarIdentidadeService
 
 class DeletarUsuarioService:

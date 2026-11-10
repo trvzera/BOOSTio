@@ -1,4 +1,3 @@
-"""Correspondência exata por modelo com verificação independente das variantes."""
 import re
 from decimal import Decimal, InvalidOperation
 from services.catalogo_service.normalizar_produto import nome, codigo
@@ -22,7 +21,6 @@ def chave_modelo(categoria,texto,marca,cor=()):
     if categoria=='memoria_ram':
         s=re.sub(r'\bddr\s*[1-5](?:-\d+)?\b|\bcl\s*\d+\b|\b(?:288|260|240|204)-pin\b|\b(?:so-?)?dimm\b',' ',s)
     s=re.sub(r'\b(?:motherboard|processor|graphics card|video card|memory|kit|internal|desktop)\b',' ',s)
-    # Mantém números, sufixos, OC, revisões e nomes de edições.
     return '|'.join(sorted(re.findall(r'[a-z0-9]+',s)))
 
 
@@ -60,7 +58,6 @@ class CompararFichasBuildcoresService:
             if atual is None:continue
             if equivalente(cat,campo,atual,v) is False:conflitos.append('campo_divergente:'+campo)
             elif equivalente(cat,campo,atual,v) is True:conferidos.append(campo)
-        # Especificações que distinguem SKUs e não têm coluna local ainda.
         pares={'placa_video':{'core_clock':'core_base_clock','boost_clock':'core_boost_clock','length':'length'},
           'fonte':{'modular':'modular'},'fan':{'pwm':'pwm'}}.get(cat,{})
         for a,b in pares.items():

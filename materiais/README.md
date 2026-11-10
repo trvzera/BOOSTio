@@ -22,5 +22,5 @@ Edite os roteiros na pasta de origem. As cópias em pacotes exportados são apen
 versões para distribuição; gere um novo pacote quando os materiais mudarem.
 
 Fontes, imagens, SVGs, Lotties e vídeos usados em produção continuam em
-`frontend/`. Documentação técnica e testes continuam em `docs/`,
+`frontend/`. Comandos e funcionalidades estão em `docs/`,
 `frontend/tests/` e `backend/tests/`. Bancos e segredos não pertencem a esta pasta.

@@ -16,13 +16,11 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 
 def _responder(funcao):
-    """Traduz os erros dos services para HTTP; nenhuma mensagem de banco chega ao navegador."""
     try:
         resposta = jsonify(funcao())
         resposta.headers["Cache-Control"] = "no-store"
         return resposta, 200
     except (ErroMercadoLivre, OrcamentoRequisicoesEsgotado):
-        # Antes de ValueError, de que ambos herdam: é falha da loja, não da entrada do administrador.
         return jsonify({"erro": "O Mercado Livre não respondeu agora. Tente novamente em instantes.", "codigo": "loja-indisponivel"}), 502
     except ConflitoPendencia as erro:
         return jsonify({"erro": str(erro), "codigo": "conflito"}), 409

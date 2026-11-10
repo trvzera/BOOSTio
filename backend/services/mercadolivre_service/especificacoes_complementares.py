@@ -1,4 +1,3 @@
-"""Somente atributos observados nas respostas reais da API. Não infere ausências."""
 import re
 from services.catalogo_service.normalizar_produto import nome
 
@@ -48,7 +47,6 @@ def complementar(produto, atributos, categoria, specs):
             conexao.append('wireless')
         if valores('WITH_BLUETOOTH') == ['sim']:
             conexao.append('bluetooth')
-        # USB só quando aparece explicitamente; ter fio não comprova USB.
         texto_conexao = titulo + ' ' + ' '.join(valores('WIRELESS_TECHNOLOGY'))
         if re.search(r'\busb(?:[ -]?c)?\b', texto_conexao):
             conexao.append('usb-c' if re.search(r'\busb[ -]?c\b', texto_conexao) else 'usb')

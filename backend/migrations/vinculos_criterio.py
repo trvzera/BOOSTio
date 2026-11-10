@@ -1,4 +1,3 @@
-"""Alarga vinculo_mercado_livre.criterio (VARCHAR(20) -> VARCHAR(100)); repetível e sem perda de dados."""
 from sqlalchemy import inspect, text
 from models import db
 
@@ -16,7 +15,6 @@ def preparar_vinculos_criterio(*, simular=False):
     if coluna is None:
         raise ValueError('Tabela de vínculos incompatível; revise o schema antes de migrar')
     atual = getattr(coluna['type'], 'length', None)
-    # SQLite não aplica limite de VARCHAR: nada a alterar.
     if dialecto == 'sqlite' or (atual is not None and atual >= TAMANHO):
         return {'simulacao': simular, 'alteracoes': []}
     ddl = f'ALTER TABLE `vinculo_mercado_livre` MODIFY COLUMN `criterio` VARCHAR({TAMANHO}) NOT NULL'

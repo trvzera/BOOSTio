@@ -305,7 +305,7 @@ def test_catalogo_ambiguo_vira_pendencia_como_na_shopee(banco):
     _,p=banco
     sem_mpn=produto(attributes=[{'id':'BRAND','value_name':'AMD'}])
     simulado=executar(p,prod=sem_mpn,ofertas=[anuncio('MLB77',5,300),anuncio('MLB78',6,250,'used')])
-    assert ProdutoPendente.query.count()==0  # simulação não grava
+    assert ProdutoPendente.query.count()==0
     r=executar(p,prod=sem_mpn,ofertas=[anuncio('MLB77',5,300),anuncio('MLB78',6,250,'used')],simular=False)
     assert r['revisao']==1 and r['detalhes'][0]['ambiguas']==1 and r['detalhes'][0]['ambiguas_registradas']==1
     pendencia=ProdutoPendente.query.one()
@@ -313,7 +313,6 @@ def test_catalogo_ambiguo_vira_pendencia_como_na_shopee(banco):
     assert pendencia.dados_originais['catalogo']['id']==CAT and pendencia.dados_originais['anuncio']['price']=='300.00'
     assert [c['peca'] for c in pendencia.candidatos]==[f'processador:{p.id}']
     assert Oferta.query.filter(Oferta.loja!='kabum').count()==0
-    # repetir não duplica
     executar(p,prod=sem_mpn,ofertas=[anuncio('MLB77',5,300)],simular=False)
     assert ProdutoPendente.query.count()==1
 
@@ -337,7 +336,7 @@ def test_catalogo_sem_ofertas_404_na_fila_nao_derruba_a_tarefa(banco):
     def api(self,path,token,params=None):
         if path=='/products/search': return {'paging':{'total':1},'results':[prod]}
         if path==f'/products/{CAT}': return prod
-        raise FalhaMarketplace(206)  # /items: na fila o 404 chega como FalhaMarketplace
+        raise FalhaMarketplace(206)
     with patch.object(BuscarOfertasMercadoLivreService,'_requisitar',api),patch('services.mercadolivre_service.atualizar_ofertas_service.TokenMercadoLivreService') as tokens:
         tokens.return_value.executar.return_value='token'
         r=Service().executar(categoria='processador',peca_id=p.id,simular=False)

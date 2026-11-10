@@ -1,4 +1,4 @@
-from repositories.especificacoes_peca_repository import preencher_especificacoes
+from services.catalogo_service.gravar_especificacoes_peca_service import preencher_especificacoes
 """Propõe somente lacunas com código completo em comum e ficha compatível."""
 import re
 from decimal import Decimal
@@ -37,7 +37,6 @@ class EnriquecerPecaExistenteService:
         remotos = set().union(*(extrator.extrair(v,peca.__tablename__) for v in
             (produto.modelo or '', *produto.modelos_alternativos, *valores(produto.identificadores.get('mpn')))))
         if produto.contexto.get('mpn_confirmado_na_fonte'):
-            # O MPN exato foi comprovado no índice da fonte (ex.: Icecat); vale mesmo sem parecer "código de modelo".
             remotos |= {codigo(v) for v in valores(produto.identificadores.get('mpn'))}
         comuns = locais & remotos
         origem_confirmada = False
@@ -86,7 +85,7 @@ class EnriquecerPecaExistenteService:
         campos = (*ESSENCIAIS.get(peca.__tablename__,()), *OPCIONAIS.get(peca.__tablename__,()))
         for campo in dict.fromkeys(campos):
             if not ficha_suficiente:
-                continue  # Identidade da origem não autoriza inventar especificações ausentes.
+                continue
             destino = self.ALIASES.get(campo,campo)
             if destino not in peca.__table__.columns or destino in self.CAMPOS_PROTEGIDOS or not self.ausente(getattr(peca,destino)):
                 continue

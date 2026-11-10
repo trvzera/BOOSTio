@@ -1,15 +1,8 @@
-"""Índice por marca e identificadores, sem limitar a busca aos primeiros IDs.
-
-O índice só elimina marcas explicitamente incompatíveis. Identificadores iguais
-continuam na comparação mesmo entre marcas diferentes, para detectar conflitos.
-Sem marca explícita, todos os registros são examinados. Nenhuma semelhança textual
-é usada para excluir candidatos ou decidir uma associação neste estágio.
-"""
 from collections import defaultdict
 from types import SimpleNamespace
 from copy import deepcopy
 
-from models import IdentidadeFabricante
+from .identidades_para_matching_service import IdentidadesParaMatchingService
 from .associacao_inteligente_service import AssociacaoInteligenteService
 from .comparar_nomes_service import marca
 from .conferir_especificacoes_service import valores
@@ -30,8 +23,6 @@ class IndiceCandidatosService:
             dados = ({c.name:deepcopy(getattr(peca, c.name)) for c in tabela.columns
                       if c.name != 'fontes_especificacoes'}
                      if tabela is not None else deepcopy(vars(peca)))
-            # O comparador só usa esta evidência. Não duplique os JSONs brutos
-            # das bases técnicas para cada peça do catálogo na memória da VPS.
             fonte_codigo = (getattr(peca, 'fontes_especificacoes', None) or {}).get('codigo_modelo_fabricante')
             dados['fontes_especificacoes'] = ({'codigo_modelo_fabricante':deepcopy(fonte_codigo)}
                                              if fonte_codigo else {})
@@ -49,17 +40,15 @@ class IndiceCandidatosService:
     def carregar(cls, modelo):
         pecas = []
         identidades = {}
-        # SQL e validação das identidades permanecem nos models; INs pequenos
-        # funcionam também no SQLite e evitam uma consulta por componente.
         lote = []
         for peca in modelo.iterar_para_matching():
             lote.append(peca)
             if len(lote) == 500:
-                identidades.update(IdentidadeFabricante.para_matching(lote))
+                identidades.update(IdentidadesParaMatchingService().executar(lote))
                 pecas.extend(lote)
                 lote = []
         if lote:
-            identidades.update(IdentidadeFabricante.para_matching(lote))
+            identidades.update(IdentidadesParaMatchingService().executar(lote))
             pecas.extend(lote)
         return cls(pecas, identidades)
 
@@ -79,9 +68,6 @@ class IndiceCandidatosService:
         return [self.pecas[posicao] for posicao in self._posicoes(produto)]
 
     def avaliar(self, produto):
-        # Snapshot da classificação: commits de diagnósticos expiram objetos
-        # SQLAlchemy. Não faça uma consulta por peça a cada anúncio do lote.
-        # A importação monta outro índice dentro da transação e revalida tudo.
         candidatos = [self.comparaveis[posicao] for posicao in self._posicoes(produto)]
         decisao = AssociacaoInteligenteService().selecionar(
             candidatos, produto, identidades=self.identidades, completo=self.completo)

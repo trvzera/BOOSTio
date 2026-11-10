@@ -3,7 +3,7 @@ from datetime import timezone
 from models import HistoricoOferta, Oferta, VinculoMercadoLivre
 from repositories.ofertas_kabum_repository import buscar_ativa
 from utils.identidade_peca import assinatura_peca
-from .modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 
 class ConsultarHistoricoPrecosService:

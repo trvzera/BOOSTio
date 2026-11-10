@@ -1,4 +1,4 @@
-/* Base e utilitários compartilhados */
+
 @import "./global/global.css";
 @import "./utilitarios/cores.css";
 @import "./utilitarios/espacamentos.css";
@@ -9,7 +9,7 @@
 @import "./utilitarios/decorations.css";
 @import "./utilitarios/transition.css";
 
-/* Componentes compartilhados */
+
 @import "./componentes/loading.css";
 @import "./componentes/site-menu.css";
 @import "./componentes/scroll-reveal.css";
@@ -17,7 +17,7 @@
 @import "./componentes/onboarding.css";
 @import "./componentes/value-transition.css";
 
-/* Páginas */
+
 @import "./home/home.css";
 @import "./home/build-page.css";
 @import "./home/footer.css";
@@ -36,7 +36,7 @@
 @import "./build/catalogo.css";
 @import "./build/price-history.css";
 
-/* Formulário */
+
 @import "./forms/forms.css";
 @import "./forms/opcoes.css";
 @import "./forms/orcamento.css";
@@ -52,7 +52,7 @@
 @import "./componentes/feedback.css";
 @import "./componentes/email-verification.css";
 
-/* Ajustes por largura de tela */
+
 @import "./responsividades/r-site.css";
 @import "./responsividades/r-home.css";
 @import "./responsividades/r-services.css";

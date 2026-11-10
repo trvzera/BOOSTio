@@ -1,14 +1,14 @@
-// Mesmo contrato de services/build_service/encaixe_fisico.py. Sem inferir pelo nome.
+
 const n = v => v == null || v === "" || typeof v === "boolean" || !Number.isFinite(Number(v)) || Number(v) < 0 ? null : Number(v);
 const inteiro = (v,min = 0) => Number.isInteger(n(v)) && n(v) >= min && n(v) <= 64 ? n(v) : null;
 const tamanhos = v => Array.isArray(v) && v.every(x => n(x) > 0) ? v.map(n) : null;
-// Presença de ventilação não aprova encaixe nem elimina verificações de capacidade.
-// Fans do air cooler refrigeram a CPU e não contam como fans do gabinete.
+
+
 export function temFansInclusas(gabinete,water = null) {
   return [gabinete?.fans_inclusos,water?.quantidade_fans].some(v => inteiro(v,1) != null);
 }
-// Sugestão editorial por modelo revisado. Não preenche capacidade, diâmetro,
-// fans inclusas ou aprovação de encaixe; dimensões externas são só contexto.
+
+
 export function planejamentoFans(gabinete) {
   const estimativa = gabinete?.estimativa_fans;
   const quantidade = inteiro(estimativa?.quantidade_inicial,1);
@@ -112,7 +112,7 @@ export function informacoesFans(gabinete,fans = [],water = null,substituir = fal
 
 export function fluxoFan(peca) {
   if (peca?.fluxo_ar === "reverso" || peca?.fluxo_ar === "normal") return peca.fluxo_ar;
-  // Identificação comercial, não certificação técnica nem direção de instalação.
+
   return /\b(reverse|reversa|reverso)\b/i.test(peca?.modelo || "") ? "reverso" : "nao_informado";
 }
 

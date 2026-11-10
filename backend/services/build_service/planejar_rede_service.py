@@ -38,8 +38,6 @@ class PlanejarRedeService:
             if tipo == "adaptador_wifi" and solicitada and velocidade is None:
                 continue
             opcoes.append(peca)
-        # Preferência de catálogo, sem afirmar que um cabo de padrão desconhecido é Cat6.
-        # Mantém as alternativas para não inviabilizar o PC quando só elas cabem no teto.
         if tipo == "cabo_rede":
             opcoes.sort(key=lambda p: not cls._cat6(p))
         return opcoes

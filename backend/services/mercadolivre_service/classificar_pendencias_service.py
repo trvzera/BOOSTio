@@ -1,4 +1,3 @@
-"""Ligação do adaptador Mercado Livre com a classificação compartilhada."""
 from dataclasses import replace
 from services.catalogo_service.classificar_pendencias_service import ClassificarPendenciasService as ClassificarCatalogoService
 from .normalizar_produto_service import NormalizarProdutoService

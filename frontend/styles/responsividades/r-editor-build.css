@@ -12,7 +12,7 @@
 .ram-controls .disabled-tip-anchor > button { width: 100%; }
 .builder-demo, .compatibility-trigger { max-width: 100%; }
 .build-sidebar { min-width: 0; top: min(88px,calc(100dvh - var(--summary-height,0px) - 16px)); }
-/* Expandir os detalhes não desativa o sticky; telas baixas/móveis usam o fluxo normal. */
+
 .catalog-toolbar { grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 1fr)); }
 .product-actions { flex-wrap: wrap; }
 .product-actions > * { min-width: 0; }
@@ -36,7 +36,7 @@
 
 @media (max-width: 1100px) {
   .builder-layout { grid-template-columns: minmax(0, 1fr) 280px; gap: 20px; }
-  /* Grade explícita mantém o remover no canto, mesmo quando ele está bloqueado. */
+
   .component-selected-main { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 12px; }
   .component-image { grid-column: 1; grid-row: 1; }
   .component-copy { grid-column: 2; grid-row: 1; }
@@ -57,7 +57,7 @@
 }
 @media (max-width: 850px) {
   .builder-page-main, .builder-footer-wrapper { width: calc(100% - 32px); }
-  /* Reduz apenas o lápis; o botão mantém a área de toque de 2.75rem. */
+
   .builder-rename > .ui-lottie { width: 1rem; height: 1rem; flex-basis: 1rem; }
   .builder-rename .ui-icon-fallback { font-size: 1rem; }
   .catalog-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 20px; gap: 16px; }

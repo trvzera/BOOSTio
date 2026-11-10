@@ -1,4 +1,3 @@
-"""HTTP limitado aos fabricantes cadastrados, com cache e respeito ao robots.txt."""
 import hashlib
 import json
 from pathlib import Path
@@ -54,7 +53,6 @@ class ConsultarPaginasFabricanteService:
             with requests.get(url,timeout=(5,15),stream=True,allow_redirects=False,
                               headers={'User-Agent':'BOOSTioCatalogo/1.0'}) as resposta:
                 if resposta.status_code in (301,302,303,307,308):
-                    # O resolver consulta o destino em outra etapa, após validação.
                     destino=urljoin(url,resposta.headers.get('Location',''))
                     self.validar(destino,fabricante)
                     raise ValueError('Página oficial mudou de endereço; atualizar índice de descoberta')

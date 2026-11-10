@@ -10,7 +10,7 @@ from services.peca_service.popular_pecas_service import PopularPecasService
 from services.peca_service.atualizar_precos_service import AtualizarPrecosService
 from services.peca_service.salvar_peca_service import SalvarPecaService
 from services.peca_service.restaurar_links_kabum_service import RestaurarLinksKabumService
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from services.peca_service.atualizar_imagem_peca_service import AtualizarImagemPecaService
 from services.peca_service.auditar_catalogo_service import AuditarCatalogoService
 from services.peca_service.cadastrar_complementares_service import CadastrarComplementaresService

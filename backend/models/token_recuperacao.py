@@ -37,7 +37,6 @@ class TokenRecuperacao(ModeloBase):
 
   @staticmethod
   def _hash_token(token):
-    # O token aleatório tem 256 bits; o hash permite busca indexada sem armazená-lo em claro.
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
   @staticmethod
@@ -66,7 +65,6 @@ class TokenRecuperacao(ModeloBase):
   def redefinir_senha(self, senha_hash):
     from .usuario import Usuario
     try:
-      # Bloqueia a linha do usuário antes do token, na mesma ordem usada na emissão.
       atualizados = Usuario.query.filter_by(
         id=self.usuario_id, ativo=True, email=self.email_destino, versao_sessao=self.versao_sessao,
       ).update({Usuario.senha: senha_hash, Usuario.versao_sessao: Usuario.versao_sessao + 1}, synchronize_session=False)
@@ -85,8 +83,3 @@ class TokenRecuperacao(ModeloBase):
       db.session.rollback()
       raise
 
-  @staticmethod
-  def deletar_tokens_usuario(usuario_id:int):
-    TokenRecuperacao.query.filter_by(usuario_id = usuario_id).delete()
-
-    db.session.commit()

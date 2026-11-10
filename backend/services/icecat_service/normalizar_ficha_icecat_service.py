@@ -1,4 +1,3 @@
-"""Converte somente campos estruturados da ficha inglesa, com evidência por campo."""
 import hashlib
 import re
 from defusedxml.ElementTree import fromstring
@@ -8,9 +7,8 @@ from services.catalogo_service.normalizar_produto import nome, numero, gtin
 
 
 class CategoriaIcecatIncompativel(ValueError):
-    """Candidato de outra categoria, não uma falha de leitura do lote."""
+    pass
 
-# Nomes da taxonomia inglesa da ficha XML. Rótulos desconhecidos ficam pendentes.
 CATEGORIAS = {
     'processador': {'processors'}, 'placa_video': {'graphics cards'},
     'memoria_ram': {'memory modules'}, 'placa_mae': {'motherboards'},
@@ -73,7 +71,6 @@ PORTAS_MONITOR = {'HDMI ports quantity': 'hdmi', 'DisplayPorts quantity': 'displ
 
 
 def conexoes_do_monitor(atributos):
-    """Conexão do monitor = portas de vídeo que a ficha declara com quantidade maior que zero."""
     encontradas = set()
     for atributo in atributos:
         rotulo = atributo.find('./Feature/Name')
@@ -181,8 +178,6 @@ class NormalizarFichaIcecatService:
         if categoria == 'ssd' and 'tipo' not in dados and 'sata' in nome(dados.get('interface')):
             dados['tipo'] = 'SATA'
             fontes['tipo'] = fontes['interface']
-        # As categorias de refrigeração compartilham taxonomia: requerem validação
-        # adicional para separar ventoinha, air cooler e water cooler.
         if categoria in ('fan', 'air_cooler', 'water_cooler'):
             conflitos.append('icecat_subtipo_refrigeracao_nao_confirmado')
         eans = {gtin(e.get('EAN')) for e in produto.findall('EANCode') if e.get('IsApproved')=='1' and gtin(e.get('EAN'))}

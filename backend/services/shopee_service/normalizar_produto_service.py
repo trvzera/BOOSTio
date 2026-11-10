@@ -1,4 +1,3 @@
-"""Não transforma uma faixa de variantes numa cotação de uma peça individual."""
 from decimal import Decimal, InvalidOperation
 import re
 import time
@@ -8,21 +7,9 @@ from services.catalogo_service.produto_normalizado import ProdutoNormalizado
 from services.catalogo_service.conferir_especificacoes_service import extrair_titulo
 from services.catalogo_service.comparar_nomes_service import marca as normalizar_marca
 from services.catalogo_service.normalizar_produto import nome as normalizar_nome
+from utils.url_shopee import validar_url_shopee
 
 
-def validar_url_shopee(url, *, afiliado=False):
-    try:
-        partes = urlsplit(url)
-        hosts = {'shopee.com.br', 'www.shopee.com.br'}
-        if afiliado:
-            hosts |= {'s.shopee.com.br', 'shope.ee'}
-        return (partes.scheme == 'https' and partes.hostname in hosts
-                and not partes.username and not partes.password and partes.port in (None, 443))
-    except (ValueError, TypeError):
-        return False
-
-
-# Títulos da Shopee são escritos pelo vendedor: retirar propaganda sem tocar em modelo, capacidade ou sufixo.
 _RUIDO = re.compile(
     r'[\U0001F000-\U0001FAFF\u2600-\u27BF\u3010\u3011\u300A\u300B\u2B50]|'
     r'\b(?:frete\s+gr[aá]tis|envio\s+(?:imediato|r[aá]pido|em\s+24\s*h)|pronta\s+entrega|entrega\s+r[aá]pida|'
@@ -40,20 +27,17 @@ _PREFIXO_CATEGORIA = re.compile(
 
 
 def identificar_marca(titulo, marcas):
-    """Marca conhecida citada no título. Duas marcas diferentes citadas = ambíguo (devolve o conjunto)."""
     texto = normalizar_nome(titulo)
     achadas = {}
     for original in marcas:
         chave = normalizar_marca(original)
         if chave and re.search(r'(?<!\w)' + re.escape(chave) + r'(?!\w)', texto):
             achadas.setdefault(chave, original)
-    # "kingston" e "kingston technology" são a mesma marca citada; vale a mais específica.
     finais = {c: o for c, o in achadas.items() if not any(c != d and c in d for d in achadas)}
     return finais
 
 
 def derivar_modelo(titulo, marca):
-    """Nome sem a categoria e sem a marca; só descreve o que o anunciante escreveu."""
     restante = _PREFIXO_CATEGORIA.sub('', titulo)
     restante = re.sub(r'(?<!\w)' + re.escape(marca) + r'(?!\w)', ' ', restante, count=1, flags=re.I)
     restante = re.sub(r'\s+', ' ', restante).strip(' -|/,.:')
@@ -80,8 +64,6 @@ class NormalizarProdutoShopeeService:
         original, titulo = titulo, limpar_titulo(titulo) or titulo
         contexto = {'variantes_nao_resolvidas': self._variantes(titulo, categoria),
                     'titulo_original': original, 'usado': bool(_USADO.search(original))}
-        # Categorias observadas na API oficial. Demais categorias permanecem
-        # não confirmadas até existir evidência, nunca inferidas do termo buscado.
         confirmada = self.CATEGORIAS_OBSERVADAS.get(categoria) in anuncio.get('productCatIds', [])
         contexto['variantes_nao_resolvidas'] |= bool(re.search(
             r'\b(organizador|adaptador|conversor|suporte|reposição|reposicao)\b', titulo, re.I))

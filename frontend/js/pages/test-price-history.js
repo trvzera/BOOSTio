@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const raiz = document.querySelector("#test-price-history-preview");
   if (!raiz) return;
   const agora = Date.now();
-  // Dados exclusivos do laboratório. Não são cotações e não saem desta página.
+
   const exemplo = {
     historico_precos: [
       [120, 899.90], [100, 849.90], [85, 879.90],

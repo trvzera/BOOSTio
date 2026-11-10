@@ -1,4 +1,3 @@
-"""Anúncios descobertos aguardando identificação; nunca entram no catálogo público."""
 from . import db, ModeloBase
 
 
@@ -33,6 +32,17 @@ class ProdutoPendente(ModeloBase):
         return db.session.get(cls, identificador)
 
     @classmethod
+    def buscar_por_id_com_trava(cls, identificador):
+        return cls.query.filter_by(id=identificador).populate_existing().with_for_update().first()
+
+    @classmethod
+    def mapear_por_anuncios(cls, loja, produtos_id_loja):
+        if not produtos_id_loja:
+            return {}
+        pendencias = cls.query.filter(cls.loja == loja, cls.produto_id_loja.in_(list(produtos_id_loja))).all()
+        return {p.produto_id_loja: p for p in pendencias}
+
+    @classmethod
     def buscar_por_anuncio(cls, loja, produto_id_loja):
         return cls.query.filter_by(loja=loja, produto_id_loja=produto_id_loja).first()
 
@@ -46,8 +56,16 @@ class ProdutoPendente(ModeloBase):
 
 
     @classmethod
+    def listar_ids_e_candidatos(cls, *, status, loja=None, categoria=None):
+        consulta = cls.query.with_entities(cls.id, cls.candidatos).filter(cls.status == status)
+        if loja is not None:
+            consulta = consulta.filter(cls.loja == loja)
+        if categoria is not None:
+            consulta = consulta.filter(cls.categoria_sugerida == categoria)
+        return consulta.order_by(cls.id).all()
+
+    @classmethod
     def listar_para_admin(cls, *, status, loja=None, categoria=None, depois_id=0, limite=20, ids=None):
-        """Página de pendências em ordem estável; devolve também o total do filtro."""
         consulta = cls.query.filter(cls.status == status)
         if loja is not None:
             consulta = consulta.filter(cls.loja == loja)
@@ -67,7 +85,6 @@ class ProdutoPendente(ModeloBase):
 
     @classmethod
     def registrar_sugestao_ia(cls, identificador, sugestao):
-        """Guarda a recomendação da IA; é só informação, nunca decide nem muda o status."""
         try:
             registro = cls.query.filter_by(id=identificador).with_for_update().first()
             if registro is None or registro.status not in ('pendente', 'em_revisao'):
@@ -80,7 +97,6 @@ class ProdutoPendente(ModeloBase):
 
     @classmethod
     def descartar_candidato(cls, identificador, peca, revisao):
-        """Tira uma peça da lista de candidatas; um novo matching não a recoloca."""
         try:
             registro = cls.query.filter_by(id=identificador).with_for_update().first()
             if registro is None:
@@ -101,7 +117,6 @@ class ProdutoPendente(ModeloBase):
 
     @classmethod
     def rejeitar(cls, identificador, motivo, revisao):
-        """Encerra uma pendência aberta; nunca reabre uma já importada ou rejeitada."""
         from datetime import datetime, timezone
         try:
             registro = cls.query.filter_by(id=identificador).with_for_update().first()
@@ -121,7 +136,6 @@ class ProdutoPendente(ModeloBase):
 
     @classmethod
     def registrar_descobertos(cls, linhas, *, simular=True):
-        """Transação por página. Nunca reabre pendência revisada ou altera oferta."""
         from . import Oferta
         contagens = {'novos': 0, 'ja_coletados': 0, 'ja_associados': 0}
         vistos = set()

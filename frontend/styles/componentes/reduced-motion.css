@@ -1,4 +1,4 @@
-/* A preferência do menu vale para todas as páginas, incluindo conteúdo dinâmico. */
+
 html[data-reduced-motion="true"] { scroll-behavior: auto; }
 html[data-reduced-motion="true"] *,
 html[data-reduced-motion="true"] *::before,

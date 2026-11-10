@@ -3,7 +3,7 @@ from collections import Counter
 from pathlib import Path
 from urllib.parse import urlparse
 
-from .modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from .atualizar_imagem_peca_service import PASTA_COLETADOS
 from services.preco_service.validar_link_service import ValidarLinkService
 

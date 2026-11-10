@@ -1,8 +1,5 @@
-"""Mínimos para candidatura. Identidade e compatibilidade final são verificações distintas."""
 from .conferir_especificacoes_service import ESSENCIAIS
 
-# O matching continua conferindo latência, RGB, RPM e demais variantes quando existem.
-# A ausência desses campos não impede toda combinação de build.
 DISPENSAVEIS = {
     'memoria_ram': {'latencia'}, 'hd': {'velocidade_rpm'},
     'fan': {'iluminacao'}, 'air_cooler': {'iluminacao'},

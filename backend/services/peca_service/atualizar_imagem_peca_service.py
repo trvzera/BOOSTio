@@ -4,7 +4,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 from .buscar_imagem_kabum_service import BuscarImagemKabumService
-from .modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 
 PROJETO = Path(__file__).resolve().parents[3]

@@ -1,4 +1,3 @@
-"""Converte especificações normalizadas em campos, sem preencher valores ausentes."""
 from decimal import Decimal
 
 from sqlalchemy import Boolean, Integer, Numeric, Float, String
@@ -8,7 +7,6 @@ from .normalizar_especificacoes import CONJUNTOS, agregar
 
 
 class ExtrairDadosTecnicosService:
-    # Lista explícita: dados comerciais, identificadores e benchmarks não entram.
     CAMPOS = {
         'capacidade_gb', 'memoria_gb', 'ddr', 'tipo_memoria', 'frequencia_mhz',
         'quantidade_pentes', 'latencia', 'formato_ram', 'formato', 'tipo',

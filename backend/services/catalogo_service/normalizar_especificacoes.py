@@ -1,4 +1,3 @@
-"""Conversões explícitas de unidades e rótulos; ausências não viram valores."""
 import re
 from decimal import Decimal
 from .normalizar_produto import nome, numero
@@ -97,7 +96,6 @@ def agregar(valores_convertidos):
 
 
 def comparar_conexoes(local, remoto):
-    """True: todas as conexões locais comprovadas; None: faltam dados; False: contradição."""
     a, b = set(local.split('|')), set(remoto.split('|'))
     if a <= b:
         return True

@@ -1,4 +1,3 @@
-"""Campos enviados à IA e categorias compartilhadas da montagem."""
 EXTRAS_PROPRIOS = ("webcam", "microfone")
 
 PERIFERICOS = {"monitor", "teclado", "mouse", "fone"}

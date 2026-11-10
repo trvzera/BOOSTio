@@ -47,7 +47,6 @@ class Usuario(ModeloBase,UserMixin):
       "administrador": bool(self.administrador),
       "criado_em":self.criado_em
     }
-    # A listagem geral de usuários não deve expor o orçamento de cada conta.
     if incluir_budget:
       dados.update(budget=float(self.budget) if self.budget is not None else None,
                    usar_budget=bool(self.usar_budget))
@@ -90,7 +89,6 @@ class Usuario(ModeloBase,UserMixin):
 
   @staticmethod
   def alterar_administrador(usuario_id: int, administrador: bool) -> bool:
-    """Concede ou retira o papel e encerra as sessões da conta, para o novo papel valer de imediato."""
     alteradas = Usuario.query.filter_by(id=usuario_id, ativo=True, verificado=True).update(
       {Usuario.administrador: administrador, Usuario.versao_sessao: Usuario.versao_sessao + 1},
       synchronize_session=False)
@@ -100,6 +98,14 @@ class Usuario(ModeloBase,UserMixin):
   @staticmethod
   def listar_administradores() -> list["Usuario"]:
     return Usuario.query.filter_by(administrador=True, ativo=True).order_by(Usuario.id).all()
+
+  @staticmethod
+  def gravar_google_sub(usuario: "Usuario", google_sub: str) -> int:
+    return Usuario.query.filter_by(id=usuario.id, ativo=True, google_sub=None,
+                                   versao_sessao=usuario.versao_sessao).update({
+      Usuario.google_sub: google_sub, Usuario.login_google: True,
+      Usuario.versao_sessao: Usuario.versao_sessao + 1,
+    }, synchronize_session=False)
 
   @staticmethod
   def buscar_por_google_sub(google_sub: str) -> "Usuario | None":

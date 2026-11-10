@@ -1,8 +1,7 @@
-"""Oferta da KaBuM de uma peça: link, preço e disponibilidade vivem só na tabela oferta."""
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
 from models import db, Oferta, HistoricoOferta
-from models.medidas_fisicas import produto_kabum
+from utils.medidas_fisicas import produto_kabum
 
 LOJA = 'kabum'
 
@@ -14,7 +13,6 @@ def buscar_ativa(peca, *, bloquear=False):
 
 
 def definir_link(peca, url):
-    """Troca o anúncio da peça. Link novo começa sem preço; o anterior é desativado, não apagado."""
     url = (url or '').strip() or None
     atual = buscar_ativa(peca, bloquear=True)
     if atual is not None and atual.url == url:
@@ -42,7 +40,6 @@ def definir_link(peca, url):
 
 
 def gravar_cotacao_inicial(peca, url, preco, esgotado, atualizado_em):
-    """Carga inicial (seed): cria a oferta já com a cotação conhecida."""
     oferta = definir_link(peca, url)
     if oferta is None:
         return None
@@ -54,7 +51,6 @@ def gravar_cotacao_inicial(peca, url, preco, esgotado, atualizado_em):
 
 
 def validar_cotacao(resultado):
-    """Confere a resposta da loja antes de gravar; devolve preço decimal (ou None) e disponibilidade."""
     if type(resultado.get('esgotado')) is not bool:
         raise ValueError('Disponibilidade inválida na cotação')
     preco = resultado.get('preco')
@@ -74,7 +70,6 @@ def validar_cotacao(resultado):
 
 
 def aplicar_cotacao(oferta, resultado, instante):
-    """Atualiza preço e estoque da oferta; o histórico recebe uma linha por mudança ou por dia."""
     preco_alterado = False
     if resultado['preco'] is not None:
         novo = _decimal(resultado['preco'])

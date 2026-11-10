@@ -1,6 +1,6 @@
 from models import Usuario
 from utils.validacoes import validar_senha_forte
-from werkzeug.security import generate_password_hash,check_password_hash
+from werkzeug.security import generate_password_hash
 from email_validator import validate_email, ValidatedEmail
 from .confirmar_identidade_service import ConfirmarIdentidadeService
 
@@ -59,14 +59,6 @@ class AtualizarUsuarioService:
 
     return senha
 
-  @staticmethod
-  def _confirma_senha(dados: dict, senha_atual_hash: str) -> bool:
-    senha_atual_informada = dados.get("senha_atual")
-
-    if not senha_atual_informada:
-      return False
-
-    return check_password_hash(senha_atual_hash,senha_atual_informada)
 
   @staticmethod
   def _validar_email(email: str) -> ValidatedEmail:

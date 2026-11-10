@@ -1,4 +1,3 @@
-"""Migração incremental; banco-preparar cria o backup antes de aplicá-la."""
 from sqlalchemy import inspect, text
 from models import db
 
@@ -14,7 +13,6 @@ def migrar_benchmarks_pecas():
     if db.engine.dialect.name != "sqlite":
         raise ValueError("Esta migração é específica para o SQLite do projeto")
     with db.engine.begin() as conexao:
-        # DDL também deve ser atômico no sqlite3 (BEGIN não é implícito para ALTER).
         conexao.exec_driver_sql("BEGIN IMMEDIATE")
         for tabela, metricas in (("processador", ("multi_core", "single_thread")),
                                  ("placa_video", ("g2d", "g3d"))):

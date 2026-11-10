@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from models import Gabinete
-from models.medidas_fisicas import completar_medidas
+from utils.medidas_fisicas import completar_medidas
 from services.build_service.criar_build_service import CriarBuildService
 from services.validacoes_service.encaixe_fisico import avaliar_fans, encaixe_radiador
 from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService

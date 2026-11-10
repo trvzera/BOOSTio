@@ -1,4 +1,3 @@
-"""Estimativas de busca; a aprovação da build continua no validador final."""
 from decimal import Decimal, ROUND_DOWN
 
 from utils.memorias import normalizar_ddr
@@ -8,7 +7,6 @@ from .planejar_armazenamento_service import PlanejarArmazenamentoService
 
 
 class PlanejarOrcamentoComponentesService:
-    # Heurísticas de produto, não medidas de desempenho. Os tetos não são parcelas para somar.
     PERFIS = {
         'jogos': {'processador': '.22', 'placa_video': '.50', 'placa_mae': '.14', 'memoria_ram': '.16', 'plataforma': '.48'},
         'trabalho-pesado': {'processador': '.35', 'placa_video': '.35', 'placa_mae': '.18', 'memoria_ram': '.24', 'plataforma': '.65'},
@@ -66,7 +64,6 @@ class PlanejarOrcamentoComponentesService:
                           "gabinete": Decimal('.08'), "air_cooler": Decimal('.05'),
                           "water_cooler": Decimal('.08'), "fan": Decimal('.02'),
                           "adaptador_wifi": Decimal('.06'), "cabo_rede": Decimal('.03')})
-            # Faixas de orçamento alteram a distribuição, além de multiplicar os valores.
             if pc <= 4000:
                 pesos['processador'] += Decimal('.04')
                 pesos['placa_video'] -= Decimal('.06')
@@ -149,6 +146,6 @@ class PlanejarOrcamentoComponentesService:
             opcoes = [p for tipo in ('air_cooler', 'water_cooler') for p in pools.get(tipo, [])
                       if suporte_socket_cooler(cpu.get('soquete'), p) is not False]
             if not opcoes:
-                return None  # Sem refrigeração candidata, o custo da plataforma é pendente.
+                return None
             cooler = min(self.preco(p) for p in opcoes)
         return min(pares) + cooler

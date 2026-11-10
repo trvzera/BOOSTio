@@ -13,7 +13,7 @@ function jaVisto(id) {
 }
 function marcarVisto(id) {
   vistos.add(id);
-  try { sessionStorage.setItem(chave(id),"visto"); } catch { /* A preferência principal fica na conta. */ }
+  try { sessionStorage.setItem(chave(id),"visto"); } catch {   }
 }
 function telaLivre() {
   return document.body.classList.contains("page-ready") &&

@@ -13,10 +13,7 @@ const cl = valor => {
   return resultado ? NUMERO(resultado[1].replace(",",".")) : null;
 };
 
-// Política conservadora: ausência de dados não prova que a troca não é pior.
-// Não classifica CPU/GPU por nome, preço, GHz, núcleos ou quantidade de VRAM.
-// Substituição troca a categoria inteira por UMA unidade/kit. Expansão de discos
-// mantém os itens atuais e não promete melhora nas velocidades dos novos volumes.
+
 export function avaliarTrocaMelhoria(build,candidata,catalogo,{modo = "substituir"} = {}) {
   if (!build?.componentes || typeof candidata?.id !== "string" || !candidata.id.trim() || !Array.isArray(catalogo)
     || !categorias.some(categoria => categoria.id === candidata.categoria))
@@ -28,7 +25,7 @@ export function avaliarTrocaMelhoria(build,candidata,catalogo,{modo = "substitui
   if (expandirDiscos && NUMERO(candidata.capacidade_gb) == null)
     return desconhecida("Falta a capacidade do novo disco para confirmar a expansão de armazenamento.");
   if (!itens.length) {
-    // Uma GPU dedicada antiga não é necessariamente melhor que o vídeo integrado.
+
     if (categoria === "placa_video") {
       const cpu = itensCategoria(build,"processador")[0];
       const processador = catalogo.find(peca => peca.categoria === "processador" && peca.id === cpu?.id);
@@ -76,7 +73,7 @@ export function avaliarTrocaMelhoria(build,candidata,catalogo,{modo = "substitui
       const antesCl = cl(peca.latencia), antesFrequencia = NUMERO(peca.frequencia_mhz);
       if (novaCl == null || antesCl == null)
         return desconhecida("Falta a latência CAS identificada para descartar uma piora na RAM.");
-      // Com a mesma geração DDR, CL/frequência compara a latência, não o CL isolado.
+
       if (novaCl / novaFrequencia > antesCl / antesFrequencia + 1e-12)
         return regrediu("a resposta da RAM ao aumentar a latência CAS relativa à frequência");
     }

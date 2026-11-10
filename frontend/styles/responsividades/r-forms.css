@@ -43,7 +43,7 @@
 .answers-summary li { flex-wrap: wrap; }
 .edit-answer { min-height: 44px; }
 
-/* Feedback ocupa o card inteiro, sem manter um título de geração ao lado do erro. */
+
 .form-page #questions[data-form-state="error"] { grid-template-columns: minmax(0,1fr); grid-template-rows: minmax(0,1fr); min-height: 0; overflow-y: auto; }
 .form-page #questions[data-form-state="error"] > #question-info { display: none; }
 .form-page #questions[data-form-state="error"] > #question-content { grid-column: 1; grid-row: 1; border: 0; justify-content: center; }
@@ -182,7 +182,7 @@
   #forms-header::after { content: attr(data-active-step); grid-column: 1/-1; color: var(--cor-4); font: 400 .75rem/1.5 var(--font-body); padding: .25rem 0; }
 }
 
-/* Em paisagem ou com zoom, a página pode crescer para manter todos os controles acessíveis. */
+
 @media (max-height: 600px) {
   .form-page { height: auto; min-height: 100dvh; overflow-y: auto; }
   #forms-page-container { height: auto; }
@@ -192,7 +192,7 @@
   .form-page .question-options-scroll { flex: 1 1 18rem; max-height: 24rem; }
 }
 
-/* Paisagem: voltar e etapas dividem uma linha, liberando altura para o card. */
+
 @media (min-width: 480px) and (max-height: 500px) {
   #forms-page-container { display: grid; grid-template-columns: auto minmax(0,1fr); grid-template-rows: auto minmax(0,1fr); gap: 12px; }
   .form-page-back { grid-column: 1; grid-row: 1; align-self: center; padding: 10px; min-height: 44px; }

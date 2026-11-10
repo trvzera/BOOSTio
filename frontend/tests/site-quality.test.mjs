@@ -38,7 +38,7 @@ test("atalho de acessibilidade só fica visível com foco de teclado",async () =
   const oculto = css.match(/\.skip-link \{([^}]+)\}/)?.[1] || "";
   const visivel = css.match(/\.skip-link:focus-visible \{([^}]+)\}/)?.[1] || "";
   assert.match(oculto,/transform: translateY\(calc\(-100% - 20px\)\)/);
-  // O overscroll pode expor elementos deslocados: a transparência também é necessária.
+
   assert.match(oculto,/opacity: 0;/);
   assert.match(oculto,/pointer-events: none;/);
   assert.doesNotMatch(oculto,/display:\s*none|visibility:\s*hidden/);

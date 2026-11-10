@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from models.medidas_fisicas import completar_medidas
+from utils.medidas_fisicas import completar_medidas
 from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 from utils.sockets import normalizar_socket, listar_sockets, suporte_socket_cooler
 

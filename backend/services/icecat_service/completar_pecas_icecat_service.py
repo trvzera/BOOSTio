@@ -1,4 +1,3 @@
-"""Completa fichas de peças já cadastradas com a ficha do Icecat, só em campos vazios."""
 import os
 from dataclasses import replace
 
@@ -6,14 +5,13 @@ from models import db
 from services.catalogo_service.enriquecer_peca_existente_service import EnriquecerPecaExistenteService
 from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from .completar_ficha_icecat_service import CompletarFichaIcecatService
 from .indice_icecat_service import IndiceIcecatService
 from .obter_ficha_icecat_service import ErroConsultaIcecat, ObterFichaIcecatService
 
 FICHA_VAZIA = dict(dados={}, fontes={}, identidade={}, conflitos=[], pronto=False)
 
-# O Icecat chama de "tipo" o que a validação de montagem chama de "tipo_fone" (e assim por diante).
 NOME_NA_VALIDACAO = {('fone', 'tipo'): 'tipo_fone', ('memoria_ram', 'formato'): 'formato_ram',
                      ('cabo_rede', 'categoria'): 'categoria_cabo'}
 
@@ -48,7 +46,6 @@ class CompletarPecasIcecatService:
                 resumo['ignoradas'] += 1
                 continue
             if not pendencias_para_montagem(peca):
-                # Já completa (por exemplo, preenchida antes): só falta liberar a marca de ficha reprovada.
                 resumo['ficha_liberada' if self._reavaliar_ficha(peca, simular) else 'ignoradas'] += 1
                 continue
             if not peca.part_number:
@@ -58,7 +55,6 @@ class CompletarPecasIcecatService:
             try:
                 resultado = self._completar(peca, simular)
             except ErroConsultaIcecat as erro:
-                # Limite, autenticação ou indisponibilidade: para o lote; o cursor permite retomar.
                 resumo['interrompido'] = True
                 resumo['motivo_interrupcao'] = str(erro)
                 break
@@ -70,7 +66,6 @@ class CompletarPecasIcecatService:
 
     @staticmethod
     def _reavaliar_ficha(peca, simular):
-        """Recalcula a marca de ficha de montagem (gravada reprovada na importação) com os campos já preenchidos."""
         if pendencias_para_montagem(peca) or peca.ficha_montagem_validada is True:
             return False
         if not simular:
@@ -81,7 +76,7 @@ class CompletarPecasIcecatService:
     def _completar(self, peca, simular):
         base = ProdutoNormalizado(loja='icecat', id_externo=f'{peca.__tablename__}:{peca.id}',
                                   categoria=peca.__tablename__, categoria_confirmada=True,
-                                  ativo=True,  # a fonte é uma ficha de catálogo, não um anúncio que possa ter saído do ar
+                                  ativo=True,
                                   titulo=f'{peca.fabricante} {peca.modelo}', marca=peca.fabricante,
                                   modelo=peca.modelo, identificadores={'mpn': peca.part_number})
         _, ficha = self.icecat.executar(base, FICHA_VAZIA)

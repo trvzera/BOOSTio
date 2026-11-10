@@ -1,4 +1,3 @@
-"""Migração aditiva: não importa tokens nem altera tabelas existentes."""
 from sqlalchemy import inspect
 from models import db, TokenIntegracao
 

@@ -1,4 +1,4 @@
-// Mesmo contrato de services/build_service/armazenamento.py. Sem inferência pelo nome.
+
 export function contagem(valor) {
   if(!['number','string'].includes(typeof valor)||!String(valor).trim())return null;
   if(typeof valor==='string'&&!/^[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?$/.test(valor.trim()))return null;

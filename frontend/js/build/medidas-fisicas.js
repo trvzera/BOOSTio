@@ -1,5 +1,5 @@
 import { referenciasPeca } from './codigos-pecas.js';
-// Mesmas regras de models/medidas_fisicas.py. Sem scraping ou escrita no catálogo.
+
 function produtoKabum(link) {
   if (typeof link !== "string" || /[\s\\]/.test(link)
       || !/^https:\/\/(?:www\.)?kabum\.com\.br(?::443)?\//i.test(link)) return null;
@@ -7,7 +7,7 @@ function produtoKabum(link) {
     const url = new URL(link);
     if (url.protocol !== "https:" || !["kabum.com.br","www.kabum.com.br"].includes(url.hostname)
         || url.username || url.password || url.port) return null;
-    // URL normaliza /../ e %2e; validar o caminho original mantém a regra do Python.
+
     const caminho = /^https:\/\/[^/?#]+(\/[^?#]*)/i.exec(link)?.[1];
     return /^\/produto\/([1-9][0-9]*)(?:\/[a-zA-Z0-9_-]+)?\/?$/.exec(caminho)?.[1] ?? null;
   } catch { return null; }

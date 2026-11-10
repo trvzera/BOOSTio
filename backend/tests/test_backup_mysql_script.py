@@ -29,7 +29,6 @@ def test_backup_nao_consumir_comandos_do_terminal(tmp_path, falhar):
         'BOOSTIO_BACKUP_DIR': str(destino),
         'BOOSTIO_TEST_BACKUP_FAIL': str(int(falhar)),
     }
-    # O bash lê comandos pelo stdin, como no bloco colado no console da VPS.
     resultado = subprocess.run(
         ['bash'],
         input=f'bash "{SCRIPT}"\nretorno=$?\nprintf "RETORNO=%s\\n" "$retorno"\n',

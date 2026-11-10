@@ -10,7 +10,7 @@ const rotulos = {
   "esqueci-senha.html":"Voltar à recuperação de senha", "testes.html":"Voltar aos testes",
 };
 
-// Mantém a URL completa (build, categoria, filtros e posição na página).
+
 export function destinoAnterior(atual, origem, padrao, contextual = false) {
   const base = new URL(atual);
   function valido(valor) {
@@ -26,8 +26,8 @@ export function destinoAnterior(atual, origem, padrao, contextual = false) {
   }
   const anterior = valido(origem), destino = valido(padrao);
   if (contextual && destino) {
-    // Um retorno à build/categoria não pode apontar ao início ou a outra build.
-    // Preserva filtros e posição do histórico somente dentro do mesmo contexto.
+
+
     const esperado = new URL(destino), historico = anterior && new URL(anterior);
     const mesmoContexto = historico && caminhoComparacao(esperado.pathname) === caminhoComparacao(historico.pathname) &&
       ["build","build_id","id","categoria"].every(chave => esperado.searchParams.get(chave) === historico.searchParams.get(chave));
@@ -36,7 +36,7 @@ export function destinoAnterior(atual, origem, padrao, contextual = false) {
   return anterior || destino || new URL("./index.html", base).href;
 }
 
-// Nunca retorna o editor sem ID: essa URL inicia a criação de uma nova build.
+
 export function destinoBuild(atual) {
   const url = new URL(atual), id = url.searchParams.get("build");
   if (!["pecas.html", "peca.html"].includes(nomePagina(url.pathname)) || !id?.trim()) return "./builds.html";
@@ -49,7 +49,7 @@ export function rotuloVoltar(destino) {
 function retorno(controle) {
   const nav = window.navigation;
   const entrada = nav?.entries().find(e => e.index === nav.currentEntry.index - 1);
-  // A Navigation API identifica a entrada real mesmo após back/forward ou replace.
+
   const origem = nav ? entrada?.url : document.referrer;
   const padrao = controle.dataset.backFallback || controle.getAttribute("href") || "./index.html";
   const destino = destinoAnterior(location.href, origem, padrao, controle.hasAttribute("data-back-destination"));

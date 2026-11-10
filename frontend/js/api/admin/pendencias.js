@@ -1,7 +1,6 @@
 import { fetchComErro } from "../_shared/fetchComErro.js";
 
-// Rotas de administração das pendências de ofertas (backend: /admin/pendencias).
-// O backend recusa quem não é administrador (403); aqui só montamos os pedidos.
+
 export function montarConsultaPendencias({status = "em_revisao", loja = "", categoria = "", depoisId = 0, limite = 20} = {}) {
   const parametros = new URLSearchParams({status, limite: String(limite)});
   if (loja) parametros.set("loja", loja);

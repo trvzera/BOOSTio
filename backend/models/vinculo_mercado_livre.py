@@ -1,4 +1,3 @@
-"""Associação revisada ou comprovada por MPN, sem duplicar peças."""
 from . import db, ModeloBase
 
 
@@ -20,6 +19,13 @@ class VinculoMercadoLivre(ModeloBase):
             consulta = consulta.populate_existing().with_for_update()
         return consulta.first()
 
+
+    @classmethod
+    def buscar_por_catalogo(cls, catalogo_id, *, bloquear=False, recarregar=False):
+        consulta = cls.query.filter_by(catalogo_id=catalogo_id)
+        if recarregar:
+            consulta = consulta.populate_existing()
+        return (consulta.with_for_update() if bloquear else consulta).first()
 
     @classmethod
     def registrar_revisado(cls, peca, catalogo_id, assinatura, assinatura_catalogo):
@@ -48,7 +54,7 @@ class VinculoMercadoLivre(ModeloBase):
         from utils.identidade_peca import assinatura_peca
         try:
             db.session.refresh(peca, with_for_update=True)
-            if assinatura_peca(peca) != assinatura or not IdentidadeFabricante._conferem(peca, especificacoes):
+            if assinatura_peca(peca) != assinatura or not IdentidadeFabricante.conferem(peca, especificacoes):
                 raise ValueError('Ficha local mudou ou diverge da revisão')
             existente = cls.buscar(peca.__tablename__, peca.id, bloquear=True)
             if existente:
@@ -76,4 +82,4 @@ class VinculoMercadoLivre(ModeloBase):
 
     def especificacoes_compativeis(self, peca):
         from .identidade_fabricante import IdentidadeFabricante
-        return self.especificacoes_revisadas is None or IdentidadeFabricante._conferem(peca, self.especificacoes_revisadas)
+        return self.especificacoes_revisadas is None or IdentidadeFabricante.conferem(peca, self.especificacoes_revisadas)

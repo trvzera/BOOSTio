@@ -10,7 +10,7 @@ from repositories.controle_catalogo_repository import RepositorioControleCatalog
 from services.marketplace_service.controle_requisicoes_service import agora_utc
 from services.marketplace_service.processar_fila_service import ProcessarFilaMarketplaceService, LOJAS
 from services.marketplace_service.executores_service import executores_disponiveis
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 
 

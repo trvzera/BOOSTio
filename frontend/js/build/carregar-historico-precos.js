@@ -1,7 +1,7 @@
 import { consultarHistoricoPrecos, consultarHistoricoOferta } from "../api/peca/historico-precos.js";
 
 export async function obterHistoricoDaPeca(peca, {conta = false, consultar = consultarHistoricoPrecos, ofertaId = null, consultarOferta = consultarHistoricoOferta, lojaOferta = "mercado_livre"} = {}) {
-  // IDs do catálogo demonstrativo não identificam os registros do banco.
+
   if (!conta) return {historico_precos:[], historico_precos_incompleto:false};
   const partes = /^([a-z_]+):([1-9]\d*)$/.exec(peca?.id || "");
   if (!partes || partes[1] !== peca.categoria) throw new Error("Identificação da peça inválida.");

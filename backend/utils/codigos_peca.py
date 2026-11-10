@@ -1,4 +1,3 @@
-"""Separa códigos internos de referências do fabricante, sem adivinhar MPNs."""
 import re
 
 

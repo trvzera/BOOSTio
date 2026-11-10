@@ -1,4 +1,3 @@
-"""Cache curto por execução; cotações para gravação sempre consultam a API."""
 import json
 import hashlib
 import time
@@ -18,7 +17,6 @@ class ClienteCatalogoCacheService(BuscarOfertasMercadoLivreService):
         self.reaproveitadas = 0
 
     def _consultar(self, caminho, token, params=None):
-        # O cache não é compartilhado entre contas, comandos ou execuções.
         chave = (hashlib.sha256(token.encode()).hexdigest(), json.dumps([caminho, params], sort_keys=True))
         cacheavel = self.simular or caminho == '/products/search'
         registro = self.cache.get(chave) if cacheavel else None

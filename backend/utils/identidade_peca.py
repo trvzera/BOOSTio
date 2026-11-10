@@ -5,7 +5,6 @@ import unicodedata
 
 
 def normalizar_identidade(valor):
-    # Conservador: não apaga hífens, números, capacidades ou sufixos de modelos.
     valor = unicodedata.normalize('NFKC', str(valor or '')).casefold()
     return re.sub(r'\s+', ' ', valor.replace('®', '').replace('™', '')).strip()
 

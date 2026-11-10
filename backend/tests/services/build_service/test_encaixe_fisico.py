@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from models import Gabinete, AirCooler
-from models.medidas_fisicas import completar_medidas
+from utils.medidas_fisicas import completar_medidas
 from services.validacoes_service.encaixe_fisico import avaliar_fans, encaixe_radiador
 from services.build_service.criar_build_service import CriarBuildService
 from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
@@ -110,7 +110,7 @@ def test_nr200_nao_aceita_matx_atx_psu_ou_radiador_360():
     assert not any(r['codigo'] == 'gabinete-condicoes' for r in resultado['verificacoes'])
     assert not next(p for p in case["posicoes_fans"] if p["nome"] == "Base")["radiadores_mm"]
     fans = avaliar_fans(case, [({"quantidade": 6}, {"quantidade": 1, "tamanho_mm": 120})], None)
-    assert fans["quantidade"] is False  # 6 novas + 2 inclusas > 7; não sete de 120 mm
+    assert fans["quantidade"] is False
 
 
 def test_medidas_gpu_somente_na_variante_exata():
@@ -151,7 +151,7 @@ def test_diagnostico_resolve_medidas_do_catalogo_persistido_em_banco_isolado():
         resultado = AvaliarCompatibilidadeService().executar({"componentes": {"gabinete": {"id": f"gabinete:{case.id}"}, "fan": [{"id": f"fan:{fan.id}", "quantidade": 1}]}})
         assert regra(resultado, "fans-posicoes")["status"] == "incompativel"
         assert resultado["fans"]["inclusas"] == 1
-        assert case.fans_inclusos == 2  # complemento não faz update silencioso na base
+        assert case.fans_inclusos == 2
         db.session.remove(); db.drop_all()
 
 

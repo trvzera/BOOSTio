@@ -1,4 +1,3 @@
-"""Credenciais OAuth recuperáveis, cifradas com chave externa ao banco."""
 from datetime import datetime, timezone
 
 from cryptography.fernet import Fernet, InvalidToken
@@ -15,7 +14,6 @@ class TokenIntegracao(ModeloBase):
     conta_id = db.Column(db.String(80), nullable=False)
     _access_token = db.Column('access_token_cifrado', db.Text, nullable=False)
     _refresh_token = db.Column('refresh_token_cifrado', db.Text, nullable=False)
-    # UTC sem tzinfo: compatível com MySQL DATETIME e as datas de coleta.
     expira_em = db.Column(db.DateTime, nullable=False)
     versao = db.Column(db.Integer, nullable=False, default=0)
     renovacao_pendente = db.Column(db.Boolean, nullable=False, default=False)
@@ -45,13 +43,11 @@ class TokenIntegracao(ModeloBase):
         return valor
 
     def definir_tokens(self, access_token, refresh_token, expira_em, *, renovado_em=None):
-        """Altera o par em memória; a transação pertence ao chamador."""
         access_token = self._validar_token(access_token)
         refresh_token = self._validar_token(refresh_token)
         expiracao = self._utc(expira_em)
         renovacao = self._utc(renovado_em) if renovado_em is not None else None
         cifra = self._cifra()
-        # Cifrar ambos antes de modificar a instância evita um par parcialmente alterado.
         access = cifra.encrypt(access_token.encode()).decode('ascii')
         refresh = cifra.encrypt(refresh_token.encode()).decode('ascii')
         self._access_token, self._refresh_token = access, refresh
@@ -89,7 +85,6 @@ class TokenIntegracao(ModeloBase):
 
     @classmethod
     def buscar(cls, integracao, client_id, conta_id, *, bloquear=False):
-        """No MySQL, bloquear=True requer transação aberta até commit/rollback."""
         consulta = cls.query.filter_by(integracao=integracao, client_id=client_id, conta_id=conta_id)
         if bloquear:
             consulta = consulta.populate_existing().with_for_update()
@@ -109,7 +104,6 @@ class TokenIntegracao(ModeloBase):
 
     @classmethod
     def gravar_estado(cls, client_id, conta_id, dados, versao_esperada):
-        """Transação própria e CAS: não confirma alterações da sessão da build."""
         from sqlalchemy.orm import Session
         from sqlalchemy.exc import IntegrityError
         from datetime import datetime, timezone

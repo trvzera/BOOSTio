@@ -1,4 +1,3 @@
-"""Atualização aditiva v1 de benchmarks em MySQL existente (DDL não atômico)."""
 from sqlalchemy import inspect, text
 from models import db
 from .benchmarks_pecas import CAMPOS
@@ -15,7 +14,6 @@ def atualizar_benchmarks_mysql(simular=True):
     if engine.dialect.name != 'mysql':
         raise ValueError('Este comando exige MySQL existente.')
     with engine.connect() as conexao:
-        # O lock é da conexão; serializa execuções mesmo com commits implícitos do DDL.
         if conexao.scalar(text("SELECT GET_LOCK('boostio_benchmarks_mysql_v1', 0)")) != 1:
             raise ValueError('Outra atualização do banco está em execução.')
         try:
@@ -35,7 +33,6 @@ def atualizar_benchmarks_mysql(simular=True):
                         atual = colunas[nome]['type'].compile(dialect=engine.dialect)
                         if esperado.replace('NUMERIC', 'DECIMAL') != atual.replace('NUMERIC', 'DECIMAL') or not colunas[nome]['nullable']:
                             raise ValueError(f'Coluna incompatível: {tabela}.{nome}; revisão necessária.')
-            # Não tentar remendar silenciosamente um banco de outra versão.
             divergencias = []
             for tabela in db.metadata.sorted_tables:
                 if tabela.name not in existentes:
@@ -49,7 +46,6 @@ def atualizar_benchmarks_mysql(simular=True):
             resultado = dict(versao=VERSAO, simulacao=simular, alteracoes=plano)
             if simular:
                 return resultado
-            # A rotina de deploy interrompe escritores; contagem é uma conferência adicional.
             quote = engine.dialect.identifier_preparer.quote
             def contagens():
                 return {t: conexao.scalar(text(f'SELECT COUNT(*) FROM {quote(t)}')) for t in sorted(existentes)}

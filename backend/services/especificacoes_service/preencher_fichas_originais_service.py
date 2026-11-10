@@ -1,9 +1,8 @@
-"""Enriquece peças a partir do anúncio de origem, com arquivo reproduzível."""
 import json
 from pathlib import Path
 from dataclasses import replace
 from sqlalchemy.exc import SQLAlchemyError
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from services.catalogo_service.enriquecer_peca_existente_service import EnriquecerPecaExistenteService
 from .normalizar_ficha_kabum_service import NormalizarFichaKabumService
 
@@ -27,7 +26,7 @@ class PreencherFichasOriginaisService:
                     break
                 for peca in lote:
                     depois = peca.id
-                    from models.medidas_fisicas import produto_kabum
+                    from utils.medidas_fisicas import produto_kabum
                     externo = produto_kabum(peca.kabum_external)
                     if externo is None:
                         resumo['sem_ficha'] += 1

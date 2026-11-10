@@ -12,7 +12,6 @@ CONTROLLERS = [
     ("email_controller", "EmailController", "email_bp"),
     ("benchmark_controller", "BenchmarkController", "benchmark_bp"),
     ("saude_controller", "SaudeController", "saude_bp"),
-    ("peca_controller", "PecaController", "peca_bp"),
 ]
 
 
@@ -72,7 +71,6 @@ def test_contrato_de_urls_metodos_e_endpoints_preservado():
         ("/benchmark/requisitos", "GET", "benchmark.consultar_requisitos"),
         ("/benchmark/requisitos-build", "GET", "benchmark.consultar_requisitos_build"),
         ("/health", "GET", "saude.verificar_saude"),
-        ("/pecas/", "GET", "peca.mostrar_pecas"),
     }
     atuais = {(regra.rule, metodo, regra.endpoint) for regra in app.url_map.iter_rules()
               if regra.endpoint != "static" for metodo in regra.methods - {"OPTIONS", "HEAD"}}
