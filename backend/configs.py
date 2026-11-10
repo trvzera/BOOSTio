@@ -43,6 +43,8 @@ class Config:
     MAIL_SUPPRESS_SEND = False
     MAIL_ASCII_ATTACHMENTS = False
 
+    CATALOGO_CACHE_SEGUNDOS = 0
+
 class Desenvolvimento(Config):
     SESSION_COOKIE_SAMESITE = 'Lax'
     SESSION_COOKIE_SECURE = False
@@ -55,6 +57,7 @@ class Producao(Config):
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     RATELIMIT_STORAGE_URI = os.getenv("RATELIMIT_STORAGE_URI")
+    CATALOGO_CACHE_SEGUNDOS = int(os.getenv("CATALOGO_CACHE_SEGUNDOS", "60"))
 
 ambientes = {
     'producao': Producao,
