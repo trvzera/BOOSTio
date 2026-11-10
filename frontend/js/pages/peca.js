@@ -12,7 +12,7 @@ import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta } from "../
 import { ajudaCategorias } from "../build/uso-formulario.js";
 import { cartoesOfertasHtml } from "../build/ofertas-peca.js";
 import { obterHistoricoDaPeca } from "../build/carregar-historico-precos.js";
-import { historicoPrecosHtml, iniciarHistoricoPrecos } from "../build/price-history.js";
+import { historicoPrecosHtml, iniciarHistoricoPrecos, nomesLojas } from "../build/price-history.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const main = document.querySelector("#product-main");
@@ -64,23 +64,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     iniciarIcones(main);
     iniciarHistoricoPrecos(main, peca);
     if (conta) {
-      const ofertasMercado = ofertasPeca(peca).filter(o => o.marketplace);
       let seletor = null, consultaHistorico = 0;
-      if (ofertasMercado.length) {
-        main.querySelector("[data-price-history]").insertAdjacentHTML("beforebegin", '<div class="planning-help planning-field"><label for="history-offer">Histórico por loja e vendedor</label><select id="history-offer" class="input-text"><option value="kabum">KaBuM!</option>' +
-          ofertasMercado.map(o => '<option value="' + o.id + '" data-loja="' + h(o.codigo) + '">' + h(o.loja) + ' · ' + h(o.vendedor) + ' · anúncio ' + h(o.produto_id_loja) + '</option>').join("") + '</select></div>');
+      const lojasHistorico = ["kabum", "mercado_livre", "shopee"].filter(l => (peca.ofertas || []).some(o => o.loja === l));
+      if (lojasHistorico.length) {
+        main.querySelector("[data-price-history]").insertAdjacentHTML("beforebegin", '<div class="planning-help planning-field"><label for="history-offer">Histórico por loja</label><select id="history-offer" class="input-text"><option value="todas">' + h(nomesLojas.todas) + '</option>' +
+          lojasHistorico.map(l => '<option value="' + l + '">' + h(nomesLojas[l]) + '</option>').join("") + '</select></div>');
         seletor = main.querySelector("#history-offer");
       }
       const carregarHistorico = async () => {
         const consultaAtual = ++consultaHistorico;
-        const ofertaId = seletor && seletor.value !== "kabum" ? Number(seletor.value) : null;
+        const loja = seletor ? seletor.value : "todas";
         const secao = main.querySelector("[data-price-history]");
         secao.querySelectorAll("[data-history-period]").forEach(botao => { botao.disabled = true; });
-        const escolhida = ofertaId ? ofertasMercado.find(o => o.id === ofertaId) : null;
-        secao.querySelector(".price-history-store").textContent = escolhida ? escolhida.loja : "KaBuM!";
+        secao.querySelector(".price-history-store").textContent = nomesLojas[loja];
         secao.querySelector("[data-history-content]").innerHTML = '<p role="status">Carregando histórico de preços…</p>';
         try {
-          const dados = await obterHistoricoDaPeca(peca, {conta:true, ofertaId, lojaOferta:escolhida?.codigo});
+          const dados = await obterHistoricoDaPeca(peca, {conta:true, loja});
           if (consultaAtual !== consultaHistorico) return;
           secao.outerHTML = historicoPrecosHtml({...peca, ...dados});
           iniciarHistoricoPrecos(main, {...peca, ...dados});

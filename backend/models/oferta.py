@@ -62,6 +62,32 @@ class Oferta(ModeloBase):
         return (consulta.with_for_update() if bloquear else consulta).all()
 
     @classmethod
+    def listar_para_atualizar(cls, loja, consultadas_antes_de, limite=None):
+        consulta = cls.query.filter(cls.loja == loja, cls.ativa.is_(True),
+            db.or_(cls.consultado_em.is_(None), cls.consultado_em < consultadas_antes_de))
+        consulta = consulta.order_by(cls.consultado_em.is_(None).desc(), cls.consultado_em, cls.id)
+        return (consulta.limit(limite) if limite else consulta).all()
+
+    def registrar_coleta(self, preco, esgotado, agora):
+        from . import HistoricoOferta
+        ultimo = HistoricoOferta.ultimo(self.id)
+        if self.preco != preco:
+            self.preco_atualizado_em = agora
+        self.preco, self.esgotado, self.consultado_em = preco, esgotado, agora
+        registrar = (ultimo is None or ultimo.preco != preco or ultimo.esgotado != esgotado
+                     or ultimo.coletado_em.date() != agora.date())
+        if registrar:
+            db.session.add(HistoricoOferta(oferta_id=self.id, preco=preco, esgotado=esgotado, coletado_em=agora))
+        return registrar
+
+    def desativar(self):
+        self.ativa = False
+
+    @classmethod
+    def confirmar_coletas(cls):
+        db.session.commit()
+
+    @classmethod
     def corresponde_origem(cls, peca, loja, identificador, *, bloquear=False):
         consulta = cls.query.filter_by(loja=loja, produto_id_loja=identificador)
         registro = (consulta.with_for_update() if bloquear else consulta).first()
@@ -134,6 +160,34 @@ class Oferta(ModeloBase):
 
     @classmethod
     def anexar_a_catalogo(cls, pecas):
+        cls._juntar_ofertas(pecas)
+        for peca in pecas:
+            cls._manter_mais_barata_por_loja(peca)
+        return pecas
+
+    @staticmethod
+    def _chave_preco(oferta):
+        esgotado = oferta['esgotado']
+        disponibilidade = 2 if esgotado is True else 0 if esgotado is False or oferta['loja'] == 'shopee' else 1
+        return (disponibilidade, oferta['preco'], oferta['id'])
+
+    @classmethod
+    def _manter_mais_barata_por_loja(cls, peca):
+        por_loja = {}
+        for oferta in peca.get('ofertas', []):
+            atual = por_loja.get(oferta['loja'])
+            if atual is None or cls._chave_preco(oferta) < cls._chave_preco(atual):
+                por_loja[oferta['loja']] = oferta
+        peca['ofertas'] = list(por_loja.values())
+        if not peca['ofertas']:
+            return
+        melhor = min(peca['ofertas'], key=cls._chave_preco)
+        peca['preco'] = melhor['preco']
+        peca['esgotado'] = False if cls._chave_preco(melhor)[0] == 0 else melhor['esgotado']
+        peca['preco_atualizado_em'] = melhor['atualizadoEm']
+
+    @classmethod
+    def _juntar_ofertas(cls, pecas):
         from sqlalchemy import inspect, and_
         from . import VinculoMercadoLivre
         from utils.identidade_peca import assinatura_campos

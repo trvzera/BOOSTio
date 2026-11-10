@@ -39,3 +39,11 @@ test("consulta histórico do anúncio escolhido e rejeita resposta de outro vend
   assert.equal(r.historico_loja,"mercado_livre");
   await assert.rejects(obterHistoricoDaPeca(peca,{conta:true,ofertaId:7,consultarOferta:async()=>({peca_id:peca.id,oferta_id:8,loja:"mercado_livre",historico_precos:[],tem_mais:false})}));
 });
+
+test("consulta o histórico pela loja escolhida e rejeita resposta de outra loja", async () => {
+  const consultar = async (categoria, id, loja) => ({peca_id:peca.id, loja, historico_precos:[], tem_mais:false});
+  const r = await obterHistoricoDaPeca(peca, {conta:true, loja:"todas", consultar});
+  assert.equal(r.historico_loja, "todas");
+  await assert.rejects(obterHistoricoDaPeca(peca, {conta:true, loja:"shopee", consultar:async () => ({peca_id:peca.id, loja:"kabum", historico_precos:[], tem_mais:false})}));
+  await assert.rejects(obterHistoricoDaPeca(peca, {conta:true, loja:"outra", consultar}));
+});

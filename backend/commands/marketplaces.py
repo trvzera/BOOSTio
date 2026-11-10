@@ -69,6 +69,26 @@ def registrar_comandos_marketplaces(app):
     def resumo():
         click.echo(json.dumps(RepositorioFilaMarketplace().resumo()))
 
+    @app.cli.command('marketplaces-precos-atualizar')
+    @click.option('--loja', type=click.Choice([*LOJAS, 'todas']), default='todas', show_default=True)
+    @click.option('--horas', type=click.IntRange(0, 720), default=20, show_default=True,
+                  help='Só consulta ofertas não consultadas nas últimas N horas; permite repetir ou retomar sem refazer.')
+    @click.option('--limite', type=click.IntRange(1), default=None, help='Máximo de ofertas por loja.')
+    @click.option('--simular', is_flag=True, help='Consulta as lojas e conta o que mudaria, sem gravar.')
+    def atualizar_precos(loja, horas, limite, simular):
+        """Reconsulta o preço das ofertas ativas pelo identificador do anúncio e grava o histórico."""
+        from models import db
+        from services.marketplace_service.atualizar_precos_marketplace_service import AtualizarPrecosMarketplaceService
+        try:
+            resumos = [AtualizarPrecosMarketplaceService().executar(l, horas=horas, limite=limite, simular=simular)
+                       for l in (LOJAS if loja == 'todas' else (loja,))]
+        except SQLAlchemyError:
+            db.session.rollback()
+            raise click.ClickException('Falha ao gravar os preços; nada do lote em andamento foi confirmado') from None
+        except ValueError as erro:
+            raise click.ClickException(str(erro)) from None
+        click.echo(json.dumps(resumos, ensure_ascii=False))
+
     @app.cli.command('marketplaces-enfileirar-ofertas')
     @click.option('--loja', type=click.Choice(LOJAS), required=True)
     @click.option('--categoria', type=click.Choice([m.__tablename__ for m in MODELOS_PECAS]), default=None,

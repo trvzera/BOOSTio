@@ -8,6 +8,7 @@ from sqlalchemy.exc import OperationalError
 
 from models import db, PlacaVideo, HistoricoOferta, Oferta
 from controllers.build_controller import build_bp
+from services.peca_service.consultar_historico_precos_service import ConsultarHistoricoPrecosService
 
 
 @pytest.fixture
@@ -91,3 +92,48 @@ def test_limite_e_ordem_deterministica(banco):
     r=client.get(url(p)).get_json()
     assert r['tem_mais'] is True and len(r['historico_precos'])==1000
     assert r['historico_precos'][0]['preco']==2 and r['historico_precos'][-1]['preco']==1001
+
+
+def ofertas_de_varias_lojas(p):
+    from decimal import Decimal
+    agora = datetime(2026, 11, 5)
+    criadas = {}
+    for loja, anuncio in (('kabum', '555'), ('shopee', '1:2'), ('mercado_livre', 'MLB9')):
+        o = Oferta(tabela_peca='placa_video', peca_id=p.id, loja=loja, produto_id_loja=anuncio, ativa=True,
+                   url='https://exemplo.com/' + anuncio, preco=Decimal('500'), consultado_em=agora, preco_atualizado_em=agora)
+        db.session.add(o); db.session.flush(); criadas[loja] = o
+    for loja, preco, dia in (('kabum', 500, 1), ('kabum', 450, 3), ('shopee', 400, 2), ('shopee', 480, 3), ('mercado_livre', 420, 3)):
+        db.session.add(HistoricoOferta(oferta_id=criadas[loja].id, preco=preco, esgotado=False, coletado_em=datetime(2026, 11, dia, 12)))
+    db.session.commit()
+
+
+def pontos(resposta):
+    return [(h['data'][:10], h['preco'], h['loja']) for h in resposta.get_json()['historico_precos']]
+
+
+def test_historico_geral_mostra_o_menor_preco_do_dia_entre_as_lojas(banco):
+    _, client, p = banco
+    ofertas_de_varias_lojas(p)
+    with patch.object(ConsultarHistoricoPrecosService, '_exibivel', return_value=True):
+        r = client.get(url(p) + '?loja=todas')
+    assert r.status_code == 200 and r.get_json()['loja'] == 'todas'
+    assert r.get_json()['lojas'] == ['kabum', 'mercado_livre', 'shopee']
+    assert pontos(r) == [('2026-11-01', 500.0, 'kabum'), ('2026-11-02', 400.0, 'shopee'), ('2026-11-03', 420.0, 'mercado_livre')]
+
+
+def test_historico_filtrado_por_loja_traz_so_aquela_loja(banco):
+    _, client, p = banco
+    ofertas_de_varias_lojas(p)
+    with patch.object(ConsultarHistoricoPrecosService, '_exibivel', return_value=True):
+        kabum, shopee = client.get(url(p) + '?loja=kabum'), client.get(url(p) + '?loja=shopee')
+    assert pontos(kabum) == [('2026-11-01', 500.0, 'kabum'), ('2026-11-03', 450.0, 'kabum')]
+    assert pontos(shopee) == [('2026-11-02', 400.0, 'shopee'), ('2026-11-03', 480.0, 'shopee')]
+
+
+def test_historico_ignora_oferta_nao_exibivel(banco):
+    _, client, p = banco
+    ofertas_de_varias_lojas(p)
+    with patch.object(ConsultarHistoricoPrecosService, '_exibivel', side_effect=lambda o, peca: o.loja != 'shopee'):
+        r = client.get(url(p) + '?loja=todas')
+    assert r.get_json()['lojas'] == ['kabum', 'mercado_livre']
+    assert pontos(r) == [('2026-11-01', 500.0, 'kabum'), ('2026-11-03', 420.0, 'mercado_livre')]

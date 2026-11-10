@@ -12,6 +12,7 @@ A sequência de aprovação, busca de ofertas, worker e análise por IA está no
 | --- | --- |
 | `precos-atualizar` | Atualiza preço e estoque da **KaBuM** (um anúncio por vez). Agendado por `deploy/atualizar_precos.sh`. |
 | `mercadolivre-ofertas-atualizar` | Atualiza as ofertas do **Mercado Livre** das peças. Script: `deploy/atualizar_ofertas_mercadolivre.sh`. |
+| `marketplaces-precos-atualizar` | Reconsulta o preço das ofertas ativas do Mercado Livre (`GET /items?ids=`, 20 por chamada) e da Shopee (`productOfferV2` por `shopId:itemId`) e grava o histórico. `--loja`, `--horas 20` (só ofertas não consultadas nesse prazo), `--limite`, `--simular`. |
 | `marketplaces-enfileirar-ofertas` | Põe na fila uma tarefa de ofertas por peça, para **Mercado Livre ou Shopee**. Sem `--categoria`, percorre **todas** as categorias; só entram peças aprovadas e com o mínimo técnico. |
 | `marketplaces-worker` | Executa a fila acima (processo que fica rodando). `--uma-vez` processa uma tarefa por loja e termina. |
 | `marketplaces-fila-resumo` | Mostra quantas tarefas estão pendentes, em andamento, concluídas ou com falha. |
