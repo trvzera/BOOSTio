@@ -12,7 +12,7 @@ A sequência de aprovação, busca de ofertas, worker e análise por IA está no
 | --- | --- |
 | `precos-atualizar` | Atualiza preço e estoque da **KaBuM** (um anúncio por vez). Agendado por `deploy/atualizar_precos.sh`. |
 | `mercadolivre-ofertas-atualizar` | Atualiza as ofertas do **Mercado Livre** das peças. Script: `deploy/atualizar_ofertas_mercadolivre.sh`. |
-| `marketplaces-precos-atualizar` | Reconsulta o preço das ofertas ativas do Mercado Livre (`GET /items?ids=`, 20 por chamada) e da Shopee (`productOfferV2` por `shopId:itemId`) e grava o histórico. `--loja`, `--horas 20` (só ofertas não consultadas nesse prazo), `--limite`, `--simular`. |
+| `marketplaces-precos-atualizar` | Atualiza o **preço diário** das ofertas já cadastradas, sem fila: Mercado Livre por `GET /items?ids=` (20 anúncios por chamada) e Shopee por `productOfferV2` (`shopId` e `itemId` vêm do `produto_id_loja`). Grava o preço e uma linha por dia em `historico_oferta`. Opções: `--loja mercado_livre\|shopee\|todas`, `--horas 20` (só consulta ofertas não consultadas nesse prazo, então dá para repetir ou retomar), `--limite`, `--simular` (consulta e conta, sem gravar). No Mercado Livre, anúncio inexistente (404) é desativado; na Shopee, anúncio sem retorno fica como está. |
 | `marketplaces-enfileirar-ofertas` | Põe na fila uma tarefa de ofertas por peça, para **Mercado Livre ou Shopee**. Sem `--categoria`, percorre **todas** as categorias; só entram peças aprovadas e com o mínimo técnico. |
 | `marketplaces-worker` | Executa a fila acima (processo que fica rodando). `--uma-vez` processa uma tarefa por loja e termina. |
 | `marketplaces-fila-resumo` | Mostra quantas tarefas estão pendentes, em andamento, concluídas ou com falha. |
@@ -99,7 +99,7 @@ A sequência de aprovação, busca de ofertas, worker e análise por IA está no
 
 ## Como escolher
 
-- **Quero preço atualizado:** `precos-atualizar` (KaBuM) e fila + worker (Mercado Livre e Shopee).
+- **Quero preço atualizado:** `precos-atualizar` (KaBuM) e `marketplaces-precos-atualizar` (Mercado Livre e Shopee). A fila + worker serve para descobrir e associar ofertas novas, não para o preço diário.
 - **Subi uma versão nova:** os `*-preparar` / scripts de `deploy/`, com backup.
 - **Quero peças novas:** seção 3, ou `shopee-descobrir` / `catalogo-worker`.
 - **Algo está estranho:** seção 6, que não altera dados.
@@ -136,6 +136,14 @@ Os comandos com `--aplicar` gravam; o worker e a reativação já executam açõ
    credencial e então rode `marketplaces-fila-reativar --loja mercado_livre` (ou `shopee`). Tarefa concluída não
    garante que houve oferta: meça por peças com ao menos uma oferta ativa e preço maior que zero.
 
-5. **Analisar as pendências com IA**: `admin-pendencias-sugerir --limite 500 --aplicar` só sugere; com `--decidir`
+5. **Atualizar os preços das ofertas já cadastradas** (uma vez por dia; simule antes). Não usa a fila, e a fila
+   de descoberta pode continuar rodando ao mesmo tempo, pois as duas respeitam o limite de requisições por loja:
+
+   ```bash
+   python -m flask --app app marketplaces-precos-atualizar --simular
+   python -m flask --app app marketplaces-precos-atualizar
+   ```
+
+6. **Analisar as pendências com IA**: `admin-pendencias-sugerir --limite 500 --aplicar` só sugere; com `--decidir`
    também aceita ou rejeita quando a confiança alcança 90. Rejeição da IA não tem desfazer. Alternativa: o painel
    de administração ("Selecionar todas" e "Enviar para a IA").

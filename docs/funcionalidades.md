@@ -169,6 +169,14 @@ A maioria dos preços cadastrados vem da **KaBuM**. Quando existe vínculo com o
 anúncio, o link leva ao produto exato. A **Pichau** é uma alternativa de busca
 pelo modelo, sem garantia de oferta equivalente ou de preço confirmado.
 
+Cada peça mostra **no máximo um anúncio por loja: o mais barato**. O preço de referência da
+peça é o menor entre as ofertas exibidas de todas as lojas, desconsiderando as esgotadas quando
+há alguma disponível. O preço das ofertas do Mercado Livre e da Shopee é reconsultado uma vez
+por dia (`marketplaces-precos-atualizar`) e cada coleta alimenta o histórico.
+
+O **histórico de preços** da peça tem um filtro por loja. A visão padrão, "Todas as lojas", mostra
+o menor preço de cada dia entre as lojas; as demais mostram só a KaBuM, o Mercado Livre ou a Shopee.
+
 Preço cadastrado não significa cotação em tempo real. Estoque, frete e condições
 de compra devem ser conferidos na loja. A ficha da peça distingue dados da conta
 de exemplos demonstrativos e informa a última atualização do preço quando cadastrada.
