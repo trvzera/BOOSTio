@@ -29,6 +29,7 @@ from commands.requisitos_montagem import registrar_comandos_requisitos_montagem
 from commands.catalogo import registrar_comandos_catalogo
 from commands.banco import registrar_comandos_banco
 from commands.benchmarks import registrar_comandos_benchmarks
+from utils.compressao import configurar_compressao
 from utils.csrf import configurar_csrf
 from utils.limite_requisicoes import configurar_limites
 
@@ -51,6 +52,7 @@ if ambiente == 'producao':
 ConfigurarAcessoService().executar(app, producao=ambiente == 'producao')
 
 configurar_csrf(app)
+configurar_compressao(app)
 configurar_limites(app, producao=ambiente == 'producao')
 #Iniciar o login manager e passar o app como parametro
 lm.init_app(app)

@@ -166,15 +166,30 @@ class Oferta(ModeloBase):
                 por_peca.setdefault((registro.tabela_peca, registro.peca_id), []).append(dados)
         for peca, referencia in zip(pecas, referencias):
             peca['ofertas'] = [*peca.get('ofertas', []), *por_peca.get(referencia, [])]
-        modelos = {m.__tablename__: m for m in MODELOS_PECAS}
-        for oferta in cls.query.filter(cls.loja == 'shopee', cls.ativa.is_(True),
-                tuple_(cls.tabela_peca, cls.peca_id).in_(referencias)).order_by(cls.preco, cls.id).all():
-            modelo = modelos.get(oferta.tabela_peca)
-            peca = modelo.buscar_por_id(oferta.peca_id) if modelo else None
-            dados = oferta.para_exibicao()
-            if peca and dados and oferta.shopee_validada(peca):
-                fichas[(oferta.tabela_peca, oferta.peca_id)]['ofertas'].append(dados)
+        cls._anexar_shopee(fichas, referencias)
         return pecas
+
+    @classmethod
+    def _anexar_shopee(cls, fichas, referencias):
+        from sqlalchemy import tuple_
+        from . import ProdutoPendente
+        ofertas = cls.query.filter(cls.loja == 'shopee', cls.ativa.is_(True),
+                tuple_(cls.tabela_peca, cls.peca_id).in_(referencias)).order_by(cls.preco, cls.id).all()
+        # Peças e pendências de todas as ofertas são lidas de uma vez, não uma consulta por oferta.
+        ids_por_tabela = {}
+        for oferta in ofertas:
+            ids_por_tabela.setdefault(oferta.tabela_peca, set()).add(oferta.peca_id)
+        modelos = {m.__tablename__: m for m in MODELOS_PECAS}
+        pecas = {(tabela, peca.id): peca for tabela, ids in ids_por_tabela.items() if tabela in modelos
+                 for peca in modelos[tabela].listar_por_ids(ids)}
+        pendencias = ProdutoPendente.mapear_por_anuncios('shopee', {o.produto_id_loja for o in ofertas})
+        for oferta in ofertas:
+            peca = pecas.get((oferta.tabela_peca, oferta.peca_id))
+            pendencia = pendencias.get(oferta.produto_id_loja)
+            dados = oferta.para_exibicao()
+            # Sem pendência importada não há prova de associação: a oferta não é exibida.
+            if peca and pendencia and dados and oferta.shopee_validada(peca, pendencia):
+                fichas[(oferta.tabela_peca, oferta.peca_id)]['ofertas'].append(dados)
 
     @classmethod
     def _anexar_kabum(cls, pecas, referencias):
@@ -191,10 +206,10 @@ class Oferta(ModeloBase):
         return cls.query.filter_by(id=oferta_id, tabela_peca=categoria, peca_id=peca_id,
                                    ativa=True).filter(cls.loja.in_(('mercado_livre', 'shopee'))).first()
 
-    def shopee_validada(self, peca):
+    def shopee_validada(self, peca, pendencia=None):
         from . import ProdutoPendente
         from utils.identidade_peca import assinatura_peca, assinatura_tecnica
-        p = ProdutoPendente.buscar_por_anuncio('shopee', self.produto_id_loja)
+        p = pendencia or ProdutoPendente.buscar_por_anuncio('shopee', self.produto_id_loja)
         prova = (p.evidencias or {}).get('vinculo', {}) if p else {}
         return bool(p and p.status == 'importado' and p.oferta_id == self.id
                     and prova.get('assinatura_peca') == assinatura_peca(peca)

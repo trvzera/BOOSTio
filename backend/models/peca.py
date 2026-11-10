@@ -200,6 +200,10 @@ class Peca(ModeloBase):
                             ~cls.id.in_(com_oferta))
 
   @classmethod
+  def listar_por_ids(cls, ids):
+    return cls.query.filter(cls.id.in_(ids)).all()
+
+  @classmethod
   def iterar_todas(cls, lote=500):
     return cls.query.yield_per(lote)
 

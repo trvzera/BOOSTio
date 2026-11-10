@@ -37,6 +37,14 @@ class ProdutoPendente(ModeloBase):
         return cls.query.filter_by(id=identificador).populate_existing().with_for_update().first()
 
     @classmethod
+    def mapear_por_anuncios(cls, loja, produtos_id_loja):
+        """Pendências de vários anúncios de uma loja em uma consulta: {produto_id_loja: pendência}."""
+        if not produtos_id_loja:
+            return {}
+        pendencias = cls.query.filter(cls.loja == loja, cls.produto_id_loja.in_(list(produtos_id_loja))).all()
+        return {p.produto_id_loja: p for p in pendencias}
+
+    @classmethod
     def buscar_por_anuncio(cls, loja, produto_id_loja):
         return cls.query.filter_by(loja=loja, produto_id_loja=produto_id_loja).first()
 
