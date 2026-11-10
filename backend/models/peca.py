@@ -7,8 +7,6 @@ from .medidas_fisicas import completar_medidas
 from .imagens_referencia import imagem_referencia
 
 
-
-
 class Peca(ModeloBase):
   __abstract__ = True
   
@@ -108,9 +106,6 @@ class Peca(ModeloBase):
       cls.fabricante).group_by(cls.fabricante).order_by(
       func.count(cls.id).desc(), cls.fabricante).all() if linha[0] and linha[0].strip()]
 
-  @classmethod
-  def pool_para_matching(cls, limite=2001):
-    return cls.query.order_by(cls.id).limit(limite).all()
 
   @classmethod
   def iterar_para_matching(cls, tamanho_lote=500):
@@ -130,7 +125,6 @@ class Peca(ModeloBase):
   @classmethod
   def lote_para_identificadores(cls, depois_id=0, limite=100):
     return cls.query.filter(cls.id > depois_id).order_by(cls.id).limit(limite).all()
-
 
 
   @classmethod
@@ -198,7 +192,6 @@ class Peca(ModeloBase):
       return pecas
     # Distribui as opções pela faixa de preços, sem enviar o catálogo inteiro ao LLM.
     return [pecas[indice * (len(pecas) - 1) // (limite - 1)] for indice in range(limite)]
-
 
 
   @classmethod

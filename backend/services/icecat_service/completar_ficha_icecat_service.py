@@ -1,13 +1,13 @@
 """Enriquece anúncios desconhecidos com ficha comprovada, sem gravar componentes."""
-from dataclasses import replace, asdict
-from decimal import Decimal, InvalidOperation
+
+
 import os
 from types import SimpleNamespace
 from services.catalogo_service.associacao_inteligente_service import AssociacaoInteligenteService
-from services.catalogo_service.conferir_especificacoes_service import converter
+
 from services.catalogo_service.normalizar_produto import codigo, gtin
 from services.catalogo_service.conferir_especificacoes_service import valores
-from services.catalogo_service.validar_ficha_tecnica_service import ValidarFichaTecnicaService
+
 from .indice_icecat_service import IndiceIcecatService
 from .normalizar_ficha_icecat_service import NormalizarFichaIcecatService, CategoriaIcecatIncompativel
 from .obter_ficha_icecat_service import ObterFichaIcecatService, ErroConsultaIcecat

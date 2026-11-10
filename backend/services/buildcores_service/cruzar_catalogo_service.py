@@ -1,5 +1,5 @@
 """Cruza uma revisão local verificada com o catálogo docyx já importado."""
-from collections import defaultdict,Counter
+from collections import defaultdict
 from pathlib import Path
 import hashlib
 import json

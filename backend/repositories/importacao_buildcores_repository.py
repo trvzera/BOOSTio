@@ -1,8 +1,8 @@
 from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 """Importação transacional do OpenDB; consultas e deduplicação ficam no repositório."""
 from collections import defaultdict
-from types import SimpleNamespace
-from decimal import Decimal
+
+
 from difflib import SequenceMatcher
 import re
 from sqlalchemy import null

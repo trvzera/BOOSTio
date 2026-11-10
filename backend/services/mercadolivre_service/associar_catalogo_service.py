@@ -1,5 +1,5 @@
-import re
-from utils.identidade_peca import normalizar_identidade as normalizar, assinatura_peca
+
+from utils.identidade_peca import assinatura_peca
 from models import VinculoMercadoLivre, IdentidadeFabricante
 from services.catalogo_service.consultas_peca_service import consultas_da_peca, mpn_da_peca
 

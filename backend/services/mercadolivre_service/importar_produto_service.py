@@ -2,11 +2,11 @@
 from services.icecat_service.obter_ficha_icecat_service import ErroConsultaIcecat
 from datetime import datetime, timezone
 from sqlalchemy.exc import SQLAlchemyError
-from models import db, ProdutoPendente, IdentidadeFabricante, Oferta
+from models import db, ProdutoPendente
 from repositories.importacao_catalogo_repository import RepositorioImportacaoCatalogo
 from models.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_peca, assinatura_catalogo, assinatura_documento
-from .comparar_produtos_service import CompararProdutosService
+
 from .enriquecer_produto_service import EnriquecerProdutoService
 from .buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
 from .token_mercado_livre_service import TokenMercadoLivreService

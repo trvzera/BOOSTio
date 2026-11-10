@@ -1,6 +1,6 @@
 """Preparação e diagnóstico da fonte técnica, sem criar peças diretamente."""
 import json
-import os
+
 import click
 from defusedxml.common import DefusedXmlException
 from xml.etree.ElementTree import ParseError

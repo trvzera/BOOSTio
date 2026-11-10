@@ -1,5 +1,5 @@
 import re
-from decimal import Decimal
+
 from .normalizar_produto import nome, numero
 from utils.sockets import normalizar_socket
 from .normalizar_especificacoes import converter_adicional, agregar, CONJUNTOS, comparar_conexoes

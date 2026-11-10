@@ -80,7 +80,6 @@ def aplicar_lote_mercado_livre(peca, catalogo_id, assinatura, assinatura_catalog
         raise
 
 
-
 def aplicar_ofertas_loja(peca,loja,ofertas,agora):
     """Parte genérica da unidade de trabalho. O chamador confirma a transação."""
     from decimal import Decimal,InvalidOperation
@@ -120,11 +119,6 @@ def aplicar_ofertas_loja(peca,loja,ofertas,agora):
         if historico:db.session.add(HistoricoOferta(oferta_id=registro.id,preco=preco,esgotado=registro.esgotado,coletado_em=agora))
         propostas.append(dict(anuncio=chave,acao='criada' if novo else 'atualizada' if mudou else 'inalterada',historico=historico))
     return propostas
-
-
-def atualizar_oferta_validada(peca, loja, oferta, assinatura, produto, *, simular):
-    """Uma oferta; mantido para a importação de um anúncio descoberto."""
-    return atualizar_ofertas_validadas(peca, loja, [(oferta, produto)], assinatura, simular=simular)
 
 
 def atualizar_ofertas_validadas(peca, loja, itens, assinatura, *, simular, desativar_ausentes=False, revisao_manual=None):

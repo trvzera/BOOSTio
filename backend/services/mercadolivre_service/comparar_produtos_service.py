@@ -1,6 +1,6 @@
 """Fachada compatível: converte dados Mercado Livre e chama o núcleo comum."""
 from services.catalogo_service.associacao_inteligente_service import AssociacaoInteligenteService
-from .normalizar_produto_service import NormalizarProdutoService, DOMINIOS
+from .normalizar_produto_service import NormalizarProdutoService
 
 
 class CompararProdutosService:

@@ -5,7 +5,7 @@ from dataclasses import asdict
 from models.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_catalogo
 from services.catalogo_service.normalizar_produto import atributos, numero, gtin
-from .comparar_produtos_service import CompararProdutosService, DOMINIOS
+
 from .buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
 from services.catalogo_service.consultar_benchmark_catalogo_service import ConsultarBenchmarkCatalogoService
 

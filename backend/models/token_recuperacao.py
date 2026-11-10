@@ -85,8 +85,3 @@ class TokenRecuperacao(ModeloBase):
       db.session.rollback()
       raise
 
-  @staticmethod
-  def deletar_tokens_usuario(usuario_id:int):
-    TokenRecuperacao.query.filter_by(usuario_id = usuario_id).delete()
-
-    db.session.commit()

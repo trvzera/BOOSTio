@@ -1,5 +1,5 @@
 """Importação direta das fichas nativas, sem ofertas, preços ou novas aprovações."""
-from collections import Counter
+
 from decimal import Decimal,InvalidOperation
 from sqlalchemy import Integer,Numeric,Float,Boolean,String
 from sqlalchemy.exc import SQLAlchemyError
