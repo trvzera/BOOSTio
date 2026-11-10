@@ -58,7 +58,7 @@ A sequência de aprovação, busca de ofertas, worker e análise por IA está no
 | `buildcores-baixar` / `buildcores-importar` / `buildcores-cruzar` | Baixa, importa e cruza fichas técnicas do BuildCores com o catálogo. |
 | `dataset-pecas-baixar` / `dataset-pecas-importar` | Baixa e importa o dataset público de peças (só ficha técnica). |
 | `catalogo-tecnico-importar` / `-listar` / `-revisar` | Importa fichas técnicas em JSON, lista o que existe e revisa/aprova. |
-| `benchmarks-importar` | Preenche benchmarks de CPU/GPU (PassMark) nas peças já cadastradas, sem rede: `--cpu database/benchmarks/20261102T113616731428Z/cpus.csv --gpu database/benchmarks/20261102T113616731428Z/gpus.csv`; `--simular` só mostra. Associa por nome exato ou pelo mapa revisado `backend/data/benchmarks/passmark_associacoes.json`. |
+| `benchmarks-importar` | Preenche benchmarks de CPU/GPU (PassMark) nas peças já cadastradas, sem rede: `--cpu database/benchmarks/20261102T113616731428Z/cpus.csv --gpu database/benchmarks/20261102T113616731428Z/gpus.csv`; `--simular` só mostra. Associa pelo mapa revisado `backend/data/benchmarks/passmark_associacoes.json`, pelo nome exato ou pelo chip/modelo (GPU: `modelo_referencia`), sem aceitar variantes parecidas. |
 
 ## 4. Descoberta e importação do Mercado Livre (etapas em sequência)
 
