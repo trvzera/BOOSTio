@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from dataclasses import replace
 from sqlalchemy.exc import SQLAlchemyError
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from services.catalogo_service.enriquecer_peca_existente_service import EnriquecerPecaExistenteService
 from .normalizar_ficha_kabum_service import NormalizarFichaKabumService
 

@@ -2,7 +2,7 @@ from services.catalogo_service.pendencias_montagem_service import pendencias_par
 """Recalcula apenas o indicador técnico das peças importadas, sem aprová-las."""
 from collections import Counter
 from models import db,ControleColeta
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 
 class RepositorioReavaliacaoMontagem:

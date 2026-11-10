@@ -1,5 +1,5 @@
 from types import SimpleNamespace
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from .associacao_inteligente_service import AssociacaoInteligenteService
 
 

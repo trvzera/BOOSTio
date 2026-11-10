@@ -3,7 +3,7 @@ import hashlib
 import re
 import unicodedata
 
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 
 class PlanejarDescobertaService:

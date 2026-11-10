@@ -6,7 +6,7 @@ pendência fica fora do painel (e volta sozinha quando a peça for aprovada).
 from collections import defaultdict
 
 from models import ProdutoPendente
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 ABERTAS = ("pendente", "em_revisao")
 

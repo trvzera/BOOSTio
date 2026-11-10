@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from sqlalchemy.exc import SQLAlchemyError
 from models import db, ProdutoPendente, IdentidadeFabricante, Oferta
 from repositories.importacao_catalogo_repository import RepositorioImportacaoCatalogo
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_peca, assinatura_catalogo, assinatura_documento
 from .comparar_produtos_service import CompararProdutosService
 from .enriquecer_produto_service import EnriquecerProdutoService

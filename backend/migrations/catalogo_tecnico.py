@@ -3,7 +3,7 @@ from utils.colunas_antigas import COLUNAS_ANTIGAS_DA_PECA
 from sqlalchemy import inspect, MetaData, Table, select
 from sqlalchemy.schema import CreateTable, CreateColumn
 from models import db
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from .fichas_tecnicas import preparar_fichas_tecnicas
 
 CAMPOS_NULOS=('consumo_energia',)

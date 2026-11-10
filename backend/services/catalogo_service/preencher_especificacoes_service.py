@@ -1,7 +1,7 @@
 """Preenche lacunas comprovadas nas peças existentes, independente da loja."""
 from sqlalchemy.exc import SQLAlchemyError
 from models import ProdutoPendente
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from .classificar_pendencias_service import ClassificarPendenciasService
 from .enriquecer_peca_existente_service import EnriquecerPecaExistenteService
 from .indice_candidatos_service import IndiceCandidatosService

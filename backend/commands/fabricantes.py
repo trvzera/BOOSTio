@@ -5,7 +5,7 @@ import click
 from services.fabricante_service.completar_ficha_service import CompletarFichaFabricanteService
 from services.fabricante_service.consultar_paginas_service import ConsultarPaginasFabricanteService
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 
 def registrar_comandos_fabricantes(app):

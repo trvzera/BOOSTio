@@ -10,7 +10,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from models import ProdutoPendente
 from services.llm_service.llm_service import LLMService
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from .catalogo_ocupado import catalogo_que_ocupa_a_peca
 from .apresentar_pendencia_service import preco_do_anuncio, resumir_ficha
 from .pendencias_acionaveis import ABERTAS, ids_acionaveis

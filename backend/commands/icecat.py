@@ -8,7 +8,7 @@ from services.icecat_service.indice_icecat_service import IndiceIcecatService
 from services.icecat_service.completar_ficha_icecat_service import CompletarFichaIcecatService
 from services.icecat_service.completar_pecas_icecat_service import CompletarPecasIcecatService
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 
 def registrar_comandos_icecat(app):

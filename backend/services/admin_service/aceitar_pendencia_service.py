@@ -5,7 +5,7 @@ from repositories.ofertas_repository import atualizar_ofertas_validadas
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
 from services.mercadolivre_service.controle_requisicoes_service import ControleRequisicoesService
 from services.mercadolivre_service.importar_produto_service import ImportarProdutoService
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from services.shopee_service.normalizar_produto_service import NormalizarProdutoShopeeService
 from utils.identidade_peca import assinatura_peca
 from .apresentar_pendencia_service import apresentar_pendencia

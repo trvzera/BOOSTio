@@ -1,7 +1,7 @@
 """Importação reutilizável. A consulta externa pertence ao adaptador de cada loja."""
 from datetime import datetime, timezone
 from repositories.importacao_catalogo_repository import RepositorioImportacaoCatalogo
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_documento
 from .indice_candidatos_service import IndiceCandidatosService
 from .validar_ficha_tecnica_service import ValidarFichaTecnicaService

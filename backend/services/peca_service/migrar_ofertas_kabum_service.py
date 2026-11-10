@@ -10,7 +10,7 @@ from sqlalchemy import inspect, text
 
 from models import db, Oferta, HistoricoOferta
 from models.medidas_fisicas import produto_kabum
-from .modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 COLUNAS_ANTIGAS = {'kabum_external', 'preco', 'esgotado', 'preco_atualizado_em'}
 

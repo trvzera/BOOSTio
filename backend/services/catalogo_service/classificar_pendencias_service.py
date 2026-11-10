@@ -1,7 +1,7 @@
 """Classifica qualquer loja usando produtos normalizados e models compartilhados."""
 from sqlalchemy.exc import SQLAlchemyError
 from models import ProdutoPendente
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_documento
 from .produto_normalizado import ProdutoNormalizado
 from .indice_candidatos_service import IndiceCandidatosService

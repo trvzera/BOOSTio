@@ -3,7 +3,7 @@ from utils.colunas_antigas import COLUNAS_ANTIGAS_DA_PECA
 from sqlalchemy import inspect, text
 from sqlalchemy.schema import CreateIndex
 from models import db, Oferta, ProdutoPendente, ExecucaoDescoberta, EstadoCatalogo, RevisaoIdentidadePeca
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 CAMPOS = {'status_validacao', 'validacao_motivo', 'validado_em'}
 ESTADOS = "'pendente','em_revisao','aprovado','rejeitado','legado'"

@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from sqlalchemy.exc import SQLAlchemyError
 from models import db, ProdutoPendente, ExecucaoDescoberta
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from .buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
 from .controle_requisicoes_service import ControleRequisicoesService, OrcamentoRequisicoesEsgotado, ErroMercadoLivre
 from .normalizar_produto_service import DOMINIOS

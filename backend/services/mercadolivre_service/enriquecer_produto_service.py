@@ -2,7 +2,7 @@
 import re
 from datetime import datetime, timezone
 from dataclasses import asdict
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_catalogo
 from services.catalogo_service.normalizar_produto import atributos, numero, gtin
 from .comparar_produtos_service import CompararProdutosService, DOMINIOS

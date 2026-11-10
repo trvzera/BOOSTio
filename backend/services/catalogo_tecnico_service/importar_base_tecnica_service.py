@@ -4,7 +4,7 @@ import re
 import json
 from datetime import datetime
 from models import db
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
 from services.catalogo_service.validar_ficha_tecnica_service import ValidarFichaTecnicaService
 from services.catalogo_service.conferir_especificacoes_service import converter

@@ -3,7 +3,7 @@ from flask import Flask
 from sqlalchemy import MetaData, inspect, text, event
 from models import db, SSD, Usuario, Build
 from migrations.catalogo_tecnico import preparar_catalogo_tecnico
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 
 @pytest.fixture

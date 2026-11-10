@@ -1,5 +1,8 @@
 """Anúncio de uma loja vinculado a uma peça; valores monetários em BRL."""
 from . import db, ModeloBase
+from .medidas_fisicas import produto_kabum
+from .modelos_pecas import MODELOS_PECAS
+from utils.url_shopee import validar_url_shopee
 
 
 class Oferta(ModeloBase):
@@ -48,8 +51,6 @@ class Oferta(ModeloBase):
     def identidades_kabum_ambiguas(cls):
         from sqlalchemy import inspect
         from collections import defaultdict
-        from services.peca_service.modelos_pecas import MODELOS_PECAS
-        from .medidas_fisicas import produto_kabum
         import re
         encontrados = defaultdict(set)
         inspetor = inspect(db.engine)
@@ -70,7 +71,6 @@ class Oferta(ModeloBase):
     @classmethod
     def registrar_identidade_kabum(cls, peca, *, simular=False, ids_ambiguos=None):
         """Registra o ID real do anúncio. Não inventa cotação nem estoque da seed."""
-        from .medidas_fisicas import produto_kabum
         import re
         referencia = peca.referencia_interna or peca.part_number or ''
         legado = re.fullmatch(r'KABUM-([1-9][0-9]*)', referencia, re.I)
@@ -146,7 +146,6 @@ class Oferta(ModeloBase):
                 por_peca.setdefault((registro.tabela_peca, registro.peca_id), []).append(dados)
         for peca, referencia in zip(pecas, referencias):
             peca['ofertas'] = [*peca.get('ofertas', []), *por_peca.get(referencia, [])]
-        from services.peca_service.modelos_pecas import MODELOS_PECAS
         modelos = {m.__tablename__: m for m in MODELOS_PECAS}
         for oferta in cls.query.filter(cls.loja == 'shopee', cls.ativa.is_(True),
                 tuple_(cls.tabela_peca, cls.peca_id).in_(referencias)).order_by(cls.preco, cls.id).all():
@@ -191,12 +190,10 @@ class Oferta(ModeloBase):
         try:
             url = urlsplit(self.url)
             if self.loja == 'kabum':
-                from .medidas_fisicas import produto_kabum
                 if produto_kabum(self.url) != self.produto_id_loja:
                     return None
                 url_compra = self.url
             elif self.loja == 'shopee':
-                from services.shopee_service.normalizar_produto_service import validar_url_shopee
                 if (not validar_url_shopee(self.url) or
                         url.path != '/product/' + self.produto_id_loja.replace(':', '/')):
                     return None

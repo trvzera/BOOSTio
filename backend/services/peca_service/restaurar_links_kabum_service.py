@@ -3,7 +3,7 @@ from pathlib import Path
 
 from models import db
 from repositories.ofertas_kabum_repository import definir_link
-from .modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 
 class RestaurarLinksKabumService:

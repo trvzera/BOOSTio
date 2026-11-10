@@ -2,7 +2,7 @@ from repositories.identificadores_peca_repository import separar_identificadores
 """Coordena lotes; persistência e migração de cada peça ficam nos models."""
 from sqlalchemy.exc import SQLAlchemyError
 from models import Oferta
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 
 class SepararIdentificadoresService:

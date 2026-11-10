@@ -54,7 +54,7 @@ class RepositorioControleCatalogo:
     def verificar_esquema(self, trabalhos):
         from sqlalchemy import inspect
         from models import EstadoCatalogo, ProdutoPendente, Oferta, HistoricoOferta, VinculoMercadoLivre, IdentidadeFabricante, ControleColeta
-        from services.peca_service.modelos_pecas import MODELOS_PECAS
+        from models.modelos_pecas import MODELOS_PECAS
         modelos=[EstadoCatalogo,ProdutoPendente,Oferta,HistoricoOferta,VinculoMercadoLivre,IdentidadeFabricante,ControleColeta]
         modelos += [m for m in MODELOS_PECAS if m.__tablename__ in {t['categoria'] for t in trabalhos}]
         insp=inspect(db.engine)

@@ -3,7 +3,7 @@ from dataclasses import asdict
 from datetime import datetime, timezone
 
 from models import ProdutoPendente
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from services.catalogo_service.indice_candidatos_service import IndiceCandidatosService
 from services.catalogo_service.importar_catalogo_service import ImportarCatalogoService
 from services.catalogo_service.enriquecer_normalizado_service import EnriquecerNormalizadoService

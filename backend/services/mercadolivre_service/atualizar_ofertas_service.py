@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy.exc import SQLAlchemyError
 
 from models import Oferta, VinculoMercadoLivre
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_peca, assinatura_catalogo
 from .associar_catalogo_service import AssociarCatalogoService
 from .buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService

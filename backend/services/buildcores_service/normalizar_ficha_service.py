@@ -102,7 +102,7 @@ class NormalizarFichaBuildcoresService:
         # Nenhuma iluminação é inferida da ausência ou de uma lista vazia.
         if isinstance(bruto.get('lighting'),list) and bruto['lighting']:
             dados['iluminacao']=True;caminhos['iluminacao']='lighting'
-        from services.peca_service.modelos_pecas import MODELOS_PECAS
+        from models.modelos_pecas import MODELOS_PECAS
         from sqlalchemy import Integer,String,Boolean
         modelo=next(m for m in MODELOS_PECAS if m.__tablename__==cat)
         for k,v in list(dados.items()):

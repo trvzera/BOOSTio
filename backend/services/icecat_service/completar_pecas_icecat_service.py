@@ -6,7 +6,7 @@ from models import db
 from services.catalogo_service.enriquecer_peca_existente_service import EnriquecerPecaExistenteService
 from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from .completar_ficha_icecat_service import CompletarFichaIcecatService
 from .indice_icecat_service import IndiceIcecatService
 from .obter_ficha_icecat_service import ErroConsultaIcecat, ObterFichaIcecatService

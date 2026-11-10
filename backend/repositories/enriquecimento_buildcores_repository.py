@@ -1,7 +1,7 @@
 from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 """Acesso ao catálogo e atualizações condicionais, sem criar componentes/ofertas."""
 from models import db, ControleColeta
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_documento
 
 

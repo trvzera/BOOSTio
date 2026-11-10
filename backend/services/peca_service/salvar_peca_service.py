@@ -1,5 +1,5 @@
 from models import db
-from .modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from services.preco_service.validar_link_service import ValidarLinkService
 from repositories.ofertas_kabum_repository import definir_link
 

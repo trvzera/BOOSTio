@@ -95,7 +95,7 @@ class NormalizarPecaDatasetService:
         cor=linha.get('color')
         if isinstance(cor,str) and cor.strip():dados['modelo']+=' ['+cor.strip()+']'
         bruto={k:v for k,v in linha.items() if k not in ('price','price_per_gb')}
-        from services.peca_service.modelos_pecas import MODELOS_PECAS
+        from models.modelos_pecas import MODELOS_PECAS
         classe=next(m for m in MODELOS_PECAS if m.__tablename__==categoria)
         ausentes=[c.name for c in classe.__table__.columns if not c.nullable
             and c.name not in ('id','criado_em') and dados.get(c.name) is None]

@@ -8,18 +8,7 @@ from services.catalogo_service.produto_normalizado import ProdutoNormalizado
 from services.catalogo_service.conferir_especificacoes_service import extrair_titulo
 from services.catalogo_service.comparar_nomes_service import marca as normalizar_marca
 from services.catalogo_service.normalizar_produto import nome as normalizar_nome
-
-
-def validar_url_shopee(url, *, afiliado=False):
-    try:
-        partes = urlsplit(url)
-        hosts = {'shopee.com.br', 'www.shopee.com.br'}
-        if afiliado:
-            hosts |= {'s.shopee.com.br', 'shope.ee'}
-        return (partes.scheme == 'https' and partes.hostname in hosts
-                and not partes.username and not partes.password and partes.port in (None, 443))
-    except (ValueError, TypeError):
-        return False
+from utils.url_shopee import validar_url_shopee
 
 
 # Títulos da Shopee são escritos pelo vendedor: retirar propaganda sem tocar em modelo, capacidade ou sufixo.

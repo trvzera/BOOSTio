@@ -3,7 +3,7 @@ from services.catalogo_service.pendencias_montagem_service import pendencias_par
 from collections import defaultdict
 from sqlalchemy import null
 from models import db, ControleColeta
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from services.catalogo_service.normalizar_produto import nome
 
 

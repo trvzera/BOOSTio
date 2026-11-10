@@ -7,7 +7,7 @@ from difflib import SequenceMatcher
 import re
 from sqlalchemy import null
 from models import db,ControleColeta
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from services.catalogo_service.normalizar_produto import nome,codigo
 from services.buildcores_service.normalizar_ficha_service import fabricante
 from services.buildcores_service.comparar_fichas_service import CompararFichasBuildcoresService,chave_modelo,equivalente
