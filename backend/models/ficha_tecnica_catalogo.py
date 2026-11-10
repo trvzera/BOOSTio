@@ -1,4 +1,3 @@
-"""Fila de fichas técnicas: uma fonte técnica não é uma loja nem uma oferta."""
 from sqlalchemy.orm import validates
 from . import db, ModeloBase
 

@@ -1,4 +1,3 @@
-"""Requisitos técnicos preservados mesmo quando o catálogo aceita fichas parciais."""
 CAMPOS_TECNICOS_OBRIGATORIOS = {'adaptador_wifi': ('interface', 'padrao_wifi', 'velocidade_mbps', 'bluetooth'),
  'air_cooler': ('compatibilidade', 'dimensoes'),
  'fan': ('tamanho_mm', 'quantidade'),

@@ -1,4 +1,3 @@
-"""Importação de um manifesto revisado, sem inferência de códigos por nome."""
 import json
 from pathlib import Path
 from urllib.parse import urlsplit

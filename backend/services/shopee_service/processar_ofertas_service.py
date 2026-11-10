@@ -1,4 +1,3 @@
-"""Adapta ofertas Shopee aos serviços comuns; rede fora das transações."""
 from dataclasses import asdict
 from datetime import datetime, timezone
 
@@ -20,7 +19,6 @@ class ProcessarOfertasShopeeService:
         self._marcas = None
 
     def _normalizador(self):
-        """Marcas conhecidas: as do catálogo e as da base técnica; só elas identificam o fabricante."""
         if self._marcas is None:
             marcas = {m for modelo in MODELOS_PECAS for m in modelo.fabricantes_para_descoberta()}
             marcas |= {m[1] for m in self._marcas_da_base_tecnica()}
@@ -41,8 +39,6 @@ class ProcessarOfertasShopeeService:
     POR_PAGINA = 20
 
     def ofertas_peca(self, *, categoria, peca_id, simular=True, limite_ofertas=1):
-        """Associa anúncios à peça como no Mercado Livre: busca por MPN, depois por nome, e exige
-        correspondência única; fica o menor preço de cada loja (vendedor), até `limite_ofertas`."""
         modelo = next((m for m in MODELOS_PECAS if m.__tablename__ == categoria), None)
         if modelo is None or type(peca_id) is not int or not 1 <= limite_ofertas <= 20:
             raise ValueError('Filtro de peça inválido')
@@ -104,7 +100,6 @@ class ProcessarOfertasShopeeService:
 
     @staticmethod
     def _registrar_ambiguos(categoria, ambiguos):
-        """Grava em produto_pendente (em_revisao) com os candidatos; nunca reabre pendência encerrada."""
         agora = datetime.now(timezone.utc).replace(tzinfo=None)
         registradas = 0
         for bruto, produto, oferta, decisao in ambiguos:
@@ -122,7 +117,6 @@ class ProcessarOfertasShopeeService:
 
     @staticmethod
     def _selecionar(confirmados, limite):
-        """Menor preço primeiro, um anúncio por loja da Shopee, como o Mercado Livre faz por vendedor."""
         vendedores, selecionados = set(), []
         for oferta, produto in sorted(confirmados, key=lambda i: (i[0]['preco'], i[0]['vendedor_id'], i[0]['produto_id_loja'])):
             if oferta['vendedor_id'] in vendedores:

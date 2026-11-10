@@ -1,4 +1,3 @@
-"""MPN revisado sem substituir a referência interna usada por imagens e fichas."""
 from decimal import Decimal
 from sqlalchemy import inspect
 from . import db, ModeloBase

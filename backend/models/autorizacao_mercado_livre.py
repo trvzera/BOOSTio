@@ -1,4 +1,3 @@
-"""Convites administrativos e estados OAuth de uso único, válidos por dez minutos."""
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 from . import db, ModeloBase, TokenIntegracao

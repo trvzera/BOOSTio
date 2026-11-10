@@ -1,4 +1,3 @@
-"""Adaptador do JSON docyx; ausências e preços não são inferidos."""
 import hashlib
 import json
 import math

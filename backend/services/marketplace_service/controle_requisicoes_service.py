@@ -1,4 +1,3 @@
-"""Limitador durável compartilhado por processos e independente da loja."""
 from contextvars import ContextVar
 from datetime import datetime, timezone
 import math

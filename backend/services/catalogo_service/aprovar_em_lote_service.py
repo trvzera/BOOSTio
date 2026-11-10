@@ -1,11 +1,3 @@
-"""Aprova peças importadas que passam em regras objetivas; o restante continua em revisão.
-
-Regras (versão `aprovacao_lote_v1`):
-- identidade: fabricante e modelo preenchidos, e o modelo tem algum algarismo (nome genérico não identifica);
-- ficha: todos os campos mínimos da categoria para montagem estão preenchidos e a ficha não foi reprovada;
-- sem duplicata: nenhuma outra peça da categoria tem o mesmo fabricante+modelo ou o mesmo part number;
-- opcionalmente, exige part number ou código do fabricante.
-"""
 import random
 import re
 from collections import Counter
@@ -105,7 +97,6 @@ class AprovarEmLoteService:
         return total
 
     def reverter(self, *, categoria=None, simular=True):
-        """Volta para revisão as aprovadas por esta regra que ainda não têm nenhuma oferta."""
         modelos = [m for m in MODELOS_PECAS if categoria is None or m.__tablename__ == categoria]
         if not modelos:
             raise ValueError("Categoria inválida")

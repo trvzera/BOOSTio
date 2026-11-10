@@ -1,8 +1,3 @@
-"""Copia preço, estoque e link da KaBuM das tabelas de peças para a tabela oferta.
-
-As colunas antigas não são alteradas nem apagadas: ficam como cópia de segurança até a fase 2.
-Repetir o comando não duplica ofertas nem sobrescreve cotações mais novas já gravadas na oferta.
-"""
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
@@ -41,7 +36,6 @@ class MigrarOfertasKabumService:
 
     @staticmethod
     def comandos_colunas_opcionais(dialeto, tabela, colunas):
-        """ALTER TABLE para as colunas antigas ainda NOT NULL: peças novas não as preenchem mais."""
         nome = dialeto.identifier_preparer.quote(tabela)
         return [f'ALTER TABLE {nome} MODIFY {dialeto.identifier_preparer.quote(c["name"])} {c["type"].compile(dialect=dialeto)} NULL'
                 for c in colunas if c['name'] in COLUNAS_ANTIGAS and not c['nullable']]

@@ -4,7 +4,6 @@ from models import db
 
 
 class MigracaoLinksRepository:
-    """Encapsula o acesso especial de migração de links; não é CRUD duplicado."""
 
     def executar(self, modelos):
         if db.engine.dialect.name != "sqlite":

@@ -1,4 +1,3 @@
-"""Catálogos do Mercado Livre em dúvida viram pendência para revisão, como as ambíguas da Shopee."""
 import json
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -19,7 +18,6 @@ def _json_exato(valor):
 
 class RegistrarAmbiguosMercadoLivreService:
     def executar(self, categoria, ambiguos, cliente, token):
-        """Cada catálogo ambíguo entra pela sua oferta nova mais barata (o anúncio que o administrador verá)."""
         registradas = 0
         for item in ambiguos[:MAX_CATALOGOS]:
             produto, normal, decisao = item['produto'], item['normal'], item['decisao']

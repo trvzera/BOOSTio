@@ -1,4 +1,3 @@
-"""Preenche lacunas comprovadas nas peças existentes, independente da loja."""
 from sqlalchemy.exc import SQLAlchemyError
 from models import ProdutoPendente
 from models.modelos_pecas import MODELOS_PECAS

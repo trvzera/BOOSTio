@@ -1,4 +1,3 @@
-"""Não transforma uma faixa de variantes numa cotação de uma peça individual."""
 from decimal import Decimal, InvalidOperation
 import re
 import time
@@ -28,7 +27,6 @@ _PREFIXO_CATEGORIA = re.compile(
 
 
 def identificar_marca(titulo, marcas):
-    """Marca conhecida citada no título. Duas marcas diferentes citadas = ambíguo (devolve o conjunto)."""
     texto = normalizar_nome(titulo)
     achadas = {}
     for original in marcas:
@@ -40,7 +38,6 @@ def identificar_marca(titulo, marcas):
 
 
 def derivar_modelo(titulo, marca):
-    """Nome sem a categoria e sem a marca; só descreve o que o anunciante escreveu."""
     restante = _PREFIXO_CATEGORIA.sub('', titulo)
     restante = re.sub(r'(?<!\w)' + re.escape(marca) + r'(?!\w)', ' ', restante, count=1, flags=re.I)
     restante = re.sub(r'\s+', ' ', restante).strip(' -|/,.:')

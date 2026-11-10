@@ -1,4 +1,3 @@
-"""Leitura local reproduzível ou download autenticado, limitado e sem redirecionamentos."""
 import os
 from pathlib import Path
 import re
@@ -8,7 +7,6 @@ import requests
 
 
 class ErroConsultaIcecat(ValueError):
-    """Falha de acesso ou limite: interromper lote antes de novas consultas."""
     def __init__(self, mensagem, status=None):
         self.status = status
         super().__init__(mensagem)

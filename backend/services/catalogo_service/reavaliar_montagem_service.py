@@ -1,4 +1,3 @@
-"""Reavalia completude técnica, sem mudar status de identidade, oferta ou preço."""
 from collections import Counter
 from services.catalogo_service.gravar_reavaliacao_montagem_service import GravarReavaliacaoMontagemService
 

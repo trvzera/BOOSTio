@@ -1,4 +1,3 @@
-"""Converte especificações normalizadas em campos, sem preencher valores ausentes."""
 from decimal import Decimal
 
 from sqlalchemy import Boolean, Integer, Numeric, Float, String

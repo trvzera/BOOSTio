@@ -1,4 +1,3 @@
-"""Reparo limitado de custo de uma proposta completa, sem IA, SQL ou salvamento."""
 from copy import deepcopy
 from decimal import Decimal
 from math import isfinite

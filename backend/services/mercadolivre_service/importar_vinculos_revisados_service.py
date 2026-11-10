@@ -1,4 +1,3 @@
-"""Aplica decisões humanas versionadas, sem descoberta por semelhança."""
 import json
 import re
 from pathlib import Path

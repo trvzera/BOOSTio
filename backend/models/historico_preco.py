@@ -1,4 +1,3 @@
-"""Cotações observadas em BRL; registros anteriores não são sobrescritos pela coleta."""
 from datetime import datetime, timezone
 
 from . import db, ModeloBase

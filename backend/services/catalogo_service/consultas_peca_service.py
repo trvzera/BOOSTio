@@ -1,11 +1,9 @@
-"""Textos de busca de uma peça, iguais para qualquer loja: MPN, nome comercial limpo e nome original."""
 import re
 
 from models import IdentidadeFabricante
 
 
 def consultas_da_peca(peca):
-    """MPN, nome comercial limpo e nome original; nunca remove variantes."""
     modelo = str(peca.modelo or '').strip()
     limpo = re.sub(r'\[([^\]]*)\]', lambda m: '' if re.search(
         r'\b(?:gb|tb|mhz|ghz|sata|nvme|ddr[345])\b', m[1], re.I) else m[0], modelo)

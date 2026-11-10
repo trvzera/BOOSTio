@@ -1,4 +1,3 @@
-"""Contrato interno: adaptadores de lojas traduzem suas respostas para estes campos."""
 from dataclasses import dataclass, field
 from typing import Any
 

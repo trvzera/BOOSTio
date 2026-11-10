@@ -1,4 +1,3 @@
-"""Uma peça só pode ter um catálogo do Mercado Livre; diz qual já a ocupa, se não for o da pendência."""
 from models import VinculoMercadoLivre
 
 

@@ -1,4 +1,3 @@
-"""Cache curto por execução; cotações para gravação sempre consultam a API."""
 import json
 import hashlib
 import time

@@ -1,4 +1,3 @@
-"""Orçamento de potência explícito, não uma medição nem especificação do hardware."""
 from decimal import Decimal, InvalidOperation
 
 

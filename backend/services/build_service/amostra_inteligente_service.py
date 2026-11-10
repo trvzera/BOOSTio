@@ -1,4 +1,3 @@
-"""Redução conservadora e amostragem determinística, sem acesso ao banco."""
 from decimal import Decimal
 from math import isfinite
 

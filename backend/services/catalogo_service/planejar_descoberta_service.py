@@ -1,4 +1,3 @@
-"""Planeja buscas por marcas reais do catálogo, sem acesso a APIs de lojas."""
 import hashlib
 import re
 import unicodedata
@@ -18,7 +17,6 @@ class PlanejarDescobertaService:
     }
 
     def por_peca(self, *, categoria, limite=100, depois_id=0, resultados=10, modelos=None):
-        """Pesquisa modelo/MPN completos; encontrar um anúncio não comprova associação."""
         from utils.codigos_peca import codigo_interno
         if type(limite) is not int or not 1 <= limite <= 500 or type(resultados) is not int or not 1 <= resultados <= 100:
             raise ValueError('Limites inválidos')
@@ -42,7 +40,6 @@ class PlanejarDescobertaService:
         return dict(versao=1, trabalhos=trabalhos)
 
     def alternativas(self, peca, *, resultados=30):
-        """Consultas curtas sem apagar sufixos. Nenhuma busca comprova associação."""
         from utils.codigos_peca import codigo_interno
         from .comparar_codigo_modelo_service import CompararCodigoModeloService
         from .comparar_nomes_service import marca as normalizar_marca

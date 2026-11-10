@@ -1,10 +1,3 @@
-"""Índice por marca e identificadores, sem limitar a busca aos primeiros IDs.
-
-O índice só elimina marcas explicitamente incompatíveis. Identificadores iguais
-continuam na comparação mesmo entre marcas diferentes, para detectar conflitos.
-Sem marca explícita, todos os registros são examinados. Nenhuma semelhança textual
-é usada para excluir candidatos ou decidir uma associação neste estágio.
-"""
 from collections import defaultdict
 from types import SimpleNamespace
 from copy import deepcopy

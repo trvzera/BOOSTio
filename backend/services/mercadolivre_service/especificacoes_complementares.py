@@ -1,4 +1,3 @@
-"""Somente atributos observados nas respostas reais da API. Não infere ausências."""
 import re
 from services.catalogo_service.normalizar_produto import nome
 

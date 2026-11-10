@@ -1,4 +1,3 @@
-"""Índice local descartável, separado do banco de peças e reconstruído atomicamente."""
 import fcntl
 import gzip
 import os
@@ -103,7 +102,6 @@ class IndiceIcecatService:
             return [dict(r) for r in banco.execute('SELECT * FROM produto WHERE modelo=? LIMIT 21', (modelo,))]
 
     def sugerir_para_revisao(self, produto):
-        """Localiza códigos regionais e nomes alternativos, sem autorizar cadastro."""
         import re
         chaves = [*valores(produto.identificadores.get('mpn')), produto.modelo,
                   *produto.modelos_alternativos]

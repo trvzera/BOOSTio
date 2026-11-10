@@ -1,4 +1,3 @@
-"""Progresso em JSON + detalhes incrementais, com retomada e lock local."""
 import json
 import os
 from pathlib import Path

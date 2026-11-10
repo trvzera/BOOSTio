@@ -1,4 +1,3 @@
-"""Persistência atômica das lacunas, com origem por campo e controle de concorrência."""
 from datetime import datetime, timezone
 from models import db
 from repositories.identificadores_peca_repository import _vinculos, reassinar_vinculos

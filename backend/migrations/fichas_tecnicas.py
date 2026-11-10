@@ -1,4 +1,3 @@
-"""Fila técnica aditiva, sem alterar peças, usuários ou builds."""
 from sqlalchemy import inspect, select
 from models import db, FichaTecnicaCatalogo, RevisaoFichaTecnica, ControleColeta
 

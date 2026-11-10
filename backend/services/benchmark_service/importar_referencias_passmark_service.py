@@ -1,4 +1,3 @@
-"""Snapshots ehan03/passmark com associações explícitas e auditáveis, sem fuzzy match."""
 import csv
 import hashlib
 import io
@@ -69,10 +68,6 @@ class ImportarReferenciasPassmarkService:
 
     @classmethod
     def _por_identidade(cls, tipo, peca, ids):
-        """IDs da fonte com o mesmo chip e a mesma variante (Ti, SUPER, XT, mobile...) do cadastro.
-
-        CPU: identificada pelo nome do modelo. GPU: pelo `modelo_referencia`, porque o nome
-        comercial do anúncio traz marca, cooler e overclock. Sem identidade clara, não casa."""
         nome = peca.modelo_referencia if tipo == 'gpu' else peca.modelo
         identidade = cls._identidade(tipo, nome) if nome else None
         if identidade is None:

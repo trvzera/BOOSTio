@@ -1,4 +1,3 @@
-"""Etapa 1: estrutura aditiva, sem descobrir/importar anúncios ou excluir peças."""
 from utils.colunas_antigas import COLUNAS_ANTIGAS_DA_PECA
 from sqlalchemy import inspect, text
 from sqlalchemy.schema import CreateIndex

@@ -1,4 +1,3 @@
-
 from utils.identidade_peca import assinatura_peca
 from models import VinculoMercadoLivre, IdentidadeFabricante
 from services.catalogo_service.consultas_peca_service import consultas_da_peca, mpn_da_peca
@@ -19,7 +18,6 @@ class AssociarCatalogoService:
         return self._catalogo_local
 
     def localizar_candidatos(self, peca, cliente, token):
-        """Resultados remotos são independentes; cada um exige unicidade local."""
         from services.catalogo_service.associacao_inteligente_service import AssociacaoInteligenteService
         from .normalizar_produto_service import NormalizarProdutoService, DOMINIOS
         from utils.identidade_peca import assinatura_catalogo

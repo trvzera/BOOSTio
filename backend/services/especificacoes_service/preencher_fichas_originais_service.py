@@ -1,4 +1,3 @@
-"""Enriquece peças a partir do anúncio de origem, com arquivo reproduzível."""
 import json
 from pathlib import Path
 from dataclasses import replace

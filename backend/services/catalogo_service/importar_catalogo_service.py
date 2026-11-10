@@ -1,4 +1,3 @@
-"""Importação reutilizável. A consulta externa pertence ao adaptador de cada loja."""
 from datetime import datetime, timezone
 from services.catalogo_service.gravar_importacao_catalogo_service import GravarImportacaoCatalogoService
 from models.modelos_pecas import MODELOS_PECAS

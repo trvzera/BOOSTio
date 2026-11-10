@@ -1,4 +1,3 @@
-"""Fotos locais com proveniência de catálogo, sem alterar o banco ou inferir IDs."""
 import json
 from functools import lru_cache
 from pathlib import Path

@@ -89,7 +89,6 @@ class Usuario(ModeloBase,UserMixin):
 
   @staticmethod
   def alterar_administrador(usuario_id: int, administrador: bool) -> bool:
-    """Concede ou retira o papel e encerra as sessões da conta, para o novo papel valer de imediato."""
     alteradas = Usuario.query.filter_by(id=usuario_id, ativo=True, verificado=True).update(
       {Usuario.administrador: administrador, Usuario.versao_sessao: Usuario.versao_sessao + 1},
       synchronize_session=False)

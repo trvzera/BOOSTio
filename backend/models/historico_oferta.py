@@ -1,4 +1,3 @@
-"""Observações de marketplace; disponibilidade não informada permanece NULL."""
 from . import db, ModeloBase
 
 

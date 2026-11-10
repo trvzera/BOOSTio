@@ -1,4 +1,3 @@
-"""Adapta campos efetivamente presentes no snapshot OpenDB, sem valores presumidos."""
 import re
 from decimal import Decimal, InvalidOperation
 from services.catalogo_service.comparar_nomes_service import marca

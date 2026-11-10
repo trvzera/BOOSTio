@@ -1,4 +1,3 @@
-"""Importa snapshots locais PassMark sem executar scraper nem criar peças."""
 import csv
 import hashlib
 import io

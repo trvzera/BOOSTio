@@ -35,7 +35,6 @@ class SalvarPecaService:
 
     @staticmethod
     def _validar_link(peca, campos):
-        """O link é da oferta KaBuM: sai dos campos da peça e é gravado depois dela."""
         if "kabum_external" not in campos:
             return _SEM_LINK
         url = (campos.pop("kabum_external") or "").strip() or None

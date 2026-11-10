@@ -78,10 +78,6 @@ class Peca(ModeloBase):
 
   @classmethod
   def consulta_catalogo(cls):
-    """O que o site mostra e a montagem (manual e inteligente) pode usar: aprovada e com preço.
-
-    O preço vem das ofertas ativas; sem oferta com preço a peça não existe para o usuário.
-    """
     return cls.consulta_publicavel().filter(cls.preco > 0)
 
   @classmethod
@@ -98,7 +94,6 @@ class Peca(ModeloBase):
 
   @classmethod
   def fabricantes_para_descoberta(cls):
-    """Marcas por presença no catálogo publicável, com desempate estável."""
     from sqlalchemy import func
     return [linha[0] for linha in cls.consulta_publicavel().with_entities(
       cls.fabricante).group_by(cls.fabricante).order_by(
@@ -107,7 +102,6 @@ class Peca(ModeloBase):
 
   @classmethod
   def iterar_para_matching(cls, tamanho_lote=500):
-    """Catálogo completo, incluindo fichas em revisão para detectar duplicatas."""
     if type(tamanho_lote) is not int or not 1 <= tamanho_lote <= 1000:
       raise ValueError('Tamanho do lote entre 1 e 1000')
     ultimo_id = 0
@@ -227,6 +221,5 @@ class Peca(ModeloBase):
 
   @classmethod
   def listar_candidatos_disponiveis(cls, preco_maximo):
-    """Pool completo para planejamento; não aplica corte/amostragem prematuros."""
     return (cls.consulta_para_montagem().filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
             .order_by(cls.preco.asc(), cls.id.asc()).all())

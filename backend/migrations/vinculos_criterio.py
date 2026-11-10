@@ -1,4 +1,3 @@
-"""Alarga vinculo_mercado_livre.criterio (VARCHAR(20) -> VARCHAR(100)); repetível e sem perda de dados."""
 from sqlalchemy import inspect, text
 from models import db
 

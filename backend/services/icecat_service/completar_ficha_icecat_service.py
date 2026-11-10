@@ -1,6 +1,3 @@
-"""Enriquece anúncios desconhecidos com ficha comprovada, sem gravar componentes."""
-
-
 import os
 from types import SimpleNamespace
 from services.catalogo_service.associacao_inteligente_service import AssociacaoInteligenteService

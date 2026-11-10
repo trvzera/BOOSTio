@@ -1,8 +1,3 @@
-"""Pendência só é do administrador quando alguma peça candidata já está aprovada.
-
-Peça importada e ainda em revisão não recebe oferta; enquanto ela não for aprovada, a
-pendência fica fora do painel (e volta sozinha quando a peça for aprovada).
-"""
 from collections import defaultdict
 
 from models import ProdutoPendente

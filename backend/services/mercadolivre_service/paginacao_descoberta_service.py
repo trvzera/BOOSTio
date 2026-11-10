@@ -76,7 +76,6 @@ def iterar_paginas(cliente, parametros, resumo, max_paginas, tokens=None):
 
 
 def _fora_do_grupo(produto, parametros):
-    """A pesquisa textual não comprova marca nem categoria dos resultados."""
     if parametros['max_produtos'] is not None:
         categorias = {categoria for categoria, dominio in DOMINIOS.items() if dominio == produto.get('domain_id')}
         if categorias and parametros['categoria'] not in categorias:

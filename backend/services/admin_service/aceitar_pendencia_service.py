@@ -13,7 +13,7 @@ from .catalogo_ocupado import catalogo_que_ocupa_a_peca
 
 
 class ConflitoPendencia(ValueError):
-    """A pendência existe, mas não pode receber esta decisão agora."""
+    pass
 
 
 class AceitarPendenciaService:
@@ -49,7 +49,6 @@ class AceitarPendenciaService:
 
     @staticmethod
     def _recusar_peca_ja_vinculada_a_outro_catalogo(pendencia, peca):
-        """Avisa antes de tentar gravar: cada peça tem um único catálogo do Mercado Livre."""
         ocupante = catalogo_que_ocupa_a_peca(pendencia, peca)
         if ocupante:
             raise ValueError(f"Esta peça já está vinculada a outro catálogo do Mercado Livre ({ocupante}). "

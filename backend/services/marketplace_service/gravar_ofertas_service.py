@@ -2,7 +2,6 @@ from models import db, Oferta
 
 
 def aplicar_lote_mercado_livre(peca, catalogo_id, assinatura, assinatura_catalogo, criterio, ofertas, agora, *, simular, confirmar=True, desativar_ausentes=True, validar_identidade=None):
-    """Uma transação por peça; nunca altera preço/estoque da peça da KaBuM."""
     from models import VinculoMercadoLivre, HistoricoOferta, ControleColeta
     from utils.identidade_peca import assinatura_peca
     propostas = []
@@ -76,7 +75,6 @@ def aplicar_lote_mercado_livre(peca, catalogo_id, assinatura, assinatura_catalog
 
 
 def aplicar_ofertas_loja(peca,loja,ofertas,agora):
-    """Parte genérica da unidade de trabalho. O chamador confirma a transação."""
     from decimal import Decimal,InvalidOperation
     from urllib.parse import urlsplit
     from models import HistoricoOferta
@@ -117,14 +115,6 @@ def aplicar_ofertas_loja(peca,loja,ofertas,agora):
 
 
 def atualizar_ofertas_validadas(peca, loja, itens, assinatura, *, simular, desativar_ausentes=False, revisao_manual=None):
-    """Revalida matching sob a trava de coleta e grava as ofertas de uma peça numa só transação.
-
-    `itens` é uma lista de (oferta, ProdutoNormalizado). Com `desativar_ausentes`, as demais ofertas
-    ativas da peça nessa loja são desativadas, como no Mercado Livre; use só com busca completa.
-    Com `revisao_manual` (dados de quem decidiu), a associação foi aprovada por uma pessoa: a decisão
-    automática não é refeita, mas peça, trava, publicação e posse do anúncio continuam sendo conferidas.
-    Não altera o preço da peça: ele é lido das ofertas.
-    """
     from datetime import datetime, timezone
     from models import ControleColeta
     from utils.identidade_peca import assinatura_peca

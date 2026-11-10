@@ -1,5 +1,3 @@
-"""Reaproveita a leitura pública de páginas; não executa scripts do site."""
-
 from html.parser import HTMLParser
 
 

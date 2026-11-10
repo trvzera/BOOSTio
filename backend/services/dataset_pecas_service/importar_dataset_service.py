@@ -1,4 +1,3 @@
-"""Importa snapshots locais verificáveis; não consulta lojas nem cria ofertas."""
 import hashlib
 import json
 from pathlib import Path

@@ -1,4 +1,3 @@
-"""Anúncio de uma loja vinculado a uma peça; valores monetários em BRL."""
 from . import db, ModeloBase
 from utils.medidas_fisicas import produto_kabum
 from .modelos_pecas import MODELOS_PECAS
@@ -83,7 +82,6 @@ class Oferta(ModeloBase):
 
     @classmethod
     def registrar_identidade_kabum(cls, peca, *, simular=False, ids_ambiguos=None):
-        """Registra o ID real do anúncio. Não inventa cotação nem estoque da seed."""
         import re
         referencia = peca.referencia_interna or peca.part_number or ''
         legado = re.fullmatch(r'KABUM-([1-9][0-9]*)', referencia, re.I)

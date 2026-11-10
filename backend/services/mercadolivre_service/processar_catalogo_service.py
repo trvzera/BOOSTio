@@ -1,4 +1,3 @@
-"""Uma etapa limitada por ciclo, com agenda, exclusão mútua e checkpoint no banco."""
 from datetime import datetime, timezone, timedelta
 from threading import Event
 from models import db, EstadoCatalogo, ProdutoPendente

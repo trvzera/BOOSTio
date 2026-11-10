@@ -1,4 +1,3 @@
-"""Troca os links antigos da KaBuM das placas de rede pelos novos."""
 from models import db, PlacaRede
 from repositories.ofertas_kabum_repository import definir_link
 

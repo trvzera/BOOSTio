@@ -1,4 +1,3 @@
-"""Contrato productOfferV2 conferido na documentação oficial da conta brasileira."""
 import hashlib
 import json
 import os

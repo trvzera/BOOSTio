@@ -1,4 +1,3 @@
-"""Correspondência exata por modelo com verificação independente das variantes."""
 import re
 from decimal import Decimal, InvalidOperation
 from services.catalogo_service.normalizar_produto import nome, codigo

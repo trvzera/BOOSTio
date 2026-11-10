@@ -1,4 +1,3 @@
-"""Estimativas de busca; a aprovação da build continua no validador final."""
 from decimal import Decimal, ROUND_DOWN
 
 from utils.memorias import normalizar_ddr

@@ -1,4 +1,3 @@
-"""Auditoria de conversões explícitas de referências genéricas em SKUs comerciais."""
 from . import db, ModeloBase
 
 

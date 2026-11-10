@@ -1,4 +1,3 @@
-"""Atualização aditiva v1 de benchmarks em MySQL existente (DDL não atômico)."""
 from sqlalchemy import inspect, text
 from models import db
 from .benchmarks_pecas import CAMPOS

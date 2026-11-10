@@ -1,4 +1,3 @@
-"""Snapshot reproduzível dos arquivos públicos OpenDB, sem executar código remoto."""
 import hashlib
 import json
 from pathlib import Path

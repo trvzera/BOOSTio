@@ -1,4 +1,3 @@
-"""Ficha técnica extraída de atributos oficiais, mantendo lacunas explícitas."""
 import re
 from datetime import datetime, timezone
 from dataclasses import asdict

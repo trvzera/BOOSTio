@@ -1,4 +1,3 @@
-"""Cria somente as tabelas necessárias; não coleta nem importa dados."""
 from sqlalchemy import inspect
 from models import db, Oferta, VinculoMercadoLivre, HistoricoOferta, ControleColeta
 

@@ -65,7 +65,6 @@ class SeletorInteligenteService:
         return resultado
 
     def preparar_geracao(self, dados):
-        """Adapta a seleção experimental ao gerador existente, sem chamar IA nem salvar."""
         if not isinstance(dados, dict):
             raise ValueError("Informe um objeto com os dados da geração")
         validacao_campos(dados, ["nome", "descricao", "utilidade", "orcamento"])

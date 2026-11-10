@@ -1,9 +1,3 @@
-"""Complemento técnico versionado, sem migração ou inferência pelo nome comercial.
-
-O mesmo JSON é consumido pelo catálogo demonstrativo. Exige categoria, fabricante,
-modelo E part number exatos. Apelidos internos também exigem um produto de loja
-revisado explicitamente no manifesto; nomes/revisões semelhantes não herdam dados.
-"""
 import json
 from copy import deepcopy
 from functools import lru_cache
@@ -19,7 +13,6 @@ def manifesto():
 
 
 def produto_kabum(link):
-    """Só identifica o anúncio; não consulta a loja nem confia no slug do URL."""
     if (not isinstance(link, str) or re.search(r"[\s\\]", link)
             or not re.match(r"https://(?:www\.)?kabum\.com\.br(?::443)?/", link, re.I)):
         return None

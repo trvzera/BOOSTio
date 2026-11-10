@@ -1,4 +1,3 @@
-"""Único adaptador de atributos/domínios Mercado Livre para o contrato comum."""
 import re
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
 from services.catalogo_service.normalizar_produto import atributos

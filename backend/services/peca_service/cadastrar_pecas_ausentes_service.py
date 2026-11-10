@@ -1,4 +1,3 @@
-"""Cadastra as peças da lista que ainda não existem na tabela da categoria."""
 from models import db
 from repositories.ofertas_kabum_repository import gravar_cotacao_inicial
 from utils.codigos_peca import separar_codigos

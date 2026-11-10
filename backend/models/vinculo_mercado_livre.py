@@ -1,4 +1,3 @@
-"""Associação revisada ou comprovada por MPN, sem duplicar peças."""
 from . import db, ModeloBase
 
 

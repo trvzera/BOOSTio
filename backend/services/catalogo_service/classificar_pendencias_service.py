@@ -1,4 +1,3 @@
-"""Classifica qualquer loja usando produtos normalizados e models compartilhados."""
 from sqlalchemy.exc import SQLAlchemyError
 from models import ProdutoPendente
 from models.modelos_pecas import MODELOS_PECAS

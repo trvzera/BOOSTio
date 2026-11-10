@@ -1,4 +1,3 @@
-"""Identidades revisadas (MPN e GTIN) das peças, para o matching de ofertas."""
 from sqlalchemy import inspect
 
 from models import db, IdentidadeFabricante

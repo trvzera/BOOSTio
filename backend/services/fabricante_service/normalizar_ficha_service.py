@@ -1,4 +1,3 @@
-"""Extrai identidade JSON-LD e pares de especificações das páginas oficiais."""
 import json
 import re
 import hashlib

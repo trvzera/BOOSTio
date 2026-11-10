@@ -1,4 +1,3 @@
-"""Adaptadores administrativos pequenos; matching e persistência continuam existentes."""
 from services.mercadolivre_service.atualizar_ofertas_service import AtualizarOfertasMercadoLivreService
 from .controle_requisicoes_service import controle_em_execucao
 

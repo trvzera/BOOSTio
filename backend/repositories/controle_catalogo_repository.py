@@ -1,4 +1,3 @@
-"""Trava por banco. MySQL advisory lock; SQLite flock liberado com o processo."""
 import hashlib
 from contextlib import contextmanager
 from pathlib import Path

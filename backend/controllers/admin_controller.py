@@ -16,7 +16,6 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 
 def _responder(funcao):
-    """Traduz os erros dos services para HTTP; nenhuma mensagem de banco chega ao navegador."""
     try:
         resposta = jsonify(funcao())
         resposta.headers["Cache-Control"] = "no-store"

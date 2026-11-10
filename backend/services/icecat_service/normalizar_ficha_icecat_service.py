@@ -1,4 +1,3 @@
-"""Converte somente campos estruturados da ficha inglesa, com evidência por campo."""
 import hashlib
 import re
 from defusedxml.ElementTree import fromstring
@@ -8,7 +7,7 @@ from services.catalogo_service.normalizar_produto import nome, numero, gtin
 
 
 class CategoriaIcecatIncompativel(ValueError):
-    """Candidato de outra categoria, não uma falha de leitura do lote."""
+    pass
 
 CATEGORIAS = {
     'processador': {'processors'}, 'placa_video': {'graphics cards'},
@@ -72,7 +71,6 @@ PORTAS_MONITOR = {'HDMI ports quantity': 'hdmi', 'DisplayPorts quantity': 'displ
 
 
 def conexoes_do_monitor(atributos):
-    """Conexão do monitor = portas de vídeo que a ficha declara com quantidade maior que zero."""
     encontradas = set()
     for atributo in atributos:
         rotulo = atributo.find('./Feature/Name')

@@ -1,4 +1,3 @@
-"""Uma tarefa por ciclo; recuperação após crash sob trava por marketplace."""
 from datetime import timedelta
 import hashlib
 import json

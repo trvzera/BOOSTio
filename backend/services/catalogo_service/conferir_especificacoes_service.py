@@ -94,7 +94,6 @@ def converter(campo, valor):
 
 
 def consolidar_interfaces(observados):
-    """Combina descrições genéricas e específicas sem fundir gerações ou lanes."""
     resultado = set(observados)
     for familia in ('sata', 'pcie'):
         padrao = familia + r'[1-5](?:\.0)?(?:x(?:1|2|4|8|16))?'
@@ -147,7 +146,6 @@ def extrair_titulo(categoria,titulo):
 class ConferirEspecificacoesService:
     @staticmethod
     def confrontar_titulo(campo, estruturados, titulo):
-        """Não deixe um atributo correto esconder outro valor explícito no título."""
         if not estruturados or not titulo:
             return False
         ficha = {converter(campo, v) for v in valores(estruturados)}

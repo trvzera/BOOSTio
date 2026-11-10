@@ -101,7 +101,6 @@ class Build(ModeloBase):
     }
  
     def quantidade_de(self, campo: str) -> int:
-        """Quantas unidades desta peça a build tem."""
         atributo = self.QUANTIDADES.get(campo)
         if atributo is None:
             return 1 if getattr(self, f"{campo}_id") else 0

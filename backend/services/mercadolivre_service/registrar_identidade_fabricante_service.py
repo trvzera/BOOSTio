@@ -1,4 +1,3 @@
-"""Registra o MPN revisado de uma peça sem substituir a referência interna."""
 from models import db, IdentidadeFabricante
 from repositories.identificadores_peca_repository import _vinculos, reassinar_vinculos
 from services.catalogo_service.normalizar_produto import codigo

@@ -1,4 +1,3 @@
-"""Consulta antes da transação; revalida duplicados sob bloqueio e importa atomicamente."""
 from services.icecat_service.obter_ficha_icecat_service import ErroConsultaIcecat
 from datetime import datetime, timezone
 from sqlalchemy.exc import SQLAlchemyError
@@ -63,7 +62,6 @@ class ImportarProdutoService:
         return resultado_importacao
 
     def _consultar_anuncio(self,p):
-        """Rede antes da transação: catálogo atual e o anúncio como oferta nova do mesmo vendedor."""
         bruto=p.dados_originais
         catalogo=(bruto.get('catalogo') or {}).get('id') or (bruto.get('anuncio') or {}).get('catalog_product_id')
         self.cliente._validar_id(catalogo,'catálogo')
@@ -79,8 +77,6 @@ class ImportarProdutoService:
         return produto,anuncio
 
     def aceitar_revisado(self,pendencia_id,peca,revisao):
-        """Associação decidida por uma pessoa: a decisão automática não é refeita, mas o anúncio é
-        reconsultado e a gravação (trava, vínculo do catálogo, posse do anúncio e histórico) é a mesma."""
         p=ProdutoPendente.buscar_por_id(pendencia_id)
         if p is None or p.loja!='mercado_livre':raise ValueError('Pendência ausente ou de outra loja')
         if p.status not in ('pendente','em_revisao'):raise ValueError('Esta pendência já foi decidida')

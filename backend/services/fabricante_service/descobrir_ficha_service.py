@@ -1,4 +1,3 @@
-"""Descoberta pelo sitemap oficial, preservando códigos e variantes nas URLs."""
 import re
 from urllib.parse import urlsplit, unquote
 from defusedxml.ElementTree import fromstring

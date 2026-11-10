@@ -1,5 +1,4 @@
 def espera_do_provedor(erro_http):
-    """Segundos pedidos pelo provedor de IA em Retry-After, ou None se o valor não for confiável."""
     if erro_http.response is None:
         return None
     espera = erro_http.response.headers.get("Retry-After", "")

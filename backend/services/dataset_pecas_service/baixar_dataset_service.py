@@ -1,4 +1,3 @@
-"""Baixa arquivos de uma revisão fixa; nunca executa o scraper da fonte."""
 import hashlib
 import json
 import os

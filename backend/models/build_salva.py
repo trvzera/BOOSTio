@@ -48,7 +48,6 @@ class BuildSalva(ModeloBase):
 
     @classmethod
     def criar_limitada(cls, usuario_id, estado, gerada=None):
-        """Serializa a escrita por usuário; nunca mantém lock durante a chamada à LLM."""
         try:
             resultado = db.session.execute(update(Usuario).where(Usuario.id == usuario_id).values(id=Usuario.id))
             if resultado.rowcount != 1:

@@ -1,10 +1,3 @@
-"""Preço, disponibilidade e link da peça são lidos da melhor oferta ativa; nada disso é gravado na peça.
-
-A melhor oferta é a mais barata entre as ativas, preferindo as disponíveis, depois as de estoque
-desconhecido e por último as esgotadas. A Shopee não informa estoque; por decisão do projeto, seus
-anúncios ativos contam como disponíveis. Ofertas do Mercado Livre e da Shopee só são
-gravadas pela associação revisada, que as desativa quando a identidade deixa de valer.
-"""
 from sqlalchemy import Boolean, Float, and_, case, select, type_coerce
 from sqlalchemy.orm import column_property
 

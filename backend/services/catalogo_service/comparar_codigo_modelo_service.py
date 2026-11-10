@@ -1,4 +1,3 @@
-"""Código comercial completo em comum; não trata capacidade ou família como SKU."""
 import re
 from .normalizar_produto import nome
 
@@ -6,7 +5,6 @@ from .normalizar_produto import nome
 class CompararCodigoModeloService:
     @staticmethod
     def variantes_armazenamento(peca, produto):
-        """Códigos completos de discos não são intercambiáveis pela mesma linha."""
         if peca.__tablename__ not in ('ssd','hd'):
             return dict(conflitos=[],pendencias=[])
         from .conferir_especificacoes_service import valores

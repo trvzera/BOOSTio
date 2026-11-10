@@ -1,4 +1,3 @@
-"""Migração aditiva e repetível; preserva anúncios e todas as tabelas anteriores."""
 from sqlalchemy import inspect
 from models import db
 from models.tarefa_marketplace import TarefaMarketplace, LimiteMarketplace

@@ -1,4 +1,3 @@
-"""Enriquecimento reproduzível por nome exato em snapshot licenciado, sem HTTP."""
 import hashlib,json,re
 from dataclasses import asdict, replace
 from datetime import date

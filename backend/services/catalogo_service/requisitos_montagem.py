@@ -1,4 +1,3 @@
-"""Mínimos para candidatura. Identidade e compatibilidade final são verificações distintas."""
 from .conferir_especificacoes_service import ESSENCIAIS
 
 DISPENSAVEIS = {

@@ -1,4 +1,3 @@
-"""Completa fichas de peças já cadastradas com a ficha do Icecat, só em campos vazios."""
 import os
 from dataclasses import replace
 
@@ -67,7 +66,6 @@ class CompletarPecasIcecatService:
 
     @staticmethod
     def _reavaliar_ficha(peca, simular):
-        """Recalcula a marca de ficha de montagem (gravada reprovada na importação) com os campos já preenchidos."""
         if pendencias_para_montagem(peca) or peca.ficha_montagem_validada is True:
             return False
         if not simular:

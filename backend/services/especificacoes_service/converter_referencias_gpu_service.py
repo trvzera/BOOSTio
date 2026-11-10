@@ -1,4 +1,3 @@
-"""Converte referências genéricas somente usando sua oferta original comprovada."""
 import re
 import json
 from pathlib import Path

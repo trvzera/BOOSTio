@@ -1,4 +1,3 @@
-"""Migração transacional de identificadores, preservando a identidade das peças."""
 from sqlalchemy import MetaData, Table, inspect, select, update
 from flask import g
 from models import db, Oferta, IdentidadeFabricante

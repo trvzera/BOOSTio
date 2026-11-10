@@ -1,4 +1,3 @@
-"""Migração incremental; banco-preparar cria o backup antes de aplicá-la."""
 from sqlalchemy import inspect, text
 from models import db
 

@@ -1,7 +1,3 @@
-"""Menor custo de capacidade entre um modelo SSD e um HD, até 64 de cada.
-
-É uma estimativa de preço/capacidade; portas, baias e interfaces são validadas depois.
-"""
 from decimal import Decimal
 
 

@@ -1,4 +1,3 @@
-"""Credenciais OAuth recuperáveis, cifradas com chave externa ao banco."""
 from datetime import datetime, timezone
 
 from cryptography.fernet import Fernet, InvalidToken
@@ -44,7 +43,6 @@ class TokenIntegracao(ModeloBase):
         return valor
 
     def definir_tokens(self, access_token, refresh_token, expira_em, *, renovado_em=None):
-        """Altera o par em memória; a transação pertence ao chamador."""
         access_token = self._validar_token(access_token)
         refresh_token = self._validar_token(refresh_token)
         expiracao = self._utc(expira_em)
@@ -87,7 +85,6 @@ class TokenIntegracao(ModeloBase):
 
     @classmethod
     def buscar(cls, integracao, client_id, conta_id, *, bloquear=False):
-        """No MySQL, bloquear=True requer transação aberta até commit/rollback."""
         consulta = cls.query.filter_by(integracao=integracao, client_id=client_id, conta_id=conta_id)
         if bloquear:
             consulta = consulta.populate_existing().with_for_update()
@@ -107,7 +104,6 @@ class TokenIntegracao(ModeloBase):
 
     @classmethod
     def gravar_estado(cls, client_id, conta_id, dados, versao_esperada):
-        """Transação própria e CAS: não confirma alterações da sessão da build."""
         from sqlalchemy.orm import Session
         from sqlalchemy.exc import IntegrityError
         from datetime import datetime, timezone

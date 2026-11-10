@@ -1,4 +1,3 @@
-"""Adiciona o budget ao SQLite sem recriar tabelas nem alterar usuários existentes."""
 import sqlite3
 from contextlib import closing
 from datetime import datetime, timezone
@@ -42,7 +41,6 @@ def migrar_budget(caminho):
 def registrar_migracao_budget(app, db):
     @app.cli.command("migrar-budget")
     def comando():
-        """Atualiza um SQLite existente, criando backup antes da alteração."""
         if db.engine.dialect.name != "sqlite" or not db.engine.url.database or db.engine.url.database == ":memory:":
             raise click.ClickException("Esta migração atende apenas bancos SQLite em arquivo.")
         try:

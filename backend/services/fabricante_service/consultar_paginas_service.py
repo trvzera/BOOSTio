@@ -1,4 +1,3 @@
-"""HTTP limitado aos fabricantes cadastrados, com cache e respeito ao robots.txt."""
 import hashlib
 import json
 from pathlib import Path

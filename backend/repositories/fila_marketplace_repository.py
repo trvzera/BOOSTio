@@ -1,4 +1,3 @@
-"""Operações curtas e atômicas; nenhuma transação permanece aberta durante HTTP."""
 from datetime import timedelta
 from uuid import uuid4
 from sqlalchemy import select, update, func
@@ -96,7 +95,6 @@ class RepositorioFilaMarketplace:
                 Tarefa.status == 'bloqueada').values(status='pendente', disponivel_em=agora))
 
     def normalizar_limitacoes(self, loja):
-        """Zera o contador de 429 seguidos depois de uma tarefa concluída sem limitação."""
         with Session(db.engine) as s, s.begin():
             s.execute(update(Limite).where(Limite.loja == loja, Limite.limitacoes > 0).values(limitacoes=0))
 

@@ -1,4 +1,3 @@
-"""Pontuação explicável e independente de loja. Percentual não é probabilidade."""
 import re
 from heapq import nsmallest
 from .produto_normalizado import ProdutoNormalizado
