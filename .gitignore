@@ -57,6 +57,5 @@ testes.html
 
 # Gerados em execução
 /database/*.lock
-/database/benchmarks/
 /.codex-attachments/
 /.vscode/
