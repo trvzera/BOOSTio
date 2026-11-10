@@ -28,8 +28,10 @@ def app(monkeypatch):
     app.register_blueprint(usuario_bp)
     with app.app_context():
         db.create_all()
-        Usuario(nome="Local", email="local@example.com", senha=generate_password_hash("Original.123"), verificado=True).salvar()
-        Usuario(nome="Google", email="google@example.com", google_sub="google-123", login_google=True, verificado=True).salvar()
+        db.session.add(Usuario(nome="Local", email="local@example.com", senha=generate_password_hash("Original.123"), verificado=True))
+        db.session.commit()
+        db.session.add(Usuario(nome="Google", email="google@example.com", google_sub="google-123", login_google=True, verificado=True))
+        db.session.commit()
     with patch("controllers.auth_controller.oauth"):
         yield app
     with app.app_context():

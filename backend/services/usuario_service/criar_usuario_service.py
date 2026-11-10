@@ -1,4 +1,4 @@
-from models import Usuario, PreferenciasUso
+from models import db, Usuario, PreferenciasUso
 from werkzeug.security import generate_password_hash
 from email_validator import validate_email
 from utils.validacoes import validacao_campos,validar_senha_forte
@@ -34,7 +34,8 @@ class CriarUsuarioService:
     )
 
     usuario.preferencias_uso = PreferenciasUso(tutorial="pendente")
-    usuario.salvar()
+    db.session.add(usuario)
+    db.session.commit()
 
     return usuario
 

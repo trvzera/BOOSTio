@@ -24,7 +24,9 @@ class EstadoCatalogo(ModeloBase):
         if registro is None:
             registro=cls(nome=plano['nome'],assinatura_plano=assinatura,fase='descoberta',cursor_fila=0,tentativas=0,
                          proxima_execucao=datetime.now(timezone.utc).replace(tzinfo=None))
-            if not simular:registro.salvar()
+            if not simular:
+                db.session.add(registro)
+                db.session.commit()
         if registro.assinatura_plano!=assinatura:
             raise ValueError('Plano mudou: use outro nome de trabalho para não reutilizar cursor incompatível')
         return registro

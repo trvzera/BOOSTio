@@ -92,7 +92,9 @@ def test_historico_separado_por_anuncio_e_sessao(banco):
 def test_validacao_nao_consulta_rede_nem_renova(banco):
     app,_,_=banco
     t=TokenIntegracao(integracao='mercado_livre',client_id='123',conta_id='42')
-    t.definir_tokens('access','refresh',datetime.now(timezone.utc)-timedelta(seconds=1));t.salvar()
+    t.definir_tokens('access','refresh',datetime.now(timezone.utc)-timedelta(seconds=1))
+    db.session.add(t)
+    db.session.commit()
     with patch('requests.post') as post,patch('requests.get') as get:
         r=app.test_cli_runner().invoke(args=['mercadolivre-validar'])
     assert r.exit_code==0 and '"renovacao_necessaria": true' in r.output

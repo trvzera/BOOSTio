@@ -28,7 +28,8 @@ def identidade(**alteracoes):
 def criar_usuario(**alteracoes):
     usuario = Usuario(**(dict(nome="Pessoa", email="pessoa@example.com", senha=None,
                              login_google=False, verificado=False, ativo=True) | alteracoes))
-    usuario.salvar()
+    db.session.add(usuario)
+    db.session.commit()
     return usuario
 
 

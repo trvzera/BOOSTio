@@ -15,8 +15,10 @@ def app():
     app.register_blueprint(usuario_bp)
     with app.app_context():
         db.create_all()
-        Usuario(nome="Teste", email="teste@example.com", senha="hash-privado").salvar()
-        Usuario(nome="Outro", email="outro@example.com").salvar()
+        db.session.add(Usuario(nome="Teste", email="teste@example.com", senha="hash-privado"))
+        db.session.commit()
+        db.session.add(Usuario(nome="Outro", email="outro@example.com"))
+        db.session.commit()
     yield app
     with app.app_context():
         db.session.remove()

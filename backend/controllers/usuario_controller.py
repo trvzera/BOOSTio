@@ -1,6 +1,5 @@
 from flask import Blueprint,request,jsonify,current_app
 from flask_login import login_user, logout_user, login_required
-from models import db
 from sqlalchemy.exc import SQLAlchemyError
 from smtplib import SMTPException
 from email_validator import EmailNotValidError
@@ -40,7 +39,6 @@ def atualizar_preferencias_uso(usuario_id):
     except ValueError as erro:
         return jsonify({"erro": str(erro)}), 400
     except SQLAlchemyError:
-        db.session.rollback()
         return jsonify({"erro": "Não foi possível salvar suas preferências. Tente novamente."}), 500
 
 
@@ -58,7 +56,6 @@ def atualizar_budget(usuario_id):
     except ValueError as erro:
         return jsonify({"erro": str(erro)}), 400
     except SQLAlchemyError:
-        db.session.rollback()
         return jsonify({"erro": "Não foi possível salvar o budget. Tente novamente."}), 500
 
 
@@ -84,7 +81,6 @@ def criar_usuario():
         return jsonify({f"erro": f"{str(erro)}"}),400
 
     except SQLAlchemyError:
-        db.session.rollback()
         return jsonify({"erro": "Erro ao salvar o usuario no banco de dados."}), 500
 
 
@@ -107,7 +103,6 @@ def excluir_usuario(usuario_id):
     except ValueError as erro:
         return jsonify({"erro": str(erro)}), 400
     except SQLAlchemyError as e:
-        db.session.rollback()
         print(e)
         return jsonify({"erro":"Erro ao excluir o usuario do banco de dados"}),500
 
@@ -151,7 +146,6 @@ def atualizar_usuario(usuario_id):
         return jsonify({"erro":f"{str(erro)}"}),400
 
     except SQLAlchemyError:
-        db.session.rollback()
         return jsonify({"erro":"Erro ao atualizar o usuario no banco de dados"}), 500
 
 
@@ -165,9 +159,8 @@ def esqueci_senha():
     except (SMTPException, OSError):
         current_app.logger.warning("Falha no envio de email de recuperação de senha")
     except ValueError:
-        db.session.rollback()
+        pass
     except SQLAlchemyError:
-        db.session.rollback()
         current_app.logger.error("Falha no banco durante solicitação de recuperação de senha")
 
     return jsonify({
@@ -192,5 +185,4 @@ def redefinir_senha():
         return jsonify({"erro": str(erro)}),400
 
     except SQLAlchemyError:
-        db.session.rollback()
         return jsonify({"erro": "Erro ao redefinir a senha."}), 500

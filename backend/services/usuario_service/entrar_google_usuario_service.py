@@ -1,4 +1,4 @@
-from models import Usuario, PreferenciasUso
+from models import db, Usuario, PreferenciasUso
 
 class EntrarGoogleService:
   def executar(self, dados_google: dict):
@@ -37,7 +37,8 @@ class EntrarGoogleService:
     )
 
     usuario.preferencias_uso = PreferenciasUso(tutorial="pendente")
-    usuario.salvar()
+    db.session.add(usuario)
+    db.session.commit()
 
     return usuario
 

@@ -46,7 +46,8 @@ def test_preparar_banco_novo_e_migrar_preservando_usuario(tmp_path):
     runner = app.test_cli_runner()
     assert runner.invoke(args=["banco-preparar"]).exit_code == 0
     with app.app_context():
-        Usuario(nome="Preservado", email="teste@example.com").salvar()
+        db.session.add(Usuario(nome="Preservado", email="teste@example.com"))
+        db.session.commit()
         db.session.remove()
         with db.engine.begin() as conexao:
             conexao.execute(text("ALTER TABLE usuario DROP COLUMN versao_sessao"))

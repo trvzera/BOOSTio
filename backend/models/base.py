@@ -10,12 +10,3 @@ class ModeloBase(db.Model):
     nullable=False
 )
   atualizado_em = db.Column( db.DateTime,default=datetime.now,onupdate=datetime.now)
-
-  def salvar(self) -> None:
-    db.session.add(self)
-    db.session.commit()
-
-  def deletar(self) -> None:
-    db.session.delete(self)
-    db.session.commit()
-

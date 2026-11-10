@@ -18,7 +18,8 @@ class ExecucaoDescoberta(ModeloBase):
     @classmethod
     def iniciar(cls, parametros):
         registro = cls(parametros=parametros)
-        registro.salvar()
+        db.session.add(registro)
+        db.session.commit()
         return registro.id
 
     @classmethod

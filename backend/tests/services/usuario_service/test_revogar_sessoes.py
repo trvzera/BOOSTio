@@ -31,8 +31,10 @@ def app():
 
     with app.app_context():
         db.create_all()
-        Usuario(nome="Teste", email="teste@example.com", senha=generate_password_hash("Original.123")).salvar()
-        Usuario(nome="Outro", email="outro@example.com", senha=generate_password_hash("Original.123")).salvar()
+        db.session.add(Usuario(nome="Teste", email="teste@example.com", senha=generate_password_hash("Original.123")))
+        db.session.commit()
+        db.session.add(Usuario(nome="Outro", email="outro@example.com", senha=generate_password_hash("Original.123")))
+        db.session.commit()
     yield app
     with app.app_context():
         db.session.remove()

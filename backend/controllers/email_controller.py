@@ -1,6 +1,5 @@
 from flask import Blueprint,request,jsonify
 from flask_login import login_required
-from models import db
 from sqlalchemy.exc import SQLAlchemyError
 from smtplib import SMTPException, SMTPAuthenticationError, SMTPRecipientsRefused
 from email_validator import EmailNotValidError
@@ -45,7 +44,6 @@ def enviar_email(usuario_id):
     return jsonify({"erro":str(e)}),400
 
   except SQLAlchemyError:
-    db.session.rollback()
     return jsonify({"erro": "Erro ao salvar o codigo no banco de dados."}), 500
 
 

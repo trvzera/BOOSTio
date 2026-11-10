@@ -20,7 +20,8 @@ def usuario():
     with app.app_context():
         db.create_all()
         usuario = Usuario(nome="Teste", email="antigo@example.com")
-        usuario.salvar()
+        db.session.add(usuario)
+        db.session.commit()
         yield usuario
         db.session.remove()
         db.drop_all()
@@ -94,7 +95,8 @@ def test_email_igual_preserva_confirmacao(usuario):
 
 
 def test_codigo_sem_destinatario_nao_confirma(usuario):
-    Codigo(usuario_id=usuario.id, codigo="123456").salvar()
+    db.session.add(Codigo(usuario_id=usuario.id, codigo="123456"))
+    db.session.commit()
     with pytest.raises(ValueError):
         conferir(usuario, "123456")
     assert not usuario.verificado

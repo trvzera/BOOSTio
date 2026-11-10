@@ -31,7 +31,8 @@ class TestCodigosEmail(unittest.TestCase):
         db.create_all()
 
         usuario = Usuario(nome="Teste", email="teste@example.test", verificado=False)
-        usuario.salvar()
+        db.session.add(usuario)
+        db.session.commit()
         self.usuario_id = usuario.id
         self.cliente = app.test_client()
         with self.cliente.session_transaction() as sessao:
