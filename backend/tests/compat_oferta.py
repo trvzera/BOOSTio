@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified, set_committed_value
 
 from models import Peca, Oferta
-from models.medidas_fisicas import produto_kabum
+from utils.medidas_fisicas import produto_kabum
 
 CAMPOS = Peca.CAMPOS_DA_OFERTA
 _original_setattr = Peca.__setattr__

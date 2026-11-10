@@ -58,7 +58,7 @@ def cadastrar_pecas(tipos):
         modelo = MODELOS[tipo]
         dados = {"status_validacao": "aprovado", "fabricante": "Teste", "modelo": tipo, "preco": 100, "consumo_energia": 1}
         for coluna in modelo.__table__.columns:
-            from models.campos_tecnicos import CAMPOS_TECNICOS_OBRIGATORIOS
+            from utils.campos_tecnicos import CAMPOS_TECNICOS_OBRIGATORIOS
             obrigatoria = not coluna.nullable or coluna.name in CAMPOS_TECNICOS_OBRIGATORIOS.get(tipo, ())
             if coluna.name not in dados and obrigatoria and not coluna.primary_key and not coluna.default and not coluna.server_default:
                 dados[coluna.name] = "Teste" if coluna.type.python_type is str else 1

@@ -9,7 +9,7 @@ class ValidarFichaTecnicaService:
         if classe is None:raise ValueError('Categoria inválida')
         ignorados={'id','criado_em','atualizado_em','status_validacao'}
         obrigatorios={c.name for c in classe.__table__.columns if not c.nullable and c.name not in ignorados}
-        from models.campos_tecnicos import CAMPOS_TECNICOS_OBRIGATORIOS
+        from utils.campos_tecnicos import CAMPOS_TECNICOS_OBRIGATORIOS
         obrigatorios.update(CAMPOS_TECNICOS_OBRIGATORIOS.get(categoria, ()))
         if finalidade not in ('comercial','catalogo'):raise ValueError('Finalidade inválida')
         if finalidade=='comercial':

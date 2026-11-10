@@ -1,6 +1,6 @@
 """Anúncio de uma loja vinculado a uma peça; valores monetários em BRL."""
 from . import db, ModeloBase
-from .medidas_fisicas import produto_kabum
+from utils.medidas_fisicas import produto_kabum
 from .modelos_pecas import MODELOS_PECAS
 from utils.url_shopee import validar_url_shopee
 

@@ -1,6 +1,6 @@
 """Converte referência genérica de placa de vídeo em SKU comercial, com auditoria da conversão."""
 from models import db, Oferta, RevisaoIdentidadePeca
-from models.medidas_fisicas import produto_kabum
+from utils.medidas_fisicas import produto_kabum
 from repositories.identificadores_peca_repository import _vinculos
 from services.catalogo_service.normalizar_produto import variante
 from utils.identidade_peca import assinatura_peca, assinatura_tecnica

@@ -35,7 +35,7 @@ A primeira versão desta auditoria dizia que Model não pode consultar nem grava
 3. ~~Repository importando service e com regra de negócio~~ (resolvido em 09/11/2026): os 8 arquivos que decidiam o que gravar (`importacao_buildcores`, `importacao_catalogo`, `catalogo_tecnico`, `dataset_pecas`, `enriquecimento_buildcores`, `especificacoes_peca`, `reavaliacao_montagem`, `ofertas`) passaram para `services/` com nome `gravar_*_service`. Em `repositories/` ficaram só os de acesso (fila, tokens, ofertas da KaBuM, identificadores, controle do catálogo, saúde, migração de links), e nenhum importa `services`.
 4. ~~Controller com lógica de protocolo~~ (resolvido em 09/11/2026): a leitura do `state` do OAuth foi para `estado_oauth_service` e a validação do `Retry-After` da IA para `espera_ia_service`. Os controllers só traduzem as exceções em resposta HTTP.
 5. ~~Código morto: `controllers/peca_controller.py`~~ (removido em 09/11/2026, com o `MostrarPecasService` e seus testes).
-6. **Arquivos que não são Model dentro de `models/`**: `medidas_fisicas`, `imagens_referencia`, `campos_tecnicos` (regra e dados de domínio) e `preco_oferta` (colunas calculadas injetadas).
+6. ~~Arquivos que não são Model dentro de `models/`~~ (resolvido em 09/11/2026): `medidas_fisicas`, `imagens_referencia` e `campos_tecnicos` foram para `utils/`. `preco_oferta` fica em `models/` porque só declara colunas calculadas das próprias models.
 7. **Dados em `services/`**: `dados_seed.py` (1.247 linhas) e os arquivos `pecas_*` que ele junta. Mantidos onde estão por enquanto: mover só um deles separaria a seed de seus dados e não muda a arquitetura.
 8. **Front-end**: não auditado; conferir se `forms.js`, `melhorias.js`, `configuracao-build.js` e `configuracoes.js` misturam regra com tela.
 
@@ -46,6 +46,6 @@ A primeira versão desta auditoria dizia que Model não pode consultar nem grava
 3. (feito) Repositories que importam service e têm regra.
 4. (feito) Services que consultam direto.
 5. (feito) Lógica de protocolo nos controllers.
-6. Arquivos de domínio em `models/` (item 6).
+6. (feito) Arquivos de domínio em `models/`.
 
 Cada passo em um commit, sem mudar resposta da API, esquema, seed nem DDL, com a suíte inteira passando.

@@ -8,7 +8,7 @@ import pytest
 from services.validacoes_service.armazenamento import avaliar_armazenamento, avaliar_baias
 from services.validacoes_service.conectores import avaliar_conectores
 from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
-from models.medidas_fisicas import completar_medidas
+from utils.medidas_fisicas import completar_medidas
 
 CASOS = json.loads((Path(__file__).resolve().parents[4] / 'frontend/tests/fixtures/conexoes.json').read_text())
 

@@ -3,8 +3,8 @@ from datetime import timezone
 from . import db
 from sqlalchemy.orm import declared_attr, validates
 from . import ModeloBase
-from .medidas_fisicas import completar_medidas
-from .imagens_referencia import imagem_referencia
+from utils.medidas_fisicas import completar_medidas
+from utils.imagens_referencia import imagem_referencia
 
 
 class Peca(ModeloBase):

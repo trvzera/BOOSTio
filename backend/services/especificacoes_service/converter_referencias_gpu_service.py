@@ -65,7 +65,7 @@ class ConverterReferenciasGpuService:
                 cursor=p.id
                 try:
                     if not self.generica(p):resumo['inalteradas']+=1;continue
-                    from models.medidas_fisicas import produto_kabum
+                    from utils.medidas_fisicas import produto_kabum
                     ident=produto_kabum(p.kabum_external);arquivo=pasta/f'kabum-{ident}.json'
                     if not ident or not arquivo.is_file():
                         resultado=dict(status='revisao',motivo='Ficha original ausente')

@@ -1,4 +1,4 @@
-from models.medidas_fisicas import produto_kabum
+from utils.medidas_fisicas import produto_kabum
 from .cadastrar_pecas_ausentes_service import CadastrarPecasAusentesService
 from .pecas_complementares import pecas_complementares
 

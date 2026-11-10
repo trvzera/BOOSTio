@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from models import Processador
-from models.imagens_referencia import imagem_referencia, referencias
+from utils.imagens_referencia import imagem_referencia, referencias
 
 
 def test_vinculo_exato_prioridade_e_sem_update_no_banco():

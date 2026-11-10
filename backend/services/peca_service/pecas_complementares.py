@@ -1,5 +1,5 @@
 from models import Fan, Fone, Gabinete, Mouse, Teclado
-from models.medidas_fisicas import completar_medidas
+from utils.medidas_fisicas import completar_medidas
 
 
 CADASTROS = (

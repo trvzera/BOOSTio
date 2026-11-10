@@ -27,7 +27,7 @@ class PreencherFichasOriginaisService:
                     break
                 for peca in lote:
                     depois = peca.id
-                    from models.medidas_fisicas import produto_kabum
+                    from utils.medidas_fisicas import produto_kabum
                     externo = produto_kabum(peca.kabum_external)
                     if externo is None:
                         resumo['sem_ficha'] += 1

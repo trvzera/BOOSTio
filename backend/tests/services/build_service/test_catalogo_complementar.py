@@ -5,7 +5,7 @@ from flask import Flask
 import pytest
 
 from models import db, Fan
-from models.medidas_fisicas import completar_medidas
+from utils.medidas_fisicas import completar_medidas
 from commands.precos import registrar_comandos_precos
 from services.peca_service.pecas_complementares import pecas_complementares
 from services.peca_service.cadastrar_complementares_service import CadastrarComplementaresService
