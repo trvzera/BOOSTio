@@ -1,6 +1,6 @@
 import { movimentoReduzido } from "./components/motion-preference.js";
 
-// Carrossel dos cards de serviço (só existe na página inicial, id "cards-grid").
+
 document.addEventListener("DOMContentLoaded", () => {
   const cardsGrid = document.getElementById("cards-grid");
   const cards = Array.from(document.querySelectorAll(".card-service"));

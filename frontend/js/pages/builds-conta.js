@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     status.classList.toggle("builds-empty",salvas.length === 0);
     status.innerHTML = salvas.length ? "" : '<strong class="font-1-m-b">Suas próximas ideias começam aqui</strong><p class="font-2-xs">Você ainda não tem builds salvas. Crie uma montagem ou escolha uma build pronta para personalizar.</p><div class="builds-empty-actions"><button type="button" class="btn-primary" data-empty-create aria-label="Criar minha primeira build">Criar minha primeira build</button><a class="btn-secondary" href="./configuracoes-prontas.html" aria-label="Explorar builds prontas">Explorar builds prontas</a></div>';
     lista.innerHTML = salvas.map(card).join("");
-    // Não deixa o menu invisível aumentar a rolagem e causar um salto ao abri-lo.
+
     lista.querySelectorAll(".build-menu").forEach(menu => {
       if (typeof menu.showPopover === "function") menu.popover = "manual";
     });

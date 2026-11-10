@@ -50,13 +50,13 @@ test("DeepCool conta kits, alternativas e AIO sem duplicar posições",()=>{
   const p=gabinete("SEED-CASE-40");
   assert.equal(informacoesFans(p,fans(2,120,2)).total,8);
   assert.equal(informacoesFans(p,fans(3,120,2)).quantidade,false);
-  // Três fans de 140 frontais + uma traseira, duas AIO no topo e duas avulsas na cobertura.
+
   const water={quantidade_fans:2,tamanho_fan_mm:120,tamanho_radiador_mm:240};
   const info=informacoesFans(p,fans(2),water);
   assert.equal(info.total,8);assert.equal(info.distribuicao,true);
   assert.equal(informacoesFans(p,fans(3),water).quantidade,false);
   assert.equal(informacoesFans(p,fans(3,140)).distribuicao,false);
-  assert.equal(encaixeRadiador(p,water),null); // nominal não confirma espessura real
+  assert.equal(encaixeRadiador(p,water),null);
 });
 
 test("MSI não aceita fan de 120 mm nem transforma radiador ausente em suporte",()=>{

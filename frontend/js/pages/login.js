@@ -1,4 +1,4 @@
-// Entry point da página de login (pages/login.html).
+
 import "../header.js";
 import "../services-carousel.js";
 import "../auth/auth.js";
@@ -15,8 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const botaoGoogle = document.querySelector("#btn-google-login");
     erroTexto.style.display = "none";
 
-    // O callback do Google (backend) redireciona de volta pra cá com
-    // ?erro=... quando o login falha (ex: email não verificado no Google).
+
     const erroGoogle = new URLSearchParams(window.location.search).get("erro");
     if (erroGoogle) {
       erroTexto.style.display = "block";

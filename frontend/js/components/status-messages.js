@@ -1,5 +1,5 @@
-// Uma mensagem contextual após a pausa, não um anúncio por movimento do controle.
-// A fila pura permite testar o tempo/deduplicação sem DOM nem leitor de tela.
+
+
 export function criarAnunciadorStatus({publicar, agendar = setTimeout, cancelar = clearTimeout}) {
   let timer, ultima = "";
   const limpar = (reiniciar = false) => {
@@ -27,8 +27,8 @@ const raizAtiva = () => [...document.querySelectorAll("dialog[open]")].at(-1) ||
 
 function obterAnunciador(raiz) {
   if (porRaiz.has(raiz)) return porRaiz.get(raiz);
-  // As regiões vazias existem antes da alteração de texto. Ficam dentro do modal
-  // ativo para não serem tornadas inertes pelo showModal(). Nunca recebem foco.
+
+
   const regioes = ["status", "alert"].map(papel => {
     const regiao = document.createElement("div");
     regiao.className = "sr-only";

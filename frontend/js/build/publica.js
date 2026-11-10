@@ -40,7 +40,7 @@ export async function mostrarBuildPublica(main,id) {
     testar.disabled = true;
     try {
       if (!await sessao('testar')) return;
-      // Revalida a visibilidade antes de permitir a interação autenticada.
+
       const {build:atual} = await fetchComErro('/build/' + encodeURIComponent(id) + '/publica',{method:'GET',cache:'no-store'});
       const estado = buildDaConta(atual), motivo = motivoBenchmark(estado,atual.pecas || []);
       if (motivo) throw new Error(motivo);
@@ -64,6 +64,6 @@ export async function mostrarBuildPublica(main,id) {
   const perfil = await carregarPerfil().catch(()=>({auth:false}));
   if (perfil.auth) informar('Você pode testar ou salvar uma cópia privada, respeitando as vagas da sua conta.');
   const acao = new URLSearchParams(location.search).get('acao_publica');
-  if (perfil.auth && acao === 'testar') testar.click(); // Abre apenas a escolha; não consulta API automaticamente.
+  if (perfil.auth && acao === 'testar') testar.click();
   else if (perfil.auth && acao === 'salvar') { informar('Para criar uma cópia privada, confirme em “Salvar cópia no perfil”.'); salvar.focus({preventScroll:true}); }
 }

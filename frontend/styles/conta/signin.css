@@ -1,4 +1,4 @@
-/* AMBAS */
+
 
 .login-divider {
   width: 100%;
@@ -22,7 +22,7 @@
   color: var(--cor-4);
 }
 
-/* SIGNIN */
+
 #signin-page {
   height: 100vh;
   display: flex;
@@ -211,7 +211,7 @@
   color: var(--cor-d1);
 }
 
-/* LOGIN */
+
 #login-page {
   height: 100vh;
   display: flex;

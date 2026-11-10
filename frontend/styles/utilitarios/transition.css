@@ -1,4 +1,4 @@
-/* O fade preto é controlado pelo loading.js. Evita duas camadas de transição sobrepostas. */
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }

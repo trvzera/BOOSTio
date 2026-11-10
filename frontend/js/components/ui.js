@@ -48,9 +48,8 @@ export function iniciarIcones(raiz = document) {
     const arquivo = arquivos[elemento.dataset.lottie];
     if (!arquivo) return;
     try {
-      // user.json usa uma composição 1000×1000 com o desenho concentrado no centro.
-      // Enquadra a área útil, incluindo o giro da engrenagem, sem escalar o SVG via CSS
-      // (o renderer aplica seu próprio transform inline) ou aumentar o espaço do menu.
+
+
       const opcoes = elemento.dataset.lottie === "user"
         ? {rendererSettings:{viewBoxSize:"175 170 750 750",preserveAspectRatio:"xMidYMid meet"}}
         : elemento.dataset.lottie === "toggle"
@@ -103,7 +102,7 @@ export function iniciarIcones(raiz = document) {
         controle?.removeEventListener("focusin",entrar);
         controle?.removeEventListener("focusout",sair);
       }});
-    } catch { /* A animação é opcional; o controle mantém seu fallback e sua função. */ }
+    } catch {   }
   });
 }
 
@@ -131,7 +130,7 @@ function motivo(controle) {
   if (controle.textContent.includes("Voltar")) return "Você está na primeira etapa.";
   return motivos[controle.id] || "Esta ação está indisponível no estado atual. Confira os campos e os avisos da página.";
 }
-// Evita mutação quando o texto é igual: o tooltip também está dentro do body observado.
+
 export function definirTextoSeMudou(elemento,texto) {
   if (elemento.textContent !== texto) elemento.textContent = texto;
 }

@@ -25,7 +25,7 @@ export function contextoMelhoriaRam(build,catalogo) {
   return {placa,slots,slotsProvisorios,maximoGb,padrao};
 }
 
-// Uma proposta contém somente as unidades/kit que serão compradas. Não grava a build.
+
 export function planejarMelhoriaRam(build,catalogo,{modo = 'adicionar',itens = []} = {}) {
   if (build?.travada) throw new Error('Destranque a build para melhorar a RAM.');
   if (!build?.componentes || !Array.isArray(catalogo) || !Array.isArray(itens) || !['adicionar','substituir'].includes(modo))
@@ -75,7 +75,7 @@ export function planejarMelhoriaRam(build,catalogo,{modo = 'adicionar',itens = [
     throw new Error('Essa proposta mantém as mesmas memórias. Para expandir esse modelo, escolha adicionar sem remover as atuais.');
   proxima.componentes.memoria_ram = lista.map(i=>({id:i.peca.id,quantidade:i.quantidade}));
   if (proxima.compatibilidade) {
-    // Somente os erros de RAM podem estar obsoletos. Não esconda conflitos de outras peças.
+
     const erros = (proxima.compatibilidade.erros || []).filter(r=>!/^ram-/.test(r.codigo || ''));
     proxima.compatibilidade = {status:erros.length ? 'incompativel' : 'nao_verificado',escopo:'parcial',
       rotulo:erros.length ? 'Incompatibilidade identificada' : 'Prévia local: revalidação pendente',erros,naoVerificado:[],

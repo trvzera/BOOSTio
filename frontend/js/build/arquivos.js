@@ -1,10 +1,7 @@
 import { categorias, nomePeca } from "./catalogo.js";
 import { categoriasMultiplas, itensCategoria, normalizarBuild } from "./estado.js";
 
-// JSON: {formato:"boostio-build",versao:1,build:{...}} ou build legado.
-// CSV v1 (vírgula, CRLF): boostio-build,1 / metadados,<JSON sem componentes>
-// / categoria,id,proprio,quantidade,nome / uma linha por modelo.
-// Células perigosas e apóstrofos iniciais recebem um apóstrofo reversível.
+
 const FORMATO = "boostio-build", VERSAO = 1, LIMITE_BYTES = 1024 * 1024;
 const CABECALHO = ["categoria","id","proprio","quantidade","nome"];
 const categoriasValidas = new Set(categorias.map(c => c.id));
@@ -26,7 +23,7 @@ function lerJson(texto) {
   catch { falhar("JSON inválido ou incompleto."); }
 }
 
-// Evita coerções, perda silenciosa na serialização e chaves de protótipo.
+
 function validarJson(valor,ancestrais = new Set(),nivel = 0) {
   if (nivel > 64) falhar("Payload com profundidade excessiva.");
   if (valor === null || typeof valor === "boolean") return;
@@ -119,7 +116,7 @@ function prepararBuild(valor,catalogo) {
     }
   }
   const metadados = Object.fromEntries(Object.entries(valor).filter(([chave]) => !transientes.has(chave)));
-  // Preserva extensões JSON, inclusive rede/orcamento em builds de versões antigas.
+
   return {...metadados,...normalizarBuild(valor)};
 }
 
@@ -190,12 +187,12 @@ function buildCsv(texto) {
   return {...dados,componentes};
 }
 
-/** Exporta um envelope JSON v1; não altera a build nem acessa storage. */
+
 export function exportarJson(build) {
   return limitarTexto(JSON.stringify({formato:FORMATO,versao:VERSAO,build:prepararBuild(build)},null,2));
 }
 
-/** Exporta CSV v1. A coluna nome é informativa; id/proprio são a identidade. */
+
 export function exportarCsv(build,catalogo) {
   const {componentes,...metadados} = prepararBuild(build,catalogo);
   const linhas = [[FORMATO,VERSAO],["metadados",JSON.stringify(metadados)],CABECALHO];
@@ -208,7 +205,7 @@ export function exportarCsv(build,catalogo) {
   return limitarTexto(linhas.map(linha => linha.map(codificarCelula).join(",")).join("\r\n") + "\r\n");
 }
 
-/** Importa .json/.csv (até 1 MiB UTF-8) como cópia privada, destrancada e sem totais. */
+
 export function importarBuild(texto,extensao,catalogo) {
   limitarTexto(texto);
   texto = texto.replace(/^\uFEFF/,"");

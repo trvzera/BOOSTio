@@ -51,7 +51,7 @@ export function iniciarNavegacao() {
   const atualizarMovimento = () => {
     const reduzido = movimentoReduzido();
     movimento.setAttribute("aria-pressed", String(reduzido));
-    // O nome do botão permanece estável; leitores de tela anunciam o estado pressionado.
+
     movimento.title = reduzido ? "Vídeos e efeitos de página desativados. Ícones animados continuam ativos. Clique para reativar os efeitos." : "Desativar vídeos e reduzir os efeitos de página, mantendo os ícones animados.";
   };
   movimento.addEventListener("click", () => definirMovimentoReduzido(!movimentoReduzido()));
@@ -125,7 +125,7 @@ export function atualizarNavegacao(autenticado, administrador = false) {
   host.querySelector("[data-profile-user]").hidden = !autenticado;
   host.querySelectorAll("[data-menu-auth]").forEach(link => { link.hidden = !autenticado; });
   host.querySelectorAll("[data-menu-admin]").forEach(link => { link.hidden = !(autenticado && administrador); });
-  hamburger.container.hidden = false; // Visitantes também acessam a navegação pública.
+  hamburger.container.hidden = false;
   iniciarIcones(host);
   perfil.alternar(false);
   hamburger.alternar(false);

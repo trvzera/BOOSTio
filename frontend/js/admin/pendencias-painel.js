@@ -1,5 +1,5 @@
-// Seção "Pendências" do dashboard de administração: lista, detalhe e decisão (aceitar ou rejeitar).
-// Todo texto vindo da API entra por textContent; nada é montado com innerHTML.
+
+
 import { listarPendencias, detalharPendencia, aceitarPendencia, rejeitarPendencia, descartarCandidato, enviarPendenciasParaIA, listarIdsParaIA } from "../api/admin/pendencias.js";
 import { processarEnvioIA } from "./envio-ia.js";
 import {
@@ -70,7 +70,7 @@ export function iniciarPendencias(raiz) {
 
   const marcadas = () => [...lista.querySelectorAll(".admin-pending-check:checked")];
 
-  // "Selecionar todas" vale para o filtro inteiro (inclusive páginas ainda não carregadas); "Selecionar 20" só a lista visível.
+
   let todasSelecionadas = false, idsTodas = [];
   const TAMANHO_SELECAO = 20;
 
@@ -110,7 +110,7 @@ export function iniciarPendencias(raiz) {
     atualizarLote();
   }
 
-  // O envio é um processo: lotes de 20 (uma requisição à IA por lote); o que falhar espera e tenta de novo.
+
   let parar = false, enviando = false;
 
   function textoResultado(r, decidir) {
@@ -146,7 +146,7 @@ export function iniciarPendencias(raiz) {
     }
   }
 
-  // Com "todas" selecionadas, quem já tem sugestão atual não gasta IA de novo: um envio interrompido pode ser retomado.
+
   const enviarSelecionadasParaIA = () => todasSelecionadas
     ? enviarParaIA(idsTodas, {decidir: decidirIA.checked, refazer: false})
     : enviarParaIA(marcadas().map(c => Number(c.value)), {decidir: decidirIA.checked, refazer: true});
@@ -286,7 +286,7 @@ export function iniciarPendencias(raiz) {
       await carregar();
       avisar(sucesso);
     } catch (erro) {
-      // Resultado incerto (rede) ou conflito: o administrador relê o estado antes de repetir.
+
       avisar(erro.message, true);
       aceitar.disabled = !detalhe.querySelector("input:checked");
       rejeitar.disabled = false;

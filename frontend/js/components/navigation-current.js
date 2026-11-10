@@ -3,7 +3,7 @@ import { caminhoComparacao } from "./page-routes.js";
 export function linkDaPaginaAtual(href,atual) {
   try {
     const pagina = new URL(atual), destino = new URL(href,pagina);
-    // Ações (criar=1) e âncoras continuam disponíveis, mesmo na mesma página.
+
     return destino.origin === pagina.origin && !destino.search && !destino.hash
       && caminhoComparacao(destino.pathname) === caminhoComparacao(pagina.pathname);
   } catch { return false; }

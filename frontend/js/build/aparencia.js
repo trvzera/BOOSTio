@@ -1,11 +1,11 @@
 import { htmlSeguro as h, imagemPeca } from "./catalogo.js";
 
-// Os valores anteriores continuam válidos para as builds já salvas.
+
 export const estilosGabinete=[['sem-preferencia','Sem preferência'],['discreto','Sem vidro'],['vidro','Vidro lateral'],['compacto','Compacto'],['panoramico','Aquário'],['panoramico-3-faces','Panorâmico — 3 faces']];
 export const portesGabinete=[['sem-preferencia','Sem preferência'],['mini-tower','Pequeno'],['mid-tower','Médio'],['full-tower','Grande']];
 export const coresSetup=[['sem-preferencia','Sem preferência'],['preto','Preto'],['branco','Branco'],['misto','Preto e branco']];
 
-// Exemplos visuais, não ofertas.
+
 const exemplos={
   'mini-tower':{modelo:'Cooler Master MasterBox Q300L',imagem:'../imgs/produtos/gabinete-1.webp',descricao:'Mini Tower · ocupa menos espaço. Costuma usar placas-mãe menores.',preco:'Geralmente tem opções econômicas. Modelos muito compactos podem custar mais.',
     medidas:'387 × 230 × 381 mm',placas:'Micro-ATX e Mini-ITX.',fans:'120 mm; na frente também aceita 140 mm.',radiador:'Até 240 mm na frente.'},
@@ -19,7 +19,7 @@ const exemplos={
   'panoramico-3-faces':{modelo:'Lian Li O11 Vision',imagem:'../imgs/referencia-gabinete-tres-faces.webp',descricao:'Vidro na frente, na lateral e no teto. Pode ter um custo maior.'},
 };
 
-// Referências dos modelos das fotos, nunca regras gerais de compatibilidade.
+
 export function guiaPorteGabineteHtml(porte) {
   const exemplo=portesGabinete.some(([v])=>v===porte)&&exemplos[porte];
   if(!exemplo)return '<p class="font-2-xs">Escolha um tamanho para ver medidas e encaixes de um modelo de exemplo. Não existe uma medida única para todos os Mini, Mid ou Full Tower.</p>';

@@ -1,4 +1,4 @@
-// Mesmo contrato de backend/utils/sockets.py. Não infere pela marca/modelo da CPU.
+
 const padrao = '(?:FC)?LGA[\\s-]*[0-9]{3,5}(?:-v?[0-9]+)?|AM\\s*[1-9][0-9]*\\+?|FM\\s*[1-9][0-9]*\\+?|s?TRX?[1-9][0-9]*|SP[1-9][0-9]*';
 export function normalizarSocket(valor) {
   if(typeof valor!=='string')return null;

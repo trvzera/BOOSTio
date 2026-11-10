@@ -23,7 +23,7 @@ function resumirBuild(build, catalogo) {
   const semPreco = itens.filter(({ peca }) => numero(peca?.preco) == null).length;
   const precos = itens.filter(({ peca }) => numero(peca?.preco) != null);
   const subtotal = precos.reduce((soma, { item, peca }) => soma + numero(peca.preco) * item.quantidade, 0);
-  // Orçamento é um limite de planejamento, nunca o preço da build.
+
   const rede = build.rede;
   const redeDefinida = ["cabo", "wifi"].includes(rede?.tipo);
   const categoriaRede = rede?.tipo === "cabo" ? "cabo_rede" : "adaptador_wifi";
@@ -36,7 +36,7 @@ function resumirBuild(build, catalogo) {
   const preco = Math.round(subtotal * 100) / 100;
   const completa = !avaliacao.faltam.length && itens.length > 0 && semModelo === 0;
   const totalConfiavel = completa && semPreco === 0 && !redeSemCotacao && !redeAConfirmar && Number.isFinite(preco);
-  // A fonte fornece energia; sua potência não é consumo. Periféricos ficam fora da estimativa do PC.
+
   const consumidores = itens.filter(({ categoria }) => ![...perifericos, ...acessoriosRede, "fonte"].includes(categoria));
   const consumos = consumidores.filter(({ peca }) => numero(peca?.consumo_energia) != null);
   const watts = Math.round(consumos.reduce((soma, { item, peca }) =>
@@ -99,14 +99,7 @@ function compatibilidade({ avaliacao }) {
     + (!mensagens.length && !dicas.length ? 'Verificação das regras disponíveis no catálogo; confirme os dados dos fabricantes.' : '') + '</dd></div>';
 }
 
-/**
- * Abre um dialog nativo, sem buscar dados nem gravar builds/storage.
- * @param {Array<object>} builds Builds no formato de estado.js; IDs repetidos contam uma vez.
- * @param {Array<object>} catalogo Peças já carregadas, no formato de catalogo.js.
- * @returns {HTMLDialogElement} Dialog aberto; pode ser fechado com .close(). É removido ao fechar.
- * @throws {TypeError|RangeError} Entradas inválidas ou menos de duas builds distintas.
- * Requer comparacao.css e os tokens/fontes do site carregados pela página consumidora.
- */
+
 export function abrirComparacao(builds, catalogo) {
   if (!Array.isArray(builds) || builds.some(build => !build || typeof build !== "object" || Array.isArray(build)))
     throw new TypeError("Informe uma lista de builds válidas para comparar.");
@@ -233,8 +226,8 @@ export function abrirComparacao(builds, catalogo) {
       }).join("") + '</div><p class="compare-footnote">Valores cadastrados no catálogo podem ser demonstrativos; não são cotações em tempo real. '
       + 'Orçamento não entra no preço. Acessório de rede a confirmar ou sem cotação deixa o total parcial. '
       + 'O consumo é uma estimativa dos componentes do PC, sem fonte, periféricos e acessórios de rede; não é uma medição na tomada.</p></section>';
-    // Cada card ocupa uma linha para o cabeçalho e uma para cada especificação.
-    // Sem essa contagem, campos novos podem se sobrepor na última linha do subgrid.
+
+
     const colunas = conteudo.querySelector(".compare-columns");
     const linhas = Math.max(...[...colunas.querySelectorAll(".compare-card")].map(cartao =>
       1 + cartao.querySelectorAll(".compare-field").length));
@@ -278,7 +271,7 @@ export function abrirComparacao(builds, catalogo) {
       selecionadas.delete(indice);
       mostrarResultados();
     }
-    // Padding e backdrop não disparam nenhuma ação de fechamento.
+
   });
   dialogo.addEventListener("cancel", evento => {
     evento.preventDefault();

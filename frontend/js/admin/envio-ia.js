@@ -1,11 +1,11 @@
-// Envio de pendências para a IA como um processo: lotes de 20, com espera e nova tentativa nos que falharem.
+
 export const TAMANHO_LOTE_IA = 20;
 export const ESPERAS_MS = [15000, 45000, 90000];
 
 const somar = ["sugeridas", "sem_sugestao", "aceitas", "rejeitadas", "decisoes_falhas", "ignoradas"];
 const dormir = ms => new Promise(resolver => setTimeout(resolver, ms));
 
-// enviar(ids) devolve o resumo do servidor (com ids_falhos); pode lançar erro de rede.
+
 export async function processarEnvioIA({
   ids, enviar, tamanho = TAMANHO_LOTE_IA, esperas = ESPERAS_MS, esperar = dormir,
   parou = () => false, aoProgredir = () => {},

@@ -52,7 +52,7 @@ test("histórico da oferta da Shopee valida a loja devolvida e identifica a orig
     {historico_precos:[], historico_precos_incompleto:false, historico_loja:"shopee"});
   await assert.rejects(obterHistoricoDaPeca(p, {conta:true, ofertaId:11, lojaOferta:"mercado_livre", consultarOferta}));
   await assert.rejects(obterHistoricoDaPeca(p, {conta:true, ofertaId:11, lojaOferta:"outra", consultarOferta}), /Loja da oferta inválida/);
-  // sem lojaOferta o comportamento anterior (Mercado Livre) continua o mesmo
+
   await assert.rejects(obterHistoricoDaPeca(p, {conta:true, ofertaId:11, consultarOferta}));
 });
 

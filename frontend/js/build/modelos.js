@@ -1,8 +1,7 @@
 import { categoriasMultiplas, normalizarBuild } from "./estado.js";
 import { referenciasPeca } from './codigos-pecas.js';
 
-// Referências estáveis do catálogo existente. O total sempre vem dos preços carregados.
-// Não são metas de FPS nem ofertas garantidas; todos os modelos são sem periféricos.
+
 const MODELOS = [
   {
     id:"modelo-estudos",titulo:"Estudos e dia a dia",objetivo:"estudos",objetivoRotulo:"Estudos",plataforma:"AM5",nivel:"Entrada",

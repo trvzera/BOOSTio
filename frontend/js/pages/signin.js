@@ -1,4 +1,4 @@
-// Entry point da página de criação de conta (pages/signin.html).
+
 import "../header.js";
 import "../services-carousel.js";
 import "../auth/auth.js";
@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     validarFormulario();
 
-    // --- Modal de verificação de e-mail ---
+
     const modalVerificacao = document.querySelector("#verify-email-modal");
     const fluxoVerificacao = iniciarFluxoVerificacaoEmail({
       modal:modalVerificacao,enviar:enviarEmailVerificar,confirmar:conferirEmailVerificar,

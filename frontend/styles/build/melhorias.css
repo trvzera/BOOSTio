@@ -1,4 +1,4 @@
-/* Buscar melhorias: cabeçalho e confirmação fixos, conteúdo nas áreas de peças/prévia. */
+
 .upgrade-dialog[open] {
   position: fixed;
   inset: var(--upgrade-dialog-top,4dvh) 0 auto;
@@ -13,7 +13,7 @@
   background: linear-gradient(145deg,rgba(22,24,29,.97),rgba(8,9,12,.98));
   overflow: hidden;
   color-scheme: dark;
-  /* Redução de movimento global não deve animar o reposicionamento do modal. */
+
   transition: none;
 }
 .upgrade-dialog *, .upgrade-dialog *::before, .upgrade-dialog *::after { box-sizing: border-box; }
@@ -49,7 +49,7 @@ details[open] > summary > .upgrade-real-chevron { transform: rotate(225deg); mar
 .upgrade-real-categories label { display: grid; grid-template-columns: 1.5rem minmax(0,1fr); align-items: center; gap: .625rem; min-height: 2.75rem; padding: .5rem; border: 1px solid transparent; border-radius: .75rem; color: var(--cor-4); font: 400 .75rem/1.5 var(--font-body); cursor: pointer; overflow-wrap: anywhere; transition: color .18s ease,border-color .18s ease,background .18s ease; }
 .upgrade-real-categories label:has(input:checked) { color: var(--cor-6); border-color: rgba(0,123,255,.25); background: rgba(0,123,255,.06); }
 .upgrade-real-categories label:focus-within { border-color: var(--cor-p1); }
-/* Mesmo checkbox do site: input acessível sobre todo o label e Lottie visual. */
+
 :is(.upgrade-real-categories,.test-upgrade-categories) .ui-check > input { width: 100%; height: 100%; margin: 0; accent-color: var(--cor-p1); }
 :is(.upgrade-real-categories,.test-upgrade-categories) .ui-check > .ui-lottie[data-lottie="checkbox"] { width: 1.5rem; height: 1.5rem; flex-basis: 1.5rem; color: var(--cor-p1); pointer-events: none; }
 :is(.upgrade-real-categories,.test-upgrade-categories) .ui-check > input:checked + .ui-lottie svg path[stroke]:not([stroke="none"]) { stroke: var(--cor-p1); }

@@ -3,7 +3,7 @@ import { completarMedidas } from "./medidas-fisicas.js";
 import { avaliarBaias } from "./armazenamento.js";
 export { conexaoDisco } from "./armazenamento.js";
 export { informacoesFans } from "./fans.js";
-// Campos ausentes são desconhecidos, nunca zero ou uma medida inferida pelo nome.
+
 export function numeroConhecido(valor) {
   if (valor == null || valor === "" || typeof valor === "boolean") return null;
   const n = Number(valor);
@@ -14,7 +14,7 @@ export function slotsRam(placa) {
   if (!placa) return {slots:0,provisorio:false};
   const valor = placa.quantidade_slots_ram;
   const numero = ["number","string"].includes(typeof valor) && String(valor).trim() ? numeroConhecido(valor) : null;
-  // Zero ou um slot explicitamente cadastrado não vira dois. Não altera a ficha.
+
   return numero != null && Number.isInteger(numero) ? {slots:numero,provisorio:false} : {slots:2,provisorio:true};
 }
 export function limitesArmazenamento(placa, m2Sata = 0) {
@@ -23,8 +23,8 @@ export function limitesArmazenamento(placa, m2Sata = 0) {
   return {
     m2:numeroConhecido(placa?.quantidade_slots_m2),
     m2Sata:numeroConhecido(placa?.quantidade_slots_m2_sata),
-    // Com mapa por slot, este é o teto nominal. A distribuição completa é
-    // revalidada antes de adicionar, sem descontar duas vezes uma porta compartilhada.
+
+
     sata:sata == null ? null : placa?.slots_m2 && placa.topologia_armazenamento_verificada === true ? sata : Math.max(0,sata - m2Sata * (compartilhadas ?? 0)),
     compartilhamentoDesconhecido:m2Sata > 0 && compartilhadas == null && placa?.topologia_armazenamento_verificada !== true,
   };
@@ -101,8 +101,7 @@ export function validarEncaixe({gpu,air,water,fans = [],gabinete,placa,fonte,dis
   return {erros,avisos,alertas};
 }
 
-// Slots/SATA: complemento somente demonstrativo. Medidas: manifesto compartilhado
-// com Peca.to_catalogo(), sem alterar registros ou o esquema do banco.
+
 export function completarCatalogoDemo(catalogo,manifesto = {pecas:[]}) {
   const placas = {
     "ASUS|Prime A520M-K": {quantidade_slots_m2:1,quantidade_portas_sata:4,quantidade_slots_m2_sata:1},

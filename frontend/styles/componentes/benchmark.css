@@ -99,7 +99,7 @@
 .fpshq-matrix-caption { margin: 10px 0 8px; }
 .fpshq-data-copy { color: var(--cor-4); font: 400 .75rem/1.65 var(--font-body); }
 .fpshq-data-copy p { margin: 0 0 10px; }
-/* As variantes reaproveitam os mesmos controles e o mesmo resultado, sem cópias. */
+
 .fpshq-panel[data-layout="panel"] .fpshq-workspace { display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); gap: 28px; margin-top: 28px; }
 .fpshq-panel[data-layout="panel"] .fpshq-controls { padding-right: 28px; border-right: 1px solid var(--glass-border); }
 .fpshq-panel[data-layout="panel"] .fpshq-fields { grid-template-columns: minmax(0,1fr); margin-top: 0; }
@@ -152,7 +152,7 @@
 }
 @media (prefers-reduced-motion: reduce) { .fpshq-disclosure > summary, .fpshq-disclosure > summary::after, .fpshq-quality-tabs span, .fpshq-layouts span { transition: none; } }
 
-/* Cards é a apresentação principal: controles curtos e uma só hierarquia de resultado. */
+
 .fpshq-panel .fpshq-result-heading h3 { font: 500 1.1rem/1.4 var(--font-heading); }
 .fpshq-panel .fpshq-metrics { gap: 10px; margin: 14px 0 16px; }
 .fpshq-panel .fpshq-metrics > div { padding: 14px 16px; border-radius: 14px; }

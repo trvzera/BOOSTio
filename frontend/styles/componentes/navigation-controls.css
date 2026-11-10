@@ -1,4 +1,4 @@
-/* Controles de navegação: um mesmo tamanho, acabamento e interação em todas as páginas. */
+
 .ui-close-button:is(button), .ui-back-button:is(a,button) {
   box-sizing: border-box;
   display: inline-flex;

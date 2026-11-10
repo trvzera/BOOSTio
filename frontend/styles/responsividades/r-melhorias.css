@@ -30,7 +30,7 @@
   .upgrade-real-footer .build-action-actions > .disabled-tip-anchor { min-width: 10rem; }
   .upgrade-real-totals > div { padding-block: .625rem; }
 }
-/* Zoom/texto grande ou teclado deixando pouco espaço: conteúdo sempre alcançável. */
+
 .upgrade-dialog.upgrade-dialog-flow[open] { display: block; overflow-y: auto; }
 .upgrade-dialog-flow .upgrade-real-panel { overflow: visible; }
 .upgrade-dialog-flow > .build-action-heading { display: grid; grid-template-columns: minmax(0,1fr) auto; }

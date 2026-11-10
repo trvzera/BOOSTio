@@ -1,4 +1,4 @@
-// Textos e formatos do painel de pendências. Funções puras, sem DOM, para poder testar.
+
 import { formatarReal } from "../utils/formatarMoeda.js";
 
 const lojas = {mercado_livre: "Mercado Livre", shopee: "Shopee"};
@@ -20,7 +20,7 @@ export function formatarFaixaPreco(preco) {
   return `${formatarReal(preco.minimo)} a ${formatarReal(preco.maximo)}`;
 }
 
-// Só abrimos links https; qualquer outro esquema (javascript:, data:) vira texto sem link.
+
 export function linkSeguro(url) {
   try {
     const endereco = new URL(url);
@@ -28,9 +28,9 @@ export function linkSeguro(url) {
   } catch { return null; }
 }
 
-// Um candidato com conflito contradiz o anúncio; o backend também recusa, aqui só desabilitamos a escolha.
+
 export function candidatoSelecionavel(candidato) {
-  // Uma peça só pode ter um catálogo do Mercado Livre: quem já tem outro não pode receber este.
+
   return Array.isArray(candidato?.conflitos) && candidato.conflitos.length === 0 && !candidato.vinculada_a_outro_catalogo;
 }
 

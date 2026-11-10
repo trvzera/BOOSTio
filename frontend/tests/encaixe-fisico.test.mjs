@@ -41,7 +41,7 @@ test("fichas oficiais exigem identificação exata e corrigem medidas ambíguas 
 
 test("filtro impede conflito por posição na adição e na escolha posterior de gabinete",() => {
   const gabinete = {id:"case",categoria:"gabinete",...fixture.gabinete};
-  const fan = {id:"fan",categoria:"fan",tamanho_mm:140,quantidade:3}; // só existem duas posições de 140
+  const fan = {id:"fan",categoria:"fan",tamanho_mm:140,quantidade:3};
   const catalogo = [gabinete,fan];
   const build = normalizarBuild({componentes:{gabinete:{id:"case"}}});
   assert.equal(pecaCompativel(build,fan,catalogo),false);
@@ -78,14 +78,14 @@ test("fans confirmadas do water cooler atendem presença e progresso sem compra 
   const build=normalizarBuild({componentes:{gabinete:{id:'case'},water_cooler:{id:'water'}}});
   const resultado=avaliarBuild(build,[gabinete,water]);
   assert.ok(!resultado.faltam.includes('Fans'));
-  assert.equal(resultado.preenchidos,3); // gabinete, refrigeração e ventilação
+  assert.equal(resultado.preenchidos,3);
   assert.equal(informacoesFans(gabinete,[],water).total,2);
   assert.equal(informacoesFans(gabinete,[],water).livres,0);
   for(const quantidade_fans of [undefined,null,0,-1,1.5,true,65]) {
     assert.equal(temFansInclusas(gabinete,{...water,quantidade_fans}),false);
     assert.ok(avaliarBuild(build,[gabinete,{...water,quantidade_fans}]).faltam.includes('Fans'));
   }
-  // Só presença: não certifica um radiador incompatível nem ignora excesso.
+
   assert.ok(avaliarBuild(build,[{...gabinete,quantidade_max_fans:1},water]).erros.length>0);
   assert.equal(temFansInclusas(gabinete),false);
 });

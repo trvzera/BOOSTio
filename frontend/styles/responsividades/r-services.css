@@ -10,7 +10,7 @@
 .card-desc { width: 100%; }
 .scroll-dots { display: none; }
 
-/* O carrossel continua disponível no tablet, dentro da largura da seção. */
+
 @media (min-width: 701px) and (max-width: 1150px) {
   #cards-grid {
     display: flex;

@@ -2,8 +2,7 @@ import { selecionarPeca, informacoesArmazenamento, itensSelecionados } from "./e
 import { exigirTrocaMelhoria } from "./validar-melhoria.js";
 import { numeroConhecido } from "./hardware.js";
 
-// A expansão preserva os volumes existentes; a substituição continua explícita.
-// O seletor do editor confere M.2/SATA, portas compartilhadas e quantidades.
+
 export function planejarMelhoriaDisco(build,peca,catalogo,{modo = "adicionar",quantidade = 1} = {}) {
   if (build?.travada) throw new Error("Destranque a build para melhorar o armazenamento.");
   if (!["ssd","hd"].includes(peca?.categoria) || !["adicionar","substituir"].includes(modo))
@@ -30,8 +29,8 @@ export function planejarMelhoriaDisco(build,peca,catalogo,{modo = "adicionar",qu
     const info = informacoesArmazenamento(proxima,catalogo);
     const revalidados = new Set(["m2","sata"].filter(tipo => info[tipo] === 0
       || info.limites[tipo] != null && info[tipo] <= info.limites[tipo]).map(tipo => "discos-" + tipo));
-    // Somente erros de conexões que o seletor acabou de conferir podem ficar obsoletos.
-    // Não apagar diagnósticos das outras peças nem certificar limites desconhecidos.
+
+
     const erros = (base.compatibilidade.erros || []).filter(erro => !revalidados.has(erro.codigo));
     if (erros.length !== (base.compatibilidade.erros || []).length)
       proxima.compatibilidade = {status:erros.length ? "incompativel" : "nao_verificado",escopo:"parcial",

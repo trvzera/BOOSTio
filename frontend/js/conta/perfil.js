@@ -20,7 +20,7 @@ export function atualizarPerfil(usuario, revisaoEsperada = revisao) {
 }
 export function limparPerfil() { return atualizarPerfil(null); }
 
-// Compartilha somente consultas simultâneas. Cada nova página revalida a sessão.
+
 export function carregarPerfil() {
   if (pendente) return pendente;
   const versao = revisao, controle = new AbortController();

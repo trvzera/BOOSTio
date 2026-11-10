@@ -1,6 +1,6 @@
 import { iniciarCodigoVerificacao } from "./verification-code.js";
 
-// Um envio automático por destino nesta página; reabrir o modal nunca dispara SMTP.
+
 export function iniciarFluxoVerificacaoEmail({modal,enviar,confirmar,aoConfirmar,agora=Date.now}) {
   const inputs=[...modal.querySelectorAll(".code-input")];
   const enviarBtn=modal.querySelector("#btn-send-code"),confirmarBtn=modal.querySelector("#btn-confirm-code");

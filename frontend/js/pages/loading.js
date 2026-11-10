@@ -50,12 +50,12 @@ function revelar() {
 function liberar() {
   if (finalizada) return;
   finalizada = true;
-  // Prepara a entrada enquanto a camada ainda cobre a página: evita um frame
-  // visível sem as classes de animação entre o loading e o conteúdo.
+
+
   if (!home) iniciarEntradaPagina();
   iniciarRevealsGlobais();
   document.body.classList.remove("loading-active");
-  tela.classList.add("loading-dismissed"); // Nunca captura cliques enquanto desaparece.
+  tela.classList.add("loading-dismissed");
   const duracao = reduzido ? 0 : perfil.fadeMs;
   tela.addEventListener("transitionend",e => { if (e.target === tela && e.propertyName === "opacity") revelar(); });
   setTimeout(revelar,duracao + 80);
@@ -79,7 +79,7 @@ const videoPronto = !video || perfil.modo === "fade" || reduzido ? Promise.resol
 const conteudoPronto = domPronto.then(async () => {
   await (document.fonts?.ready || Promise.resolve());
   await aguardarCarregamentos();
-  // Só o fluxo editor/catálogo/peça acelera quando pronto. A home permanece em 1×.
+
   if (frequente && video && perfil.modo === "full") video.playbackRate = perfil.velocidadePronta;
 });
 const limite = pesada ? 8000 : perfil.modo === "full" ? 5000 : 5000;
@@ -92,11 +92,11 @@ Promise.all([conteudoPronto,videoPronto,esperar(reduzido ? 0 : perfil.minimoMs)]
 });
 window.addEventListener("pageshow",e => {
   if (!e.persisted) return;
-  if (home || frequente) { location.reload(); return; } // Reabre o rascunho atual, não o snapshot antigo do editor.
+  if (home || frequente) { location.reload(); return; }
   document.querySelectorAll(".navigation-fade").forEach(el => el.remove());
   document.body.classList.remove("loading-active");
   if (movimentoReduzido()) return;
-  // O bfcache não executa os módulos novamente: ainda precisa de uma transição curta.
+
   const rapida = document.createElement("div"); rapida.id = "loading-screen";
   rapida.className = "loading-fade"; rapida.setAttribute("aria-hidden","true");
   rapida.style.setProperty("--loading-fade",perfil.fadeMs + "ms");

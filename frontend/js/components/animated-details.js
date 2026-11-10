@@ -22,7 +22,7 @@ function preparar(details) {
   return estado;
 }
 
-// Também permite fechar por código sem deixar uma animação anterior reabrir o menu.
+
 export function definirDetalheAberto(details,aberto,{animar = true} = {}) {
   const estado = preparar(details);
   if (!estado) return;
@@ -36,7 +36,7 @@ export function definirDetalheAberto(details,aberto,{animar = true} = {}) {
     details.open = estado.desejado;
     return;
   }
-  // O JS mede a altura natural; duração e curva podem ser personalizadas no CSS.
+
   details.open = true;
   const estilo = getComputedStyle(details);
   const fechado = estado.summary.getBoundingClientRect().height + parseFloat(estilo.paddingTop) +
@@ -57,7 +57,7 @@ export function definirDetalheAberto(details,aberto,{animar = true} = {}) {
   };
 }
 
-// Mantém o comportamento nativo do details, sem altura fixa nem listeners duplicados.
+
 export function iniciarDetalhesAnimados(raiz = document) {
   raiz.querySelectorAll("details[data-animated-details]").forEach(preparar);
 }

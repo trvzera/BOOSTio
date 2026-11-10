@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Simula por padrão. Não faz pull, build, migration, backup ou configuração automática.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 [[ -f .env.production ]] || { echo 'Configure .env.production na VPS antes de executar.' >&2; exit 2; }

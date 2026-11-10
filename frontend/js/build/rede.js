@@ -8,7 +8,7 @@ export function normalizarRede(valor = {}) {
     possuiAcessorio:typeof valor.possuiAcessorio === "boolean" ? valor.possuiAcessorio : null,
     velocidadeMbps:numero(valor.velocidadeMbps,100000),
     comprimentoCaboM:numero(valor.comprimentoCaboM,1000),
-    // Legado v1: mantido nulo para ler arquivos antigos, sem gerar custo estimado.
+
     custoPrevisto:null,
   };
 }
@@ -20,7 +20,7 @@ export function resumoRede(valor) {
   return meio + " · " + acessorio;
 }
 export function custoRede(valor) {
-  return 0; // Somente produtos do catálogo entram no preço da build.
+  return 0;
 }
 export function selecionarAcessorioRede(valor,opcao) {
   const rede = normalizarRede(valor);
@@ -54,7 +54,7 @@ export function vincularRedeBuild(container,valor,{bloqueado = false,aoAlterar =
 function ajudaWifi(rede) {
   return 'O adaptador é um acessório que permite usar Wi-Fi no computador. Alguns PCs já têm essa função. Se você já usa Wi-Fi nesse PC, pode marcar que já possui o necessário.';
 }
-// Padrões apenas deste formulário. Importações e builds antigas preservam suas medidas.
+
 export function redeFormulario(valor = {}) {
   const rede = normalizarRede(valor);
   return {...rede,velocidadeMbps:rede.tipo === "wifi" && rede.possuiAcessorio === false ? 500 : null};
@@ -83,7 +83,7 @@ export function vincularRede(container,valor,{prefixo = "rede",bloqueado = false
     if (evento.target.tagName !== "SELECT" && !evento.target.checkValidity()) { aoAlterar(rede); return; }
     const valor = chave === "possuiAcessorio" ? (evento.target.value === "confirmar" ? null : evento.target.value === "true") : evento.target.value;
     rede = redeFormulario({...rede,[chave]:valor,...(chave === "tipo" && rede.tipo !== valor ? {comprimentoCaboM:null} : {})});
-    // Só as escolhas estruturais recriam os campos: digitar ou usar as setas não perde o foco.
+
     if (evento.type === "change" && evento.target.tagName === "SELECT") desenhar();
     const ajuda = container.querySelector("[data-network-wifi-help]");
     if (ajuda) ajuda.textContent = ajudaWifi(rede);

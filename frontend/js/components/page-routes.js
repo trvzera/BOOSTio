@@ -1,4 +1,4 @@
-// Os arquivos continuam em pages/. O Nginx publica os mesmos documentos sem .html.
+
 export const paginas = new Set([
   "index.html", "login.html", "signin.html", "esqueci-senha.html", "reset-senha.html",
   "formulario.html", "builds.html", "configuracoes.html", "configuracoes-prontas.html",

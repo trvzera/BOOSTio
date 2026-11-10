@@ -1,4 +1,4 @@
-/* Uma navegação flutuante, sem camada que bloqueie o restante da página. */
+
 [data-site-navigation]::before {
   content: "";
   position: fixed;

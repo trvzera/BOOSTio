@@ -9,7 +9,7 @@ const CATEGORIAS = [
   { id:"placa_video", nome:"Placa de vídeo" },
 ];
 
-// Este módulo só altera uma cópia em memória. A integração com builds salvas virá depois dos testes.
+
 export function iniciarTesteMelhorias({builds,catalogo,valorBudget,informar}) {
   const seletor = document.querySelector("#upgrade-build");
   const resultados = document.querySelector("#upgrade-results");

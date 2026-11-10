@@ -23,7 +23,7 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
   const consulta = form.querySelector('button[type="submit"]');
   const requisitos = iniciarRequisitosBuild(raiz,{prefixo,buildId,cliente,publica});
   iniciarDetalhesAnimados(raiz);
-  // Uma só interface de dados: trocar o layout não recria o DOM nem consulta a API.
+
   const aplicarInterface = opcao => {
     if (!opcao?.matches('input[name="fpshq-layout"]') || !["cards","panel","compact"].includes(opcao.value)) return;
     painel.dataset.layout = opcao.value;

@@ -1,5 +1,5 @@
-// Registro explícito: nunca remove sufixos F/K/X/G nem troca uma GPU por outra.
-// O backend só aceita o resultado se o provedor confirmar os dois IDs exatos.
+
+
 const cpus = new Map([
   ["Ryzen 5 5600","ryzen-5-5600"], ["Ryzen 7 5700X","ryzen-7-5700x"],
   ["Ryzen 5 7600","ryzen-5-7600"], ["Ryzen 7 7700X","ryzen-7-7700x"],
@@ -30,10 +30,8 @@ export function hardwareBenchmark(cpu,gpu) {
 }
 
 export function hardwareBlender(cpu,gpu) {
-  // Open Data identifica o chip, não o nome comercial da placa (EAGLE, DUAL,
-  // SHADOW etc.). Isso é independente do registro de slugs da API de jogos.
-  // Só extrai identificadores explícitos: a API Python ainda exige nome exato
-  // na resposta. Nunca remove Ti/SUPER/XT/F nem tenta uma peça parecida no 422.
+
+
   const nome = p => String(p?.modelo || "").replace(/\((?:R|TM)\)|[®™]/gi,"")
     .replace(/[‐‑–—]/g,"-").replace(/\s+/g," ").trim();
   const identificadores = (texto,expressao) => [...new Map([...texto.matchAll(expressao)]
@@ -56,8 +54,8 @@ export function hardwareBlender(cpu,gpu) {
     }
   }
   const modeloGpu = nome(gpu);
-  // Não tratar versões mobile, RX 580 2048SP ou títulos com vários chips como
-  // a GPU desktop padrão. Uma variante sem identificação continua indisponível.
+
+
   if (/\b(?:laptop|notebook|mobile|max-q|2048\s*sp)\b/i.test(modeloGpu)) return {cpu:nomeCpu,gpu:null};
   const padraoNvidia = /\b(RTX|GTX|GT)\s*(\d{3,4})(?:\s*(TI(?:\s*SUPER)?|SUPER))?\b/gi;
   const padraoAmd = /\bRX\s*(\d{3,4})(?:\s*(XTX|XT|GRE))?\b/gi;
@@ -65,8 +63,8 @@ export function hardwareBlender(cpu,gpu) {
   let nomeGpu = null;
   if (nvidias.length + amds.length === 1) {
     const nvidia = nvidias[0], m = nvidia || amds[0];
-    // Mantém a restrição já existente: não usar a referência 3060 de 12 GB
-    // para a variante de 8 GB (ou capacidade ausente), nem substituir por Ti.
+
+
     if (nvidia && m[1].toUpperCase() === "RTX" && m[2] === "3060" && !m[3] && Number(gpu.memoria_gb) !== 12)
       return {cpu:nomeCpu,gpu:null};
     const restante = modeloGpu.replace(nvidia ? padraoNvidia : padraoAmd,"");
