@@ -126,9 +126,9 @@ def historico_precos_oferta(categoria, peca_id, oferta_id):
 @login_required
 def historico_precos_peca(categoria, peca_id):
   try:
-    if request.args:
+    if set(request.args) - {"loja"}:
       raise ValueError("Esta consulta não aceita parâmetros adicionais")
-    dados = ConsultarHistoricoPrecosService().executar(categoria, peca_id)
+    dados = ConsultarHistoricoPrecosService().executar(categoria, peca_id, loja=request.args.get("loja"))
     resposta = jsonify(dados)
     resposta.headers["Cache-Control"] = "no-store"
     return resposta, 200

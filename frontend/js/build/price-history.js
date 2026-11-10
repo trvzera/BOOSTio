@@ -13,7 +13,7 @@ function instanteRegistro(valor) {
 }
 
 
-const nomesLojas = {kabum: "KaBuM!", mercado_livre: "Mercado Livre", shopee: "Shopee"};
+export const nomesLojas = {todas: "Todas as lojas · menor preço do dia", kabum: "KaBuM!", mercado_livre: "Mercado Livre", shopee: "Shopee"};
 
 export function normalizarHistoricoPrecos(registros, agora = Date.now(), lojaEsperada = "kabum") {
   if (!Array.isArray(registros)) return [];
@@ -22,7 +22,7 @@ export function normalizarHistoricoPrecos(registros, agora = Date.now(), lojaEsp
     if (!registro || typeof registro !== "object") continue;
     const instante = instanteRegistro(registro.data);
     const loja = typeof registro.loja === "string" ? registro.loja.trim().toLowerCase().replace(/!$/, "") : "";
-    if (!["kabum", "mercado_livre", "shopee"].includes(lojaEsperada) || loja !== lojaEsperada || typeof registro.preco !== "number" || !Number.isFinite(registro.preco) || registro.preco <= 0 || !Number.isFinite(instante) || instante > agora || registro.esgotado === true) continue;
+    if (!nomesLojas[lojaEsperada] || !["kabum", "mercado_livre", "shopee"].includes(loja) || (lojaEsperada !== "todas" && loja !== lojaEsperada) || typeof registro.preco !== "number" || !Number.isFinite(registro.preco) || registro.preco <= 0 || !Number.isFinite(instante) || instante > agora || registro.esgotado === true) continue;
     porInstante.set(instante, {instante, preco:registro.preco});
   }
   return [...porInstante.values()].sort((a, b) => a.instante - b.instante);

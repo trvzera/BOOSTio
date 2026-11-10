@@ -24,6 +24,13 @@ class HistoricoOferta(ModeloBase):
         return consulta.first()
 
     @classmethod
+    def listar_das_ofertas(cls, oferta_ids, limite):
+        if not oferta_ids:
+            return []
+        return cls.query.filter(cls.oferta_id.in_(oferta_ids)).order_by(
+            cls.coletado_em.desc(), cls.id.desc()).limit(limite + 1).all()
+
+    @classmethod
     def listar(cls, oferta_id, limite=1000):
         return cls.query.filter_by(oferta_id=oferta_id).order_by(
             cls.coletado_em.desc(), cls.id.desc()).limit(limite + 1).all()

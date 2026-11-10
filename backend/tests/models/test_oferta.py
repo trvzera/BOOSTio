@@ -73,3 +73,40 @@ def test_indisponibilidade_preserva_ultimo_preco_ou_ausencia_de_valor(banco):
     a = oferta(esgotado=True)
     b = oferta(produto_id_loja='456', esgotado=True, preco=Decimal('100.00'))
     assert a.preco is None and b.preco == Decimal('100.00')
+
+
+def ficha(*ofertas, preco=999.0):
+    return {'preco': preco, 'esgotado': None, 'preco_atualizado_em': None, 'ofertas': list(ofertas)}
+
+
+def anuncio(id, loja, preco, esgotado=False):
+    return {'id': id, 'loja': loja, 'preco': preco, 'esgotado': esgotado, 'atualizadoEm': f'2026-11-10T00:00:{id:02d}+00:00'}
+
+
+def test_catalogo_mostra_so_o_anuncio_mais_barato_de_cada_loja():
+    peca = ficha(anuncio(1, 'shopee', 300.0), anuncio(2, 'shopee', 250.0), anuncio(3, 'shopee', 280.0),
+                 anuncio(4, 'mercado_livre', 400.0), anuncio(5, 'mercado_livre', 390.0))
+    Oferta._manter_mais_barata_por_loja(peca)
+    assert [(o['loja'], o['id']) for o in peca['ofertas']] == [('shopee', 2), ('mercado_livre', 5)]
+
+
+def test_preco_de_referencia_e_o_menor_entre_todas_as_lojas():
+    peca = ficha(anuncio(1, 'kabum', 500.0), anuncio(2, 'shopee', 250.0), anuncio(3, 'mercado_livre', 390.0))
+    Oferta._manter_mais_barata_por_loja(peca)
+    assert peca['preco'] == 250.0 and peca['esgotado'] is False
+    assert peca['preco_atualizado_em'] == '2026-11-10T00:00:02+00:00'
+
+
+def test_oferta_esgotada_so_vira_referencia_se_nao_houver_disponivel():
+    peca = ficha(anuncio(1, 'kabum', 100.0, esgotado=True), anuncio(2, 'mercado_livre', 390.0))
+    Oferta._manter_mais_barata_por_loja(peca)
+    assert peca['preco'] == 390.0
+    assim = ficha(anuncio(1, 'kabum', 100.0, esgotado=True), anuncio(2, 'mercado_livre', 90.0, esgotado=True))
+    Oferta._manter_mais_barata_por_loja(assim)
+    assert assim['preco'] == 90.0 and assim['esgotado'] is True
+
+
+def test_sem_ofertas_mantem_o_preco_da_peca():
+    peca = ficha(preco=123.0)
+    Oferta._manter_mais_barata_por_loja(peca)
+    assert peca['preco'] == 123.0 and peca['ofertas'] == []
