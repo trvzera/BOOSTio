@@ -22,5 +22,10 @@ class ListarCatalogoBuildService:
             return _guardado["catalogo"]
 
     @staticmethod
+    def limpar_cache():
+        with _trava:
+            _guardado["catalogo"] = None
+
+    @staticmethod
     def _montar():
         return Oferta.anexar_a_catalogo([peca.to_catalogo() for modelo in MODELOS_PECAS for peca in modelo.listar_publicadas()])
