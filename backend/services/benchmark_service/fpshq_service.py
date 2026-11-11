@@ -87,7 +87,7 @@ class FpshqService:
         try:
             resposta = self.buscar(
                 self.BASE_URL + caminho, params={**parametros, "lang": "pt"},
-                headers={"Accept": "application/json", "User-Agent": "BOOSTio/1.0 (benchmark)"}, timeout=(4, 10),
+                headers={"Accept": "application/json", "User-Agent": "BOOSTio/1.0 (benchmark)"}, timeout=(10, 30),
                 allow_redirects=False,
             )
         except requests.Timeout as causa:
