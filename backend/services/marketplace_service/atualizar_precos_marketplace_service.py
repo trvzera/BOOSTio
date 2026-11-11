@@ -2,22 +2,20 @@ import time
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
 
-import requests
-
-from models import Oferta
-from services.marketplace_service.controle_requisicoes_service import executar_requisicao
+from models import Oferta, VinculoMercadoLivre
 from services.marketplace_service.erros import FalhaMarketplace
+from services.mercadolivre_service.buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
+from services.mercadolivre_service.controle_requisicoes_service import ErroMercadoLivre
 from services.mercadolivre_service.token_mercado_livre_service import TokenMercadoLivreService
 from services.shopee_service.cliente_service import ClienteShopeeService
 
 LOJAS = ('mercado_livre', 'shopee')
 ITENS_POR_CHAMADA = 20
-URL_ITENS = 'https://api.mercadolibre.com/items'
 
 
 class AtualizarPrecosMarketplaceService:
-    def __init__(self, http=None, cliente_shopee=None, token=None):
-        self.http = http or requests
+    def __init__(self, cliente_ml=None, cliente_shopee=None, token=None):
+        self.cliente_ml = cliente_ml
         self.cliente_shopee = cliente_shopee
         self.token = token
 
@@ -40,50 +38,39 @@ class AtualizarPrecosMarketplaceService:
         return resumo
 
     def _mercado_livre(self, ofertas, agora, resumo, simular):
-        for inicio in range(0, len(ofertas), ITENS_POR_CHAMADA):
-            lote = ofertas[inicio:inicio + ITENS_POR_CHAMADA]
-            itens = self._consultar_itens([o.produto_id_loja for o in lote])
+        por_peca = {}
+        for oferta in ofertas:
+            por_peca.setdefault((oferta.tabela_peca, oferta.peca_id), []).append(oferta)
+        cliente = self.cliente_ml or BuscarOfertasMercadoLivreService()
+        token = self.token or TokenMercadoLivreService().executar()
+        for (tabela, peca_id), lote in por_peca.items():
+            anuncios = self._anuncios_do_catalogo(cliente, VinculoMercadoLivre.buscar(tabela, peca_id), token)
             for oferta in lote:
-                resposta = itens.get(oferta.produto_id_loja)
-                if resposta is None:
+                if anuncios is None:
                     resumo['sem_retorno'] += 1
-                elif isinstance(resposta, dict) and resposta.get('code') == 404:
-                    resumo['ausentes'] += 1
-                    if not simular:
-                        oferta.desativar()
-                elif (not isinstance(resposta, dict) or resposta.get('code') != 200 or not isinstance(resposta.get('body'), dict)
-                      or resposta['body'].get('id') != oferta.produto_id_loja):
-                    resumo['sem_retorno'] += 1
+                elif oferta.produto_id_loja in anuncios:
+                    anuncio = anuncios[oferta.produto_id_loja]
+                    self._gravar(oferta, anuncio['preco'], anuncio['esgotado'], agora, resumo, simular)
                 else:
-                    self._gravar(oferta, resposta['body'].get('price'), self._esgotado_ml(resposta['body']), agora, resumo, simular)
+                    # Anúncio que saiu da lista do catálogo: mantém o último preço, mas fica esgotado.
+                    resumo['ausentes'] += 1
+                    self._gravar(oferta, oferta.preco, True, agora, resumo, simular)
             if not simular:
                 Oferta.confirmar_coletas()
 
-    def _consultar_itens(self, ids):
-        token = self.token or TokenMercadoLivreService().executar()
-        resposta = executar_requisicao(lambda: self._requisitar(ids, token), loja='mercado_livre')
-        return dict(zip(ids, resposta))
-
-    def _requisitar(self, ids, token):
-        try:
-            resposta = self.http.get(URL_ITENS, params={'ids': ','.join(ids), 'attributes': 'id,price,available_quantity,status'},
-                                     headers={'Authorization': f'Bearer {token}', 'Accept': 'application/json'},
-                                     timeout=(10, 30), allow_redirects=False)
-        except requests.RequestException:
-            raise FalhaMarketplace(temporaria=True) from None
-        if resposta.status_code != 200:
-            raise FalhaMarketplace(resposta.status_code, resposta.headers.get('Retry-After'))
-        dados = resposta.json(parse_float=Decimal)
-        if not isinstance(dados, list):
-            raise ValueError('Formato de resposta inválido no Mercado Livre')
-        return dados
-
     @staticmethod
-    def _esgotado_ml(item):
-        quantidade = item.get('available_quantity')
-        if item.get('status') not in (None, 'active'):
-            return True
-        return quantidade == 0 if type(quantidade) is int and quantidade >= 0 else None
+    def _anuncios_do_catalogo(cliente, vinculo, token):
+        if vinculo is None:
+            return None
+        try:
+            ofertas = cliente.executar(vinculo.catalogo_id, access_token=token)['ofertas']
+        except ErroMercadoLivre as erro:
+            if erro.status in (401, 403, 429) or erro.status >= 500:
+                raise FalhaMarketplace(erro.status) from None
+            return None
+        except ValueError:
+            return None
+        return {oferta['produto_id_loja']: oferta for oferta in ofertas}
 
     def _shopee(self, ofertas, agora, resumo, simular):
         cliente = self.cliente_shopee or ClienteShopeeService()
