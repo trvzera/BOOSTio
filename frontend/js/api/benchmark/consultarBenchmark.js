@@ -3,7 +3,7 @@ import { erroConexao } from "../_shared/erros-conexao.js";
 
 const SLUG = /^[a-z0-9-]{1,190}$/;
 const BUILD_ID = /^(?:s-)?[1-9][0-9]{0,17}$/;
-export function criarClienteBenchmark({requisitar = fetchComErro,timeoutMs = 25000} = {}) {
+export function criarClienteBenchmark({requisitar = fetchComErro,timeoutMs = 45000} = {}) {
   async function enviar(rota,parametros,{signal} = {}) {
     const controle = new AbortController();
     const cancelar = () => controle.abort();

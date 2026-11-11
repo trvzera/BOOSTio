@@ -5,6 +5,9 @@ import { resultadoDesempenhoHtml,resolucoesHtml } from "./view.js";
 import { definirDetalheAberto,iniciarDetalhesAnimados } from "../components/animated-details.js";
 import { iniciarRequisitosBuild } from "./requisitos.js";
 
+const MENSAGENS_CONSULTA = ["Consultando desempenho…","Conectando à FPSHQ…","Buscando as medições do jogo…","Cruzando com a sua CPU e GPU…","A FPSHQ pode levar alguns segundos, estamos aguardando…","Quase lá, finalizando a consulta…"];
+const MENSAGENS_BUSCA = ["Buscando jogos…","Procurando na FPSHQ…","Organizando os resultados…","A FPSHQ pode levar alguns segundos…"];
+
 export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERENCIA_FPS,buildId = null,publica = false,cliente = criarClienteBenchmark()} = {}) {
   const localizar = seletor => raiz.querySelector(seletor.replaceAll("#fpshq-","#" + prefixo + "-"));
   const form = localizar("#fpshq-test-form");
@@ -34,6 +37,13 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
   const informar = (mensagem,tom = "info",alvo = feedback) => {
     alvo.textContent = mensagem; alvo.dataset.tone = tom; alvo.hidden = !mensagem;
   };
+  let rotacao;
+  function mensagensEmSequencia(mensagens,alvo = feedback) {
+    clearInterval(rotacao);
+    let posicao = 0;
+    informar(mensagens[0],"info",alvo);
+    rotacao = setInterval(() => { posicao = Math.min(posicao + 1,mensagens.length - 1); informar(mensagens[posicao],"info",alvo); },3000);
+  }
   function incluirJogos(jogos) {
     for (const item of jogos) {
       if ([...jogo.options].some(opcao => opcao.value === item.slug)) continue;
@@ -59,6 +69,7 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
   }
   function atualizarFonte(url = "https://fpshq.com/pt/api/") { fonte.href = url; }
   function tratarErro(erro,alvo = feedback) {
+    clearInterval(rotacao);
     informar(erro.message,"error",alvo);
     if (erro.espera > 0) {
       ocupado = true; acaoAtual = "espera";
@@ -96,7 +107,7 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
     if (ocupado || hardware.motivo || !form.reportValidity()) return;
     const atual = ++versao;
     ocupado = true; acaoAtual = "consulta"; controles(); resultado.hidden = true; resultado.setAttribute("aria-busy","true");
-    informar("Consultando desempenho…");
+    mensagensEmSequencia(MENSAGENS_CONSULTA);
     try {
       if (requisitos) {
         const ficha = await requisitos.verificar(jogo.value);
@@ -107,10 +118,11 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
         }
       }
       const dados = await cliente.consultar({...hardware,game:jogo.value,res:res.value,preset:preset.value},{signal:controle.signal});
+      clearInterval(rotacao);
       if (ativo && atual === versao) { renderizar(dados); informar(""); }
       ocupado = false; acaoAtual = "";
     } catch (erro) { ocupado = false; acaoAtual = ""; if (ativo && atual === versao) tratarErro(erro); }
-    finally { ocupado = false; if (acaoAtual === "consulta") acaoAtual = ""; if (acaoAtual === "espera") ocupado = true; resultado.setAttribute("aria-busy","false"); controles(); }
+    finally { clearInterval(rotacao); ocupado = false; if (acaoAtual === "consulta") acaoAtual = ""; if (acaoAtual === "espera") ocupado = true; resultado.setAttribute("aria-busy","false"); controles(); }
   });
   buscar.addEventListener("click",async () => {
     if (ocupado) return;
@@ -118,9 +130,10 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
     limparResultado(); mostrarAviso(false); informar("");
     resultadosBusca.hidden = true; resultadosBusca.replaceChildren();
     ocupado = true; acaoAtual = "busca"; controles();
-    informar("Buscando jogos…","info",feedbackBusca);
+    mensagensEmSequencia(MENSAGENS_BUSCA,feedbackBusca);
     try {
       const jogos = await cliente.buscarJogos(textoBusca.value,{signal:controle.signal});
+      clearInterval(rotacao);
       if (ativo && atual === versaoBusca) {
         incluirJogos(jogos);
         resultadosBusca.innerHTML = jogos.map(item => '<li><button type="button" data-fpshq-game="' + h(item.slug) + '" aria-label="Selecionar ' + h(item.name) + '">' + h(item.name) + '<span aria-hidden="true">→</span></button></li>').join("");
@@ -146,5 +159,5 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
   textoBusca.addEventListener("keydown",evento => { if (evento.key === "Enter") { evento.preventDefault(); buscar.click(); } });
   controles();
   if (hardware.motivo) informar(hardware.motivo);
-  return () => { ativo = false; versao++; versaoBusca++; clearInterval(cooldown); controle.abort(); requisitos?.destruir(); };
+  return () => { ativo = false; versao++; versaoBusca++; clearInterval(cooldown); clearInterval(rotacao); controle.abort(); requisitos?.destruir(); };
 }

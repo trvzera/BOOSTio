@@ -113,7 +113,7 @@ def test_normaliza_e_preserva_ausencias_sem_aprovar_requisitos():
     assert resultado["ramAvaliada"] is False
     assert "verdict" not in resultado
     assert api.buscar.call_args.kwargs["allow_redirects"] is False
-    assert api.buscar.call_args.kwargs["timeout"] == (4, 10)
+    assert api.buscar.call_args.kwargs["timeout"] == (10, 30)
 
 
 @pytest.mark.parametrize("alteracao", [{"cpu": {"slug": "outra"}}, {"cpu": None}, {"gpu": None}, {"game": {"slug": "outro"}}, {"res": "4K"}, {"preset": "low"}])
