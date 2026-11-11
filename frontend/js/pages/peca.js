@@ -11,6 +11,8 @@ import { salvarAlteracaoLocal } from "../build/autosalvar.js";
 import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta } from "../build/conta.js";
 import { ajudaCategorias } from "../build/uso-formulario.js";
 import { cartoesOfertasHtml } from "../build/ofertas-peca.js";
+import { carregarPerfil } from "../conta/perfil.js";
+import { removerOferta } from "../api/admin/ofertas.js";
 import { obterHistoricoDaPeca } from "../build/carregar-historico-precos.js";
 import { historicoPrecosHtml, iniciarHistoricoPrecos, nomesLojas } from "../build/price-history.js";
 
@@ -25,6 +27,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const categoria = categorias.find((c) => c.id === peca.categoria);
     let build = conta ? await carregarBuildConta(parametros.get("build")) : abrirBuild(new URLSearchParams({ id: parametros.get("build") || "" }));
     if (!conta) guardarRascunho(build);
+    const administrador = Boolean((await carregarPerfil().catch(() => null))?.usuario?.administrador);
     const destaques = destaquesFichaTecnica(peca);
     const gruposTecnicos = gruposFichaTecnica(peca);
     const preco = informacoesPreco(peca,conta);
@@ -46,7 +49,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       '<button type="button" id="add-product" class="btn-primary" aria-label="Adicionar à build: ' + h(nomePeca(peca)) + '" ' + (motivo ? 'disabled data-disabled-reason="' + h(motivo) + '"' : "") + '>' + iconeAnimado("plus") + 'Adicionar à build</button>' +
       '<p class="font-2-xs summary-note">' + h(motivo || "Não encontramos novos problemas com as peças escolhidas nas verificações disponíveis. Quando faltar informação, confira com o fabricante.") + '</p></div></section>' +
       '<section class="product-stores" aria-labelledby="stores-title"><h2 class="font-1-l" id="stores-title">Onde comprar</h2><p class="font-2-xs summary-note">Confira preço, estoque e o modelo exato na loja. As buscas não representam ofertas confirmadas.</p><div class="store-grid">' +
-      cartoesOfertasHtml(peca) + '</div></section>' +
+      cartoesOfertasHtml(peca,{administrador}) + '</div></section>' +
       historicoPrecosHtml(peca) +
       '<section class="product-specifications glass-card" aria-labelledby="spec-title"><h2 class="font-1-l" id="spec-title">Informações técnicas</h2>' +
       '<p class="font-2-xs summary-note product-specifications-note">Estas são as informações cadastradas deste modelo. Usamos esses dados para verificar sua montagem. Se uma informação estiver faltando, não podemos confirmar que as peças combinam nesse ponto. O consumo de energia é uma estimativa, não uma medição do computador ligado.</p>' +
@@ -61,6 +64,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       try { abrirCompraBuild({...build,componentes:{[peca.categoria]:{id:peca.id,quantidade:1}}},catalogo,{loja:ofertasPeca(peca)[indice].codigo}); }
       catch(erro) { avisar(erro.message); }
     })));
+    main.querySelectorAll("[data-remover-oferta]").forEach(botao => botao.addEventListener("click", async () => {
+      if (!confirm("Remover esta oferta do site? Ela deixa de aparecer, de contar no preço e de ser atualizada.")) return;
+      botao.disabled = true;
+      try {
+        await removerOferta(botao.dataset.removerOferta);
+        botao.closest(".store-card").remove();
+        avisar("Oferta removida. O preço de referência é atualizado em até 1 minuto.");
+      } catch (erro) { botao.disabled = false; avisar(erro.message || "Não foi possível remover a oferta."); }
+    }));
     iniciarIcones(main);
     iniciarHistoricoPrecos(main, peca);
     if (conta) {

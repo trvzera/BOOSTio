@@ -118,6 +118,7 @@ export function ofertasPeca(peca) {
     const valor = oferta?.preco;
     const preco = valor != null && valor !== "" && Number.isFinite(Number(valor)) && Number(valor) >= 0 ? Number(valor) : null;
     return {...loja,url,direta,preco,atualizadoEm:oferta?.atualizadoEm || null,esgotado:oferta?.esgotado === true,
+      ofertaId:Number.isSafeInteger(oferta?.id) && oferta.id > 0 ? oferta.id : null,
       logo:new URL("../../svgs/" + logos[loja.codigo],import.meta.url).href};
   });
   const vistas = new Set();

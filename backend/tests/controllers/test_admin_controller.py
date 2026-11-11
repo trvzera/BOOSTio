@@ -551,3 +551,31 @@ def test_ia_nao_escolhe_candidata_ocupada_e_rejeita_quando_todas_estao_ocupadas(
     from services.admin_service.sugerir_pendencia_service import SugerirPendenciaService
     contexto = SugerirPendenciaService._contexto(mista)
     assert [c['peca'] for c in contexto['candidatas']] == [f'hd:{livre.id}']
+
+
+def _oferta_para_remover(p):
+    oferta = Oferta(tabela_peca='processador', peca_id=p.id, loja='shopee', produto_id_loja='1:2',
+                    url='https://shopee.com.br/product/1/2', preco=Decimal('500.00'))
+    db.session.add(oferta)
+    db.session.commit()
+    return oferta
+
+
+def test_administrador_remove_oferta_e_ela_sai_das_ofertas_ativas(banco):
+    app, admin, _, p5500, _ = banco
+    oferta = _oferta_para_remover(p5500)
+    resposta = entrar(app, admin).post(f'/admin/ofertas/{oferta.id}/remover')
+    assert resposta.status_code == 200 and resposta.get_json()['ativa'] is False
+    assert Oferta.listar_para_atualizar('shopee', datetime.utcnow()) == []
+
+
+def test_remover_oferta_exige_administrador(banco):
+    app, _, comum, p5500, _ = banco
+    oferta = _oferta_para_remover(p5500)
+    assert entrar(app, comum).post(f'/admin/ofertas/{oferta.id}/remover').status_code == 403
+    assert db.session.get(Oferta, oferta.id).ativa is True
+
+
+def test_remover_oferta_inexistente_retorna_404(banco):
+    app, admin, *_ = banco
+    assert entrar(app, admin).post('/admin/ofertas/9999/remover').status_code == 404

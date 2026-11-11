@@ -300,6 +300,17 @@ atualização, antes de subir o código novo: sem a coluna, o login quebra.
 - **O que protege de verdade é o servidor:** toda rota `/admin/*` usa `@login_required` e `@apenas_administrador`
   (401 sem login, 403 sem o papel) e as ações de escrita exigem o token CSRF como no resto do site.
 
+### Remover oferta
+
+Na página de uma peça, quem é administrador vê o botão **Remover oferta** em cada loja que tem preço cadastrado.
+Serve para tirar do site um anúncio que não existe mais. A oferta é só desativada (`oferta.ativa = false`, sem apagar
+linha nem histórico): ela some do catálogo, deixa de contar no preço de referência e deixa de ser atualizada pelos
+comandos de preço. O catálogo guardado em cache é limpo na hora.
+
+| Rota | O que faz |
+| --- | --- |
+| `POST /admin/ofertas/<id>/remover` | Desativa a oferta (404 se não existir; 403 sem o papel de administrador). |
+
 ### Pendências
 
 Lista os anúncios de `produto_pendente` (por padrão `em_revisao`), com filtros de situação, loja e categoria.

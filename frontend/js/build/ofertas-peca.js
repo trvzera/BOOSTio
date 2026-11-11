@@ -1,6 +1,12 @@
 import { ofertasPeca, moeda, htmlSeguro as h } from "./catalogo.js";
 
-export function cartoesOfertasHtml(peca) {
+function botaoRemover(oferta, administrador) {
+  const id = oferta.marketplace ? oferta.id : oferta.ofertaId;
+  if (!administrador || !Number.isSafeInteger(id) || id <= 0 || oferta.preco == null) return "";
+  return '<button type="button" class="btn-ghost" data-remover-oferta="' + id + '" aria-label="Remover a oferta da ' + h(oferta.loja) + ' do site">Remover oferta</button>';
+}
+
+export function cartoesOfertasHtml(peca, {administrador = false} = {}) {
   return ofertasPeca(peca).map(oferta => {
     const marca = oferta.logo ? '<img class="store-logo" src="' + h(oferta.logo) + '" alt="' + h(oferta.loja) + '"><span class="store-name font-1-m-b" hidden>' + h(oferta.loja) + '</span>'
       : '<span class="store-name font-1-m-b">' + h(oferta.loja) + '</span>';
@@ -13,6 +19,6 @@ export function cartoesOfertasHtml(peca) {
       (oferta.preco != null ? '<strong class="store-price">' + moeda(oferta.preco) + '</strong>' : '<span class="store-price-unavailable">Preço ainda não cadastrado</span>') +
       '<p class="font-2-xs">' + h(descricao) + '</p>' + data + '<a class="btn-ghost" href="' + h(oferta.url) + '" target="_blank" rel="noopener noreferrer" aria-label="' +
       h((oferta.direta ? "Conferir oferta na " : "Buscar na ") + oferta.loja + (oferta.vendedor ? " · " + oferta.vendedor : "")) + '">' +
-      (oferta.direta ? "Conferir na loja" : "Buscar na loja") + '</a></article>';
+      (oferta.direta ? "Conferir na loja" : "Buscar na loja") + '</a>' + botaoRemover(oferta, administrador) + '</article>';
   }).join("");
 }

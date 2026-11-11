@@ -84,6 +84,14 @@ class Oferta(ModeloBase):
         self.ativa = False
 
     @classmethod
+    def retirar_do_catalogo(cls, oferta_id):
+        oferta = db.session.get(cls, oferta_id)
+        if oferta is not None and oferta.ativa:
+            oferta.desativar()
+            db.session.commit()
+        return oferta
+
+    @classmethod
     def confirmar_coletas(cls):
         db.session.commit()
 
