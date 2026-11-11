@@ -1,0 +1,11 @@
+[Unit]
+Description=BOOSTio - atualizar precos de Mercado Livre e Shopee diariamente as 04h de Brasilia
+
+[Timer]
+OnCalendar=*-*-* 04:00:00 America/Sao_Paulo
+Persistent=true
+AccuracySec=1min
+Unit=boostio-precos-marketplaces.service
+
+[Install]
+WantedBy=timers.target
