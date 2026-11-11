@@ -153,3 +153,20 @@ migrações, suspenda a agenda e aguarde encerrar qualquer coleta em execução.
 O limite de três horas evita uma execução indefinida. Retomar após interrupção
 continua sujeito às reservas diárias da aplicação; não apague essas reservas
 para forçar requisições repetidas.
+
+### Preços do Mercado Livre e da Shopee
+
+O mesmo molde vale para as ofertas dessas lojas: `boostio-precos-marketplaces.timer`
+executa `deploy/atualizar_precos_marketplaces.sh` às **04h de Brasília**, uma hora
+depois da KaBuM, e roda `marketplaces-precos-atualizar --horas 20`. Só são
+consultadas as ofertas não consultadas nas últimas 20 horas, então uma execução
+interrompida retoma de onde parou. O limite do serviço é de seis horas.
+
+```bash
+sudo install -m 644 deploy/systemd/boostio-precos-marketplaces.service /etc/systemd/system/
+sudo install -m 644 deploy/systemd/boostio-precos-marketplaces.timer /etc/systemd/system/
+sudo systemd-analyze verify /etc/systemd/system/boostio-precos-marketplaces.service /etc/systemd/system/boostio-precos-marketplaces.timer
+sudo systemctl daemon-reload
+sudo systemctl enable --now boostio-precos-marketplaces.timer
+systemctl list-timers boostio-precos-marketplaces.timer --no-pager
+```
