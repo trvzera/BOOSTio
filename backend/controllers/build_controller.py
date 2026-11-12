@@ -145,7 +145,10 @@ def historico_precos_peca(categoria, peca_id):
 @build_bp.get("/catalogo")
 @login_required
 def catalogo_build():
-  return jsonify({"pecas": ListarCatalogoBuildService().executar()}),200
+  resposta = jsonify({"pecas": ListarCatalogoBuildService().executar()})
+  resposta.headers["Cache-Control"] = "private, max-age=60"
+  resposta.add_etag()
+  return resposta.make_conditional(request)
 
 
 @build_bp.post("/manual")

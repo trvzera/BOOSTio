@@ -31,7 +31,7 @@ class ConfigurarAcessoService:
     else:
       origens = [f"http://{host}:{porta}" for host in ("localhost", "127.0.0.1") for porta in (5500, 5501)]
     CORS(app, supports_credentials=True, origins=origens, expose_headers=["Retry-After"],
-         allow_headers=["Content-Type", "X-CSRF-Token"])
+         allow_headers=["Content-Type", "X-CSRF-Token"], max_age=7200)
 
   @staticmethod
   def _configurar_proxy(app):

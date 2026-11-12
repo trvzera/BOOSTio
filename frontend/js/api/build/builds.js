@@ -28,7 +28,7 @@ export function buscarBuild(id) {
 }
 
 export function catalogoBuilds(opcoes = {}) {
-  return fetchComErro("/build/catalogo", { ...opcoes, method: "GET", cache:"no-store" });
+  return fetchComErro("/build/catalogo", { ...opcoes, method: "GET" });
 }
 
 export function criarBuildManual(dados) {
