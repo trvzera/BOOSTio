@@ -58,3 +58,12 @@ def test_centavos_e_amostragem_limitada_nao_mudam_o_catalogo():
     assert plano["viavel"]
     assert len(dados["mouse"]) == 100
     assert len(plano["combinacoes"]) <= 12
+
+
+def test_sobra_de_orcamento_leva_a_conjuntos_melhores_e_nao_aos_mais_baratos():
+    dados = catalogo()
+    plano = PlanejarPerifericosService().executar(dados, Decimal("1000"))
+    totais = [c["total"] for c in plano["combinacoes"]]
+    notas = [c["pontuacao"] for c in plano["combinacoes"]]
+    assert notas == sorted(notas, reverse=True)
+    assert plano["combinacoes"][0]["total"] == max(totais) and plano["combinacoes"][0]["total"] > 800

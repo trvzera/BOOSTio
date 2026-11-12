@@ -1,9 +1,9 @@
 {
   "esquema:mysql": "bcc7e64a9b9a1b678bb3cc483c67657dc8c94655f0e953723bd5baeeb9e6941d",
   "esquema:sqlite": "22b665c4e690c0abe9678a5c7daec2ddde9a7018a019a69d44c57e0cd4ec36c6",
-  "prompt:custo_beneficio:0": "005c63b761542c7736c715c7b70af8af39189028ae6aca017264fa96657f37d4",
-  "prompt:custo_beneficio:20": "63003f675de379446234cead02c699a0efef315d7c61fa24bd354800de6a6bd6",
-  "prompt:desempenho:0": "aaa21c773f5740a6b286d3f6272c8fdab2097ce46f29d96ef03147c37e07f3b9",
-  "prompt:desempenho:20": "7b35104bfd66fd9796fedbfe2dbe1f2554f568931e0a4f5626bf2c2355797098",
+  "prompt:custo_beneficio:0": "1042620885462dd1f84a8320211285e867e984f7019cf9d7f56c484a7c1f7702",
+  "prompt:custo_beneficio:20": "e236ca98b4ec95fe218c87012c1766937f018022e7c777e5285ee0eb115abac7",
+  "prompt:desempenho:0": "e66d81cfbb2a4eec39dcdd90481cd6ccc863932aa08b85b03456cf0bd6356206",
+  "prompt:desempenho:20": "bcba773ddc750261cddb3d6535c6b81f06f2ace168f9124f9c1154e83808b05c",
   "seed": "3fb646e43da31888b61c4f4ce34d2fb8abaedc233f6b1d1cf6c2040ce53e303a"
 }
