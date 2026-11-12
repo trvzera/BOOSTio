@@ -47,7 +47,6 @@ class ControleRequisicoesService:
                 if erro.status != 429 or tentativa == 2:
                     raise
                 pausa = max(erro.espera, 2 ** tentativa + self.jitter())
-                # Pausas maiores exigem nova execução; não ignorar Retry-After longo.
                 if pausa > 60:
                     raise
                 self.dormir(pausa)

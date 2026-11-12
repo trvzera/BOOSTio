@@ -1,4 +1,4 @@
-// Exclusivo do laboratório: não importar este cliente nas páginas de produção.
+
 import { erroConexao } from "../api/_shared/erros-conexao.js";
 export const FPSHQ_BASE = "https://fpshq.com/api/public/v1/";
 export const REFERENCIA_FPS = Object.freeze({cpu:"ryzen-5-5600",gpu:"rtx-3060"});
@@ -37,7 +37,7 @@ export function normalizarResultado(dados,consulta) {
     confianca:["high","medium","low"].includes(dados.confidence) ? dados.confidence : null,
     matriz:Object.fromEntries(["1080p","1440p","4K"].map(res => [res,
       Object.fromEntries(["low","medium","high","ultra"].map(preset => [preset,finito(dados.matrix?.[res]?.[preset])]))])),
-    // O verdict da API usa 1080p High, não necessariamente a escolha atual. Não o reutilizar.
+
     url:"https://fpshq.com/pt/games/" + consulta.game + "/",
   };
 }
@@ -48,7 +48,7 @@ export function criarClienteFPSHQ({fetcher = (...args) => fetch(...args),agora =
     try {
       const item = memoria.get(chave) || JSON.parse(armazenamento?.getItem(chave) || "null");
       if (item && Number.isFinite(item.data) && item.data <= agora() && agora() - item.data < TTL) return item;
-    } catch { /* Armazenamento indisponível não impede uma consulta explícita. */ }
+    } catch {   }
     return null;
   }
   async function requisitar(caminho,parametros,{signal} = {}) {
@@ -85,7 +85,7 @@ export function criarClienteFPSHQ({fetcher = (...args) => fetch(...args),agora =
         if (dados?.ok !== true) throw new ErroFPSHQ("Não há dados disponíveis para esta consulta.","sem-dados");
         const item = {dados,data:agora()};
         memoria.set(chave,item);
-        try { armazenamento?.setItem(chave,JSON.stringify(item)); } catch { /* Cache em memória permanece ativo. */ }
+        try { armazenamento?.setItem(chave,JSON.stringify(item)); } catch {   }
         return {...item,cache:false};
       } catch (erro) {
         if (erro instanceof ErroFPSHQ) throw erro;

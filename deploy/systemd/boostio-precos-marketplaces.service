@@ -1,0 +1,13 @@
+[Unit]
+Description=BOOSTio - atualizar precos das ofertas do Mercado Livre e da Shopee
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+ConditionPathExists=/opt/BOOSTio/.env.production
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/BOOSTio
+ExecStart=/usr/bin/bash /opt/BOOSTio/deploy/atualizar_precos_marketplaces.sh
+TimeoutStartSec=6h
+Nice=10

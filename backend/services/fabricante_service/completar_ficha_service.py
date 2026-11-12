@@ -1,4 +1,3 @@
-"""Complementa a ficha pelo fabricante com as mesmas regras de associação."""
 import os
 import re
 from types import SimpleNamespace

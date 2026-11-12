@@ -119,7 +119,7 @@ def test_carregamento_real_em_lotes_encontra_peca_apos_2000():
             assert indice.avaliar(remoto())['peca'] == f'processador:{alvo.id}'
             assert Processador.query.count() == 2101
             alvo_id = alvo.id
-            db.session.commit()  # Simula persistência do diagnóstico anterior.
+            db.session.commit()
             from sqlalchemy import event
             consultas = []
             def contar(*args):

@@ -5,11 +5,8 @@ _instalar_compat_oferta()
 from models import Usuario
 from werkzeug.security import generate_password_hash
 
-#fixture coloca o retorno na função que a chama(so passar o nome da func no parametro)
 @pytest.fixture
 def mock_usuario_salvar(mocker):
-    #mocker.patch é onde aponto para função do db que vou querer simular(não mexe no db de verdade)
-    #qualquer codigo de chamar Usuario.salvar, vai estar mockado durante o funcionamento da func
     return mocker.patch("models.usuario.Usuario.salvar")
 
 
@@ -33,7 +30,6 @@ def usuario_fake_com_senha():
 
 @pytest.fixture
 def mock_atualizar_dados_sem_commit(mocker):
-    # deixa atualizar_dados rodar de verdade, só mocka o commit interno dele
     mocker.patch("models.usuario.db.session.commit")
 
 

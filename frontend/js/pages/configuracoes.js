@@ -1,5 +1,5 @@
-// Entry point da página de configurações (pages/configuracoes.html):
-// edição de perfil, troca de senha e exclusão de conta.
+
+
 import "../header.js";
 import "./budget-perfil.js";
 import "./experiencia-perfil.js";
@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (value.length >= 8) score++;
       if (/[A-Z]/.test(value) && /[a-z]/.test(value)) score++;
       if (/\d/.test(value) && /[^A-Za-z0-9]/.test(value)) score++;
-      return score; // 0 a 3
+      return score;
     }
 
     function updateStrengthBars(score) {
@@ -253,7 +253,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       await atualizarQuantidadeBuilds();
     }
 
-    // --- Modal de verificação de e-mail ---
+
     const modalVerificacao = document.querySelector("#verify-email-modal");
     const fluxoVerificacao = iniciarFluxoVerificacaoEmail({
       modal:modalVerificacao,enviar:enviarEmailVerificar,confirmar:conferirEmailVerificar,

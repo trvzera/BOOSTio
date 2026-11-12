@@ -1,4 +1,4 @@
-/* Seções acompanham o conteúdo; não ficam limitadas a 100vh em landscape. */
+
 #main-page {
   height: auto;
   min-height: 100vh;
@@ -28,7 +28,7 @@
 @media (max-width: 950px) {
   #about-container { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 32px; }
   #text-about { align-items: center; text-align: center; }
-  /* Integra o fundo preto do vídeo/poster ao azul da seção, sem formar um retângulo. */
+
   #pc-video { width: min(380px, 100%); mix-blend-mode: screen; }
   #about-line { display: none; }
 }
@@ -36,7 +36,7 @@
   #main-page { padding-bottom: 96px; }
   #about-container { padding-block: 56px; gap: 24px; }
 }
-/* Tamanhos de título do layout original, sem reduzir o container com scale(). */
+
 @media (max-width: 1400px) { #main-title { font-size: 3.4rem; } #main-description { width: 50%; font-size: 1rem; } #text-about .about-title { font-size: 2.2rem; } #text-about p { font-size: .9rem; } }
 @media (max-width: 1000px) { #main-title { font-size: 2.6rem; } #main-description { width: 60%; font-size: .8rem; } #text-about .about-title { font-size: 2rem; } #text-about p { font-size: .8rem; } }
 @media (max-width: 950px) { #text-about .about-title { font-size: 2.3rem; } #text-about p { font-size: 1rem; } }

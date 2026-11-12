@@ -5,7 +5,6 @@ from . import db, ModeloBase
 
 
 class ConsultaPreco(ModeloBase):
-    """Uma tentativa reservada antes da rede; falhas também contam no orçamento."""
 
     __tablename__ = "consulta_preco"
     tabela_peca = db.Column(db.String(40), nullable=False)
@@ -58,7 +57,6 @@ class ConsultaPreco(ModeloBase):
 
 
 class ControleColeta(db.Model):
-    """Linha única usada para serializar reservas concorrentes no banco."""
 
     __tablename__ = "controle_coleta"
     id = db.Column(db.Integer, primary_key=True)

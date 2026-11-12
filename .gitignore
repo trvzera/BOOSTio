@@ -54,3 +54,8 @@ testes.html
 
 # Snapshot público reproduzível pelo comando dataset-pecas-baixar.
 
+
+# Gerados em execução
+/database/*.lock
+/.codex-attachments/
+/.vscode/

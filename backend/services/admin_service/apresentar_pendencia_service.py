@@ -1,5 +1,5 @@
-"""Formato de uma pendência para o painel de administração; não decide nada."""
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
+from .catalogo_ocupado import catalogo_que_ocupa_a_peca
 
 
 def apresentar_pendencia(pendencia, *, detalhado=False):
@@ -19,7 +19,7 @@ def apresentar_pendencia(pendencia, *, detalhado=False):
         "sugestao_ia": _sugestao(pendencia, detalhado),
     }
     if detalhado:
-        dados["candidatos"] = [_candidato(c) for c in candidatos]
+        dados["candidatos"] = [_candidato(c, pendencia) for c in candidatos]
         dados["decisao"] = (pendencia.evidencias or {}).get("revisao_manual")
     return dados
 
@@ -57,18 +57,18 @@ _FICHA = (("capacidade_gb", "{} GB"), ("tipo", "{}"), ("interface", "{}"), ("for
 
 
 def resumir_ficha(peca):
-    """Resumo do que a peça já tem na ficha; o que falta simplesmente não aparece."""
     return [texto.format(getattr(peca, campo)) for campo, texto in _FICHA
             if peca is not None and getattr(peca, campo, None) not in (None, "")]
 
 
-def _candidato(candidato):
+def _candidato(candidato, pendencia):
     referencia = str(candidato.get("peca", ""))
     categoria, _, identificador = referencia.partition(":")
     modelo = next((m for m in MODELOS_PECAS if m.__tablename__ == categoria), None)
     peca = modelo.buscar_por_id(int(identificador)) if modelo and identificador.isdecimal() else None
     return {
         "peca": referencia,
+        "vinculada_a_outro_catalogo": catalogo_que_ocupa_a_peca(pendencia, peca),
         "percentual": candidato.get("percentual"),
         "conflitos": candidato.get("conflitos", []),
         "pendencias": candidato.get("pendencias", []),

@@ -63,7 +63,7 @@ def test_modelo_e_titulo_com_sufixos_distintos_ficam_em_revisao(banco):
 
 
 def test_revalida_oferta_original_antes_de_persistir(banco):
-    from repositories.especificacoes_peca_repository import preencher_especificacoes
+    from services.catalogo_service.gravar_especificacoes_peca_service import preencher_especificacoes
     from utils.identidade_peca import assinatura_peca
     p=memoria();d=dto(p)
     oferta=Oferta.query.filter_by(loja='kabum',produto_id_loja='123').one()

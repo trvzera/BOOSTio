@@ -1,6 +1,6 @@
 import { htmlSeguro } from "./catalogo.js";
 
-// Metadado da resposta da API: nunca é enviado como autoria numa gravação.
+
 export function autoriaBuildHtml(build) {
   const nome = typeof build?.criador?.nome === "string" ? build.criador.nome.trim() : "";
   if (!nome) return "";

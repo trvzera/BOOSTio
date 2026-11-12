@@ -1,4 +1,3 @@
-"""Agendamento e checkpoint duráveis, separados do processo da API."""
 from datetime import datetime, timezone
 from . import db, ModeloBase
 from utils.identidade_peca import assinatura_documento

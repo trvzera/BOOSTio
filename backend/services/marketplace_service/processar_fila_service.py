@@ -1,4 +1,3 @@
-"""Uma tarefa por ciclo; recuperação após crash sob trava por marketplace."""
 from datetime import timedelta
 import hashlib
 import json
@@ -34,7 +33,6 @@ class ProcessarFilaMarketplaceService:
     def enfileirar(self, loja, tipo, dados, *, execucao):
         if loja not in LOJAS or (loja, tipo) not in self.executores:
             raise ValueError('Marketplace ou tarefa não suportados')
-        # Payloads são parâmetros administrativos: nunca aceitar tokens ou URL arbitrária.
         if not isinstance(dados, dict) or any(c in json.dumps(dados).lower() for c in ('secret', 'access_token', 'refresh_token', 'password', 'authorization')):
             raise ValueError('Dados da tarefa inválidos ou sensíveis')
         if not isinstance(execucao, str) or not 1 <= len(execucao) <= 100:
@@ -77,7 +75,6 @@ class ProcessarFilaMarketplaceService:
                     status = 'pendente'
                 else:
                     status = 'falhou'
-                # Temporários persistem com backoff limitado, sem loop apertado.
                 minimo = 60 if erro.status == 429 else 5
                 espera = max(erro.espera, min(3600, minimo * 2 ** min(tarefa['tentativas']-1, 10)))
                 if erro.status == 429:

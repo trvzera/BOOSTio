@@ -32,7 +32,6 @@ def registrar_comandos_catalogo_tecnico(app):
             if isinstance(documentos,dict):documentos=[documentos]
             if not isinstance(documentos,list) or not 1<=len(documentos)<=1000:raise ValueError('Informe entre 1 e 1000 fichas')
             service=ImportarBaseTecnicaService()
-            # Valida o formato de todo o arquivo antes da primeira gravação.
             documentos=[service.normalizar(d) for d in documentos]
             origens=[(d['provedor'],d['id_externo']) for d in documentos]
             if len(set(origens))!=len(origens):raise ValueError('Origem duplicada no lote; separe versões para revisão')

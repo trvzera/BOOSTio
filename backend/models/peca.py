@@ -3,10 +3,8 @@ from datetime import timezone
 from . import db
 from sqlalchemy.orm import declared_attr, validates
 from . import ModeloBase
-from .medidas_fisicas import completar_medidas
-from .imagens_referencia import imagem_referencia
-
-
+from utils.medidas_fisicas import completar_medidas
+from utils.imagens_referencia import imagem_referencia
 
 
 class Peca(ModeloBase):
@@ -23,8 +21,6 @@ class Peca(ModeloBase):
 
   ficha_montagem_validada = db.Column(db.Boolean(), nullable=True)
 
-  # NULL identifica exclusivamente os registros anteriores à migração.
-  # Legado preserva publicação sem afirmar que a ficha já foi auditada.
   status_validacao = db.Column(db.String(20), nullable=True, default='pendente', server_default='pendente')
   validacao_motivo = db.Column(db.Text, nullable=True)
   validado_em = db.Column(db.DateTime, nullable=True)
@@ -82,10 +78,6 @@ class Peca(ModeloBase):
 
   @classmethod
   def consulta_catalogo(cls):
-    """O que o site mostra e a montagem (manual e inteligente) pode usar: aprovada e com preço.
-
-    O preço vem das ofertas ativas; sem oferta com preço a peça não existe para o usuário.
-    """
     return cls.consulta_publicavel().filter(cls.preco > 0)
 
   @classmethod
@@ -102,25 +94,18 @@ class Peca(ModeloBase):
 
   @classmethod
   def fabricantes_para_descoberta(cls):
-    """Marcas por presença no catálogo publicável, com desempate estável."""
     from sqlalchemy import func
     return [linha[0] for linha in cls.consulta_publicavel().with_entities(
       cls.fabricante).group_by(cls.fabricante).order_by(
       func.count(cls.id).desc(), cls.fabricante).all() if linha[0] and linha[0].strip()]
 
-  @classmethod
-  def pool_para_matching(cls, limite=2001):
-    return cls.query.order_by(cls.id).limit(limite).all()
 
   @classmethod
   def iterar_para_matching(cls, tamanho_lote=500):
-    """Catálogo completo, incluindo fichas em revisão para detectar duplicatas."""
     if type(tamanho_lote) is not int or not 1 <= tamanho_lote <= 1000:
       raise ValueError('Tamanho do lote entre 1 e 1000')
     ultimo_id = 0
     while True:
-      # Materializa e fecha o cursor antes de consultar identidades. MySQL
-      # não permite outra consulta durante a leitura de cursor não bufferizado.
       lote = cls.query.filter(cls.id > ultimo_id).order_by(cls.id).limit(tamanho_lote).all()
       if not lote:
         return
@@ -130,7 +115,6 @@ class Peca(ModeloBase):
   @classmethod
   def lote_para_identificadores(cls, depois_id=0, limite=100):
     return cls.query.filter(cls.id > depois_id).order_by(cls.id).limit(limite).all()
-
 
 
   @classmethod
@@ -175,7 +159,6 @@ class Peca(ModeloBase):
     dados["categoria"] = self.__tablename__
     dados["link"] = self.kabum_external
     data = self.preco_atualizado_em
-    # As coletas gravam UTC sem tzinfo no SQLite; o contrato explicita o fuso.
     if data and data.tzinfo is None:
       data = data.replace(tzinfo=timezone.utc)
     dados["preco_atualizado_em"] = data.isoformat() if data else None
@@ -188,53 +171,55 @@ class Peca(ModeloBase):
     db.session.commit()
 
   @classmethod
-  def cadastrar_ausentes(cls, itens):
-    from utils.codigos_peca import separar_codigos
-    novos = []
-    try:
-      for original in itens:
-        original = dict(original)
-        oferta = {campo: original.pop(campo, None) for campo in cls.CAMPOS_DA_OFERTA}
-        item = separar_codigos(original)
-        referencia, numero = item.get('referencia_interna'), item.get('part_number')
-        if referencia:
-          existente = cls.query.filter(db.or_(cls.referencia_interna == referencia, cls.part_number == referencia)).first()
-        elif numero:
-          existente = cls.query.filter_by(part_number=numero, fabricante=item['fabricante']).first()
-        else:
-          raise ValueError('Cadastro sem identificador estável')
-        if existente is None:
-          existente = cls(status_validacao='legado', **{k:v for k,v in item.items() if k != 'status_validacao'})
-          db.session.add(existente)
-          db.session.flush()
-          if oferta['kabum_external']:
-            from repositories.ofertas_kabum_repository import gravar_cotacao_inicial
-            gravar_cotacao_inicial(existente, oferta['kabum_external'], oferta['preco'],
-                                   oferta['esgotado'], oferta['preco_atualizado_em'])
-          novos.append(existente)
-      db.session.commit()
-    except Exception:
-      db.session.rollback()
-      raise
-    return len(novos)
-  
-
-  @classmethod
   def mostrar_pecas(cls):
     return cls.query.all()
+
+  @classmethod
+  def aprovar_ids(cls, ids, motivo, validado_em):
+    return cls.query.filter(cls.id.in_(ids), cls.status_validacao == "em_revisao").update(
+      {"status_validacao": "aprovado", "validacao_motivo": motivo, "validado_em": validado_em},
+      synchronize_session=False)
+
+  @classmethod
+  def consultar_aprovadas_sem_oferta(cls, motivo):
+    from models import Oferta
+    com_oferta = db.session.query(Oferta.peca_id).filter(Oferta.tabela_peca == cls.__tablename__)
+    return cls.query.filter(cls.status_validacao == "aprovado", cls.validacao_motivo == motivo,
+                            ~cls.id.in_(com_oferta))
+
+  @classmethod
+  def listar_por_ids(cls, ids):
+    return cls.query.filter(cls.id.in_(ids)).all()
+
+  @classmethod
+  def iterar_todas(cls, lote=500):
+    return cls.query.yield_per(lote)
+
+  @classmethod
+  def buscar_por_codigo(cls, codigo):
+    return cls.query.filter(db.or_(cls.referencia_interna == codigo, cls.part_number == codigo)).first()
+
+  @classmethod
+  def buscar_por_part_number(cls, part_number, fabricante):
+    return cls.query.filter_by(part_number=part_number, fabricante=fabricante).first()
+
+  @classmethod
+  def listar_por_codigos(cls, codigos):
+    return cls.query.filter(db.or_(cls.part_number.in_(codigos), cls.referencia_interna.in_(codigos))).all()
+
+  @classmethod
+  def listar_por_link_kabum(cls, url):
+    return cls.query.filter(cls.kabum_external == url).all()
 
   @classmethod
   def listar_disponiveis_ate(cls, preco_maximo: float, limite: int = 30):
     pecas = cls.listar_candidatos_disponiveis(preco_maximo)
     if len(pecas) <= limite:
       return pecas
-    # Distribui as opções pela faixa de preços, sem enviar o catálogo inteiro ao LLM.
     return [pecas[indice * (len(pecas) - 1) // (limite - 1)] for indice in range(limite)]
-
 
 
   @classmethod
   def listar_candidatos_disponiveis(cls, preco_maximo):
-    """Pool completo para planejamento; não aplica corte/amostragem prematuros."""
     return (cls.consulta_para_montagem().filter(cls.preco > 0, cls.preco <= preco_maximo, cls.esgotado.is_(False))
             .order_by(cls.preco.asc(), cls.id.asc()).all())

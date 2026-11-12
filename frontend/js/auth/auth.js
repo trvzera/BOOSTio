@@ -57,8 +57,8 @@ async function conferirSessao() {
   catch (erro) {
     console.warn("Não foi possível consultar a sessão do usuário:",erro);
     atualizarMenu(false);
-    // Falha de conexão não equivale a sair da conta. Não libera o conteúdo,
-    // não apaga o formulário e permite repetir a conferência sem novo login.
+
+
     if (privada) mostrarFalhaSessao(erro,conferirSessao);
   }
 }

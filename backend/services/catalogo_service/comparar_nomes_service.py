@@ -62,7 +62,6 @@ class CompararNomesService:
             lc=cpu(peca.modelo);rc=cpu(produto.titulo)
             exato=exato or bool(lc and lc==rc)
         if categoria=='placa_video':
-            # Chip e VRAM não distinguem edições comerciais da mesma montadora.
             generico=re.fullmatch(r'(?:(?:geforce|radeon|nvidia|amd))*?(?:rtx|gtx|rx|arc)[a-z]?\d{3,4}(?:ti|super|xt|xtx)*',local)
             if generico:exato=False
         similaridade=similaridade_chaves(local,chaves)

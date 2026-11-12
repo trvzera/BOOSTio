@@ -1,4 +1,3 @@
-"""Catálogos do Mercado Livre em dúvida viram pendência para revisão, como as ambíguas da Shopee."""
 import json
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -19,16 +18,17 @@ def _json_exato(valor):
 
 class RegistrarAmbiguosMercadoLivreService:
     def executar(self, categoria, ambiguos, cliente, token):
-        """Cada catálogo ambíguo entra pela sua oferta nova mais barata (o anúncio que o administrador verá)."""
         registradas = 0
         for item in ambiguos[:MAX_CATALOGOS]:
             produto, normal, decisao = item['produto'], item['normal'], item['decisao']
             try:
                 resultado = cliente.executar(produto['id'], access_token=token, produto=produto)
-            except (FalhaMarketplace, ErroMercadoLivre, OrcamentoRequisicoesEsgotado):
-                raise  # limite ou autorização: a fila decide a espera
+            except (FalhaMarketplace, ErroMercadoLivre, OrcamentoRequisicoesEsgotado) as erro:
+                if getattr(erro, 'status', None) in (404, 206):
+                    continue
+                raise
             except ValueError:
-                continue  # catálogo inativo ou formato inesperado: não vira pendência
+                continue
             novas = sorted((o for o in resultado['ofertas'] if o['condicao'] == 'new'),
                            key=lambda o: (o['preco'], o['vendedor_id'], o['produto_id_loja']))
             if not novas:
@@ -48,10 +48,10 @@ class RegistrarAmbiguosMercadoLivreService:
             ProdutoPendente.registrar_descobertos([linha], simular=False)
             pendente = ProdutoPendente.buscar_por_anuncio('mercado_livre', oferta['produto_id_loja'])
             if pendente is None:
-                continue  # o anúncio já é uma oferta (registrar_descobertos o contou como associado)
+                continue
             try:
                 ProdutoPendente.registrar_matching(pendente.id, decisao, assinatura_documento(pendente.dados_originais), simular=False)
                 registradas += 1
             except ValueError:
-                continue  # já importada ou rejeitada: a decisão anterior vale
+                continue
         return registradas

@@ -1,6 +1,6 @@
 from models import ProdutoPendente
 from services.marketplace_service.processar_fila_service import LOJAS
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from .apresentar_pendencia_service import apresentar_pendencia
 from .pendencias_acionaveis import ABERTAS, contar_acionaveis, ids_acionaveis
 

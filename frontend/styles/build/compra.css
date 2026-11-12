@@ -12,6 +12,8 @@
 .store-card > .btn-ghost { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; min-width: 0; min-height: 44px; margin-top: auto; padding: 10px 14px; border-color: #3395ff55; color: #91c6ff; font-size: .8125rem; white-space: normal; text-align: left; }
 .store-card > .btn-ghost span { flex-shrink: 0; }
 .store-card > .btn-ghost:focus-visible { outline: 2px solid var(--text-accent); outline-offset: 3px; }
+.store-card > .store-remove-offer { justify-content: center; margin-top: 0; border-color: #ff3b3040; color: #ff918a; font-size: .75rem; }
+.store-card > .store-remove-offer:hover:not(:disabled) { border-color: var(--status-error); background: var(--status-error-bg); color: #ffb4af; }
 .build-purchase-dialog { width: min(920px,calc(100vw - 32px)); max-height: calc(100dvh - 48px); padding: 0; overflow: hidden; }
 .build-purchase-dialog[open] { display: flex; flex-direction: column; }
 .build-purchase-dialog .build-action-heading { flex-shrink: 0; align-items: center; gap: 16px; margin: 0; padding: 22px 24px; border-bottom: 1px solid var(--cor-2); }

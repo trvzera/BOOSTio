@@ -1,4 +1,3 @@
-"""Baixa arquivos de uma revisão fixa; nunca executa o scraper da fonte."""
 import hashlib
 import json
 import os
@@ -40,6 +39,5 @@ class BaixarDatasetService:
                 (Path(pasta)/arquivo).write_bytes(corpo)
                 manifesto['arquivos'][arquivo]=dict(url=url,sha256=hashlib.sha256(corpo).hexdigest(),bytes=len(corpo))
             (Path(pasta)/'manifesto.json').write_text(json.dumps(manifesto,ensure_ascii=False,indent=2))
-            # Manifesto por último: se houver interrupção, os hashes recusam um snapshot misto.
             for arquivo in [*manifesto['arquivos'],'manifesto.json']:os.replace(Path(pasta)/arquivo,destino/arquivo)
         return manifesto

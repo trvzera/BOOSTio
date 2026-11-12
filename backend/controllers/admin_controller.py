@@ -8,6 +8,7 @@ from services.admin_service.descartar_candidato_service import DescartarCandidat
 from services.admin_service.detalhar_pendencia_service import DetalharPendenciaService
 from services.admin_service.listar_pendencias_service import ListarPendenciasService
 from services.admin_service.rejeitar_pendencia_service import RejeitarPendenciaService
+from services.admin_service.remover_oferta_service import RemoverOfertaService
 from services.admin_service.sugerir_pendencia_service import EnviarPendenciasParaIAService, listar_ids_para_ia
 from services.mercadolivre_service.controle_requisicoes_service import ErroMercadoLivre, OrcamentoRequisicoesEsgotado
 from utils.decorators import apenas_administrador
@@ -16,13 +17,11 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 
 def _responder(funcao):
-    """Traduz os erros dos services para HTTP; nenhuma mensagem de banco chega ao navegador."""
     try:
         resposta = jsonify(funcao())
         resposta.headers["Cache-Control"] = "no-store"
         return resposta, 200
     except (ErroMercadoLivre, OrcamentoRequisicoesEsgotado):
-        # Antes de ValueError, de que ambos herdam: é falha da loja, não da entrada do administrador.
         return jsonify({"erro": "O Mercado Livre não respondeu agora. Tente novamente em instantes.", "codigo": "loja-indisponivel"}), 502
     except ConflitoPendencia as erro:
         return jsonify({"erro": str(erro), "codigo": "conflito"}), 409
@@ -99,6 +98,13 @@ def rejeitar_pendencia(pendencia_id):
     corpo = request.get_json(silent=True) or {}
     motivo = corpo.get("motivo") if isinstance(corpo.get("motivo"), str) else None
     return _responder(lambda: RejeitarPendenciaService().executar(pendencia_id, current_user.id, motivo))
+
+
+@admin_bp.post("/ofertas/<int:oferta_id>/remover")
+@login_required
+@apenas_administrador
+def remover_oferta(oferta_id):
+    return _responder(lambda: RemoverOfertaService().executar(oferta_id))
 
 
 def _inteiro(valor):

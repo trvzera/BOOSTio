@@ -110,9 +110,9 @@ def test_sem_permissao_nao_consulta_icecat(banco,base):
 
 
 def test_falha_historico_reverte_peca_e_oferta(banco,base,monkeypatch):
-    from repositories.importacao_catalogo_repository import RepositorioImportacaoCatalogo
+    from services.catalogo_service.gravar_importacao_catalogo_service import GravarImportacaoCatalogoService
     def falhar(*a,**k):raise ValueError('Falha de persistência')
-    monkeypatch.setattr(RepositorioImportacaoCatalogo,'concluir',falhar)
+    monkeypatch.setattr(GravarImportacaoCatalogoService,'concluir',falhar)
     with pytest.raises(ValueError):importar(base).executar(banco.id,simular=False,permitir_novos=True)
     assert HD.query.count()==Oferta.query.filter(Oferta.loja!='kabum').count()==HistoricoOferta.query.count()==0
 
@@ -143,7 +143,6 @@ def test_indice_bloqueia_entidades_externas(tmp_path):
 
 
 def test_ram_representacoes_gb_mb_observadas_na_ficha_real():
-    # Estrutura e rótulos conferidos na ficha oficial Icecat 14532212.
     corpo=b'''<ICECAT-interface><Product ID="14532212" Name="ValueRAM" Prod_id="KVR16N11/8">
     <Supplier Name="Kingston Technology"/><Category ID="911"><Name Value="Memory Modules"/></Category>
     <ProductFeature Presentation_Value="8 GB"><Feature><Name Value="Internal memory"/></Feature></ProductFeature>

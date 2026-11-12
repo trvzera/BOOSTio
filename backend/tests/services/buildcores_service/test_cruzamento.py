@@ -6,7 +6,7 @@ import pytest
 from flask import Flask
 from sqlalchemy import null
 from models import db,ControleColeta,Processador,Oferta
-from repositories.enriquecimento_buildcores_repository import RepositorioEnriquecimentoBuildcores
+from services.buildcores_service.gravar_enriquecimento_buildcores_service import GravarEnriquecimentoBuildcoresService
 from services.buildcores_service.cruzar_catalogo_service import CruzarCatalogoBuildcoresService
 from services.buildcores_service.normalizar_ficha_service import NormalizarFichaBuildcoresService
 from services.buildcores_service.comparar_fichas_service import CompararFichasBuildcoresService,chave_modelo
@@ -47,7 +47,7 @@ def test_simulacao_aplicacao_repeticao_sem_publicar_ou_criar(banco,tmp_path):
     r=s.executar(tmp_path,simular=False)
     assert r['atualizadas']==1 and banco.thread==12 and banco.soquete=='AM4'
     assert banco.videointegrado is False
-    assert banco.cooler is banco.part_number is None  # Box/Tray não identificado no docyx.
+    assert banco.cooler is banco.part_number is None
     assert banco.preco is None and banco.status_validacao=='em_revisao' and banco.ficha_montagem_validada is True
     assert Processador.query.count()==1 and Oferta.query.filter(Oferta.loja!='kabum').count()==0
     fontes=deepcopy(banco.fontes_especificacoes)
@@ -91,7 +91,7 @@ def test_identificadores_e_zeros_nao_viram_fatos():
 
 
 def test_nao_perde_atualizacao_concorrente(banco,tmp_path):
-    snapshot(tmp_path);repo=RepositorioEnriquecimentoBuildcores();p=repo.listar()[0]
+    snapshot(tmp_path);repo=GravarEnriquecimentoBuildcoresService();p=repo.listar()[0]
     banco.nucleo=8;db.session.commit()
     r=repo.aplicar_lote([dict(**{k:p[k] for k in ('id','categoria','assinatura')},alteracoes={'thread':12},fontes={'thread':{'url':'https://example.org'}})],simular=False)
     assert r[0]['acao']=='conflito_concorrencia' and banco.thread is None
@@ -115,11 +115,10 @@ def test_ram_preserva_kit_cor_e_frequencia():
 
 
 def test_falha_no_lote_reverte_campos_e_proveniencia(banco,tmp_path):
-    snapshot(tmp_path);repo=RepositorioEnriquecimentoBuildcores();p=repo.listar()[0]
+    snapshot(tmp_path);repo=GravarEnriquecimentoBuildcoresService();p=repo.listar()[0]
     inicial=deepcopy(banco.fontes_especificacoes)
     primeira=dict(id=p['id'],categoria=p['categoria'],assinatura=p['assinatura'],alteracoes={'thread':12},fontes={'thread':{'url':'https://example.org'}})
     segunda={**primeira,'assinatura':p['assinatura']}
-    # Falha deliberada antes de confirmar o lote, após a primeira alteração.
     from unittest.mock import patch
     with patch.object(db.session,'flush',side_effect=ValueError('Falha de persistência')):
         with pytest.raises(ValueError):repo.aplicar_lote([primeira,segunda],simular=False)

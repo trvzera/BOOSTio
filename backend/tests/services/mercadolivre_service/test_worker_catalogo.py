@@ -46,7 +46,6 @@ def test_worker_percorre_fases_retoma_e_so_publica_com_opcao(banco,tmp_path):
     trabalhos=plano(tmp_path)
     with patch.object(BuscarOfertasMercadoLivreService,'_requisitar',api),patch.object(TokenMercadoLivreService,'executar',return_value='teste'),patch('services.mercadolivre_service.processar_catalogo_service.ControleRequisicoesCatalogo') as cls:
         cls.side_effect=lambda *args: ControleRequisicoesCatalogo(*args)
-        # A espera é pequena e restrita ao transporte simulado.
         for fase in ('descoberta','classificacao','enriquecimento','importacao'):
             r=ProcessarCatalogoService().executar(trabalhos,simular=False,permitir_novos=True)
             assert r['status']=='concluido' and r['fase']==fase, r

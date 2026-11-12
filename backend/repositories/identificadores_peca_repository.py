@@ -1,4 +1,3 @@
-"""Migração transacional de identificadores, preservando a identidade das peças."""
 from sqlalchemy import MetaData, Table, inspect, select, update
 from flask import g
 from models import db, Oferta, IdentidadeFabricante
@@ -55,11 +54,10 @@ def separar_identificadores(peca, *, simular=True, ids_ambiguos=None):
             if tabela.name != 'identidade_fabricante' or registro['assinatura_peca'] != antiga:
                 continue
             specs = registro['especificacoes']
-            # Conferir contra a identidade anterior, antes de mover sua referência.
             from types import SimpleNamespace
             anterior = SimpleNamespace(**{c.name: getattr(peca, c.name) for c in peca.__table__.columns})
             anterior.part_number = numero
-            if (not codigo_interno(registro['mpn']) and IdentidadeFabricante._conferem(anterior, specs)
+            if (not codigo_interno(registro['mpn']) and IdentidadeFabricante.conferem(anterior, specs)
                     and (not numero or codigo_interno(numero))):
                 peca.part_number = registro['mpn']
         reassinar_vinculos(peca, vinculos, antiga, numero)

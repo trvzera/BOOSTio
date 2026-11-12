@@ -45,7 +45,6 @@ def test_simulacao_preserva_banco_e_aplicar_e_idempotente(banco):
     legada(p, 'KABUM-175110')
     antes = p.id, p.preco, p.esgotado, p.kabum_external
     r = separar_identificadores(p)
-    # O link da peça já é uma oferta da KaBuM; separar identificadores não cria outra.
     assert r['alterada'] and r['oferta'] == 'inalterada'
     assert Oferta.query.count() == 1
     assert p.part_number == 'KABUM-175110' and p.referencia_interna is None

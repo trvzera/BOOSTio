@@ -1,11 +1,11 @@
-"""Converte referências genéricas somente usando sua oferta original comprovada."""
 import re
 import json
 from pathlib import Path
 from types import SimpleNamespace
 from dataclasses import replace
 from sqlalchemy.exc import SQLAlchemyError
-from models import PlacaVideo, Oferta, RevisaoIdentidadePeca
+from models import PlacaVideo, Oferta
+from .aplicar_revisao_identidade_service import AplicarRevisaoIdentidadeService
 from utils.identidade_peca import assinatura_tecnica
 from services.catalogo_service.normalizar_produto import variante, nome
 from services.catalogo_service.conferir_especificacoes_service import ConferirEspecificacoesService
@@ -64,7 +64,7 @@ class ConverterReferenciasGpuService:
                 cursor=p.id
                 try:
                     if not self.generica(p):resumo['inalteradas']+=1;continue
-                    from models.medidas_fisicas import produto_kabum
+                    from utils.medidas_fisicas import produto_kabum
                     ident=produto_kabum(p.kabum_external);arquivo=pasta/f'kabum-{ident}.json'
                     if not ident or not arquivo.is_file():
                         resultado=dict(status='revisao',motivo='Ficha original ausente')
@@ -73,7 +73,7 @@ class ConverterReferenciasGpuService:
                         dto=NormalizarFichaKabumService().executar(json.loads(arquivo.read_text()),'placa_video',codigo_esperado=ident)
                         dto=replace(dto,contexto={**dto.contexto,'origem_peca':f'placa_video:{p.id}'})
                         proposta=self.preparar(p,dto)
-                        resultado=RevisaoIdentidadePeca.aplicar(p,proposta,simular=simular) if proposta['status']=='proposta' else proposta
+                        resultado=AplicarRevisaoIdentidadeService().executar(p,proposta,simular=simular) if proposta['status']=='proposta' else proposta
                     chave={'proposta':'propostas','convertida':'convertidas','inalterada':'inalteradas'}.get(resultado['status'],resultado['status'])
                     resumo[chave]+=1;resumo['detalhes'].append({'peca':f'placa_video:{cursor}',**resultado})
                 except (ValueError,TypeError,OSError,SQLAlchemyError):

@@ -1,14 +1,10 @@
-"""Textos de busca de uma peça, iguais para qualquer loja: MPN, nome comercial limpo e nome original."""
 import re
 
 from models import IdentidadeFabricante
 
 
 def consultas_da_peca(peca):
-    """MPN, nome comercial limpo e nome original; nunca remove variantes."""
     modelo = str(peca.modelo or '').strip()
-    # Só retira blocos descritivos que contêm unidades técnicas. Não apaga
-    # sufixos de modelo, capacidade, Ti, SUPER, XT ou notebook fora deles.
     limpo = re.sub(r'\[([^\]]*)\]', lambda m: '' if re.search(
         r'\b(?:gb|tb|mhz|ghz|sata|nvme|ddr[345])\b', m[1], re.I) else m[0], modelo)
     capacidade = getattr(peca, 'capacidade_gb', None)
@@ -29,5 +25,4 @@ def mpn_da_peca(peca):
     from flask import has_app_context
     verificada = IdentidadeFabricante.buscar(peca) if has_app_context() else None
     codigo = verificada.mpn if verificada else str(peca.part_number or '').strip()
-    # Identificadores internos da seed não são códigos do fabricante.
     return None if not codigo or re.match(r'^(SEED|DEMO|BOOSTIO|REDE|KABUM)[-_]', codigo, re.I) else codigo

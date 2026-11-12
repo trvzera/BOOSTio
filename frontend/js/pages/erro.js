@@ -32,7 +32,7 @@ tituloElemento.textContent = erro.titulo;
 descricaoElemento.textContent = erro.descricao;
 document.title = `${codigo} — ${erro.titulo}`;
 
-// Sem uma origem distinta do início, não oferece dois botões para o mesmo destino.
+
 const voltar = document.querySelector("#error-back");
 try {
   const nav = window.navigation;

@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded",async () => {
       if(!acao || desfazendo || document.querySelector('dialog[open],.modal-overlay.open') || historico.motivo(build,acao))return;
       evento.preventDefault();void moverHistorico(acao);
     });
-    // Um resumo mais alto que a tela precisa poder subir ao rolar até as ações.
+
     const observarResumo = typeof ResizeObserver === "function" ? new ResizeObserver(entradas => {
       for (const {target} of entradas) {
         const altura = Math.ceil(target.getBoundingClientRect().height) + "px";
@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded",async () => {
     function renderizar(recriarOpcoes = false) {
       observarResumo?.disconnect();
       const valoresAnteriores = capturarValores(main);
-      // Preserva o checkbox e sua instância Lottie durante as atualizações da build.
+
       const opcoes = recriarOpcoes ? null : main.querySelector(".builder-options");
       const detalhesAbertos = main.querySelector(".summary-metadata")?.open;
       const resultado = avaliarBuild(build,catalogo);

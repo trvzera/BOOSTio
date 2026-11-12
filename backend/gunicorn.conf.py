@@ -15,9 +15,7 @@ preload_app = False
 reload = False
 accesslog = "-"
 errorlog = "-"
-# Não registrar query strings: o callback OAuth contém um código temporário.
 access_log_format = '%(h)s %(m)s %(U)s %(s)s %(L)s'
-# O tratamento de X-Forwarded-Proto fica centralizado no ProxyFix configurado.
 secure_scheme_headers = {}
 
 if min(workers, threads, timeout, graceful_timeout) < 1:

@@ -1,4 +1,3 @@
-"""Limitador durável compartilhado por processos e independente da loja."""
 from contextvars import ContextVar
 from datetime import datetime, timezone
 import math
@@ -31,8 +30,6 @@ def executar_requisicao(chamada, *, loja='mercado_livre'):
     from models import db
     from repositories.fila_marketplace_repository import RepositorioFilaMarketplace
     if not has_app_context() or not inspect(db.engine).has_table('limite_marketplace'):
-        # Compatibilidade durante o deploy: após preparar a fila, comandos
-        # antigos também compartilham o mesmo limite persistente.
         return chamada()
     repo = RepositorioFilaMarketplace()
     if not repo.preparado():
@@ -72,8 +69,6 @@ class ControleRequisicoesMarketplaceService:
                 raise self.erro
             if espera <= 0:
                 break
-            # Não segurar um worker dormindo em pausas longas: o scheduler
-            # conserva a tarefa no banco e deixa o outro marketplace trabalhar.
             if espera > self.intervalo and self.liberar_espera:
                 self.erro = FilaAguardando('Marketplace aguardando retomada')
                 raise self.erro
@@ -90,7 +85,8 @@ class ControleRequisicoesMarketplaceService:
                 falha = FalhaMarketplace(erro.status, getattr(erro, 'espera', 0))
             else:
                 raise
-            self.erro = falha
+            if falha.status not in (404, 206):
+                self.erro = falha
             if falha.status == 429:
                 repeticoes = self.repositorio.limitacoes(self.loja)
                 espera = max(falha.espera, min(3600, 60 * 2 ** min(repeticoes, 6)))

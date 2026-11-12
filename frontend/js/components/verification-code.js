@@ -1,4 +1,4 @@
-// Mantém a colagem nativa e distribui códigos completos, inclusive autofill de SMS.
+
 export function iniciarCodigoVerificacao(campos, aoAlterar) {
   const inputs = Array.from(campos);
   inputs.forEach((input, indice) => {

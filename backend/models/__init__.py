@@ -3,17 +3,13 @@ from flask_login import LoginManager
 from flask_mail import Mail
 
 
-#Importante iniciar antes de importar
 db = SQLAlchemy()
 
-#Iniciar o flask_login
 lm = LoginManager()
 
-#Iniciar o flask_mail
 mail = Mail()
 
 
-#Importar em ordem de heranca
 from .base import ModeloBase
 from .peca import Peca
 from .perifericos import Periferico
@@ -36,7 +32,6 @@ from .mouse import Mouse
 from .monitor import Monitor
 from .placa_rede import PlacaRede
 from .cabo_rede import CaboRede
-from .setup import Setup
 from .codigo import Codigo
 from .build import Build
 from .build_salva import BuildSalva
@@ -57,11 +52,9 @@ from .ficha_tecnica_catalogo import FichaTecnicaCatalogo, RevisaoFichaTecnica
 
 from .tarefa_marketplace import TarefaMarketplace, LimiteMarketplace
 
-# Preço e link das peças vêm das ofertas; depende de todos os models acima.
 from .preco_oferta import instalar_precos_derivados
 instalar_precos_derivados()
 
-#Funcão obrigatória para o login buscar informações do usuario pelo id
 @lm.user_loader
 def user_loader(id: str) -> Usuario | None:
     usuario = Usuario.buscar_por_sessao(id)
@@ -73,5 +66,5 @@ __all__ = [
     'Processador','PlacaMae','PlacaVideo','MemoriaRAM','SSD','HD',
     'Gabinete','WaterCooler','AirCooler','Fan','Fone','Teclado','Mouse','Monitor',
     'PlacaRede','CaboRede','RevisaoIdentidadePeca','FichaTecnicaCatalogo','RevisaoFichaTecnica',
-    'Setup','Codigo','TokenRecuperacao','Build','BuildSalva','ConsultaPreco','ControleColeta','HistoricoPreco','Oferta','ProdutoPendente','ExecucaoDescoberta','EstadoCatalogo','TokenIntegracao','VinculoMercadoLivre','HistoricoOferta','IdentidadeFabricante','AutorizacaoMercadoLivre'
+    'Codigo','TokenRecuperacao','Build','BuildSalva','ConsultaPreco','ControleColeta','HistoricoPreco','Oferta','ProdutoPendente','ExecucaoDescoberta','EstadoCatalogo','TokenIntegracao','VinculoMercadoLivre','HistoricoOferta','IdentidadeFabricante','AutorizacaoMercadoLivre'
 ]

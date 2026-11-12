@@ -49,7 +49,7 @@ def test_fonte_com_reserva_insuficiente_e_barrada():
 def test_campos_opcionais_nao_bloqueiam_minimos_mas_identidade_continua_separada():
     ram=MemoriaRAM(fabricante='Teste',modelo='RAM',capacidade_gb=16,ddr='DDR4',frequencia_mhz=3200,quantidade_pentes=2,formato='DIMM')
     assert pendencias_para_montagem(ram)==[]
-    ram.formato='SO-DIMM';assert pendencias_para_montagem(ram)==[]  # Formato conhecido; a build ainda deve confrontar o slot.
+    ram.formato='SO-DIMM';assert pendencias_para_montagem(ram)==[]
     ram.quantidade_pentes=None;assert 'quantidade_pentes' in pendencias_para_montagem(ram)
     hd=HD(fabricante='Teste',modelo='HD',capacidade_gb=500,interface='SATA')
     assert pendencias_para_montagem(hd)==[]

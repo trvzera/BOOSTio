@@ -105,7 +105,7 @@ export function abrirBuild(parametros = new URLSearchParams(location.search), co
       }
       nova.incluirPerifericos ||= perifericos.some(categoria => nova.componentes[categoria]);
       if (consumirFormulario) sessionStorage.removeItem("boostio:respostas-formulario");
-    } catch { /* Funciona também sem o formulário. */ }
+    } catch {   }
   }
   return normalizarBuild(nova);
 }
@@ -164,7 +164,7 @@ export function informacoesArmazenamento(build,catalogo) {
     capacidade:itens.reduce((n,{item,peca}) => n + Number(peca?.capacidade_gb || 0) * item.quantidade,0)};
 }
 export function resumoCapacidadeDiscos(info,catalogo=[]) {
-  // Apenas capacidade para exibição; não transforma peça própria em compra.
+
   const itens=info.itens.map(dado=>({...dado,peca:dado.peca || (dado.item.proprio?reconhecerPecaPropria(catalogo,dado.categoria,dado.item.proprio).peca:null)}));
   const conhecidos=itens.filter(({peca})=>typeof peca?.capacidade_gb==="number"&&Number.isFinite(peca.capacidade_gb)&&peca.capacidade_gb>0);
   if(!conhecidos.length)return "Capacidade não informada";
@@ -206,7 +206,7 @@ export function motivoSelecao(build,peca,catalogo) {
       if (!posicoesFans(gabinete) && (numeroConhecido(gabinete.quantidade_max_fans) == null || gabinete.tamanhos_fan_suportados_mm == null))
         return "Faltam a quantidade e os tamanhos dos encaixes do gabinete para adicionar mais fans.";
     }
-    return ""; // Encaixes e quantidade são avaliados com o gabinete.
+    return "";
   }
   if (peca.categoria !== "memoria_ram") {
     if (build.componentes[peca.categoria]) return "Remova a peça atual antes de adicionar outra nesta categoria.";

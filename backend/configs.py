@@ -5,11 +5,9 @@ from authlib.integrations.flask_client import OAuth
 
 load_dotenv()
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__)) #pasta backend/, usada para resolver o caminho do sqlite independente de onde o app é executado
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def resolver_uri_banco(uri):
-    #Caminho relativo do sqlite (ex: sqlite:///../database/banco.db) é resolvido pelo sqlite3 com base no cwd do processo, não no instance_path do Flask.
-    #Por isso convertemos para um caminho absoluto baseado neste arquivo, e garantimos que a pasta exista (o sqlite não cria diretórios sozinho).
     if uri and uri.startswith("sqlite:///") and not uri.startswith("sqlite:////"):
         caminho_relativo = uri[len("sqlite:///"):]
         caminho_absoluto = os.path.normpath(os.path.join(BASE_DIR, caminho_relativo))
@@ -18,7 +16,7 @@ def resolver_uri_banco(uri):
     return uri
 
 class Config:
-    SECRET_KEY = os.getenv("SECRET_KEY") #Sempre maiuscula, ate os nomes das variaveis se não o flask não reconhece
+    SECRET_KEY = os.getenv("SECRET_KEY")
     MAX_CONTENT_LENGTH = 64 * 1024
     MAX_FORM_MEMORY_SIZE = 16 * 1024
     MAX_FORM_PARTS = 20
@@ -32,7 +30,7 @@ class Config:
     MERCADO_LIVRE_CLIENT_SECRET = os.getenv("MERCADO_LIVRE_CLIENT_SECRET")
     CORS_ORIGINS = os.getenv("CORS_ORIGINS")
     SQLALCHEMY_DATABASE_URI = resolver_uri_banco(os.getenv("URL_DATABASE"))
-    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:5500/frontend") #Base usada para montar links enviados por email (ex: recuperar senha)
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:5500/frontend")
     
     MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.hostinger.com')
     MAIL_PORT = int(os.getenv('MAIL_PORT', '465'))
@@ -41,9 +39,11 @@ class Config:
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER') or MAIL_USERNAME
-    MAIL_MAX_EMAILS = None                 # limite de emails por conexão (None = sem limite)
-    MAIL_SUPPRESS_SEND = False             # se True, NÃO envia de verdade (usado em testes automatizados)
-    MAIL_ASCII_ATTACHMENTS = False         # força nomes de anexos em ASCII puro
+    MAIL_MAX_EMAILS = None
+    MAIL_SUPPRESS_SEND = False
+    MAIL_ASCII_ATTACHMENTS = False
+
+    CATALOGO_CACHE_SEGUNDOS = 0
 
 class Desenvolvimento(Config):
     SESSION_COOKIE_SAMESITE = 'Lax'
@@ -57,14 +57,13 @@ class Producao(Config):
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     RATELIMIT_STORAGE_URI = os.getenv("RATELIMIT_STORAGE_URI")
+    CATALOGO_CACHE_SEGUNDOS = int(os.getenv("CATALOGO_CACHE_SEGUNDOS", "60"))
 
 ambientes = {
     'producao': Producao,
     'desenvolvimento': Desenvolvimento
 }
 
-
-#Login google
 
 oauth = OAuth()
 

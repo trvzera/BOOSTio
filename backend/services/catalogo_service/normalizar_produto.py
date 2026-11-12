@@ -1,4 +1,3 @@
-"""Normalização conservadora de identidade; nunca remove números ou sufixos."""
 import re
 import unicodedata
 from decimal import Decimal, InvalidOperation

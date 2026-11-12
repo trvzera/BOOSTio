@@ -1,6 +1,5 @@
-"""Enriquecimento de lojas sem ficha própria, usando as mesmas bases técnicas."""
 from dataclasses import asdict
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from services.icecat_service.completar_ficha_icecat_service import CompletarFichaIcecatService
 from .extrair_dados_tecnicos_service import ExtrairDadosTecnicosService
 from .consultar_base_hardware_service import ConsultarBaseHardwareService

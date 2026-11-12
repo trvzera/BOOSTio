@@ -1,4 +1,3 @@
-"""Redução conservadora e amostragem determinística, sem acesso ao banco."""
 from decimal import Decimal
 from math import isfinite
 
@@ -81,7 +80,6 @@ class AmostraInteligenteService:
             preco = cls.numero(p['preco'])
             criterio = pontos / preco if prioridade == 'custo_beneficio' else pontos
             return (-criterio, preco, int(str(p['id']).split(':')[-1]))
-        # Ausência não vira pontuação: fallback usa preço, fora do ranking medido.
         return sorted(medidas, key=chave) + sorted(sem_medida, key=lambda p: (
             cls.numero(p['preco']), int(str(p['id']).split(':')[-1])))
 
@@ -106,7 +104,6 @@ class AmostraInteligenteService:
                 socket = normalizar_socket(p.get('soquete'))
                 if socket:
                     grupos.setdefault((socket, p.get("videointegrado")), p)
-            # A ordem é a do ranking, sem uma preferência fixa de fabricante.
             for p in grupos.values():
                 incluir(p)
         for faixa in ('entrada', 'intermediaria', 'superior'):
@@ -117,7 +114,6 @@ class AmostraInteligenteService:
             p = next((p for p in principal if PreferenciasCoresService.prioridade(p, cor) <= 1), None)
             if p:
                 incluir(p)
-        # Intercala os dois rankings; o resultado final mantém a ordenação solicitada.
         for a, b in zip(principal, secundario):
             incluir(a)
             incluir(b)

@@ -1,5 +1,4 @@
-import re
-from utils.identidade_peca import normalizar_identidade as normalizar, assinatura_peca
+from utils.identidade_peca import assinatura_peca
 from models import VinculoMercadoLivre, IdentidadeFabricante
 from services.catalogo_service.consultas_peca_service import consultas_da_peca, mpn_da_peca
 
@@ -19,7 +18,6 @@ class AssociarCatalogoService:
         return self._catalogo_local
 
     def localizar_candidatos(self, peca, cliente, token):
-        """Resultados remotos são independentes; cada um exige unicidade local."""
         from services.catalogo_service.associacao_inteligente_service import AssociacaoInteligenteService
         from .normalizar_produto_service import NormalizarProdutoService, DOMINIOS
         from utils.identidade_peca import assinatura_catalogo
@@ -67,10 +65,7 @@ class AssociarCatalogoService:
                         catalogos.append(dict(catalogo_id=produto['id'], assinatura=assinatura,
                             criterio=comparacao['criterio'], percentual=comparacao['percentual']))
                     elif decisao['classificacao'] == 'ambigua' and any(c['peca'] == referencia for c in decisao['candidatos']):
-                        # Como na Shopee: dúvida real que envolve esta peça vira pendência para revisão.
                         ambiguos.append(dict(produto=produto, normal=normal, decisao=decisao))
-                # Uma identidade comprovada já basta. Nunca paginar indefinidamente
-                # nem repetir páginas ignoradas pelo servidor.
                 if catalogos or not novos or len(linhas) < 20 or offset + len(linhas) >= total or offset >= 20:
                     break
                 offset += len(linhas)
@@ -121,7 +116,6 @@ class AssociarCatalogoService:
             return {'status': 'encontrada', 'catalogo_id': existente.catalogo_id,
                     'assinatura': assinatura, 'criterio': existente.criterio,
                     'assinatura_catalogo': existente.assinatura_catalogo}
-        # Busca textual produz candidatos, nunca prova identidade por si só.
         consulta = self._mpn(peca) or f'{peca.fabricante} {peca.modelo}'
         parametros = {'site_id': 'MLB', 'status': 'active', 'q': consulta, 'limit': 20}
         if peca.__tablename__ == 'processador':
@@ -164,11 +158,6 @@ class AssociarCatalogoService:
         verificada = IdentidadeFabricante.buscar(peca)
         identidade = {'mpn': verificada.mpn, 'gtin': verificada.gtin} if verificada else None
         return CompararProdutosService().avaliar(peca, produto, identidade=identidade)
-
-    @staticmethod
-    def comprova_mpn(peca, produto):
-        resultado = AssociarCatalogoService.comparar(peca, produto)
-        return resultado['classificacao'] == 'confirmada' and 'mpn' in resultado['evidencias']
 
     @staticmethod
     def comprova_identidade(peca, produto):

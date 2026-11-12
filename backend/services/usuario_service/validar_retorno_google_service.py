@@ -1,5 +1,3 @@
-"""Confere identidade e prazo do retorno Google; sessão e HTTP ficam no controller."""
-
 def validar_vinculo(usuario, vinculo, state, agora):
     if (not usuario.is_authenticated or usuario.get_id() != vinculo.get("sessao")
         or usuario.email != vinculo.get("email") or state != vinculo.get("state")

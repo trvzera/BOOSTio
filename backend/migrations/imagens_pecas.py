@@ -1,7 +1,7 @@
 from sqlalchemy import inspect, text
 
 from models import db
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 
 def migrar_imagens_pecas():

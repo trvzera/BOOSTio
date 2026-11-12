@@ -9,6 +9,7 @@ from requests.exceptions import RequestException, HTTPError, Timeout, Connection
 
 from services.build_service.listar_builds_service import ListarBuildService
 from services.build_service.erros_build import ErroGeracaoBuild
+from services.build_service.espera_ia_service import espera_do_provedor
 from services.build_service.planejamento_geracao import ErroPlanejamentoBuild
 from services.build_service.gerar_build_service import GerarBuildService
 from services.build_service.buscar_build_service import BuscarBuildService
@@ -87,8 +88,8 @@ def criar_build():
   except HTTPError as erro:
     if erro.response is not None and erro.response.status_code == 429:
       resposta = jsonify({"erro": "O serviço de montagem atingiu um limite temporário. Aguarde alguns instantes e tente novamente.", "codigo": "ia-limite"})
-      espera = erro.response.headers.get("Retry-After", "")
-      if espera.isascii() and espera.isdigit() and len(espera) <= 4 and 0 < int(espera) <= 3600:
+      espera = espera_do_provedor(erro)
+      if espera:
         resposta.headers["Retry-After"] = espera
       return resposta,503
     return jsonify({"erro": "O serviço de montagem está indisponível agora. Tente novamente mais tarde.", "codigo": "ia-provedor"}),502
@@ -125,9 +126,9 @@ def historico_precos_oferta(categoria, peca_id, oferta_id):
 @login_required
 def historico_precos_peca(categoria, peca_id):
   try:
-    if request.args:
+    if set(request.args) - {"loja"}:
       raise ValueError("Esta consulta não aceita parâmetros adicionais")
-    dados = ConsultarHistoricoPrecosService().executar(categoria, peca_id)
+    dados = ConsultarHistoricoPrecosService().executar(categoria, peca_id, loja=request.args.get("loja"))
     resposta = jsonify(dados)
     resposta.headers["Cache-Control"] = "no-store"
     return resposta, 200

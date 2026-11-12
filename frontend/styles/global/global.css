@@ -39,7 +39,7 @@ body {
   position: relative;
 }
 
-/* Mensagens e campos criados por JavaScript também herdam a identidade do site. */
+
 button, input, textarea, select, optgroup {
   font: inherit;
   color: inherit;
@@ -54,13 +54,13 @@ main {
   display: block;
 }
 
-/* Firefox */
+
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--cor-p1) var(--cor-1);
 }
 
-/* Chrome, Edge, Safari */
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;

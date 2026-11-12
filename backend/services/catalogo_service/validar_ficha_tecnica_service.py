@@ -1,5 +1,5 @@
 from types import SimpleNamespace
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from .associacao_inteligente_service import AssociacaoInteligenteService
 
 
@@ -9,7 +9,7 @@ class ValidarFichaTecnicaService:
         if classe is None:raise ValueError('Categoria inválida')
         ignorados={'id','criado_em','atualizado_em','status_validacao'}
         obrigatorios={c.name for c in classe.__table__.columns if not c.nullable and c.name not in ignorados}
-        from models.campos_tecnicos import CAMPOS_TECNICOS_OBRIGATORIOS
+        from utils.campos_tecnicos import CAMPOS_TECNICOS_OBRIGATORIOS
         obrigatorios.update(CAMPOS_TECNICOS_OBRIGATORIOS.get(categoria, ()))
         if finalidade not in ('comercial','catalogo'):raise ValueError('Finalidade inválida')
         if finalidade=='comercial':
@@ -32,7 +32,6 @@ class ValidarFichaTecnicaService:
                 conflitos.append('campo_protegido:'+campo)
                 continue
             if campo in classe.CAMPOS_DA_OFERTA:
-                # Preço e disponibilidade do anúncio seguem para a oferta, não para a ficha da peça.
                 if campo=='preco' and valor is not None and (type(valor) is bool or not isinstance(valor,(int,float,Decimal)) or not 0<valor<10**12):
                     conflitos.append('numero_invalido:'+campo)
                 continue

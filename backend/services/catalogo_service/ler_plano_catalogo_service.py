@@ -2,7 +2,7 @@ import json
 import math
 import re
 from pathlib import Path
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 
 def ler_plano(caminho):

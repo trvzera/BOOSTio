@@ -1,7 +1,7 @@
 import { buildsLocais, guardarRascunho, salvarNoPerfilLocal } from "./estado.js";
 import { avaliarBuild } from "./compatibilidade.js";
 
-// Chamado somente após uma alteração, nunca ao apenas abrir uma build vazia.
+
 export function salvarAlteracaoLocal(build,catalogo) {
   const salvas = buildsLocais(), existente = salvas.find(item => item.id === build.id);
   if (build.travada || existente?.travada) throw new Error("Destranque a build para salvar alterações.");

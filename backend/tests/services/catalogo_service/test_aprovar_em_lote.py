@@ -41,7 +41,7 @@ def test_aprova_so_quem_passa_nas_regras_e_explica_as_recusas(banco):
     assert c['recusadas'] == {'modelo_generico': 1, 'ficha_incompleta': 1, 'ficha_reprovada': 1,
                               'identidade_incompleta': 1, 'possivel_duplicata': 2}
     db.session.refresh(ok)
-    assert ok.status_validacao == 'em_revisao'  # simulação não grava
+    assert ok.status_validacao == 'em_revisao'
     r = AprovarEmLoteService().executar(categoria='processador', simular=False)
     assert r['total_aprovadas'] == 1
     for p in (ok, generico, incompleta, reprovada, sem_marca, dup_a, dup_b):

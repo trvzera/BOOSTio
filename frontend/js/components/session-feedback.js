@@ -1,4 +1,4 @@
-// Mantém o conteúdo privado bloqueado quando não é possível conferir a sessão.
+
 export function mostrarFalhaSessao(erro,tentarNovamente) {
   let dialogo=document.querySelector("#session-connection-dialog");
   if(!dialogo) {

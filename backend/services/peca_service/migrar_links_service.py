@@ -1,5 +1,5 @@
 from repositories.migracao_links_repository import MigracaoLinksRepository
-from .modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 
 
 class MigrarLinksService:

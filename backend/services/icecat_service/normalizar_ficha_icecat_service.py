@@ -1,4 +1,3 @@
-"""Converte somente campos estruturados da ficha inglesa, com evidência por campo."""
 import hashlib
 import re
 from defusedxml.ElementTree import fromstring
@@ -8,9 +7,8 @@ from services.catalogo_service.normalizar_produto import nome, numero, gtin
 
 
 class CategoriaIcecatIncompativel(ValueError):
-    """Candidato de outra categoria, não uma falha de leitura do lote."""
+    pass
 
-# Nomes da taxonomia inglesa da ficha XML. Rótulos desconhecidos ficam pendentes.
 CATEGORIAS = {
     'processador': {'processors'}, 'placa_video': {'graphics cards'},
     'memoria_ram': {'memory modules'}, 'placa_mae': {'motherboards'},
@@ -60,11 +58,27 @@ CAMPOS = {
     'teclado': {'Keyboard layout': ('layout', None), 'Keyboard key switch': ('mecanico', 'switch'), 'Device interface': ('conexao', None)},
     'monitor': {'Display diagonal': ('tamanho_polegadas', 'inch'), 'Display resolution': ('resolucao', None),
                 'Maximum refresh rate': ('taxa_atualizacao_hz', 'hz'), 'Panel type': ('tipo_painel', None)},
-    'fone': {'Product type': ('tipo', None), 'Microphone type': ('microfone', 'microfone')},
+    'fone': {'Product type': ('tipo', None), 'Microphone type': ('microfone', 'microfone'),
+             'Connectivity technology': ('conexao', None)},
     'cabo_rede': {'Cable standard': ('categoria', None), 'Cable length': ('comprimento_m', 'm')},
     'adaptador_wifi': {'Host interface': ('interface', 'interface'), 'Wi-Fi standards': ('padrao_wifi', None),
                        'Maximum data transfer rate': ('velocidade_mbps', 'mbps')},
 }
+
+
+PORTAS_MONITOR = {'HDMI ports quantity': 'hdmi', 'DisplayPorts quantity': 'displayport',
+                  'VGA (D-Sub) ports quantity': 'vga', 'DVI-D ports quantity': 'dvi'}
+
+
+def conexoes_do_monitor(atributos):
+    encontradas = set()
+    for atributo in atributos:
+        rotulo = atributo.find('./Feature/Name')
+        porta = PORTAS_MONITOR.get(rotulo.get('Value')) if rotulo is not None else None
+        quantidade = re.fullmatch(r'\d+', atributo.get('Presentation_Value', '').strip())
+        if porta and quantidade and int(quantidade[0]) > 0:
+            encontradas.add(porta)
+    return ', '.join(sorted(encontradas))
 
 
 def converter(valor, tipo):
@@ -155,11 +169,15 @@ class NormalizarFichaIcecatService:
             dados[campo] = valor
             fontes[campo] = dict(url=url, base='Icecat', sha256=sha, atributo=rotulo.get('Value'),
                                  feature_id=atributo.get('Feature_ID'), atualizado_na_origem=referencia['atualizado'])
+        if categoria == 'monitor':
+            conexao = conexoes_do_monitor(produto.findall('ProductFeature'))
+            if conexao:
+                dados['conexao'] = conexao
+                fontes['conexao'] = dict(url=url, base='Icecat', sha256=sha, atributo='Video ports quantity',
+                                         atualizado_na_origem=referencia['atualizado'])
         if categoria == 'ssd' and 'tipo' not in dados and 'sata' in nome(dados.get('interface')):
             dados['tipo'] = 'SATA'
             fontes['tipo'] = fontes['interface']
-        # As categorias de refrigeração compartilham taxonomia: requerem validação
-        # adicional para separar ventoinha, air cooler e water cooler.
         if categoria in ('fan', 'air_cooler', 'water_cooler'):
             conflitos.append('icecat_subtipo_refrigeracao_nao_confirmado')
         eans = {gtin(e.get('EAN')) for e in produto.findall('EANCode') if e.get('IsApproved')=='1' and gtin(e.get('EAN'))}

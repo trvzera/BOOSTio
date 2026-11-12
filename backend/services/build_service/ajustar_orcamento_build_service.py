@@ -1,4 +1,3 @@
-"""Reparo limitado de custo de uma proposta completa, sem IA, SQL ou salvamento."""
 from copy import deepcopy
 from decimal import Decimal
 from math import isfinite
@@ -54,7 +53,6 @@ class AjustarOrcamentoBuildService:
         orcamento, teto_pc, teto_perifericos = map(lambda x: Decimal(str(x)), (orcamento, teto_pc, teto_perifericos))
         if self.cabe(custos, orcamento, teto_pc, teto_perifericos):
             return None
-        # Não usar economia do PC para cobrir periféricos que já excederam sua reserva.
         if sum((v for k, v in custos.items() if k in self.PERIFERICOS), Decimal(0)) > teto_perifericos:
             return None
         originais = {i['tipo']: next(p for p in catalogo[i['tipo']] if p['id'] == i['id']) for i in build['componentes']}
@@ -129,7 +127,6 @@ class AjustarOrcamentoBuildService:
                        'subtotal_anterior': float(subtotal), 'subtotal_novo': float(preco * quantidade),
                        'economia': float(subtotal - preco * quantidade), 'diferencas_cadastradas': diferencas}
             candidatas.append((dict(id=peca['id'], quantidade=quantidade), mudanca, perda))
-        # Manter alternativas econômicas e de menor perda nominal, não só a mais barata.
         por_preco = sorted(candidatas, key=lambda x: (x[1]['subtotal_novo'], x[0]['id']))
         por_recurso = sorted(candidatas, key=lambda x: (x[2], x[1]['subtotal_novo'], x[0]['id']))
         vistas = set()

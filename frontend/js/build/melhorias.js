@@ -18,7 +18,7 @@ const centavos = valor => valor == null || String(valor).trim() === "" || !["num
   || !Number.isFinite(Number(valor)) || Number(valor) < 0 ? null : Math.round(Number(valor) * 100);
 const valorMonetario = valor => moeda(valor / 100);
 
-// A busca e a prévia são locais; somente o callback recebe a build confirmada.
+
 export function abrirMelhorias(build,catalogo,aoAplicar) {
   if (build?.travada) throw new Error(MOTIVO_TRAVA);
   if (!build?.componentes || !Array.isArray(catalogo) || typeof aoAplicar !== "function")
@@ -170,13 +170,13 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     const gasto = pecas.reduce((total,peca) => total + centavos(peca.preco)*quantidadeTroca(peca.categoria),ram.gastoCentavos);
     if (limite != null && gasto > limite) throw new Error("As peças escolhidas juntas ultrapassam o budget em " + valorMonetario(gasto - limite) + ". Remova uma troca, escolha outra peça ou ajuste o budget.");
     const proxima = ram.build;
-    // As substituições de discos são montadas pelo planejador; as demais saem antes da validação.
+
     for (const peca of pecas) if (!modosDiscos.has(peca.categoria)) delete proxima.componentes[peca.categoria];
     for (const peca of pecas) {
       const validada = ["ssd","hd"].includes(peca.categoria)
         ? planejarMelhoriaDisco(proxima,peca,catalogo,{modo:modoTroca(peca.categoria),quantidade:quantidadeTroca(peca.categoria)})
         : selecionarPecaCompativel(proxima,peca,catalogo);
-      // O seletor normaliza a build. Copiar só o componente preserva rede, orçamento e metadados.
+
       proxima.componentes[peca.categoria] = validada.componentes[peca.categoria];
       if (validada.compatibilidade) proxima.compatibilidade = validada.compatibilidade;
     }
@@ -188,7 +188,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
   }
 
   function renderizarResultados() {
-    // Durante uma animação de fechamento, open ainda é true; ARIA indica o destino.
+
     resultados.querySelectorAll("[data-upgrade-group]").forEach(grupo => {
       const categoria = grupo.dataset.upgradeGroup;
       const aberto = grupo.hasAttribute("data-animating")
@@ -288,7 +288,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
       const peca = pecaPorId(categoria.id,trocas.get(categoria.id)), preco = centavos(peca?.preco);
       if (modosDiscos.has(categoria.id)) {
         try { proxima = planejarMelhoriaDisco(proxima,peca,catalogo,{modo:modoTroca(categoria.id),quantidade:quantidadeTroca(categoria.id)}); }
-        catch { /* A confirmação explica o erro e permanece bloqueada. */ }
+        catch {   }
       } else proxima.componentes[categoria.id] = {id:trocas.get(categoria.id),quantidade:1};
       if (preco == null) precoConhecido = false; else gasto += preco*quantidadeTroca(categoria.id);
       const itensAntigos = itensCategoria(original,categoria.id);

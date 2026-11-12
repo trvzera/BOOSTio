@@ -33,7 +33,7 @@ export function categoriaCatalogo(id) {
 }
 
 let carregamento;
-// Trocar somente este carregamento pela API quando /pecas/ estiver pronta.
+
 export function carregarCatalogo() {
   carregamento ??= acompanharCarregamento(Promise.all([
     fetch(new URL("../../data/catalogo-demo.json", import.meta.url),{cache:"force-cache"}),
@@ -81,13 +81,13 @@ export function imagemPeca(peca, classe = "") {
   const categoria = categorias.find((c) => c.id === peca?.categoria);
   const imagem = enderecoImagem(peca?.imagem) || enderecoImagem(peca?.imagem_url);
   const alternativa = '<span class="component-placeholder ' + htmlSeguro(classe) + '" data-product-placeholder' + (imagem ? ' hidden' : '') + ' aria-hidden="true" title="Imagem indisponível">' + (categoria?.sigla || "PC") + '</span>';
-  // Foto ausente: placeholder neutro, sem fingir que é a foto do produto.
+
   return imagem
     ? '<img class="' + htmlSeguro(classe) + '" data-product-image src="' + htmlSeguro(imagem) + '" alt="' + htmlSeguro(nomePeca(peca) || peca?.nome || "Componente") + '" width="160" height="160" loading="lazy" decoding="async">' + alternativa
     : alternativa;
 }
 
-// Lojas de anúncios de terceiros: o endereço precisa ser https e do domínio da própria loja.
+
 export const marketplaces = {
   mercado_livre: {nome:"Mercado Livre", vendedor:"Vendedor ", dominios:["mercadolivre.com.br","www.mercadolivre.com.br","produto.mercadolivre.com.br"]},
   shopee: {nome:"Shopee", vendedor:"Loja ", dominios:["shopee.com.br","www.shopee.com.br","s.shopee.com.br","shope.ee"]},
@@ -113,11 +113,12 @@ export function ofertasPeca(peca) {
         if (endereco.protocol === "https:" && (endereco.hostname === dominio || endereco.hostname.endsWith("." + dominio))) {
           url = endereco.href; direta = true;
         }
-      } catch { /* Ignora uma oferta com URL inválida. */ }
+      } catch {   }
     }
     const valor = oferta?.preco;
     const preco = valor != null && valor !== "" && Number.isFinite(Number(valor)) && Number(valor) >= 0 ? Number(valor) : null;
     return {...loja,url,direta,preco,atualizadoEm:oferta?.atualizadoEm || null,esgotado:oferta?.esgotado === true,
+      ofertaId:Number.isSafeInteger(oferta?.id) && oferta.id > 0 ? oferta.id : null,
       logo:new URL("../../svgs/" + logos[loja.codigo],import.meta.url).href};
   });
   const vistas = new Set();
@@ -215,7 +216,7 @@ export const rotulosTecnicos = {
 
 function entradasFichaTecnica(peca) {
   const ignorados = new Set(["id", "categoria", "imagem", "preco", "preco_atualizado_em", "historico_precos", "link", "part_number", "referencia_interna", "esgotado", "ofertas", "topologia_armazenamento_verificada", "conectores_alimentacao_completos", "configuracoes_baias_completas"]);
-  // Medidas genéricas antigas não devem contradizer a ficha exata revisada.
+
   if (peca.modelo_ficha_tecnica && peca.baias_25 != null && peca.baias_35 != null) ignorados.add("bays_disco");
   if (peca.modelo_ficha_tecnica && [peca.comprimento_mm,peca.largura_mm,peca.altura_mm].every(v=>v!=null)) ignorados.add("dimensoes");
   return Object.entries(peca).filter(([chave, valor]) => !ignorados.has(chave) && valor != null && valor !== "");

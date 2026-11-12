@@ -1,4 +1,3 @@
-"""Observações de marketplace; disponibilidade não informada permanece NULL."""
 from . import db, ModeloBase
 
 
@@ -14,11 +13,22 @@ class HistoricoOferta(ModeloBase):
     )
 
     @classmethod
+    def existe_coleta(cls, oferta_id, coletado_em):
+        return cls.query.filter_by(oferta_id=oferta_id, coletado_em=coletado_em).first() is not None
+
+    @classmethod
     def ultimo(cls, oferta_id, *, bloquear=False):
         consulta = cls.query.filter_by(oferta_id=oferta_id).order_by(cls.coletado_em.desc(), cls.id.desc())
         if bloquear:
             consulta = consulta.populate_existing().with_for_update()
         return consulta.first()
+
+    @classmethod
+    def listar_das_ofertas(cls, oferta_ids, limite):
+        if not oferta_ids:
+            return []
+        return cls.query.filter(cls.oferta_id.in_(oferta_ids)).order_by(
+            cls.coletado_em.desc(), cls.id.desc()).limit(limite + 1).all()
 
     @classmethod
     def listar(cls, oferta_id, limite=1000):

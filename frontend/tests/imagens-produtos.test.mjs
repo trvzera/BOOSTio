@@ -35,7 +35,7 @@ test("caminhos de imagens independem de estar em pages ou no laboratório",() =>
 
 test("as imagens do manifesto existem nos caminhos publicados",async () => {
   const mapa=JSON.parse(await readFile(new URL("../data/imagens-produtos.json",import.meta.url),"utf8"));
-  // O comando pecas-imagens gera o mapa; uma instalação nova pode começar vazia.
+
   assert.ok(mapa && typeof mapa === "object" && !Array.isArray(mapa));
   await Promise.all(Object.values(mapa).map(caminho=>access(new URL(caminho,new URL("../pages/",import.meta.url)))));
   const peca=completarImagens([{categoria:"processador",part_number:"SEM-FOTO"}],{} )[0];

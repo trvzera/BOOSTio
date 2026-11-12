@@ -21,7 +21,6 @@ def test_mensagem_multipart_tem_codigo_expiracao_e_instrucao_sem_rastreamento(ap
         msg = Message(subject="Seu código de verificação — BOOSTio", recipients=["qa@example.test"])
         EnviarEmailService._monta_mensagem(msg, "001234", "Giovanni")
         mime = message_from_bytes(msg.as_bytes())
-    # Flask-Mail envolve as alternativas em multipart/mixed, mesmo sem anexos.
     assert {parte.get_content_type() for parte in mime.walk()} >= {"multipart/alternative", "text/plain", "text/html"}
     for corpo in (msg.body, msg.html):
         assert "001234" in corpo and "5 minutos" in corpo and "Giovanni" in corpo

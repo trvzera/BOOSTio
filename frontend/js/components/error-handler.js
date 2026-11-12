@@ -23,7 +23,7 @@ export function redirecionarParaErro(codigo = 500, erro = null) {
       }),
     );
   } catch {
-    // O redirecionamento continua mesmo se o armazenamento estiver indisponível.
+
   }
 
   window.location.replace(caminhoPaginaErro(codigo));

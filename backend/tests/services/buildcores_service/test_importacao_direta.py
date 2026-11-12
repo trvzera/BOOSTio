@@ -55,9 +55,9 @@ def test_dois_uuids_mesmo_mpn_nao_duplicam_e_reexecucao_nao_alterna_origem(banco
 
 def test_busca_por_tokens_nao_perde_duplicata_quando_catalogo_cresce():
     from collections import defaultdict
-    from repositories.importacao_buildcores_repository import RepositorioImportacaoBuildcores
+    from services.buildcores_service.gravar_importacao_buildcores_service import GravarImportacaoBuildcoresService
 
-    repo = RepositorioImportacaoBuildcores()
+    repo = GravarImportacaoBuildcoresService()
     repo.guarda = defaultdict(set)
     repo.codigos_nome = defaultdict(set)
     repo.tokens = defaultdict(set)
@@ -72,7 +72,6 @@ def test_busca_por_tokens_nao_perde_duplicata_quando_catalogo_cresce():
     ficha = dict(categoria='processador', fabricante='amd', nome='Novo nome', mpns=[], bruto={})
 
     assert repo._proximos(ficha, chave) == {existente}
-    # O token compartilhado deixa de ser o mais raro. A revisão deve permanecer.
     repo.tokens[('processador', 'amd', '1234')].add(outro)
     assert repo._proximos(ficha, chave) == {existente}
 
@@ -142,10 +141,10 @@ def test_chip_e_familia_comercial_detectam_descricao_diferente_de_gpu(banco,tmp_
 
 
 def test_falha_de_lote_reverte_componentes_e_permite_repeticao(banco,tmp_path,mocker):
-    from repositories.importacao_buildcores_repository import RepositorioImportacaoBuildcores
+    from services.buildcores_service.gravar_importacao_buildcores_service import GravarImportacaoBuildcoresService
     from sqlalchemy.exc import SQLAlchemyError
     a=cpu();b=deepcopy(a);b['opendb_id']='22222222-2222-4222-8222-222222222222';b['metadata']['name']='AMD Ryzen 5 5600';b['identifiers']['identifiers']=[{'type':'mpn','value':'100-100000927BOX'}]
-    escrever(tmp_path,[a,b]);repo=RepositorioImportacaoBuildcores();original=repo._processar;chamadas=[]
+    escrever(tmp_path,[a,b]);repo=GravarImportacaoBuildcoresService();original=repo._processar;chamadas=[]
     def falhar(r,simular):
         chamadas.append(r)
         if len(chamadas)==2:raise SQLAlchemyError('falha simulada')

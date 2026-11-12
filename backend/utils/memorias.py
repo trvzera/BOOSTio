@@ -1,4 +1,3 @@
-"""Identificação conservadora do padrão DDR, sem inferir pelo socket."""
 import re
 
 

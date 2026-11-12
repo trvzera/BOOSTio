@@ -93,7 +93,6 @@ class Build(ModeloBase):
         "cabo_rede",
     )
  
-    # Multiplicadores por peça — usados no preço total.
     QUANTIDADES = {
         "memoria_ram": "quantidade_ram",
         "ssd": "quantidade_ssd",
@@ -102,7 +101,6 @@ class Build(ModeloBase):
     }
  
     def quantidade_de(self, campo: str) -> int:
-        """Quantas unidades desta peça a build tem."""
         atributo = self.QUANTIDADES.get(campo)
         if atributo is None:
             return 1 if getattr(self, f"{campo}_id") else 0

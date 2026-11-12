@@ -1,4 +1,3 @@
-"""Lê apenas informações explícitas de uma ficha original da KaBuM."""
 import re
 from html.parser import HTMLParser
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado

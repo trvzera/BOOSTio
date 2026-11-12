@@ -1,30 +1,25 @@
-"""Anúncio de uma loja vinculado a uma peça; valores monetários em BRL."""
 from . import db, ModeloBase
+from utils.medidas_fisicas import produto_kabum
+from .modelos_pecas import MODELOS_PECAS
+from utils.url_shopee import validar_url_shopee
 
 
 class Oferta(ModeloBase):
     __tablename__ = "oferta"
 
-    # Peca é abstrato; o vínculo segue a referência usada por ConsultaPreco.
     tabela_peca = db.Column(db.String(40), nullable=False)
     peca_id = db.Column(db.Integer, nullable=False)
     loja = db.Column(db.String(20), nullable=False)
     produto_id_loja = db.Column(db.String(80), nullable=False)
-    # Vazio identifica venda direta. Em marketplace, informar o ID do vendedor.
-    # Metadado: a identidade única do anúncio é loja + produto_id_loja.
     vendedor_id = db.Column(db.String(80), nullable=False, default="")
     vendedor_nome = db.Column(db.String(120), nullable=True)
-    # Endereço original do anúncio para consultar preço e disponibilidade.
     url = db.Column(db.Text, nullable=False)
-    # Link de divulgação; permanece None enquanto não houver afiliação configurada.
     url_afiliado = db.Column(db.Text, nullable=True, default=None)
 
     preco = db.Column(db.Numeric(14, 2), nullable=True)
     condicao_pagamento = db.Column(db.String(120), nullable=True)
-    # NULL: disponibilidade ainda desconhecida; não assumir estoque sem coleta.
     esgotado = db.Column(db.Boolean, nullable=True)
     ativa = db.Column(db.Boolean, nullable=False, default=True)
-    # UTC sem tzinfo, seguindo as datas de cotação do projeto.
     preco_atualizado_em = db.Column(db.DateTime, nullable=True)
     consultado_em = db.Column(db.DateTime, nullable=True)
 
@@ -39,6 +34,68 @@ class Oferta(ModeloBase):
     )
 
     @classmethod
+    def _das_pecas(cls, referencias):
+        # Um IN por tabela de peça usa o índice (tabela_peca, peca_id); o IN de pares é lento no MySQL.
+        ids = {}
+        for tabela, identificador in referencias:
+            ids.setdefault(tabela, []).append(identificador)
+        return db.or_(*[db.and_(cls.tabela_peca == tabela, cls.peca_id.in_(lista)) for tabela, lista in ids.items()])
+
+    @classmethod
+    def buscar_por_anuncio(cls, loja, produto_id_loja, *, bloquear=False, recarregar=False):
+        consulta = cls.query.filter_by(loja=loja, produto_id_loja=produto_id_loja)
+        if recarregar:
+            consulta = consulta.populate_existing()
+        return (consulta.with_for_update() if bloquear else consulta).first()
+
+    @classmethod
+    def buscar_unica_por_anuncio(cls, loja, produto_id_loja):
+        return cls.query.filter_by(loja=loja, produto_id_loja=produto_id_loja).one()
+
+    @classmethod
+    def listar_da_peca(cls, peca, loja, *, apenas_ativas=False, bloquear=False, recarregar=False):
+        consulta = cls.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id, loja=loja)
+        if apenas_ativas:
+            consulta = consulta.filter_by(ativa=True)
+        if recarregar:
+            consulta = consulta.populate_existing()
+        return (consulta.with_for_update() if bloquear else consulta).all()
+
+    @classmethod
+    def listar_para_atualizar(cls, loja, consultadas_antes_de, limite=None):
+        consulta = cls.query.filter(cls.loja == loja, cls.ativa.is_(True),
+            db.or_(cls.consultado_em.is_(None), cls.consultado_em < consultadas_antes_de))
+        consulta = consulta.order_by(cls.consultado_em.is_(None).desc(), cls.consultado_em, cls.id)
+        return (consulta.limit(limite) if limite else consulta).all()
+
+    def registrar_coleta(self, preco, esgotado, agora):
+        from . import HistoricoOferta
+        ultimo = HistoricoOferta.ultimo(self.id)
+        if self.preco != preco:
+            self.preco_atualizado_em = agora
+        self.preco, self.esgotado, self.consultado_em = preco, esgotado, agora
+        registrar = (ultimo is None or ultimo.preco != preco or ultimo.esgotado != esgotado
+                     or ultimo.coletado_em.date() != agora.date())
+        if registrar:
+            db.session.add(HistoricoOferta(oferta_id=self.id, preco=preco, esgotado=esgotado, coletado_em=agora))
+        return registrar
+
+    def desativar(self):
+        self.ativa = False
+
+    @classmethod
+    def retirar_do_catalogo(cls, oferta_id):
+        oferta = db.session.get(cls, oferta_id)
+        if oferta is not None and oferta.ativa:
+            oferta.desativar()
+            db.session.commit()
+        return oferta
+
+    @classmethod
+    def confirmar_coletas(cls):
+        db.session.commit()
+
+    @classmethod
     def corresponde_origem(cls, peca, loja, identificador, *, bloquear=False):
         consulta = cls.query.filter_by(loja=loja, produto_id_loja=identificador)
         registro = (consulta.with_for_update() if bloquear else consulta).first()
@@ -48,8 +105,6 @@ class Oferta(ModeloBase):
     def identidades_kabum_ambiguas(cls):
         from sqlalchemy import inspect
         from collections import defaultdict
-        from services.peca_service.modelos_pecas import MODELOS_PECAS
-        from .medidas_fisicas import produto_kabum
         import re
         encontrados = defaultdict(set)
         inspetor = inspect(db.engine)
@@ -69,8 +124,6 @@ class Oferta(ModeloBase):
 
     @classmethod
     def registrar_identidade_kabum(cls, peca, *, simular=False, ids_ambiguos=None):
-        """Registra o ID real do anúncio. Não inventa cotação nem estoque da seed."""
-        from .medidas_fisicas import produto_kabum
         import re
         referencia = peca.referencia_interna or peca.part_number or ''
         legado = re.fullmatch(r'KABUM-([1-9][0-9]*)', referencia, re.I)
@@ -115,10 +168,37 @@ class Oferta(ModeloBase):
 
     @classmethod
     def anexar_a_catalogo(cls, pecas):
-        from sqlalchemy import inspect, tuple_, and_
+        cls._juntar_ofertas(pecas)
+        for peca in pecas:
+            cls._manter_mais_barata_por_loja(peca)
+        return pecas
+
+    @staticmethod
+    def _chave_preco(oferta):
+        esgotado = oferta['esgotado']
+        disponibilidade = 2 if esgotado is True else 0 if esgotado is False or oferta['loja'] == 'shopee' else 1
+        return (disponibilidade, oferta['preco'], oferta['id'])
+
+    @classmethod
+    def _manter_mais_barata_por_loja(cls, peca):
+        por_loja = {}
+        for oferta in peca.get('ofertas', []):
+            atual = por_loja.get(oferta['loja'])
+            if atual is None or cls._chave_preco(oferta) < cls._chave_preco(atual):
+                por_loja[oferta['loja']] = oferta
+        peca['ofertas'] = list(por_loja.values())
+        if not peca['ofertas']:
+            return
+        melhor = min(peca['ofertas'], key=cls._chave_preco)
+        peca['preco'] = melhor['preco']
+        peca['esgotado'] = False if cls._chave_preco(melhor)[0] == 0 else melhor['esgotado']
+        peca['preco_atualizado_em'] = melhor['atualizadoEm']
+
+    @classmethod
+    def _juntar_ofertas(cls, pecas):
+        from sqlalchemy import inspect, and_
         from . import VinculoMercadoLivre
         from utils.identidade_peca import assinatura_campos
-        # Leitura opcional: catálogo anterior continua funcionando antes da migration.
         if not pecas or not inspect(db.engine).has_table(cls.__tablename__):
             return pecas
         referencias = []
@@ -131,7 +211,7 @@ class Oferta(ModeloBase):
             return pecas
         registros = db.session.query(cls, VinculoMercadoLivre).join(VinculoMercadoLivre, and_(
             VinculoMercadoLivre.tabela_peca == cls.tabela_peca, VinculoMercadoLivre.peca_id == cls.peca_id)).filter(cls.loja == 'mercado_livre', cls.ativa.is_(True),
-            tuple_(cls.tabela_peca, cls.peca_id).in_(referencias)).order_by(cls.preco.asc(), cls.id.asc()).all()
+            cls._das_pecas(referencias)).order_by(cls.preco.asc(), cls.id.asc()).all()
         por_peca = {}
         fichas = dict(zip(referencias, pecas))
         for registro, vinculo in registros:
@@ -146,23 +226,33 @@ class Oferta(ModeloBase):
                 por_peca.setdefault((registro.tabela_peca, registro.peca_id), []).append(dados)
         for peca, referencia in zip(pecas, referencias):
             peca['ofertas'] = [*peca.get('ofertas', []), *por_peca.get(referencia, [])]
-        from services.peca_service.modelos_pecas import MODELOS_PECAS
-        modelos = {m.__tablename__: m for m in MODELOS_PECAS}
-        for oferta in cls.query.filter(cls.loja == 'shopee', cls.ativa.is_(True),
-                tuple_(cls.tabela_peca, cls.peca_id).in_(referencias)).order_by(cls.preco, cls.id).all():
-            modelo = modelos.get(oferta.tabela_peca)
-            peca = modelo.buscar_por_id(oferta.peca_id) if modelo else None
-            dados = oferta.para_exibicao()
-            if peca and dados and oferta.shopee_validada(peca):
-                fichas[(oferta.tabela_peca, oferta.peca_id)]['ofertas'].append(dados)
+        cls._anexar_shopee(fichas, referencias)
         return pecas
 
     @classmethod
+    def _anexar_shopee(cls, fichas, referencias):
+        from . import ProdutoPendente
+        ofertas = cls.query.filter(cls.loja == 'shopee', cls.ativa.is_(True),
+                cls._das_pecas(referencias)).order_by(cls.preco, cls.id).all()
+        ids_por_tabela = {}
+        for oferta in ofertas:
+            ids_por_tabela.setdefault(oferta.tabela_peca, set()).add(oferta.peca_id)
+        modelos = {m.__tablename__: m for m in MODELOS_PECAS}
+        pecas = {(tabela, peca.id): peca for tabela, ids in ids_por_tabela.items() if tabela in modelos
+                 for peca in modelos[tabela].listar_por_ids(ids)}
+        pendencias = ProdutoPendente.mapear_por_anuncios('shopee', {o.produto_id_loja for o in ofertas})
+        for oferta in ofertas:
+            peca = pecas.get((oferta.tabela_peca, oferta.peca_id))
+            pendencia = pendencias.get(oferta.produto_id_loja)
+            dados = oferta.para_exibicao()
+            if peca and pendencia and dados and oferta.shopee_validada(peca, pendencia):
+                fichas[(oferta.tabela_peca, oferta.peca_id)]['ofertas'].append(dados)
+
+    @classmethod
     def _anexar_kabum(cls, pecas, referencias):
-        from sqlalchemy import tuple_
         fichas = dict(zip(referencias, pecas))
         for oferta in cls.query.filter(cls.loja == 'kabum', cls.ativa.is_(True),
-                tuple_(cls.tabela_peca, cls.peca_id).in_(referencias)).order_by(cls.id).all():
+                cls._das_pecas(referencias)).order_by(cls.id).all():
             dados = oferta.para_exibicao()
             if dados is not None:
                 fichas[(oferta.tabela_peca, oferta.peca_id)]['ofertas'].append(dados)
@@ -172,10 +262,10 @@ class Oferta(ModeloBase):
         return cls.query.filter_by(id=oferta_id, tabela_peca=categoria, peca_id=peca_id,
                                    ativa=True).filter(cls.loja.in_(('mercado_livre', 'shopee'))).first()
 
-    def shopee_validada(self, peca):
+    def shopee_validada(self, peca, pendencia=None):
         from . import ProdutoPendente
         from utils.identidade_peca import assinatura_peca, assinatura_tecnica
-        p = ProdutoPendente.buscar_por_anuncio('shopee', self.produto_id_loja)
+        p = pendencia or ProdutoPendente.buscar_por_anuncio('shopee', self.produto_id_loja)
         prova = (p.evidencias or {}).get('vinculo', {}) if p else {}
         return bool(p and p.status == 'importado' and p.oferta_id == self.id
                     and prova.get('assinatura_peca') == assinatura_peca(peca)
@@ -191,12 +281,10 @@ class Oferta(ModeloBase):
         try:
             url = urlsplit(self.url)
             if self.loja == 'kabum':
-                from .medidas_fisicas import produto_kabum
                 if produto_kabum(self.url) != self.produto_id_loja:
                     return None
                 url_compra = self.url
             elif self.loja == 'shopee':
-                from services.shopee_service.normalizar_produto_service import validar_url_shopee
                 if (not validar_url_shopee(self.url) or
                         url.path != '/product/' + self.produto_id_loja.replace(':', '/')):
                     return None

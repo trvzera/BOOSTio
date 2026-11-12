@@ -1,4 +1,3 @@
-"""Fila durável; a chave impede duplicação e a reserva permite recuperar crashes."""
 from datetime import datetime, timezone
 from . import db, ModeloBase
 from sqlalchemy.dialects.mysql import DATETIME

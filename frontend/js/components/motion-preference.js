@@ -32,7 +32,7 @@ function aplicar() {
 }
 export function definirMovimentoReduzido(reduzido) {
   manual = reduzido ? "1" : "0";
-  try { globalThis.localStorage?.setItem(CHAVE, manual); } catch { /* Preferência continua válida nesta página. */ }
+  try { globalThis.localStorage?.setItem(CHAVE, manual); } catch {   }
   aplicar();
 }
 try { manual = globalThis.localStorage?.getItem(CHAVE) ?? null; } catch {}

@@ -1,17 +1,16 @@
-"""Cruza uma revisão local verificada com o catálogo docyx já importado."""
-from collections import defaultdict,Counter
+from collections import defaultdict
 from pathlib import Path
 import hashlib
 import json
 import re
 from sqlalchemy.exc import SQLAlchemyError
-from repositories.enriquecimento_buildcores_repository import RepositorioEnriquecimentoBuildcores
+from services.buildcores_service.gravar_enriquecimento_buildcores_service import GravarEnriquecimentoBuildcoresService
 from .normalizar_ficha_service import NormalizarFichaBuildcoresService, CATEGORIAS, fabricante
 from .comparar_fichas_service import CompararFichasBuildcoresService
 
 
 class CruzarCatalogoBuildcoresService:
-    def __init__(self,repositorio=None):self.repositorio=repositorio or RepositorioEnriquecimentoBuildcores()
+    def __init__(self,repositorio=None):self.repositorio=repositorio or GravarEnriquecimentoBuildcoresService()
 
     def executar(self,pasta,*,simular=True,tamanho_lote=100,progresso=None):
         if type(simular) is not bool or type(tamanho_lote) is not int or not 1<=tamanho_lote<=1000:raise ValueError('Opções inválidas')
@@ -54,7 +53,6 @@ class CruzarCatalogoBuildcoresService:
                 resumo[tipo]+=1
                 resumo['detalhes'].append(dict(peca=f"{cat}:{p['id']}",acao=tipo,candidatos=[dict(id=r['origem']['id_externo'],**d) for r,d in avaliacoes]))
         for pares in relacoes.values():
-            # Não usar a mesma ficha para dois registros locais potencialmente duplicados.
             if len(pares)>1:
                 for p,r,d in pares:
                     resumo['ambiguas']+=1;resumo['detalhes'].append(dict(peca=f"{p['categoria']}:{p['id']}",acao='ambiguas',motivo='Ficha candidata a múltiplas peças locais'))
@@ -62,16 +60,11 @@ class CruzarCatalogoBuildcoresService:
             p,r,d=pares[0];resumo['confirmadas']+=1
             alteracoes={k:v for k,v in r['dados'].items() if p['dados'].get(k) is None}
             if p['categoria']=='processador':
-                # A base docyx não identifica Box/Tray. Cooler é atributo da
-                # embalagem, portanto não pode ser transferido só pelo modelo.
                 alteracoes.pop('cooler',None)
             fontes={k:r['fontes'][k] for k in alteracoes}
-            # Vários MPNs podem representar regiões ou embalagens diferentes.
             if len(r['mpns'])==1:
                 resumo['com_mpn_unico']+=1
                 mpn=r['mpns'][0]
-                # CPU sem identificação da embalagem: preencher fatos compartilhados,
-                # mas não transformar o código de uma caixa em identidade de um tray.
                 if p['categoria']!='processador' and p['dados'].get('part_number') is None and (len(mpn)>=8 or re.search('[-/]',mpn)):
                     alteracoes['part_number']=mpn;fontes['part_number']={**r['origem'],'campo':'identifiers.identifiers[type=mpn]'}
             elif len(r['mpns'])>1:resumo['com_mpn_multiplo']+=1

@@ -1,4 +1,3 @@
-"""Credenciais locais: arquivo privado, substituição atômica e lock por host."""
 import json
 import os
 import tempfile
@@ -56,7 +55,6 @@ class ArquivoMercadoLivreTokenRepository:
 
 
 class MercadoLivreTokenRepository:
-    """Adapter SQL; operações de persistência e concorrência pertencem ao model."""
     def __init__(self, client_id, conta_id):
         self.client_id, self.conta_id = client_id, conta_id
         self.versao = None
@@ -64,7 +62,6 @@ class MercadoLivreTokenRepository:
 
     @contextmanager
     def bloquear(self):
-        # CAS no model reserva a renovação antes da rede, sem manter locks HTTP.
         self.lido = False
         yield
 

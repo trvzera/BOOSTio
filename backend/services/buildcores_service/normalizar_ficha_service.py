@@ -1,4 +1,3 @@
-"""Adapta campos efetivamente presentes no snapshot OpenDB, sem valores presumidos."""
 import re
 from decimal import Decimal, InvalidOperation
 from services.catalogo_service.comparar_nomes_service import marca
@@ -99,10 +98,9 @@ class NormalizarFichaBuildcoresService:
                 dados['resolucao']=f"{r['horizontalRes']}x{r['verticalRes']}";caminhos['resolucao']='resolution'
         if cat=='gabinete' and isinstance(bruto.get('supported_motherboard_form_factors'),list) and bruto['supported_motherboard_form_factors']:
             dados['formatos_placa_mae']=', '.join(bruto['supported_motherboard_form_factors']);caminhos['formatos_placa_mae']='supported_motherboard_form_factors'
-        # Nenhuma iluminação é inferida da ausência ou de uma lista vazia.
         if isinstance(bruto.get('lighting'),list) and bruto['lighting']:
             dados['iluminacao']=True;caminhos['iluminacao']='lighting'
-        from services.peca_service.modelos_pecas import MODELOS_PECAS
+        from models.modelos_pecas import MODELOS_PECAS
         from sqlalchemy import Integer,String,Boolean
         modelo=next(m for m in MODELOS_PECAS if m.__tablename__==cat)
         for k,v in list(dados.items()):
@@ -120,7 +118,6 @@ class NormalizarFichaBuildcoresService:
             valor=id.get('value')
             if id.get('type')=='mpn' and isinstance(valor,str) and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9./_-]{2,99}',valor) and re.search('[0-9]',valor):mpns.add(valor)
             if id.get('type') in ('ean','gtin','upc') and gtin(valor):gtins.add(gtin(valor))
-        # metadata.part_numbers não é identificador canônico e pode conter nomes.
         return dict(categoria=cat,fabricante=fabricante(meta['manufacturer']),nome=meta['name'],dados=dados,
           mpns=sorted(mpns),gtins=sorted(gtins),cores=cores(bruto.get('color') or meta.get('manufacturer_color')),
           bruto=bruto,origem=origem,fontes={k:{**origem,'campo':caminhos[k]} for k in dados})

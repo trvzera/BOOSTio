@@ -1,15 +1,16 @@
-from repositories.ofertas_repository import aplicar_lote_mercado_livre
+from services.marketplace_service.gravar_ofertas_service import aplicar_lote_mercado_livre
 from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 from datetime import datetime, timezone
 
 from sqlalchemy.exc import SQLAlchemyError
 
 from models import Oferta, VinculoMercadoLivre
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_peca, assinatura_catalogo
 from .associar_catalogo_service import AssociarCatalogoService
 from .buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
 from .controle_requisicoes_service import ControleRequisicoesService, OrcamentoRequisicoesEsgotado, ErroMercadoLivre
+from services.marketplace_service.erros import FalhaMarketplace
 from .token_mercado_livre_service import TokenMercadoLivreService
 from .cliente_catalogo_cache_service import ClienteCatalogoCacheService
 from .registrar_ambiguos_service import RegistrarAmbiguosMercadoLivreService
@@ -54,7 +55,6 @@ class AtualizarOfertasMercadoLivreService:
                     if not esquema_verificado:
                         Oferta.verificar_esquema_mercado_livre()
                         esquema_verificado = True
-                    # O token pode precisar de renovação entre lotes; não manter um token por horas.
                     token = TokenMercadoLivreService().executar()
                     resultado = self._processar_peca(peca, cliente, associador, token, limite_ofertas, simular)
                     chave = resultado.pop('contador')
@@ -140,8 +140,8 @@ class AtualizarOfertasMercadoLivreService:
                     catalogo_id=vinculo['catalogo_id'], ofertas=propostas,
                     busca_remota_completa=busca.get('busca_remota_completa'),
                     buscas=busca.get('buscas', []))
-            except ErroMercadoLivre as erro:
-                if erro.status not in (403,404):raise
+            except (ErroMercadoLivre, FalhaMarketplace) as erro:
+                if erro.status not in ((403,404,206) if isinstance(erro, ErroMercadoLivre) else (404,206)):raise
                 indisponiveis.append(dict(catalogo_id=vinculo['catalogo_id'], http=erro.status))
         return dict(contador='revisao' if indisponiveis else 'sem_ofertas',
             status='revisao' if indisponiveis else 'sem_ofertas', catalogos_indisponiveis=indisponiveis)

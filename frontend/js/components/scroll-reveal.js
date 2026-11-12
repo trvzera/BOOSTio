@@ -8,7 +8,7 @@ observarMovimento(reduzido => {
   for (const elemento of observados.keys()) elemento.classList.remove("reveal-pending", "is-visible");
   observados.clear();
 });
-// Um único observador atende também os cards renderizados pelo JS.
+
 export function iniciarScrollReveal(raiz = document, seletor = "[data-reveal]") {
   if (movimentoReduzido() ||
       !("IntersectionObserver" in window)) return;

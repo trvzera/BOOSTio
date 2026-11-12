@@ -1,4 +1,3 @@
-"""Classificação comum sem registrar conteúdo de respostas ou credenciais."""
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 import math

@@ -1,7 +1,6 @@
-"""Preenche lacunas comprovadas nas peças existentes, independente da loja."""
 from sqlalchemy.exc import SQLAlchemyError
 from models import ProdutoPendente
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from .classificar_pendencias_service import ClassificarPendenciasService
 from .enriquecer_peca_existente_service import EnriquecerPecaExistenteService
 from .indice_candidatos_service import IndiceCandidatosService
@@ -28,8 +27,6 @@ class PreencherEspecificacoesService:
                     raise ValueError('Categoria desconhecida')
                 indice = IndiceCandidatosService.carregar(modelo)
                 produtos = tuple(self.normalizar(pendencia))
-                # União das fichas normalizadas: divergência entre anúncio e
-                # catálogo não pode ocultar um candidato antes da conferência.
                 pecas = {p.id:p for produto in produtos for p in indice.candidatos(produto)}
                 candidatos = []
                 for peca in pecas.values():

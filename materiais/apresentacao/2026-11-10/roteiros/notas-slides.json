@@ -15,43 +15,43 @@
   },
   {
     "slide": 3,
-    "title": "Montagem pelo formulário",
-    "time": 8,
-    "notes": "RF04 — Montar o setup através de formulário.\n\nO primeiro caso de uso é a montagem inteligente. O objetivo é transformar as respostas do usuário em uma configuração dentro do orçamento. A integração com LLM existe no código e exige disponibilidade do provedor.\n\nFonte: frontend/pages/formulario.html; backend/controllers/build_controller.py:criar_build; backend/services/build_service/gerar_build_service.py.\nCaptura do frontend local com sessão e respostas da API simuladas sobre o catálogo demonstrativo versionado. Esta imagem não é evidência de homologação do backend.",
+    "title": "Montagem inteligente",
+    "time": 9,
+    "notes": "O primeiro caso de uso é a montagem inteligente. O objetivo é transformar as respostas do usuário em uma configuração dentro do orçamento. A integração com LLM existe no código e exige disponibilidade do provedor.\n\nFonte: frontend/pages/formulario.html; backend/controllers/build_controller.py:criar_build; backend/services/build_service/gerar_build_service.py.\nO GIF (03-montagem.gif) passa enquanto o integrante fala; não ler o texto do slide.",
     "hidden": false
   },
   {
     "slide": 4,
     "title": "Diagnóstico de compatibilidade",
-    "time": 8,
-    "notes": "RF13 — Ver informações de compatibilidade e consumo de energia.\n\nO segundo caso identifica conflitos e dados que precisam de conferência. O sistema cruza regras técnicas das peças e calcula uma estimativa de consumo. Ausência de dados não confirma compatibilidade.\n\nFonte: frontend/js/build/compatibilidade.js; backend/services/build_service/avaliar_compatibilidade_service.py.\nCaptura do frontend local com sessão e respostas da API simuladas sobre o catálogo demonstrativo versionado. Esta imagem não é evidência de homologação do backend.",
+    "time": 9,
+    "notes": "O segundo caso identifica conflitos e dados que precisam de conferência. O sistema cruza regras técnicas das peças e calcula uma estimativa de consumo. Ausência de dados não confirma compatibilidade.\n\nFonte: frontend/js/build/compatibilidade.js; backend/services/build_service/avaliar_compatibilidade_service.py.\nO GIF (04-compatibilidade.gif) passa enquanto o integrante fala; não ler o texto do slide.",
     "hidden": false
   },
   {
     "slide": 5,
     "title": "Comparação de configurações",
-    "time": 8,
-    "notes": "RF07 — Comparar configurações salvas.\n\nO terceiro caso ajuda a decidir entre configurações. A comparação calcula diferenças sobre builds carregadas da API. O cálculo básico acontece no navegador. A consulta Blender é opcional e separada.\n\nFonte: frontend/js/build/comparacao.js; frontend/js/build/comparacao-renderizacao.js.\nCaptura do frontend local com sessão e respostas da API simuladas sobre o catálogo demonstrativo versionado. Esta imagem não é evidência de homologação do backend.",
+    "time": 9,
+    "notes": "O terceiro caso ajuda a decidir entre configurações. A comparação calcula diferenças sobre builds carregadas da API. O cálculo básico acontece no navegador. A consulta Blender é opcional e separada.\n\nFonte: frontend/js/build/comparacao.js; frontend/js/build/comparacao-renderizacao.js.\nO GIF (05-comparacao.gif) passa enquanto o integrante fala; não ler o texto do slide.",
     "hidden": false
   },
   {
     "slide": 6,
-    "title": "Busca de melhorias",
-    "time": 8,
-    "notes": "RF09 — Buscar melhorias do setup.\n\nO quarto caso busca melhorias de RAM e armazenamento respeitando orçamento e dados de compatibilidade disponíveis. A prévia mostra antes e depois. Aplicar usa o fluxo de atualização da build na API. Não demonstrar CPU ou GPU como recomendações já concluídas.\n\nFonte: frontend/js/build/melhorias.js; frontend/js/build/melhorias-ram.js; frontend/js/build/melhorias-discos.js.\nCaptura do frontend local com sessão e respostas da API simuladas sobre o catálogo demonstrativo versionado. Esta imagem não é evidência de homologação do backend.",
+    "title": "Compartilhamento por link",
+    "time": 9,
+    "notes": "O quarto caso permite compartilhar uma configuração por link. A build pública abre sem login em uma tela somente leitura; o visitante não altera a original nem acessa o orçamento. Tornar a build privada interrompe novas consultas pelo link. Na demonstração, mostrar o controle de acesso: abrir sem login e depois bloquear. RF08 e RF17 (visibilidade).\n\nFonte: README.md (RF08, RF17); backend/controllers/build_controller.py; backend/models/build_salva.py; frontend/js/api/build/builds.js.\nO GIF (06-compartilhamento.gif) passa enquanto o integrante fala; não ler o texto do slide.",
     "hidden": false
   },
   {
     "slide": 7,
-    "title": "Builds prontas",
-    "time": 8,
-    "notes": "RF10 — Ver configurações prontas; quinto caso de uso dos slides, fora das quatro funções não CRUD do vídeo.\n\nO quinto caso oferece 16 configurações iniciais. O usuário filtra, escolhe um modelo e pode salvar uma cópia privada para editar. Abrir ou listar modelos não será contado entre as quatro funções não CRUD da demonstração.\n\nFonte: frontend/js/build/modelos.js; frontend/pages/configuracoes-prontas.html.\nCaptura do frontend local com sessão e respostas da API simuladas sobre o catálogo demonstrativo versionado. Esta imagem não é evidência de homologação do backend.",
+    "title": "Melhorias do setup",
+    "time": 9,
+    "notes": "O quinto caso busca melhorias de RAM e armazenamento respeitando orçamento, slots e conexões conhecidas da placa-mãe. A prévia mostra antes e depois e o custo; aplicar atualiza a build. Não prometer ganho de FPS nem CPU/GPU como recomendações concluídas.\n\nFonte: frontend/js/build/melhorias.js; frontend/js/build/melhorias-ram.js; frontend/js/build/melhorias-discos.js (RF09).\nO GIF (07-melhorias.gif) passa enquanto o integrante fala; não ler o texto do slide.",
     "hidden": false
   },
   {
     "slide": 8,
     "title": "Modelo de domínio",
-    "time": 30,
+    "time": 35,
     "notes": "Este recorte destaca as entidades centrais. Usuario possui builds. Build referencia modelos do catálogo, como Processador. Peca concentra fabricante, modelo e preço. BuildSalva guarda estado em JSON e pode existir sem uma Build original. O limite de três configurações é uma regra de negócio, não a multiplicidade da relação. Outros componentes e entidades do domínio ficam fora deste recorte.\n\nFontes: backend/models/usuario.py, build.py, build_salva.py, peca.py e processador.py. A imagem do diagrama de montagem existente está no apoio. Relação BuildSalva–Build opcional nos dois lados e sem composição.",
     "hidden": false
   },
@@ -65,7 +65,7 @@
   {
     "slide": 10,
     "title": "Fluxo de entrada de dados",
-    "time": 25,
+    "time": 20,
     "notes": "Na entrada, o frontend envia o estado da configuração em JSON. O Controller lê o corpo e o Service aplica o budget e valida o estado. BuildSalva verifica e-mail e limite por conta, grava a configuração e confirma a transação. A resposta volta ao navegador com o diagnóstico. O Repository em tracejado indica uma extração ainda necessária para esta rubrica.\n\nFontes: controllers/build_controller.py:criar_build_manual, services/build_service/criar_build_manual_service.py e models/build_salva.py:criar_limitada.",
     "hidden": false
   },
@@ -87,20 +87,20 @@
     "slide": 13,
     "title": "Demonstração funcional",
     "time": 110,
-    "notes": "Tempo deste bloco: 1min50, dentro do limite de dois minutos. O vídeo deve mostrar quatro funcionalidades não CRUD escolhidas entre os 20 requisitos do README: RF04, RF13, RF07 e RF09. Mostrar a ação do usuário e o resultado real em cada uma. As capturas ilustrativas do deck não substituem essa execução.\n\n00:00–00:35 — RF04, montar o setup através de formulário. Mostrar objetivo e orçamento em respostas previamente preparadas, confirmar o pedido e exibir as peças e o total da build realmente retornada. Conferir tetos separados de PC e periféricos, se houver reserva. Fala: “Informo para que vou usar o computador e quanto posso gastar. A montagem inteligente escolhe as peças, e o backend confere as regras e o orçamento antes de salvar.”\n\n00:35–01:00 — RF13, compatibilidade e consumo de energia. Abrir o diagnóstico e mostrar uma regra com dados conhecidos, como o padrão de RAM aceito ou os slots, seu efeito nas opções disponíveis e o consumo estimado. Não forçar seleções bloqueadas nem tratar dados ausentes como compatibilidade aprovada. Fala: “O sistema cruza as informações das peças para verificar se podem trabalhar juntas e estima o consumo de energia. Quando falta algum dado do fabricante, ele indica o que ainda precisa de conferência.”\n\n01:00–01:25 — RF07, comparar configurações salvas. Abrir a comparação de duas builds e mostrar os totais e uma diferença concreta de componentes ou consumo. A comparação básica é calculada em JavaScript sobre builds carregadas da API. Preço e consumo não comprovam desempenho. Fala: “Posso comparar duas configurações lado a lado. Aqui vejo o que muda nas peças, no preço e no consumo estimado para decidir qual atende melhor ao que preciso.”\n\n01:25–01:50 — RF09, buscar melhorias do setup. Informar quanto investir, selecionar uma expansão válida de RAM ou SSD/HD e mostrar capacidade antes/depois, custo e limites de slots ou conexões conhecidos. Aplicar trocas e mostrar o resultado salvo; conferir a persistência ao reabrir durante a gravação. Fala: “Para melhorar o computador que já tenho, informo um valor e consulto opções compatíveis. Nesta sugestão, aumento a capacidade mantendo as peças atuais e vejo o custo antes de aplicar.”\n\nPreparar conta com e-mail verificado, duas builds e vaga para uma terceira. Escolher uma expansão disponível no catálogo atual e ensaiar os quatro cenários. Usar legendas com os quatro RFs e edição de uma execução real para controlar as esperas. Não prometer ganho de FPS com expansão de RAM/armazenamento nem recomendar CPU/GPU como funções já disponíveis nesta busca. RF10 permanece como quinto caso de uso dos slides, mas listagem/cópia de builds prontas não conta entre as quatro funções do vídeo. Não incluir FPS ou Blender como substitutos nesta seleção.\n\nFonte: README.md, requisitos 04, 13, 07 e 09; roteiro-do-pitch.md. Este planejamento não comprova homologação nem substitui a gravação real.",
+    "notes": "Tempo máximo deste bloco: 1min50. Abrir o sistema real ou executar um vídeo gravado previamente. As telas do deck são ilustrativas, não substituem a demonstração de ponta a ponta.\n\n00:00–00:35: geração inteligente. Confirmar objetivo, orçamento e respostas previamente preparadas, enviar e mostrar a build retornada. Usar vídeo de execução real para não depender do tempo da LLM.\n00:35–01:00: diagnóstico. Mostrar uma incompatibilidade conhecida do catálogo e depois uma combinação adequada. Exibir o motivo, não apenas a troca de peça.\n01:00–01:25: comparação. Abrir duas builds e mostrar o cálculo de diferenças de total e consumo. O cálculo básico acontece no JavaScript com dados carregados pela API.\n01:25–01:50: compartilhamento (RF08). Tornar a build pública, copiar o link, abri-lo em janela sem login e mostrar a tela somente leitura. Se couber, tornar privada e mostrar o bloqueio, evidenciando o controle de acesso. Alternativa mais robusta: RF09 (melhorias de RAM com antes/depois e aplicação persistida).\n\nNão contar cadastro, listagem ou cópia de build como funções não CRUD. Não incluir FPS, que está desativado. Se a LLM falhar no ensaio, gravar previamente a função Testar build / requisitos ou Blender com resposta real para substituir um bloco, mantendo quatro funções com ações e resultados completos.\n\nFontes: README.md e roteiro de demo preparado para o grupo.",
     "hidden": false
   },
   {
     "slide": 14,
     "title": "Persistência com SQLAlchemy",
-    "time": 17,
+    "time": 15,
     "notes": "As entidades herdam de ModeloBase, que adiciona a instância à sessão e executa commit. O exemplo usa a implementação real. Para comprovar CRUD, mostrar criar, consultar, atualizar e excluir somente em uma base temporária e observar a mudança no banco. CRUD não entra na contagem das quatro funções da demo.\n\nFontes: backend/models/base.py; models/build_salva.py; models/usuario.py.",
     "hidden": false
   },
   {
     "slide": 15,
     "title": "Consulta SQL no Repository",
-    "time": 18,
+    "time": 15,
     "notes": "SaudeRepository executa SELECT 1 pela sessão SQLAlchemy para verificar a conexão. O fluxo de saúde já passa por Controller, Service e Repository e retorna status ok quando as dependências respondem. Esta é uma evidência limitada: SELECT 1 comprova conectividade, não uma consulta de negócio. Para atender bem à rubrica, extrair a consulta de build para Repository e comparar o resultado esperado em dados controlados.\n\nFontes: repositories/saude_repository.py; controllers/saude_controller.py; services/configuracao_service/verificar_saude_service.py.",
     "hidden": false
   },

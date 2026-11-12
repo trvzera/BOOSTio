@@ -1,4 +1,3 @@
-"""MPN revisado sem substituir a referência interna usada por imagens e fichas."""
 from decimal import Decimal
 from sqlalchemy import inspect
 from . import db, ModeloBase
@@ -18,52 +17,22 @@ class IdentidadeFabricante(ModeloBase):
 
     @classmethod
     def buscar(cls, peca):
-        # Compatível com instalações que ainda não fizeram esta migração.
         if not inspect(db.session.connection()).has_table(cls.__tablename__):
             return None
         obj = cls.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id).first()
         if not obj or obj.assinatura_peca != assinatura_peca(peca):
             return None
-        if not cls._conferem(peca, obj.especificacoes):
+        if not cls.conferem(peca, obj.especificacoes):
             return None
         return obj
 
     @classmethod
-    def registrar(cls, peca, mpn, fonte, especificacoes, *, simular=True, gtin=None):
-        try:
-            from utils.codigos_peca import codigo_interno
-            from services.catalogo_service.normalizar_produto import codigo
-            from repositories.identificadores_peca_repository import _vinculos, reassinar_vinculos
-            if not isinstance(mpn, str) or not mpn.strip() or len(mpn) > 100 or codigo_interno(mpn):
-                raise ValueError('Informe um código real do fabricante')
-            # Releitura bloqueada protege contra mudança da peça durante a importação.
-            db.session.refresh(peca, with_for_update=True)
-            if not cls._conferem(peca, especificacoes):
-                raise ValueError('Especificações locais divergem da fonte revisada')
-            if peca.part_number and not codigo_interno(peca.part_number) and codigo(peca.part_number) != codigo(mpn):
-                raise ValueError('Part number existente diverge da fonte revisada')
-            antiga, numero = assinatura_peca(peca), peca.part_number
-            vinculos = [v for v in _vinculos(peca) if v[0].name == 'vinculo_mercado_livre']
-            if codigo_interno(numero):
-                peca.referencia_interna = peca.referencia_interna or numero
-            peca.part_number = mpn.strip()
-            reassinar_vinculos(peca, vinculos, antiga, numero)
-            atual = cls.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id).with_for_update().first()
-            dados = dict(assinatura_peca=assinatura_peca(peca), mpn=mpn, fonte=fonte, especificacoes=especificacoes, gtin=gtin)
-            if atual:
-                if any(getattr(atual, k) != v for k, v in dados.items()):
-                    raise ValueError('Identidade existente diverge; exige revisão manual')
-                return 'inalterada'
-            if not simular:
-                db.session.add(cls(tabela_peca=peca.__tablename__, peca_id=peca.id, **dados))
-                db.session.commit()
-            return 'proposta' if simular else 'cadastrada'
-        except Exception:
-            db.session.rollback()
-            raise
-        finally:
-            # Encerra também transações de leitura e simulações.
-            db.session.rollback()
+    def buscar_com_trava(cls, peca):
+        return cls.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id).with_for_update().first()
+
+    @classmethod
+    def listar_das_pecas(cls, tabela, ids):
+        return cls.query.filter(cls.tabela_peca == tabela, cls.peca_id.in_(ids)).all()
 
     @staticmethod
     def localizar(modelo, referencia, fabricante, nome):
@@ -71,7 +40,7 @@ class IdentidadeFabricante(ModeloBase):
             modelo.fabricante == fabricante, modelo.modelo == nome).all()
 
     @staticmethod
-    def _conferem(peca, especificacoes):
+    def conferem(peca, especificacoes):
         for campo, esperado in especificacoes.items():
             atual = getattr(peca, campo, None)
             if isinstance(atual, (Decimal, float, int)) and isinstance(esperado, (float, int)):
@@ -80,26 +49,3 @@ class IdentidadeFabricante(ModeloBase):
             elif atual != esperado:
                 return False
         return True
-
-
-    @classmethod
-    def para_matching(cls, pecas):
-        if not pecas:return {}
-        tabela=pecas[0].__tablename__;locais={p.id:p for p in pecas}
-        registros=[]
-        if inspect(db.session.connection()).has_table(cls.__tablename__):
-            registros=cls.query.filter(cls.tabela_peca==tabela,cls.peca_id.in_(locais)).all()
-        resultado={r.peca_id:{'mpn':r.mpn,'gtin':r.gtin} for r in registros
-            if r.assinatura_peca==assinatura_peca(locais[r.peca_id]) and cls._conferem(locais[r.peca_id],r.especificacoes)}
-        from utils.identidade_peca import assinatura_tecnica
-        from services.catalogo_service.normalizar_produto import gtin, codigo
-        for p in pecas:
-            prova=(p.fontes_especificacoes or {}).get('_identidade_tecnica',{})
-            if (not prova or not p.publicavel or prova.get('assinatura_peca')!=assinatura_peca(p)
-                    or prova.get('assinatura_tecnica')!=assinatura_tecnica(p)):continue
-            mpn=p.part_number or prova.get('mpn');ean=prova.get('gtin')
-            if ean is not None and gtin(ean) is None:continue
-            anterior=resultado.get(p.id,{})
-            if any(anterior.get(k) and v and codigo(anterior[k])!=codigo(v) for k,v in [('mpn',mpn),('gtin',ean)]):continue
-            resultado[p.id]={'mpn':anterior.get('mpn') or mpn,'gtin':anterior.get('gtin') or ean}
-        return resultado

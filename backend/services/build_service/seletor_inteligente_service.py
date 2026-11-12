@@ -1,5 +1,3 @@
-from services.build_service.gerar_candidata_service import gerar_candidata
-from services.build_service.gerar_candidata_service import perfil_revisa_investimento
 from .selecionar_plataforma_service import selecionar_placas_mae, selecionar_memorias, aplicar_teto, ficha_catalogo, id_numerico
 from services.validacoes_service.validar_pedido_build_service import validar_orcamento, validar_rede, validar_textos_pedido, pecas_proprias
 from services.build_service.custos_build_service import dividir_orcamento
@@ -8,8 +6,8 @@ from services.build_service.catalogo_geracao_service import validar_disponibilid
 from services.build_service.prompt_build_service import criar_prompt
 from services.build_service.constantes_build import PERIFERICOS
 
-from models import Processador, PlacaVideo, BuildSalva
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models import Processador, PlacaVideo
+from models.modelos_pecas import MODELOS_PECAS
 from utils.aparencia import validar_aparencia
 from utils.validacoes import validacao_campos
 from utils.sockets import normalizar_socket
@@ -22,7 +20,6 @@ from .amostra_inteligente_service import AmostraInteligenteService
 from .planejar_orcamento_componentes_service import PlanejarOrcamentoComponentesService
 from .planejar_armazenamento_service import PlanejarArmazenamentoService
 from .ajustar_orcamento_build_service import AjustarOrcamentoBuildService
-from services.llm_service.bloquear_geracao_service import BloquearGeracaoService
 
 
 class SeletorInteligenteService:
@@ -68,7 +65,6 @@ class SeletorInteligenteService:
         return resultado
 
     def preparar_geracao(self, dados):
-        """Adapta a seleção experimental ao gerador existente, sem chamar IA nem salvar."""
         if not isinstance(dados, dict):
             raise ValueError("Informe um objeto com os dados da geração")
         validacao_campos(dados, ["nome", "descricao", "utilidade", "orcamento"])
@@ -94,23 +90,6 @@ class SeletorInteligenteService:
         return {**resultado, "catalogo": catalogo, "prompt": prompt, "proprias": proprias,
                 "detalhes_proprias": detalhes}
 
-    def gerar_build(self, usuario_id, dados, modelo="gemini-3.5-flash-lite", tentativas_correcao=1):
-        """Gera pela estratégia experimental e repara excesso de custo; não salva a build."""
-        with BloquearGeracaoService().executar(usuario_id):
-            BuildSalva.verificar_espaco(usuario_id)
-            preparado = self.preparar_geracao(dados)
-            aparencia = validar_aparencia(dados.get("aparencia"))
-            build = gerar_candidata(
-                usuario_id, preparado["prompt"], modelo, preparado["catalogo"],
-                validar_orcamento(dados["orcamento"]), dados.get("percentual_perifericos", 0),
-                preparado["proprias"], preparado["detalhes_proprias"], dados.get("rede") or {},
-                tentativas_correcao=tentativas_correcao,
-                revisar_investimento=perfil_revisa_investimento(dados["utilidade"]),
-                cor=aparencia["cor"], aparencia=aparencia,
-                armazenamento_minimo_gb=preparado["armazenamento_minimo_gb"],
-                ajustar_orcamento=True, catalogo_reparo=preparado["catalogo_reparo"], utilidade=dados["utilidade"])
-            return {**preparado, "build": build}
-
     def _catalogo_reparo(self, contexto, selecionados, excluidas):
         catalogo = {}
         for peca in selecionados:
@@ -118,7 +97,6 @@ class SeletorInteligenteService:
         for tipo in AjustarOrcamentoBuildService.AJUSTAVEIS:
             if tipo in excluidas:
                 continue
-            # Não enviar o pool inteiro à IA; usá-lo só para reparar a resposta concreta.
             fichas = [ficha_catalogo(p) for p in contexto["pools"].get(tipo, [])]
             catalogo[tipo] = list({p["id"]: p for p in [*catalogo.get(tipo, []), *fichas]}.values())
         return catalogo
@@ -279,9 +257,8 @@ class SeletorInteligenteService:
             return viaveis
         if any(estimativas.get(p["id"]) is not None for p in pecas):
             plano["avisos"].append("Nenhuma plataforma confirmável cabe com as reservas mínimas do conjunto.")
-            # Ausência de ficha não prova inviabilidade: manter as alternativas pendentes.
             return [p for p in pecas if estimativas.get(p["id"]) is None]
-        return pecas  # Dados incompletos: preservar alternativas, sem afirmar viabilidade.
+        return pecas
 
 
     def _selecionar_demais_pecas(self, contexto, excluidas, selecionados):

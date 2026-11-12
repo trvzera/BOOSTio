@@ -4,8 +4,7 @@ Todos rodam a partir de `backend/`: `python -m flask --app app <comando>`. Na VP
 scripts de `deploy/` já fazem isso. A maioria **simula por padrão** e só grava com `--aplicar`. Os comandos
 `*-preparar` criam ou ajustam tabelas, são seguros para repetir e pedem backup em banco já existente.
 
-Para executar a sequência de aprovação da amostra, busca nas duas lojas, worker
-e análise por IA, use o [passo a passo com um comando por bloco](rotina-catalogo-ofertas.md).
+A sequência de aprovação, busca de ofertas, worker e análise por IA está no fim deste arquivo ("Rotina do catálogo e das ofertas").
 
 ## 1. Os do dia a dia (atualizar preços e ofertas)
 
@@ -13,6 +12,7 @@ e análise por IA, use o [passo a passo com um comando por bloco](rotina-catalog
 | --- | --- |
 | `precos-atualizar` | Atualiza preço e estoque da **KaBuM** (um anúncio por vez). Agendado por `deploy/atualizar_precos.sh`. |
 | `mercadolivre-ofertas-atualizar` | Atualiza as ofertas do **Mercado Livre** das peças. Script: `deploy/atualizar_ofertas_mercadolivre.sh`. |
+| `marketplaces-precos-atualizar` | Atualiza o **preço diário** das ofertas já cadastradas, sem fila: Mercado Livre por `GET /products/{catalogo_id}/items` (uma consulta por peça vinculada, que traz o preço de todos os anúncios dela; a rota `/items` não serve porque devolve 403 para anúncios de outros vendedores) e Shopee por `productOfferV2` (`shopId` e `itemId` vêm do `produto_id_loja`). Grava o preço e uma linha por dia em `historico_oferta`. Opções: `--loja mercado_livre\|shopee\|todas`, `--horas 20` (só consulta ofertas não consultadas nesse prazo, então dá para repetir ou retomar), `--limite`, `--simular` (consulta e conta, sem gravar). No Mercado Livre, anúncio que saiu da lista do catálogo fica como esgotado com o último preço, e peça sem vínculo não é consultada; na Shopee, anúncio sem retorno fica como está. |
 | `marketplaces-enfileirar-ofertas` | Põe na fila uma tarefa de ofertas por peça, para **Mercado Livre ou Shopee**. Sem `--categoria`, percorre **todas** as categorias; só entram peças aprovadas e com o mínimo técnico. |
 | `marketplaces-worker` | Executa a fila acima (processo que fica rodando). `--uma-vez` processa uma tarefa por loja e termina. |
 | `marketplaces-fila-resumo` | Mostra quantas tarefas estão pendentes, em andamento, concluídas ou com falha. |
@@ -37,6 +37,7 @@ e análise por IA, use o [passo a passo com um comando por bloco](rotina-catalog
 | `ofertas-kabum-migrar` | **Novo:** copia link, preço e estoque da KaBuM das peças para a tabela de ofertas. Script: `deploy/migrar_ofertas_kabum.sh`. |
 | `marketplaces-fila-preparar` | Cria as duas tabelas da fila de marketplaces. |
 | `mercadolivre-ofertas-preparar` | Cria as tabelas de ofertas do Mercado Livre. |
+| `mercadolivre-vinculos-criterio-preparar` | Amplia a coluna `criterio` de `vinculo_mercado_livre` para 100 caracteres, só no MySQL (simula; `--aplicar` grava). |
 | `mercadolivre-vinculos-preparar`, `mercadolivre-identidades-preparar`, `mercadolivre-autorizacao-preparar` | Criam as tabelas de vínculos, de MPNs revisados e de autorização do Mercado Livre. |
 | `integracoes-tokens-preparar` | Cria a tabela de tokens das integrações. |
 | `historico-precos-preparar` | Cria a tabela do histórico antigo de preços. |
@@ -44,7 +45,7 @@ e análise por IA, use o [passo a passo com um comando por bloco](rotina-catalog
 | `catalogo-tecnico-preparar` | Ajusta as tabelas de peças para aceitar ficha técnica sem preço. |
 | `dataset-pecas-preparar` | Prepara a importação do dataset público de peças. |
 | `preferencias-preparar` | Cria a tabela de preferências do usuário. |
-| `usuarios-admin-preparar` | Adiciona `usuario.administrador` (simula; `--aplicar` grava). Ver [admin.md](admin.md). |
+| `usuarios-admin-preparar` | Adiciona `usuario.administrador` (simula; `--aplicar` grava). Ver a seção Administração em [funcionalidades.md](funcionalidades.md). |
 | `precos-migrar`, `migrar-budget` | Migrações antigas de SQLite (links; orçamento do usuário). |
 
 ## 3. Cadastrar e importar peças
@@ -58,7 +59,7 @@ e análise por IA, use o [passo a passo com um comando por bloco](rotina-catalog
 | `buildcores-baixar` / `buildcores-importar` / `buildcores-cruzar` | Baixa, importa e cruza fichas técnicas do BuildCores com o catálogo. |
 | `dataset-pecas-baixar` / `dataset-pecas-importar` | Baixa e importa o dataset público de peças (só ficha técnica). |
 | `catalogo-tecnico-importar` / `-listar` / `-revisar` | Importa fichas técnicas em JSON, lista o que existe e revisa/aprova. |
-| `benchmarks-importar` | Preenche benchmarks de CPU/GPU nas peças já cadastradas. |
+| `benchmarks-importar` | Preenche benchmarks de CPU/GPU (PassMark) nas peças já cadastradas, sem rede: `--cpu database/benchmarks/20261102T113616731428Z/cpus.csv --gpu database/benchmarks/20261102T113616731428Z/gpus.csv`; `--simular` só mostra. Associa pelo mapa revisado `backend/data/benchmarks/passmark_associacoes.json`, pelo nome exato ou pelo chip/modelo (GPU: `modelo_referencia`), sem aceitar variantes parecidas. |
 
 ## 4. Descoberta e importação do Mercado Livre (etapas em sequência)
 
@@ -92,12 +93,57 @@ e análise por IA, use o [passo a passo com um comando por bloco](rotina-catalog
 | `catalogo-montagem-reavaliar` | Reavalia se cada peça tem o mínimo técnico para montar build. |
 | `catalogo-especificacoes-preencher`, `catalogo-fichas-originais` | Completam e conferem fichas usando dados já coletados. |
 | `catalogo-gpus-converter-referencias`, `catalogo-identificadores-separar` | Correções pontuais de GPUs genéricas e de códigos (MPN, referência, ID da loja). |
+| `icecat-completar-pecas` | Completa campos vazios das peças recusadas por ficha incompleta com a ficha do Icecat (`--categoria`, `--limite`, `--depois-id`; simula, `--aplicar` grava) e libera a marca de ficha de montagem. |
 | `icecat-consultar`, `icecat-indice-preparar` | Consulta uma ficha do Icecat para diagnóstico; monta o índice local. |
 | `fabricantes-consultar` | Consulta páginas oficiais de fabricantes e mostra as evidências. |
 
 ## Como escolher
 
-- **Quero preço atualizado:** `precos-atualizar` (KaBuM) e fila + worker (Mercado Livre e Shopee).
+- **Quero preço atualizado:** `precos-atualizar` (KaBuM) e `marketplaces-precos-atualizar` (Mercado Livre e Shopee). A fila + worker serve para descobrir e associar ofertas novas, não para o preço diário.
 - **Subi uma versão nova:** os `*-preparar` / scripts de `deploy/`, com backup.
 - **Quero peças novas:** seção 3, ou `shopee-descobrir` / `catalogo-worker`.
 - **Algo está estranho:** seção 6, que não altera dados.
+
+## Rotina do catálogo e das ofertas
+
+Rode tudo a partir de `backend/` (na VPS, via Docker, como nos scripts de `deploy/`). Um comando por vez.
+Os comandos com `--aplicar` gravam; o worker e a reativação já executam ações reais.
+
+1. **Aprovar peças em lote** (até 300 por categoria; simule antes, depois grave):
+
+   ```bash
+   python -m flask --app app catalogo-aprovar-lote --limite 300 --semente 1
+   python -m flask --app app catalogo-aprovar-lote --limite 300 --semente 1 --aplicar
+   ```
+
+   Aprovar não cria preço nem oferta: a peça só aparece ao usuário com oferta ativa e preço. Para desfazer
+   (só peças aprovadas por esta regra e ainda sem oferta): `catalogo-aprovar-lote --reverter [--aplicar]`.
+
+2. **Enfileirar a busca de ofertas** em cada loja (o texto de `--execucao` só identifica a rodada e evita duplicatas):
+
+   ```bash
+   python -m flask --app app marketplaces-enfileirar-ofertas --loja shopee --execucao rodada-1 --gravar-ofertas --aplicar
+   python -m flask --app app marketplaces-enfileirar-ofertas --loja mercado_livre --execucao rodada-1 --gravar-ofertas --aplicar
+   ```
+
+3. **Rodar o worker** (fica aberto; `--uma-vez` processa uma tarefa por loja e termina):
+
+   ```bash
+   python -m flask --app app marketplaces-worker
+   ```
+
+4. **Acompanhar a fila** com `marketplaces-fila-resumo`. Se uma loja ficar bloqueada por autorização, corrija a
+   credencial e então rode `marketplaces-fila-reativar --loja mercado_livre` (ou `shopee`). Tarefa concluída não
+   garante que houve oferta: meça por peças com ao menos uma oferta ativa e preço maior que zero.
+
+5. **Atualizar os preços das ofertas já cadastradas** (uma vez por dia; simule antes). Não usa a fila, e a fila
+   de descoberta pode continuar rodando ao mesmo tempo, pois as duas respeitam o limite de requisições por loja:
+
+   ```bash
+   python -m flask --app app marketplaces-precos-atualizar --simular
+   python -m flask --app app marketplaces-precos-atualizar
+   ```
+
+6. **Analisar as pendências com IA**: `admin-pendencias-sugerir --limite 500 --aplicar` só sugere; com `--decidir`
+   também aceita ou rejeita quando a confiança alcança 90. Rejeição da IA não tem desfazer. Alternativa: o painel
+   de administração ("Selecionar todas" e "Enviar para a IA").

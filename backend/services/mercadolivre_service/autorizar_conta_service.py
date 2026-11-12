@@ -63,7 +63,6 @@ class AutorizarContaMercadoLivreService:
             dados = self._trocar(dict(grant_type='authorization_code', client_id=config[0],
                 client_secret=current_app.config['MERCADO_LIVRE_CLIENT_SECRET'], code=codigo,
                 redirect_uri=config[2], code_verifier=verificador))
-            # Não aceitar a conta errada nem expor seu token. O endpoint OAuth informa user_id.
             if str(dados.get('user_id')) != config[1]:
                 raise ValueError('A conta autorizada difere de MERCADO_LIVRE_CONTA_ID; nenhum token local alterado')
             access = TokenMercadoLivreService._credencial(dados.get('access_token'))

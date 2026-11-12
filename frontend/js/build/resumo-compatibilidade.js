@@ -1,4 +1,4 @@
-// Organiza a apresentação; não altera o diagnóstico nem aprova dados ausentes.
+
 const assuntos = [
   ["processador", "Processador e placa-mãe", "Confira o suporte ao processador e a versão de BIOS necessária."],
   ["memoria", "Memória RAM", "Confira slots, capacidade e suporte aos pentes escolhidos."],
@@ -56,7 +56,7 @@ function agrupar(entradas) {
 export function resumirCompatibilidade(resultado) {
   const diagnostico = resultado.compatibilidade || {};
   const errosServidor = Array.isArray(diagnostico.erros) ? diagnostico.erros : [];
-  // O servidor repete a descrição da mesma regra com um título adicional.
+
   const erros = unicos([...(resultado.erros || []), ...errosServidor.map(v => v.mensagem)]);
   const conflitos = erros.filter((mensagem, i) => !erros.some((outra, j) => i !== j
     && chave(outra).length > chave(mensagem).length && chave(outra).endsWith(chave(mensagem))));
@@ -66,19 +66,19 @@ export function resumirCompatibilidade(resultado) {
   const dicas = [];
   for (const mensagem of unicos(resultado.dicas || [])) {
     if (equivalentesLocais.some(([padrao, regras]) => padrao.test(mensagem) && regras.some(c => codigos.has(c)))) continue;
-    // Dúvidas locais sobre medidas não precisam reaparecer em uma segunda lista.
+
     const faltaDado = /^(faltam?\b|slots .*não informados|este cooler tem versões|confirme no fabricante|confirme quais slots|confirme se o ssd|há discos sem|selecione a placa-mãe)/i.test(mensagem);
     (faltaDado ? pendentes : dicas).push(faltaDado ? {mensagem} : mensagem);
   }
   const grupos = agrupar(pendentes);
-  // Uma orientação sobre o mesmo assunto fica junto da conferência técnica.
+
   const orientacoes = [];
   for (const mensagem of dicas) {
     const grupo = grupos.find(g => g.id === assunto("", mensagem));
     if (grupo) grupo.mensagens = unicos([...grupo.mensagens, mensagem]);
     else orientacoes.push(mensagem);
   }
-  // Um aviso sério não é rebaixado a conferência recolhida por coincidência de texto.
+
   const conhecidos = new Set(conflitos.map(chave));
   return {erros: conflitos, faltam: unicos(resultado.faltam || []),
     avisos: unicos(resultado.avisos || []).filter(v => !conhecidos.has(chave(v))),

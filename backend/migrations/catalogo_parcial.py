@@ -1,5 +1,4 @@
-"""Permite fichas técnicas parciais sem apagar dados e sem liberar para builds."""
-from models.campos_tecnicos import CAMPOS_CATALOGO_PARCIAL
+from utils.campos_tecnicos import CAMPOS_CATALOGO_PARCIAL
 from .catalogo_tecnico import preparar_catalogo_tecnico
 
 

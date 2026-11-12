@@ -48,9 +48,7 @@ class BuildSalva(ModeloBase):
 
     @classmethod
     def criar_limitada(cls, usuario_id, estado, gerada=None):
-        """Serializa a escrita por usuário; nunca mantém lock durante a chamada à LLM."""
         try:
-            # UPDATE também serializa no SQLite, onde SELECT FOR UPDATE não tem efeito.
             resultado = db.session.execute(update(Usuario).where(Usuario.id == usuario_id).values(id=Usuario.id))
             if resultado.rowcount != 1:
                 raise ValueError("Usuário não encontrado")
@@ -112,7 +110,6 @@ class BuildSalva(ModeloBase):
             return None
         build = db.session.get(cls, int(identificador[2:]))
         return build if build is not None and build.estado.get("visibilidade") == "publico" else None
-
 
 
     @classmethod

@@ -127,7 +127,7 @@ def test_vram_e_disco_usam_modelos_persistidos_e_nao_somam_capacidade_de_unidade
     assert dados["ram"]["atendeMinimo"] is True
     assert dados["vram"] == {"dedicadaGb": 4, "minimaGb": 6, "atendeCapacidadeMinima": False}
     assert dados["armazenamento"]["maiorUnidadeElegivelGb"] == 40
-    assert dados["armazenamento"]["atendeCapacidadeMinima"] is False  # 2x40 não é um volume de 80
+    assert dados["armazenamento"]["atendeCapacidadeMinima"] is False
     assert dados["armazenamento"]["espacoLivreVerificado"] is False
     assert len(dados["impedimentosMinimos"]) == 2
     cs2 = cliente(app_requisitos).get("/benchmark/requisitos-build?game=cs2&build_id=s-1").json["resultado"]

@@ -1,4 +1,3 @@
-# tests/services/usuario_service/test_atualizar_usuario_service.py
 import pytest
 from services.usuario_service.atualizar_usuario_service import AtualizarUsuarioService
 from werkzeug.security import check_password_hash

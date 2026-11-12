@@ -12,9 +12,8 @@ function instanteRegistro(valor) {
   return Date.parse(valor.length === 10 ? valor + "T00:00:00Z" : valor);
 }
 
-// Usa cotações explícitas da loja recebidas do backend, nunca visitas locais
-// ou cópias do preço atual apresentadas como se fossem cotações anteriores.
-const nomesLojas = {kabum: "KaBuM!", mercado_livre: "Mercado Livre", shopee: "Shopee"};
+
+export const nomesLojas = {todas: "Todas as lojas · menor preço do dia", kabum: "KaBuM!", mercado_livre: "Mercado Livre", shopee: "Shopee"};
 
 export function normalizarHistoricoPrecos(registros, agora = Date.now(), lojaEsperada = "kabum") {
   if (!Array.isArray(registros)) return [];
@@ -23,7 +22,7 @@ export function normalizarHistoricoPrecos(registros, agora = Date.now(), lojaEsp
     if (!registro || typeof registro !== "object") continue;
     const instante = instanteRegistro(registro.data);
     const loja = typeof registro.loja === "string" ? registro.loja.trim().toLowerCase().replace(/!$/, "") : "";
-    if (!["kabum", "mercado_livre", "shopee"].includes(lojaEsperada) || loja !== lojaEsperada || typeof registro.preco !== "number" || !Number.isFinite(registro.preco) || registro.preco <= 0 || !Number.isFinite(instante) || instante > agora || registro.esgotado === true) continue;
+    if (!nomesLojas[lojaEsperada] || !["kabum", "mercado_livre", "shopee"].includes(loja) || (lojaEsperada !== "todas" && loja !== lojaEsperada) || typeof registro.preco !== "number" || !Number.isFinite(registro.preco) || registro.preco <= 0 || !Number.isFinite(instante) || instante > agora || registro.esgotado === true) continue;
     porInstante.set(instante, {instante, preco:registro.preco});
   }
   return [...porInstante.values()].sort((a, b) => a.instante - b.instante);
@@ -32,7 +31,7 @@ export function normalizarHistoricoPrecos(registros, agora = Date.now(), lojaEsp
 export function filtrarHistoricoPrecos(registros, periodo, agora = Date.now()) {
   if (!periodos.some(([valor]) => valor === periodo)) return [];
   if (periodo === "todos") return registros.slice();
-  // Inclui o dia atual e os anteriores até completar o número de dias escolhido.
+
   const hoje = new Date(agora);
   const inicio = Date.UTC(hoje.getUTCFullYear(), hoje.getUTCMonth(), hoje.getUTCDate()) - (Number(periodo) - 1) * DIA;
   return registros.filter(registro => registro.instante >= inicio && registro.instante <= agora);

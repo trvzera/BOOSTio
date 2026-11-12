@@ -1,4 +1,3 @@
-"""Execute antes de publicar o frontend; não inicializa o banco nem o servidor."""
 import os
 from pathlib import Path
 

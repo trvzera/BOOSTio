@@ -1,5 +1,6 @@
 from .dados_seed import dados_seed
-from models import PlacaRede
+from .atualizar_links_placa_rede_service import AtualizarLinksPlacaRedeService
+from .cadastrar_pecas_ausentes_service import CadastrarPecasAusentesService
 from .atualizar_precos_service import AtualizarPrecosService
 from .restaurar_links_kabum_service import RestaurarLinksKabumService
 
@@ -26,7 +27,7 @@ class PopularPecasService:
 
   @staticmethod
   def _atualizar_links_rede():
-    PlacaRede.atualizar_links_antigos({
+    AtualizarLinksPlacaRedeService().executar({
       "https://www.kabum.com.br/produto/1049525/adaptador-wi-fi-tp-link-archer-t2u-plus-ac600-dual-band-usb-2-0-600mbps-antena-externa-compativel-windows-mac":
         "https://www.kabum.com.br/produto/173198/adaptador-wireless-tp-link-archer-t2u-plus-ac600-usb-dual-band",
       "https://www.kabum.com.br/produto/101797/adaptador-wireless-tp-link-usb-3-0-ac1300-archer-t3u":
@@ -34,5 +35,5 @@ class PopularPecasService:
     })
 
   def _popular_classe(self, classe, itens: list[dict]) -> None:
-    novos = classe.cadastrar_ausentes(itens)
+    novos = CadastrarPecasAusentesService().executar(classe, itens)
     print(f"[seed] {classe.__name__}: {novos} inseridos, {len(itens) - novos} já cadastrados")

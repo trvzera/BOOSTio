@@ -93,9 +93,9 @@ test("dimensões novas são critérios de encaixe, sem certificar folgas desconh
   assert.match(validarEncaixe({gabinete:{...gabinete,tamanho_max_cooler_mm:157},air}).erros.join(" "),/ultrapassa/);
   assert.match(validarEncaixe({gabinete:{...gabinete,tamanho_max_fonte_mm:124},fonte}).erros.join(" "),/ultrapassa/);
   const fan = quantidade => [{peca:{quantidade:1,tamanho_mm:120},item:{quantidade}}];
-  assert.equal(informacoesFans(gabinete,fan(2),water).quantidade,true); // 3 fábrica + 2 AIO + 2 extras
+  assert.equal(informacoesFans(gabinete,fan(2),water).quantidade,true);
   assert.equal(informacoesFans(gabinete,fan(3),water).quantidade,false);
-  assert.equal(encaixeRadiador(gabinete,water),null); // não inventa limite real do gabinete
+  assert.equal(encaixeRadiador(gabinete,water),null);
   assert.ok(validarEncaixe({gabinete,water}).avisos.some(a => a.includes("folgas")));
   const pequeno = {...gabinete,limites_radiador_mm:[{nome:"Topo",tamanhos_mm:[240],comprimento_mm:276,largura_mm:120,espessura_conjunto_mm:53}]};
   assert.equal(encaixeRadiador(pequeno,water),false);

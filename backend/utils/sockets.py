@@ -1,4 +1,3 @@
-"""Identificadores explícitos; socket igual não certifica CPU/BIOS."""
 import re
 
 

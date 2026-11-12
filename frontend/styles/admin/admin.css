@@ -1,4 +1,4 @@
-/* Revisão de ofertas: resumo, filtros, fila e detalhe da seleção. */
+
 .admin-page-body { min-height: 100vh; height: auto; overflow-x: clip; font-family: var(--font-body); }
 .admin-page-body [hidden] { display: none; }
 #admin-page { position: relative; isolation: isolate; width: 100%; max-width: 1520px; margin: auto; padding: 112px var(--page-gutter,32px) 80px; color: var(--cor-5); }

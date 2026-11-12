@@ -15,7 +15,6 @@ from utils.limite_requisicoes import configurar_limites, limiter
 
 @pytest.fixture
 def app(monkeypatch):
-    # Limiter é compartilhado: restaurar sua configuração ao encerrar o teste.
     monkeypatch.setattr(limiter, "enabled", limiter.enabled)
     app = Flask(__name__)
     app.config.update(TESTING=True, SECRET_KEY="apenas-testes", SQLALCHEMY_DATABASE_URI="sqlite:///:memory:",

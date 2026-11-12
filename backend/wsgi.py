@@ -1,4 +1,3 @@
-"""Entrada de produção: gunicorn -c gunicorn.conf.py wsgi:app."""
 from app import app, ambiente
 
 if ambiente != "producao":

@@ -48,7 +48,6 @@ def test_idempotencia_persistencia_e_recuperacao_crash(banco):
     assert worker.enfileirar('shopee','teste',{'consulta':'SSD'},execucao='teste') == ident
     primeira = repo.reservar('shopee',datetime.now(timezone.utc).replace(tzinfo=None)+timedelta(seconds=1))
     assert primeira['id'] == ident
-    # Nova instância, como após reiniciar o processo; tarefa em execução recuperada.
     worker.relogio=lambda:datetime.now(timezone.utc).replace(tzinfo=None)+timedelta(seconds=1)
     assert worker.executar('shopee')['status'] == 'concluida'
     assert worker.executar('shopee')['status'] == 'aguardando'
@@ -88,7 +87,6 @@ def test_erros_fila_e_retomada_automatica(banco,status,espera):
     assert worker.executar('shopee')['status']=='aguardando'
     agora[0]+=timedelta(seconds=espera+1)
     worker.controle=ControleRequisicoesMarketplaceService('shopee',repo,relogio=lambda:agora[0])
-    # Handler recebe o controle do novo ciclo, assim como o cliente HTTP real.
     from services.marketplace_service.controle_requisicoes_service import executar_requisicao
     worker.executores[('shopee','teste')]=lambda _:executar_requisicao(chamada, loja='shopee')
     assert worker.executar('shopee')['status']=='concluida'
@@ -187,7 +185,7 @@ def test_enfileirar_sem_categoria_percorre_todas_e_so_pecas_aprovadas_e_completa
     db.session.add_all([
         Processador(modelo='Ryzen 5 5500', status_validacao='aprovado', **cpu),
         Processador(modelo='Ryzen 5 5600', status_validacao='legado', **cpu),
-        Processador(modelo='Ryzen 5 4500', status_validacao='em_revisao', **cpu),  # não aprovada
+        Processador(modelo='Ryzen 5 4500', status_validacao='em_revisao', **cpu),
         Fonte(fabricante='Corsair', modelo='CV550', potencia_w=550, consumo_energia=0, status_validacao='aprovado')])
     db.session.commit()
     registrar_comandos_marketplaces(app)
@@ -197,9 +195,23 @@ def test_enfileirar_sem_categoria_percorre_todas_e_so_pecas_aprovadas_e_completa
     assert simulado['tarefas'] == sum(simulado['por_categoria'].values()) and repo.resumo() == []
     aplicado = json.loads(runner.invoke(args=['marketplaces-enfileirar-ofertas', '--loja', 'shopee', '--execucao', 'todas', '--aplicar']).output)
     assert aplicado['tarefas'] == simulado['tarefas'] and TarefaMarketplace.query.count() == aplicado['tarefas']
-    # repetir com a mesma identificação não duplica; outra categoria continua exigindo o filtro
     runner.invoke(args=['marketplaces-enfileirar-ofertas', '--loja', 'shopee', '--execucao', 'todas', '--aplicar'])
     assert TarefaMarketplace.query.count() == aplicado['tarefas']
     uma = json.loads(runner.invoke(args=['marketplaces-enfileirar-ofertas', '--loja', 'shopee', '--categoria', 'processador', '--execucao', 'so-cpu']).output)
     assert uma['tarefas'] == 2 and list(uma['por_categoria']) == ['processador']
     assert runner.invoke(args=['marketplaces-enfileirar-ofertas', '--loja', 'shopee', '--peca-id', '1', '--execucao', 'x']).exit_code != 0
+
+
+def test_404_nao_envenena_as_proximas_chamadas_da_tarefa(banco):
+    _, repo = banco
+    agora = datetime.now(timezone.utc).replace(tzinfo=None)+timedelta(seconds=1)
+    controle = ControleRequisicoesMarketplaceService('mercado_livre', repo, relogio=lambda: agora, dormir=lambda _: None)
+    with pytest.raises(FalhaMarketplace) as erro:
+        controle.executar(Mock(side_effect=FalhaMarketplace(404)))
+    assert erro.value.status == 404 and controle.erro is None
+    agora += timedelta(seconds=2)
+    assert controle.executar(Mock(return_value={'ok': True})) == {'ok': True}
+    agora += timedelta(seconds=2)
+    with pytest.raises(FalhaMarketplace):
+        controle.executar(Mock(side_effect=FalhaMarketplace(400)))
+    assert controle.erro is not None

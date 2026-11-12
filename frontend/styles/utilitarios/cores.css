@@ -1,5 +1,5 @@
 :root {
-  /* MONOCROMÁTICAS */
+
   --cor-0: #000000;
   --cor-1: #1c1c1e;
   --cor-2: #3a3a3c;
@@ -8,7 +8,7 @@
   --cor-5: #e5e5ea;
   --cor-6: #ffffff;
 
-  /* PRIMÁRIAS */
+
   --cor-p1: #007bff;
   --cor-p2: #0077F6;
   --cor-p3: #0067D4;
@@ -16,13 +16,13 @@
   --cor-p5: #004691;
   --cor-p6: #00356F;
 
-  /* SECUNDÁRIAS */
+
   --cor-s1: #72fdff;
   --cor-s2: #62f5ff;
   --cor-s3: #32ddff;
   --cor-s4: #22d5ff;
 
-  /* DETALHES */
+
   --cor-d1: #FF3B30;
   --cor-d2: #FFCC00;
   --cor-d3: #FFCC00;
@@ -34,7 +34,7 @@
   --status-error-bg: #ff3b3014;
   --text-primary: var(--cor-6);
   --text-secondary: #a1a1a6;
-  --text-accent: #3395ff; /* Tom da primária para texto pequeno sobre superfícies azuladas. */
+  --text-accent: #3395ff;
   --brand-gradient: linear-gradient(115deg, var(--cor-p1), var(--cor-p3));
   --radius-control: 999px;
   --radius-card: 20px;

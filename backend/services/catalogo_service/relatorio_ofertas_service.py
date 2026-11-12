@@ -1,4 +1,3 @@
-"""Progresso em JSON + detalhes incrementais, com retomada e lock local."""
 import json
 import os
 from pathlib import Path
@@ -46,7 +45,6 @@ class RelatorioOfertasService:
 
     def atualizar(self, resumo):
         linhas = resumo.get('detalhes', [])
-        # Uma escrita por detalhe; nunca reescrever milhares de linhas por peça.
         novas = linhas if resumo.get('detalhes_incrementais') else linhas[self.emitidos:]
         if novas:
             with self.detalhes.open('a') as arquivo:
@@ -61,7 +59,7 @@ class RelatorioOfertasService:
             if campo == 'pecas':
                 anterior -= self.anterior.get('falhas', 0)
             if campo == 'falhas':
-                anterior = 0  # A peça falha é retomada; não contá-la duas vezes.
+                anterior = 0
             resultado[campo] = anterior + resumo.get(campo, 0)
         resultado.update(versao_relatorio=1, opcoes=self.opcoes,
             atualizado_em=datetime.now(timezone.utc).isoformat(),

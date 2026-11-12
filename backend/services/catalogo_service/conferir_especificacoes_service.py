@@ -1,5 +1,5 @@
 import re
-from decimal import Decimal
+
 from .normalizar_produto import nome, numero
 from utils.sockets import normalizar_socket
 from .normalizar_especificacoes import converter_adicional, agregar, CONJUNTOS, comparar_conexoes
@@ -52,7 +52,6 @@ def converter(campo, valor):
             n=numero(s,'ghz')
             if n is not None:n*=1000
         if n is None:return None
-        # Campos de clock de CPU são armazenados em GHz no projeto.
         if campo in ('clockbase','clockmax'):
             return n/1000 if re.search(r'(?:ghz|mhz)',s) else numero(s)
         return n
@@ -95,7 +94,6 @@ def converter(campo, valor):
 
 
 def consolidar_interfaces(observados):
-    """Combina descrições genéricas e específicas sem fundir gerações ou lanes."""
     resultado = set(observados)
     for familia in ('sata', 'pcie'):
         padrao = familia + r'[1-5](?:\.0)?(?:x(?:1|2|4|8|16))?'
@@ -118,8 +116,6 @@ def extrair_titulo(categoria,titulo):
         kit=re.search(r'\b(\d+)\s*[x×]\s*(\d+)\s*gb',texto)
         if categoria=='memoria_ram' and kit:
             dados['quantidade_pentes']=[kit[1]];dados['capacidade_gb']=[str(int(kit[1])*int(kit[2]))+' gb']
-            # Capacidade do módulo não é a capacidade total. Outros totais
-            # explícitos, porém, também precisam concordar com o kit anunciado.
             restante = texto[:kit.start()] + texto[kit.end():]
             extras = re.findall(r'\b(\d+(?:[.,]\d+)?)\s*(gb|tb)\b(?!\s*(?:/|ps\b))', restante)
             dados['capacidade_gb'].extend(''.join(v) for v in extras)
@@ -150,7 +146,6 @@ def extrair_titulo(categoria,titulo):
 class ConferirEspecificacoesService:
     @staticmethod
     def confrontar_titulo(campo, estruturados, titulo):
-        """Não deixe um atributo correto esconder outro valor explícito no título."""
         if not estruturados or not titulo:
             return False
         ficha = {converter(campo, v) for v in valores(estruturados)}

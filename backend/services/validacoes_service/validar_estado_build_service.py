@@ -1,4 +1,3 @@
-"""Valida o estado editável; não exige uma configuração completa de IA."""
 from models.build_salva import MODELOS, MULTIPLAS
 from utils.aparencia import validar_aparencia
 

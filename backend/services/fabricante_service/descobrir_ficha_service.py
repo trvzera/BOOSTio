@@ -1,4 +1,3 @@
-"""Descoberta pelo sitemap oficial, preservando códigos e variantes nas URLs."""
 import re
 from urllib.parse import urlsplit, unquote
 from defusedxml.ElementTree import fromstring
@@ -21,7 +20,6 @@ class DescobrirFichaFabricanteService:
             return []
         regras=self.paginas.regras(fabricante)
         mapas=regras.site_maps() or []
-        # Prefere o catálogo inglês para os parsers de atributos ingleses.
         def prioridade(u):
             caminho=urlsplit(u).path
             return (not any(v in caminho for v in ('us-','/en-us/','/en-in/','/en-ph/')), 'products' not in caminho, u)

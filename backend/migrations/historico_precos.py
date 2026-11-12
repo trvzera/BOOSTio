@@ -1,4 +1,3 @@
-"""Migração aditiva de histórico para SQLite/MySQL existentes."""
 from sqlalchemy import inspect
 from models import db, HistoricoPreco
 

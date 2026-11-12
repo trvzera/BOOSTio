@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       try {
         const valor = JSON.parse(localStorage.getItem("boostio:rascunhos-build") || "{}")[idSolicitado];
         if (valor) rascunho = normalizarBuild({...valor,id:idSolicitado});
-      } catch { /* A prévia continua disponível com as builds de exemplo. */ }
+      } catch {   }
     }
     const builds = [...salvas,...(rascunho ? [rascunho] : []),
       ...exemplos.filter(exemplo => !salvas.some(build => build.id === exemplo.id) && exemplo.id !== rascunho?.id)];
@@ -272,7 +272,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const valor = valorBudget();
       const disponivel = valor != null && valor > 0;
       let marcado = false;
-      try { marcado = sessionStorage.getItem(CHAVE_BUDGET_NOVAS) === "1"; } catch { /* Sem persistência na sessão. */ }
+      try { marcado = sessionStorage.getItem(CHAVE_BUDGET_NOVAS) === "1"; } catch {   }
       usarBudgetNovas.disabled = !disponivel;
       usarBudgetNovas.dataset.disabledReason = "Registre um budget maior que zero para habilitar esta opção.";
       usarBudgetNovas.checked = disponivel && marcado;

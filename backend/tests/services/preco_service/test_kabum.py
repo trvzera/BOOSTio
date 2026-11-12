@@ -11,7 +11,7 @@ from services.preco_service.reservar_consulta_service import ReservarConsultaSer
 from services.preco_service.validar_link_service import ValidarLinkService
 from services.peca_service.atualizar_precos_service import AtualizarPrecosService
 from services.peca_service.migrar_links_service import MigrarLinksService
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models.modelos_pecas import MODELOS_PECAS
 from services.peca_service.popular_pecas_service import PopularPecasService
 from services.peca_service.salvar_peca_service import SalvarPecaService
 

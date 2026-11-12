@@ -101,7 +101,6 @@ def test_copia_exige_login_csrf_email_e_vaga_sem_alterar_original(app_publica):
         assert estado["componentes"]["memoria_ram"][0]["quantidade"] == 2
         assert not estado.get("setupAtual") and not estado["pecasExtras"] and not estado["rede"]
     assert navegador.post("/build/s-1/copiar-publica", headers=csrf).status_code == 409
-    # As rotas privadas existentes usam 400 para falhas de alteração/exclusão.
     assert navegador.put("/build/s-1", json={"travada": False}, headers=csrf).status_code == 400
     assert navegador.delete("/build/s-1", headers=csrf).status_code == 400
     with app_publica.app_context():
@@ -145,5 +144,5 @@ def test_autoria_nao_expoe_nome_retido_da_conta_desativada(app_publica):
     with app_publica.app_context():
         db.session.get(Usuario, 1).desativar()
     resposta = navegador.get("/build/s-1/publica")
-    assert resposta.status_code == 200  # Política atual de links públicos preservada.
+    assert resposta.status_code == 200
     assert resposta.json["build"]["criador"] == {"nome": "Conta desativada"}

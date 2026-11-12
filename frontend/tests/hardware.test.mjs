@@ -96,8 +96,8 @@ test("water cooler 360 mm requer suporte explícito, não apenas um booleano",()
 });
 test("conta unidades do kit fan, fans inclusas e fans do radiador sem somar diâmetros",() => {
   const build = adicionar(vazio(),gabinete,water,fan);
-  assert.equal(pecaCompativel(build,fan,catalogo),false); // 1 + 2 + 4 > 6
-  const semWater = adicionar(vazio(),gabinete,fan,fan); // duas duplas de 120, nunca uma fan de 480
+  assert.equal(pecaCompativel(build,fan,catalogo),false);
+  const semWater = adicionar(vazio(),gabinete,fan,fan);
   assert.equal(avaliarBuild(semWater,catalogo).erros.length,0);
   assert.equal(pecaCompativel(semWater,fan,catalogo),false);
   const gigante = {...fan,id:"fan360",tamanho_mm:360,quantidade:1};

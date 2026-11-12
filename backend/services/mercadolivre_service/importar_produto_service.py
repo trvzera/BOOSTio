@@ -1,12 +1,11 @@
-"""Consulta antes da transação; revalida duplicados sob bloqueio e importa atomicamente."""
 from services.icecat_service.obter_ficha_icecat_service import ErroConsultaIcecat
 from datetime import datetime, timezone
 from sqlalchemy.exc import SQLAlchemyError
-from models import db, ProdutoPendente, IdentidadeFabricante, Oferta
-from repositories.importacao_catalogo_repository import RepositorioImportacaoCatalogo
-from services.peca_service.modelos_pecas import MODELOS_PECAS
+from models import db, ProdutoPendente
+from services.catalogo_service.gravar_importacao_catalogo_service import GravarImportacaoCatalogoService
+from models.modelos_pecas import MODELOS_PECAS
 from utils.identidade_peca import assinatura_peca, assinatura_catalogo, assinatura_documento
-from .comparar_produtos_service import CompararProdutosService
+
 from .enriquecer_produto_service import EnriquecerProdutoService
 from .buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
 from .token_mercado_livre_service import TokenMercadoLivreService
@@ -22,7 +21,7 @@ class ImportarProdutoService:
         from services.fabricante_service.completar_ficha_service import CompletarFichaFabricanteService
         self.fabricantes=fabricantes if fabricantes is not None else CompletarFichaFabricanteService.configurado()
         self.base_icecat=base_icecat if base_icecat is not None else CompletarFichaIcecatService.configurado()
-        self.repositorio=repositorio or RepositorioImportacaoCatalogo()
+        self.repositorio=repositorio or GravarImportacaoCatalogoService()
         self.verificar_execucao=verificar_execucao or (lambda: None)
 
     def executar(self, pendencia_id, *, simular=True, permitir_novos=False):
@@ -36,7 +35,6 @@ class ImportarProdutoService:
         if p.categoria_sugerida not in modelos:raise ValueError('Categoria precisa de revisão')
         categoria=p.categoria_sugerida;bruto=p.dados_originais;assinatura=assinatura_documento(bruto)
         produto,anuncio=self._consultar_anuncio(p)
-        # Somente preço e estoque atuais; nunca reutilizar a cotação antiga da descoberta.
         entrada={'price':anuncio['preco'],'available_quantity':anuncio.get('quantidade_disponivel')}
         if (bruto.get('anuncio') or {}).get('title'):entrada['title']=bruto['anuncio']['title']
         ficha=self.enriquecedor.executar(categoria,produto,entrada)
@@ -50,8 +48,6 @@ class ImportarProdutoService:
         if permitir_novos and (self.base_icecat is not None or self.fabricantes is not None):
             from services.catalogo_service.indice_candidatos_service import IndiceCandidatosService
             decisao=IndiceCandidatosService.carregar(modelos[categoria]).avaliar(normalizado)
-            # Uma ficha técnica também pode resolver lacunas de uma associação
-            # ambígua. A decisão é refeita sob bloqueio depois do enriquecimento.
             if decisao['classificacao']!='confirmada':
                 if self.base_icecat is not None:
                     normalizado,ficha=self.base_icecat.executar(normalizado,ficha)
@@ -66,7 +62,6 @@ class ImportarProdutoService:
         return resultado_importacao
 
     def _consultar_anuncio(self,p):
-        """Rede antes da transação: catálogo atual e o anúncio como oferta nova do mesmo vendedor."""
         bruto=p.dados_originais
         catalogo=(bruto.get('catalogo') or {}).get('id') or (bruto.get('anuncio') or {}).get('catalog_product_id')
         self.cliente._validar_id(catalogo,'catálogo')
@@ -82,8 +77,6 @@ class ImportarProdutoService:
         return produto,anuncio
 
     def aceitar_revisado(self,pendencia_id,peca,revisao):
-        """Associação decidida por uma pessoa: a decisão automática não é refeita, mas o anúncio é
-        reconsultado e a gravação (trava, vínculo do catálogo, posse do anúncio e histórico) é a mesma."""
         p=ProdutoPendente.buscar_por_id(pendencia_id)
         if p is None or p.loja!='mercado_livre':raise ValueError('Pendência ausente ou de outra loja')
         if p.status not in ('pendente','em_revisao'):raise ValueError('Esta pendência já foi decidida')

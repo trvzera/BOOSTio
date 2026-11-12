@@ -20,7 +20,6 @@ class Codigo(ModeloBase):
 
   @staticmethod
   def invalidar_anteriores(usuario_id):
-    # A transação é concluída por quem altera o email ou emite o novo código.
     Codigo.query.filter_by(usuario_id=usuario_id, usado=False).update(
       {Codigo.usado: True}, synchronize_session=False,
     )
@@ -28,7 +27,6 @@ class Codigo(ModeloBase):
   @staticmethod
   def emitir(usuario_id, email_destino, codigo):
     from .usuario import Usuario
-    # Serializa emissão, confirmação e troca de email pela linha do usuário.
     atualizados = Usuario.query.filter_by(
       id=usuario_id, email=email_destino, ativo=True, verificado=False,
     ).update({Usuario.verificado: False}, synchronize_session=False)
