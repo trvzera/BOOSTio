@@ -31,7 +31,7 @@ class CompletarPecasIcecatService:
                                          max_requisicoes=max_fichas)
         return CompletarFichaIcecatService(IndiceIcecatService(indice), fichas)
 
-    def executar(self, *, categoria, limite=100, depois_id=0, simular=True):
+    def executar(self, *, categoria, limite=100, depois_id=0, simular=True, incluir_publicadas=False):
         modelo = next((m for m in MODELOS_PECAS if m.__tablename__ == categoria), None)
         if modelo is None:
             raise ValueError('Categoria inválida')
@@ -42,10 +42,13 @@ class CompletarPecasIcecatService:
                       nao_encontrada=0, ambigua=0, interrompido=False, ultima_peca_id=depois_id, detalhes=[])
         for peca in modelo.lote_para_identificadores(depois_id, limite):
             resumo['ultima_peca_id'] = peca.id
-            if peca.status_validacao != 'em_revisao':
+            if peca.status_validacao != 'em_revisao' and not (incluir_publicadas and peca.publicavel):
                 resumo['ignoradas'] += 1
                 continue
-            if not pendencias_para_montagem(peca):
+            from services.catalogo_service.conferir_especificacoes_service import OPCIONAIS
+            opcionais_ausentes = any(EnriquecerPecaExistenteService.ausente(getattr(peca, campo, None))
+                                     for campo in OPCIONAIS.get(categoria, ()))
+            if not pendencias_para_montagem(peca) and not opcionais_ausentes:
                 resumo['ficha_liberada' if self._reavaliar_ficha(peca, simular) else 'ignoradas'] += 1
                 continue
             if not peca.part_number:

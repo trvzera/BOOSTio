@@ -130,3 +130,11 @@ test("cliente consulta Blender somente pelo backend e rejeita pontuação invent
     await assert.rejects(invalido.consultarBlender(entrada));
   }
 });
+
+test("modelos de jogos e renderização incluem GPU e recusam cópia com referência ausente",()=>{
+  for(const build of modelosProntos(catalogo).filter(b=>['jogos','renderizacao','criacao'].includes(b.objetivo))) {
+    assert.ok(build.componentes.placa_video,build.titulo);
+    const semGpu=modelosProntos(catalogo.filter(p=>p.categoria!=='placa_video'),{referencias:catalogo}).find(b=>b.id===build.id);
+    assert.throws(()=>copiarModelo(semGpu),/modelo está em revisão/);
+  }
+});

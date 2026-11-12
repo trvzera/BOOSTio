@@ -69,9 +69,9 @@ const MODELOS = [
     pecas:[["SEED-CPU-03",1],["SEED-MB-17",1],["SEED-RAM-03",2],["SEED-SSD-04",1],["SEED-HDD-02",1],["SEED-PSU-04",1],["SEED-CASE-02",1],["SEED-FAN-01",2]],
   },
   {
-    id:"modelo-render-cpu",titulo:"Renderização pelo processador",objetivo:"renderizacao",objetivoRotulo:"Modelagem e renderização",plataforma:"AM5",nivel:"Avançada",
-    descricao:"Ryzen 9 e 64 GB de RAM para cenas renderizadas pela CPU. Sem GPU dedicada; usa vídeo integrado para imagem.",
-    pecas:[["SEED-CPU-05",1],["SEED-MB-17",1],["SEED-RAM-03",4],["SEED-SSD-04",1],["SEED-PSU-03",1],["SEED-CASE-02",1],["SEED-FAN-01",2],["SEED-ACOOL-02",1]],
+    id:"modelo-render-cpu",titulo:"Renderização e projetos 3D",objetivo:"renderizacao",objetivoRotulo:"Modelagem e renderização",plataforma:"AM5",nivel:"Avançada",
+    descricao:"Ryzen 9, RTX 3060 de 12 GB e 64 GB de RAM para cenas renderizadas pela CPU ou GPU.",
+    pecas:[["SEED-CPU-05",1],["SEED-MB-17",1],["SEED-RAM-03",4],["SEED-SSD-04",1],["SEED-GPU-02",1],["SEED-PSU-03",1],["SEED-CASE-02",1],["SEED-FAN-01",2],["SEED-ACOOL-02",1]],
   },
   {
     id:"modelo-laboratorio",titulo:"Laboratório de desenvolvimento",objetivo:"programacao",objetivoRotulo:"Programação",plataforma:"LGA1700",nivel:"Avançada",
@@ -114,6 +114,7 @@ export function modelosProntos(catalogo,{referencias = catalogo} = {}) {
 }
 
 export function copiarModelo(build) {
+  if (build.metadados?.pendentes?.length) throw new Error("Este modelo está em revisão: faltam peças disponíveis e com preço confirmado no catálogo. Escolha outro modelo ou monte manualmente.");
   return normalizarBuild({
     ...build, id:crypto.randomUUID(), criadoEm:new Date().toISOString(),
     visibilidade:"privado", travada:false,incluirPerifericos:false,

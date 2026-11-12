@@ -62,7 +62,7 @@ export function validarEncaixe({gpu,air,water,fans = [],gabinete,placa,fonte,dis
   checarMedida(fonte,fonte?.comprimento_mm,gabinete.tamanho_max_fonte_mm,"da fonte");
   if (gpu) {
     const slots = numeroConhecido(gpu.slots_ocupados), limite = numeroConhecido(gabinete.slots_expansao);
-    if (slots && limite && slots > limite) erros.push("A placa de vídeo ocupa mais slots do que o gabinete oferece.");
+    if (slots && limite != null && slots > limite) erros.push("A placa de vídeo ocupa mais slots do que o gabinete oferece.");
     avisos.push("Confirme as folgas da GPU com cabos, radiador e fans frontais; comprimento isolado não confirma o conjunto.");
   }
   if (fonte) {

@@ -39,6 +39,11 @@ class EnriquecerPecaExistenteService:
         if produto.contexto.get('mpn_confirmado_na_fonte'):
             remotos |= {codigo(v) for v in valores(produto.identificadores.get('mpn'))}
         comuns = locais & remotos
+        mpns_confirmados = {codigo(v) for v in valores(produto.identificadores.get('mpn'))}
+        if (produto.contexto.get('mpn_confirmado_na_fonte') and peca.part_number
+                and not codigo_interno(peca.part_number)
+                and mpns_confirmados == {codigo(peca.part_number)}):
+            comuns = mpns_confirmados
         origem_confirmada = False
         if (produto.contexto.get('finalidade') == 'especificacoes'
                 and produto.contexto.get('origem_peca') == f'{peca.__tablename__}:{peca.id}'):

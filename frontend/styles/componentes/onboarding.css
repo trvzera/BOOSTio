@@ -45,3 +45,5 @@ html[data-hardware-level="iniciante"] .appearance-beginner-note { display: block
   .onboarding-top { margin-bottom: .5rem; }
   .onboarding-actions { margin-top: .5rem; padding-top: .5rem; }
 }
+
+[data-knowledge-beginner][hidden] { display: none !important; }

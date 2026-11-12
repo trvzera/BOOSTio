@@ -187,7 +187,9 @@ def avaliar_medidas(itens, registrar, substituir=False):
         ("fonte", "comprimento_mm", "tamanho_max_fonte_mm", "fonte-medida", "Comprimento da fonte"),
     ):
         if tem(tipo):
-            medida, maximo = n(get(tipo).get(campo)) or None, n(gabinete.get(limite)) or None
+            medida, maximo = n(get(tipo).get(campo)) or None, n(gabinete.get(limite))
+            if maximo == 0 and codigo != "gpu-slots":
+                maximo = None
             registrar(codigo, titulo, medida <= maximo if medida is not None and maximo is not None else None,
                       f"{titulo}: {medida:g} / {maximo:g}" if medida is not None and maximo is not None else
                       f"Faltam {campo} da peça ou {limite} do gabinete; medidas genéricas não são interpretadas.")

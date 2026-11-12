@@ -178,3 +178,23 @@ def test_estado_aceita_fans_de_modelos_diferentes_e_preserva_quantidade(monkeypa
                                       "componentes": {"fan": [{"id": 1, "quantidade": 3}, {"id": 2, "quantidade": 2}]}})
     assert estado["componentes"]["fan"] == [{"id": 1, "quantidade": 3}, {"id": 2, "quantidade": 2}]
     assert estado["substituirFansWaterCooler"] is True
+
+
+@pytest.mark.parametrize('tipo,campo,limite,codigo', [
+    ('placa_video','comprimento_mm','tamanho_max_gpu_mm','placa_video-medida'),
+    ('placa_video','altura_mm','tamanho_max_altura_gpu_mm','gpu-altura'),
+    ('placa_video','espessura_mm','tamanho_max_espessura_gpu_mm','gpu-espessura'),
+    ('air_cooler','altura_mm','tamanho_max_cooler_mm','air_cooler-medida'),
+    ('fonte','comprimento_mm','tamanho_max_fonte_mm','fonte-medida'),
+])
+@pytest.mark.parametrize('medida,esperado', [(159,'sem_conflitos'),(160,'sem_conflitos'),(161,'incompativel'),(None,'nao_verificado')])
+def test_limites_do_gabinete_antes_igual_depois_e_sem_medida(tipo,campo,limite,codigo,medida,esperado):
+    pecas = [{'id':1,'categoria':'gabinete',limite:160,'comprimento_mm':999,'altura_mm':999,'largura_mm':999},
+             {'id':2,'categoria':tipo,campo:medida}]
+    assert regra(avaliar(pecas),codigo)['status'] == esperado
+
+
+def test_zero_slots_de_expansao_nao_e_tratado_como_dado_ausente():
+    pecas = [{'id':1,'categoria':'gabinete','slots_expansao':0},
+             {'id':2,'categoria':'placa_video','slots_ocupados':2}]
+    assert regra(avaliar(pecas),'gpu-slots')['status'] == 'incompativel'

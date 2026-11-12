@@ -59,3 +59,9 @@ testes.html
 /database/*.lock
 /.codex-attachments/
 /.vscode/
+
+# Caches de fontes externas e prévias geradas; preservados apenas na máquina.
+/database/fabricantes/cache/
+/database/icecat/fichas/
+/database/icecat/*.lock
+/generated_images/

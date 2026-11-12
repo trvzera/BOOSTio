@@ -138,7 +138,7 @@ export function ofertasPeca(peca) {
         preco:oferta.preco,atualizadoEm:oferta.atualizadoEm,esgotado:oferta.esgotado === true,estoqueConfirmado:oferta.esgotado === false}];
     } catch { return []; }
   });
-  return [...tradicionais, ...mercado];
+  return [...tradicionais, ...mercado].sort((a,b) => Number(b.direta) - Number(a.direta));
 }
 
 export const rotulosTecnicos = {

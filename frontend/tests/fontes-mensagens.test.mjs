@@ -24,7 +24,7 @@ test("as duas verificações de e-mail descrevem seis dígitos e têm seis campo
 test("instruções de exclusão e senha recebem tipografia explícita",async()=>{
   const html=await readFile(new URL("../pages/configuracoes.html",import.meta.url),"utf8");
   assert.match(html,/label class="font-1-m" for="delete-current-password"/);
-  assert.match(html,/<p class="font-2-xs">Conta somente Google\?/);
+  assert.match(html,/<p class="font-2-xs" data-google-confirm-help hidden>Confirme sua identidade pelo Google/);
 });
 
 test("interface apresenta exclusão da conta e suas consequências sem prometer apagar todos os dados",async()=>{
