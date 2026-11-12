@@ -10,7 +10,6 @@
   <p>
     <a href="#sobre">Sobre</a> ·
     <a href="#funcionalidades">Funcionalidades</a> ·
-    <a href="#como-rodar">Como rodar</a> ·
     <a href="#arquitetura">Arquitetura</a> ·
     <a href="#documentação">Documentação</a>
   </p>
@@ -72,25 +71,6 @@ inteligente depende da LLM.
 | 19 | O sistema deve permitir ao usuário definir um nome e descrição para a build | ✅ **Implementado** | Identificação e edição dos detalhes da build. |
 | 20 | O sistema deve permitir ao usuário importar builds por meio de arquivos CSV ou JSON | ✅ **Implementado** | Validação do arquivo e criação de uma configuração na conta. |
 
-## Como rodar
-
-Na raiz, instale as dependências e, dentro de `backend/`, prepare o banco (SQLite local) e inicie a API:
-
-```bash
-python -m pip install -r requirements.txt
-cd backend
-python -m flask --app app banco-preparar   # uma vez, e após atualizações com migração
-python app.py                              # API em http://127.0.0.1:5000
-```
-
-O frontend é estático (`frontend/`): sirva a pasta com qualquer servidor local, por exemplo `python -m http.server 5500`
-na raiz, e abra `http://127.0.0.1:5500/frontend`. Use o mesmo hostname ao abrir o site e ao cadastrar o callback do Google.
-Variáveis de ambiente ficam em `backend/.env` (modelo de produção: `.env.production.example`).
-
-Testes: `cd backend && python -m pytest` e, na raiz, `node --test frontend/tests`.
-
-Publicação na VPS (Docker, MySQL, Redis, rotinas agendadas): [deploy/README.md](deploy/README.md).
-
 ## Arquitetura
 
 ```text
@@ -111,9 +91,7 @@ ainda foge dela está em [docs/arquitetura.md](docs/arquitetura.md).
 ## Documentação
 
 - [docs/funcionalidades.md](docs/funcionalidades.md): o que o sistema faz e as regras de cada área.
-- [docs/comandos.md](docs/comandos.md): todos os comandos do servidor e a rotina de catálogo e ofertas.
 - [docs/arquitetura.md](docs/arquitetura.md): regra de camadas e pendências de arquitetura.
-- [deploy/README.md](deploy/README.md): publicação e operação na VPS.
 
 ---
 
