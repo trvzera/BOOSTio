@@ -9,7 +9,7 @@ import logging
 
 import requests
 
-from utils.administrador import usuario_atual_e_administrador
+from utils.decorators import exceto_administrador
 
 logger = logging.getLogger(__name__)
 
@@ -170,23 +170,29 @@ class FpshqService:
             while len(self.cache) > self.MAX_CACHE:
                 self.cache.popitem(last=False)
 
+    @exceto_administrador
+    def _fila_do_usuario(self, agora, usuario_id):
+        usuario = self.usuarios.setdefault(str(usuario_id), deque())
+        self.usuarios.move_to_end(str(usuario_id))
+        while usuario and agora - usuario[0] >= 60:
+            usuario.popleft()
+        return usuario
+
     def _validar_limites(self, agora, usuario_id):
         if agora < self.bloqueado_ate:
             raise ErroBenchmark("Aguarde o intervalo solicitado pelo provedor.", "limite", 429, math.ceil(self.bloqueado_ate - agora))
         for fila, janela in ((self.minuto, 60), (self.dia, 86400)):
             while fila and agora - fila[0] >= janela:
                 fila.popleft()
-        usuario = self.usuarios.setdefault(str(usuario_id), deque())
-        self.usuarios.move_to_end(str(usuario_id))
-        while usuario and agora - usuario[0] >= 60:
-            usuario.popleft()
+        usuario = self._fila_do_usuario(agora, usuario_id)
         filas = [(self.minuto, self.LIMITE_MINUTO, 60), (self.dia, self.LIMITE_DIA, 86400)]
-        if not usuario_atual_e_administrador():
+        if usuario is not None:
             filas.insert(0, (usuario, self.LIMITE_USUARIO, 60))
         for fila, limite, janela in filas:
             if len(fila) >= limite:
                 raise ErroBenchmark("Aguarde antes de fazer outra consulta de desempenho.", "limite", 429, max(1, math.ceil(janela - agora + fila[0])))
-        usuario.append(agora)
+        if usuario is not None:
+            usuario.append(agora)
         self.minuto.append(agora)
         self.dia.append(agora)
         while len(self.usuarios) > 1000:

@@ -5,6 +5,8 @@ from zoneinfo import ZoneInfo
 from flask import current_app, has_app_context
 from redis import Redis, RedisError
 
+from utils.decorators import exceto_administrador
+
 
 _controle = Lock()
 _dia_local = None
@@ -25,6 +27,7 @@ class ReservarChamadaService:
   LIMITE_DIARIO = 100
   FUSO = ZoneInfo("America/Sao_Paulo")
 
+  @exceto_administrador
   def executar(self):
     global _dia_local, _chamadas_locais
     agora = datetime.now(self.FUSO)

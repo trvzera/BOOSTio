@@ -4,7 +4,7 @@ from flask_login import login_required,current_user
 from utils.limite_requisicoes import limiter, chave_usuario
 from models import db
 from models.build_salva import LimiteBuildsError, EmailNaoVerificadoError
-from utils.administrador import usuario_atual_e_administrador
+from utils.decorators import usuario_atual_e_administrador
 from sqlalchemy.exc import SQLAlchemyError
 from requests.exceptions import RequestException, HTTPError, Timeout, ConnectionError
 

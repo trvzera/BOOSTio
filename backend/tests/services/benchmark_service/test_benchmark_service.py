@@ -256,7 +256,7 @@ def test_limites_por_usuario_globais_e_cache_limitado():
 
 
 def test_administrador_nao_tem_limite_por_usuario(monkeypatch):
-    monkeypatch.setattr("services.benchmark_service.fpshq_service.usuario_atual_e_administrador", lambda: True)
+    monkeypatch.setattr("utils.decorators.usuario_atual_e_administrador", lambda: True)
     api = cliente()
     api.buscar.return_value = Mock(status_code=200, headers={}, json=Mock(return_value={"ok": True, "results": []}))
     for n in range(api.LIMITE_USUARIO + 5):

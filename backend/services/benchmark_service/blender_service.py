@@ -8,7 +8,7 @@ import time
 
 import requests
 
-from utils.administrador import usuario_atual_e_administrador
+from utils.decorators import exceto_administrador
 from .fpshq_service import ErroBenchmark, FpshqService
 
 logger = logging.getLogger(__name__)
@@ -100,17 +100,24 @@ class BlenderService:
                 "metodo": escolhido["Compute Type"], "score": escolhido["Median Score"], "quantidade": escolhido["Number of Benchmarks"],
                 "unidade": "amostras/min", "url": self.URL + "?" + requests.compat.urlencode({"device_name": escolhido["Device Name"], "blender_version": escolhido["Blender Version"], "group_by": "device_name"})}
 
+    @exceto_administrador
+    def _fila_do_usuario(self, agora, usuario_id):
+        usuario = self.usuarios.setdefault(str(usuario_id), deque())
+        self.usuarios.move_to_end(str(usuario_id))
+        while usuario and agora - usuario[0] >= 60:
+            usuario.popleft()
+        return usuario
+
     def _limitar(self, agora, usuario_id):
         if agora < self.bloqueado_ate:
             raise ErroBenchmark("Aguarde o intervalo solicitado pelo Blender Open Data.", "limite", 429, math.ceil(self.bloqueado_ate - agora))
-        usuario = self.usuarios.setdefault(str(usuario_id), deque())
-        self.usuarios.move_to_end(str(usuario_id))
-        for fila in (usuario, self.chamadas):
-            while fila and agora - fila[0] >= 60:
-                fila.popleft()
-        if (len(usuario) >= 10 and not usuario_atual_e_administrador()) or len(self.chamadas) >= 30:
+        usuario = self._fila_do_usuario(agora, usuario_id)
+        while self.chamadas and agora - self.chamadas[0] >= 60:
+            self.chamadas.popleft()
+        if (usuario is not None and len(usuario) >= 10) or len(self.chamadas) >= 30:
             raise ErroBenchmark("Aguarde antes de consultar o Blender novamente.", "limite", 429, 60)
-        usuario.append(agora)
+        if usuario is not None:
+            usuario.append(agora)
         self.chamadas.append(agora)
         while len(self.usuarios) > 1000:
             self.usuarios.popitem(last=False)

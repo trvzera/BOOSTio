@@ -5,7 +5,7 @@ from flask_login import current_user
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-from utils.administrador import usuario_atual_e_administrador
+from utils.decorators import usuario_atual_e_administrador
 
 
 def resposta_limite(_limite):

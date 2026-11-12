@@ -3,6 +3,20 @@ from flask import jsonify
 from flask_login import current_user
 
 
+def usuario_atual_e_administrador():
+    return bool(getattr(current_user, "administrador", False))
+
+
+def exceto_administrador(func):
+    """Pula a função (e devolve None) quando o usuário logado é administrador."""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if usuario_atual_e_administrador():
+            return None
+        return func(*args, **kwargs)
+    return wrapper
+
+
 def apenas_proprio_usuario(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
