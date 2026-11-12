@@ -56,5 +56,7 @@ def test_peca_sem_kabum_usa_o_vinculo_do_catalogo():
 def test_peca_sem_kabum_e_sem_vinculo_falha_com_motivo_claro():
     peca = Mock(kabum_external=None, id=7, __tablename__="processador")
     with patch("services.peca_service.atualizar_imagem_peca_service.VinculoMercadoLivre.buscar", return_value=None), \
+         patch("services.peca_service.atualizar_imagem_peca_service.Oferta") as oferta, \
          pytest.raises(ValueError, match="vínculo"):
+        oferta.query.filter_by.return_value.order_by.return_value.first.return_value = None
         AtualizarImagemPecaService._baixar(peca)

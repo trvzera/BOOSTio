@@ -15,6 +15,8 @@ class ClienteShopeeService:
         priceMin priceMax productCatIds periodStartTime periodEndTime }
         pageInfo { page limit hasNextPage }'''
 
+    CAMPOS_IMAGEM = '''nodes { itemId shopId imageUrl } pageInfo { page limit hasNextPage }'''
+
     def __init__(self, *, app_id=None, secret=None, sessao=None, relogio=time.time):
         self.app_id = app_id if app_id is not None else os.getenv('SHOPEE_APP_ID', '')
         self._secret = secret if secret is not None else os.getenv('SHOPEE_APP_SECRET', '')
@@ -32,13 +34,22 @@ class ClienteShopeeService:
         return self._consultar(argumentos)
 
     def consultar_anuncio(self, vendedor_id, item_id):
+        self._validar_ids(vendedor_id, item_id)
+        return self._consultar(f'shopId:{int(vendedor_id)},itemId:{int(item_id)},page:1,limit:1')
+
+    def consultar_imagem(self, vendedor_id, item_id):
+        # consulta própria: um campo de imagem recusado não pode derrubar a atualização de preços
+        self._validar_ids(vendedor_id, item_id)
+        return self._consultar(f'shopId:{int(vendedor_id)},itemId:{int(item_id)},page:1,limit:1', self.CAMPOS_IMAGEM)
+
+    @staticmethod
+    def _validar_ids(vendedor_id, item_id):
         for identificador in (vendedor_id, item_id):
             if not str(identificador).isdigit() or not 0 < int(identificador) < 2**63:
                 raise ValueError('Identificador Shopee inválido')
-        return self._consultar(f'shopId:{int(vendedor_id)},itemId:{int(item_id)},page:1,limit:1')
 
-    def _consultar(self, argumentos):
-        payload = json.dumps({'query': '{ productOfferV2(' + argumentos + ') {' + self.CAMPOS + '} }'},
+    def _consultar(self, argumentos, campos=None):
+        payload = json.dumps({'query': '{ productOfferV2(' + argumentos + ') {' + (campos or self.CAMPOS) + '} }'},
                              ensure_ascii=False, separators=(',', ':'))
         return executar_requisicao(lambda: self._enviar(payload), loja='shopee')
 

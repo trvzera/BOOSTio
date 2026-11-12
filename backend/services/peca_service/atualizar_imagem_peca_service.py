@@ -5,7 +5,8 @@ from tempfile import NamedTemporaryFile
 
 from .buscar_imagem_kabum_service import BuscarImagemKabumService
 from .buscar_imagem_mercado_livre_service import BuscarImagemMercadoLivreService
-from models import VinculoMercadoLivre
+from .buscar_imagem_shopee_service import BuscarImagemShopeeService
+from models import Oferta, VinculoMercadoLivre
 from models.modelos_pecas import MODELOS_PECAS
 
 
@@ -36,9 +37,13 @@ class AtualizarImagemPecaService:
         if peca.kabum_external:
             return BuscarImagemKabumService().executar(peca.kabum_external)
         vinculo = VinculoMercadoLivre.buscar(peca.__tablename__, peca.id)
-        if vinculo is None:
-            raise ValueError("Peça sem anúncio da KaBuM nem vínculo com o catálogo do Mercado Livre")
-        return BuscarImagemMercadoLivreService().executar(vinculo.catalogo_id)
+        if vinculo is not None:
+            return BuscarImagemMercadoLivreService().executar(vinculo.catalogo_id)
+        anuncio = Oferta.query.filter_by(tabela_peca=peca.__tablename__, peca_id=peca.id,
+                                         loja="shopee", ativa=True).order_by(Oferta.preco.asc()).first()
+        if anuncio is None:
+            raise ValueError("Peça sem anúncio da KaBuM, vínculo com o Mercado Livre ou oferta da Shopee")
+        return BuscarImagemShopeeService().executar(anuncio.vendedor_id, anuncio.produto_id_loja.split(":")[-1])
 
     @staticmethod
     def exportar_manifesto():

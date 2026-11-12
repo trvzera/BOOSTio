@@ -136,11 +136,14 @@ class Peca(ModeloBase):
 
   @classmethod
   def sem_imagem_com_fonte(cls):
-    """Sem foto e com anúncio da KaBuM ou vínculo com o catálogo do Mercado Livre."""
-    from . import VinculoMercadoLivre
+    """Sem foto e com anúncio da KaBuM, vínculo com o catálogo do Mercado Livre ou oferta da Shopee."""
+    from . import Oferta, VinculoMercadoLivre
     vinculadas = db.select(VinculoMercadoLivre.peca_id).where(VinculoMercadoLivre.tabela_peca == cls.__tablename__)
+    na_shopee = db.select(Oferta.peca_id).where(Oferta.tabela_peca == cls.__tablename__,
+                                                Oferta.loja == "shopee", Oferta.ativa.is_(True))
     com_link = db.and_(cls.kabum_external.isnot(None), cls.kabum_external != "")
-    return cls.query.filter(cls.imagem_url.is_(None), db.or_(com_link, cls.id.in_(vinculadas))).all()
+    return cls.query.filter(cls.imagem_url.is_(None),
+                            db.or_(com_link, cls.id.in_(vinculadas), cls.id.in_(na_shopee))).all()
 
   @classmethod
   def buscar_por_id(cls, peca_id):
