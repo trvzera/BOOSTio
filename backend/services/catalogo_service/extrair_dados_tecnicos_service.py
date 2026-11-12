@@ -17,7 +17,9 @@ class ExtrairDadosTecnicosService:
         'quantidade', 'compatibilidade', 'tamanho_radiador_mm',
         'formatos_placa_mae', 'tamanho_max_gpu_mm', 'tamanho_max_cooler_mm',
         'velocidade_mbps', 'bluetooth', 'comprimento_m', 'categoria_cabo',
-        'conector', 'iluminacao',
+        'clockbase', 'clockmax', 'consumo_energia', 'consumo_w', 'videointegrado', 'cooler',
+        'conector', 'iluminacao', 'quantidade_slots_ram', 'memoria_maxima_gb',
+        'quantidade_slots_m2', 'slots_expansao', 'fans_inclusos',
     }
 
     def executar(self, modelo, produto):

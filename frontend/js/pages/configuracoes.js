@@ -199,12 +199,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       const google=usuarioAtual?.google_vinculado===true,senha=usuarioAtual?.possui_senha!==false;
       document.querySelector("#google-access-status").textContent=google?"Conta vinculada ao Google" : "Google não vinculado";
       document.querySelector("#google-link-fields").hidden=google||!senha;
-      document.querySelector(".profile-identity-confirmation").hidden=senha;
+      const confirmarGoogle = google && !senha;
+      document.querySelectorAll("[data-confirmar-google], [data-google-confirm-help], .profile-identity-confirmation").forEach(elemento => { elemento.hidden = !confirmarGoogle; });
       document.querySelector("#profile-current-password").closest(".field").hidden=!senha;
       currentPassword.closest(".field").hidden=!senha;
       document.querySelector("#delete-current-password").closest(".field").hidden=!senha;
-      document.querySelector('#delete-modal [data-confirmar-google]').hidden=senha;
-      document.querySelector("#password-google-confirm").hidden=senha;
       document.querySelector("#password-settings-title").textContent=senha?"Alterar senha":"Criar senha de acesso";
       document.querySelector("#password-settings-description").textContent=senha?"Utilize esse campo para alterar a sua senha.":"Confirme sua identidade pelo Google e crie uma senha em até cinco minutos. Você continuará podendo entrar pelo Google.";
       validatePasswordForm();

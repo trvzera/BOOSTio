@@ -378,3 +378,11 @@
 #google-link-fields:not([hidden]) { display: grid; gap: 1rem; padding-top: 1rem; }
 #google-link-fields > button { justify-self: start; }
 #google-link-feedback:empty { display: none; }
+
+/* Ocultação deve prevalecer sobre o layout de botões e painéis. */
+.settings-page-body [hidden] { display: none !important; }
+.budget-settings-card { border-color: var(--cor-p1); scroll-margin-top: 100px; }
+.budget-settings-card:focus-visible { outline: 2px solid var(--cor-p1); outline-offset: 4px; }
+.meta-pill-budget { text-decoration: none; }
+.meta-pill-budget:hover { color: var(--cor-p1); border-color: var(--cor-p1); }
+.meta-pill-budget:focus-visible { outline: 2px solid var(--cor-p1); outline-offset: 3px; }

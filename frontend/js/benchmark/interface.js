@@ -5,7 +5,7 @@ import { resultadoDesempenhoHtml,resolucoesHtml } from "./view.js";
 import { definirDetalheAberto,iniciarDetalhesAnimados } from "../components/animated-details.js";
 import { iniciarRequisitosBuild } from "./requisitos.js";
 
-const MENSAGENS_CONSULTA = ["Consultando desempenho…","Conectando à FPSHQ…","Buscando as medições do jogo…","Cruzando com a sua CPU e GPU…","A FPSHQ pode levar alguns segundos, estamos aguardando…","Quase lá, finalizando a consulta…"];
+const MENSAGENS_CONSULTA = ["Consultando o desempenho esperado…","Aguardando os dados do jogo para as peças escolhidas…","A FPSHQ está demorando um pouco. A consulta continua em andamento…","Ainda estamos aguardando a resposta. Nenhuma nova consulta foi enviada…","O resultado aparecerá aqui quando a consulta terminar…"];
 const MENSAGENS_BUSCA = ["Buscando jogos…","Procurando na FPSHQ…","Organizando os resultados…","A FPSHQ pode levar alguns segundos…"];
 
 export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERENCIA_FPS,buildId = null,publica = false,cliente = criarClienteBenchmark()} = {}) {
@@ -42,7 +42,7 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
     clearInterval(rotacao);
     let posicao = 0;
     informar(mensagens[0],"info",alvo);
-    rotacao = setInterval(() => { posicao = Math.min(posicao + 1,mensagens.length - 1); informar(mensagens[posicao],"info",alvo); },3000);
+    rotacao = setInterval(() => { posicao = posicao + 1 < mensagens.length ? posicao + 1 : Math.max(0,mensagens.length - 3); informar(mensagens[posicao],"info",alvo); },5000);
   }
   function incluirJogos(jogos) {
     for (const item of jogos) {
@@ -142,7 +142,7 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
       }
       ocupado = false; acaoAtual = "";
     } catch (erro) { ocupado = false; acaoAtual = ""; if (ativo && atual === versaoBusca) tratarErro(erro,feedbackBusca); }
-    finally { controles(); }
+    finally { clearInterval(rotacao); controles(); }
   });
   resultadosBusca.addEventListener("click",evento => {
     const botao = evento.target.closest("button[data-fpshq-game]");

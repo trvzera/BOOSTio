@@ -29,15 +29,18 @@ test("guias ajustam apresentação sem impedir abertura manual",t => {
   ajustarGuiasConhecimento(raiz);assert.equal(guia.open,true);
   document.documentElement.dataset.hardwareLevel="intermediario";guia.open=false;
   ajustarGuiasConhecimento(raiz);assert.equal(guia.open,true);
+  delete document.documentElement.dataset.hardwareLevel;
+  ajustarGuiasConhecimento(raiz);assert.equal(guia.open,false);
+  guia.open=true;ajustarGuiasConhecimento(raiz);assert.equal(guia.open,true);
 });
 
-test("explicações extras aparecem para iniciantes e perfis sem nível definido",t => {
+test("explicações extras aparecem somente para iniciantes",t => {
   const anterior=globalThis.document;
   globalThis.document={documentElement:{dataset:{}}};
   t.after(()=>{if(anterior)globalThis.document=anterior;else delete globalThis.document;});
   const ajuda={hidden:false};
   const raiz={querySelectorAll:seletor=>seletor === "[data-knowledge-beginner]" ? [ajuda] : []};
-  for(const [nivel,oculta] of [[undefined,false],["iniciante",false],["intermediario",true],["experiente",true],["iniciante",false]]) {
+  for(const [nivel,oculta] of [[undefined,true],["sem-preferencia",true],["iniciante",false],["intermediario",true],["experiente",true],["iniciante",false]]) {
     document.documentElement.dataset.hardwareLevel=nivel;
     ajustarGuiasConhecimento(raiz);
     assert.equal(ajuda.hidden,oculta);

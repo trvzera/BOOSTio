@@ -50,11 +50,12 @@ def registrar_comandos_icecat(app):
     @click.option('--limite', default=100, type=click.IntRange(1, 500), help='Peças por execução.')
     @click.option('--depois-id', default=0, type=click.IntRange(min=0), help='Retoma depois desta peça.')
     @click.option('--aplicar', is_flag=True, help='Grava; sem esta opção só simula e mostra os números.')
-    def completar_pecas(categoria, limite, depois_id, aplicar):
+    @click.option('--incluir-publicadas', is_flag=True, help='Também busca lacunas técnicas das peças já publicadas, sem alterar sua aprovação.')
+    def completar_pecas(categoria, limite, depois_id, aplicar, incluir_publicadas):
         """Completa campos vazios das peças em revisão com a ficha do Icecat (casa por part number)."""
         try:
             resumo = CompletarPecasIcecatService().executar(categoria=categoria, limite=limite,
-                                                            depois_id=depois_id, simular=not aplicar)
+                                                            depois_id=depois_id, simular=not aplicar, incluir_publicadas=incluir_publicadas)
         except (ValueError, OSError) as erro:
             raise click.ClickException(str(erro)) from None
         click.echo(json.dumps(resumo, ensure_ascii=False, default=str))
