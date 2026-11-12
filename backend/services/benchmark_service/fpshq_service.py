@@ -9,6 +9,8 @@ import logging
 
 import requests
 
+from utils.administrador import usuario_atual_e_administrador
+
 logger = logging.getLogger(__name__)
 
 
@@ -178,7 +180,10 @@ class FpshqService:
         self.usuarios.move_to_end(str(usuario_id))
         while usuario and agora - usuario[0] >= 60:
             usuario.popleft()
-        for fila, limite, janela in ((usuario, self.LIMITE_USUARIO, 60), (self.minuto, self.LIMITE_MINUTO, 60), (self.dia, self.LIMITE_DIA, 86400)):
+        filas = [(self.minuto, self.LIMITE_MINUTO, 60), (self.dia, self.LIMITE_DIA, 86400)]
+        if not usuario_atual_e_administrador():
+            filas.insert(0, (usuario, self.LIMITE_USUARIO, 60))
+        for fila, limite, janela in filas:
             if len(fila) >= limite:
                 raise ErroBenchmark("Aguarde antes de fazer outra consulta de desempenho.", "limite", 429, max(1, math.ceil(janela - agora + fila[0])))
         usuario.append(agora)

@@ -8,6 +8,7 @@ import time
 
 import requests
 
+from utils.administrador import usuario_atual_e_administrador
 from .fpshq_service import ErroBenchmark, FpshqService
 
 logger = logging.getLogger(__name__)
@@ -107,7 +108,7 @@ class BlenderService:
         for fila in (usuario, self.chamadas):
             while fila and agora - fila[0] >= 60:
                 fila.popleft()
-        if len(usuario) >= 10 or len(self.chamadas) >= 30:
+        if (len(usuario) >= 10 and not usuario_atual_e_administrador()) or len(self.chamadas) >= 30:
             raise ErroBenchmark("Aguarde antes de consultar o Blender novamente.", "limite", 429, 60)
         usuario.append(agora)
         self.chamadas.append(agora)

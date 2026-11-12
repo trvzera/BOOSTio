@@ -5,6 +5,8 @@ from flask_login import current_user
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
+from utils.administrador import usuario_atual_e_administrador
+
 
 def resposta_limite(_limite):
     resposta = jsonify({
@@ -21,6 +23,11 @@ limiter = Limiter(
     retry_after="delta-seconds",
     on_breach=resposta_limite,
 )
+
+
+@limiter.request_filter
+def administrador_sem_limite():
+    return usuario_atual_e_administrador()
 
 
 def configurar_limites(app, producao=False):

@@ -43,7 +43,7 @@ class BuildSalva(ModeloBase):
         if not usuario.verificado:
             raise EmailNaoVerificadoError()
         cls.migrar_geradas(usuario_id)
-        if cls.query.filter_by(usuario_id=usuario_id).count() >= cls.LIMITE:
+        if not usuario.administrador and cls.query.filter_by(usuario_id=usuario_id).count() >= cls.LIMITE:
             raise LimiteBuildsError()
 
     @classmethod
@@ -52,10 +52,11 @@ class BuildSalva(ModeloBase):
             resultado = db.session.execute(update(Usuario).where(Usuario.id == usuario_id).values(id=Usuario.id))
             if resultado.rowcount != 1:
                 raise ValueError("Usuário não encontrado")
-            if not db.session.get(Usuario, usuario_id).verificado:
+            usuario = db.session.get(Usuario, usuario_id)
+            if not usuario.verificado:
                 raise EmailNaoVerificadoError()
             cls.migrar_geradas(usuario_id, confirmar=False)
-            if cls.query.filter_by(usuario_id=usuario_id).count() >= cls.LIMITE:
+            if not usuario.administrador and cls.query.filter_by(usuario_id=usuario_id).count() >= cls.LIMITE:
                 raise LimiteBuildsError()
             original = Build.criar_gerada(usuario_id, gerada, confirmar=False) if gerada else None
             build = cls(usuario_id=usuario_id, estado=estado, build_original_id=original.id if original else None)

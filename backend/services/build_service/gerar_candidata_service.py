@@ -11,6 +11,7 @@ from decimal import Decimal
 from requests.exceptions import RequestException
 from models import BuildSalva
 from services.llm_service.llm_service import LLMService
+from utils.administrador import usuario_atual_e_administrador
 from services.llm_service.reservar_chamada_service import CotaGlobalIAError, ControleIAIndisponivelError
 from .completar_ventilacao_service import CompletarVentilacaoService
 from services.validacoes_service.requisitos_armazenamento_service import RequisitosArmazenamentoService
@@ -33,7 +34,8 @@ def gerar_candidata(usuario_id, prompt, modelo, catalogo, orcamento,
     build = None
     inicio_llm = perf_counter()
     try:
-      resposta = LLMService().executar(instrucao, modelo)
+      sem_cota = {"reservar_cota": False} if usuario_atual_e_administrador() else {}
+      resposta = LLMService().executar(instrucao, modelo, **sem_cota)
       logger.info("Geração: etapa=llm tentativa=%d duracao_ms=%d caracteres_prompt=%d", tentativa+1, (perf_counter()-inicio_llm)*1000, len(instrucao))
       inicio_validacao = perf_counter()
       build = json.loads(resposta) if isinstance(resposta, str) else resposta
