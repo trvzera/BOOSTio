@@ -53,7 +53,12 @@ CAMPOS = {
         'HDD speed': ('velocidade_rpm', 'rpm'), 'Storage drive buffer size': ('memoria_cache_mb', 'mb'),
     },
     'fonte': {'Total power': ('potencia_w', 'w'), 'Power supply unit (PSU) form factor': ('formato', None)},
-    'gabinete': {'Supported motherboard form factors': ('formatos_placa_mae', 'lista')},
+    'gabinete': {
+        'Supported motherboard form factors': ('formatos_placa_mae', 'lista'),
+        'Maximum graphics card length': ('tamanho_max_gpu_mm', 'mm'),
+        'Maximum CPU cooler height': ('tamanho_max_cooler_mm', 'mm'),
+        'Number of expansion slots': ('slots_expansao', 'int'),
+    },
     'mouse': {'Movement resolution': ('dpi_max', 'dpi'), 'Device interface': ('conexao', None)},
     'teclado': {'Keyboard layout': ('layout', None), 'Keyboard key switch': ('mecanico', 'switch'), 'Device interface': ('conexao', None)},
     'monitor': {'Display diagonal': ('tamanho_polegadas', 'inch'), 'Display resolution': ('resolucao', None),

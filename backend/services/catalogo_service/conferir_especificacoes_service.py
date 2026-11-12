@@ -25,8 +25,8 @@ ESSENCIAIS={
 }
 OPCIONAIS={
  'memoria_ram':('iluminacao',),
- 'placa_mae':('chipset',), 'ssd':('formato',), 'hd':('memoria_cache_mb',),
- 'gabinete':('tamanho_max_gpu_mm','tamanho_max_cooler_mm'),
+ 'placa_mae':('chipset','quantidade_slots_ram','memoria_maxima_gb','quantidade_slots_m2'), 'ssd':('formato',), 'hd':('memoria_cache_mb',),
+ 'gabinete':('tamanho_max_gpu_mm','tamanho_max_cooler_mm','slots_expansao','fans_inclusos'),
  'teclado':('switch',),
 }
 

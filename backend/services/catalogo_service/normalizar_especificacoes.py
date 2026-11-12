@@ -38,6 +38,13 @@ def converter_adicional(campo, valor):
         return numero(s, 'hz')
     if campo in {'tamanho_mm', 'tamanho_radiador_mm', 'tamanho_max_gpu_mm', 'tamanho_max_cooler_mm'}:
         return medida(s, 'mm')
+    if campo == 'memoria_maxima_gb':
+        return numero(s, 'gb')
+    if campo in {'quantidade_slots_ram', 'quantidade_slots_m2', 'slots_expansao', 'fans_inclusos'}:
+        if type(valor) is bool:
+            return None
+        m = re.fullmatch(r'(\d+)\s*(?:[x×]\s*)?(?:slots?|portas?|ventoinhas?|fans?|(?:so[ -]?)?dimm)?', s)
+        return int(m[1]) if m else None
     if campo == 'comprimento_m':
         return medida(s, 'm')
     if campo in {'quantidade', 'quantidade_fans'}:
