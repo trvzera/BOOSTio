@@ -21,7 +21,7 @@ from .planejar_rede_service import PlanejarRedeService
 logger = logging.getLogger("services.build_service.criar_build_service")
 
 def gerar_candidata(usuario_id, prompt, modelo, catalogo, orcamento,
-                   percentual, proprias, detalhes_proprias, rede, tentativas_correcao=1, revisar_investimento=False, cor="sem-preferencia", aparencia=None, armazenamento_minimo_gb=None, ajustar_orcamento=False, catalogo_reparo=None):
+                   percentual, proprias, detalhes_proprias, rede, tentativas_correcao=1, revisar_investimento=False, cor="sem-preferencia", aparencia=None, armazenamento_minimo_gb=None, ajustar_orcamento=False, catalogo_reparo=None, utilidade=None):
   armazenamento_minimo_gb = RequisitosArmazenamentoService.validar_parametro(armazenamento_minimo_gb)
   limite = 1 if tentativas_correcao else 0
   instrucao = prompt
@@ -42,7 +42,7 @@ def gerar_candidata(usuario_id, prompt, modelo, catalogo, orcamento,
       build = CompletarVentilacaoService().executar(build, catalogo, teto_pc, proprias, detalhes_proprias, cor=cor)
       try:
         validada = _validar_candidata_completa(build, catalogo, orcamento, percentual, proprias,
-                                                    detalhes_proprias, rede, aparencia or {"cor": cor}, armazenamento_minimo_gb)
+                                                    detalhes_proprias, rede, aparencia or {"cor": cor}, armazenamento_minimo_gb, utilidade)
       except ValueError as erro:
         if not ajustar_orcamento or codigo_falha(erro) != "orcamento":
           raise
@@ -52,7 +52,7 @@ def gerar_candidata(usuario_id, prompt, modelo, catalogo, orcamento,
           candidata = CompletarVentilacaoService().executar(
               candidata, pool_reparo, teto_pc, proprias, detalhes_proprias, cor=cor)
           return _validar_candidata_completa(candidata, pool_reparo, orcamento, percentual, proprias,
-                                                 detalhes_proprias, rede, aparencia or {"cor": cor}, armazenamento_minimo_gb)
+                                                 detalhes_proprias, rede, aparencia or {"cor": cor}, armazenamento_minimo_gb, utilidade)
         reparo = AjustarOrcamentoBuildService().executar(
             build, pool_reparo, orcamento, teto_pc, teto_perifericos, validar_reparo, proprias, cor)
         if reparo is None:
@@ -92,8 +92,8 @@ def gerar_candidata(usuario_id, prompt, modelo, catalogo, orcamento,
 
 
 def _validar_candidata_completa(build, catalogo, orcamento, percentual, proprias,
-                               detalhes_proprias, rede, aparencia, armazenamento_minimo_gb):
-  validada = validar_build_gerada(build, catalogo, orcamento, percentual, proprias, detalhes_proprias, rede)
+                               detalhes_proprias, rede, aparencia, armazenamento_minimo_gb, utilidade=None):
+  validada = validar_build_gerada(build, catalogo, orcamento, percentual, proprias, detalhes_proprias, rede, utilidade=utilidade)
   validada = ajustar_aparencia(validada, catalogo, orcamento, percentual, proprias,
                                    detalhes_proprias, rede, aparencia)
   RequisitosArmazenamentoService.validar_build(

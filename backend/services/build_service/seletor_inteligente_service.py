@@ -108,7 +108,7 @@ class SeletorInteligenteService:
                 revisar_investimento=perfil_revisa_investimento(dados["utilidade"]),
                 cor=aparencia["cor"], aparencia=aparencia,
                 armazenamento_minimo_gb=preparado["armazenamento_minimo_gb"],
-                ajustar_orcamento=True, catalogo_reparo=preparado["catalogo_reparo"])
+                ajustar_orcamento=True, catalogo_reparo=preparado["catalogo_reparo"], utilidade=dados["utilidade"])
             return {**preparado, "build": build}
 
     def _catalogo_reparo(self, contexto, selecionados, excluidas):

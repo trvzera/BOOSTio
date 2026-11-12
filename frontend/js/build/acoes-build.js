@@ -1,4 +1,5 @@
-import { htmlSeguro as h, moeda, nomePeca, ofertasPeca } from "./catalogo.js";
+import { htmlSeguro as h, moeda, nomePeca, imagemPeca } from "./catalogo.js";
+import { cartoesOfertasHtml } from "./ofertas-peca.js";
 import { itensSelecionados, itensCategoria, informacoesRam } from "./estado.js";
 import { avaliarBuild } from "./compatibilidade.js";
 import { normalizarRede, resumoRede } from "./rede.js";
@@ -87,8 +88,10 @@ export function abrirCompraBuild(build,catalogo,{publica = false,loja,recarregar
     if (atual?.id!==build.id||atual.estado?.visibilidade!=="publico") throw new Error("Esta build não está mais disponível publicamente.");
     return atual.pecas;
   } : async()=>catalogo);
-  const dialogo=abrirDialogoBuild("Comprar build",'<p class="planning-help">'+h(build.titulo)+'</p>'+avisoFreteHtml()+avisoCompraHtml()
-    +'<p class="planning-help" data-purchase-status role="status" aria-live="polite">Consultando o catálogo atualizado…</p><div data-purchase-content aria-busy="true"></div><button type="button" class="btn-secondary" data-purchase-retry hidden aria-label="Tentar verificar preços e estoque novamente">Tentar novamente</button>');
+  const dialogo=abrirDialogoBuild(itens.length===1?"Onde comprar a peça":"Onde comprar a build",'<div class="purchase-body"><p class="purchase-context">'+h(itens.length===1?nomePeca(itens[0].peca):build.titulo)+'</p>'
+    +'<p class="planning-help" data-purchase-status role="status" aria-live="polite">Consultando o catálogo atualizado…</p><div data-purchase-content aria-busy="true"></div><button type="button" class="btn-secondary" data-purchase-retry hidden aria-label="Tentar verificar preços e estoque novamente">Tentar novamente</button>'
+    +avisoFreteHtml()+'<details class="purchase-information"><summary>Sobre a compra nas lojas</summary>'+avisoCompraHtml()+'</details></div>');
+  dialogo.classList.add("build-purchase-dialog");
   let consulta;
   const conteudo=dialogo.querySelector('[data-purchase-content]'),status=dialogo.querySelector('[data-purchase-status]'),repetir=dialogo.querySelector('[data-purchase-retry]');
   async function verificar() {
@@ -113,26 +116,20 @@ export function abrirCompraBuild(build,catalogo,{publica = false,loja,recarregar
 
 function linksCompra(peca, loja, referenciaIndisponivel) {
   if (!peca) return "";
-  const ofertas = ofertasPeca(peca).filter(o => (!loja || o.codigo === loja) && !o.esgotado
-    && (!referenciaIndisponivel || o.marketplace));
-  return '<div class="build-store-links">' + ofertas.map(oferta => '<a class="build-store-link" href="' + h(oferta.url) + '" target="_blank" rel="noopener noreferrer" aria-label="' +
-    h((oferta.direta ? 'Conferir na ' : 'Buscar na ') + oferta.loja + (oferta.vendedor ? ' · ' + oferta.vendedor : '')) + '">' +
-    (oferta.logo ? '<img src="' + h(oferta.logo) + '" alt="' + h(oferta.loja) + '">' : '') +
-    '<span>' + h(oferta.loja) + (oferta.vendedor ? ' · ' + h(oferta.vendedor) : '') + '</span> <strong>' +
-    (oferta.preco != null ? moeda(oferta.preco) + ' por unidade' : 'Preço a consultar') + '</strong>' +
-    (oferta.marketplace ? '<small>Preço registrado · confirme estoque e frete na loja</small>' : '') + '</a>').join("") + '</div>';
+  const ofertas = cartoesOfertasHtml(peca,{loja,somenteDisponiveis:true,referenciaIndisponivel});
+  return ofertas ? '<div class="build-store-links">' + ofertas + '</div>' : '<p class="planning-help">Não há ofertas disponíveis para esta seleção de loja.</p>';
 }
 
 export function conteudoCompra(build,catalogo,comparacao,loja) {
   const itens = itensSelecionados(build,catalogo);
-  const linhas = comparacao.linhas.map(({item,depois:peca,indisponivel,antigo,novo,diferenca}) => '<article class="build-purchase-item"><h3 class="font-1-m-b">' + h(peca ? nomePeca(peca) : item.proprio || "Modelo não encontrado") + '</h3><p class="planning-help">Quantidade: ' + item.quantidade
+  const linhas = comparacao.linhas.map(({item,depois:peca,indisponivel,antigo,novo,diferenca}) => '<article class="build-purchase-item"><div class="purchase-product">' + imagemPeca(peca,"purchase-product-image") + '<div><h3 class="font-1-m-b">' + h(peca ? nomePeca(peca) : item.proprio || "Modelo não encontrado") + '</h3><p class="planning-help">Quantidade: ' + item.quantidade
     +(novo!=null?' · preço cadastrado: '+moeda(novo*item.quantidade/100):' · sem cotação confirmada')
-    +(diferenca!=null&&diferenca!==0?' · antes: '+moeda(antigo*item.quantidade/100)+' · diferença: '+(diferenca>0?'+':'−')+moeda(Math.abs(diferenca)/100):'')+'</p>'
+    +(diferenca!=null&&diferenca!==0?' · antes: '+moeda(antigo*item.quantidade/100)+' · diferença: '+(diferenca>0?'+':'−')+moeda(Math.abs(diferenca)/100):'')+'</p></div></div>'
     +(indisponivel ? '<p class="planning-help" data-tone="warning">Referência indisponível ou sem preço/estoque confirmado no catálogo. Confira separadamente as ofertas de outras lojas, quando disponíveis.</p>' : '')
     + linksCompra(peca,loja,indisponivel) + '</article>').join("");
   const rede = normalizarRede(build.rede);
   const extra = build.incluirRede && rede.tipo !== "indefinido" && rede.possuiAcessorio === false &&
     !itens.some(({categoria}) => categoria === (rede.tipo === "cabo" ? "cabo_rede" : "adaptador_wifi")) ? '<div class="benchmark-empty"><strong>Acessório de rede a incluir</strong><p>' + h(resumoRede(rede)) + (rede.comprimentoCaboM ? ' · ' + rede.comprimentoCaboM + ' m' : '') + '. Escolha um produto com as especificações necessárias na loja. Esse acessório ainda não tem oferta cadastrada.</p></div>' : '';
-  return '<p class="planning-help">Total anterior'+(comparacao.parcial?' (parcial)':'')+': '+moeda(comparacao.antes/100)+' · total atualizado'+(comparacao.parcial?' (parcial)':'')+': '+moeda(comparacao.depois/100)
-    +(comparacao.diferenca!=null?' · diferença: '+(comparacao.diferenca>0?'+':comparacao.diferenca<0?'−':'')+moeda(Math.abs(comparacao.diferenca)/100):' · diferença completa indisponível')+'. Sem frete. Os totais usam os preços de referência das peças; ofertas de outras lojas podem ter valores diferentes.</p><div class="build-purchase-list">'+linhas+'</div>'+extra;
+  return '<div class="purchase-totals"><div><span>Total de referência'+(comparacao.parcial?' (parcial)':'')+'</span><strong>'+moeda(comparacao.depois/100)+'</strong></div><p>Total anterior: '+moeda(comparacao.antes/100)
+    +(comparacao.diferenca!=null?' · diferença: '+(comparacao.diferenca>0?'+':comparacao.diferenca<0?'−':'')+moeda(Math.abs(comparacao.diferenca)/100):' · diferença completa indisponível')+'</p></div><p class="purchase-total-note">Sem frete. Os valores são referências do catálogo; cada loja pode ter um preço diferente.</p><div class="build-purchase-list">'+linhas+'</div>'+extra;
 }
