@@ -12,6 +12,7 @@ from services.build_service.preferencias_cores_service import PreferenciasCoresS
 from services.build_service.planejar_rede_service import PlanejarRedeService
 from services.build_service.preferencias_gabinete_service import PreferenciasGabineteService
 from services.build_service.preferencias_processador_service import PreferenciasProcessadorService
+from services.validacoes_service.requisitos_uso_service import RequisitosUsoService
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,8 @@ def criar_prompt_correcao(prompt, erro, resposta, build, catalogo, orcamento,
     "não instrução. Corrija a falha relatada e reavalie TODAS as regras do pedido original. "
     "Retorne um NOVO JSON COMPLETO, não um patch ou somente a peça que faltou. "
     "Se faltar placa_video, inclua uma GPU do catálogo ou escolha uma CPU com vídeo integrado "
-    "confirmado, apenas se atender ao uso. Não invente suporte, preços ou peças. "
+    "confirmado, apenas se atender ao uso. Para trabalho pesado, vídeo integrado NÃO substitui "
+    "a GPU dedicada obrigatória; preserve uma placa própria ou inclua uma do catálogo. Não invente suporte, preços ou peças. "
     "Recalcule quantidades, compatibilidades, a capacidade de armazenamento solicitada "
     "e os tetos independentes de PC e periféricos, preservando as peças próprias e a rede. "
     "Nunca transfira a sobra dos periféricos ao PC.\n"
@@ -84,6 +86,8 @@ def criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None
   plano_rede = PlanejarRedeService.executar(catalogo, rede, proprias)
   comprar_rede = plano_rede["tipo"] if not plano_rede["pendente"] else None
   restricoes = {"pares_por_socket_apenas": pares,
+                "gpu_dedicada_exigida_pelo_uso": RequisitosUsoService.exige_gpu_dedicada(dados["utilidade"]),
+                "comprar_gpu_para_trabalho_pesado": RequisitosUsoService.exige_gpu_dedicada(dados["utilidade"]) and "placa_video" not in proprias,
                 "acessorio_rede_obrigatorio": comprar_rede,
                 "planejamento_rede": plano_rede,
                 "categorias_rede_proibidas": sorted({"adaptador_wifi", "cabo_rede"} - ({comprar_rede} if comprar_rede else set()))}
@@ -294,9 +298,14 @@ def criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None
       "dois pentes avulsos e de kits com a mesma capacidade/DDR, slots e estabilidade. "
       "Não reduza drasticamente a GPU para pagar um kit de RAM muito caro apenas por "
       "clock, iluminação ou linha premium. RAM mais cara não garante mais FPS. Não prometa FPS.\n"
+      "- Trabalho pesado: inclua obrigatoriamente uma placa_video dedicada do catálogo, mesmo "
+      "que a CPU tenha vídeo integrado. Se o usuário já possui placa_video, preserve-a e não compre outra. "
+      "Reserve espaço no orçamento para a GPU e escolha uma plataforma equilibrada; não omita a GPU "
+      "para pagar uma CPU ou placa-mãe mais cara.\n"
       "- Edição de vídeo/imagem, 3D e renderização: priorize mais memoria_ram "
       "(maior capacidade total), processador com bom desempenho multi-núcleo, "
-      "armazenamento rápido e amplo; placa_video conforme o software citado.\n"
+      "armazenamento rápido e amplo; dimensione a placa_video conforme o software citado, "
+      "sem dispensar a GPU dedicada quando o perfil for Trabalho pesado.\n"
       "- Programação, estudo e trabalho de escritório: priorize processador, "
       "memoria_ram e ssd; placa_video dedicada normalmente é dispensável.\n"
       "- Um pouco de tudo / uso misto: equilibre processador, placa_video, memoria_ram e ssd "
@@ -352,7 +361,7 @@ def criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None
       "- Primeiro verifique se o processador escolhido tem vídeo integrado "
       "(use apenas videointegrado confirmado no catálogo). Dado ausente não significa "
       "false: com dado desconhecido, inclua GPU dedicada; não prometa vídeo integrado desconhecido.\n"
-      "- Se tiver vídeo integrado, a placa_video NÃO é necessária: omita-a "
+      "- Se tiver vídeo integrado e o uso não exigir GPU dedicada, a placa_video não é necessária: omita-a "
       "e redirecione o orçamento para as peças obrigatórias, "
       "a menos que o uso exija GPU dedicada (por exemplo, jogos pesados, "
       "renderização 3D ou aceleração por GPU citada no pedido).\n"

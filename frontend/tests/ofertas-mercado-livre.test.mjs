@@ -20,3 +20,14 @@ test("referência KaBuM indisponível não oculta alternativas de marketplace",(
   assert.match(html,/produto.mercadolivre.com.br/);assert.match(html,/confirme estoque e frete/);
   assert.doesNotMatch(html,/src="null"/);
 });
+
+test("layout de ofertas combina o filtro por loja com os controles exclusivos de administrador",()=>{
+  const opcoes={loja:"mercado_livre",somenteDisponiveis:true,referenciaIndisponivel:true};
+  const normal=cartoesOfertasHtml(peca,opcoes);
+  assert.match(normal,/Conferir na loja/);
+  assert.doesNotMatch(normal,/data-remover-oferta/);
+  const admin=cartoesOfertasHtml(peca,{...opcoes,administrador:true});
+  assert.match(admin,/data-remover-oferta="7"/);
+  assert.match(admin,/Conferir na loja/);
+  assert.doesNotMatch(admin,/KaBuM!|Pichau|<img src=x/);
+});

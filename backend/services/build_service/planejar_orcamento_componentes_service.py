@@ -4,6 +4,7 @@ from utils.memorias import normalizar_ddr
 from utils.sockets import normalizar_socket, suporte_socket_cooler
 from .preferencias_perifericos_service import PreferenciasPerifericosService
 from .planejar_armazenamento_service import PlanejarArmazenamentoService
+from services.validacoes_service.requisitos_uso_service import RequisitosUsoService
 
 
 class PlanejarOrcamentoComponentesService:
@@ -40,7 +41,7 @@ class PlanejarOrcamentoComponentesService:
         avisos.extend(pendencias)
         gpu_minimo = min((self.preco(p) for p in pools.get('placa_video', [])), default=Decimal(0))
         propria_gpu = 'placa_video' in contexto['proprias']
-        exige_gpu = perfil == 'jogos' and not propria_gpu
+        exige_gpu = (perfil == 'jogos' or RequisitosUsoService.exige_gpu_dedicada(contexto['utilidade'])) and not propria_gpu
         estimativas = {}
         cpus = pools.get('processador', [])
         cpu_propria = contexto['detalhes_proprias'].get('processador', {}).get('especificacoes_confirmadas')

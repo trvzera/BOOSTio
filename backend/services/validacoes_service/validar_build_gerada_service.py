@@ -8,9 +8,10 @@ from services.build_service.planejamento_geracao import RecusaModeloBuild
 from services.build_service.planejar_rede_service import PlanejarRedeService
 from services.build_service.preferencias_perifericos_service import PreferenciasPerifericosService
 from .avaliar_compatibilidade_service import AvaliarCompatibilidadeService
+from .requisitos_uso_service import RequisitosUsoService
 
 
-def validar_build_gerada(build, catalogo, orcamento, percentual=0, proprias=None, detalhes_proprias=None, rede=None):
+def validar_build_gerada(build, catalogo, orcamento, percentual=0, proprias=None, detalhes_proprias=None, rede=None, *, utilidade=None):
   if isinstance(build, dict) and build.get("erro"):
     raise RecusaModeloBuild(build.get("motivo"))
   if not isinstance(build, dict) or not isinstance(build.get("componentes"), list):
@@ -60,6 +61,7 @@ def validar_build_gerada(build, catalogo, orcamento, percentual=0, proprias=None
   if total - total_perifericos > teto_pc:
     raise ValueError(f"A configuração sugerida ultrapassou o limite destinado ao PC: subtotal PC+rede R$ {total - total_perifericos:.2f}, teto R$ {teto_pc:.2f}. Reduza as compras do PC em R$ {total - total_perifericos - teto_pc:.2f}. A sobra dos periféricos não pode ser transferida.")
   finais = set(tipos) | set(proprias)
+  RequisitosUsoService.validar_gpu(utilidade if utilidade is not None else build["utilidade"], finais)
   rede = rede or {}
   acessorio = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
   escolhidos_rede = set(tipos) & {"adaptador_wifi", "cabo_rede"}

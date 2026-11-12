@@ -82,4 +82,3 @@ class TokenRecuperacao(ModeloBase):
     except Exception:
       db.session.rollback()
       raise
-
