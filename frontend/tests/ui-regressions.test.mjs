@@ -254,6 +254,12 @@ test("rodapés usam ícones sociais com destino, nome acessível e proteção na
     assert.match(telegram,/target="_blank"/);
     assert.match(telegram,/rel="noopener noreferrer"/);
     assert.match(telegram,/footer-social-icon-telegram[^>]*aria-hidden="true"/);
+    const discord=contato.match(/<a\b[^>]*href="https:\/\/discord\.gg\/hBs9xtapya"[^>]*>[\s\S]*?<\/a>/)?.[0];
+    assert.ok(discord,pagina);
+    assert.match(discord,/target="_blank"/);
+    assert.match(discord,/rel="noopener noreferrer"/);
+    assert.match(discord,/aria-label="Discord: comunidade da BOOSTio \(abre em nova aba\)"/);
+    assert.match(discord,/footer-social-icon-discord[^>]*aria-hidden="true"/);
   }
 });
 

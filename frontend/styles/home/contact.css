@@ -16,7 +16,5 @@
 a.home-contact-channel:is(:hover,:focus-visible) { color: var(--cor-p1); }
 a.home-contact-channel:is(:hover,:focus-visible) .ui-lottie { color: inherit; }
 a.home-contact-channel:focus-visible { outline: 2px solid var(--cor-p1); outline-offset: 6px; }
-.home-contact-soon h3 { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
-.home-contact-soon h3 span { color: var(--cor-4); }
 @media (max-width:850px) { .home-contact-layout { grid-template-columns: minmax(0,1fr); gap: var(--espacamento-40); } .home-contact { padding-block: 64px; } }
 @media (max-width:480px) { .home-contact { padding-inline: 16px; } .home-contact-channel { gap: 14px; } .home-contact-copy h2 { font-size: 2rem; } .home-contact-channel h3 { font-size: 1.15rem; } }
