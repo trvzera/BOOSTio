@@ -4,6 +4,8 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 from .buscar_imagem_kabum_service import BuscarImagemKabumService
+from .buscar_imagem_mercado_livre_service import BuscarImagemMercadoLivreService
+from models import VinculoMercadoLivre
 from models.modelos_pecas import MODELOS_PECAS
 
 
@@ -18,7 +20,7 @@ class AtualizarImagemPecaService:
         if peca is None:
             raise ValueError("Peça não encontrada")
 
-        conteudo, extensao = BuscarImagemKabumService().executar(peca.kabum_external)
+        conteudo, extensao = self._baixar(peca)
         PASTA_IMAGENS.mkdir(parents=True, exist_ok=True)
         nome = f"{peca.__tablename__}-{peca.id}.{extensao}"
         destino = PASTA_IMAGENS / nome
@@ -28,6 +30,15 @@ class AtualizarImagemPecaService:
         os.replace(temporario.name, destino)
         peca.definir_imagem(f"../coletados/imagens/{nome}")
         return destino
+
+    @staticmethod
+    def _baixar(peca):
+        if peca.kabum_external:
+            return BuscarImagemKabumService().executar(peca.kabum_external)
+        vinculo = VinculoMercadoLivre.buscar(peca.__tablename__, peca.id)
+        if vinculo is None:
+            raise ValueError("Peça sem anúncio da KaBuM nem vínculo com o catálogo do Mercado Livre")
+        return BuscarImagemMercadoLivreService().executar(vinculo.catalogo_id)
 
     @staticmethod
     def exportar_manifesto():

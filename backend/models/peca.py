@@ -135,6 +135,14 @@ class Peca(ModeloBase):
     return cls.query.filter(cls.imagem_url.is_(None), cls.kabum_external.isnot(None), cls.kabum_external != "").all()
 
   @classmethod
+  def sem_imagem_com_fonte(cls):
+    """Sem foto e com anúncio da KaBuM ou vínculo com o catálogo do Mercado Livre."""
+    from . import VinculoMercadoLivre
+    vinculadas = db.select(VinculoMercadoLivre.peca_id).where(VinculoMercadoLivre.tabela_peca == cls.__tablename__)
+    com_link = db.and_(cls.kabum_external.isnot(None), cls.kabum_external != "")
+    return cls.query.filter(cls.imagem_url.is_(None), db.or_(com_link, cls.id.in_(vinculadas))).all()
+
+  @classmethod
   def buscar_por_id(cls, peca_id):
     return db.session.get(cls, peca_id)
 
