@@ -121,5 +121,3 @@ ainda foge dela está em [docs/arquitetura.md](docs/arquitetura.md).
   <strong>Projeto acadêmico em desenvolvimento</strong><br>
   Funcionalidades implementadas não equivalem a homologação em produção.
 </div>
-
-[Apresentação da BOOSTio](https://docs.google.com/presentation/d/1T8IafJe7wyfnaIWoAmYwfCx_qvOP4aw2x5slewX20uo/edit)
