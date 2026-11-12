@@ -83,7 +83,7 @@ export function abrirCompraBuild(build,catalogo,{publica = false,loja,recarregar
   if (!itens.length) throw new Error("Adicione pelo menos uma peça à build para consultar lojas.");
   const estado = structuredClone(build), conta = /^s-/.test(String(build.id));
   const carregar = recarregar || (conta ? async signal => {
-    if (!publica) return (await catalogoBuilds({signal})).pecas;
+    if (!publica) return (await catalogoBuilds({signal,cache:"no-store"})).pecas;
     const {build:atual}=await fetchComErro('/build/'+encodeURIComponent(build.id)+'/publica',{method:'GET',cache:'no-store',signal});
     if (atual?.id!==build.id||atual.estado?.visibilidade!=="publico") throw new Error("Esta build não está mais disponível publicamente.");
     return atual.pecas;

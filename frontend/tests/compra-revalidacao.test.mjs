@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { compararCatalogosCompra } from "../js/build/compra-revalidacao.js";
 import { catalogoBuilds } from "../js/api/build/builds.js";
+import { readFile } from "node:fs/promises";
 import { conteudoCompra } from "../js/build/acoes-build.js";
 const antes=[{id:"ram",categoria:"memoria_ram",preco:100,esgotado:false}];
 const build={componentes:{memoria_ram:[{id:"ram",quantidade:2}]}};
@@ -29,7 +30,11 @@ test("compra força reconsulta sem cache do navegador",async()=>{
     assert.equal(opcoes.cache,"no-store");assert.equal(opcoes.method,"GET");
     return {ok:true,status:200,json:async()=>({pecas:antes})};
   };
-  try {assert.deepEqual((await catalogoBuilds({cache:"force-cache"})).pecas,antes);}
+  try {
+    assert.deepEqual((await catalogoBuilds({cache:"no-store"})).pecas,antes);
+    const fonte=await readFile(new URL("../js/build/acoes-build.js",import.meta.url),"utf8");
+    assert.match(fonte,/catalogoBuilds\(\{signal,cache:"no-store"\}\)/);
+  }
   finally {globalThis.fetch=original;}
 });
 
