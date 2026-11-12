@@ -1,3 +1,4 @@
+import { iconeAnimado } from "../components/ui.js";
 import { ofertasPeca, moeda, htmlSeguro as h } from "./catalogo.js";
 
 function botaoRemover(oferta, administrador) {
@@ -21,6 +22,6 @@ export function cartoesOfertasHtml(peca,{administrador=false,loja,somenteDisponi
       (oferta.preco != null ? '<strong class="store-price">' + moeda(oferta.preco) + '</strong>' : '<span class="store-price-unavailable">Preço ainda não cadastrado</span>') +
       '<p class="font-2-xs">' + h(descricao) + '</p>' + data + '<a class="btn-ghost" href="' + h(oferta.url) + '" target="_blank" rel="noopener noreferrer" aria-label="' +
       h((oferta.direta ? "Conferir oferta na " : "Buscar na ") + oferta.loja + (oferta.vendedor ? " · " + oferta.vendedor : "")) + '">' +
-      (oferta.direta ? "Conferir na loja" : "Buscar na loja") + '<span aria-hidden="true">↗</span></a>' + botaoRemover(oferta,administrador) + '</article>';
+      (oferta.direta ? "Conferir na loja" : "Buscar na loja") + iconeAnimado('arrow','external') + '</a>' + botaoRemover(oferta,administrador) + '</article>';
   }).join("");
 }

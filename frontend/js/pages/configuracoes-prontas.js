@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const contador = document.querySelector("#prontas-contador");
   const feedback = document.querySelector("#prontas-feedback");
   const cota = document.querySelector("#prontas-cota");
-  let abrindo = false;
+  let abrindo = false, modelosAtuais = [];
   let motivoBloqueio = 'Verificando as vagas da sua conta…', revisaoCota = 0;
 
   function informar(texto, erro = false) {
@@ -28,8 +28,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function aplicarCota() {
     lista.querySelectorAll("[data-usar-modelo]").forEach(botao => {
-      botao.disabled = abrindo || Boolean(motivoBloqueio);
+      const modelo = modelosAtuais.find(({build}) => build.id === botao.dataset.usarModelo);
+      const pendente = Boolean(modelo?.build.metadados.pendentes.length || modelo?.avaliacao.erros.length);
+      botao.disabled = abrindo || Boolean(motivoBloqueio) || pendente;
       if (motivoBloqueio) botao.dataset.disabledReason = motivoBloqueio;
+      else if (pendente) botao.dataset.disabledReason = "Modelo em revisão: peças ausentes, indisponíveis ou incompatíveis. Escolha outro modelo ou monte manualmente.";
       else delete botao.dataset.disabledReason;
     });
   }
@@ -60,6 +63,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const [catalogo,referencias] = await Promise.all([carregarCatalogoConta(),carregarCatalogo()]);
     const modelos = ordenarModelosPorPreco(modelosProntos(catalogo,{referencias}).map(build => ({build,avaliacao:avaliarBuild(build,catalogo)})));
+    modelosAtuais = modelos;
     const objetivos = new Map(modelos.map(({build}) => [build.objetivo,build.metadados.objetivoRotulo]));
     objetivo.innerHTML = '<option value="">Todos os objetivos</option>' + [...objetivos].map(([valor,rotulo]) =>
       '<option value="' + h(valor) + '">' + h(rotulo) + '</option>').join("");
@@ -72,7 +76,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         '<dl class="prontas-resumo"><div><dt>Memória RAM</dt><dd>' + ram.capacidade + ' GB</dd></div><div><dt>Armazenamento</dt><dd>' + discos.capacidade + ' GB</dd></div></dl>' +
         '<div class="prontas-total"><span>' + (build.metadados.pendentes.length ? 'Total parcial dos preços disponíveis' : 'Total das peças') + '</span><strong>' + (avaliacao.preco > 0 ? moeda(avaliacao.preco) : 'Preço a consultar') + '</strong><small>Sem periféricos e sem frete.' + (build.metadados.pendentes.length ? ' Há peças sem cotação ou estoque confirmado.' : '') + '</small></div>' +
         '<div class="prontas-acoes"><button type="button" class="btn-primary" data-usar-modelo="' + h(build.id) + '" aria-label="Abrir build e personalizar: ' + h(build.titulo) +
-        '">Abrir build</button><small>Peças e compatibilidade aparecem no editor. Salva uma cópia na sua conta.</small></div></article>';
+        '">' + (build.metadados.pendentes.length || avaliacao.erros.length ? 'Modelo em revisão' : 'Abrir build') + '</button><small>' + (build.metadados.pendentes.length || avaliacao.erros.length ? 'Este modelo está incompleto ou precisa de revisão. Escolha outro ou monte manualmente.' : 'Peças e compatibilidade aparecem no editor. Salva uma cópia na sua conta.') + '</small></div></article>';
     }
 
     function renderizar() {

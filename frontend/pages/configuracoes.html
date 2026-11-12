@@ -35,18 +35,6 @@
         <h1 class="font-1-l">Configurações da conta</h1>
         <p class="font-2-s">Gerencie suas informações pessoais e a segurança do seu perfil.</p>
       </div>
-      <section class="settings-card budget-settings-card" id="profile-budget-section" tabindex="-1" aria-labelledby="profile-budget-title">
-        <div class="card-heading"><h2 class="font-1-m-b" id="profile-budget-title">Seu budget</h2></div>
-        <p class="card-subtext font-2-xs">Registre quanto pretende investir nas próximas montagens e melhorias.</p>
-        <form id="budget-profile-form">
-          <label class="planning-field" for="profile-budget"><span>Orçamento disponível (R$)</span><input id="profile-budget" type="number" min="0" max="1000000" step="0.01" inputmode="decimal" placeholder="Ex.: 5000" disabled></label>
-          <label class="planning-consent ui-check" for="profile-budget-use"><input id="profile-budget-use" type="checkbox" disabled><span class="ui-lottie" data-lottie="checkbox" aria-hidden="true"><span class="ui-icon-fallback">✓</span></span><span>Usar este budget nas novas configurações</span></label>
-          <p class="planning-help">Salvo na sua conta e disponível em outros dispositivos após entrar. Cada build mantém seu próprio orçamento; este valor não é descontado automaticamente.</p>
-          <button type="submit" class="btn-primary" aria-label="Salvar budget" disabled data-disabled-reason="Aguarde o carregamento do budget.">Salvar budget</button>
-          <p class="planning-help" id="profile-budget-feedback" role="status" aria-live="polite"></p>
-        </form>
-      </section>
-
 
       <div class="settings-card">
         <div class="card-heading"><i class="fa-solid fa-user" aria-hidden="true"></i><span class="font-1-l">Perfil</span></div>
@@ -61,7 +49,7 @@
         <div class="profile-meta">
           <div class="meta-pill font-1-m"><i class="fa-solid fa-calendar" aria-hidden="true"></i><span id="created-at"></span></div>
           <div class="meta-pill font-1-m"><i class="fa-solid fa-desktop" aria-hidden="true"></i><span id="profile-build-count" role="status" aria-live="polite">Carregando builds…</span></div>
-          <a class="meta-pill meta-pill-budget font-1-m" href="#profile-budget-section" aria-label="Consultar ou alterar meu orçamento"><i class="fa-solid fa-wallet" aria-hidden="true"></i><span id="profile-budget-summary" role="status" aria-live="polite">Carregando budget…</span><span aria-hidden="true">↗</span></a>
+          <a class="meta-pill meta-pill-budget font-1-m" href="#profile-budget-section" aria-label="Consultar ou alterar meu orçamento"><i class="fa-solid fa-wallet" aria-hidden="true"></i><span id="profile-budget-summary" role="status" aria-live="polite">Carregando budget…</span></a>
           <div class="meta-pill font-1-m" id="verified-pill">
             <i class="fa-solid" id="verified-icon" aria-hidden="true"></i>
             <span id="verified-text"></span>
@@ -95,6 +83,18 @@
           <button class="btn-primary" id="save-profile-btn" aria-label="Salvar alterações do perfil">Salvar alterações</button>
         </div>
       </div>
+
+      <section class="settings-card budget-settings-card" id="profile-budget-section" tabindex="-1" aria-labelledby="profile-budget-title">
+        <div class="card-heading"><h2 class="font-1-m-b" id="profile-budget-title">Seu budget</h2></div>
+        <p class="card-subtext font-2-xs">Registre quanto pretende investir nas próximas montagens e melhorias.</p>
+        <form id="budget-profile-form">
+          <label class="planning-field" for="profile-budget"><span>Orçamento disponível (R$)</span><input id="profile-budget" type="number" min="0" max="1000000" step="0.01" inputmode="decimal" placeholder="Ex.: 5000" disabled></label>
+          <label class="planning-consent ui-check" for="profile-budget-use"><input id="profile-budget-use" type="checkbox" disabled><span class="ui-lottie" data-lottie="checkbox" aria-hidden="true"><span class="ui-icon-fallback">✓</span></span><span>Usar este budget nas novas configurações</span></label>
+          <p class="planning-help">Salvo na sua conta e disponível em outros dispositivos após entrar. Cada build mantém seu próprio orçamento; este valor não é descontado automaticamente.</p>
+          <button type="submit" class="btn-primary" aria-label="Salvar budget" disabled data-disabled-reason="Aguarde o carregamento do budget.">Salvar budget</button>
+          <p class="planning-help" id="profile-budget-feedback" role="status" aria-live="polite"></p>
+        </form>
+      </section>
 
       <section class="settings-card" aria-labelledby="google-access-title">
         <div class="card-heading"><h2 class="font-1-m-b" id="google-access-title">Formas de acesso</h2></div>

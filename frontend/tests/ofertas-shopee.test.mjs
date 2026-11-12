@@ -13,7 +13,7 @@ const peca = ofertas => ({id:"processador:1", categoria:"processador", fabricant
 
 test("KaBuM, Pichau, Mercado Livre e Shopee aparecem juntas, cada uma com seu preço", () => {
   const lista = ofertasPeca(peca([kabum, ml, shopee]));
-  assert.deepEqual(lista.map(o => [o.loja, o.preco]), [["KaBuM!", 950], ["Pichau", null], ["Mercado Livre", 929], ["Shopee", 899.9]]);
+  assert.deepEqual(lista.map(o => [o.loja, o.preco]), [["KaBuM!", 950], ["Mercado Livre", 929], ["Shopee", 899.9], ["Pichau", null]]);
   const loja = lista.find(o => o.codigo === "shopee");
   assert.equal(loja.marketplace, true);
   assert.equal(loja.vendedor, "Loja 10");
@@ -60,4 +60,14 @@ test("gráfico de histórico da Shopee usa só registros da Shopee", () => {
   const dados = [{data:"2026-11-01", preco:100, loja:"kabum", esgotado:false}, {data:"2026-11-02", preco:200, loja:"shopee", esgotado:null}];
   assert.deepEqual(normalizarHistoricoPrecos(dados, Date.parse("2026-11-07"), "shopee"), [{instante:Date.parse("2026-11-02"), preco:200}]);
   assert.match(historicoPrecosHtml({historico_loja:"shopee", historico_precos:dados}, Date.parse("2026-11-07")), /Shopee/);
+});
+
+test("anúncios cadastrados precedem buscas e usam o lottie de seta",()=>{
+  const semLink={...peca([ml,shopee]),link:null};
+  const ofertas=ofertasPeca(semLink);
+  assert.equal(ofertas[0].codigo,'mercado_livre');
+  assert.ok(ofertas.slice(0,2).every(o=>o.direta));
+  const html=cartoesOfertasHtml(semLink);
+  assert.match(html,/data-lottie="arrow" data-direction="external"/);
+  assert.doesNotMatch(html,/↗/);
 });
