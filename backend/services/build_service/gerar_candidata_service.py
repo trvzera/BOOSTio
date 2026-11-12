@@ -15,6 +15,7 @@ from services.llm_service.reservar_chamada_service import CotaGlobalIAError, Con
 from .completar_ventilacao_service import CompletarVentilacaoService
 from services.validacoes_service.requisitos_armazenamento_service import RequisitosArmazenamentoService
 from .ajustar_orcamento_build_service import AjustarOrcamentoBuildService
+from .melhorar_investimento_build_service import MelhorarInvestimentoBuildService
 from .preferencias_perifericos_service import PreferenciasPerifericosService
 from .planejar_rede_service import PlanejarRedeService
 
@@ -62,6 +63,19 @@ def gerar_candidata(usuario_id, prompt, modelo, catalogo, orcamento,
         validada["ajuste_orcamento"] = reparo["diagnostico"]
         logger.info("Geração: etapa=ajuste_orcamento economia=%.2f trocas=%d",
                     reparo["diagnostico"]["economia"], len(reparo["diagnostico"]["trocas"]))
+      if revisar_investimento:
+        pool_melhoria = catalogo_reparo if catalogo_reparo is not None else catalogo
+        def validar_melhoria(candidata):
+          candidata = CompletarVentilacaoService().executar(
+              candidata, pool_melhoria, teto_pc, proprias, detalhes_proprias, cor=cor)
+          return _validar_candidata_completa(candidata, pool_melhoria, orcamento, percentual, proprias,
+                                                 detalhes_proprias, rede, aparencia or {"cor": cor}, armazenamento_minimo_gb, utilidade)
+        melhoria = MelhorarInvestimentoBuildService().executar(validada, pool_melhoria, teto_pc, proprias, validar_melhoria)
+        if melhoria is not None:
+          validada, trocas = melhoria
+          validada["melhoria_investimento"] = {"trocas": trocas}
+          catalogo = pool_melhoria
+          logger.info("Geração: etapa=melhoria_investimento trocas=%d", len(trocas))
       resumo = resumo_custos(validada, catalogo)
 
       if tentativa < limite and revisar_investimento and _ha_margem_para_melhorar(validada, catalogo, teto_pc, proprias):

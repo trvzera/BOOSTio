@@ -264,6 +264,15 @@ ajustamos FPS por uma fórmula. Equivalência de CPU/GPU, sistema, espaço livre
 demais exigências continuam sem validação completa.
 
 
+## Aproveitamento do orçamento na geração com IA
+
+Para jogos e trabalho pesado, se a build válida usa menos de 75% do teto do PC, o servidor sobe o nível sozinho, sem
+nova chamada à IA: tenta trocar placa de vídeo, processador, memória e SSD pela opção mais cara que caiba no teto
+(placa de vídeo até 45%, processador 40%, memória 25% e SSD 15% do teto do PC) e que seja comprovadamente melhor
+(benchmark maior na CPU e na GPU; mais capacidade ou frequência na memória e no SSD). Cada troca passa pelo mesmo
+validador de compatibilidade, fonte, cooler e orçamento; se falhar, é descartada. Peças próprias nunca são trocadas.
+As trocas ficam em `melhoria_investimento` na build gerada. Código em `melhorar_investimento_build_service.py`.
+
 ## Administração
 
 Dashboard em `/admin` (`frontend/pages/admin.html`), só para contas com o papel de administrador. Hoje tem
