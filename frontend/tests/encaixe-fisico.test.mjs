@@ -124,3 +124,16 @@ test('estado da conta e arquivos mantêm opção explícita de substituição',(
   assert.equal(importarBuild(exportarCsv(build,[]),'csv',[]).substituirFansWaterCooler,true);
   assert.throws(()=>importarBuild(JSON.stringify({...build,substituirFansWaterCooler:'true'}),'json',[]),/Metadado inválido/);
 });
+
+for(const [peca,campo,limite] of [
+ ['gpu','comprimento_mm','tamanho_max_gpu_mm'],['gpu','altura_mm','tamanho_max_altura_gpu_mm'],
+ ['gpu','espessura_mm','tamanho_max_espessura_gpu_mm'],['air','altura_mm','tamanho_max_cooler_mm'],
+ ['fonte','comprimento_mm','tamanho_max_fonte_mm'],
+])for(const [valor,erro] of [[159,false],[160,false],[161,true],[null,false]])test(`limite do gabinete ${peca}/${campo} = ${valor}`,()=>{
+ const r=validarEncaixe({gabinete:{[limite]:160,comprimento_mm:999,altura_mm:999,largura_mm:999},[peca]:{[campo]:valor}});
+ assert.equal(r.erros.length>0,erro);
+ if(valor===null)assert.ok(r.avisos.some(t=>t.includes('Faltam medidas')));
+});
+test('gabinete com zero slots não recebe GPU de dois slots',()=>{
+ assert.ok(validarEncaixe({gabinete:{slots_expansao:0},gpu:{slots_ocupados:2}}).erros.some(t=>t.includes('slots')));
+});
