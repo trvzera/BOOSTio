@@ -24,6 +24,8 @@ ESSENCIAIS={
  'cabo_rede':('categoria_cabo','comprimento_m','conector'),
 }
 OPCIONAIS={
+ 'processador':('clockbase','clockmax','consumo_energia','videointegrado','cooler'),
+ 'placa_video':('consumo_w',),
  'memoria_ram':('iluminacao',),
  'placa_mae':('chipset','quantidade_slots_ram','memoria_maxima_gb','quantidade_slots_m2'), 'ssd':('formato',), 'hd':('memoria_cache_mb',),
  'gabinete':('tamanho_max_gpu_mm','tamanho_max_cooler_mm','slots_expansao','fans_inclusos'),
@@ -61,8 +63,8 @@ def converter(campo, valor):
         m=re.fullmatch(r'(\d+)\s*[x×]\s*\d+\s*gb',s)
         return int(m[1]) if m else numero(s)
     if campo in ('nucleo','thread'):return numero(s)
-    if campo in ('potencia_w','velocidade_rpm','dpi_max','memoria_cache_mb'):
-        return numero(s,{'potencia_w':'w','velocidade_rpm':'rpm','dpi_max':'dpi','memoria_cache_mb':'mb'}[campo])
+    if campo in ('potencia_w','consumo_energia','consumo_w','velocidade_rpm','dpi_max','memoria_cache_mb'):
+        return numero(s,{'consumo_energia':'w','consumo_w':'w','potencia_w':'w','velocidade_rpm':'rpm','dpi_max':'dpi','memoria_cache_mb':'mb'}[campo])
     if campo=='iluminacao':
         if type(valor) is bool:return valor
         return True if s in ('sim','yes','true','1') else False if s in ('nao','não','no','false','0') else None

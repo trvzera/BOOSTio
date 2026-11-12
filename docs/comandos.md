@@ -147,3 +147,5 @@ Os comandos com `--aplicar` gravam; o worker e a reativação já executam açõ
 6. **Analisar as pendências com IA**: `admin-pendencias-sugerir --limite 500 --aplicar` só sugere; com `--decidir`
    também aceita ou rejeita quando a confiança alcança 90. Rejeição da IA não tem desfazer. Alternativa: o painel
    de administração ("Selecionar todas" e "Enviar para a IA").
+
+O comando `icecat-completar-pecas` aceita `--incluir-publicadas` para buscar lacunas técnicas também nas peças já publicadas. Continua simulando por padrão; `--aplicar` grava apenas campos vazios com identidade confirmada. Slots e capacidade máxima são buscados mesmo quando a ficha mínima já está completa. Não altera preço, estoque ou aprovação. O índice e as fichas do Icecat são dados locais regeneráveis, fora do Git.

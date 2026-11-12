@@ -168,3 +168,31 @@ def test_peca_ja_completa_com_ficha_reprovada_so_tem_a_marca_liberada(banco):
     db.session.refresh(fone)
     assert fone.ficha_montagem_validada is True and fone.status_validacao == 'em_revisao'
     assert completar(icecat, simular=False)['ficha_liberada'] == 0
+
+
+def test_publicada_com_ficha_minima_completa_busca_slots_quando_autorizado(banco):
+    from models import PlacaMae
+    from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
+    placa = PlacaMae(fabricante='MSI', modelo='PRO B660M-A DDR4', part_number='PRO B660M-A DDR4',
+                     socket='LGA1700', tipo_memoria='DDR4', formato='Micro-ATX', chipset='B660', status_validacao='aprovado')
+    db.session.add(placa); db.session.commit()
+    dados = dict(fabricante='MSI', modelo=placa.modelo, socket='LGA1700', tipo_memoria='DDR4',
+                 formato='Micro-ATX', chipset='B660', quantidade_slots_ram=4, memoria_maxima_gb=128, quantidade_slots_m2=2)
+    icecat = IcecatSimulado(dados, mpn=placa.part_number)
+    servico = CompletarPecasIcecatService(icecat=icecat)
+    assert servico.executar(categoria='placa_mae')['ignoradas'] == 1
+    resultado = servico.executar(categoria='placa_mae', incluir_publicadas=True, simular=False)
+    assert resultado['atualizada'] == 1, str(resultado['detalhes'])
+    assert placa.status_validacao == 'aprovado'
+    assert (placa.quantidade_slots_ram, placa.memoria_maxima_gb, placa.quantidade_slots_m2) == (4,128,2)
+    assert placa.fontes_especificacoes['quantidade_slots_ram']['url'] == URL
+    catalogo = [dict(id=placa.id,categoria='placa_mae',tipo_memoria='DDR4',quantidade_slots_ram=4,memoria_maxima_gb=128),
+                dict(id=999,categoria='memoria_ram',ddr='DDR4',quantidade_pentes=2,capacidade_gb=32)]
+    componentes = {'placa_mae':{'id':placa.id},'memoria_ram':[{'id':999,'quantidade':2}]}
+    def estado_slots():
+        resultado = AvaliarCompatibilidadeService().executar({'componentes':componentes},catalogo=catalogo)
+        return next(r for r in resultado['verificacoes'] if r['codigo']=='ram-slots')['status']
+    assert estado_slots() == 'sem_conflitos'
+    componentes['memoria_ram'][0]['quantidade']=3
+    assert estado_slots() == 'incompativel'
+    assert servico.executar(categoria='placa_mae', incluir_publicadas=True)['analisadas'] == 0

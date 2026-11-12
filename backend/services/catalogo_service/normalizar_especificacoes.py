@@ -3,7 +3,7 @@ from decimal import Decimal
 from .normalizar_produto import nome, numero
 
 
-BOOLEANOS = {'microfone', 'mecanico', 'bluetooth', 'hdr', 'iluminacao'}
+BOOLEANOS = {'microfone', 'mecanico', 'bluetooth', 'hdr', 'iluminacao', 'videointegrado', 'cooler'}
 CONJUNTOS = {'conexao', 'compatibilidade', 'formatos_placa_mae'}
 
 

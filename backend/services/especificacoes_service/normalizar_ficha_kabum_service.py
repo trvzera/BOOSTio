@@ -88,6 +88,8 @@ class NormalizarFichaKabumService:
         'microfone': {'microfone', 'microfone integrado', 'com microfone', 'possui microfone'},
         'nucleo': {'nucleos', 'numero de nucleos', 'quantidade de nucleos'},
         'thread': {'threads', 'numero de threads'},
+        'clockbase': {'frequencia base', 'clock base'},
+        'clockmax': {'frequencia turbo maxima', 'frequencia boost', 'clock boost'},
         'socket': {'soquete', 'socket', 'soquete de cpu'},
     }
 
@@ -121,7 +123,9 @@ class NormalizarFichaKabumService:
             'tamanho_max_cooler_mm': {'altura maxima do cooler', 'altura maxima do cooler de cpu', 'altura maxima do air cooler'},
             'slots_expansao': {'slots de expansao', 'numero de slots de expansao'},
             'fans_inclusos': {'ventoinhas inclusas', 'fans inclusos', 'ventoinhas pre instaladas'},
-        } if categoria == 'gabinete' else {}
+        } if categoria == 'gabinete' else {
+            'consumo_energia': {'tdp', 'tdp padrao', 'potencia base do processador'},
+        } if categoria == 'processador' else {}
         rotulos_validos = {'modelo', 'part number', 'mpn', 'tipo de conexao', 'conexoes'}
         rotulos_validos.update(set().union(*self.ROTULOS.values(), *rotulos_categoria.values()))
         for i, linha in enumerate(linhas):
