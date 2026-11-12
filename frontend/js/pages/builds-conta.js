@@ -1,6 +1,6 @@
 import "../header.js";
 import "../auth/auth.js";
-import { listarBuilds, criarBuildManual, atualizarBuild, duplicarBuild, excluirBuild, definirSetupAtual, LIMITE_BUILDS, verificarEspacoBuild } from "../api/build/builds.js";
+import { listarBuilds, criarBuildManual, atualizarBuild, duplicarBuild, excluirBuild, definirSetupAtual, LIMITE_BUILDS, limiteDeBuilds, verificarEspacoBuild } from "../api/build/builds.js";
 import { carregarCatalogoConta, buildDaConta, estadoParaConta, linkBuildConta } from "../build/conta.js";
 import { htmlSeguro as h, moeda } from "../build/catalogo.js";
 import { itensSelecionados } from "../build/estado.js";
@@ -26,7 +26,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const inputDescricao = document.querySelector("#edit-description");
   let salvas = [], catalogo = [], idEdicao = null, idExclusao = null;
   let carregadas = false, criando = false;
-  const lotado = () => salvas.length >= LIMITE_BUILDS;
+  let limite = LIMITE_BUILDS;
+  const lotado = () => salvas.length >= limite;
   for (const id of ["#btn-create-build","#btn-import-build"]) {
     const botao = document.querySelector(id);
     botao.disabled = true;
@@ -53,6 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       const [resposta, pecas] = await Promise.all([listarBuilds(), carregarCatalogoConta()]);
       salvas = resposta.builds || []; catalogo = pecas; carregadas = true;
+      limite = limiteDeBuilds(resposta.limite === null);
       renderizar();
     } catch (erro) { status.hidden = false; status.classList.remove("builds-empty"); status.textContent = erro.message; status.dataset.tone = "error"; }
   }
@@ -97,10 +99,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     lista.querySelectorAll(".build-menu").forEach(menu => {
       if (typeof menu.showPopover === "function") menu.popover = "manual";
     });
-    atualizarValor(document.querySelector("#quota-count"),`${salvas.length} / ${LIMITE_BUILDS}`,salvas.length);
-    document.querySelector("#quota-progress").setAttribute("aria-valuenow",String(Math.min(LIMITE_BUILDS,salvas.length)));
-    document.querySelector("#quota-fill").style.width = `${Math.min(100,salvas.length / LIMITE_BUILDS * 100)}%`;
-    document.querySelector("#quota-help").textContent = lotado() ? "Limite atingido. Exclua uma build para liberar espaço." : "Até três builds salvas na sua conta";
+    const semLimite = limite === Infinity;
+    atualizarValor(document.querySelector("#quota-count"),semLimite ? `${salvas.length} builds` : `${salvas.length} / ${limite}`,salvas.length);
+    document.querySelector("#quota-progress").setAttribute("aria-valuenow",String(semLimite ? 0 : Math.min(limite,salvas.length)));
+    document.querySelector("#quota-fill").style.width = semLimite ? "0%" : `${Math.min(100,salvas.length / limite * 100)}%`;
+    document.querySelector("#quota-help").textContent = semLimite ? "Sem limite de builds nesta conta" : lotado() ? "Limite atingido. Exclua uma build para liberar espaço." : "Até três builds salvas na sua conta";
     for (const id of ["#btn-create-build","#btn-import-build"]) {
       const botao = document.querySelector(id);
       botao.disabled = lotado();

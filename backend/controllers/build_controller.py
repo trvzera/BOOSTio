@@ -4,6 +4,7 @@ from flask_login import login_required,current_user
 from utils.limite_requisicoes import limiter, chave_usuario
 from models import db
 from models.build_salva import LimiteBuildsError, EmailNaoVerificadoError
+from utils.decorators import usuario_atual_e_administrador
 from sqlalchemy.exc import SQLAlchemyError
 from requests.exceptions import RequestException, HTTPError, Timeout, ConnectionError
 
@@ -42,7 +43,7 @@ def limite_builds(erro):
 def mostrar_builds():
   try:
     builds = ListarBuildService().executar(current_user.id)
-    return jsonify({"builds": builds, "limite": 3}),200
+    return jsonify({"builds": builds, "limite": None if usuario_atual_e_administrador() else 3}),200
   except ValueError as e:
     return jsonify({"erro": str(e)}),404
 
@@ -144,7 +145,10 @@ def historico_precos_peca(categoria, peca_id):
 @build_bp.get("/catalogo")
 @login_required
 def catalogo_build():
-  return jsonify({"pecas": ListarCatalogoBuildService().executar()}),200
+  resposta = jsonify({"pecas": ListarCatalogoBuildService().executar()})
+  resposta.headers["Cache-Control"] = "private, max-age=60"
+  resposta.add_etag()
+  return resposta.make_conditional(request)
 
 
 @build_bp.post("/manual")

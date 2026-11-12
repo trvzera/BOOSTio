@@ -2,12 +2,13 @@ import { fetchComErro } from "../_shared/fetchComErro.js";
 import { carregarPerfil } from "../../conta/perfil.js";
 
 export const LIMITE_BUILDS = 3;
+export const limiteDeBuilds = administrador => administrador ? Infinity : LIMITE_BUILDS;
 export async function verificarEspacoBuild(perfil) {
   const sessao = perfil || await carregarPerfil();
   if (!sessao.auth) throw Object.assign(new Error("Entre na sua conta para criar uma build."),{status:401});
   if (!sessao.usuario?.verificado) throw Object.assign(new Error("Verifique seu e-mail nas configurações do perfil antes de criar uma build."),{status:403,codigo:"email-nao-verificado"});
   const resposta = await listarBuilds();
-  if (resposta.builds.length >= LIMITE_BUILDS) {
+  if (resposta.builds.length >= limiteDeBuilds(sessao.usuario?.administrador)) {
     const erro = new Error("Você atingiu o limite de três builds. Exclua uma para liberar espaço.");
     erro.codigo = "limite-builds";
     throw erro;
@@ -27,7 +28,7 @@ export function buscarBuild(id) {
 }
 
 export function catalogoBuilds(opcoes = {}) {
-  return fetchComErro("/build/catalogo", { ...opcoes, method: "GET", cache:"no-store" });
+  return fetchComErro("/build/catalogo", { ...opcoes, method: "GET" });
 }
 
 export function criarBuildManual(dados) {

@@ -255,6 +255,15 @@ def test_limites_por_usuario_globais_e_cache_limitado():
         BuscarJogosBenchmarkService(api).executar({"q": "novo"}, 2)
 
 
+def test_administrador_nao_tem_limite_por_usuario(monkeypatch):
+    monkeypatch.setattr("utils.decorators.usuario_atual_e_administrador", lambda: True)
+    api = cliente()
+    api.buscar.return_value = Mock(status_code=200, headers={}, json=Mock(return_value={"ok": True, "results": []}))
+    for n in range(api.LIMITE_USUARIO + 5):
+        BuscarJogosBenchmarkService(api).executar({"q": "jogo " + str(n)}, 1)
+    assert api.buscar.call_count == api.LIMITE_USUARIO + 5
+
+
 @pytest.mark.parametrize("status,esperado", [(404, 404), (503, 503), (302, 503)])
 def test_erros_http_sem_cache(status, esperado):
     api = cliente(Mock(return_value=Mock(status_code=status, headers={})))

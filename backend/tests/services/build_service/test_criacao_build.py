@@ -111,6 +111,17 @@ def test_referencia_gabinete_so_enriquece_amostra_se_disponivel_dentro_do_teto(a
         assert not gerar_catalogo(200,referencia_gabinete=gabinete.id)
 
 
+def test_administrador_nao_tem_limite_de_builds(app_build):
+    with app_build.app_context():
+        db.session.get(Usuario, 1).administrador = True
+        db.session.commit()
+    cliente = app_build.test_client()
+    autenticar(cliente)
+    for _ in range(4):
+        assert cliente.post("/build/manual", json=ESTADO).status_code == 201
+    assert cliente.get("/build/").json["limite"] is None
+
+
 def test_limite_em_manual_importacao_duplicacao_e_llm(app_build, mocker):
     llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar")
     cliente = app_build.test_client()

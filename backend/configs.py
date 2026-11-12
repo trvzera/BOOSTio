@@ -57,7 +57,7 @@ class Producao(Config):
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     RATELIMIT_STORAGE_URI = os.getenv("RATELIMIT_STORAGE_URI")
-    CATALOGO_CACHE_SEGUNDOS = int(os.getenv("CATALOGO_CACHE_SEGUNDOS", "60"))
+    CATALOGO_CACHE_SEGUNDOS = int(os.getenv("CATALOGO_CACHE_SEGUNDOS", "300"))
 
 ambientes = {
     'producao': Producao,
