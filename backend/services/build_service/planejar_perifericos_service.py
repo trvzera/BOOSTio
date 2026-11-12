@@ -44,7 +44,7 @@ class PlanejarPerifericosService:
         def ordem(item):
             return (-pontuacao(item), item[0], tuple(peca["id"] for peca in item[1]))
 
-        prioritarias = self._priorizar_combinacoes(combinacoes, tipos, opcoes, utilidade, cor)
+        prioritarias = self._priorizar_combinacoes(combinacoes, tipos, opcoes, utilidade, cor, pontuacao)
         escolhidas = []
         for item in prioritarias + sorted(combinacoes, key=ordem):
             if len(escolhidas) == self.LIMITE_COMBINACOES:
@@ -104,7 +104,7 @@ class PlanejarPerifericosService:
         return pecas
 
     @staticmethod
-    def _priorizar_combinacoes(combinacoes, tipos, opcoes, utilidade, cor):
+    def _priorizar_combinacoes(combinacoes, tipos, opcoes, utilidade, cor, nota):
         prioritarias = []
         if utilidade:
             def criterio(item):
@@ -112,7 +112,7 @@ class PlanejarPerifericosService:
                 monitor = conjunto.get("monitor",{})
                 teclado = conjunto.get("teclado",{})
                 mecanico = PreferenciasPerifericosService.teclado_documentado(teclado) if PreferenciasPerifericosService.jogos(utilidade) else False
-                return (-int(mecanico), *(-v for v in PreferenciasPerifericosService.monitor(monitor,utilidade)), item[0])
+                return (-int(mecanico), *(-v for v in PreferenciasPerifericosService.monitor(monitor,utilidade)), -nota(item), item[0])
             prioritarias = sorted(combinacoes, key=criterio)[:3]
         if cor in ("preto", "branco", "misto"):
 
@@ -122,5 +122,5 @@ class PlanejarPerifericosService:
             prioritarias += sorted(combinacoes, key=lambda item: (
                 sum(pesos[id(p)] for p in item[1]),
                 int(cor == "misto" and not {"preto", "branco"} <= set().union(*(cores[id(p)] for p in item[1]))),
-                item[0], tuple(p["id"] for p in item[1])))[:3]
+                -nota(item), item[0], tuple(p["id"] for p in item[1])))[:3]
         return prioritarias
