@@ -45,6 +45,12 @@ class TestLimitesRequisicoes(unittest.TestCase):
             environ_overrides={"REMOTE_ADDR": ip},
         )
 
+    @patch("utils.limite_requisicoes.usuario_atual_e_administrador", return_value=True)
+    @patch("controllers.auth_controller.EntrarUsuarioService.executar", side_effect=ValueError("Credenciais inválidas"))
+    def test_administrador_nao_e_limitado(self, executar, _administrador):
+        for indice in range(25):
+            self.assertNotEqual(self.login(f"admin{indice}@example.test").status_code, 429)
+
     @patch("controllers.auth_controller.EntrarUsuarioService.executar", side_effect=ValueError("Credenciais inválidas"))
     def test_login_limita_ip_mesmo_com_emails_diferentes(self, executar):
         for indice in range(20):

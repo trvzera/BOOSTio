@@ -300,6 +300,17 @@ atualização, antes de subir o código novo: sem a coluna, o login quebra.
 - **O que protege de verdade é o servidor:** toda rota `/admin/*` usa `@login_required` e `@apenas_administrador`
   (401 sem login, 403 sem o papel) e as ações de escrita exigem o token CSRF como no resto do site.
 
+### Contas administradoras sem limite
+
+Quem tem `usuario.administrador` não é barrado pelos limites de uso, para poder testar o site à vontade:
+
+- **Requisições:** o limitador de requisições (`429`) ignora administradores logados. Login, cadastro e recuperação de senha continuam limitados, porque nessas rotas ainda não há conta logada.
+- **Builds:** sem o teto de três builds salvas; a tela mostra só a quantidade, sem "x / 3".
+- **FPS e Blender:** sem o limite de consultas por usuário por minuto.
+- **IA:** a geração de build não conta na cota diária de chamadas.
+
+Continuam valendo os limites do **provedor** (FPSHQ por minuto e por dia, Blender por minuto), a pausa depois de falhas e a validação de e-mail, que protegem serviços externos e não a conta.
+
 ### Remover oferta
 
 Na página de uma peça, quem é administrador vê o botão **Remover oferta** em cada loja que tem preço cadastrado.

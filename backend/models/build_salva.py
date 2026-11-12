@@ -4,6 +4,7 @@ import re
 from . import db, ModeloBase
 from .build import Build
 from .usuario import Usuario
+from utils.decorators import exceto_administrador
 from sqlalchemy import update
 from . import Processador, PlacaMae, PlacaVideo, MemoriaRAM, SSD, HD, Fonte, Gabinete
 from . import WaterCooler, AirCooler, Fan, Fone, Teclado, Mouse, Monitor
@@ -36,6 +37,12 @@ class BuildSalva(ModeloBase):
     LIMITE = 3
 
     @classmethod
+    @exceto_administrador
+    def verificar_limite(cls, usuario_id):
+        if cls.query.filter_by(usuario_id=usuario_id).count() >= cls.LIMITE:
+            raise LimiteBuildsError()
+
+    @classmethod
     def verificar_espaco(cls, usuario_id):
         usuario = db.session.get(Usuario, usuario_id)
         if usuario is None:
@@ -43,8 +50,7 @@ class BuildSalva(ModeloBase):
         if not usuario.verificado:
             raise EmailNaoVerificadoError()
         cls.migrar_geradas(usuario_id)
-        if cls.query.filter_by(usuario_id=usuario_id).count() >= cls.LIMITE:
-            raise LimiteBuildsError()
+        cls.verificar_limite(usuario_id)
 
     @classmethod
     def criar_limitada(cls, usuario_id, estado, gerada=None):
@@ -55,8 +61,7 @@ class BuildSalva(ModeloBase):
             if not db.session.get(Usuario, usuario_id).verificado:
                 raise EmailNaoVerificadoError()
             cls.migrar_geradas(usuario_id, confirmar=False)
-            if cls.query.filter_by(usuario_id=usuario_id).count() >= cls.LIMITE:
-                raise LimiteBuildsError()
+            cls.verificar_limite(usuario_id)
             original = Build.criar_gerada(usuario_id, gerada, confirmar=False) if gerada else None
             build = cls(usuario_id=usuario_id, estado=estado, build_original_id=original.id if original else None)
             db.session.add(build)

@@ -45,6 +45,7 @@ services:
       GUNICORN_BIND: 0.0.0.0:8000
       TRUSTED_PROXY_HOPS: "1"
       TRUSTED_PROXY_PROTO_HOPS: "1"
+      GUNICORN_THREADS: "12"
       IMAGENS_COLETADAS_DIR: /dados/coletados
     volumes:
       - imagens_coletadas:/dados/coletados
