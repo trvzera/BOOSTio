@@ -28,6 +28,17 @@ def test_reserva_real_e_viabilidade_do_conjunto():
     assert dados == antes
 
 
+def test_trabalho_pesado_reserva_gpu_antes_de_aprovar_plataforma():
+    dados = pools()
+    dados['processador'][0]['preco'] = 5000
+    dados['processador'][0]['videointegrado'] = True
+    plano = Planner().executar(contexto(utilidade='Trabalho pesado'), dados)
+    assert plano['estimativas_cpu']['processador:1']['disponivel_gpu'] == 1500
+    assert plano['estimativas_cpu']['processador:1']['viavel'] is False
+    reaproveitando = Planner().executar(contexto(utilidade='Trabalho pesado', proprias={'placa_video': 'RTX 4060'}), dados)
+    assert reaproveitando['estimativas_cpu']['processador:1']['viavel'] is True
+
+
 def test_orcamento_uso_prioridade_e_reaproveitamento_alteram_metas():
     base = Planner().executar(contexto(), pools())
     baixo = Planner().executar(contexto(teto_pc=3000, teto_peca=2200), pools())

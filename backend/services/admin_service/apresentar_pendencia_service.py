@@ -77,4 +77,3 @@ def _candidato(candidato, pendencia):
         "part_number": peca.part_number if peca else None,
         "ficha": resumir_ficha(peca),
     }
-

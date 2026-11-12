@@ -63,5 +63,5 @@ class CriarBuildService:
     dados_build = gerar_candidata(usuario_id, prompt, modelo, catalogo, orcamento,
                                      percentual, proprias, detalhes_proprias, rede, tentativas_correcao,
                                      revisar_investimento=perfil_revisa_investimento(dados["utilidade"]), cor=aparencia["cor"], aparencia=aparencia,
-                                     armazenamento_minimo_gb=armazenamento_minimo, **reparo)
+                                     armazenamento_minimo_gb=armazenamento_minimo, utilidade=dados["utilidade"], **reparo)
     return salvar_build(usuario_id, dados_build, proprias, rede, percentual, aparencia, orcamento)

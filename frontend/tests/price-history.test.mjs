@@ -77,10 +77,11 @@ test("histórico do Mercado Livre é escolhido explicitamente e não mistura loj
 });
 
 test("visão geral aceita o ponto de qualquer loja e o filtro por loja ignora as outras", () => {
+  const consulta = Date.parse("2026-11-04T12:00:00Z");
   const registros = [registro("2026-11-01", 500), registro("2026-11-02", 400, {loja:"shopee"}), registro("2026-11-03", 420, {loja:"mercado_livre"}),
     registro("2026-11-03", 10, {loja:"outra"})];
-  assert.deepEqual(normalizarHistoricoPrecos(registros, agora, "todas").map(r => r.preco), [500, 400, 420]);
-  assert.deepEqual(normalizarHistoricoPrecos(registros, agora, "shopee").map(r => r.preco), [400]);
+  assert.deepEqual(normalizarHistoricoPrecos(registros, consulta, "todas").map(r => r.preco), [500, 400, 420]);
+  assert.deepEqual(normalizarHistoricoPrecos(registros, consulta, "shopee").map(r => r.preco), [400]);
 });
 
 test("histórico geral indica que mostra o menor preço do dia entre as lojas", () => {

@@ -34,4 +34,3 @@ class HistoricoPreco(ModeloBase):
         from sqlalchemy import inspect
         if not inspect(db.engine).has_table(cls.__tablename__):
             raise ValueError("Execute historico-precos-preparar antes de atualizar preços")
-

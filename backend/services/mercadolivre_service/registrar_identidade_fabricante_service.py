@@ -36,4 +36,3 @@ class RegistrarIdentidadeFabricanteService:
             raise
         finally:
             db.session.rollback()
-

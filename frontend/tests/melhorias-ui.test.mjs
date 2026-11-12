@@ -128,7 +128,7 @@ test("aplicar melhorias pelo menu devolve o foco ao novo card depois da atualiza
   assert.match(lista,/await atualizar\(build\.id,estadoParaConta\(proxima\)\)/);
   assert.match(lista,/janela\.returnValue !== "aplicar"\) return;/);
   assert.match(lista,/find\(card => card\.dataset\.id === build\.id\)\?\.querySelector\("\.build-menu-trigger"\)\?\.focus/);
-  assert.match(lista,/lista\.innerHTML = salvas\.map\(card\)\.join\(""\);\s*\/\/[^\n]+\n\s*lista\.querySelectorAll\("\.build-menu"\)\.forEach/);
+  assert.match(lista,/lista\.innerHTML = salvas\.map\(card\)\.join\(""\);\s*lista\.querySelectorAll\("\.build-menu"\)\.forEach/);
 });
 
 test("resumo sticky permite alcançar melhorias mesmo quando é maior que a tela",() => {

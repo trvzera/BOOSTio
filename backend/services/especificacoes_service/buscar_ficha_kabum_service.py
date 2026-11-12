@@ -16,5 +16,3 @@ class _ScriptsJson(HTMLParser):
     def handle_endtag(self, tag):
         if tag == 'script' and self.ler:
             self.scripts.append(''.join(self.partes)); self.ler = False
-
-
