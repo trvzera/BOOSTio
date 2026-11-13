@@ -2,7 +2,6 @@ from services.build_service.constantes_build import CAMPOS_PECAS, PERIFERICOS
 import logging
 from time import perf_counter
 from decimal import Decimal
-from math import isfinite
 
 from models.build_salva import MODELOS
 from models.modelos_pecas import MODELOS_PECAS
@@ -13,6 +12,7 @@ from services.build_service.preferencias_cores_service import PreferenciasCoresS
 from services.build_service.planejar_rede_service import PlanejarRedeService
 from services.build_service.preferencias_gabinete_service import PreferenciasGabineteService
 from services.build_service.planejamento_geracao import ErroPlanejamentoBuild, sugerir_total
+from services.build_service.preco_exibido_service import PrecoExibidoService
 
 logger = logging.getLogger("services.build_service.criar_build_service")
 
@@ -80,9 +80,10 @@ def gerar_catalogo(preco_maximo, reserva_perifericos=0, excluidas=(), referencia
     periferico = modelo.__tablename__ in PERIFERICOS
     if modelo.__tablename__ in excluidas or (periferico and not reserva_perifericos):
       continue
-    pecas = modelo.listar_disponiveis_ate(reserva_perifericos if periferico else preco_maximo, limite=200)
+    teto = reserva_perifericos if periferico else preco_maximo
+    pecas = PrecoExibidoService.catalogo(modelo.listar_disponiveis_ate(teto, limite=200), teto)
     if pecas:
-      fichas = [campos_pecas(peca) for peca in pecas]
+      fichas = [campos_catalogo({**item, "id": PrecoExibidoService.id_numerico(item)}) for item in pecas]
       if modelo.__tablename__ == "monitor":
         fichas = [p for p in fichas if PreferenciasPerifericosService.painel_permitido(p)]
       if modelo.__tablename__ in ("cabo_rede", "adaptador_wifi") and rede:
@@ -104,10 +105,10 @@ def gerar_catalogo(preco_maximo, reserva_perifericos=0, excluidas=(), referencia
               amostra.append(destaque)
   if referencia_gabinete is not None and "gabinete" not in excluidas:
     referencia = MODELOS["gabinete"].buscar_por_id(referencia_gabinete)
-    if referencia and referencia.publicavel and referencia.ficha_montagem_validada is not False:
-      peca = campos_pecas(referencia)
-      preco = peca.get("preco")
-      if peca.get("esgotado") is False and type(preco) in (int, float) and isfinite(preco) and 0 < preco <= preco_maximo:
+    precificada = PrecoExibidoService.catalogo([referencia], preco_maximo) if referencia else []
+    if referencia and precificada and referencia.publicavel and referencia.ficha_montagem_validada is not False:
+      peca = campos_catalogo({**precificada[0], "id": referencia.id})
+      if peca.get("esgotado") is False:
         amostra = catalogo.setdefault("gabinete", [])
         if not any(item["id"] == referencia_gabinete for item in amostra):
           if len(amostra) >= 12:

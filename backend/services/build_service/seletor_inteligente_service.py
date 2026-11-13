@@ -20,6 +20,7 @@ from .amostra_inteligente_service import AmostraInteligenteService
 from .planejar_orcamento_componentes_service import PlanejarOrcamentoComponentesService
 from .planejar_armazenamento_service import PlanejarArmazenamentoService
 from .ajustar_orcamento_build_service import AjustarOrcamentoBuildService
+from .preco_exibido_service import PrecoExibidoService
 
 
 class SeletorInteligenteService:
@@ -204,7 +205,7 @@ class SeletorInteligenteService:
                          and p.benchmark_versao is None]
                 if pecas:
                     contexto["fallbacks_benchmark"].add(modelo.__tablename__)
-            pools[modelo.__tablename__] = [p.to_catalogo() for p in pecas]
+            pools[modelo.__tablename__] = PrecoExibidoService.catalogo(pecas, teto)
         for tipo in ("cabo_rede", "adaptador_wifi"):
             if contexto["rede"]:
                 pools[tipo] = PlanejarRedeService.opcoes(pools, contexto["rede"], contexto["proprias"])

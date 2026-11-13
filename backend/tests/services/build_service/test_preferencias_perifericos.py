@@ -32,7 +32,8 @@ def test_gamer_prioriza_hz_e_edicao_resolucao_sem_pontuacao_de_qualidade():
 def test_catalogo_filtra_monitor_antes_de_amostrar_sem_excluir_outros_produtos():
     monitores=[Monitor(id=i,fabricante="Teste",modelo=str(i),preco=100+i,tipo_painel=p,tamanho_polegadas=24,resolucao="1920x1080",taxa_atualizacao_hz=144) for i,p in enumerate(["IPS","VA","TN","OLED",None],1)]
     modelo=SimpleNamespace(__tablename__="monitor",listar_disponiveis_ate=lambda *a,**k:monitores)
-    with patch("services.build_service.catalogo_geracao_service.MODELOS_PECAS",(modelo,)):
+    with patch("services.build_service.catalogo_geracao_service.MODELOS_PECAS",(modelo,)), \
+         patch("services.build_service.preco_exibido_service.Oferta.anexar_a_catalogo",side_effect=lambda pecas:pecas):
         catalogo=gerar_catalogo(200,500,utilidade="Jogos")
     assert {p["id"] for p in catalogo["monitor"]} == {1,2,3,4,5}
 
