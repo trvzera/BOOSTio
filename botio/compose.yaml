@@ -19,7 +19,8 @@ services:
       DISCORD_MESSAGE_LOG_CHANNEL_ID: ${DISCORD_MESSAGE_LOG_CHANNEL_ID:-}
       BOTIO_STATE_PATH: /data/state.sqlite3
     volumes: [botio_data:/data]
-    tmpfs: [/tmp:rw,noexec,nosuid,size=16m]
+    tmpfs:
+      - "/tmp:rw,noexec,nosuid,size=16m"
     logging:
       driver: json-file
       options:
