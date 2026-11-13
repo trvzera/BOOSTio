@@ -70,3 +70,5 @@
 .profile-logout, .profile-logout .ui-lottie { color: var(--status-error); }
 .profile-logout:hover, .profile-logout:focus-visible { color: var(--status-error); background: var(--status-error-bg); }
 @media (prefers-reduced-motion: reduce) { .site-profile * { transition: none !important; } }
+
+.site-menu-telegram-icon { flex: 0 0 24px; width: 24px; height: 24px; color: var(--cor-6); }
