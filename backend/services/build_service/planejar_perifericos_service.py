@@ -122,7 +122,9 @@ class PlanejarPerifericosService:
                 monitor = conjunto.get("monitor",{})
                 teclado = conjunto.get("teclado",{})
                 mecanico = PreferenciasPerifericosService.teclado_documentado(teclado) if PreferenciasPerifericosService.jogos(utilidade) else False
-                return (-int(mecanico), *(-v for v in PreferenciasPerifericosService.monitor(monitor,utilidade)), -nota(item), item[0])
+                abaixo_do_piso = sum(not PreferenciasPerifericosService.atende_piso(tipo, peca, utilidade)
+                                     for tipo, peca in conjunto.items())
+                return (abaixo_do_piso, -int(mecanico), *(-v for v in PreferenciasPerifericosService.monitor(monitor,utilidade)), -nota(item), item[0])
             prioritarias = sorted(combinacoes, key=criterio)[:3]
         if cor in ("preto", "branco", "misto"):
 

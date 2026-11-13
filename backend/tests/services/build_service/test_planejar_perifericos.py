@@ -112,3 +112,19 @@ def test_atende_piso_do_mouse_para_jogos():
     assert not piso("mouse", {"dpi_max": 16000, "conexao": "Bluetooth"}, "Jogos")
     assert piso("mouse", {"dpi_max": 800, "conexao": "Bluetooth"}, "Escritório")
     assert piso("teclado", {}, "Jogos")
+
+
+def test_piso_do_mouse_vem_antes_do_maior_hz_do_monitor_na_ordem_das_prioritarias():
+    catalogo = {
+        "monitor": [{"id": 1, "preco": 300, "taxa_atualizacao_hz": 144, "resolucao": "1920x1080", "tamanho_polegadas": 24},
+                    {"id": 2, "preco": 500, "taxa_atualizacao_hz": 240, "resolucao": "1920x1080", "tamanho_polegadas": 24}],
+        "teclado": [{"id": 5, "preco": 50}],
+        "mouse": [{"id": 6, "preco": 30, "dpi_max": 1600, "conexao": "Bluetooth"},
+                  {"id": 9, "preco": 20, "dpi_max": 1200, "conexao": "USB"},
+                  {"id": 7, "preco": 250, "dpi_max": 10000, "conexao": "USB"}],
+        "fone": [{"id": 8, "preco": 50, "microfone": True}, {"id": 10, "preco": 60, "microfone": True}],
+    }
+    plano = PlanejarPerifericosService().executar(catalogo, 800, {}, "Jogos")
+    assert len(plano["combinacoes"]) > 3
+    topo = {i["tipo"]: i["id"] for i in plano["combinacoes"][0]["componentes"]}
+    assert topo["mouse"] == 7
