@@ -10,7 +10,7 @@ services:
     mem_limit: 256m
     cpus: 0.5
     environment:
-      DISCORD_BOT_TOKEN_FILE: /run/secrets/discord_token
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:?Defina DISCORD_BOT_TOKEN no .env}
       DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:?Defina DISCORD_GUILD_ID}
       DISCORD_MEMBER_ROLE_ID: ${DISCORD_MEMBER_ROLE_ID:?Defina DISCORD_MEMBER_ROLE_ID}
       DISCORD_ANNOUNCEMENTS_CHANNEL_ID: ${DISCORD_ANNOUNCEMENTS_CHANNEL_ID:-}
@@ -18,7 +18,6 @@ services:
       DISCORD_MEMBER_COUNT_CHANNEL_ID: ${DISCORD_MEMBER_COUNT_CHANNEL_ID:-}
       DISCORD_MESSAGE_LOG_CHANNEL_ID: ${DISCORD_MESSAGE_LOG_CHANNEL_ID:-}
       BOTIO_STATE_PATH: /data/state.sqlite3
-    secrets: [discord_token]
     volumes: [botio_data:/data]
     tmpfs: [/tmp:rw,noexec,nosuid,size=16m]
     logging:
@@ -28,10 +27,6 @@ services:
         max-file: "2"
     labels:
       traefik.enable: "false"
-
-secrets:
-  discord_token:
-    file: ${BOTIO_TOKEN_FILE:?Defina BOTIO_TOKEN_FILE com o caminho privado do token}
 
 volumes:
   botio_data:
