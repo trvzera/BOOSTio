@@ -1,5 +1,7 @@
 import json
+import signal
 import time
+from threading import Event
 
 import click
 import requests
@@ -120,33 +122,70 @@ def registrar_comandos_precos(app):
                   help="Restringe a coleta a uma ou mais categorias; omitido, percorre todas.")
     def imagens(limite, intervalo, categoria):
         """Baixa a foto principal validada dos anúncios cadastrados."""
-        resumo = {"consultas": 0, "salvas": 0, "falhas": 0, "bloqueada": False}
         servico = AtualizarImagemPecaService()
-        for classe in MODELOS_PECAS:
-            if categoria and classe.__tablename__ not in categoria:
-                continue
-            for peca in classe.sem_imagem_com_fonte():
-                if limite is not None and resumo["consultas"] >= limite:
-                    break
-                if resumo["consultas"] and intervalo:
-                    time.sleep(intervalo)
-                resumo["consultas"] += 1
-                try:
-                    servico.executar(peca)
-                    resumo["salvas"] += 1
-                except requests.HTTPError as erro:
-                    resumo["falhas"] += 1
-                    status = erro.response.status_code if erro.response is not None else 0
-                    click.echo(f"{classe.__tablename__}:{peca.id}: HTTP {status}", err=True)
-                    if status in (401, 403, 429) or status >= 500:
-                        resumo["bloqueada"] = True
-                        break
-                except (requests.RequestException, ValueError, OSError) as erro:
-                    resumo["falhas"] += 1
-                    click.echo(f"{classe.__tablename__}:{peca.id}: {erro}", err=True)
-                if resumo["consultas"] % 25 == 0:
-                    click.echo(json.dumps(resumo, ensure_ascii=False))
-            if resumo["bloqueada"] or limite is not None and resumo["consultas"] >= limite:
-                break
+        resumo = _coletar_imagens(servico, limite, intervalo, categoria)
         resumo["manifesto"] = servico.exportar_manifesto()
         click.echo(json.dumps(resumo, ensure_ascii=False))
+
+    @app.cli.command("pecas-imagens-worker")
+    @click.option("--intervalo", default=0.5, type=click.FloatRange(min=0), show_default=True,
+                  help="Segundos entre consultas a anúncios e catálogos.")
+    @click.option("--pausa-minutos", default=30, type=click.FloatRange(min=1), show_default=True,
+                  help="Espera entre passadas pelas peças sem foto.")
+    @click.option("--espera-bloqueio-horas", default=6, type=click.FloatRange(min=0.1), show_default=True,
+                  help="Espera quando uma loja bloqueia a coleta.")
+    @click.option("--uma-vez", is_flag=True, help="Faz uma única passada e encerra.")
+    def imagens_worker(intervalo, pausa_minutos, espera_bloqueio_horas, uma_vez):
+        """Mantém a coleta de fotos rodando: cada passada pega só as peças que ainda estão sem foto."""
+        parada = Event()
+        anteriores = {}
+        try:
+            for sinal in (signal.SIGTERM, signal.SIGINT):
+                anteriores[sinal] = signal.getsignal(sinal)
+                signal.signal(sinal, lambda *_: parada.set())
+            servico = AtualizarImagemPecaService()
+            while not parada.is_set():
+                resumo = _coletar_imagens(servico, None, intervalo, (), parada)
+                if resumo["consultas"]:
+                    resumo["manifesto"] = servico.exportar_manifesto()
+                click.echo(json.dumps(resumo, ensure_ascii=False))
+                if uma_vez:
+                    break
+                parada.wait((espera_bloqueio_horas * 3600) if resumo["bloqueada"] else pausa_minutos * 60)
+        except SQLAlchemyError:
+            raise click.ClickException("Worker de imagens interrompido; confira o banco. Fotos já salvas foram preservadas") from None
+        finally:
+            for sinal, anterior in anteriores.items():
+                signal.signal(sinal, anterior)
+
+
+def _coletar_imagens(servico, limite, intervalo, categoria, parada=None):
+    parada = parada or Event()
+    resumo = {"consultas": 0, "salvas": 0, "falhas": 0, "bloqueada": False}
+    for classe in MODELOS_PECAS:
+        if categoria and classe.__tablename__ not in categoria:
+            continue
+        for peca in classe.sem_imagem_com_fonte():
+            if parada.is_set() or limite is not None and resumo["consultas"] >= limite:
+                break
+            if resumo["consultas"] and intervalo:
+                parada.wait(intervalo)
+            resumo["consultas"] += 1
+            try:
+                servico.executar(peca)
+                resumo["salvas"] += 1
+            except requests.HTTPError as erro:
+                resumo["falhas"] += 1
+                status = erro.response.status_code if erro.response is not None else 0
+                click.echo(f"{classe.__tablename__}:{peca.id}: HTTP {status}", err=True)
+                if status in (401, 403, 429) or status >= 500:
+                    resumo["bloqueada"] = True
+                    break
+            except (requests.RequestException, ValueError, OSError) as erro:
+                resumo["falhas"] += 1
+                click.echo(f"{classe.__tablename__}:{peca.id}: {erro}", err=True)
+            if resumo["consultas"] % 25 == 0:
+                click.echo(json.dumps(resumo, ensure_ascii=False))
+        if resumo["bloqueada"] or parada.is_set() or limite is not None and resumo["consultas"] >= limite:
+            break
+    return resumo
