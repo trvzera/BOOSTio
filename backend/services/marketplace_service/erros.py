@@ -4,8 +4,9 @@ import math
 
 
 class FalhaMarketplace(ValueError):
-    def __init__(self, status=None, retry_after=None, *, temporaria=False):
+    def __init__(self, status=None, retry_after=None, *, temporaria=False, local=False):
         self.status = status
+        self.local = local
         self.temporaria = temporaria or status in (429, 500, 502, 503, 504)
         self.autenticacao = status in (401, 403)
         self.espera = _retry_after(retry_after)

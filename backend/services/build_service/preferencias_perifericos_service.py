@@ -34,6 +34,19 @@ class PreferenciasPerifericosService:
         return peca.get("mecanico") is True and isinstance(peca.get("switch"), str) and bool(peca["switch"].strip())
 
     @classmethod
+    def qualidade(cls, tipo, peca, utilidade):
+        """Chave de ordenação pela ficha técnica; maior é melhor."""
+        if tipo == "monitor":
+            return cls.monitor(peca, utilidade)
+        if tipo == "mouse":
+            return (min(cls.numero(peca.get("dpi_max")), 16000),)
+        if tipo == "teclado":
+            return (int(cls.teclado_documentado(peca)), int(peca.get("mecanico") is True))
+        if tipo == "fone":
+            return (int(bool(peca.get("microfone"))),)
+        return (0,)
+
+    @classmethod
     def destaques(cls, tipo, pecas, utilidade):
         if not utilidade:
             return []

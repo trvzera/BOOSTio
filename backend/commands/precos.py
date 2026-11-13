@@ -115,7 +115,7 @@ def registrar_comandos_precos(app):
     @app.cli.command("pecas-imagens")
     @click.option("--limite", type=click.IntRange(min=1), help="Quantidade máxima de anúncios; omitido, percorre todas as peças sem foto.")
     @click.option("--intervalo", default=0.5, type=click.FloatRange(min=0), show_default=True,
-                  help="Segundos entre anúncios da KaBuM.")
+                  help="Segundos entre consultas a anúncios e catálogos.")
     @click.option("--categoria", multiple=True, type=click.Choice([c.__tablename__ for c in MODELOS_PECAS]),
                   help="Restringe a coleta a uma ou mais categorias; omitido, percorre todas.")
     def imagens(limite, intervalo, categoria):
@@ -125,7 +125,7 @@ def registrar_comandos_precos(app):
         for classe in MODELOS_PECAS:
             if categoria and classe.__tablename__ not in categoria:
                 continue
-            for peca in classe.sem_imagem_com_link():
+            for peca in classe.sem_imagem_com_fonte():
                 if limite is not None and resumo["consultas"] >= limite:
                     break
                 if resumo["consultas"] and intervalo:

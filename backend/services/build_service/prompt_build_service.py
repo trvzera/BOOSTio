@@ -116,7 +116,8 @@ def criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None
   )
   regra_perifericos = (
     "Complete monitor, teclado, mouse e fone (headset), exceto os já possuídos; "
-    "escolha itens adequados ao uso sem ultrapassar o teto reservado, nem tentar consumi-lo exatamente. "
+    "escolha itens adequados ao uso sem ultrapassar o teto reservado, nem tentar consumi-lo exatamente, "
+    "mas prefira o conjunto de maior pontuação em vez do mais barato. "
     "Qualquer sobra permanece com o usuário; nunca a transfira para o PC."
     if percentual else "Não inclua periféricos novos. Preserve apenas os que o usuário já possui."
   )
@@ -405,7 +406,9 @@ def criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None
       "e copie seus IDs/quantidades para componentes. O total de cada conjunto já foi somado: "
       "é o conjunto inteiro que cabe na reserva, não uma reserva separada para cada periférico. "
       "Não combine o monitor de um conjunto com todos os acessórios mais caros de outros. "
-      "A lista é uma referência de viabilidade, não um ranking de qualidade por preço. "
+      "A lista traz primeiro os conjuntos que atendem às preferências de uso e cor e, depois, "
+      "segue a pontuação de qualidade (0 a 100, maior é melhor); "
+      "escolha o primeiro conjunto adequado ao uso, só descendo na lista se houver motivo claro. "
       "Exemplo: R$ 3.000 com 20% significa PC+rede até R$ 2.400 e TODOS os periféricos "
       "juntos até R$ 600. Se já possui RTX 4060, não compre outra GPU nem desconte seu valor "
       "dos R$ 3.000. Um adaptador Wi-Fi novo entra nos R$ 2.400, não nos R$ 600.\n"

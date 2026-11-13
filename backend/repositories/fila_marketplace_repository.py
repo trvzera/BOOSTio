@@ -1,6 +1,6 @@
 from datetime import timedelta
 from uuid import uuid4
-from sqlalchemy import select, update, func
+from sqlalchemy import case, select, update, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from models import db
@@ -8,6 +8,8 @@ from models.tarefa_marketplace import TarefaMarketplace as Tarefa, LimiteMarketp
 
 
 class RepositorioFilaMarketplace:
+    PRIORITARIAS = ('monitor', 'mouse', 'teclado', 'fone')
+
     def preparado(self):
         with Session(db.engine) as s:
             return s.execute(select(Limite.id).limit(1)).first() is not None
@@ -38,6 +40,9 @@ class RepositorioFilaMarketplace:
             with Session(db.engine) as s:
                 return s.execute(select(Tarefa.id).filter_by(loja=loja, chave=chave)).scalar_one()
 
+    def _prioridade(self):
+        return case((Tarefa.dados['categoria'].as_string().in_(self.PRIORITARIAS), 0), else_=1)
+
     def reservar(self, loja, agora):
         with Session(db.engine) as s, s.begin():
             limite = self._limite(s, loja, agora)
@@ -45,7 +50,7 @@ class RepositorioFilaMarketplace:
                 return None
             tarefa = s.execute(select(Tarefa).where(Tarefa.loja == loja,
                 ((Tarefa.status == 'pendente') & (Tarefa.disponivel_em <= agora)) |
-                (Tarefa.status == 'executando')).order_by(Tarefa.id).limit(1)).scalar_one_or_none()
+                (Tarefa.status == 'executando')).order_by(self._prioridade(), Tarefa.id).limit(1)).scalar_one_or_none()
             if tarefa is None:
                 return None
             tarefa.status, tarefa.reserva = 'executando', uuid4().hex
@@ -63,6 +68,18 @@ class RepositorioFilaMarketplace:
                 Tarefa.reserva == tarefa['reserva'], Tarefa.status == 'executando').values(**valores)).rowcount
             if alteradas != 1:
                 raise RuntimeError('Reserva da tarefa foi perdida')
+
+    def falhas_403_seguidas(self, loja, maximo):
+        with Session(db.engine) as s:
+            recentes = s.execute(select(Tarefa.status, Tarefa.erro).where(Tarefa.loja == loja,
+                Tarefa.status.in_(('concluida', 'falhou', 'bloqueada'))).order_by(
+                Tarefa.atualizado_em.desc(), Tarefa.id.desc()).limit(maximo)).all()
+        seguidas = 0
+        for status, erro in recentes:
+            if status != 'falhou' or erro != 'HTTP 403':
+                break
+            seguidas += 1
+        return seguidas
 
     def intervalo(self, loja, agora, segundos):
         with Session(db.engine) as s, s.begin():
