@@ -10,8 +10,8 @@ class PlanejarPerifericosService:
     PESOS = {"monitor": 2, "teclado": 1, "mouse": 1, "fone": 1}
     PESOS_JOGOS = {"monitor": 2, "teclado": 1, "mouse": 2, "fone": 1}
     PENALIDADE_ABAIXO_DO_PISO = 0.3
-    # em jogos, cada um destes itens deve receber pelo menos esta fração da reserva
-    PROPORCAO_MINIMA_JOGOS = {"mouse": 0.10, "teclado": 0.10, "fone": 0.10}
+    # em jogos, cada um destes itens deve ficar entre estas frações da reserva (mínimo, máximo)
+    PROPORCAO_JOGOS = {"mouse": (0.08, 0.25), "teclado": (0.08, 0.25), "fone": (0.08, 0.25)}
     LIMITE_COMBINACOES = 12
 
     def executar(self, catalogo, teto, proprias=None, utilidade="", cor="sem-preferencia"):
@@ -28,16 +28,17 @@ class PlanejarPerifericosService:
         opcoes = []
         notas = {}
         abaixo_do_piso = {}
-        proporcao = self.PROPORCAO_MINIMA_JOGOS if PreferenciasPerifericosService.jogos(utilidade) else {}
+        proporcao = self.PROPORCAO_JOGOS if PreferenciasPerifericosService.jogos(utilidade) else {}
         for tipo in tipos:
             # peça mais cara do que sobra depois dos itens mais baratos dos outros tipos nunca cabe
             limite = teto - (minimo - Decimal(str(disponiveis[tipo][0]["preco"])))
             cabem = [peca for peca in disponiveis[tipo] if Decimal(str(peca["preco"])) <= limite] or disponiveis[tipo][:1]
             notas[tipo] = self._notas(tipo, cabem, utilidade)
-            gasto_minimo = teto * Decimal(str(proporcao.get(tipo, 0)))
+            minimo_pct, maximo_pct = proporcao.get(tipo, (0, 1))
+            gasto_minimo, gasto_maximo = teto * Decimal(str(minimo_pct)), teto * Decimal(str(maximo_pct))
             abaixo_do_piso[tipo] = {peca["id"] for peca in cabem
                                     if not PreferenciasPerifericosService.atende_piso(tipo, peca, utilidade)
-                                    or Decimal(str(peca["preco"])) < gasto_minimo}
+                                    or not gasto_minimo <= Decimal(str(peca["preco"])) <= gasto_maximo}
             opcoes.append(self._amostrar(cabem, cor))
         if minimo > teto:
             return {"viavel": False, "minimo_catalogado": float(minimo), "teto": float(teto), "combinacoes": []}

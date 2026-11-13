@@ -117,14 +117,14 @@ def test_atende_piso_do_mouse_para_jogos():
 def test_piso_do_mouse_vem_antes_do_maior_hz_do_monitor_na_ordem_das_prioritarias():
     catalogo = {
         "monitor": [{"id": 1, "preco": 300, "taxa_atualizacao_hz": 144, "resolucao": "1920x1080", "tamanho_polegadas": 24},
-                    {"id": 2, "preco": 500, "taxa_atualizacao_hz": 240, "resolucao": "1920x1080", "tamanho_polegadas": 24}],
-        "teclado": [{"id": 5, "preco": 50}],
+                    {"id": 2, "preco": 600, "taxa_atualizacao_hz": 240, "resolucao": "1920x1080", "tamanho_polegadas": 24}],
+        "teclado": [{"id": 5, "preco": 90}],
         "mouse": [{"id": 6, "preco": 30, "dpi_max": 1600, "conexao": "Bluetooth"},
                   {"id": 9, "preco": 20, "dpi_max": 1200, "conexao": "USB"},
-                  {"id": 7, "preco": 250, "dpi_max": 10000, "conexao": "USB"}],
-        "fone": [{"id": 8, "preco": 50, "microfone": True}, {"id": 10, "preco": 60, "microfone": True}],
+                  {"id": 7, "preco": 240, "dpi_max": 10000, "conexao": "USB"}],
+        "fone": [{"id": 8, "preco": 90, "microfone": True}, {"id": 10, "preco": 100, "microfone": True}],
     }
-    plano = PlanejarPerifericosService().executar(catalogo, 800, {}, "Jogos")
+    plano = PlanejarPerifericosService().executar(catalogo, 1000, {}, "Jogos")
     assert len(plano["combinacoes"]) > 3
     topo = {i["tipo"]: i["id"] for i in plano["combinacoes"][0]["componentes"]}
     assert topo["mouse"] == 7
@@ -149,7 +149,7 @@ def escolha(plano):
 
 def test_jogos_nao_deixa_o_fone_com_quase_nada_da_reserva(monkeypatch):
     catalogo = catalogo_com_fone_e_teclado_baratos()
-    monkeypatch.setattr(PlanejarPerifericosService, "PROPORCAO_MINIMA_JOGOS", {})
+    monkeypatch.setattr(PlanejarPerifericosService, "PROPORCAO_JOGOS", {})
     sem_regra = escolha(PlanejarPerifericosService().executar(catalogo, 1000, {}, "Jogos"))
     monkeypatch.undo()
     com_regra = PlanejarPerifericosService().executar(catalogo, 1000, {}, "Jogos")
@@ -168,3 +168,18 @@ def test_sem_fone_ou_teclado_acima_da_proporcao_o_plano_continua_viavel():
     catalogo["fone"] = [f for f in catalogo["fone"] if f["id"] == 9]
     plano = PlanejarPerifericosService().executar(catalogo, 1000, {}, "Jogos")
     assert plano["viavel"] and escolha(plano)["fone"] == 9
+
+
+def test_jogos_tambem_limita_a_participacao_maxima_do_teclado(monkeypatch):
+    catalogo = {
+        "monitor": [{"id": 1, "preco": 300, "taxa_atualizacao_hz": 144, "resolucao": "1920x1080", "tamanho_polegadas": 24}],
+        "teclado": [{"id": 5, "preco": 130}, {"id": 6, "preco": 700, "mecanico": True, "switch": "red"}],
+        "mouse": [{"id": 7, "preco": 150, "dpi_max": 8000, "conexao": "USB"}],
+        "fone": [{"id": 9, "preco": 150, "microfone": True}],
+    }
+    monkeypatch.setattr(PlanejarPerifericosService, "PROPORCAO_JOGOS", {})
+    sem_regra = escolha(PlanejarPerifericosService().executar(catalogo, 1500, {}, "Jogos"))
+    monkeypatch.undo()
+    com_regra = escolha(PlanejarPerifericosService().executar(catalogo, 1500, {}, "Jogos"))
+    assert sem_regra["teclado"] == 6
+    assert com_regra["teclado"] == 5
