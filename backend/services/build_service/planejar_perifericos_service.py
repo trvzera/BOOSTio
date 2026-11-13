@@ -10,6 +10,8 @@ class PlanejarPerifericosService:
     PESOS = {"monitor": 2, "teclado": 1, "mouse": 1, "fone": 1}
     PESOS_JOGOS = {"monitor": 2, "teclado": 1, "mouse": 2, "fone": 1}
     PENALIDADE_ABAIXO_DO_PISO = 0.3
+    # em jogos, cada um destes itens deve receber pelo menos esta fração da reserva
+    PROPORCAO_MINIMA_JOGOS = {"mouse": 0.10, "teclado": 0.10, "fone": 0.10}
     LIMITE_COMBINACOES = 12
 
     def executar(self, catalogo, teto, proprias=None, utilidade="", cor="sem-preferencia"):
@@ -26,13 +28,16 @@ class PlanejarPerifericosService:
         opcoes = []
         notas = {}
         abaixo_do_piso = {}
+        proporcao = self.PROPORCAO_MINIMA_JOGOS if PreferenciasPerifericosService.jogos(utilidade) else {}
         for tipo in tipos:
             # peça mais cara do que sobra depois dos itens mais baratos dos outros tipos nunca cabe
             limite = teto - (minimo - Decimal(str(disponiveis[tipo][0]["preco"])))
             cabem = [peca for peca in disponiveis[tipo] if Decimal(str(peca["preco"])) <= limite] or disponiveis[tipo][:1]
             notas[tipo] = self._notas(tipo, cabem, utilidade)
+            gasto_minimo = teto * Decimal(str(proporcao.get(tipo, 0)))
             abaixo_do_piso[tipo] = {peca["id"] for peca in cabem
-                                    if not PreferenciasPerifericosService.atende_piso(tipo, peca, utilidade)}
+                                    if not PreferenciasPerifericosService.atende_piso(tipo, peca, utilidade)
+                                    or Decimal(str(peca["preco"])) < gasto_minimo}
             opcoes.append(self._amostrar(cabem, cor))
         if minimo > teto:
             return {"viavel": False, "minimo_catalogado": float(minimo), "teto": float(teto), "combinacoes": []}
@@ -51,7 +56,7 @@ class PlanejarPerifericosService:
         def ordem(item):
             return (-pontuacao(item), item[0], tuple(peca["id"] for peca in item[1]))
 
-        prioritarias = self._priorizar_combinacoes(combinacoes, tipos, opcoes, utilidade, cor, pontuacao)
+        prioritarias = self._priorizar_combinacoes(combinacoes, tipos, opcoes, utilidade, cor, pontuacao, abaixo_do_piso)
         escolhidas = []
         for item in prioritarias + sorted(combinacoes, key=ordem):
             if len(escolhidas) == self.LIMITE_COMBINACOES:
@@ -114,7 +119,7 @@ class PlanejarPerifericosService:
         return pecas
 
     @staticmethod
-    def _priorizar_combinacoes(combinacoes, tipos, opcoes, utilidade, cor, nota):
+    def _priorizar_combinacoes(combinacoes, tipos, opcoes, utilidade, cor, nota, abaixo_do_piso):
         prioritarias = []
         if utilidade:
             def criterio(item):
@@ -122,9 +127,8 @@ class PlanejarPerifericosService:
                 monitor = conjunto.get("monitor",{})
                 teclado = conjunto.get("teclado",{})
                 mecanico = PreferenciasPerifericosService.teclado_documentado(teclado) if PreferenciasPerifericosService.jogos(utilidade) else False
-                abaixo_do_piso = sum(not PreferenciasPerifericosService.atende_piso(tipo, peca, utilidade)
-                                     for tipo, peca in conjunto.items())
-                return (abaixo_do_piso, -int(mecanico), *(-v for v in PreferenciasPerifericosService.monitor(monitor,utilidade)), -nota(item), item[0])
+                abaixo = sum(peca["id"] in abaixo_do_piso[tipo] for tipo, peca in conjunto.items())
+                return (abaixo, -int(mecanico), *(-v for v in PreferenciasPerifericosService.monitor(monitor,utilidade)), -nota(item), item[0])
             prioritarias = sorted(combinacoes, key=criterio)[:3]
         if cor in ("preto", "branco", "misto"):
 
