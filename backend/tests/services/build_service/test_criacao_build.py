@@ -30,6 +30,14 @@ ESTADO = {"titulo": "PC de teste", "descricao": "", "componentes": {}}
 PEDIDO = {"nome": "PC", "descricao": "Teste", "utilidade": "Jogos", "orcamento": 5000}
 
 
+@pytest.fixture(autouse=True)
+def sem_exigir_placa_de_video_pelo_orcamento(monkeypatch):
+    """Os cenários deste arquivo usam CPU com vídeo integrado e testam outros comportamentos;
+    a exigência de placa de vídeo por orçamento é testada em test_conferir_placa_video.py."""
+    from services.validacoes_service.conferir_placa_video_service import ConferirPlacaVideoService
+    monkeypatch.setattr(ConferirPlacaVideoService, "ORCAMENTO_MINIMO", Decimal("Infinity"))
+
+
 @pytest.fixture
 def app_build(tmp_path):
     app = Flask(__name__)

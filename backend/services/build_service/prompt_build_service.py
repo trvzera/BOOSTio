@@ -13,6 +13,7 @@ from services.build_service.planejar_rede_service import PlanejarRedeService
 from services.build_service.preferencias_gabinete_service import PreferenciasGabineteService
 from services.build_service.preferencias_processador_service import PreferenciasProcessadorService
 from services.validacoes_service.requisitos_uso_service import RequisitosUsoService
+from services.validacoes_service.conferir_placa_video_service import ConferirPlacaVideoService
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +89,7 @@ def criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None
   restricoes = {"pares_por_socket_apenas": pares,
                 "gpu_dedicada_exigida_pelo_uso": RequisitosUsoService.exige_gpu_dedicada(dados["utilidade"]),
                 "comprar_gpu_para_trabalho_pesado": RequisitosUsoService.exige_gpu_dedicada(dados["utilidade"]) and "placa_video" not in proprias,
+                "comprar_gpu_dedicada_pelo_orcamento": ConferirPlacaVideoService.exige(dados["utilidade"], orcamento) and "placa_video" not in proprias,
                 "acessorio_rede_obrigatorio": comprar_rede,
                 "planejamento_rede": plano_rede,
                 "categorias_rede_proibidas": sorted({"adaptador_wifi", "cabo_rede"} - ({comprar_rede} if comprar_rede else set()))}
@@ -366,6 +368,9 @@ def criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None
       "e redirecione o orçamento para as peças obrigatórias, "
       "a menos que o uso exija GPU dedicada (por exemplo, jogos pesados, "
       "renderização 3D ou aceleração por GPU citada no pedido).\n"
+      "- Se restricoes.comprar_gpu_dedicada_pelo_orcamento for true (jogos ou trabalho pesado com orçamento "
+      "a partir de R$ 4000), inclua obrigatoriamente uma placa_video dedicada do catálogo, mesmo com vídeo "
+      "integrado na CPU (inclusive Ryzen G).\n"
       "- Uma placa_video própria já satisfaz a necessidade de GPU dedicada: preserve-a "
       "mesmo com CPU sem vídeo integrado e NÃO inclua outra placa_video no JSON. "
       "Só compre GPU se ela faltar nas peças próprias e o vídeo/uso exigir.\n\n"
