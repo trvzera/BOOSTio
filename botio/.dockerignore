@@ -1,0 +1,10 @@
+*
+!Dockerfile
+!requirements.lock
+!main.py
+!policy.py
+!welcome.py
+!commands.py
+!movement.py
+!member_count.py
+!message_logs.py
