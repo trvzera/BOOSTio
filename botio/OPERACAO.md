@@ -10,15 +10,12 @@ leitura, capacidades removidas, limite de recursos e volume exclusivo para estad
 O volume é protegido por permissões do sistema, mas não é criptografado pelo bot.
 
 1. Envie a pasta do bot à VPS, excluindo `.venv`, `.env`, token e caches.
-2. Em diretório privado da VPS, crie um arquivo contendo somente o token (sem
-   `DISCORD_BOT_TOKEN=`). Configure acesso de leitura apenas para o usuário do
-   container (UID 10001) e administradores autorizados. Não coloque o token na imagem.
-3. Crie `botio/.env` com IDs do servidor, cargo Membro, canal de anúncios e
-   `BOTIO_TOKEN_FILE=/caminho/privado/do/token`. Esse arquivo não precisa conter o token.
+2. Crie `botio/.env` na VPS com `chmod 600`, contendo `DISCORD_BOT_TOKEN`, IDs do servidor,
+   cargo Membro e canais. Não coloque o token na imagem nem no repositório.
    Para o contador, preencha `DISCORD_MEMBER_COUNT_CHANNEL_ID` com o canal de voz
    existente e conceda Ver canal e Gerenciar canais ao BOTio somente nesse canal.
-4. Pare o processo do Mac com Ctrl+C; mantenha apenas uma instância ativa.
-5. Na pasta `botio`, execute:
+3. Pare o processo do Mac com Ctrl+C; mantenha apenas uma instância ativa.
+4. Na pasta `botio`, execute:
 
 ```sh
 docker compose config --quiet
@@ -26,8 +23,8 @@ docker compose up -d --build
 docker compose logs --tail=50 botio
 ```
 
-O arquivo de token precisa estar legível para UID 10001 dentro do container:
-secrets do Compose local usam arquivo montado; não constituem cofre criptografado.
+O token fica no `.env` (permissão 600) e chega ao container como variável de ambiente;
+quem tem acesso root à VPS consegue lê-lo com `docker inspect`.
 Preserve `botio_data` entre atualizações. Não use `down -v` para atualizar.
 Valide o acesso aos três canais iniciais e a ocultação da equipe com conta comum.
 
