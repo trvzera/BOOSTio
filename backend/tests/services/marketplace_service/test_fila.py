@@ -293,3 +293,52 @@ def test_403_gerado_pela_flag_de_bloqueio_nao_vira_falha_da_tarefa(banco):
     ident = worker.enfileirar('mercado_livre', 'ofertas', {'peca_id': 1}, execucao='t')
     assert worker.executar('mercado_livre')['status'] == 'pendente'
     assert db.session.get(TarefaMarketplace, ident).status == 'pendente'
+
+
+def _worker_pelo_controle(repo, agora, erros):
+    controle = ControleRequisicoesMarketplaceService('mercado_livre', repo, relogio=lambda: agora[0])
+    def chamada():
+        erro = erros.pop(0)
+        if erro:
+            raise erro
+        return {'ok': True}
+    def executar(dados):
+        from services.marketplace_service.controle_requisicoes_service import executar_requisicao
+        return executar_requisicao(chamada, loja='mercado_livre')
+    return ProcessarFilaMarketplaceService({('mercado_livre', 'ofertas'): executar}, repo,
+        relogio=lambda: agora[0], trava=trava, controle=controle)
+
+
+def _executar_com_controle_novo(worker, repo, agora):
+    agora[0] += timedelta(seconds=10)
+    worker.controle = ControleRequisicoesMarketplaceService('mercado_livre', repo, relogio=lambda: agora[0])
+    return worker.executar('mercado_livre')['status']
+
+
+def _bloqueado(loja='mercado_livre'):
+    return db.session.execute(db.select(LimiteMarketplace.bloqueado).filter_by(loja=loja)).scalar()
+
+
+def test_403_isolado_pelo_controle_de_requisicoes_nao_bloqueia_a_loja(banco):
+    app, repo = banco
+    agora = [datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(seconds=1)]
+    worker = _worker_pelo_controle(repo, agora, [FalhaMarketplace(403), None])
+    for i in range(2):
+        worker.enfileirar('mercado_livre', 'ofertas', {'peca_id': i}, execucao='t')
+    resultados = [_executar_com_controle_novo(worker, repo, agora) for _ in range(2)]
+    assert resultados == ['falhou', 'concluida']
+    assert _bloqueado() is False
+
+
+def test_tres_403_seguidos_pelo_controle_bloqueiam_e_401_bloqueia_na_hora(banco):
+    app, repo = banco
+    agora = [datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(seconds=1)]
+    worker = _worker_pelo_controle(repo, agora, [FalhaMarketplace(403)] * 3)
+    for i in range(3):
+        worker.enfileirar('mercado_livre', 'ofertas', {'peca_id': i}, execucao='t')
+    resultados = [_executar_com_controle_novo(worker, repo, agora) for _ in range(3)]
+    assert resultados == ['falhou', 'falhou', 'bloqueada'] and _bloqueado() is True
+    repo.reativar('mercado_livre', agora[0])
+    worker = _worker_pelo_controle(repo, agora, [FalhaMarketplace(401)])
+    worker.enfileirar('mercado_livre', 'ofertas', {'peca_id': 9}, execucao='t2')
+    assert _executar_com_controle_novo(worker, repo, agora) == 'bloqueada' and _bloqueado() is True
