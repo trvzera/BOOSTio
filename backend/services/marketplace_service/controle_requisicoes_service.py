@@ -65,7 +65,7 @@ class ControleRequisicoesMarketplaceService:
         while True:
             espera = self.repositorio.intervalo(self.loja, self.relogio(), self.intervalo)
             if espera is None:
-                self.erro = FalhaMarketplace(403)
+                self.erro = FalhaMarketplace(403, local=True)
                 raise self.erro
             if espera <= 0:
                 break

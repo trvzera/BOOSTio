@@ -230,3 +230,66 @@ def test_perifericos_saem_da_fila_antes_das_demais_categorias(banco):
         ordem.append(tarefa['dados']['categoria'])
         repo.finalizar(tarefa, 'concluida')
     assert ordem == ['monitor', 'mouse', 'fan', 'gabinete']
+
+
+def _worker_com_status(repo, agora, status):
+    def executar(dados):
+        raise FalhaMarketplace(status)
+    return ProcessarFilaMarketplaceService({('mercado_livre', 'ofertas'): executar}, repo, relogio=lambda: agora[0], trava=trava,
+        controle=ControleRequisicoesMarketplaceService('mercado_livre', repo, relogio=lambda: agora[0]))
+
+
+def test_403_isolado_falha_so_a_tarefa_e_nao_bloqueia_a_loja(banco):
+    app, repo = banco
+    agora = [datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(seconds=1)]
+    worker = _worker_com_status(repo, agora, 403)
+    worker.enfileirar('mercado_livre', 'ofertas', {'peca_id': 1}, execucao='t')
+    assert worker.executar('mercado_livre')['status'] == 'falhou'
+    assert db.session.execute(db.select(LimiteMarketplace.bloqueado).filter_by(loja='mercado_livre')).scalar() is False
+
+
+def test_terceiro_403_seguido_bloqueia_a_loja(banco):
+    app, repo = banco
+    agora = [datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(seconds=1)]
+    worker = _worker_com_status(repo, agora, 403)
+    for i in range(3):
+        worker.enfileirar('mercado_livre', 'ofertas', {'peca_id': i}, execucao='t')
+    resultados = []
+    for _ in range(3):
+        agora[0] += timedelta(seconds=2)
+        resultados.append(worker.executar('mercado_livre')['status'])
+    assert resultados == ['falhou', 'falhou', 'bloqueada']
+
+
+def test_tarefa_concluida_entre_403_zera_a_contagem(banco):
+    app, repo = banco
+    agora = [datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(seconds=1)]
+    erros = [FalhaMarketplace(403), FalhaMarketplace(403), None, FalhaMarketplace(403)]
+    def executar(dados):
+        erro = erros.pop(0)
+        if erro:
+            raise erro
+        return {'ok': True}
+    worker = ProcessarFilaMarketplaceService({('mercado_livre', 'ofertas'): executar}, repo, relogio=lambda: agora[0], trava=trava,
+        controle=ControleRequisicoesMarketplaceService('mercado_livre', repo, relogio=lambda: agora[0]))
+    for i in range(4):
+        worker.enfileirar('mercado_livre', 'ofertas', {'peca_id': i}, execucao='t')
+    resultados = []
+    for _ in range(4):
+        agora[0] += timedelta(seconds=2)
+        resultados.append(worker.executar('mercado_livre')['status'])
+    assert resultados == ['falhou', 'falhou', 'concluida', 'falhou']
+
+
+def test_403_gerado_pela_flag_de_bloqueio_nao_vira_falha_da_tarefa(banco):
+    app, repo = banco
+    agora = [datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(seconds=1)]
+    controle = ControleRequisicoesMarketplaceService('mercado_livre', repo, relogio=lambda: agora[0])
+    def executar(dados):
+        repo.suspender('mercado_livre', agora[0], bloquear=True)
+        return controle.executar(lambda: {})
+    worker = ProcessarFilaMarketplaceService({('mercado_livre', 'ofertas'): executar}, repo,
+        relogio=lambda: agora[0], trava=trava, controle=controle)
+    ident = worker.enfileirar('mercado_livre', 'ofertas', {'peca_id': 1}, execucao='t')
+    assert worker.executar('mercado_livre')['status'] == 'pendente'
+    assert db.session.get(TarefaMarketplace, ident).status == 'pendente'

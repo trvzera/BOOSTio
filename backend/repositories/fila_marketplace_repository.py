@@ -69,6 +69,18 @@ class RepositorioFilaMarketplace:
             if alteradas != 1:
                 raise RuntimeError('Reserva da tarefa foi perdida')
 
+    def falhas_403_seguidas(self, loja, maximo):
+        with Session(db.engine) as s:
+            recentes = s.execute(select(Tarefa.status, Tarefa.erro).where(Tarefa.loja == loja,
+                Tarefa.status.in_(('concluida', 'falhou', 'bloqueada'))).order_by(
+                Tarefa.atualizado_em.desc(), Tarefa.id.desc()).limit(maximo)).all()
+        seguidas = 0
+        for status, erro in recentes:
+            if status != 'falhou' or erro != 'HTTP 403':
+                break
+            seguidas += 1
+        return seguidas
+
     def intervalo(self, loja, agora, segundos):
         with Session(db.engine) as s, s.begin():
             limite = self._limite(s, loja, agora)
