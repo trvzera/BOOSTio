@@ -2,7 +2,8 @@
 
 Bot oficial da BOOSTio, executado separadamente do site. Primeira função:
 atribuir o cargo **Membro** quando o Discord indicar a conclusão da verificação
-nativa (`pending=False`). Não lê mensagens nem precisa de Administrador.
+nativa (`pending=False`). Não precisa de Administrador. O monitoramento opcional
+de edições e exclusões usa conteúdo de mensagens apenas para registros privados.
 
 ## Boas-vindas privadas
 
@@ -25,7 +26,8 @@ entre a reserva e o envio, a saudação não é repetida para evitar mensagens d
 
 1. Ative Comunidade e o aceite obrigatório das regras em Configurações de Segurança.
 2. No https://discord.com/developers/applications crie a aplicação **BOTio**.
-3. Na seção Bot, ative **Server Members Intent**. Message Content e Presence não são necessários.
+3. Na seção Bot, ative **Server Members Intent**. Para monitorar edições e exclusões
+   com texto, ative também **Message Content Intent**. Presence não é necessário.
 4. Gere o token e guarde-o somente em `botio/.env`, nunca no código, Git ou chat.
 5. Em OAuth2 → URL Generator, selecione `bot` e a permissão **Manage Roles**.
    Abra o link gerado e adicione o bot ao servidor BOOSTio.
@@ -104,7 +106,7 @@ reiniciando-o. Confira também que nenhuma categoria privada de equipe foi liber
   `@everyone` e `Membro`; o bot precisa de Ver canal, Enviar mensagens e Inserir links.
 
 Após editar o código, encerre o processo antigo no VS Code e execute novamente.
-O terminal da versão atual informa `BOTio 0.4` e os canais configurados.
+O terminal da versão atual informa `BOTio 0.5` e os canais configurados.
 Boas-vindas são enviadas após o aceite, não antes. A tabela local distingue
 `waiting` (aguardando), `sent`, `blocked`, `failed` e `claimed` (tentativa reservada).
 Não exclua o banco para testar: use `/testar-boas-vindas` e depois uma conta comum
@@ -151,6 +153,29 @@ Tickets abertos permanecem no Discord até encerramento; sair do servidor ou
 usar `/apagar-meus-dados` não encerra um atendimento. A equipe pode encerrá-lo.
 Há intervalo de um minuto entre novas aberturas. Os botões existentes continuam
 funcionando após reiniciar o bot; confirmações de exclusão expiram normalmente.
+
+## Mensagens editadas e excluídas
+
+Configure `DISCORD_MESSAGE_LOG_CHANNEL_ID` com um canal de texto privado da equipe
+e ative **Message Content Intent** no Developer Portal antes de reiniciar o bot.
+A configuração atual usa o mesmo canal de movimentação. Ele precisa estar oculto
+para @everyone e Membro, com permissão para o BOTio enviar mensagens e embeds.
+
+✏️ indica edição, com trechos de antes/depois; 🗑️ indica exclusão. Os registros
+incluem autor quando disponível, canal, IDs e horário do evento. Cada trecho
+tem até 1.024 caracteres. Mudanças em anexos registram apenas quantidades,
+sem copiar arquivos. Exclusões em lote geram um resumo com até 20 IDs e 5 trechos.
+
+Somente canais acessíveis a @everyone ou Membro e threads públicas são monitorados.
+Tickets, threads privadas, canais privados da equipe, DMs e o próprio canal de
+registros são ignorados. Mensagens identificadas como sendo de bots são ignoradas.
+Atualizações automáticas de embeds, sem alteração de texto/anexos, não geram logs.
+
+Até 1.000 mensagens ficam no cache de memória da biblioteca; não há banco de
+conteúdo nem consulta retroativa ao histórico. Reiniciar limpa o cache. Para uma
+mensagem fora dele, o registro mostra o texto anterior/autor como indisponível,
+conforme o que o Discord envia no evento. Esses logs permanecem no Discord até
+exclusão pela equipe e não são apagados pelo comando de exclusão local.
 
 Consulte [OPERACAO.md](OPERACAO.md) para o serviço Docker independente na VPS,
 atualizações e cuidados com credenciais. A [PRIVACIDADE.md](PRIVACIDADE.md)

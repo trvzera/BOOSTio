@@ -16,7 +16,7 @@ PRIVACY_TEXT = (
     "enviar uma saudação privada e publicar atualizações aprovadas.\n\n"
     "**Dados:** IDs do servidor e do membro, data de entrada e situação da tentativa de boas-vindas. "
     "Nome e ícone são usados para apresentar a saudação, sem gravação no banco do bot. "
-    "Não lemos nem arquivamos conversas; conteúdo de mensagens e presença estão desativados.\n\n"
+    "Não mantemos histórico de conversas no banco local. Presença está desativada.\n\n"
     "**Armazenamento:** banco local no equipamento que executa o bot; quando hospedado, na VPS. "
     "Não há envio a serviços de anúncios ou IA. Mensagens e comandos também são processados pelo Discord.\n\n"
     "**Retenção:** os registros de boas-vindas permanecem durante sua participação para evitar duplicação. "
@@ -24,6 +24,10 @@ PRIVACY_TEXT = (
     "**Movimentação:** se configurado, o canal privado da equipe recebe entrada/saída, username, "
     "apelido e ID. Esses registros ficam no Discord até exclusão pela equipe e não são apagados "
     "pelo comando de exclusão local. Para solicitar sua remoção, procure a equipe.\n\n"
+    "**Mensagens:** quando configurado, edições e exclusões em canais da comunidade são registradas "
+    "no canal privado da equipe, com autor, IDs e trechos do texto disponíveis. Até 1.000 mensagens "
+    "ficam em cache temporário na memória; reiniciar perde esse cache. Tickets, canais privados da equipe "
+    "e DMs não são copiados para esses logs. Os registros ficam no Discord até exclusão pela equipe.\n\n"
     "**Atendimento:** os tickets ficam em canais privados no Discord, com ID do solicitante no tópico. "
     "Solicitante, equipe e cargos com Administrador têm acesso. Encerrar apaga o canal e as mensagens; "
     "o BOTio não guarda transcrições. /apagar-meus-dados não encerra tickets.\n\n"
@@ -149,7 +153,7 @@ def register_commands(client):
 
     @tree.command(name="privacidade", description="Veja quais dados o BOTio utiliza.", guild=guild)
     async def privacy(interaction: discord.Interaction):
-        await interaction.response.send_message(PRIVACY_TEXT, ephemeral=True)
+        await interaction.response.send_message(embed=discord.Embed(description=PRIVACY_TEXT, color=0x0088FF), ephemeral=True)
 
     @tree.command(name="apagar-meus-dados", description="Exclua seu registro local de boas-vindas do BOTio.", guild=guild)
     async def erase(interaction: discord.Interaction):
