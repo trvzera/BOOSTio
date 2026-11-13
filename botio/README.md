@@ -99,12 +99,31 @@ reiniciando-o. Confira também que nenhuma categoria privada de equipe foi liber
   `@everyone` e `Membro`; o bot precisa de Ver canal, Enviar mensagens e Inserir links.
 
 Após editar o código, encerre o processo antigo no VS Code e execute novamente.
-O terminal da versão atual informa `BOTio 0.2` e o canal de movimentação.
+O terminal da versão atual informa `BOTio 0.3` e os canais de movimentação e contador.
 Boas-vindas são enviadas após o aceite, não antes. A tabela local distingue
 `waiting` (aguardando), `sent`, `blocked`, `failed` e `claimed` (tentativa reservada).
 Não exclua o banco para testar: use `/testar-boas-vindas` e depois uma conta comum
 entrando e aceitando as regras. Falta de configuração do canal de movimentação
 não impede o cargo nem a DM. A sincronização de segurança ocorre a cada 10 minutos.
+
+## Contador de membros
+
+Configure `DISCORD_MEMBER_COUNT_CHANNEL_ID` com o ID de um canal de voz existente.
+O BOTio exibe `👥 Membros: N`, incluindo todas as pessoas e bots do servidor,
+mesmo que não estejam conectados a um canal de voz ou ainda aguardem o aceite.
+O total vem do servidor, sem depender da lista parcial de membros no cache.
+
+A primeira atualização ocorre após conectar, e as seguintes a cada 5 minutos.
+O canal só é renomeado quando o total muda. Falhas temporárias são registradas
+e tentadas novamente no próximo ciclo; a biblioteca respeita os limites da API.
+Conceda ao BOTio **Ver canal** e **Gerenciar canais** nesse canal. Não precisa
+de permissão de conectar ao áudio. O bot preserva as permissões do canal.
+Deixe apenas o BOTio atualizando esse contador; desative o Server Stats nele
+ou remova o outro bot. Apagar o canal exige configurar o ID de um novo canal.
+
+Ao atualizar a versão, preserve o banco de boas-vindas. A primeira inicialização
+padroniza automaticamente as datas antigas para milissegundos, recuperando DMs
+aguardando envio sem repetir tentativas já registradas como enviadas ou bloqueadas.
 
 Consulte [OPERACAO.md](OPERACAO.md) para o serviço Docker independente na VPS,
 atualizações e cuidados com credenciais. A [PRIVACIDADE.md](PRIVACIDADE.md)

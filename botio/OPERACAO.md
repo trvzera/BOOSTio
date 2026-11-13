@@ -15,6 +15,8 @@ O volume é protegido por permissões do sistema, mas não é criptografado pelo
    container (UID 10001) e administradores autorizados. Não coloque o token na imagem.
 3. Crie `botio/.env` com IDs do servidor, cargo Membro, canal de anúncios e
    `BOTIO_TOKEN_FILE=/caminho/privado/do/token`. Esse arquivo não precisa conter o token.
+   Para o contador, preencha `DISCORD_MEMBER_COUNT_CHANNEL_ID` com o canal de voz
+   existente e conceda Ver canal e Gerenciar canais ao BOTio somente nesse canal.
 4. Pare o processo do Mac com Ctrl+C; mantenha apenas uma instância ativa.
 5. Na pasta `botio`, execute:
 

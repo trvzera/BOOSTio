@@ -15,12 +15,13 @@ from policy import can_grant
 from welcome import WelcomeStore, send_welcome
 from commands import register_commands
 from movement import send_movement
+from member_count import sync_member_count
 
 log = logging.getLogger("botio")
 
 
 class Botio(discord.Client):
-    def __init__(self, guild_id, role_id, *, connector=None, welcome_store=None, announcements_channel_id=None, movement_channel_id=None):
+    def __init__(self, guild_id, role_id, *, connector=None, welcome_store=None, announcements_channel_id=None, movement_channel_id=None, member_count_channel_id=None):
         intents = discord.Intents.none()
         intents.guilds = True
         intents.members = True
@@ -31,6 +32,7 @@ class Botio(discord.Client):
         self.welcome_store = welcome_store or WelcomeStore(Path(os.getenv("BOTIO_STATE_PATH", str(Path(__file__).with_name("state.sqlite3")))))
         self.announcements_channel_id = announcements_channel_id
         self.movement_channel_id = movement_channel_id
+        self.member_count_channel_id = member_count_channel_id
         self.tree = register_commands(self)
 
     async def setup_hook(self):
@@ -39,9 +41,12 @@ class Botio(discord.Client):
         except discord.HTTPException as error:
             log.warning("Registro de comandos indisponível (status=%s); entrada e cargos continuam ativos.", error.status)
         self.reconcile.start()
+        if self.member_count_channel_id:
+            self.refresh_member_count.start()
 
     async def close(self):
         self.reconcile.cancel()
+        self.refresh_member_count.cancel()
         await super().close()
 
     def configured_role(self, guild):
@@ -100,8 +105,9 @@ class Botio(discord.Client):
                 log.warning("Não foi possível atribuir cargo: status=%s", error.status)
 
     async def on_ready(self):
-        log.info("BOTio 0.2 conectado. Servidor configurado: %s; boas-vindas privadas ativas.", self.guild_id)
+        log.info("BOTio 0.3 conectado. Servidor configurado: %s; boas-vindas privadas ativas.", self.guild_id)
         log.info("Canal de movimentação: %s", self.movement_channel_id or "não configurado")
+        log.info("Canal contador de membros: %s", self.member_count_channel_id or "não configurado")
         if self.get_guild(self.guild_id) is None:
             log.error("BOTio não encontrou o servidor configurado; confira o convite e o ID.")
 
@@ -158,14 +164,24 @@ class Botio(discord.Client):
     async def before_reconcile(self):
         await self.wait_until_ready()
 
+    @tasks.loop(minutes=5)
+    async def refresh_member_count(self):
+        guild = self.get_guild(self.guild_id)
+        if guild is not None:
+            await sync_member_count(guild, self.member_count_channel_id)
 
-async def run_bot(token, guild_id, role_id, announcements_channel_id=None, movement_channel_id=None):
+    @refresh_member_count.before_loop
+    async def before_refresh_member_count(self):
+        await self.wait_until_ready()
+
+
+async def run_bot(token, guild_id, role_id, announcements_channel_id=None, movement_channel_id=None, member_count_channel_id=None):
     # Acrescenta as autoridades confiáveis do certifi às do sistema.
     # Mantém a verificação do certificado e do hostname habilitada.
     context = ssl.create_default_context()
     context.load_verify_locations(cafile=certifi.where())
     connector = aiohttp.TCPConnector(ssl=context)
-    async with Botio(guild_id, role_id, connector=connector, announcements_channel_id=announcements_channel_id, movement_channel_id=movement_channel_id) as bot:
+    async with Botio(guild_id, role_id, connector=connector, announcements_channel_id=announcements_channel_id, movement_channel_id=movement_channel_id, member_count_channel_id=member_count_channel_id) as bot:
         await bot.start(token)
 
 
@@ -184,12 +200,13 @@ def main():
         role_id = int(os.environ["DISCORD_MEMBER_ROLE_ID"])
         announcements_id = int(os.getenv("DISCORD_ANNOUNCEMENTS_CHANNEL_ID") or "0") or None
         movement_id = int(os.getenv("DISCORD_MOVEMENT_CHANNEL_ID") or "0") or None
-        if guild_id <= 0 or role_id <= 0:
+        member_count_id = int(os.getenv("DISCORD_MEMBER_COUNT_CHANNEL_ID") or "0") or None
+        if any(value is not None and value <= 0 for value in (guild_id, role_id, announcements_id, movement_id, member_count_id)):
             raise ValueError
     except (KeyError, ValueError):
-        raise SystemExit("Preencha DISCORD_GUILD_ID e DISCORD_MEMBER_ROLE_ID com IDs válidos.") from None
+        raise SystemExit("Preencha os IDs de servidor, cargo e canais com números positivos válidos.") from None
     try:
-        asyncio.run(run_bot(token, guild_id, role_id, announcements_id, movement_id))
+        asyncio.run(run_bot(token, guild_id, role_id, announcements_id, movement_id, member_count_id))
     except KeyboardInterrupt:
         pass
 

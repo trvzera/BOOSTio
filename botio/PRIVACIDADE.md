@@ -19,6 +19,8 @@ do servidor oficial.
 - Entrada e saída: quando configurado, um canal privado da equipe recebe
   menção, nome, avatar, ID, data do evento e data de criação da conta.
   Esses registros ficam em mensagens do Discord, sem cópia em banco local.
+- Contador: o total de membros, incluindo bots, é exibido no nome de um canal
+  de voz. Não é mantido histórico desse total nem criada uma lista própria de membros.
 
 O bot não arquiva conversas, não solicita senhas de usuários e não usa os dados
 para publicidade, venda ou treinamento de IA. Os links para o site e Instagram
