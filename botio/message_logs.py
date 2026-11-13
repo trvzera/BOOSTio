@@ -23,8 +23,6 @@ def context(client, payload):
     parent = source.parent if isinstance(source, discord.Thread) else source
     if parent is None:
         return None
-    if client.tickets.category_id and parent.category_id == client.tickets.category_id:
-        return None
     roles = [guild.default_role, guild.get_role(client.role_id)]
     # Não copia mensagens da equipe ou de outros canais privados para o log.
     if not any(role is not None and source.permissions_for(role).view_channel for role in roles):

@@ -15,7 +15,6 @@ from welcome import WelcomeStore, send_welcome
 from commands import register_commands
 from movement import send_movement
 from member_count import sync_member_count
-from tickets import TicketManager, TicketOpenView, TicketCloseView
 from message_logs import log_edit, log_delete, log_bulk_delete
 
 log = logging.getLogger("botio")
@@ -24,7 +23,7 @@ log = logging.getLogger("botio")
 class Botio(discord.Client):
     def __init__(self, guild_id, role_id, *, connector=None, welcome_store=None,
                  announcements_channel_id=None, movement_channel_id=None, member_count_channel_id=None,
-                 tickets_category_id=None, support_role_id=None, message_log_channel_id=None):
+                 message_log_channel_id=None):
         intents = discord.Intents.none()
         intents.guilds = True
         intents.members = True
@@ -41,12 +40,9 @@ class Botio(discord.Client):
         self.movement_channel_id = movement_channel_id
         self.member_count_channel_id = member_count_channel_id
         self.message_log_channel_id = message_log_channel_id
-        self.tickets = TicketManager(self, tickets_category_id, support_role_id)
         self.tree = register_commands(self)
 
     async def setup_hook(self):
-        self.add_view(TicketOpenView(self.tickets))
-        self.add_view(TicketCloseView(self.tickets))
         try:
             await self.tree.sync(guild=discord.Object(id=self.guild_id))
         except discord.HTTPException as error:
@@ -116,11 +112,9 @@ class Botio(discord.Client):
                 log.warning("Não foi possível atribuir cargo: status=%s", error.status)
 
     async def on_ready(self):
-        log.info("BOTio 0.5 conectado. Servidor configurado: %s; boas-vindas privadas ativas.", self.guild_id)
+        log.info("BOTio 0.6 conectado. Servidor configurado: %s; boas-vindas privadas ativas.", self.guild_id)
         log.info("Canal de movimentação: %s", self.movement_channel_id or "não configurado")
         log.info("Canal contador de membros: %s", self.member_count_channel_id or "não configurado")
-        log.info("Categoria de tickets: %s; cargo de atendimento: %s",
-                 self.tickets.category_id or "não configurada", self.tickets.support_role_id or "não configurado")
         log.info("Canal de edições e exclusões: %s", self.message_log_channel_id or "não configurado")
         if self.get_guild(self.guild_id) is None:
             log.error("BOTio não encontrou o servidor configurado; confira o convite e o ID.")
@@ -199,7 +193,7 @@ class Botio(discord.Client):
 
 
 async def run_bot(token, guild_id, role_id, announcements_channel_id=None, movement_channel_id=None,
-                  member_count_channel_id=None, tickets_category_id=None, support_role_id=None, message_log_channel_id=None):
+                  member_count_channel_id=None, message_log_channel_id=None):
     # Acrescenta as autoridades confiáveis do certifi às do sistema.
     # Mantém a verificação do certificado e do hostname habilitada.
     context = ssl.create_default_context()
@@ -207,7 +201,6 @@ async def run_bot(token, guild_id, role_id, announcements_channel_id=None, movem
     connector = aiohttp.TCPConnector(ssl=context)
     async with Botio(guild_id, role_id, connector=connector, announcements_channel_id=announcements_channel_id,
                      movement_channel_id=movement_channel_id, member_count_channel_id=member_count_channel_id,
-                     tickets_category_id=tickets_category_id, support_role_id=support_role_id,
                      message_log_channel_id=message_log_channel_id) as bot:
         await bot.start(token)
 
@@ -228,17 +221,15 @@ def main():
         announcements_id = int(os.getenv("DISCORD_ANNOUNCEMENTS_CHANNEL_ID") or "0") or None
         movement_id = int(os.getenv("DISCORD_MOVEMENT_CHANNEL_ID") or "0") or None
         member_count_id = int(os.getenv("DISCORD_MEMBER_COUNT_CHANNEL_ID") or "0") or None
-        tickets_category_id = int(os.getenv("DISCORD_TICKETS_CATEGORY_ID") or "0") or None
-        support_role_id = int(os.getenv("DISCORD_SUPPORT_ROLE_ID") or "0") or None
         message_log_id = int(os.getenv("DISCORD_MESSAGE_LOG_CHANNEL_ID") or "0") or None
         if any(value is not None and value <= 0 for value in (guild_id, role_id, announcements_id, movement_id,
-                                                             member_count_id, tickets_category_id, support_role_id, message_log_id)):
+                                                             member_count_id, message_log_id)):
             raise ValueError
     except (KeyError, ValueError):
         raise SystemExit("Preencha os IDs de servidor, cargo e canais com números positivos válidos.") from None
     try:
         asyncio.run(run_bot(token, guild_id, role_id, announcements_id, movement_id, member_count_id,
-                            tickets_category_id, support_role_id, message_log_id))
+                            message_log_id))
     except KeyboardInterrupt:
         pass
 

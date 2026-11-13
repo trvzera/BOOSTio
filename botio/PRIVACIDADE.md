@@ -21,13 +21,10 @@ do servidor oficial.
   Esses registros ficam em mensagens do Discord, sem cópia em banco local.
 - Contador: o total de membros, incluindo bots, é exibido no nome de um canal
   de voz. Não é mantido histórico desse total nem criada uma lista própria de membros.
-- Atendimento: tickets ficam em canais privados do Discord. O tópico contém o ID
-  do solicitante para localizar o atendimento após reinícios. Solicitante, equipe
-  e cargos com Administrador têm acesso às mensagens enviadas nesse canal.
 - Mensagens: quando habilitado, edições e exclusões de mensagens em canais da
   comunidade geram registros privados para a equipe, com autor quando conhecido,
   IDs, canal, horário e trechos de texto antes/depois ou excluído. Anexos são
-  representados pela quantidade, sem download. Tickets, threads privadas,
+  representados pela quantidade, sem download. Threads privadas,
   canais privados da equipe e DMs não são copiados para esses registros.
 
 O bot não mantém histórico de conversas no banco local, não solicita senhas e não usa os dados
@@ -43,18 +40,12 @@ servidor para evitar duplicações. É excluído quando o bot observa a saída o
 próxima sincronização completa após voltar a funcionar. Uma nova entrada pode
 gerar novo registro e nova saudação.
 
-Tickets abertos permanecem no Discord até encerramento pelo solicitante ou pela
-equipe. Encerrar exige confirmação e apaga o canal com suas mensagens. O BOTio
-não mantém transcrições ou cópia dessas conversas no banco local. A saída do
-servidor e `/apagar-meus-dados` não encerram tickets; procure a equipe ou use
-`/fechar-ticket` no canal do atendimento para solicitar seu encerramento.
-
 O monitoramento mantém cache temporário de até 1.000 mensagens na memória do
 processo, perdido ao reiniciar. Não consulta o histórico para recuperar mensagens
 antigas. Os registros de edições e exclusões são novas mensagens no canal privado
 da equipe e permanecem no Discord até exclusão pela equipe. Cada trecho tem até
 1.024 caracteres; exclusões em lote mostram até 20 IDs e 5 trechos de até 800
-caracteres. `/apagar-meus-dados` e o encerramento de tickets não apagam esses logs.
+caracteres. `/apagar-meus-dados` não apaga esses logs.
 Para solicitar a remoção deles, procure a equipe pelo contato informado.
 
 Logs próprios evitam identificar membros e não registram token ou conteúdo das

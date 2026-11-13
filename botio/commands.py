@@ -6,7 +6,6 @@ import logging
 import discord
 from discord import app_commands
 from welcome import SITE_URL, INSTAGRAM_URL
-from tickets import TicketOpenView
 
 log = logging.getLogger("botio.commands")
 
@@ -26,11 +25,8 @@ PRIVACY_TEXT = (
     "pelo comando de exclusão local. Para solicitar sua remoção, procure a equipe.\n\n"
     "**Mensagens:** quando configurado, edições e exclusões em canais da comunidade são registradas "
     "no canal privado da equipe, com autor, IDs e trechos do texto disponíveis. Até 1.000 mensagens "
-    "ficam em cache temporário na memória; reiniciar perde esse cache. Tickets, canais privados da equipe "
+    "ficam em cache temporário na memória; reiniciar perde esse cache. Canais privados da equipe "
     "e DMs não são copiados para esses logs. Os registros ficam no Discord até exclusão pela equipe.\n\n"
-    "**Atendimento:** os tickets ficam em canais privados no Discord, com ID do solicitante no tópico. "
-    "Solicitante, equipe e cargos com Administrador têm acesso. Encerrar apaga o canal e as mensagens; "
-    "o BOTio não guarda transcrições. /apagar-meus-dados não encerra tickets.\n\n"
     "**Seus direitos:** use /apagar-meus-dados para excluir o registro local. "
     "Isso não remove cargos nem mensagens já entregues no Discord. "
     "Para acesso, correção, dúvidas ou outras solicitações: **contato@boostio.com.br** ou equipe do servidor."
@@ -43,7 +39,7 @@ def can_announce(interaction, guild_id):
             and interaction.user.guild_permissions.manage_guild)
 
 
-def help_message(guild, tickets=None):
+def help_message(guild):
     embed = discord.Embed(
         title="Como podemos ajudar?",
         description=(
@@ -54,11 +50,7 @@ def help_message(guild, tickets=None):
         color=0x0088FF,
     )
     embed.set_footer(text="BOOSTio · Menos dúvidas, mais desempenho.")
-    if tickets is not None and tickets.category_id and tickets.support_role_id:
-        embed.description += "\n\n**Atendimento privado**\nUse /ticket ou o botão abaixo para conversar com a equipe."
-        view = TicketOpenView(tickets)
-    else:
-        view = discord.ui.View()
+    view = discord.ui.View()
     view.add_item(discord.ui.Button(label="Montar meu PC", url=SITE_URL))
     view.add_item(discord.ui.Button(label="Instagram", url=INSTAGRAM_URL))
     if guild.rules_channel is not None:
@@ -132,7 +124,7 @@ def register_commands(client):
 
     @tree.command(name="ajuda", description="Veja os links e comandos úteis da BOOSTio.", guild=guild)
     async def help_command(interaction: discord.Interaction):
-        embed, view = help_message(interaction.guild, client.tickets)
+        embed, view = help_message(interaction.guild)
         await interaction.response.send_message(embed=embed, view=view, ephemeral=True,
                                                 allowed_mentions=discord.AllowedMentions.none())
 
@@ -142,14 +134,6 @@ def register_commands(client):
         view.add_item(discord.ui.Button(label="Montar meu PC", url=SITE_URL))
         await interaction.response.send_message(f"Monte seu PC no site da BOOSTio: {SITE_URL}",
                                                 view=view, ephemeral=True)
-
-    @tree.command(name="ticket", description="Abra um atendimento privado com a equipe BOOSTio.", guild=guild)
-    async def ticket(interaction: discord.Interaction):
-        await client.tickets.open(interaction)
-
-    @tree.command(name="fechar-ticket", description="Encerre este atendimento após confirmar a exclusão.", guild=guild)
-    async def close_ticket(interaction: discord.Interaction):
-        await client.tickets.request_close(interaction)
 
     @tree.command(name="privacidade", description="Veja quais dados o BOTio utiliza.", guild=guild)
     async def privacy(interaction: discord.Interaction):

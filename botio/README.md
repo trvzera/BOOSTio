@@ -91,8 +91,6 @@ reiniciando-o. Confira também que nenhuma categoria privada de equipe foi liber
 
 - `/ajuda`: painel privado com links oficiais, regras e comandos de privacidade.
 - `/montar`: envia o link do site da BOOSTio, em resposta privada.
-- `/ticket`: abre um atendimento privado; o botão em `/ajuda` faz o mesmo.
-- `/fechar-ticket`: solicita confirmação antes de apagar o canal e suas mensagens.
 - `/privacidade`: resumo dos dados e canal de contato, em resposta privada.
 - `/apagar-meus-dados`: remove o registro local do próprio membro.
 - `/anunciar`: prévia privada e confirmação para equipe com Gerenciar servidor;
@@ -106,7 +104,7 @@ reiniciando-o. Confira também que nenhuma categoria privada de equipe foi liber
   `@everyone` e `Membro`; o bot precisa de Ver canal, Enviar mensagens e Inserir links.
 
 Após editar o código, encerre o processo antigo no VS Code e execute novamente.
-O terminal da versão atual informa `BOTio 0.5` e os canais configurados.
+O terminal da versão atual informa `BOTio 0.6` e os canais configurados.
 Boas-vindas são enviadas após o aceite, não antes. A tabela local distingue
 `waiting` (aguardando), `sent`, `blocked`, `failed` e `claimed` (tentativa reservada).
 Não exclua o banco para testar: use `/testar-boas-vindas` e depois uma conta comum
@@ -132,28 +130,6 @@ Ao atualizar a versão, preserve o banco de boas-vindas. A primeira inicializaç
 padroniza automaticamente as datas antigas para milissegundos, recuperando DMs
 aguardando envio sem repetir tentativas já registradas como enviadas ou bloqueadas.
 
-## Atendimento privado
-
-Configure `DISCORD_TICKETS_CATEGORY_ID` com uma categoria de suporte e
-`DISCORD_SUPPORT_ROLE_ID` com o cargo da equipe. O cargo não pode ser Membro,
-@everyone ou um cargo gerenciado por outro bot. Conceda ao BOTio Ver canal,
-Gerenciar canais e Gerenciar permissões nessa categoria.
-
-Cada pessoa, após liberação do acesso, pode abrir um ticket por vez. O canal
-é criado com permissões explícitas para o solicitante, equipe e BOTio,
-oculto aos demais membros. Cargos com Administrador mantêm acesso pelo Discord.
-O nome é `ticket-ID` e o tópico identifica o solicitante. A consulta desses
-canais permite recuperar tickets e evitar duplicações após reinícios.
-
-`/fechar-ticket` e o botão Encerrar atendimento pedem confirmação, válida por
-um minuto. Apenas o solicitante, o cargo de suporte ou quem tem Gerenciar servidor
-pode encerrar. A permissão é verificada de novo ao confirmar. Encerrar exclui o
-canal e suas mensagens; não há transcrições nem arquivo de conteúdo pelo BOTio.
-Tickets abertos permanecem no Discord até encerramento; sair do servidor ou
-usar `/apagar-meus-dados` não encerra um atendimento. A equipe pode encerrá-lo.
-Há intervalo de um minuto entre novas aberturas. Os botões existentes continuam
-funcionando após reiniciar o bot; confirmações de exclusão expiram normalmente.
-
 ## Mensagens editadas e excluídas
 
 Configure `DISCORD_MESSAGE_LOG_CHANNEL_ID` com um canal de texto privado da equipe
@@ -167,7 +143,7 @@ tem até 1.024 caracteres. Mudanças em anexos registram apenas quantidades,
 sem copiar arquivos. Exclusões em lote geram um resumo com até 20 IDs e 5 trechos.
 
 Somente canais acessíveis a @everyone ou Membro e threads públicas são monitorados.
-Tickets, threads privadas, canais privados da equipe, DMs e o próprio canal de
+Threads privadas, canais privados da equipe, DMs e o próprio canal de
 registros são ignorados. Mensagens identificadas como sendo de bots são ignoradas.
 Atualizações automáticas de embeds, sem alteração de texto/anexos, não geram logs.
 

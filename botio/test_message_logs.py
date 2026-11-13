@@ -21,7 +21,7 @@ class MessageLogTests(unittest.IsolatedAsyncioTestCase):
                                      get_channel_or_thread=Mock(return_value=self.source),
                                      get_channel=Mock(return_value=self.destination))
         self.client = SimpleNamespace(guild_id=1, role_id=2, message_log_channel_id=99,
-                                      tickets=SimpleNamespace(category_id=30), get_guild=Mock(return_value=self.guild))
+                                      get_guild=Mock(return_value=self.guild))
         self.message = SimpleNamespace(id=100, content="Texto original", attachments=[],
                                        author=SimpleNamespace(name="pessoa", id=42, bot=False))
         self.payload = SimpleNamespace(guild_id=1, channel_id=10, message_id=100,
@@ -72,12 +72,9 @@ class MessageLogTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(embed.fields[-1].value, "Antes: 0 · Depois: 1")
         self.assertNotIn("private.png", str(embed.to_dict()))
 
-    async def test_private_tickets_and_staff_channels_are_excluded(self):
-        self.source.category_id = self.client.tickets.category_id
-        await log_edit(self.client, self.payload)
-        await log_delete(self.client, self.payload)
-        self.source.category_id = 20
+    async def test_private_channels_are_excluded(self):
         self.source.permissions_for.return_value = discord.Permissions.none()
+        await log_edit(self.client, self.payload)
         await log_delete(self.client, self.payload)
         self.destination.send.assert_not_awaited()
 

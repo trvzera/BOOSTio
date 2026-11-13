@@ -61,22 +61,11 @@ Commits não disparam anúncios públicos. O próximo passo é ligar eventos de
 deploy bem-sucedido a um canal privado. A publicação para usuários continua
 controlada; a integração GitHub/deploy ainda não foi implementada.
 
-## Tickets
-
-Configure `DISCORD_TICKETS_CATEGORY_ID` e `DISCORD_SUPPORT_ROLE_ID`. A categoria
-deve ser reservada ao atendimento; o BOTio precisa de Ver canal, Gerenciar canais
-e Gerenciar permissões. Cada canal criado tem permissões próprias, sem conceder
-acesso aos demais membros. Administradores continuam com acesso.
-Após reiniciar, valide `/ajuda`, `/montar`, `/ticket` e `/fechar-ticket`.
-Use uma conta comum para conferir que somente seu atendimento aparece e que
-cancelar o encerramento preserva o canal. Confirme uma exclusão apenas em um
-ticket de teste: ela remove o canal e suas mensagens definitivamente.
-
 ## Edições e exclusões
 
 Ative Message Content Intent no Developer Portal e configure
 `DISCORD_MESSAGE_LOG_CHANNEL_ID` com o canal privado de registros. Reinicie o bot,
 envie uma mensagem de teste em um canal comum, edite e exclua. Verifique os dois
 eventos no canal privado. Não espere conteúdo anterior de mensagens enviadas
-antes de iniciar o bot ou que saíram do cache. Confira que alterações em tickets
-e canais privados da equipe não são copiadas para os registros.
+antes de iniciar o bot ou que saíram do cache. Confira que alterações em
+canais privados da equipe não são copiadas para os registros.
