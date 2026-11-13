@@ -53,6 +53,7 @@ class CriarBuildService:
       detalhes_proprias = preparado["detalhes_proprias"]
       prompt = preparado["prompt"]
       reparo = {"ajustar_orcamento": True, "catalogo_reparo": preparado["catalogo_reparo"]}
+      plano_perifericos = preparado["plano_perifericos"]
     else:
       catalogo = preparar_catalogo(dados, proprias, rede, aparencia, orcamento, margem, teto_pc, teto_perifericos)
       validar_disponibilidade(catalogo, proprias, percentual)
@@ -63,5 +64,6 @@ class CriarBuildService:
     dados_build = gerar_candidata(usuario_id, prompt, modelo, catalogo, orcamento,
                                      percentual, proprias, detalhes_proprias, rede, tentativas_correcao,
                                      revisar_investimento=perfil_revisa_investimento(dados["utilidade"]), cor=aparencia["cor"], aparencia=aparencia,
-                                     armazenamento_minimo_gb=armazenamento_minimo, utilidade=dados["utilidade"], **reparo)
+                                     armazenamento_minimo_gb=armazenamento_minimo, utilidade=dados["utilidade"],
+                                     plano_perifericos=plano_perifericos, **reparo)
     return salvar_build(usuario_id, dados_build, proprias, rede, percentual, aparencia, orcamento)

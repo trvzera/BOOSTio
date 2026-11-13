@@ -88,7 +88,7 @@ class SeletorInteligenteService:
                                       perifericos, planejamento_componentes=resultado["planejamento_orcamento"],
                                       preferencia_neutra=True)
         return {**resultado, "catalogo": catalogo, "prompt": prompt, "proprias": proprias,
-                "detalhes_proprias": detalhes}
+                "detalhes_proprias": detalhes, "plano_perifericos": perifericos}
 
     def _catalogo_reparo(self, contexto, selecionados, excluidas):
         catalogo = {}

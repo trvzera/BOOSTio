@@ -1109,3 +1109,19 @@ def test_frontend_inteligente_preserva_prioridade_proprias_perifericos_e_rede(ap
     assert 'obrigatoriamente Ryzen' not in prompt
     with app_build.app_context():
         assert BuildSalva.query.count()==1 and Build.query.count()==0
+
+
+def test_gerar_candidata_troca_perifericos_fora_do_plano_pela_melhor_combinacao(mocker):
+    build, catalogo = resposta_com_perifericos()
+    precos = {"monitor": 90, "teclado": 60, "mouse": 70, "fone": 50}
+    for tipo, preco in precos.items():
+        catalogo[tipo].append({**catalogo[tipo][0], "id": 2, "preco": preco})
+    plano = {"viavel": True, "teto": 300, "combinacoes": [
+        {"total": 270, "componentes": [{"tipo": tipo, "id": 2, "quantidade": 1} for tipo in precos]}]}
+    mocker.patch("services.build_service.criar_build_service.BuildSalva.verificar_espaco")
+    llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value=deepcopy(build))
+    sem_plano = gerar_candidata(1, "Pedido", "teste", catalogo, 1500, 20, {}, {}, {})
+    com_plano = gerar_candidata(1, "Pedido", "teste", catalogo, 1500, 20, {}, {}, {}, plano_perifericos=plano)
+    assert sem_plano["preco_total"] == 1100 and com_plano["preco_total"] == 1170
+    assert {i["tipo"]: i["id"] for i in com_plano["componentes"] if i["tipo"] in precos} == dict.fromkeys(precos, 2)
+    assert llm.call_count == 2
