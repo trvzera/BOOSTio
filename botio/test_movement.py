@@ -1,5 +1,4 @@
 import unittest
-from datetime import datetime, timezone
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock
 
@@ -13,22 +12,20 @@ class MovementTests(unittest.IsolatedAsyncioTestCase):
         channel.permissions_for.return_value = discord.Permissions(view_channel=public)
         channel.send = AsyncMock()
         guild = SimpleNamespace(default_role=object(), get_role=lambda _: object(), get_channel=lambda _: channel)
-        member = SimpleNamespace(guild=guild, mention="<@42>", id=42,
-                                 display_avatar=SimpleNamespace(url="https://cdn.discordapp.com/embed/avatars/0.png"),
-                                 created_at=datetime(2025, 1, 1, tzinfo=timezone.utc))
+        member = SimpleNamespace(guild=guild, id=42, name="pessoa", nick="Apelido")
         client = SimpleNamespace(movement_channel_id=10, role_id=2)
         return client, member, channel
 
-    async def test_private_log_has_identity_avatar_time_without_notification(self):
+    async def test_private_log_has_only_requested_identity_fields_without_notification(self):
         client, member, channel = self.fixture()
         await send_movement(client, member, joined=True)
         channel.send.assert_awaited_once()
         args = channel.send.call_args.kwargs
         embed = args['embed']
-        self.assertIn("<@42>", embed.description)
-        self.assertEqual(embed.thumbnail.url, member.display_avatar.url)
-        self.assertEqual(embed.fields[1].value, "42")
-        self.assertIsNotNone(embed.timestamp)
+        self.assertEqual(embed.title, "📥 Membro entrou")
+        self.assertEqual([field.value for field in embed.fields], ["pessoa", "Apelido", "42"])
+        self.assertIsNone(embed.timestamp)
+        self.assertIsNone(embed.thumbnail.url)
         self.assertEqual(args['allowed_mentions'].to_dict()['parse'], [])
 
     async def test_public_channel_is_rejected(self):
