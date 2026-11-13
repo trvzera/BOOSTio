@@ -1,4 +1,6 @@
 import logging
+import sqlite3
+from contextlib import closing
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -39,6 +41,56 @@ class WelcomeTests(unittest.IsolatedAsyncioTestCase):
     async def test_existing_member_is_not_contacted_on_sync(self):
         await send_welcome(self.member, self.store, self.logger)
         self.member.send.assert_not_awaited()
+
+    async def test_gateway_and_rest_precision_refer_to_same_entry(self):
+        self.member.joined_at = datetime(2026, 11, 13, 1, 37, 43, 679047, tzinfo=timezone.utc)
+        self.store.track(self.member)
+        fetched = SimpleNamespace(**vars(self.member))
+        fetched.joined_at = self.member.joined_at.replace(microsecond=679000)
+        bot = Botio(1, 2, welcome_store=self.store)
+        self.addAsyncCleanup(bot.close)
+        self.member.guild.fetch_member = AsyncMock(return_value=fetched)
+        with patch.object(bot, "configured_role", return_value=SimpleNamespace(id=2)):
+            await bot.grant_member(self.member)
+            self.store.track(self.member)
+            await bot.grant_member(self.member)
+        self.member.send.assert_awaited_once()
+
+    def legacy_record(self, joined_at, status):
+        with closing(sqlite3.connect(self.path)) as db, db:
+            db.execute("INSERT INTO welcomes VALUES (?, ?, ?, ?)",
+                       ("1", "42", joined_at, status))
+            db.execute("PRAGMA user_version=0")
+
+    async def test_migration_recovers_waiting_welcome_with_original_precision(self):
+        self.member.joined_at = datetime(2026, 11, 13, 1, 37, 43, 679000, tzinfo=timezone.utc)
+        self.legacy_record("2026-11-13T01:37:43.679047+00:00", "waiting")
+        await send_welcome(self.member, WelcomeStore(self.path), self.logger)
+        await send_welcome(self.member, WelcomeStore(self.path), self.logger)
+        self.member.send.assert_awaited_once()
+
+    async def test_migration_preserves_all_attempted_welcomes(self):
+        self.member.joined_at = datetime(2026, 11, 13, 1, 37, 43, 679000, tzinfo=timezone.utc)
+        for status in ("sent", "blocked", "failed", "claimed"):
+            with self.subTest(status=status):
+                self.store.forget(1, 42)
+                self.legacy_record("2026-11-13T01:37:43.679047+00:00", status)
+                store = WelcomeStore(self.path)
+                store.track(self.member)
+                await send_welcome(self.member, store, self.logger)
+                with closing(sqlite3.connect(self.path)) as db:
+                    statuses = db.execute("SELECT status FROM welcomes").fetchall()
+                self.assertEqual(statuses, [(status,)])
+        self.member.send.assert_not_awaited()
+
+    async def test_migration_merges_precision_variants_without_resetting_delivery(self):
+        self.member.joined_at = datetime(2026, 11, 13, 1, 37, 43, 679000, tzinfo=timezone.utc)
+        self.legacy_record("2026-11-13T01:37:43.679047+00:00", "sent")
+        self.legacy_record("2026-11-13T01:37:43.679+00:00", "waiting")
+        store = WelcomeStore(self.path)
+        self.assertFalse(store.claim(self.member))
+        with closing(sqlite3.connect(self.path)) as db:
+            self.assertEqual(db.execute("SELECT status FROM welcomes").fetchall(), [("sent",)])
 
     async def test_blocked_dm_is_not_retried(self):
         self.store.track(self.member)

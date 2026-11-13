@@ -2,11 +2,17 @@
 
 import sqlite3
 from contextlib import closing
+from datetime import datetime, timezone
 
 import discord
 
 SITE_URL = "https://boostio.com.br/"
 INSTAGRAM_URL = "https://www.instagram.com/boostiooficial/"
+
+
+def joined_at_key(value):
+    # Gateway preserva microssegundos; REST pode devolver só milissegundos.
+    return value.astimezone(timezone.utc).isoformat(timespec="milliseconds")
 
 
 class WelcomeStore:
@@ -16,9 +22,24 @@ class WelcomeStore:
             db.execute("""CREATE TABLE IF NOT EXISTS welcomes (
                 guild_id TEXT, member_id TEXT, joined_at TEXT, status TEXT,
                 PRIMARY KEY (guild_id, member_id, joined_at))""")
+            if db.execute("PRAGMA user_version").fetchone()[0] < 1:
+                rows = db.execute("SELECT guild_id, member_id, joined_at, status FROM welcomes").fetchall()
+                for guild_id, member_id, joined_at, status in rows:
+                    normalized = joined_at_key(datetime.fromisoformat(joined_at))
+                    if normalized == joined_at:
+                        continue
+                    # Uma tentativa já reservada ou concluída nunca volta a waiting.
+                    db.execute("""INSERT INTO welcomes VALUES (?, ?, ?, ?)
+                        ON CONFLICT(guild_id, member_id, joined_at) DO UPDATE SET
+                        status=CASE WHEN welcomes.status='waiting' THEN excluded.status
+                                    ELSE welcomes.status END""",
+                               (guild_id, member_id, normalized, status))
+                    db.execute("DELETE FROM welcomes WHERE guild_id=? AND member_id=? AND joined_at=?",
+                               (guild_id, member_id, joined_at))
+                db.execute("PRAGMA user_version=1")
 
     def key(self, member):
-        return (str(member.guild.id), str(member.id), member.joined_at.isoformat())
+        return (str(member.guild.id), str(member.id), joined_at_key(member.joined_at))
 
     def track(self, member):
         if member.joined_at is None:
