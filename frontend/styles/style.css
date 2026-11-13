@@ -20,6 +20,7 @@
 
 @import "./home/home.css";
 @import "./home/build-page.css";
+@import "./home/contact.css";
 @import "./home/footer.css";
 @import "./about/about.css";
 @import "./services/services.css";
