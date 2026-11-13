@@ -5,6 +5,23 @@ import unittest
 import discord
 
 from commands import AnnouncePreview, can_announce
+from main import Botio
+from welcome import SITE_URL
+
+
+class HelpTests(unittest.IsolatedAsyncioTestCase):
+    async def test_help_and_build_link_are_private_and_point_to_official_site(self):
+        bot = Botio(1, 2, welcome_store=Mock())
+        self.addAsyncCleanup(bot.close)
+        for name in ("ajuda", "montar"):
+            with self.subTest(command=name):
+                interaction = SimpleNamespace(guild=SimpleNamespace(rules_channel=None),
+                                              response=SimpleNamespace(send_message=AsyncMock()))
+                command = bot.tree.get_command(name, guild=discord.Object(id=1))
+                await command.callback(interaction)
+                message = interaction.response.send_message.call_args.kwargs
+                self.assertTrue(message["ephemeral"])
+                self.assertIn(SITE_URL, [item.url for item in message["view"].children])
 
 
 class AnnouncementTests(unittest.IsolatedAsyncioTestCase):

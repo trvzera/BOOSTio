@@ -87,6 +87,8 @@ reiniciando-o. Confira também que nenhuma categoria privada de equipe foi liber
 
 ## Novos comandos e operação
 
+- `/ajuda`: painel privado com links oficiais, regras e comandos de privacidade.
+- `/montar`: envia o link do site da BOOSTio, em resposta privada.
 - `/privacidade`: resumo dos dados e canal de contato, em resposta privada.
 - `/apagar-meus-dados`: remove o registro local do próprio membro.
 - `/anunciar`: prévia privada e confirmação para equipe com Gerenciar servidor;

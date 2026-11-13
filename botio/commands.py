@@ -5,6 +5,7 @@ import logging
 
 import discord
 from discord import app_commands
+from welcome import SITE_URL, INSTAGRAM_URL
 
 log = logging.getLogger("botio.commands")
 
@@ -32,6 +33,25 @@ def can_announce(interaction, guild_id):
     return (interaction.guild_id == guild_id
             and isinstance(interaction.user, discord.Member)
             and interaction.user.guild_permissions.manage_guild)
+
+
+def help_message(guild):
+    embed = discord.Embed(
+        title="Como podemos ajudar?",
+        description=(
+            "**Monte seu PC**\nUse /montar ou abra o site pelo botão abaixo.\n\n"
+            "**Sua privacidade**\nUse /privacidade para consultar os dados utilizados pelo BOTio "
+            "e /apagar-meus-dados para excluir seu registro local de boas-vindas."
+        ),
+        color=0x0088FF,
+    )
+    embed.set_footer(text="BOOSTio · Menos dúvidas, mais desempenho.")
+    view = discord.ui.View()
+    view.add_item(discord.ui.Button(label="Montar meu PC", url=SITE_URL))
+    view.add_item(discord.ui.Button(label="Instagram", url=INSTAGRAM_URL))
+    if guild.rules_channel is not None:
+        view.add_item(discord.ui.Button(label="Regras do servidor", url=guild.rules_channel.jump_url))
+    return embed, view
 
 
 class AnnouncePreview(discord.ui.View):
@@ -97,6 +117,19 @@ class AnnouncePreview(discord.ui.View):
 def register_commands(client):
     tree = app_commands.CommandTree(client)
     guild = discord.Object(id=client.guild_id)
+
+    @tree.command(name="ajuda", description="Veja os links e comandos úteis da BOOSTio.", guild=guild)
+    async def help_command(interaction: discord.Interaction):
+        embed, view = help_message(interaction.guild)
+        await interaction.response.send_message(embed=embed, view=view, ephemeral=True,
+                                                allowed_mentions=discord.AllowedMentions.none())
+
+    @tree.command(name="montar", description="Abra o site da BOOSTio para montar seu PC.", guild=guild)
+    async def build_link(interaction: discord.Interaction):
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(label="Montar meu PC", url=SITE_URL))
+        await interaction.response.send_message(f"Monte seu PC no site da BOOSTio: {SITE_URL}",
+                                                view=view, ephemeral=True)
 
     @tree.command(name="privacidade", description="Veja quais dados o BOTio utiliza.", guild=guild)
     async def privacy(interaction: discord.Interaction):
