@@ -1,0 +1,8 @@
+*
+!Dockerfile
+!requirements.lock
+!main.py
+!policy.py
+!welcome.py
+!commands.py
+!movement.py

@@ -1,0 +1,35 @@
+services:
+  botio:
+    build: .
+    restart: unless-stopped
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 128
+    mem_limit: 256m
+    cpus: 0.5
+    environment:
+      DISCORD_BOT_TOKEN_FILE: /run/secrets/discord_token
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:?Defina DISCORD_GUILD_ID}
+      DISCORD_MEMBER_ROLE_ID: ${DISCORD_MEMBER_ROLE_ID:?Defina DISCORD_MEMBER_ROLE_ID}
+      DISCORD_ANNOUNCEMENTS_CHANNEL_ID: ${DISCORD_ANNOUNCEMENTS_CHANNEL_ID:-}
+      DISCORD_MOVEMENT_CHANNEL_ID: ${DISCORD_MOVEMENT_CHANNEL_ID:-}
+      BOTIO_STATE_PATH: /data/state.sqlite3
+    secrets: [discord_token]
+    volumes: [botio_data:/data]
+    tmpfs: [/tmp:rw,noexec,nosuid,size=16m]
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+    labels:
+      traefik.enable: "false"
+
+secrets:
+  discord_token:
+    file: ${BOTIO_TOKEN_FILE:?Defina BOTIO_TOKEN_FILE com o caminho privado do token}
+
+volumes:
+  botio_data:

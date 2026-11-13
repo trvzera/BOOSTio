@@ -1,0 +1,112 @@
+# BOTio
+
+Bot oficial da BOOSTio, executado separadamente do site. Primeira função:
+atribuir o cargo **Membro** quando o Discord indicar a conclusão da verificação
+nativa (`pending=False`). Não lê mensagens nem precisa de Administrador.
+
+## Boas-vindas privadas
+
+Depois da liberação do cargo, novos membros recebem um embed privado com o
+site https://boostio.com.br/, Instagram https://www.instagram.com/boostiooficial/
+e botão para abrir a comunidade. Não publica saudações nos canais.
+Membros antigos encontrados na sincronização não recebem mensagens em massa.
+Entradas e membros pendentes observados pelo bot ficam registrados em
+`botio/state.sqlite3` (ignorado pelo Git). Preserve esse arquivo entre reinícios
+e deploys para evitar duplicações e recuperar saudações pendentes.
+Quem entrar e concluir o aceite inteiramente com o bot desligado não recebe
+saudação retroativa, mas continua recebendo o cargo na sincronização.
+
+Cada entrada recebe no máximo uma tentativa de DM: se o destinatário bloquear
+mensagens ou houver falha de envio, o acesso permanece e o bot não insiste.
+Uma saída seguida de nova entrada permite nova saudação. Se o processo parar
+entre a reserva e o envio, a saudação não é repetida para evitar mensagens duplicadas.
+
+## Configuração no Discord
+
+1. Ative Comunidade e o aceite obrigatório das regras em Configurações de Segurança.
+2. No https://discord.com/developers/applications crie a aplicação **BOTio**.
+3. Na seção Bot, ative **Server Members Intent**. Message Content e Presence não são necessários.
+4. Gere o token e guarde-o somente em `botio/.env`, nunca no código, Git ou chat.
+5. Em OAuth2 → URL Generator, selecione `bot` e a permissão **Manage Roles**.
+   Abra o link gerado e adicione o bot ao servidor BOOSTio.
+6. Crie o cargo **Membro**, sem permissões administrativas. Coloque o cargo do
+   BOTio acima dele, abaixo dos cargos de equipe. Não conceda cargos de equipe ao bot.
+7. Ative Modo desenvolvedor nas configurações avançadas da sua conta Discord;
+   clique com o botão direito no cargo Membro e copie seu ID.
+8. Copie `.env.example` para `.env` nesta pasta e preencha token e ID do cargo.
+   O ID do servidor BOOSTio já está no exemplo.
+
+## Visibilidade
+
+| Área | @everyone | Membro |
+| --- | --- | --- |
+| Boas-vindas e regras | Ver e ler; sem enviar | Ver e ler |
+| Dúvidas de entrada | Ver e ler | Ver e participar |
+| Comunidade, hardware e voz | Negar Ver canal | Permitir Ver canal e participação |
+| Equipe e logs | Negar Ver canal | Sem autorização; liberar só cargos da equipe |
+
+Sincronize os canais às permissões de suas categorias. Verifique cargos de
+interesse do onboarding para que eles não liberem as categorias restritas.
+Antes do aceite, o Discord bloqueia a participação, inclusive no canal de dúvidas;
+deixe nele orientações de entrada que possam ser lidas sem conversar.
+
+Não use autorole na entrada, botão alternativo de verificação ou verificação
+manual em conjunto com esse fluxo: podem dispensar o aceite nativo.
+`pending=False` indica que o Discord liberou a pessoa, não prova de clique:
+também abrange membros antigos e pessoas dispensadas pela administração.
+O bot sincroniza esses membros existentes no primeiro início e a cada 10 minutos.
+Se o aceite obrigatório estiver desativado, não concede novos cargos.
+Não remove cargos já existentes nem modifica canais automaticamente.
+
+## Executar (Python 3.11+)
+
+Na raiz do repositório:
+
+```sh
+python3 -m venv botio/.venv
+botio/.venv/bin/python -m pip install -r botio/requirements.txt
+cp botio/.env.example botio/.env
+# Preencha botio/.env em um editor antes de executar.
+botio/.venv/bin/python botio/main.py
+```
+
+O bot precisa continuar ligado para entregar cargos imediatamente. Se parar,
+recupera os membros liberados na próxima inicialização. Esta versão não foi
+integrada ao deploy do site: hospede como processo independente.
+
+## Validação
+
+```sh
+botio/.venv/bin/python -m unittest discover -s botio -p 'test_*.py'
+```
+
+Teste real com uma conta sem administração: entre sem aceitar e confira apenas
+os três canais de entrada; confirme que não recebeu Membro; aceite as regras;
+confirme o cargo e os demais canais. Repita aceitando com o bot desligado e
+reiniciando-o. Confira também que nenhuma categoria privada de equipe foi liberada.
+
+## Novos comandos e operação
+
+- `/privacidade`: resumo dos dados e canal de contato, em resposta privada.
+- `/apagar-meus-dados`: remove o registro local do próprio membro.
+- `/anunciar`: prévia privada e confirmação para equipe com Gerenciar servidor;
+  configure `DISCORD_ANNOUNCEMENTS_CHANNEL_ID` antes de publicar.
+- `/testar-boas-vindas`: equipe testa a DM somente na própria conta, sem
+  alterar o histórico de saudações automáticas.
+- `DISCORD_MOVEMENT_CHANNEL_ID`: canal privado para registros de entrada e
+  saída com avatar, ID e data/hora. Não atribua essa função também à Loritta
+  se não quiser registros duplicados. O canal precisa estar oculto para
+  `@everyone` e `Membro`; o bot precisa de Ver canal, Enviar mensagens e Inserir links.
+
+Após editar o código, encerre o processo antigo no VS Code e execute novamente.
+O terminal da versão atual informa `BOTio 0.2` e o canal de movimentação.
+Boas-vindas são enviadas após o aceite, não antes. A tabela local distingue
+`waiting` (aguardando), `sent`, `blocked`, `failed` e `claimed` (tentativa reservada).
+Não exclua o banco para testar: use `/testar-boas-vindas` e depois uma conta comum
+entrando e aceitando as regras. Falta de configuração do canal de movimentação
+não impede o cargo nem a DM. A sincronização de segurança ocorre a cada 10 minutos.
+
+Consulte [OPERACAO.md](OPERACAO.md) para o serviço Docker independente na VPS,
+atualizações e cuidados com credenciais. A [PRIVACIDADE.md](PRIVACIDADE.md)
+descreve os dados atuais e identifica informações organizacionais que precisam
+ser completadas antes da publicação definitiva da política.
