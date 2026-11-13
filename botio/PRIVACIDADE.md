@@ -21,6 +21,9 @@ do servidor oficial.
   Esses registros ficam em mensagens do Discord, sem cópia em banco local.
 - Contador: o total de membros, incluindo bots, é exibido no nome de um canal
   de voz. Não é mantido histórico desse total nem criada uma lista própria de membros.
+- Atendimento: tickets ficam em canais privados do Discord. O tópico contém o ID
+  do solicitante para localizar o atendimento após reinícios. Solicitante, equipe
+  e cargos com Administrador têm acesso às mensagens enviadas nesse canal.
 
 O bot não arquiva conversas, não solicita senhas de usuários e não usa os dados
 para publicidade, venda ou treinamento de IA. Os links para o site e Instagram
@@ -34,6 +37,12 @@ volume privado na VPS quando hospedado. Permanece durante a participação no
 servidor para evitar duplicações. É excluído quando o bot observa a saída ou na
 próxima sincronização completa após voltar a funcionar. Uma nova entrada pode
 gerar novo registro e nova saudação.
+
+Tickets abertos permanecem no Discord até encerramento pelo solicitante ou pela
+equipe. Encerrar exige confirmação e apaga o canal com suas mensagens. O BOTio
+não mantém transcrições ou cópia dessas conversas no banco local. A saída do
+servidor e `/apagar-meus-dados` não encerram tickets; procure a equipe ou use
+`/fechar-ticket` no canal do atendimento para solicitar seu encerramento.
 
 Logs próprios evitam identificar membros e não registram token ou conteúdo das
 conversas. No modelo Docker fornecido, os logs têm rotação por tamanho.
@@ -68,4 +77,4 @@ conformidade jurídica. A equipe deve identificar o responsável pelo tratamento
 informar fornecedor/região da hospedagem, documentar a base legal adequada ao
 tratamento e sua avaliação quando necessária, manter contato funcional e
 publicar uma URL acessível no Portal do Desenvolvedor. Atualize a política antes
-de acrescentar vinculação de contas, tickets ou monitoramento com novos dados.
+de acrescentar vinculação de contas ou monitoramento com novos dados.

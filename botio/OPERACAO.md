@@ -60,3 +60,14 @@ publica uma vez. Não usa shell, não interpreta texto como código e não busca
 Commits não disparam anúncios públicos. O próximo passo é ligar eventos de
 deploy bem-sucedido a um canal privado. A publicação para usuários continua
 controlada; a integração GitHub/deploy ainda não foi implementada.
+
+## Tickets
+
+Configure `DISCORD_TICKETS_CATEGORY_ID` e `DISCORD_SUPPORT_ROLE_ID`. A categoria
+deve ser reservada ao atendimento; o BOTio precisa de Ver canal, Gerenciar canais
+e Gerenciar permissões. Cada canal criado tem permissões próprias, sem conceder
+acesso aos demais membros. Administradores continuam com acesso.
+Após reiniciar, valide `/ajuda`, `/montar`, `/ticket` e `/fechar-ticket`.
+Use uma conta comum para conferir que somente seu atendimento aparece e que
+cancelar o encerramento preserva o canal. Confirme uma exclusão apenas em um
+ticket de teste: ela remove o canal e suas mensagens definitivamente.
