@@ -215,3 +215,18 @@ def test_404_nao_envenena_as_proximas_chamadas_da_tarefa(banco):
     with pytest.raises(FalhaMarketplace):
         controle.executar(Mock(side_effect=FalhaMarketplace(400)))
     assert controle.erro is not None
+
+
+def test_perifericos_saem_da_fila_antes_das_demais_categorias(banco):
+    app, repo = banco
+    repo.enfileirar('shopee', 'a', 'ofertas', {'categoria': 'fan', 'peca_id': 1})
+    repo.enfileirar('shopee', 'b', 'ofertas', {'categoria': 'monitor', 'peca_id': 2})
+    repo.enfileirar('shopee', 'c', 'ofertas', {'categoria': 'gabinete', 'peca_id': 3})
+    repo.enfileirar('shopee', 'd', 'ofertas', {'categoria': 'mouse', 'peca_id': 4})
+    agora = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(seconds=1)
+    ordem = []
+    for _ in range(4):
+        tarefa = repo.reservar('shopee', agora)
+        ordem.append(tarefa['dados']['categoria'])
+        repo.finalizar(tarefa, 'concluida')
+    assert ordem == ['monitor', 'mouse', 'fan', 'gabinete']
