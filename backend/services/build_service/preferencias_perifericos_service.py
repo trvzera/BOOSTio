@@ -47,6 +47,13 @@ class PreferenciasPerifericosService:
         return (0,)
 
     @classmethod
+    def atende_piso(cls, tipo, peca, utilidade):
+        """Piso mínimo de qualidade para jogos; sem piso para os demais usos e tipos."""
+        if tipo == "mouse" and cls.jogos(utilidade):
+            return cls.numero(peca.get("dpi_max")) >= 3200 and str(peca.get("conexao") or "").strip().casefold() != "bluetooth"
+        return True
+
+    @classmethod
     def destaques(cls, tipo, pecas, utilidade):
         if not utilidade:
             return []
