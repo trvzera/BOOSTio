@@ -3,6 +3,7 @@ from decimal import Decimal
 import pytest
 
 from services.build_service.planejar_perifericos_service import PlanejarPerifericosService
+from services.build_service.preferencias_perifericos_service import PreferenciasPerifericosService
 
 
 def catalogo():
@@ -67,3 +68,47 @@ def test_sobra_de_orcamento_leva_a_conjuntos_melhores_e_nao_aos_mais_baratos():
     notas = [c["pontuacao"] for c in plano["combinacoes"]]
     assert notas == sorted(notas, reverse=True)
     assert plano["combinacoes"][0]["total"] == max(totais) and plano["combinacoes"][0]["total"] > 800
+
+
+def catalogo_monitor_caro():
+    monitor = dict(resolucao="1920x1080", tamanho_polegadas=27)
+    return {
+        "monitor": [{"id": 81, "preco": 700, "taxa_atualizacao_hz": 144, **monitor},
+                    {"id": 82, "preco": 862, "taxa_atualizacao_hz": 300, **monitor}],
+        "teclado": [{"id": 88, "preco": 80}, {"id": 17, "preco": 120}],
+        "mouse": [{"id": 66, "preco": 32.22, "dpi_max": 1600, "conexao": "Bluetooth"},
+                  {"id": 12, "preco": 170, "dpi_max": 12000, "conexao": "USB"}],
+        "fone": [{"id": 62, "preco": 46, "microfone": True}, {"id": 6, "preco": 170, "microfone": True}],
+    }
+
+
+def mouse_do_topo(plano):
+    return next(i["id"] for i in plano["combinacoes"][0]["componentes"] if i["tipo"] == "mouse")
+
+
+def test_jogos_nao_aceita_mouse_bluetooth_de_escritorio_quando_ha_alternativa():
+    plano = PlanejarPerifericosService().executar(catalogo_monitor_caro(), 1200, {}, "Jogos")
+    assert plano["viavel"] and mouse_do_topo(plano) == 12
+    assert all(c["total"] <= 1200 for c in plano["combinacoes"])
+
+
+def test_piso_do_mouse_vale_so_para_jogos():
+    plano = PlanejarPerifericosService().executar(catalogo_monitor_caro(), 1200, {}, "Escritório")
+    assert mouse_do_topo(plano) == 66
+
+
+def test_sem_mouse_que_atenda_o_piso_o_plano_continua_viavel():
+    catalogo = catalogo_monitor_caro()
+    catalogo["mouse"] = [m for m in catalogo["mouse"] if m["id"] == 66]
+    plano = PlanejarPerifericosService().executar(catalogo, 1200, {}, "Jogos")
+    assert plano["viavel"] and mouse_do_topo(plano) == 66
+
+
+def test_atende_piso_do_mouse_para_jogos():
+    piso = PreferenciasPerifericosService.atende_piso
+    assert piso("mouse", {"dpi_max": 12000, "conexao": "USB"}, "Jogos")
+    assert piso("mouse", {"dpi_max": 6400, "conexao": "Wireless"}, "Jogos")
+    assert not piso("mouse", {"dpi_max": 1600, "conexao": "USB"}, "Jogos")
+    assert not piso("mouse", {"dpi_max": 16000, "conexao": "Bluetooth"}, "Jogos")
+    assert piso("mouse", {"dpi_max": 800, "conexao": "Bluetooth"}, "Escritório")
+    assert piso("teclado", {}, "Jogos")

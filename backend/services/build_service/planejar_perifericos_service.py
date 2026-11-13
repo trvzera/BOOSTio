@@ -8,6 +8,8 @@ from .preferencias_cores_service import PreferenciasCoresService
 class PlanejarPerifericosService:
     TIPOS = ("monitor", "teclado", "mouse", "fone")
     PESOS = {"monitor": 2, "teclado": 1, "mouse": 1, "fone": 1}
+    PESOS_JOGOS = {"monitor": 2, "teclado": 1, "mouse": 2, "fone": 1}
+    PENALIDADE_ABAIXO_DO_PISO = 0.3
     LIMITE_COMBINACOES = 12
 
     def executar(self, catalogo, teto, proprias=None, utilidade="", cor="sem-preferencia"):
@@ -23,11 +25,14 @@ class PlanejarPerifericosService:
         minimo = sum((Decimal(str(disponiveis[tipo][0]["preco"])) for tipo in tipos), Decimal(0))
         opcoes = []
         notas = {}
+        abaixo_do_piso = {}
         for tipo in tipos:
             # peça mais cara do que sobra depois dos itens mais baratos dos outros tipos nunca cabe
             limite = teto - (minimo - Decimal(str(disponiveis[tipo][0]["preco"])))
             cabem = [peca for peca in disponiveis[tipo] if Decimal(str(peca["preco"])) <= limite] or disponiveis[tipo][:1]
             notas[tipo] = self._notas(tipo, cabem, utilidade)
+            abaixo_do_piso[tipo] = {peca["id"] for peca in cabem
+                                    if not PreferenciasPerifericosService.atende_piso(tipo, peca, utilidade)}
             opcoes.append(self._amostrar(cabem, cor))
         if minimo > teto:
             return {"viavel": False, "minimo_catalogado": float(minimo), "teto": float(teto), "combinacoes": []}
@@ -38,8 +43,10 @@ class PlanejarPerifericosService:
                 combinacoes.append((total, conjunto))
         combinacoes.sort(key=lambda item: (item[0], tuple(peca["id"] for peca in item[1])))
 
+        pesos = self.PESOS_JOGOS if PreferenciasPerifericosService.jogos(utilidade) else self.PESOS
+
         def pontuacao(item):
-            return self._pontuar(tipos, notas, item[1])
+            return self._pontuar(tipos, notas, item[1], pesos, abaixo_do_piso)
 
         def ordem(item):
             return (-pontuacao(item), item[0], tuple(peca["id"] for peca in item[1]))
@@ -86,11 +93,14 @@ class PlanejarPerifericosService:
         return {peca["id"]: (por_preco[peca["id"]] + por_ficha[peca["id"]]) / 2 for peca in pecas}
 
     @classmethod
-    def _pontuar(cls, tipos, notas, conjunto):
-        pesos = sum(cls.PESOS[tipo] for tipo in tipos)
-        if not pesos:
+    def _pontuar(cls, tipos, notas, conjunto, pesos, abaixo_do_piso):
+        total_pesos = sum(pesos[tipo] for tipo in tipos)
+        if not total_pesos:
             return 0
-        return sum(cls.PESOS[tipo] * notas[tipo][peca["id"]] for tipo, peca in zip(tipos, conjunto)) / pesos
+        base = sum(pesos[tipo] * notas[tipo][peca["id"]] for tipo, peca in zip(tipos, conjunto)) / total_pesos
+        penalidade = sum(cls.PENALIDADE_ABAIXO_DO_PISO for tipo, peca in zip(tipos, conjunto)
+                         if peca["id"] in abaixo_do_piso[tipo])
+        return max(0, base - penalidade)
 
     @staticmethod
     def _amostrar(pecas, cor):
