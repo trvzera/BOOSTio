@@ -6,6 +6,7 @@ from services.build_service.custos_build_service import dividir_orcamento
 from services.build_service.contexto_build_service import obter_detalhes_proprias
 from services.build_service.catalogo_geracao_service import preparar_catalogo, validar_disponibilidade, planejar_perifericos
 from services.build_service.prompt_build_service import criar_prompt
+from services.build_service.conferir_pecas_proprias_service import ConferirPecasPropriasService
 import logging
 from time import perf_counter
 
@@ -40,6 +41,7 @@ class CriarBuildService:
       rede = {}
     validar_rede(rede)
     proprias = pecas_proprias(dados.get("pecas_proprias", {}))
+    ConferirPecasPropriasService.executar(proprias)
     margem = min(orcamento / 2, max(800, orcamento * 0.25))
 
     teto_pc, teto_perifericos = dividir_orcamento(orcamento, percentual)

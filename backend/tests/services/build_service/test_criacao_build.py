@@ -582,7 +582,7 @@ def test_pecas_proprias_reverificam_quota_apos_llm(app_build, mocker):
 
         llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=ocupar_ultima_vaga)
         with pytest.raises(LimiteBuildsError):
-            CriarBuildService().executar(1, {**PEDIDO, "pecas_proprias": {"processador": "Minha CPU"}})
+            CriarBuildService().executar(1, {**PEDIDO, "pecas_proprias": {"processador": "processador"}})
         llm.assert_called_once()
         assert BuildSalva.query.count() == 3 and Build.query.count() == 0
 
