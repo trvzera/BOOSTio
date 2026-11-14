@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { criarClienteBenchmark } from "../js/api/benchmark/consultarBenchmark.js";
-import { hardwareBenchmark } from "../js/benchmark/hardware.js";
+import { hardwareBenchmark, slugVideo, slugProcessador } from "../js/benchmark/hardware.js";
 import { painelBenchmarkHtml } from "../js/benchmark/painel.js";
 import { resultadoDesempenhoHtml } from "../js/benchmark/view.js";
 
@@ -50,9 +50,39 @@ test("registro de hardware não troca variantes nem substitui vídeo integrado",
   const cpu = {modelo:"Ryzen 5 5600"}, gpu = {modelo:"GeForce RTX 3060",memoria_gb:12};
   assert.deepEqual(hardwareBenchmark(cpu,gpu),{cpu:"ryzen-5-5600",gpu:"rtx-3060"});
   assert.ok(hardwareBenchmark(cpu,{...gpu,memoria_gb:8}).motivo);
-  assert.ok(hardwareBenchmark({modelo:"Ryzen 5 5600G"},gpu).motivo);
+  assert.equal(hardwareBenchmark({modelo:"Ryzen 5 5600G"},gpu).cpu,"ryzen-5-5600g");
   assert.ok(hardwareBenchmark(cpu,null).motivo);
   assert.notEqual(hardwareBenchmark({modelo:"Core i5-12400F"},gpu).cpu,hardwareBenchmark({modelo:"Core i5-12400"},gpu).cpu);
+});
+test("GPU é identificada pelo nome do chip sem marca (modelo_referencia), não pela variante comercial",() => {
+  const placa = (modelo,modelo_referencia,memoria_gb) => ({fabricante:"MSI",modelo,modelo_referencia,memoria_gb});
+  assert.equal(slugVideo(placa("PULSE [Black]","Radeon RX 9060 XT",16)),"rx-9060-xt");
+  assert.equal(slugVideo(placa("Ventus 2X 12G [Black]","GeForce RTX 3060 12GB",12)),"rtx-3060");
+  assert.equal(slugVideo(placa("SHADOW 3X OC [Black]","GeForce RTX 5070 Ti",16)),"rtx-5070-ti");
+  assert.equal(slugVideo(placa("Gaming X","GeForce RTX 4060 Ti 8GB",8)),"rtx-4060-ti");
+  assert.equal(slugVideo(placa("Gaming OC","Radeon RX 9070 XT",16)),"radeon-rx-9070-xt");
+  assert.equal(slugVideo(placa("Dual","Radeon RX 7600",8)),"radeon-rx-7600");
+  assert.equal(slugVideo(placa("Dual","GeForce RTX 2060",6)),"geforce-rtx-2060");
+});
+test("slugs da GPU respeitam variantes de memória e não inventam correspondência",() => {
+  const placa = (modelo_referencia,memoria_gb) => ({modelo:"Dual",modelo_referencia,memoria_gb});
+  assert.equal(slugVideo(placa("GeForce GTX 1060",6)),"gtx-1060-6gb");
+  assert.equal(slugVideo(placa("GeForce GTX 1060",3)),"geforce-gtx-1060-3gb");
+  assert.equal(slugVideo(placa("GeForce RTX 3060 8GB",8)),null);
+  assert.equal(slugVideo(placa("GeForce RTX 3060 Laptop",6)),null);
+  assert.equal(slugVideo(placa("GeForce GTX 1630",4)),null);
+  assert.equal(slugVideo({modelo:"PULSE [Black]",memoria_gb:16}),null);
+  assert.equal(slugVideo(null),null);
+});
+test("processador usa o próprio modelo (sem marca) como slug e recusa nomes ambíguos",() => {
+  assert.equal(slugProcessador({modelo:"Ryzen 5 5600XT"}),"ryzen-5-5600xt");
+  assert.equal(slugProcessador({modelo:"Ryzen 5 8500G"}),"ryzen-5-8500g");
+  assert.equal(slugProcessador({modelo:"AMD Ryzen 7 9800X3D"}),"ryzen-7-9800x3d");
+  assert.equal(slugProcessador({modelo:"Core i5-12400F"}),"core-i5-12400f");
+  assert.equal(slugProcessador({modelo:"Intel Core Ultra 5 245KF"}),"core-ultra-5-245kf");
+  assert.equal(slugProcessador({modelo:"Xeon E5-2620 v4"}),null);
+  assert.equal(slugProcessador({modelo:"Ryzen 5 5600 ou Ryzen 5 5500"}),null);
+  assert.equal(slugProcessador({}),null);
 });
 test("painel do modal identifica campos, mostra cinco jogos por controle e isola a comparação",() => {
   const html = painelBenchmarkHtml({prefixo:"build-fpshq",hardware:'<img src=x onerror="alert(1)">',memoria:16});
