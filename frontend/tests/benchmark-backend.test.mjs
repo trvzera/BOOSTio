@@ -64,6 +64,16 @@ test("GPU é identificada pelo nome do chip sem marca (modelo_referencia), não 
   assert.equal(slugVideo(placa("Dual","Radeon RX 7600",8)),"radeon-rx-7600");
   assert.equal(slugVideo(placa("Dual","GeForce RTX 2060",6)),"geforce-rtx-2060");
 });
+test("sem modelo_referencia, o chip é extraído do título só quando é único e sem ambiguidade",() => {
+  const sem = (modelo,memoria_gb) => ({fabricante:"ASRock",modelo,modelo_referencia:null,memoria_gb});
+  assert.equal(slugVideo(sem("RX 7600 Challenger Radeon",8)),"radeon-rx-7600");
+  assert.equal(slugVideo(sem("RTX 5070 EAGLE OC SFF 12G",12)),"rtx-5070");
+  assert.equal(slugVideo(sem("GeForce RTX 4060 Ti Gaming X 8G",8)),"rtx-4060-ti");
+  assert.equal(slugVideo(sem("RTX 4060 ou RTX 4070",8)),null);
+  assert.equal(slugVideo(sem("RTX 3060 DUAL",8)),null);
+  assert.equal(slugVideo(sem("RTX 3060 Laptop",6)),null);
+  assert.equal(slugVideo({modelo:"RTX 3060 Dual",modelo_referencia:"GeForce RTX 3060 Laptop",memoria_gb:12}),null);
+});
 test("slugs da GPU respeitam variantes de memória e não inventam correspondência",() => {
   const placa = (modelo_referencia,memoria_gb) => ({modelo:"Dual",modelo_referencia,memoria_gb});
   assert.equal(slugVideo(placa("GeForce GTX 1060",6)),"gtx-1060-6gb");
