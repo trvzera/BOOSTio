@@ -1,7 +1,7 @@
 from services.build_service.gerar_candidata_service import gerar_candidata
 from services.build_service.gerar_candidata_service import perfil_revisa_investimento
 from services.build_service.salvar_build_gerada_service import salvar_build
-from services.validacoes_service.validar_pedido_build_service import validar_orcamento, validar_rede, validar_prioridade_montagem, validar_textos_pedido, pecas_proprias
+from services.validacoes_service.validar_pedido_build_service import validar_orcamento, validar_rede, validar_prioridade_montagem, validar_preferencia_processador, validar_textos_pedido, pecas_proprias
 from services.build_service.custos_build_service import dividir_orcamento
 from services.build_service.contexto_build_service import obter_detalhes_proprias
 from services.build_service.catalogo_geracao_service import preparar_catalogo, validar_disponibilidade, planejar_perifericos
@@ -23,6 +23,7 @@ class CriarBuildService:
   def executar(self, usuario_id, dados, modelo="gemini-3.5-flash-lite", tentativas_correcao=1, *, selecao_inteligente=False):
     validacao_campos(dados, ["nome", "descricao", "utilidade", "orcamento"])
     validar_textos_pedido(dados)
+    validar_preferencia_processador(dados)
     armazenamento_minimo = RequisitosArmazenamentoService.validar_parametro(dados.get("armazenamento_minimo_gb"))
     aparencia = validar_aparencia(dados.get("aparencia"))
     dados = {**dados, "aparencia": aparencia,

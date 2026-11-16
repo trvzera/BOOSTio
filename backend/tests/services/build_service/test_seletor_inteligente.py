@@ -35,6 +35,21 @@ def ids(dados):
     return [p['id'] for p in SeletorInteligenteService().executar(dados)['componentes_selecionados']]
 
 
+def test_marca_prioriza_cpu_sem_aplicar_a_gpu_e_permite_fallback(banco):
+    intel = inserir(500, 10000, fabricante="Intel", soquete="LGA1700")
+    amd = inserir(600, 15000, fabricante="AMD")
+    gpu = inserir(300, 8000, gpu=True, fabricante="NVIDIA")
+    dados = dict(orcamento=4000, prioridade_montagem="desempenho")
+    assert ids({**dados, "preferencia_processador": "intel"}) == [intel, amd, gpu]
+    assert ids({**dados, "preferencia_processador": "amd"}) == [amd, intel, gpu]
+    assert set(ids({**dados, "preferencia_processador": "sem-preferencia"})) == {intel, amd, gpu}
+    db.session.query(Processador).filter_by(fabricante="Intel").delete()
+    db.session.commit()
+    resultado = SeletorInteligenteService().executar({**dados, "preferencia_processador": "intel"})
+    assert [p["id"] for p in resultado["componentes_selecionados"]] == [amd, gpu]
+    assert any("Marca de processador flexibilizada" in s for s in resultado["planejamento_orcamento"]["flexibilizacoes"])
+
+
 @pytest.mark.parametrize('gpu', [False, True])
 def test_desempenho_e_custo_beneficio_ordenam_por_metricas_distintas(banco, gpu):
     barato = inserir(500, 10000, gpu)

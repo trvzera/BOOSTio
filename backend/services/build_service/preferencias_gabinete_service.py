@@ -11,14 +11,24 @@ class PreferenciasGabineteService:
         porte = next((valor for padrao, valor in ((r"\bmini[ -]?tower\b", "mini-tower"),
             (r"\bmid[ -]?tower\b", "mid-tower"), (r"\bfull[ -]?tower\b", "full-tower")) if re.search(padrao, texto)), None)
         estilo = None
+        # A presença de "frontal" em LED/USB não indica vidro na frente.
+        trechos_vidro = []
+        continuacao = False
+        for trecho in re.split(r"[,;|]", texto):
+            vidro = bool(re.search(r"\bvidro\b|\bglass\b", trecho))
+            continuacao = vidro or (continuacao and bool(re.match(
+                r"\s*(?:e\s+)?(?:frontal|frente|lateral|teto|superior|front|side|top)\b", trecho)))
+            if continuacao:
+                trechos_vidro.append(trecho)
+        paineis = " ".join(trechos_vidro)
         if re.search(r"\b(?:sem vidro|sem janela)\b", texto):
             estilo = "discreto"
-        elif "vidro" in texto and all(re.search(p, texto) for p in (r"frontal|frente", r"lateral", r"teto|superior")):
+        elif all(re.search(p, paineis) for p in (r"\bfrontal\b|\bfrente\b|\bfront\b", r"\blateral\b|\bside\b", r"\bteto\b|\bsuperior\b|\btop\b")):
             estilo = "panoramico-3-faces"
         elif re.search(r"\baquario\b|\bpanoramico\b", texto) or (
-                "vidro" in texto and re.search(r"frontal|frente", texto) and "lateral" in texto):
+                re.search(r"\bfrontal\b|\bfrente\b|\bfront\b", paineis) and re.search(r"\blateral\b|\bside\b", paineis)):
             estilo = "panoramico"
-        elif "vidro" in texto and "lateral" in texto:
+        elif re.search(r"\blateral\b|\bside\b", paineis):
             estilo = "vidro"
         return {"porte": porte, "estilo": estilo}
 

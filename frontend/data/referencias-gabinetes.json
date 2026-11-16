@@ -1,0 +1,34 @@
+{
+  "verificado_em": "2026-11-16",
+  "modelos": [
+    {
+      "categoria": "gabinete",
+      "fabricante": "Fractal Design",
+      "modelo": "Define 7 XL Black Solid",
+      "porte_referencia": "full-tower",
+      "estilo_referencia": "discreto",
+      "part_number": "FD-C-DEF7X-01",
+      "fonte": "https://www.fractal-design.com/products/cases/define-series/define-7-xl/define-7-xl-black-solid/",
+      "verificado_em": "2026-11-16"
+    },
+    {
+      "categoria": "gabinete",
+      "fabricante": "Fractal Design",
+      "modelo": "Define 7 XL Black Light TG",
+      "porte_referencia": "full-tower",
+      "estilo_referencia": "vidro",
+      "part_number": "FD-C-DEF7X-02",
+      "fonte": "https://www.fractal-design.com/products/cases/define-series/define-7-xl/define-7-xl-black-light-tg/",
+      "verificado_em": "2026-11-16"
+    },
+    {
+      "categoria": "gabinete",
+      "fabricante": "Lian Li",
+      "modelo": "O11 Dynamic EVO XL",
+      "porte_referencia": "full-tower",
+      "estilo_referencia": "panoramico",
+      "fonte": "https://lian-li.com/product/o11-dynamic-evo-xl/",
+      "verificado_em": "2026-11-16"
+    }
+  ]
+}

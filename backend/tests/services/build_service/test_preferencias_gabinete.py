@@ -18,6 +18,8 @@ from services.build_service.criar_build_service import CriarBuildService
     ("Full Tower Aquário", {"porte": "full-tower", "estilo": "panoramico"}),
     ("Vidro na frente, lateral e teto", {"porte": None, "estilo": "panoramico-3-faces"}),
     ("Gabinete sem vidro", {"porte": None, "estilo": "discreto"}),
+    ("Mid Tower, LED Frontal customizável, Lateral em Vidro", {"porte": "mid-tower", "estilo": "vidro"}),
+    ("Mid Tower, Lateral em Vidro, USB frontal e topo ventilado", {"porte": "mid-tower", "estilo": "vidro"}),
 ])
 def test_estilo_e_porte_nao_sao_inferidos_de_atx_ou_foto(modelo, esperado):
     assert Gabinete.identificar({"modelo": modelo}) == esperado
