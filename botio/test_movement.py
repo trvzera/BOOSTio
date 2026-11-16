@@ -12,7 +12,8 @@ class MovementTests(unittest.IsolatedAsyncioTestCase):
         channel.permissions_for.return_value = discord.Permissions(view_channel=public)
         channel.send = AsyncMock()
         guild = SimpleNamespace(default_role=object(), get_role=lambda _: object(), get_channel=lambda _: channel)
-        member = SimpleNamespace(guild=guild, id=42, name="pessoa", nick="Apelido")
+        member = SimpleNamespace(guild=guild, id=42, name="pessoa", nick="Apelido",
+                                 display_avatar=SimpleNamespace(url="https://cdn.discordapp.com/avatars/42/avatar.png"))
         client = SimpleNamespace(movement_channel_id=10, role_id=2)
         return client, member, channel
 
@@ -25,8 +26,16 @@ class MovementTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(embed.title, "📥 Membro entrou")
         self.assertEqual([field.value for field in embed.fields], ["pessoa", "Apelido", "42"])
         self.assertIsNone(embed.timestamp)
-        self.assertIsNone(embed.thumbnail.url)
+        self.assertEqual(embed.thumbnail.url, member.display_avatar.url)
         self.assertEqual(args['allowed_mentions'].to_dict()['parse'], [])
+
+    async def test_departure_uses_default_avatar_when_member_has_no_custom_photo(self):
+        client, member, channel = self.fixture()
+        member.display_avatar = SimpleNamespace(url="https://cdn.discordapp.com/embed/avatars/0.png")
+        await send_movement(client, member, joined=False)
+        embed = channel.send.call_args.kwargs['embed']
+        self.assertEqual(embed.title, "📤 Membro saiu")
+        self.assertEqual(embed.thumbnail.url, member.display_avatar.url)
 
     async def test_public_channel_is_rejected(self):
         client, member, channel = self.fixture(public=True)
