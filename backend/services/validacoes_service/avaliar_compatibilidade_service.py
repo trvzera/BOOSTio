@@ -1,3 +1,4 @@
+from services.build_service.planejar_rede_service import PlanejarRedeService
 import math
 import re
 
@@ -117,14 +118,16 @@ class AvaliarCompatibilidadeService:
     @staticmethod
     def _orientar_rede(estado, componentes, orientacoes):
         rede = estado.get("rede") if isinstance(estado.get("rede"), dict) else {}
-        acessorio_rede = {"cabo": "cabo_rede", "wifi": "adaptador_wifi"}.get(rede.get("tipo"))
-        if acessorio_rede and rede.get("possuiAcessorio") is False and not componentes.get(acessorio_rede):
-            descricao = "Cabo de rede" if acessorio_rede == "cabo_rede" else "Adaptador Wi-Fi"
-            comprimento = numero(rede.get("comprimentoCaboM"))
-            if acessorio_rede == "cabo_rede" and comprimento:
-                descricao += f" de pelo menos {comprimento:g} m"
-            orientacoes.append({"codigo": "rede-pendente", "mensagem": descricao +
-                " pendente: não foi incluído na build nem no total. Adicione um modelo adequado ou compre separadamente; confira a velocidade e as conexões antes de comprar."})
+        for rede in PlanejarRedeService.conexoes(rede):
+            acessorio_rede = {"cabo": "cabo_rede", "wifi": "adaptador_wifi"}.get(rede.get("tipo"))
+            if acessorio_rede and rede.get("possuiAcessorio") is False and not componentes.get(acessorio_rede):
+                descricao = "Cabo de rede" if acessorio_rede == "cabo_rede" else "Adaptador Wi-Fi"
+                comprimento = numero(rede.get("comprimentoCaboM"))
+                if acessorio_rede == "cabo_rede" and comprimento:
+                    descricao += f" de pelo menos {comprimento:g} m"
+                orientacoes.append({"codigo": "rede-pendente", "mensagem": descricao +
+                    " pendente: não foi incluído na build nem no total. Adicione um modelo adequado ou compre separadamente; confira a velocidade e as conexões antes de comprar."})
+
 
     @staticmethod
     def _avaliar_processador(_possui_peca, cpu, placa, _registrar):

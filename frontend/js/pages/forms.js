@@ -90,7 +90,7 @@ const perguntas = [
   {
     chave:"rede",etapa:"Conexão",tag:"Etapa 05",
     titulo:"Como seu PC vai se conectar à internet?",
-    descricao:"Escolha cabo de internet ou Wi-Fi e diga se quer incluir esse acessório na montagem.",
+    descricao:"Escolha Wi-Fi, cabo de internet ou os dois. Depois, diga se quer incluir os acessórios na montagem.",
     opcoes:[],
   },
   {
@@ -389,6 +389,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           const texto=r.estado==="encontrada"?"Modelo encontrado no catálogo. Usaremos a ficha cadastrada para verificar a compatibilidade."
             :r.estado==="ambigua"?"Há mais de uma variante com esse nome. As especificações precisam ser confirmadas."
             :r.estado==="vazio"?"Digite ou escolha um modelo cadastrado."
+            :["processador","placa_video","fonte"].includes(categoriaPecaPropria(tipo))?"Modelo não encontrado. Para processador, placa de vídeo e fonte precisamos do modelo exato do catálogo para calcular o consumo; escolha um da lista."
             :"Modelo não encontrado. Você pode continuar, mas as especificações e a compatibilidade ficarão a confirmar.";
           if(ajuda.textContent!==texto)ajuda.textContent=texto;
         }catch(erro){if(input.isConnected)ajuda.textContent=["offline","conexao","timeout"].includes(erro.codigo)?erro.message:"Não conseguimos consultar a lista de peças. Informe o modelo; vamos avisar sobre as informações que ainda precisam ser confirmadas.";}

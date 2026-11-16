@@ -20,6 +20,7 @@ from .amostra_inteligente_service import AmostraInteligenteService
 from .planejar_orcamento_componentes_service import PlanejarOrcamentoComponentesService
 from .planejar_armazenamento_service import PlanejarArmazenamentoService
 from .ajustar_orcamento_build_service import AjustarOrcamentoBuildService
+from .preco_exibido_service import PrecoExibidoService
 
 
 class SeletorInteligenteService:
@@ -88,7 +89,7 @@ class SeletorInteligenteService:
                                       perifericos, planejamento_componentes=resultado["planejamento_orcamento"],
                                       preferencia_neutra=True)
         return {**resultado, "catalogo": catalogo, "prompt": prompt, "proprias": proprias,
-                "detalhes_proprias": detalhes}
+                "detalhes_proprias": detalhes, "plano_perifericos": perifericos}
 
     def _catalogo_reparo(self, contexto, selecionados, excluidas):
         catalogo = {}
@@ -177,11 +178,8 @@ class SeletorInteligenteService:
         
         rede = contexto["rede"]
         
-        acessorio = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
-        
-        excluidas.update({"adaptador_wifi", "cabo_rede"} - (
-            {acessorio} if rede.get("possuiAcessorio") is False else set()))
-        
+        excluidas.update({"adaptador_wifi", "cabo_rede"} - PlanejarRedeService.categorias(rede))
+
         if contexto["categoria"] is not None:
             excluidas.update(m.__tablename__ for m in MODELOS_PECAS
                      if m.__tablename__ != contexto["categoria"])
@@ -204,10 +202,12 @@ class SeletorInteligenteService:
                          and p.benchmark_versao is None]
                 if pecas:
                     contexto["fallbacks_benchmark"].add(modelo.__tablename__)
-            pools[modelo.__tablename__] = [p.to_catalogo() for p in pecas]
+            pools[modelo.__tablename__] = PrecoExibidoService.catalogo(pecas, teto)
         for tipo in ("cabo_rede", "adaptador_wifi"):
             if contexto["rede"]:
-                pools[tipo] = PlanejarRedeService.opcoes(pools, contexto["rede"], contexto["proprias"])
+                pools[tipo] = [p for conexao in PlanejarRedeService.conexoes(contexto["rede"])
+                               if PlanejarRedeService.TIPOS.get(conexao.get("tipo")) == tipo
+                               for p in PlanejarRedeService.opcoes(pools, conexao, contexto["proprias"])]
         return pools
 
     def _selecionar_por_benchmark(self, contexto, excluidas):
@@ -333,10 +333,9 @@ class SeletorInteligenteService:
     @staticmethod
     def _ajustar_acessorio_rede(catalogo, contexto, excluidas):
         rede = contexto["rede"]
-        acessorio = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
-        
-        if acessorio and acessorio not in excluidas and rede.get("possuiAcessorio") is False:
-            catalogo[acessorio] = PlanejarRedeService.opcoes(catalogo, rede, contexto["proprias"])
+        for conexao in PlanejarRedeService.conexoes(rede):
+            for acessorio in PlanejarRedeService.categorias(conexao) - excluidas:
+                catalogo[acessorio] = PlanejarRedeService.opcoes(catalogo, conexao, contexto["proprias"])
 
     @staticmethod
     def _formatar_catalogo(catalogo):

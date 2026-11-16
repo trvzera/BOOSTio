@@ -305,3 +305,6 @@
   .compare-choice { transition: none; }
   .compare-columns { scroll-snap-type: none; scroll-behavior: auto; }
 }
+
+.compare-choice .compare-checkbox { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; }
+.compare-choice > .ui-lottie { margin-top: .25rem; }

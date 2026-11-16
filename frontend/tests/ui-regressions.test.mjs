@@ -254,7 +254,7 @@ test("rodapés usam ícones sociais com destino, nome acessível e proteção na
     assert.match(telegram,/target="_blank"/);
     assert.match(telegram,/rel="noopener noreferrer"/);
     assert.match(telegram,/footer-social-icon-telegram[^>]*aria-hidden="true"/);
-    const discord=contato.match(/<a\b[^>]*href="https:\/\/discord\.gg\/hBs9xtapya"[^>]*>[\s\S]*?<\/a>/)?.[0];
+    const discord=contato.match(/<a\b[^>]*href="https:\/\/discord\.gg\/EDPvAYNBWC"[^>]*>[\s\S]*?<\/a>/)?.[0];
     assert.ok(discord,pagina);
     assert.match(discord,/target="_blank"/);
     assert.match(discord,/rel="noopener noreferrer"/);

@@ -65,7 +65,7 @@ class ControleRequisicoesMarketplaceService:
         while True:
             espera = self.repositorio.intervalo(self.loja, self.relogio(), self.intervalo)
             if espera is None:
-                self.erro = FalhaMarketplace(403)
+                self.erro = FalhaMarketplace(403, local=True)
                 raise self.erro
             if espera <= 0:
                 break
@@ -92,6 +92,7 @@ class ControleRequisicoesMarketplaceService:
                 espera = max(falha.espera, min(3600, 60 * 2 ** min(repeticoes, 6)))
                 self.repositorio.suspender(self.loja, self.relogio(), espera=espera, rate_limit=True)
                 falha.espera = espera
-            elif falha.autenticacao:
+            elif falha.status == 401:
+                # 403 isolado não bloqueia a loja: a fila decide pelos 403 seguidos
                 self.repositorio.suspender(self.loja, self.relogio(), bloquear=True)
             raise falha from None

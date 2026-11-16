@@ -132,6 +132,31 @@ services:
       - traefik.enable=false
     networks: [backend, marketplaces-egress]
 
+  imagens-worker:
+    profiles: [marketplaces]
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      APP_ENV: producao
+      IMAGENS_COLETADAS_DIR: /dados/coletados
+    command: ["python", "-m", "flask", "--app", "app", "pecas-imagens-worker"]
+    volumes:
+      - imagens_coletadas:/dados/coletados
+    depends_on:
+      db:
+        condition: service_healthy
+    mem_limit: 512m
+    cpus: 0.5
+    stop_grace_period: 45s
+    healthcheck:
+      disable: true
+    labels:
+      - traefik.enable=false
+    networks: [backend, marketplaces-egress]
+
   web:
     build:
       context: .

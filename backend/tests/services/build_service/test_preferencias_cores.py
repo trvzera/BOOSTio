@@ -135,5 +135,6 @@ def test_catalogo_preserva_variante_preta_equivalente_omitida_pela_amostra(mocke
     modelo = SimpleNamespace(__tablename__="teclado", listar_disponiveis_ate=lambda *a, **k:[branco,preto])
     mocker.patch("services.build_service.catalogo_geracao_service.MODELOS_PECAS", (modelo,))
     mocker.patch.object(AmostrarCatalogoService, "executar", return_value=[campos_pecas(branco)])
+    mocker.patch("services.build_service.preco_exibido_service.Oferta.anexar_a_catalogo", side_effect=lambda pecas: pecas)
     catalogo = gerar_catalogo(200, reserva_perifericos=200, cor="preto")
     assert {p["id"] for p in catalogo["teclado"]} == {1, 2}

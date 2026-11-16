@@ -7,6 +7,23 @@ import re
 class PlanejarRedeService:
     TIPOS = {"cabo": "cabo_rede", "wifi": "adaptador_wifi"}
 
+    @classmethod
+    def conexoes(cls, rede=None):
+        rede = rede or {}
+        if rede.get("tipo") == "ambos":
+            return [{**rede, "tipo": "cabo", "velocidadeMbps": None},
+                    {**rede, "tipo": "wifi", "comprimentoCaboM": None}]
+        return [rede]
+
+    @classmethod
+    def categorias(cls, rede=None):
+        return {cls.TIPOS[r["tipo"]] for r in cls.conexoes(rede)
+                if r.get("tipo") in cls.TIPOS and r.get("possuiAcessorio") is False}
+
+    @classmethod
+    def planos(cls, catalogo, rede=None, proprias=None):
+        return [cls.executar(catalogo, r, proprias) for r in cls.conexoes(rede)]
+
     @staticmethod
     def _cat6(peca):
         texto = " ".join(str(peca.get(campo) or "") for campo in ("categoria_cabo", "categoria", "modelo"))
@@ -19,6 +36,8 @@ class PlanejarRedeService:
     @classmethod
     def opcoes(cls, catalogo, rede=None, proprias=None):
         rede = rede or {}
+        if rede.get("tipo") == "ambos":
+            return [p for r in cls.conexoes(rede) for p in cls.opcoes(catalogo, r, proprias)]
         tipo = cls.TIPOS.get(rede.get("tipo"))
         if not tipo or rede.get("possuiAcessorio") is not False or tipo in (proprias or {}):
             return []
@@ -48,6 +67,8 @@ class PlanejarRedeService:
             raise ValueError("Informe catalogo como um objeto válido")
 
         rede = rede or {}
+        if rede.get("tipo") == "ambos":
+            return {"tipo": None, "ids_permitidos": [], "pendente": False, "planos": cls.planos(catalogo, rede, proprias)}
         tipo = cls.TIPOS.get(rede.get("tipo"))
         comprar = tipo if rede.get("possuiAcessorio") is False and tipo not in (proprias or {}) else None
         opcoes = cls.opcoes(catalogo, rede, proprias)
@@ -56,6 +77,10 @@ class PlanejarRedeService:
 
     @classmethod
     def completar(cls, build, catalogo, rede=None, proprias=None):
+        if (rede or {}).get("tipo") == "ambos":
+            for conexao in cls.conexoes(rede):
+                build = cls.completar(build, catalogo, conexao, proprias)
+            return build
         plano = cls.executar(catalogo, rede, proprias)
         if not plano["tipo"] or not isinstance(build, dict) or not isinstance(build.get("componentes"), list):
             return build

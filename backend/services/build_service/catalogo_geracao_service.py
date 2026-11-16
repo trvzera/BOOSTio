@@ -2,7 +2,6 @@ from services.build_service.constantes_build import CAMPOS_PECAS, PERIFERICOS
 import logging
 from time import perf_counter
 from decimal import Decimal
-from math import isfinite
 
 from models.build_salva import MODELOS
 from models.modelos_pecas import MODELOS_PECAS
@@ -13,6 +12,7 @@ from services.build_service.preferencias_cores_service import PreferenciasCoresS
 from services.build_service.planejar_rede_service import PlanejarRedeService
 from services.build_service.preferencias_gabinete_service import PreferenciasGabineteService
 from services.build_service.planejamento_geracao import ErroPlanejamentoBuild, sugerir_total
+from services.build_service.preco_exibido_service import PrecoExibidoService
 
 logger = logging.getLogger("services.build_service.criar_build_service")
 
@@ -23,13 +23,13 @@ def preparar_catalogo(dados, proprias, rede, aparencia, orcamento, margem, teto_
     excluidas.update(("ssd", "hd"))
   if {"air_cooler", "water_cooler"} & excluidas:
     excluidas.update(("air_cooler", "water_cooler"))
-  acessorio_rede = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
-  excluidas.update({"adaptador_wifi", "cabo_rede"} - ({acessorio_rede} if rede.get("possuiAcessorio") is False else set()))
+  excluidas.update({"adaptador_wifi", "cabo_rede"} - PlanejarRedeService.categorias(rede))
   inicio_catalogo = perf_counter()
   catalogo = gerar_catalogo(min(orcamento - margem, teto_pc), teto_perifericos, excluidas,
                                 aparencia["gabinete_id"] if "gabinete" not in proprias else None, dados["utilidade"], cor=aparencia["cor"], aparencia=aparencia, rede=rede)
-  if acessorio_rede and rede.get("possuiAcessorio") is False:
-    catalogo[acessorio_rede] = PlanejarRedeService.opcoes(catalogo, rede, proprias)
+  for conexao in PlanejarRedeService.conexoes(rede):
+    for acessorio_rede in PlanejarRedeService.categorias(conexao):
+      catalogo[acessorio_rede] = PlanejarRedeService.opcoes(catalogo, conexao, proprias)
   logger.info("Geração: etapa=catalogo duracao_ms=%d categorias=%d", (perf_counter()-inicio_catalogo)*1000, len(catalogo))
   return catalogo
 
@@ -80,9 +80,10 @@ def gerar_catalogo(preco_maximo, reserva_perifericos=0, excluidas=(), referencia
     periferico = modelo.__tablename__ in PERIFERICOS
     if modelo.__tablename__ in excluidas or (periferico and not reserva_perifericos):
       continue
-    pecas = modelo.listar_disponiveis_ate(reserva_perifericos if periferico else preco_maximo, limite=200)
+    teto = reserva_perifericos if periferico else preco_maximo
+    pecas = PrecoExibidoService.catalogo(modelo.listar_disponiveis_ate(teto, limite=200), teto)
     if pecas:
-      fichas = [campos_pecas(peca) for peca in pecas]
+      fichas = [campos_catalogo({**item, "id": PrecoExibidoService.id_numerico(item)}) for item in pecas]
       if modelo.__tablename__ == "monitor":
         fichas = [p for p in fichas if PreferenciasPerifericosService.painel_permitido(p)]
       if modelo.__tablename__ in ("cabo_rede", "adaptador_wifi") and rede:
@@ -104,10 +105,10 @@ def gerar_catalogo(preco_maximo, reserva_perifericos=0, excluidas=(), referencia
               amostra.append(destaque)
   if referencia_gabinete is not None and "gabinete" not in excluidas:
     referencia = MODELOS["gabinete"].buscar_por_id(referencia_gabinete)
-    if referencia and referencia.publicavel and referencia.ficha_montagem_validada is not False:
-      peca = campos_pecas(referencia)
-      preco = peca.get("preco")
-      if peca.get("esgotado") is False and type(preco) in (int, float) and isfinite(preco) and 0 < preco <= preco_maximo:
+    precificada = PrecoExibidoService.catalogo([referencia], preco_maximo) if referencia else []
+    if referencia and precificada and referencia.publicavel and referencia.ficha_montagem_validada is not False:
+      peca = campos_catalogo({**precificada[0], "id": referencia.id})
+      if peca.get("esgotado") is False:
         amostra = catalogo.setdefault("gabinete", [])
         if not any(item["id"] == referencia_gabinete for item in amostra):
           if len(amostra) >= 12:

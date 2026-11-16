@@ -15,13 +15,15 @@ from services.llm_service.reservar_chamada_service import CotaGlobalIAError, Con
 from .completar_ventilacao_service import CompletarVentilacaoService
 from services.validacoes_service.requisitos_armazenamento_service import RequisitosArmazenamentoService
 from .ajustar_orcamento_build_service import AjustarOrcamentoBuildService
+from .melhorar_investimento_build_service import MelhorarInvestimentoBuildService
+from .ajustar_perifericos_ao_plano_service import AjustarPerifericosAoPlanoService
 from .preferencias_perifericos_service import PreferenciasPerifericosService
 from .planejar_rede_service import PlanejarRedeService
 
 logger = logging.getLogger("services.build_service.criar_build_service")
 
 def gerar_candidata(usuario_id, prompt, modelo, catalogo, orcamento,
-                   percentual, proprias, detalhes_proprias, rede, tentativas_correcao=1, revisar_investimento=False, cor="sem-preferencia", aparencia=None, armazenamento_minimo_gb=None, ajustar_orcamento=False, catalogo_reparo=None, utilidade=None):
+                   percentual, proprias, detalhes_proprias, rede, tentativas_correcao=1, revisar_investimento=False, cor="sem-preferencia", aparencia=None, armazenamento_minimo_gb=None, ajustar_orcamento=False, catalogo_reparo=None, utilidade=None, plano_perifericos=None):
   armazenamento_minimo_gb = RequisitosArmazenamentoService.validar_parametro(armazenamento_minimo_gb)
   limite = 1 if tentativas_correcao else 0
   instrucao = prompt
@@ -37,6 +39,10 @@ def gerar_candidata(usuario_id, prompt, modelo, catalogo, orcamento,
       logger.info("Geração: etapa=llm tentativa=%d duracao_ms=%d caracteres_prompt=%d", tentativa+1, (perf_counter()-inicio_llm)*1000, len(instrucao))
       inicio_validacao = perf_counter()
       build = json.loads(resposta) if isinstance(resposta, str) else resposta
+      build, ajuste_perifericos = AjustarPerifericosAoPlanoService().executar(build, plano_perifericos, catalogo)
+      if ajuste_perifericos:
+        logger.info("Geração: etapa=perifericos_no_plano gasto_anterior=%.2f gasto_novo=%.2f reserva=%.2f",
+                    ajuste_perifericos["gasto_anterior"], ajuste_perifericos["gasto_novo"], ajuste_perifericos["reserva"])
       build = PlanejarRedeService.completar(build, catalogo, rede, proprias)
       teto_pc, _ = dividir_orcamento(orcamento, percentual)
       build = CompletarVentilacaoService().executar(build, catalogo, teto_pc, proprias, detalhes_proprias, cor=cor)
@@ -62,6 +68,19 @@ def gerar_candidata(usuario_id, prompt, modelo, catalogo, orcamento,
         validada["ajuste_orcamento"] = reparo["diagnostico"]
         logger.info("Geração: etapa=ajuste_orcamento economia=%.2f trocas=%d",
                     reparo["diagnostico"]["economia"], len(reparo["diagnostico"]["trocas"]))
+      if revisar_investimento:
+        pool_melhoria = catalogo_reparo if catalogo_reparo is not None else catalogo
+        def validar_melhoria(candidata):
+          candidata = CompletarVentilacaoService().executar(
+              candidata, pool_melhoria, teto_pc, proprias, detalhes_proprias, cor=cor)
+          return _validar_candidata_completa(candidata, pool_melhoria, orcamento, percentual, proprias,
+                                                 detalhes_proprias, rede, aparencia or {"cor": cor}, armazenamento_minimo_gb, utilidade)
+        melhoria = MelhorarInvestimentoBuildService().executar(validada, pool_melhoria, teto_pc, proprias, validar_melhoria)
+        if melhoria is not None:
+          validada, trocas = melhoria
+          validada["melhoria_investimento"] = {"trocas": trocas}
+          catalogo = pool_melhoria
+          logger.info("Geração: etapa=melhoria_investimento trocas=%d", len(trocas))
       resumo = resumo_custos(validada, catalogo)
 
       if tentativa < limite and revisar_investimento and _ha_margem_para_melhorar(validada, catalogo, teto_pc, proprias):

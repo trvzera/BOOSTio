@@ -11,6 +11,7 @@ from .erros import FalhaMarketplace, FilaAguardando
 
 logger = logging.getLogger(__name__)
 LOJAS = ('mercado_livre', 'shopee')
+LIMITE_403_SEGUIDOS = 3
 
 
 class ProcessarFilaMarketplaceService:
@@ -68,7 +69,11 @@ class ProcessarFilaMarketplaceService:
                 self.repositorio.finalizar(tarefa, 'pendente', disponivel_em=self.relogio()+timedelta(seconds=1))
                 status = 'aguardando'
             except FalhaMarketplace as erro:
-                if erro.autenticacao:
+                if erro.local:
+                    status = 'pendente'
+                elif erro.status == 403 and self.repositorio.falhas_403_seguidas(loja, LIMITE_403_SEGUIDOS-1) < LIMITE_403_SEGUIDOS-1:
+                    status = 'falhou'
+                elif erro.autenticacao:
                     self.repositorio.suspender(loja, self.relogio(), bloquear=True)
                     status = 'bloqueada'
                 elif erro.status == 429 or erro.temporaria:

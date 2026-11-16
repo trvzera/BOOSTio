@@ -6,6 +6,7 @@ from services.build_service.custos_build_service import dividir_orcamento
 from services.build_service.contexto_build_service import obter_detalhes_proprias
 from services.build_service.catalogo_geracao_service import preparar_catalogo, validar_disponibilidade, planejar_perifericos
 from services.build_service.prompt_build_service import criar_prompt
+from services.build_service.conferir_pecas_proprias_service import ConferirPecasPropriasService
 import logging
 from time import perf_counter
 
@@ -40,6 +41,7 @@ class CriarBuildService:
       rede = {}
     validar_rede(rede)
     proprias = pecas_proprias(dados.get("pecas_proprias", {}))
+    ConferirPecasPropriasService.executar(proprias)
     margem = min(orcamento / 2, max(800, orcamento * 0.25))
 
     teto_pc, teto_perifericos = dividir_orcamento(orcamento, percentual)
@@ -53,6 +55,7 @@ class CriarBuildService:
       detalhes_proprias = preparado["detalhes_proprias"]
       prompt = preparado["prompt"]
       reparo = {"ajustar_orcamento": True, "catalogo_reparo": preparado["catalogo_reparo"]}
+      plano_perifericos = preparado["plano_perifericos"]
     else:
       catalogo = preparar_catalogo(dados, proprias, rede, aparencia, orcamento, margem, teto_pc, teto_perifericos)
       validar_disponibilidade(catalogo, proprias, percentual)
@@ -63,5 +66,6 @@ class CriarBuildService:
     dados_build = gerar_candidata(usuario_id, prompt, modelo, catalogo, orcamento,
                                      percentual, proprias, detalhes_proprias, rede, tentativas_correcao,
                                      revisar_investimento=perfil_revisa_investimento(dados["utilidade"]), cor=aparencia["cor"], aparencia=aparencia,
-                                     armazenamento_minimo_gb=armazenamento_minimo, utilidade=dados["utilidade"], **reparo)
+                                     armazenamento_minimo_gb=armazenamento_minimo, utilidade=dados["utilidade"],
+                                     plano_perifericos=plano_perifericos, **reparo)
     return salvar_build(usuario_id, dados_build, proprias, rede, percentual, aparencia, orcamento)
