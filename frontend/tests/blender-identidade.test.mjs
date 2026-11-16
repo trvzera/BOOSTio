@@ -45,7 +45,7 @@ test("CPUs preservam gerações antigas, Ultra, X3D e sufixos sem exigir título
 
 test("identificação Blender é independente dos slugs da API de FPS",()=>{
   const cpuPeca={fabricante:"Intel",modelo:"Core Ultra 5 245KF"},gpuPeca={modelo:"RTX 5070 EAGLE OC SFF 12G",memoria_gb:12};
-  assert.ok(hardwareBenchmark(cpuPeca,gpuPeca).motivo);
+  assert.deepEqual(hardwareBenchmark(cpuPeca,gpuPeca),{cpu:"core-ultra-5-245kf",gpu:"rtx-5070"});
   assert.deepEqual(hardwareBlender(cpuPeca,gpuPeca),{cpu:"Intel Core Ultra 5 245KF",gpu:"NVIDIA GeForce RTX 5070"});
 });
 

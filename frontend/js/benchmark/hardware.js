@@ -105,9 +105,21 @@ function chipDeVideo(texto) {
   return m ? [m[1],m[2],m[3]].filter(Boolean).join(" ") : null;
 }
 
+// Sem modelo_referencia, o chip só existe dentro do título ("RX 7600 Challenger Radeon"): aceita um único chip,
+// sem variantes ambíguas (Ti/Super/XT já entram no nome) e recusa notebook/mobile.
+function chipNoTitulo(texto) {
+  const t = String(texto || "").replace(/[®™]/g,"").replace(/\s+/g," ").toUpperCase();
+  if (/\b(?:LAPTOP|NOTEBOOK|MOBILE|MAX-Q|2048\s*SP)\b/.test(t)) return null;
+  const chips = new Set([...t.matchAll(/\b(RTX|GTX|RX)\s*(\d{3,4})(?:\s*(TI\s*SUPER|TI|SUPER|XTX|XT|GRE))?\b/g)]
+    .map(m => [m[1],m[2],(m[3] || "").replace(/\s+/g," ")].filter(Boolean).join(" ")));
+  return chips.size === 1 ? [...chips][0] : null;
+}
+
 // O banco guarda o nome do chip sem marca em modelo_referencia; "modelo" costuma ser só a variante comercial ("PULSE [Black]").
+// Se modelo_referencia existe mas não é um chip reconhecido (ex.: notebook), não se recorre ao título.
 export function slugVideo(gpu) {
-  const chip = chipDeVideo(gpu?.modelo_referencia) || chipDeVideo(gpu?.modelo);
+  const referencia = String(gpu?.modelo_referencia || "").trim();
+  const chip = referencia ? chipDeVideo(referencia) : chipNoTitulo(gpu?.modelo);
   if (!chip) return null;
   const memoria = Number(gpu.memoria_gb);
   return gpus.get(chip) || (Number.isInteger(memoria) ? gpus.get(chip + " " + memoria + "GB") : null) || null;
