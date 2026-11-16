@@ -90,7 +90,7 @@ const perguntas = [
   {
     chave:"rede",etapa:"Conexão",tag:"Etapa 05",
     titulo:"Como seu PC vai se conectar à internet?",
-    descricao:"Escolha cabo de internet ou Wi-Fi e diga se quer incluir esse acessório na montagem.",
+    descricao:"Escolha Wi-Fi, cabo de internet ou os dois. Depois, diga se quer incluir os acessórios na montagem.",
     opcoes:[],
   },
   {

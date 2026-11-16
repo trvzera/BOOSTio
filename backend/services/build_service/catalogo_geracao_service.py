@@ -23,13 +23,13 @@ def preparar_catalogo(dados, proprias, rede, aparencia, orcamento, margem, teto_
     excluidas.update(("ssd", "hd"))
   if {"air_cooler", "water_cooler"} & excluidas:
     excluidas.update(("air_cooler", "water_cooler"))
-  acessorio_rede = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
-  excluidas.update({"adaptador_wifi", "cabo_rede"} - ({acessorio_rede} if rede.get("possuiAcessorio") is False else set()))
+  excluidas.update({"adaptador_wifi", "cabo_rede"} - PlanejarRedeService.categorias(rede))
   inicio_catalogo = perf_counter()
   catalogo = gerar_catalogo(min(orcamento - margem, teto_pc), teto_perifericos, excluidas,
                                 aparencia["gabinete_id"] if "gabinete" not in proprias else None, dados["utilidade"], cor=aparencia["cor"], aparencia=aparencia, rede=rede)
-  if acessorio_rede and rede.get("possuiAcessorio") is False:
-    catalogo[acessorio_rede] = PlanejarRedeService.opcoes(catalogo, rede, proprias)
+  for conexao in PlanejarRedeService.conexoes(rede):
+    for acessorio_rede in PlanejarRedeService.categorias(conexao):
+      catalogo[acessorio_rede] = PlanejarRedeService.opcoes(catalogo, conexao, proprias)
   logger.info("Geração: etapa=catalogo duracao_ms=%d categorias=%d", (perf_counter()-inicio_catalogo)*1000, len(catalogo))
   return catalogo
 

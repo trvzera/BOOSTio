@@ -1,3 +1,4 @@
+import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { htmlSeguro as h, moeda, nomePeca, perifericos, acessoriosRede } from "./catalogo.js";
 import { normalizarBuild, itensSelecionados } from "./estado.js";
 import { avaliarBuild } from "./compatibilidade.js";
@@ -25,11 +26,11 @@ function resumirBuild(build, catalogo) {
   const subtotal = precos.reduce((soma, { item, peca }) => soma + numero(peca.preco) * item.quantidade, 0);
 
   const rede = build.rede;
-  const redeDefinida = ["cabo", "wifi"].includes(rede?.tipo);
-  const categoriaRede = rede?.tipo === "cabo" ? "cabo_rede" : "adaptador_wifi";
+  const redeDefinida = ["cabo", "wifi", "ambos"].includes(rede?.tipo);
+  const categoriasRede = rede?.tipo === "ambos" ? ["cabo_rede","adaptador_wifi"] : [rede?.tipo === "cabo" ? "cabo_rede" : "adaptador_wifi"];
   const comprarRede = build.incluirRede && redeDefinida && rede.possuiAcessorio === false;
-  const redeSemCotacao = comprarRede && !de(categoriaRede).some(({peca}) => peca && numero(peca.preco) != null);
-  const redeAConfirmar = build.incluirRede && redeDefinida && rede.possuiAcessorio == null && !de(categoriaRede).length;
+  const redeSemCotacao = comprarRede && categoriasRede.some(tipo => !de(tipo).some(({peca}) => peca && numero(peca.preco) != null));
+  const redeAConfirmar = build.incluirRede && redeDefinida && rede.possuiAcessorio == null && categoriasRede.some(tipo => !de(tipo).length);
   const detalheRede = redeSemCotacao ? "Acessório de rede necessário, ainda sem cotação"
     : redeAConfirmar ? "Confirme se será necessário comprar um acessório de rede"
     : "";
@@ -155,8 +156,8 @@ export function abrirComparacao(builds, catalogo) {
     conteudo.innerHTML = '<section class="compare-selection"><h3 class="compare-section-title" tabindex="-1">Escolha suas builds</h3>'
       + '<p class="compare-help">Selecione duas ou três builds. Depois, você pode adicionar uma terceira ou remover uma das três nos resultados.</p>'
       + '<fieldset class="compare-options" aria-describedby="' + prefixo + '-feedback"><legend class="compare-legend">Builds disponíveis para comparação</legend>'
-      + dados.map((item, indice) => '<label class="compare-choice"><input class="compare-checkbox" type="checkbox" value="' + indice
-        + '"><span class="compare-choice-copy">' + cabecalho(item) + '</span></label>').join("") + '</fieldset>'
+      + dados.map((item, indice) => '<label class="compare-choice ui-check"><input class="compare-checkbox" type="checkbox" value="' + indice
+        + '">' + iconeAnimado("checkbox") + '<span class="compare-choice-copy">' + cabecalho(item) + '</span></label>').join("") + '</fieldset>'
       + '<div class="compare-actions">' + botao("Ver comparação", "compare-button-primary", 'data-compare-action="confirm" disabled') + '</div></section>';
     atualizarSelecao();
   }
@@ -245,6 +246,7 @@ export function abrirComparacao(builds, catalogo) {
     const indice = Number(caixa.value);
     if (caixa.checked && selecionadas.size === 3) {
       caixa.checked = false;
+      caixa.dispatchEvent(new Event("change"));
       anunciar("Limite de três builds. Desmarque uma antes de selecionar outra.");
       return;
     }
@@ -290,6 +292,7 @@ export function abrirComparacao(builds, catalogo) {
   document.body.append(dialogo);
   try {
     dialogo.showModal();
+    iniciarIcones(conteudo);
     focarTitulo();
   } catch (erro) {
     dialogo.remove();
