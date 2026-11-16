@@ -21,7 +21,7 @@ PRIVACY_TEXT = (
     "**Retenção:** os registros de boas-vindas permanecem durante sua participação para evitar duplicação. "
     "São removidos ao sair, ou na próxima sincronização completa se o bot estava desligado.\n\n"
     "**Movimentação:** se configurado, o canal privado da equipe recebe entrada/saída, username, "
-    "apelido e ID. Esses registros ficam no Discord até exclusão pela equipe e não são apagados "
+    "apelido, ID e foto de perfil exibida pelo Discord. Esses registros ficam no Discord até exclusão pela equipe e não são apagados "
     "pelo comando de exclusão local. Para solicitar sua remoção, procure a equipe.\n\n"
     "**Mensagens:** quando configurado, edições e exclusões em canais da comunidade são registradas "
     "no canal privado da equipe, com autor, IDs e trechos do texto disponíveis. Até 1.000 mensagens "
