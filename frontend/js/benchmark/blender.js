@@ -10,19 +10,20 @@ export function mensagemFalhaBlender(erro) {
   return mensagem + (referencia.length ? " Referência: " + referencia.join(" · ") + "." : "");
 }
 
-export function painelBlenderHtml(dispositivos) {
+export function painelBlenderHtml(dispositivos,{prefixo = "blender"} = {}) {
+  const id = nome => h(prefixo + "-" + nome);
   return '<section class="blender-panel" aria-label="Desempenho de renderização no Blender"><p class="planning-help">Consulte resultados públicos de uma peça, sem executar testes no seu computador.</p>' +
-    '<form id="blender-form"><label class="test-field" for="blender-device">Dispositivo de renderização<select id="blender-device">' +
+    '<form id="' + id("form") + '"><label class="test-field" for="' + id("device") + '">Dispositivo de renderização<select id="' + id("device") + '">' +
     Object.entries(dispositivos).filter(([,nome]) => nome).map(([tipo,nome]) => '<option value="' + tipo + '">' + tipo.toUpperCase() + ' · ' + h(nome) + '</option>').join("") +
     '</select></label><button type="submit" class="btn-primary" aria-label="Consultar desempenho no Blender" ' +
     (!dispositivos.cpu && !dispositivos.gpu ? 'disabled data-disabled-reason="Não há CPU ou GPU com identificação cadastrada para o Blender."' : '') + '>Consultar Blender</button></form>' +
-    '<p class="test-feedback" role="status" aria-live="polite" id="blender-feedback">' + (!dispositivos.cpu && !dispositivos.gpu ? 'Identifique uma CPU ou GPU no catálogo para consultar seus resultados.' : '') + '</p>' +
-    '<div id="blender-result" aria-live="polite"></div><p class="planning-help">A pontuação representa renderização no Cycles, não FPS. CPU e GPU não são somadas. RAM, VRAM, drivers e a cena alteram o resultado real; a fonte pode agrupar variantes do mesmo nome.</p>' +
+    '<p class="test-feedback" data-blender-feedback role="status" aria-live="polite" id="' + id("feedback") + '">' + (!dispositivos.cpu && !dispositivos.gpu ? 'Identifique uma CPU ou GPU no catálogo para consultar seus resultados.' : '') + '</p>' +
+    '<div id="' + id("result") + '" data-blender-result aria-live="polite"></div><p class="planning-help">A pontuação representa renderização no Cycles, não FPS. CPU e GPU não são somadas. RAM, VRAM, drivers e a cena alteram o resultado real; a fonte pode agrupar variantes do mesmo nome.</p>' +
     '<p class="fpshq-attribution">Fonte: <a href="https://opendata.blender.org/about/" target="_blank" rel="noopener noreferrer" aria-label="Ver metodologia do Blender Open Data em nova aba">Blender Open Data</a></p></section>';
 }
 
-export function iniciarPainelBlender(raiz,dispositivos,{cliente = criarClienteBenchmark()} = {}) {
-  const form = raiz.querySelector("#blender-form"), feedback = raiz.querySelector("#blender-feedback"), resultado = raiz.querySelector("#blender-result");
+export function iniciarPainelBlender(raiz,dispositivos,{cliente = criarClienteBenchmark(),prefixo = "blender"} = {}) {
+  const form = raiz.querySelector("#" + prefixo + "-form"), feedback = raiz.querySelector("#" + prefixo + "-feedback"), resultado = raiz.querySelector("#" + prefixo + "-result");
   const botao = form.querySelector('button[type="submit"]'), controle = new AbortController();
   let ativo = true, ocupado = false, espera = 0, timer;
   form.addEventListener("submit",async evento => {

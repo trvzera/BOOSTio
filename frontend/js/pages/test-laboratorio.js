@@ -29,7 +29,7 @@ if (navegacao) {
         alvo.dataset.loaded = "true";
         iniciarIcones(alvo);
       } catch {
-        alvo.innerHTML = '<p class="font-2-s" role="status">Não foi possível carregar a prévia da equipe. Confira a conexão e tente novamente.</p><button type="button" class="btn-secondary" data-lab-team-retry>Tentar novamente</button>';
+        alvo.innerHTML = '<p class="font-2-s" role="status">Não foi possível carregar a prévia da equipe. Confira a conexão e tente novamente.</p><button type="button" class="btn-secondary" data-lab-team-retry aria-label="Tentar carregar a prévia da equipe novamente">Tentar novamente</button>';
         alvo.querySelector("[data-lab-team-retry]").addEventListener("click", carregarEquipe);
       } finally {
         equipePendente = null;

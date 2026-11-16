@@ -1,9 +1,9 @@
 import { htmlSeguro as h } from "../build/catalogo.js";
 
-export function painelBenchmarkHtml({prefixo = "fpshq",hardware = "",memoria = null,verificarRequisitos = false} = {}) {
+export function painelBenchmarkHtml({prefixo = "fpshq",hardware = "",memoria = null,verificarRequisitos = false,mostrarHardware = true} = {}) {
   const id = nome => h(prefixo + "-" + nome);
   return '<section class="fpshq-panel benchmark-panel" data-layout="cards" aria-label="Consulta de desempenho esperado">'
-    + '<p class="fpshq-hardware">' + h(hardware) + (memoria != null ? '<span data-benchmark-ram>' + h(memoria) + ' GB de RAM · não avaliada na estimativa</span>' : verificarRequisitos ? '<span data-benchmark-ram>Capacidade total de RAM a confirmar</span>' : '') + '</p>'
+    + (mostrarHardware ? '<p class="fpshq-hardware">' + h(hardware) + (memoria != null ? '<span data-benchmark-ram>' + h(memoria) + ' GB de RAM · não avaliada na estimativa</span>' : verificarRequisitos ? '<span data-benchmark-ram>Capacidade total de RAM a confirmar</span>' : '') + '</p>' : '')
     + '<div class="fpshq-workspace"><div class="fpshq-controls"><form id="' + id("test-form") + '">'
     + '<div class="test-field-row fpshq-fields"><label class="test-field" for="' + id("game") + '">Jogo<select id="' + id("game") + '" required></select></label>'
     + '<label class="test-field" for="' + id("resolution") + '">Resolução<select id="' + id("resolution") + '"><option value="1080p">1080p</option><option value="1440p">1440p</option><option value="4k">4K</option></select></label>'
