@@ -11,6 +11,7 @@ def registrar_comandos_mercadolivre(app):
     @app.cli.command('mercadolivre-importar-pendencias')
     @click.option('--limite', default=20, type=click.IntRange(1, 200))
     @click.option('--depois-id', default=0, type=click.IntRange(min=0))
+    @click.option('--categoria', default=None, help='Revisa só as pendências desta categoria.')
     @click.option('--max-requisicoes', default=50, type=click.IntRange(min=1))
     @click.option('--intervalo', default=1.0, type=click.FloatRange(min=0.1))
     @click.option('--permitir-novos', is_flag=True, help='Permite criar componentes com identidade e ficha completas.')

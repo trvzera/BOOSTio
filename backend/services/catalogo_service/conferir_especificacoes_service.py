@@ -215,6 +215,8 @@ class ConferirEspecificacoesService:
                     conferidos.append(campo);continue
             if campo=='formato' and local=='m.2' and len(observados)==1 and next(iter(observados)).startswith('m.2'):
                 conferidos.append(campo);continue
+            if campo=='clockbase' and len(observados)==1 and next(iter(observados))<local:
+                continue  # CPU híbrida: o anúncio pode informar o clock base dos núcleos de eficiência, menor que o dos de desempenho
             if observados!={local}:conflitos.append('especificacao_divergente:'+campo)
             else:conferidos.append(campo)
             if campo in titulo:

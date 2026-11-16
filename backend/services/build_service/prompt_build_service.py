@@ -13,6 +13,7 @@ from services.build_service.planejar_rede_service import PlanejarRedeService
 from services.build_service.preferencias_gabinete_service import PreferenciasGabineteService
 from services.build_service.preferencias_processador_service import PreferenciasProcessadorService
 from services.validacoes_service.requisitos_uso_service import RequisitosUsoService
+from services.validacoes_service.conferir_placa_video_service import ConferirPlacaVideoService
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +96,7 @@ def criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None
   restricoes = {"pares_por_socket_apenas": pares,
                 "gpu_dedicada_exigida_pelo_uso": RequisitosUsoService.exige_gpu_dedicada(dados["utilidade"]),
                 "comprar_gpu_para_trabalho_pesado": RequisitosUsoService.exige_gpu_dedicada(dados["utilidade"]) and "placa_video" not in proprias,
+                "comprar_gpu_dedicada_pelo_orcamento": ConferirPlacaVideoService.exige(dados["utilidade"], orcamento) and "placa_video" not in proprias,
                 "acessorio_rede_obrigatorio": comprar_rede,
                 "planejamento_rede": plano_rede,
                 "categorias_rede_proibidas": sorted({"adaptador_wifi", "cabo_rede"} - permitidas_rede)}
@@ -135,7 +137,8 @@ def criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None
     )
   regra_perifericos = (
     "Complete monitor, teclado, mouse e fone (headset), exceto os já possuídos; "
-    "escolha itens adequados ao uso sem ultrapassar o teto reservado, nem tentar consumi-lo exatamente. "
+    "escolha itens adequados ao uso sem ultrapassar o teto reservado, nem tentar consumi-lo exatamente, "
+    "mas prefira o conjunto de maior pontuação em vez do mais barato. "
     "Qualquer sobra permanece com o usuário; nunca a transfira para o PC."
     if percentual else "Não inclua periféricos novos. Preserve apenas os que o usuário já possui."
   )
@@ -384,6 +387,9 @@ def criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None
       "e redirecione o orçamento para as peças obrigatórias, "
       "a menos que o uso exija GPU dedicada (por exemplo, jogos pesados, "
       "renderização 3D ou aceleração por GPU citada no pedido).\n"
+      "- Se restricoes.comprar_gpu_dedicada_pelo_orcamento for true (jogos ou trabalho pesado com orçamento "
+      "a partir de R$ 4000), inclua obrigatoriamente uma placa_video dedicada do catálogo, mesmo com vídeo "
+      "integrado na CPU (inclusive Ryzen G).\n"
       "- Uma placa_video própria já satisfaz a necessidade de GPU dedicada: preserve-a "
       "mesmo com CPU sem vídeo integrado e NÃO inclua outra placa_video no JSON. "
       "Só compre GPU se ela faltar nas peças próprias e o vídeo/uso exigir.\n\n"
@@ -424,7 +430,9 @@ def criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None
       "e copie seus IDs/quantidades para componentes. O total de cada conjunto já foi somado: "
       "é o conjunto inteiro que cabe na reserva, não uma reserva separada para cada periférico. "
       "Não combine o monitor de um conjunto com todos os acessórios mais caros de outros. "
-      "A lista é uma referência de viabilidade, não um ranking de qualidade por preço. "
+      "A lista traz primeiro os conjuntos que atendem às preferências de uso e cor e, depois, "
+      "segue a pontuação de qualidade (0 a 100, maior é melhor); "
+      "escolha o primeiro conjunto adequado ao uso, só descendo na lista se houver motivo claro. "
       "Exemplo: R$ 3.000 com 20% significa PC+rede até R$ 2.400 e TODOS os periféricos "
       "juntos até R$ 600. Se já possui RTX 4060, não compre outra GPU nem desconte seu valor "
       "dos R$ 3.000. Um adaptador Wi-Fi novo entra nos R$ 2.400, não nos R$ 600.\n"

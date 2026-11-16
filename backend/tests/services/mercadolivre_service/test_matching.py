@@ -130,3 +130,16 @@ def test_migracao_gtin_preserva_identidade_antiga():
         assert preparar_identidades_fabricante()=={'criadas':[]}
         assert IdentidadeFabricante.query.one().mpn=='SKU' and IdentidadeFabricante.query.one().gtin is None
         db.session.remove();db.engine.dispose()
+
+
+def test_clock_base_menor_do_anuncio_em_cpu_hibrida_nao_rejeita_mpn_igual():
+    dados=json.loads((Path(__file__).parents[2]/'fixtures/matching_catalogos_reais.json').read_text())
+    a=next(d for d in dados if d['mpn']=='BX8071512900K')
+    s=CompararProdutosService()
+    def avaliar(clockbase):
+        especificacoes={**a['especificacoes'],'clockbase':clockbase}
+        p=SimpleNamespace(__tablename__=a['categoria'],id=1,fabricante=a['fabricante'],modelo=a['modelo'],part_number=a['mpn'],**especificacoes)
+        return s.avaliar(p,a['produto'])
+    assert avaliar(3.2)['classificacao']!='rejeitada'
+    maior=avaliar(1.8)
+    assert 'especificacao_divergente:clockbase' in maior['conflitos']

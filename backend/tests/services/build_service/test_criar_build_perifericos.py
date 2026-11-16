@@ -60,7 +60,8 @@ class CriarBuildPerifericosTest(unittest.TestCase):
             tipo_painel="IPS",
         )
         modelo = SimpleNamespace(__tablename__="monitor", listar_disponiveis_ate=lambda *args, **kwargs: [monitor])
-        with patch("services.build_service.catalogo_geracao_service.MODELOS_PECAS", (modelo,)):
+        with patch("services.build_service.catalogo_geracao_service.MODELOS_PECAS", (modelo,)), \
+             patch("services.build_service.preco_exibido_service.Oferta.anexar_a_catalogo", side_effect=lambda pecas: pecas):
             catalogo = gerar_catalogo(1000, reserva_perifericos=1000)
         self.assertEqual(json.loads(json.dumps(catalogo))["monitor"][0]["tamanho_polegadas"], 23.8)
 

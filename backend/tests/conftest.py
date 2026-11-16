@@ -1,9 +1,17 @@
 import pytest
-from compat_oferta import instalar as _instalar_compat_oferta
+from .compat_oferta import instalar as _instalar_compat_oferta
 
 _instalar_compat_oferta()
 from models import Usuario
 from werkzeug.security import generate_password_hash
+
+
+@pytest.fixture(autouse=True)
+def isolar_fontes_externas_do_env(monkeypatch):
+    """O .env de desenvolvimento ativa Icecat e páginas de fabricantes; os testes não dependem dele."""
+    for nome in ("ICECAT_INDICE", "ICECAT_USUARIO", "ICECAT_SENHA", "ICECAT_PASTA_FICHAS", "FABRICANTES_HABILITADOS"):
+        monkeypatch.delenv(nome, raising=False)
+
 
 @pytest.fixture
 def mock_usuario_salvar(mocker):

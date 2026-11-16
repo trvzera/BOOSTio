@@ -21,6 +21,7 @@ from .planejar_orcamento_componentes_service import PlanejarOrcamentoComponentes
 from .planejar_armazenamento_service import PlanejarArmazenamentoService
 from .ajustar_orcamento_build_service import AjustarOrcamentoBuildService
 from .preferencias_processador_service import PreferenciasProcessadorService
+from .preco_exibido_service import PrecoExibidoService
 
 
 class SeletorInteligenteService:
@@ -89,7 +90,7 @@ class SeletorInteligenteService:
                                       perifericos, planejamento_componentes=resultado["planejamento_orcamento"],
                                       preferencia_neutra=True)
         return {**resultado, "catalogo": catalogo, "prompt": prompt, "proprias": proprias,
-                "detalhes_proprias": detalhes}
+                "detalhes_proprias": detalhes, "plano_perifericos": perifericos}
 
     def _catalogo_reparo(self, contexto, selecionados, excluidas):
         catalogo = {}
@@ -203,7 +204,7 @@ class SeletorInteligenteService:
                          and p.benchmark_versao is None]
                 if pecas:
                     contexto["fallbacks_benchmark"].add(modelo.__tablename__)
-            pools[modelo.__tablename__] = [p.to_catalogo() for p in pecas]
+            pools[modelo.__tablename__] = PrecoExibidoService.catalogo(pecas, teto)
         for tipo in ("cabo_rede", "adaptador_wifi"):
             if contexto["rede"]:
                 pools[tipo] = [p for conexao in PlanejarRedeService.conexoes(contexto["rede"])
