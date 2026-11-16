@@ -8,11 +8,13 @@
   <script type="module" src="./js/pages/loading.js" defer></script>
   <script type="module" src="./js/pages/testes.js" defer></script>
   <script type="module" src="./js/pages/test-benchmark.js" defer></script>
+  <script type="module" src="./js/pages/test-benchmark-panel.js" defer></script>
   <script type="module" src="./js/pages/test-price-history.js" defer></script>
   <link rel="icon" type="image/webp" href="./imgs/favicon.webp">
   <link rel="stylesheet" href="./styles/style.css">
   <noscript><link rel="stylesheet" href="./styles/componentes/no-script.css"></noscript>
   <link rel="stylesheet" href="./styles/paginas/testes.css">
+  <link rel="stylesheet" href="./styles/paginas/test-benchmark-panel.css">
   <meta name="description" content="Laboratório de interfaces da BOOSTio: testes de comparação de builds, orçamento, melhorias e desempenho esperado em jogos.">
   <meta name="robots" content="noindex,nofollow">
   <link rel="preload" href="./fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
@@ -43,6 +45,38 @@
     <span class="test-kicker font-1-xs">Laboratório BOOSTio</span>
     <h1 class="font-1-xxl">Experimente novos recursos</h1>
     <p class="font-2-s">Teste a aparência de novos recursos antes de levá-los ao site: desempenho, comparação de builds e budget no perfil. O menu hamburger permanece visível aqui mesmo sem login.</p>
+    <nav class="lab-preview-nav" aria-label="Exemplos do laboratório">
+      <a href="#teste-painel-benchmark">Painel de desempenho</a>
+      <a href="#teste-comparacao">Comparação</a>
+      <a href="#teste-prontas">Builds prontas</a>
+      <a href="#teste-historico-precos">Histórico de preços</a>
+      <a href="#teste-contato">Contato</a>
+      <a href="#teste-budget">Budget</a>
+      <a href="#teste-melhorias">Melhorias</a>
+      <a href="#teste-desempenho">Diagnóstico da API</a>
+      <a href="./pages/sobre.html#company-team">Equipe · Sobre nós</a>
+    </nav>
+    <section class="test-feature" id="teste-painel-benchmark" aria-labelledby="benchmark-preview-title">
+      <div class="test-feature-head">
+        <span class="test-kicker font-1-xs">Prévia · novo painel de desempenho</span>
+        <h2 class="font-1-xl" id="benchmark-preview-title">Seu setup, em perspectiva.</h2>
+        <p class="font-2-s">Veja a expectativa nos jogos ou consulte o desempenho de renderização, sem sair do painel.</p>
+      </div>
+      <div class="benchmark-preview-shell glass-card">
+        <header class="benchmark-preview-build">
+          <div><p class="benchmark-preview-eyebrow">Configuração de exemplo</p><h3>Meu setup gamer</h3></div>
+          <span class="benchmark-preview-badge">Prévia</span>
+        </header>
+        <dl class="benchmark-preview-hardware"><div><dt>Processador</dt><dd>Ryzen 5 5600</dd></div><div><dt>Placa de vídeo</dt><dd>GeForce RTX 3060</dd></div><div><dt>Memória</dt><dd>16 GB de RAM</dd></div></dl>
+        <div class="builds-page-switch benchmark-preview-tabs" role="tablist" aria-label="Tipo de desempenho">
+          <button type="button" role="tab" id="preview-fps-tab" aria-controls="preview-fps-panel" aria-selected="true" tabindex="0"><span class="ui-lottie" data-lottie="gamepad" aria-hidden="true"></span>Jogos / FPS</button>
+          <button type="button" role="tab" id="preview-blender-tab" aria-controls="preview-blender-panel" aria-selected="false" tabindex="-1"><span class="ui-lottie" data-lottie="microchip" aria-hidden="true"></span>Blender</button>
+        </div>
+        <section id="preview-fps-panel" role="tabpanel" aria-labelledby="preview-fps-tab" tabindex="0"></section>
+        <section id="preview-blender-panel" role="tabpanel" aria-labelledby="preview-blender-tab" tabindex="0" hidden></section>
+        <p class="benchmark-preview-footnote">Nenhum teste é executado no seu computador. Os resultados dependem das fontes consultadas e podem variar conforme as peças e configurações.</p>
+      </div>
+    </section>
     <section class="home-contact" id="teste-contato" aria-labelledby="home-contact-title">
       <div class="home-contact-layout">
         <div class="home-contact-copy">
