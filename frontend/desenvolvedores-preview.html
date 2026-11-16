@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quem faz a BOOSTio — Prévia</title>
+  <meta name="description" content="Conheça Giovanni Trivellato e Gustavo Azevedo, os desenvolvedores da BOOSTio.">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" type="image/webp" href="./imgs/favicon.webp">
+  <link rel="stylesheet" href="./styles/style.css">
+  <link rel="stylesheet" href="./styles/paginas/desenvolvedores-preview.css">
+  <link rel="preload" href="./fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <script type="module">
+    import "./js/header.js";
+    import { iniciarIcones } from "./js/components/ui.js";
+    iniciarIcones(document.querySelector("#developers-main"));
+  </script>
+</head>
+<body class="developers-preview-page">
+  <a class="skip-link" href="#developers-main">Pular para o conteúdo principal</a>
+  <div data-site-navigation></div>
+  <main id="developers-main" class="developers-main" tabindex="-1">
+    <a class="developers-back" href="./pages/index.html">
+      <span class="ui-lottie" data-lottie="arrow" data-direction="back" aria-hidden="true"><span class="ui-icon-fallback">→</span></span>
+      Conheça a BOOSTio
+    </a>
+    <header class="developers-hero">
+      <div>
+        <p class="developers-eyebrow">Quem faz a BOOSTio</p>
+        <h1>Tecnologia com<br><span>gente por trás.</span></h1>
+      </div>
+      <p class="developers-intro">Duas pessoas, diferentes especialidades e uma ideia em comum: tornar a escolha do seu próximo computador mais simples.</p>
+    </header>
+
+    <section class="developers-grid" aria-label="Os desenvolvedores da BOOSTio">
+      <article class="developer-card" aria-labelledby="giovanni-name">
+        <header class="developer-identity">
+          <!-- Substitua o monograma por uma foto: <img src="./imgs/equipe/giovanni.webp" alt="Giovanni Trivellato" width="112" height="112"> -->
+          <div class="developer-photo" role="img" aria-label="Giovanni Trivellato, foto a adicionar"><span aria-hidden="true">GT</span></div>
+          <div>
+            <p class="developer-area">Experiência e identidade</p>
+            <h2 id="giovanni-name">Giovanni<br>Trivellato</h2>
+          </div>
+        </header>
+        <p class="developer-bio">Da primeira impressão à última interação. Cuido de como a BOOSTio se apresenta, funciona na tela e conversa com a comunidade.</p>
+        <dl class="developer-responsibilities">
+          <div><dt>Frontend e design</dt><dd>Interface do site, experiência de uso e identidade visual da marca.</dd></div>
+          <div><dt>Comunicação</dt><dd>Criação da marca e do Instagram da BOOSTio.</dd></div>
+          <div><dt>Discord e BOTio</dt><dd>Servidor da comunidade e desenvolvimento do bot do Discord.</dd></div>
+          <div><dt>Direito e tecnologia</dt><dd>Termos, privacidade e informações para o usuário.</dd></div>
+        </dl>
+        <footer class="developer-links" aria-label="Links de Giovanni Trivellato">
+          <div class="developer-buttons">
+            <button class="developer-link-primary" type="button" disabled title="Link do portfólio a definir">Portfólio <span class="ui-lottie" data-lottie="arrow" data-direction="external" aria-hidden="true"><span class="ui-icon-fallback">↗</span></span></button>
+            <button class="developer-link-secondary" type="button" disabled title="Link do GitHub a definir"><img src="./svgs/github.svg" width="18" height="18" alt="">GitHub</button>
+          </div>
+          <button class="developer-personal-site" type="button" disabled title="Link do site pessoal a definir">Visite meu site pessoal <span class="ui-lottie" data-lottie="arrow" data-direction="external" aria-hidden="true"><span class="ui-icon-fallback">↗</span></span></button>
+        </footer>
+      </article>
+
+      <article class="developer-card" aria-labelledby="gustavo-name">
+        <header class="developer-identity">
+          <!-- Substitua o monograma por uma foto: <img src="./imgs/equipe/gustavo.webp" alt="Gustavo Azevedo" width="112" height="112"> -->
+          <div class="developer-photo developer-photo-backend" role="img" aria-label="Gustavo Azevedo, foto a adicionar"><span aria-hidden="true">GA</span></div>
+          <div>
+            <p class="developer-area">Lógica e estrutura</p>
+            <h2 id="gustavo-name">Gustavo<br>Azevedo</h2>
+          </div>
+        </header>
+        <p class="developer-bio">Por trás de cada escolha, existe uma estrutura. Cuido do backend e dos dados que fazem as funcionalidades da BOOSTio acontecerem.</p>
+        <dl class="developer-responsibilities">
+          <div><dt>Backend e API</dt><dd>Serviços, integrações e funcionamento do sistema no servidor.</dd></div>
+          <div><dt>Lógica do sistema</dt><dd>Regras e processamento das informações da plataforma.</dd></div>
+          <div><dt>Banco de dados</dt><dd>Organização, consultas e armazenamento dos dados do projeto.</dd></div>
+          <div><dt>Telegram</dt><dd>Criação do grupo de promoções da BOOSTio.</dd></div>
+        </dl>
+        <footer class="developer-links" aria-label="Links de Gustavo Azevedo">
+          <div class="developer-buttons">
+            <button class="developer-link-primary" type="button" disabled title="Link do portfólio a definir">Portfólio <span class="ui-lottie" data-lottie="arrow" data-direction="external" aria-hidden="true"><span class="ui-icon-fallback">↗</span></span></button>
+            <button class="developer-link-secondary" type="button" disabled title="Link do GitHub a definir"><img src="./svgs/github.svg" width="18" height="18" alt="">GitHub</button>
+          </div>
+        </footer>
+      </article>
+    </section>
+
+    <section class="developers-together" aria-labelledby="developers-together-title">
+      <div><p class="developers-eyebrow">Feito em conjunto</p><h2 id="developers-together-title">Do primeiro esboço<br>à sua próxima <span>build.</span></h2></div>
+      <div><p>Design e desenvolvimento trabalham juntos para transformar as suas necessidades em um setup que faça sentido.</p>
+        <a href="mailto:contato@boostio.com.br" class="developers-contact">Fale com a equipe <span class="ui-lottie" data-lottie="arrow" data-direction="external" aria-hidden="true"><span class="ui-icon-fallback">↗</span></span></a>
+      </div>
+    </section>
+    <div class="developers-page-footer"><span>© 2026 BOOSTio</span><span>Um projeto de Giovanni e Gustavo.</span></div>
+  </main>
+</body>
+</html>
