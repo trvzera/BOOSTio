@@ -7,7 +7,7 @@
 .home-contact-email { display: inline-flex; align-items: center; gap: 12px; }
 .home-contact-address { display: block; margin-top: var(--espacamento-16); color: var(--cor-4); overflow-wrap: anywhere; }
 .home-contact-channels { min-width: 0; }
-.home-contact-channel { display: grid; grid-template-columns: 28px minmax(0,1fr) 20px; align-items: center; gap: 20px; padding-block: 28px; border-bottom: 1px solid var(--cor-2); color: var(--cor-6); text-decoration: none; }
+.home-contact-channel { display: grid; grid-template-columns: 28px minmax(0,1fr) 20px; align-items: center; gap: 20px; padding-block: 28px; border-bottom: 1px solid var(--cor-2); color: var(--cor-6); text-decoration: none; transition: 0.3s ease;}
 .home-contact-channel:first-child { border-top: 1px solid var(--cor-2); }
 .home-contact-icon { width: 28px; height: 28px; }
 .home-contact-channel h3 { margin: 0 0 6px; font-weight: 400; }

@@ -113,12 +113,12 @@ test("cache de reserva tem aviso visível sem precisar expandir os detalhes",() 
   assert.ok(html.includes('não foram atualizados'));
 });
 test("produção mantém cliente Python e diagnóstico direto fica restrito ao laboratório",async () => {
-  for (const arquivo of ["../js/build/acoes-build.js","../js/benchmark/interface.js"])
+  for (const arquivo of ["../js/build/acoes-build.js","../js/benchmark/dashboard.js","../js/benchmark/interface.js"])
     assert.doesNotMatch(await readFile(new URL(arquivo,import.meta.url),"utf8"),/experimentos\/fpshq|criarClienteFPSHQ/);
   const laboratorio = await readFile(new URL("../js/pages/test-benchmark.js",import.meta.url),"utf8");
   assert.match(laboratorio,/experimentos\/benchmark-diagnostico/);
   const acoes = await readFile(new URL("../js/build/acoes-build.js",import.meta.url),"utf8");
-  assert.match(acoes,/iniciarPainelBenchmark\(dialogo/);
+  assert.match(acoes,/iniciarDashboardBenchmark\(dialogo/);
   assert.doesNotMatch(acoes,/Estimativas de FPS em breve/);
 });
 test("dots acompanha apenas o estado do menu e a tela de erro evita retorno duplicado",async () => {
