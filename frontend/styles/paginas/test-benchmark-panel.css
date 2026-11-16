@@ -1,6 +1,10 @@
 .lab-preview-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 28px 0 0; }
 .lab-preview-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--glass-border); border-radius: var(--radius-control); color: var(--text-secondary); font-size: .75rem; }
 .lab-preview-nav a:hover, .lab-preview-nav a:focus-visible { color: var(--cor-6); border-color: var(--text-accent); }
+.lab-preview-nav a[aria-selected="true"] { color: var(--text-accent); background: #007bff17; border-color: #007bff55; }
+.menu-test-page [data-lab-panel][hidden] { display: none !important; }
+.menu-test-page [data-lab-panel] { scroll-margin-top: 100px; }
+.menu-test-page #teste-equipe .company-team { padding-bottom: 20px; }
 .benchmark-preview-shell { padding: 32px; border: 1px solid var(--glass-border); border-radius: var(--radius-card); }
 .benchmark-preview-build { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .benchmark-preview-eyebrow { margin-bottom: 6px; color: var(--text-secondary); font-size: .75rem; }

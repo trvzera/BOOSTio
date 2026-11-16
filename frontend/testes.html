@@ -10,11 +10,13 @@
   <script type="module" src="./js/pages/test-benchmark.js" defer></script>
   <script type="module" src="./js/pages/test-benchmark-panel.js" defer></script>
   <script type="module" src="./js/pages/test-price-history.js" defer></script>
+  <script type="module" src="./js/pages/test-laboratorio.js" defer></script>
   <link rel="icon" type="image/webp" href="./imgs/favicon.webp">
   <link rel="stylesheet" href="./styles/style.css">
   <noscript><link rel="stylesheet" href="./styles/componentes/no-script.css"></noscript>
   <link rel="stylesheet" href="./styles/paginas/testes.css">
   <link rel="stylesheet" href="./styles/paginas/test-benchmark-panel.css">
+  <link rel="stylesheet" href="./styles/paginas/equipe.css">
   <meta name="description" content="Laboratório de interfaces da BOOSTio: testes de comparação de builds, orçamento, melhorias e desempenho esperado em jogos.">
   <meta name="robots" content="noindex,nofollow">
   <link rel="preload" href="./fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
@@ -44,9 +46,10 @@
   <main id="main-content" class="test-main" tabindex="-1">
     <span class="test-kicker font-1-xs">Laboratório BOOSTio</span>
     <h1 class="font-1-xxl">Experimente novos recursos</h1>
-    <p class="font-2-s">Teste a aparência de novos recursos antes de levá-los ao site: desempenho, comparação de builds e budget no perfil. O menu hamburger permanece visível aqui mesmo sem login.</p>
+    <p class="font-2-s">Escolha uma prévia para experimentar o visual e as interações. Os exemplos abrem aqui mesmo, sem precisar sair desta página.</p>
     <nav class="lab-preview-nav" aria-label="Exemplos do laboratório">
       <a href="#teste-painel-benchmark">Painel de desempenho</a>
+      <a href="#teste-equipe">Desenvolvedores</a>
       <a href="#teste-comparacao">Comparação</a>
       <a href="#teste-prontas">Builds prontas</a>
       <a href="#teste-historico-precos">Histórico de preços</a>
@@ -54,7 +57,7 @@
       <a href="#teste-budget">Budget</a>
       <a href="#teste-melhorias">Melhorias</a>
       <a href="#teste-desempenho">Diagnóstico da API</a>
-      <a href="./pages/sobre.html#company-team">Equipe · Sobre nós</a>
+      <a href="#teste-componentes">Outros controles</a>
     </nav>
     <section class="test-feature" id="teste-painel-benchmark" aria-labelledby="benchmark-preview-title">
       <div class="test-feature-head">
@@ -76,6 +79,12 @@
         <section id="preview-blender-panel" role="tabpanel" aria-labelledby="preview-blender-tab" tabindex="0" hidden></section>
         <p class="benchmark-preview-footnote">Nenhum teste é executado no seu computador. Os resultados dependem das fontes consultadas e podem variar conforme as peças e configurações.</p>
       </div>
+    </section>
+    <section class="test-feature" id="teste-equipe" aria-label="Prévia dos desenvolvedores">
+      <div data-lab-team-preview>
+        <p class="font-2-s" role="status">Selecione Desenvolvedores para abrir a prévia da equipe aqui.</p>
+      </div>
+      <p class="test-muted font-2-xs">Esta é a mesma seção apresentada na página <a href="./pages/sobre.html#company-team">Sobre nós</a>.</p>
     </section>
     <section class="home-contact" id="teste-contato" aria-labelledby="home-contact-title">
       <div class="home-contact-layout">
@@ -109,7 +118,7 @@
       <noscript><p class="font-2-xs">Ative o JavaScript para visualizar o gráfico demonstrativo.</p></noscript>
     </section>
 
-    <div class="test-panels">
+    <div class="test-panels" id="teste-componentes">
       <section class="test-panel glass-card"><h2 class="font-1-l">Editor da build</h2><p class="font-2-xs">Selecione as peças e confira o resumo da configuração.</p><a class="btn-secondary" href="./pages/configuracao-build.html" aria-label="Abrir editor da build">Abrir editor</a></section>
       <section class="test-panel glass-card"><h2 class="font-1-l">Componentes</h2><p class="font-2-xs">Veja o catálogo de peças e as informações técnicas.</p><a class="btn-ghost" href="./pages/pecas.html?categoria=processador" aria-label="Ver processadores no catálogo">Ver processadores</a></section>
       <section class="test-panel glass-card"><h2 class="font-1-l">Teste anterior</h2><div class="login-divider"><span class="login-line"></span><p class="font-1-s">Ou se preferir</p><span class="login-line"></span></div><button class="btn-login-secondary" type="button" aria-label="Logar com Google (demonstração)">Logar com Google</button></section>
