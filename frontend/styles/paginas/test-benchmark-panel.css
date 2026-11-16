@@ -5,3 +5,15 @@
 .menu-test-page [data-lab-panel][hidden] { display: none !important; }
 .menu-test-page [data-lab-panel] { scroll-margin-top: 100px; }
 .menu-test-page #teste-equipe .company-team { padding-bottom: 20px; }
+.preview-generation-card, .preview-case-card { margin-top: 24px; padding: clamp(16px,3vw,28px); min-width: 0; }
+.preview-generation-card > p, .preview-case-card > p { margin: 14px 0; color: var(--text-secondary); line-height: 1.8; }
+.preview-case-feedback { margin: 20px 0; padding: 16px; border: 1px solid var(--status-warning); border-radius: 16px; color: var(--cor-6); font: 400 .875rem/1.8 var(--font-body); }
+.preview-case-feedback[hidden] { display: none; }
+.preview-case-summary { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--glass-border); }
+.preview-case-summary summary { min-height: 44px; cursor: pointer; }
+.preview-case-summary p { color: var(--text-secondary); line-height: 1.8; }
+[data-preview-case-summary] { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 20px; margin-top: 20px; }
+[data-preview-case-summary] ul { list-style: none; padding: 0; }
+[data-preview-case-summary] li { display: grid; gap: 4px; padding: 12px 0; border-bottom: 1px solid var(--glass-border); font: 400 .75rem/1.6 var(--font-body); }
+[data-preview-case-summary] strong { color: var(--text-accent); font-weight: 400; }
+@media(max-width:650px) { [data-preview-case-summary] { grid-template-columns: 1fr; } }

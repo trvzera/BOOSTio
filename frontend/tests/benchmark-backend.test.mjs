@@ -123,7 +123,7 @@ test("produção mantém cliente Python e diagnóstico direto fica restrito ao l
 });
 test("dots acompanha apenas o estado do menu e a tela de erro evita retorno duplicado",async () => {
   const ui = await readFile(new URL("../js/components/ui.js",import.meta.url),"utf8");
-  assert.match(ui,/const alternavel = \[[^\]]*"dots"[^\]]*\]/);
+  assert.match(ui,/const alternavel = (?:radio \|\| )?\[[^\]]*"dots"[^\]]*\]/);
   assert.match(ui,/if \(!alternavel \|\| elemento\.dataset\.lottie === "profile"\)/);
   const erro = await readFile(new URL("../pages/erro.html",import.meta.url),"utf8");
   assert.match(erro,/<button[^>]*id="error-back"[^>]*\bhidden/);

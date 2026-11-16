@@ -18,13 +18,13 @@ class AmostrarCatalogoService:
         "gabinete": ("formato", "painel_vidro", "fans_inclusos"),
     }
 
-    def executar(self, tipo, pecas, limite=12, utilidade="", cor="sem-preferencia"):
+    def executar(self, tipo, pecas, limite=12, utilidade="", cor="sem-preferencia", preferencia_processador=None):
         ordenadas = sorted(pecas, key=lambda p: (Decimal(str(p["preco"])), p["id"]))
         if len(ordenadas) <= limite:
             return ordenadas
         escolhidas = {ordenadas[0]["id"]: ordenadas[0], ordenadas[-1]["id"]: ordenadas[-1]}
         if tipo == "processador":
-            for peca in PreferenciasProcessadorService.destaques(ordenadas, utilidade):
+            for peca in PreferenciasProcessadorService.destaques(ordenadas, utilidade, preferencia_processador):
                 if len(escolhidas) < max(2, limite - 4):
                     escolhidas[peca["id"]] = peca
         for peca in PreferenciasPerifericosService.destaques(tipo, ordenadas, utilidade):

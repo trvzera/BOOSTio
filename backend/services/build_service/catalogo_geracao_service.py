@@ -26,7 +26,7 @@ def preparar_catalogo(dados, proprias, rede, aparencia, orcamento, margem, teto_
   excluidas.update({"adaptador_wifi", "cabo_rede"} - PlanejarRedeService.categorias(rede))
   inicio_catalogo = perf_counter()
   catalogo = gerar_catalogo(min(orcamento - margem, teto_pc), teto_perifericos, excluidas,
-                                aparencia["gabinete_id"] if "gabinete" not in proprias else None, dados["utilidade"], cor=aparencia["cor"], aparencia=aparencia, rede=rede)
+                                aparencia["gabinete_id"] if "gabinete" not in proprias else None, dados["utilidade"], cor=aparencia["cor"], aparencia=aparencia, rede=rede, preferencia_processador=dados.get("preferencia_processador"))
   for conexao in PlanejarRedeService.conexoes(rede):
     for acessorio_rede in PlanejarRedeService.categorias(conexao):
       catalogo[acessorio_rede] = PlanejarRedeService.opcoes(catalogo, conexao, proprias)
@@ -74,7 +74,7 @@ def campos_catalogo(dados):
   }
 
 
-def gerar_catalogo(preco_maximo, reserva_perifericos=0, excluidas=(), referencia_gabinete=None, utilidade="", cor="sem-preferencia", aparencia=None, rede=None):
+def gerar_catalogo(preco_maximo, reserva_perifericos=0, excluidas=(), referencia_gabinete=None, utilidade="", cor="sem-preferencia", aparencia=None, rede=None, preferencia_processador=None):
   catalogo = {}
   for modelo in MODELOS_PECAS:
     periferico = modelo.__tablename__ in PERIFERICOS
@@ -89,7 +89,7 @@ def gerar_catalogo(preco_maximo, reserva_perifericos=0, excluidas=(), referencia
       if modelo.__tablename__ in ("cabo_rede", "adaptador_wifi") and rede:
         fichas = PlanejarRedeService.opcoes({modelo.__tablename__: fichas}, rede)
       if fichas:
-        catalogo[modelo.__tablename__] = AmostrarCatalogoService().executar(modelo.__tablename__, fichas, utilidade=utilidade, cor=cor)
+        catalogo[modelo.__tablename__] = AmostrarCatalogoService().executar(modelo.__tablename__, fichas, utilidade=utilidade, cor=cor, preferencia_processador=preferencia_processador)
 
 
         amostra = catalogo[modelo.__tablename__]

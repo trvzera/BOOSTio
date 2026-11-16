@@ -1,4 +1,4 @@
-from services.validacoes_service.validar_pedido_build_service import validar_prioridade_montagem
+from services.validacoes_service.validar_pedido_build_service import validar_prioridade_montagem, validar_preferencia_processador
 from services.build_service.custos_build_service import dividir_orcamento, resumo_custos
 import json
 import logging
@@ -66,6 +66,7 @@ def codigo_falha(erro):
 def criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None, plano_perifericos=None, planejamento_componentes=None, preferencia_neutra=False):
   pedido = {campo: dados[campo] for campo in ("nome", "descricao", "utilidade")}
   pedido["prioridade_montagem"] = validar_prioridade_montagem(dados)
+  pedido["preferencia_processador"] = validar_preferencia_processador(dados)
   armazenamento_minimo = RequisitosArmazenamentoService.validar_parametro(dados.get("armazenamento_minimo_gb"))
   if armazenamento_minimo is not None:
     pedido["armazenamento_minimo_gb"] = armazenamento_minimo
@@ -108,8 +109,10 @@ def criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None
     restricoes["planejamento_componentes"] = planejamento_componentes
   from .planejar_potencia_service import PlanejarPotenciaService
   restricoes["planejamento_energia"] = {"reservas_w": PlanejarPotenciaService.RESERVAS, "margem_percentual": 20, "ram_e_fans_por_unidade_fisica": True}
-  ryzen = [] if preferencia_neutra else PreferenciasProcessadorService.ids_prioritarios(catalogo, dados["utilidade"], proprias)
+  marca = dados.get("preferencia_processador")
+  ryzen = [] if preferencia_neutra or marca is not None else PreferenciasProcessadorService.ids_prioritarios(catalogo, dados["utilidade"], proprias)
   restricoes["processadores_ryzen_prioritarios"] = ryzen
+  restricoes["processadores_marca_preferida"] = PreferenciasProcessadorService.ids_prioritarios(catalogo, dados["utilidade"], proprias, preferencia=marca) if marca is not None else []
   regra_processador = (
     "Para jogos, dê preferência a AMD Ryzen: avalie primeiro processadores_ryzen_prioritarios "
     "e o custo da plataforma completa (CPU + placa-mãe + RAM + cooler). É preferência, não "
@@ -122,6 +125,16 @@ def criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None
     "Não há preferência de processador aplicável a este pedido/catálogo. Preserve as peças "
     "próprias e escolha uma plataforma adequada ao uso e compatível, sem favorecer marca."
   )
+  if marca in ("intel", "amd"):
+    regra_processador = (
+      f"O usuário prefere processador {marca.upper()}. Avalie primeiro processadores_marca_preferida, "
+      "comparando o custo completo de processador, placa-mãe, RAM e cooler. Esta escolha substitui "
+      "qualquer preferência automática por Ryzen em jogos e não se aplica à placa de vídeo. "
+      "É uma preferência, não uma restrição obrigatória: compatibilidade, peças próprias, uso e tetos "
+      "de gasto vêm antes da marca. Não recompre CPU própria nem troque placa-mãe própria para "
+      "atendê-la. Se não houver alternativa adequada, use outra marca e explique o motivo na descrição, "
+      "sem inventar incompatibilidades ou benchmarks. Socket igual não confirma BIOS."
+    )
   regra_perifericos = (
     "Complete monitor, teclado, mouse e fone (headset), exceto os já possuídos; "
     "escolha itens adequados ao uso sem ultrapassar o teto reservado, nem tentar consumi-lo exatamente, "

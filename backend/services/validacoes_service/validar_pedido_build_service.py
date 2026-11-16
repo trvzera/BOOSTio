@@ -40,6 +40,13 @@ def validar_prioridade_montagem(dados):
   return prioridade
 
 
+def validar_preferencia_processador(dados):
+  marca = dados.get("preferencia_processador", "sem-preferencia")
+  if marca not in ("sem-preferencia", "intel", "amd"):
+    raise ValueError("A preferência de processador deve ser intel, amd ou sem-preferencia")
+  return marca
+
+
 def validar_textos_pedido(dados):
   for campo, limite in (("nome", 100), ("descricao", 300), ("utilidade", 120)):
     valor = dados[campo]

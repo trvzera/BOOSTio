@@ -11,6 +11,7 @@
   <script type="module" src="./js/pages/test-benchmark-panel.js" defer></script>
   <script type="module" src="./js/pages/test-price-history.js" defer></script>
   <script type="module" src="./js/pages/test-laboratorio.js" defer></script>
+  <script type="module" src="./js/pages/test-montagem.js" defer></script>
   <link rel="icon" type="image/webp" href="./imgs/favicon.webp">
   <link rel="stylesheet" href="./styles/style.css">
   <noscript><link rel="stylesheet" href="./styles/componentes/no-script.css"></noscript>
@@ -50,6 +51,7 @@
     <nav class="lab-preview-nav" aria-label="Exemplos do laboratório">
       <a href="#teste-painel-benchmark" aria-label="Painel de desempenho">Painel de desempenho</a>
       <a href="#teste-equipe" aria-label="Desenvolvedores">Desenvolvedores</a>
+      <a href="#teste-montagem" aria-label="Preferências de montagem">Preferências de montagem</a>
       <a href="#teste-comparacao" aria-label="Comparação">Comparação</a>
       <a href="#teste-prontas" aria-label="Builds prontas">Builds prontas</a>
       <a href="#teste-historico-precos" aria-label="Histórico de preços">Histórico de preços</a>
@@ -66,6 +68,26 @@
         <p class="font-2-s">Veja a expectativa nos jogos ou consulte o desempenho de renderização, sem sair do painel.</p>
       </div>
       <div data-benchmark-preview-host></div>
+    </section>
+    <section class="test-feature" id="teste-montagem" aria-labelledby="preview-preferences-title">
+      <div class="test-feature-head">
+        <span class="test-kicker font-1-xs">Prévia · montagem inteligente</span>
+        <h2 class="font-1-xl" id="preview-preferences-title">Uma montagem com a sua cara.</h2>
+        <p class="font-2-s">Experimente a escolha de Intel ou AMD, os rádios animados e a conferência das combinações de gabinete. Esta prévia não gera nem salva builds.</p>
+      </div>
+      <div class="test-feature-panel glass-card preview-generation-card">
+        <h3 class="font-1-l">Marca e prioridade da montagem</h3>
+        <p class="font-2-s">As preferências aparecem juntas, antes de gerar a configuração.</p>
+        <button type="button" class="btn-primary" data-preview-preferences aria-label="Experimentar confirmação de marca e prioridade">Experimentar preferências</button>
+        <p class="font-2-xs" role="status" data-preview-choice>Escolha uma marca e uma prioridade para ver a confirmação.</p>
+      </div>
+      <div class="test-feature-panel glass-card preview-case-card">
+        <h3 class="font-1-l">Tamanho, estilo e cor do gabinete</h3>
+        <p class="font-2-xs" data-preview-source>Carregando amostra do banco local…</p>
+        <div class="preview-case-feedback font-2-s" role="status" data-preview-availability hidden></div>
+        <div data-preview-appearance></div>
+        <details class="preview-case-summary"><summary class="font-1-s">Ver as referências das combinações</summary><p class="font-2-xs">As referências dos fabricantes confirmam tamanho e estilo; elas não são anúncios disponíveis no nosso catálogo. Fichas incompletas não confirmam uma combinação; ATX e Micro-ATX descrevem a placa-mãe, não o porte do gabinete.</p><div data-preview-case-summary></div></details>
+      </div>
     </section>
     <section class="test-feature" id="teste-equipe" aria-label="Prévia dos desenvolvedores">
       <div data-lab-team-preview>

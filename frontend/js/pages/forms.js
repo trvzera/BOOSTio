@@ -2,6 +2,7 @@ import "../header.js";
 import "../auth/auth.js";
 import { normalizarRede, vincularRede } from "../build/rede.js";
 import { normalizarAparencia, aparenciaHtml, atualizarGuiaPorteGabinete } from "../build/aparencia.js";
+import { iniciarRestricoesEstiloGabinete, carregarReferenciasGabinetes } from "../build/estilos-gabinete.js";
 import { opcoesUso, prioridadesUso, orientacoesEtapas } from "../build/uso-formulario.js";
 import { ajustarGuiasConhecimento } from "../conta/preferencias-uso.js";
 import { iniciarImagens } from "../build/imagens-produtos.js";
@@ -355,11 +356,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     if(texto)texto.textContent=prioridadesUso[respostas.objetivo]||"Escolha um uso para entender como vamos selecionar as peças, respeitando seu limite de gasto.";
   }
 
-  function renderizarAparencia() {
+  async function renderizarAparencia() {
     const campo=conteudo.querySelector("#form-appearance");
     campo.innerHTML=aparenciaHtml(respostas.aparencia,[],{possuiGabinete:respostas.pecas?.includes("gabinete")});
     campo.setAttribute("aria-busy","false");
     iniciarImagens(campo);
+    const restricoes = iniciarRestricoesEstiloGabinete(campo);
+    let catalogo = [], referencias = [], pronto = false;
     const sincronizar=()=>{
       respostas.aparencia=normalizarAparencia({
         estilo:campo.querySelector('input[name="appearance-style"]:checked')?.value,
@@ -367,9 +370,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         cor:campo.querySelector('input[name="appearance-color"]:checked').value,
         gabinete_id:null,
       });
+      const validacao = restricoes?.atualizar(catalogo,respostas.aparencia,referencias,{pronto});
+      if (validacao?.alterado) respostas.aparencia.estilo = validacao.estilo;
       atualizarGuiaPorteGabinete(campo,respostas.aparencia.porte);
     };
     sincronizar();campo.addEventListener("change",sincronizar);
+    if (!restricoes) return;
+    try {
+      [catalogo,referencias] = await Promise.all([carregarPecasProprias(),carregarReferenciasGabinetes()]);
+      if (!campo.isConnected) return;
+      pronto = true;
+      sincronizar();
+    } catch {
+      if (campo.isConnected) restricoes.falhou();
+    }
   }
 
   function vincularCamposDetalhesPecas() {
@@ -603,9 +617,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (gerando || confirmando) return;
     confirmando = true;
     try {
-      const prioridade = await confirmarPrioridadeMontagem(respostas.prioridadeMontagem);
-      if (!prioridade) return;
-      respostas.prioridadeMontagem = prioridade;
+      const preferencias = await confirmarPrioridadeMontagem(respostas.prioridadeMontagem, respostas.preferenciaProcessador);
+      if (!preferencias) return;
+      respostas.prioridadeMontagem = preferencias.prioridade_montagem;
+      respostas.preferenciaProcessador = preferencias.preferencia_processador;
       mostrarGerando();
     } finally {
       confirmando = false;
@@ -658,6 +673,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const resposta = await criarBuild({nome: `PC para ${utilidade}`, descricao: `Montagem para ${utilidade}.`, utilidade, orcamento,
         prioridade_montagem:respostas.prioridadeMontagem,
+        preferencia_processador:respostas.preferenciaProcessador,
         percentual_perifericos:respostas.incluirPerifericos ? respostas.percentualPerifericos : 0,
         pecas_proprias:pecasPropriasFormulario(respostas),rede:respostas.rede,aparencia:respostas.aparencia});
       window.location.href = `${paginaConfiguracaoBuild}?build_id=${encodeURIComponent(resposta.build.id)}`;

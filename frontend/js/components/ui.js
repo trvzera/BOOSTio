@@ -60,8 +60,9 @@ export function iniciarIcones(raiz = document) {
       if (!animacao) return;
       if (!elemento.isConnected) { destruirAnimacao(elemento.id,animacao); return; }
       const controle = elemento.closest("button,a,label,summary");
-      const input = controle?.querySelector('input[type="checkbox"]');
-      const alternavel = ["checkbox","chevron","hamburger","profile","dots","toggle"].includes(elemento.dataset.lottie);
+      const input = controle?.querySelector('input[type="checkbox"],input[type="radio"]');
+      const radio = input?.type === "radio";
+      const alternavel = radio || ["checkbox","chevron","hamburger","profile","dots","toggle"].includes(elemento.dataset.lottie);
       const atributoEstado = elemento.dataset.lottie === "toggle" ? "aria-pressed" : "aria-expanded";
       const aberto = () => input ? input.checked : controle?.getAttribute(atributoEstado) === "true";
       const invertido = elemento.dataset.lottieReversed === "true";
@@ -76,8 +77,12 @@ export function iniciarIcones(raiz = document) {
       const entrar = () => { if (!alternavel || !aberto()) mover(invertido ? -1 : 1); };
       const sair = () => { if (!alternavel || !aberto()) mover(invertido ? 1 : -1); };
       let observador;
+      const alvoMudanca = radio ? input.form || input.getRootNode() : input;
+      const aoMudar = evento => {
+        if (!radio || (evento.target.type === "radio" && evento.target.name === input.name && evento.target.form === input.form)) atualizarEstado();
+      };
       if (alternavel) {
-        input?.addEventListener("change",atualizarEstado);
+        alvoMudanca?.addEventListener("change",aoMudar);
         if (controle && !input) {
           observador = new MutationObserver(atualizarEstado);
           observador.observe(controle,{attributes:true,attributeFilter:[atributoEstado]});
@@ -97,7 +102,7 @@ export function iniciarIcones(raiz = document) {
       animacao.isLoaded ? pronto() : animacao.addEventListener("DOMLoaded",pronto);
       ativos.set(elemento,{animacao,limpar:() => {
         observador?.disconnect();
-        input?.removeEventListener("change",atualizarEstado);
+        alvoMudanca?.removeEventListener("change",aoMudar);
         controle?.removeEventListener("pointerenter",entrar);
         controle?.removeEventListener("pointerleave",sair);
         controle?.removeEventListener("focusin",entrar);

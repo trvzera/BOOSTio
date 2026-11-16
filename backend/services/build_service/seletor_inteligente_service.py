@@ -1,5 +1,5 @@
 from .selecionar_plataforma_service import selecionar_placas_mae, selecionar_memorias, aplicar_teto, ficha_catalogo, id_numerico
-from services.validacoes_service.validar_pedido_build_service import validar_orcamento, validar_rede, validar_textos_pedido, pecas_proprias
+from services.validacoes_service.validar_pedido_build_service import validar_orcamento, validar_rede, validar_textos_pedido, validar_preferencia_processador, pecas_proprias
 from services.build_service.custos_build_service import dividir_orcamento
 from services.build_service.contexto_build_service import obter_detalhes_proprias
 from services.build_service.catalogo_geracao_service import validar_disponibilidade, planejar_perifericos
@@ -20,6 +20,7 @@ from .amostra_inteligente_service import AmostraInteligenteService
 from .planejar_orcamento_componentes_service import PlanejarOrcamentoComponentesService
 from .planejar_armazenamento_service import PlanejarArmazenamentoService
 from .ajustar_orcamento_build_service import AjustarOrcamentoBuildService
+from .preferencias_processador_service import PreferenciasProcessadorService
 from .preco_exibido_service import PrecoExibidoService
 
 
@@ -108,6 +109,7 @@ class SeletorInteligenteService:
         
         validacao_campos(dados, ["orcamento"])
         armazenamento = RequisitosArmazenamentoService.validar_parametro(dados.get("armazenamento_minimo_gb"))
+        marca = validar_preferencia_processador(dados)
         prioridade = dados.get("prioridade_montagem", dados.get("preferencias"))
 
         if prioridade == "custo-beneficio":
@@ -143,7 +145,7 @@ class SeletorInteligenteService:
         proprias = pecas_proprias(dados.get("pecas_proprias", {}))
         teto_peca, teto_perifericos = self._planejar_orcamento(dados)
         
-        return {"prioridade": prioridade, "limite": limite, "categoria": categoria,
+        return {"prioridade": prioridade, "preferencia_processador": marca, "limite": limite, "categoria": categoria,
                 "rede": rede, "aparencia": aparencia, "proprias": proprias,
                 "teto_peca": teto_peca, "teto_perifericos": teto_perifericos,
                 "utilidade": utilidade, "armazenamento_minimo_gb": armazenamento,
@@ -221,6 +223,11 @@ class SeletorInteligenteService:
             if tipo == "processador":
                 pecas = self._filtrar_plataformas(contexto, pecas)
             pecas = aplicar_teto(contexto, tipo, pecas)
+            if tipo == "processador" and contexto["preferencia_processador"] != "sem-preferencia":
+                preferidas = [p for p in pecas if PreferenciasProcessadorService.marca(p, contexto["preferencia_processador"])]
+                if not preferidas:
+                    contexto["planejamento"]["flexibilizacoes"].append(
+                        "Marca de processador flexibilizada: sem alternativa adequada aos limites e à plataforma atual.")
             if tipo == "placa_video":
                 estimativas = contexto["planejamento"]["estimativas_cpu"]
                 cpus = contexto.get("cpus_candidatas", [])
@@ -232,7 +239,8 @@ class SeletorInteligenteService:
             teto_faixas = max([teto_faixas, *[p["preco"] for p in pecas]])
             amostra, diagnostico = AmostraInteligenteService().executar(
                 pecas, tipo, contexto["prioridade"], teto_faixas,
-                contexto["limites"][tipo], contexto["aparencia"]["cor"])
+                contexto["limites"][tipo], contexto["aparencia"]["cor"],
+                preferencia_processador=contexto["preferencia_processador"])
             diagnostico["sem_benchmark"] = tipo in contexto["fallbacks_benchmark"]
             contexto["amostragem"][tipo] = diagnostico
             if tipo == "processador":

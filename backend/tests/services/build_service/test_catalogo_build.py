@@ -7,6 +7,24 @@ from models import PlacaVideo, CaboRede
 from services.build_service.criar_build_service import CriarBuildService
 
 
+def test_catalogo_publico_expoe_estilo_e_porte_sem_inventar_por_atx(mocker):
+    import services.build_service.listar_catalogo_build_service as modulo
+    fichas = [
+        dict(id="gabinete:1",categoria="gabinete",modelo="Full Tower Aquário",preco=800),
+        dict(id="gabinete:2",categoria="gabinete",modelo="Mid Tower, LED Frontal, Lateral em Vidro",preco=300),
+        dict(id="gabinete:3",categoria="gabinete",modelo="Modelo",formato="ATX",preco=200),
+    ]
+    pecas = [mocker.Mock(to_catalogo=mocker.Mock(return_value=dict(f))) for f in fichas]
+    mocker.patch.object(modulo,"MODELOS_PECAS",[mocker.Mock(listar_publicadas=mocker.Mock(return_value=pecas))])
+    mocker.patch.object(modulo.Oferta,"anexar_a_catalogo",side_effect=lambda catalogo:catalogo)
+    catalogo = modulo.ListarCatalogoBuildService._montar()
+    assert catalogo[0]["porte_referencia"] == "full-tower"
+    assert catalogo[0]["estilo_referencia"] == "panoramico"
+    assert catalogo[1]["estilo_referencia"] == "vidro"
+    assert "porte_referencia" not in catalogo[2] and "estilo_referencia" not in catalogo[2]
+    assert [p["preco"] for p in catalogo] == [800,300,200]
+
+
 def test_catalogo_preserva_cat6_sem_sobrescrever_a_categoria_do_editor():
     cabo = CaboRede(id=1, modelo="Cabo de rede 20m", categoria="CAT6", comprimento_m=20, preco=30)
     ficha = cabo.to_catalogo()
