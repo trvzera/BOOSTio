@@ -23,7 +23,7 @@ def criar_gerada_com_pecas_proprias(usuario_id, dados, proprias, rede=None, perc
         "incluirPerifericos": percentual > 0 or any(tipo in componentes for tipo in ("monitor", "teclado", "mouse", "fone")),
         "percentualPerifericos": percentual,
         "aparencia": aparencia,
-        "incluirRede": (rede or {}).get("tipo") in ("cabo", "wifi"),
+        "incluirRede": (rede or {}).get("tipo") in ("cabo", "wifi", "ambos"),
         "pecasExtras": {tipo: nome for tipo, nome in proprias.items() if tipo not in MODELOS},
         "componentes": componentes,
     })
@@ -41,7 +41,7 @@ def salvar_build(usuario_id, dados_build, proprias, rede, percentual, aparencia,
   estado = validar_estado({
     "titulo": dados_build["nome"][:100], "descricao": dados_build["descricao"][:300],
     "orcamento": orcamento, "componentes": componentes, "rede": rede,
-    "incluirRede": rede.get("tipo") in ("cabo", "wifi"),
+    "incluirRede": rede.get("tipo") in ("cabo", "wifi", "ambos"),
     "incluirPerifericos": percentual > 0, "percentualPerifericos": percentual,
     "aparencia": aparencia,
   })

@@ -128,8 +128,9 @@ export function conteudoCompra(build,catalogo,comparacao,loja) {
     +(indisponivel ? '<p class="planning-help" data-tone="warning">Referência indisponível ou sem preço/estoque confirmado no catálogo. Confira separadamente as ofertas de outras lojas, quando disponíveis.</p>' : '')
     + linksCompra(peca,loja,indisponivel) + '</article>').join("");
   const rede = normalizarRede(build.rede);
-  const extra = build.incluirRede && rede.tipo !== "indefinido" && rede.possuiAcessorio === false &&
-    !itens.some(({categoria}) => categoria === (rede.tipo === "cabo" ? "cabo_rede" : "adaptador_wifi")) ? '<div class="benchmark-empty"><strong>Acessório de rede a incluir</strong><p>' + h(resumoRede(rede)) + (rede.comprimentoCaboM ? ' · ' + rede.comprimentoCaboM + ' m' : '') + '. Escolha um produto com as especificações necessárias na loja. Esse acessório ainda não tem oferta cadastrada.</p></div>' : '';
+  const conexoes = rede.tipo === "ambos" ? [{...rede,tipo:"cabo"},{...rede,tipo:"wifi",comprimentoCaboM:null}] : [rede];
+  const extra = conexoes.map(rede => build.incluirRede && rede.tipo !== "indefinido" && rede.possuiAcessorio === false &&
+    !itens.some(({categoria}) => categoria === (rede.tipo === "cabo" ? "cabo_rede" : "adaptador_wifi")) ? '<div class="benchmark-empty"><strong>Acessório de rede a incluir</strong><p>' + h(resumoRede(rede)) + (rede.comprimentoCaboM ? ' · ' + rede.comprimentoCaboM + ' m' : '') + '. Escolha um produto com as especificações necessárias na loja. Esse acessório ainda não tem oferta cadastrada.</p></div>' : '').join("");
   return '<div class="purchase-totals"><div><span>Total de referência'+(comparacao.parcial?' (parcial)':'')+'</span><strong>'+moeda(comparacao.depois/100)+'</strong></div><p>Total anterior: '+moeda(comparacao.antes/100)
     +(comparacao.diferenca!=null?' · diferença: '+(comparacao.diferenca>0?'+':comparacao.diferenca<0?'−':'')+moeda(Math.abs(comparacao.diferenca)/100):' · diferença completa indisponível')+'</p></div><p class="purchase-total-note">Sem frete. Os valores são referências do catálogo; cada loja pode ter um preço diferente.</p><div class="build-purchase-list">'+linhas+'</div>'+extra;
 }

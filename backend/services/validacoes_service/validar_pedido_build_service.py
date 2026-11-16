@@ -23,7 +23,7 @@ def validar_orcamento(valor):
 
 
 def validar_rede(rede):
-  if not isinstance(rede, dict) or rede.get("tipo", "indefinido") not in ("wifi", "cabo", "indefinido"):
+  if not isinstance(rede, dict) or rede.get("tipo", "indefinido") not in ("wifi", "cabo", "ambos", "indefinido"):
     raise ValueError("Dados de rede inválidos")
   if rede.get("possuiAcessorio") is not None and type(rede["possuiAcessorio"]) is not bool:
     raise ValueError("Informe se já possui o acessório de rede")

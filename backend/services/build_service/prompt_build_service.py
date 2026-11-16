@@ -83,16 +83,22 @@ def criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None
             if socket(p.get("socket")) == socket(cpu.get("soquete"))]}
            for cpu in catalogo.get("processador", []) if socket(cpu.get("soquete"))]
   rede = dados.get("rede") or {}
-  acessorio = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
   plano_rede = PlanejarRedeService.executar(catalogo, rede, proprias)
   comprar_rede = plano_rede["tipo"] if not plano_rede["pendente"] else None
+  if rede.get("tipo") == "ambos":
+    comprar_rede = [p["tipo"] for p in plano_rede["planos"] if p["tipo"] and not p["pendente"]]
+  permitidas_rede = set(comprar_rede) if isinstance(comprar_rede, list) else {comprar_rede} if comprar_rede else set()
+  regra_rede_final = "Nunca inclua ambos." if rede.get("tipo") != "ambos" else (
+    "Para tipo ambos, substitua a regra de acessório único: avalie cada item de planejamento_rede.planos separadamente. "
+    "Inclua UM cabo_rede e UM adaptador_wifi quando solicitados e disponíveis, cada qual com seu id permitido. "
+    "Se apenas um estiver pendente, omita somente ele e mantenha o outro. Some os dois custos ao teto do PC.")
   restricoes = {"pares_por_socket_apenas": pares,
                 "gpu_dedicada_exigida_pelo_uso": RequisitosUsoService.exige_gpu_dedicada(dados["utilidade"]),
                 "comprar_gpu_para_trabalho_pesado": RequisitosUsoService.exige_gpu_dedicada(dados["utilidade"]) and "placa_video" not in proprias,
                 "comprar_gpu_dedicada_pelo_orcamento": ConferirPlacaVideoService.exige(dados["utilidade"], orcamento) and "placa_video" not in proprias,
                 "acessorio_rede_obrigatorio": comprar_rede,
                 "planejamento_rede": plano_rede,
-                "categorias_rede_proibidas": sorted({"adaptador_wifi", "cabo_rede"} - ({comprar_rede} if comprar_rede else set()))}
+                "categorias_rede_proibidas": sorted({"adaptador_wifi", "cabo_rede"} - permitidas_rede)}
   restricoes["preferencias_visuais"] = {
     "cor_prioritaria_por_categoria": {tipo: [p["id"] for p in itens if PreferenciasCoresService.prioridade(p, pedido["aparencia"]["cor"]) <= 1]
                                      for tipo, itens in catalogo.items() if pedido["aparencia"]["cor"] != "sem-preferencia"},
@@ -430,7 +436,8 @@ def criar_prompt(dados, orcamento, margem, catalogo, percentual=0, proprias=None
       "não invente o padrão de um produto sem esse dado. A taxa anunciada do adaptador não garante a velocidade real da internet. "
       "Exceção: planejamento_rede.pendente=true exige omitir esse acessório e continuar o PC, sem retornar erro por isso. "
       "Adaptadores USB servem quando não há slot PCIe livre. Se o usuário já possui o "
-      "acessório ou ainda vai confirmar, não acrescente nenhum. Nunca inclua ambos.\n\n"
+      "acessório ou ainda vai confirmar, não acrescente nenhum. "
+      f"{regra_rede_final}\n\n"
 
       "# COMPATIBILIDADE (confira cada item)\n"
       "- Socket: o do processador deve ser igual ao da placa_mae. Socket igual não "

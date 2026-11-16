@@ -105,3 +105,57 @@ def test_recuperacao_rede_usa_mesma_chamada_e_nao_modifica_flag_de_posse():
         resultado = gerar_candidata(1, "Prompt", "teste", CATALOGO, 8000, 10, {}, {}, PEDIDO, tentativas_correcao=0)
     assert resultado["componentes"] == [] and PEDIDO["possuiAcessorio"] is False
     llm.assert_called_once()
+
+
+def test_duas_conexoes_planejadas_e_completadas_sem_misturar_ids():
+    rede = {'tipo':'ambos','possuiAcessorio':False,'velocidadeMbps':500,'comprimentoCaboM':20}
+    catalogo = {'cabo_rede':[{'id':1,'preco':50,'comprimento_m':20}],
+                'adaptador_wifi':[{'id':2,'preco':60,'velocidade_mbps':600}, {'id':3,'preco':10,'velocidade_mbps':150}]}
+    for itens in catalogo.values():
+        for peca in itens:
+            peca.update(fabricante='Teste', modelo='Acessório de rede')
+    planos = Rede.planos(catalogo, rede)
+    assert [(p['tipo'],p['ids_permitidos']) for p in planos] == [('cabo_rede',[1]),('adaptador_wifi',[2])]
+    original = {'componentes':[]}
+    build = Rede.completar(original,catalogo,rede)
+    assert original == {'componentes':[]}
+    assert build['componentes'] == [{'tipo':'cabo_rede','id':1,'quantidade':1},{'tipo':'adaptador_wifi','id':2,'quantidade':1}]
+    with pytest.raises(ValueError, match='orçamento'):
+        validar_build_gerada({'nome':'PC','descricao':'Teste','utilidade':'Estudos',**build}, catalogo, 100, rede=rede)
+    prompt = criar_prompt({'nome':'PC','descricao':'Teste','utilidade':'Estudos','rede':rede},8000,2000,catalogo,0)
+    assert '"acessorio_rede_obrigatorio": ["cabo_rede", "adaptador_wifi"]' in prompt
+    assert '"categorias_rede_proibidas": []' in prompt
+    assert 'Nunca inclua ambos.' not in prompt
+
+
+def test_falta_de_cabo_nao_remove_wifi_e_peca_propria_nao_e_recomprada():
+    rede = {'tipo':'ambos','possuiAcessorio':False,'comprimentoCaboM':20,'velocidadeMbps':500}
+    catalogo = {'cabo_rede':[{'id':1,'preco':50,'comprimento_m':2}],
+                'adaptador_wifi':[{'id':2,'preco':60,'velocidade_mbps':600}]}
+    build = Rede.completar({'componentes':[]},catalogo,rede)
+    assert build['componentes'] == [{'tipo':'adaptador_wifi','id':2,'quantidade':1}]
+    assert Rede.completar({'componentes':[]},catalogo,rede,{'adaptador_wifi':'Meu Wi-Fi'})['componentes'] == []
+    assert Rede.completar({'componentes':[]},catalogo,{**rede,'possuiAcessorio':True})['componentes'] == []
+
+
+def test_build_completa_aceita_duas_redes_mas_rejeita_acessorio_inadequado():
+    rede = {'tipo':'ambos','possuiAcessorio':False,'comprimentoCaboM':20,'velocidadeMbps':500}
+    tipos = ('processador', 'placa_mae', 'memoria_ram', 'fonte', 'gabinete', 'ssd')
+    catalogo = {tipo:[{'id':1,'fabricante':'Teste','modelo':tipo,'preco':100}] for tipo in tipos}
+    catalogo['processador'][0].update(videointegrado=True,cooler=True,consumo_energia=65)
+    catalogo['fonte'][0]['potencia_w'] = 500
+    catalogo['gabinete'][0]['fans_inclusos'] = 1
+    catalogo['memoria_ram'][0]['quantidade_pentes'] = 1
+    catalogo.update(cabo_rede=[{'id':1,'fabricante':'Teste','modelo':'CAT6','preco':50,'comprimento_m':20}],
+        adaptador_wifi=[{'id':1,'fabricante':'Teste','modelo':'Wi-Fi 600','preco':60,'velocidade_mbps':600},
+                        {'id':2,'fabricante':'Teste','modelo':'Wi-Fi 150','preco':20,'velocidade_mbps':150}])
+    build = Rede.completar({'nome':'PC','descricao':'Teste','utilidade':'Estudos',
+        'componentes':[{'tipo':tipo,'id':1} for tipo in tipos]},catalogo,rede)
+    assert validar_build_gerada(deepcopy(build),catalogo,2000,rede=rede)['preco_total'] == 710
+    sem_wifi = deepcopy(build)
+    sem_wifi['componentes'] = [c for c in sem_wifi['componentes'] if c['tipo'] != 'adaptador_wifi']
+    with pytest.raises(ValueError,match='escolha de conexão'):
+        validar_build_gerada(sem_wifi,catalogo,2000,rede=rede)
+    build['componentes'][-1]['id'] = 2
+    with pytest.raises(ValueError,match='velocidade solicitada'):
+        validar_build_gerada(build,catalogo,2000,rede=rede)
