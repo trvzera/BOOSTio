@@ -1,0 +1,66 @@
+.test-form-notice { padding: 14px 18px; margin: 0 0 20px; border: 1px dashed var(--glass-border); border-radius: 14px; color: var(--cor-4); line-height: 1.65; }
+.test-form-shell { border: 1px solid var(--glass-border); border-radius: 24px; overflow: hidden; background: rgba(16,17,20,.75); color: var(--cor-6); font: 400 .85rem/1.6 var(--font-body); }
+.test-form-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 24px; border-bottom: 1px solid var(--glass-border); }
+.test-form-toolbar > span { color: var(--cor-p1); }
+.test-form-steps { display: flex; flex-wrap: wrap; gap: 8px; padding: 18px 24px; border-bottom: 1px solid var(--glass-border); }
+.test-form-steps button { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 6px 10px; background: none; border: 0; border-radius: 10px; color: var(--cor-4); font: inherit; font-size: .7rem; cursor: pointer; }
+.test-form-steps button span { display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid var(--glass-border); border-radius: 50%; }
+.test-form-steps button[aria-current] { color: var(--cor-p1); background: #007bff12; }
+.test-form-steps button:disabled { opacity: .45; cursor: not-allowed; }
+.test-form-layout { display: grid; grid-template-columns: minmax(0,.95fr) minmax(0,1.05fr); }
+.test-form-intro { padding: 32px; }
+.test-form-intro .question-tag { margin-bottom: 20px; }
+.test-form-intro h3 { margin: 0 0 18px; font-size: clamp(1.6rem,3vw,2.5rem); line-height: 1.2; overflow-wrap: anywhere; scroll-margin-top: 110px; }
+.test-form-intro > p { color: var(--cor-4); margin: 0; line-height: 1.75; }
+.test-form-help-card { margin-top: 28px; padding: 18px; border: 1px solid var(--glass-border); border-radius: 14px; }
+.test-form-help-card p { margin-top: 8px; color: var(--cor-4); }
+.test-form-answers { display: flex; flex-direction: column; min-width: 0; height: 620px; border-left: 1px solid var(--glass-border); }
+.test-form-scroll { flex: 1; min-height: 0; padding: 28px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.test-form-options { display: grid; gap: 10px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.test-form-choice.ui-check { display: flex; min-width: 0; padding: 16px; border: 1px solid var(--glass-border); border-radius: 14px; transition: border-color .2s ease, background .2s ease; }
+.test-form-choice:hover, .test-form-choice:has(input:checked) { border-color: var(--cor-p1); background: #007bff0b; }
+.test-form-choice > span:last-child { display: grid; min-width: 0; gap: 4px; }
+.test-form-choice strong { font: 500 .9rem/1.5 var(--font-heading); overflow-wrap: anywhere; }
+.test-form-choice small { color: var(--cor-4); font: 400 .75rem/1.6 var(--font-body); }
+.test-form-choice .ui-lottie[data-lottie=circledot] { border-radius: 50%; }
+.test-form-choice input:not(:checked) + .ui-lottie { color: var(--cor-4); }
+.test-form-field { display: grid; gap: 8px; min-width: 0; margin: 20px 0; color: var(--cor-6); font: 400 .8rem/1.6 var(--font-body); }
+.test-form-field :is(input,select) { min-width: 0; width: 100%; box-sizing: border-box; min-height: 44px; padding: 12px; border: 1px solid var(--glass-border); border-radius: 10px; background: var(--cor-1); color: var(--cor-6); font: inherit; }
+.test-form-budget-presets { display: flex; flex-wrap: wrap; gap: 8px; }
+.test-form-budget-presets button { padding: 10px 12px; font-size: .75rem; }
+.test-form-budget-range { display: block; width: 100%; min-height: 44px; accent-color: var(--cor-p1); }
+.test-form-help { margin: 12px 0; color: var(--cor-4); font-size: .75rem; line-height: 1.7; }
+.test-form-group { margin: 24px 0; }
+.test-form-group h4, .test-form-scroll > h4 { margin: 12px 0; font: 500 .9rem/1.5 var(--font-heading); }
+.test-form-navigation { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; padding: 16px 24px; border-top: 1px solid var(--glass-border); background: #101114; }
+.test-form-navigation button { min-height: 44px; gap: 8px; font-size: .8rem; }
+.test-form-navigation .ui-lottie { flex: 0 0 20px; width: 20px; height: 20px; }
+.test-form-feedback { margin: 0; padding: 0 24px; color: var(--status-warning); font-size: .75rem; }
+.test-form-feedback:empty { display: none; }
+.test-form-scroll-hint { display: flex; align-items: center; gap: 8px; margin: 0 0 18px; color: var(--cor-p1); font-size: .75rem; }
+.test-form-scroll-hint .ui-lottie { flex: 0 0 18px; width: 18px; height: 18px; transform: rotate(90deg); }
+.test-form-scroll .appearance-examples { max-height: none; overflow: visible; }
+.test-form-scroll .appearance-cases { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.test-form-result { padding: 24px; border-top: 1px solid var(--glass-border); }
+.test-form-result p { margin: 12px 0; color: var(--cor-4); }
+.test-form-summary { margin-top: 24px; }
+.test-form-summary summary { cursor: pointer; min-height: 44px; color: var(--cor-p1); }
+.test-form-summary pre { margin: 12px 0 0; padding: 16px; border-radius: 12px; background: #0003; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--cor-4); font: 400 .75rem/1.6 var(--font-body); }
+.test-form-shell [hidden] { display: none !important; }
+.test-form-shell :is(button,input,select,summary):focus-visible { outline: 2px solid var(--cor-p1); outline-offset: 3px; }
+@media(max-width: 800px) {
+  .test-form-layout { grid-template-columns: minmax(0,1fr); }
+  .test-form-intro { padding: 24px; }
+  .test-form-answers { height: 600px; border-left: 0; border-top: 1px solid var(--glass-border); }
+  .test-form-scroll { padding: 22px; }
+  .test-form-steps { padding: 12px 16px; gap: 4px; }
+  .test-form-steps button { gap: 5px; padding: 4px 6px; }
+}
+@media(max-width: 400px) {
+  .test-form-intro, .test-form-toolbar { padding: 18px; }
+  .test-form-scroll { padding: 16px; }
+  .test-form-navigation { padding: 14px; }
+  .test-form-navigation button { padding: 12px 14px; }
+  .test-form-scroll .appearance-cases { grid-template-columns: minmax(0,1fr); }
+}
+@media(prefers-reduced-motion: reduce) { .test-form-choice.ui-check { transition: none; } }

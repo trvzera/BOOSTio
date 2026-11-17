@@ -13,6 +13,8 @@
   <script type="module" src="./js/pages/test-laboratorio.js" defer></script>
   <script type="module" src="./js/pages/test-montagem.js" defer></script>
   <script type="module" src="./js/pages/test-onboarding.js" defer></script>
+  <script type="module" src="./js/pages/test-forms.js" defer></script>
+  <link rel="stylesheet" href="./styles/paginas/test-forms.css">
   <link rel="stylesheet" href="./styles/paginas/test-onboarding.css">
   <link rel="icon" type="image/webp" href="./imgs/favicon.webp">
   <link rel="stylesheet" href="./styles/style.css">
@@ -51,6 +53,8 @@
     <h1 class="font-1-xxl">Experimente novos recursos</h1>
     <p class="font-2-s">Escolha uma prévia para experimentar o visual e as interações. Os exemplos abrem aqui mesmo, sem precisar sair desta página.</p>
     <nav class="lab-preview-nav" aria-label="Exemplos do laboratório">
+      <a href="#teste-formulario-pc" aria-label="Formulário de desktop">Formulário de desktop</a>
+      <a href="#teste-formulario-notebook" aria-label="Formulário de notebook">Formulário de notebook</a>
       <a href="#teste-painel-benchmark" aria-label="Painel de desempenho">Painel de desempenho</a>
       <a href="#teste-equipe" aria-label="Desenvolvedores">Desenvolvedores</a>
       <a href="#teste-montagem" aria-label="Preferências de montagem">Preferências de montagem</a>
@@ -64,6 +68,24 @@
       <a href="#teste-desempenho" aria-label="Diagnóstico da API">Diagnóstico da API</a>
       <a href="#teste-componentes" aria-label="Outros controles">Outros controles</a>
     </nav>
+    <section class="test-feature" id="teste-formulario-pc" aria-labelledby="test-form-pc-title">
+      <div class="test-feature-head">
+        <span class="test-kicker font-1-xs">Prévia · formulário de desktop</span>
+        <h2 class="font-1-xl" id="test-form-pc-title">Vamos repensar sua montagem.</h2>
+        <p class="font-2-s">Uma versão de testes das perguntas atuais. Avance, volte e revise as respostas antes de decidirmos o que vai para o formulário oficial.</p>
+      </div>
+      <p class="test-form-notice font-2-xs">Somente uma prévia: não usa a IA, não cria builds e não altera os dados da sua conta. As respostas ficam nesta página e são descartadas ao recarregar.</p>
+      <div data-form-preview="pc"></div>
+    </section>
+    <section class="test-feature" id="teste-formulario-notebook" aria-labelledby="test-form-notebook-title">
+      <div class="test-feature-head">
+        <span class="test-kicker font-1-xs">Rascunho · formulário de notebook</span>
+        <h2 class="font-1-xl" id="test-form-notebook-title">Um notebook para sua rotina.</h2>
+        <p class="font-2-s">Primeira proposta para entender uso, orçamento, mobilidade, tela e preferências. Podemos mudar as perguntas por aqui antes de integrar a busca por notebooks.</p>
+      </div>
+      <p class="test-form-notice font-2-xs">Esta prévia organiza suas preferências. Ainda não busca notebooks, não verifica modelos e não gera recomendações.</p>
+      <div data-form-preview="notebook"></div>
+    </section>
     <section class="test-feature" id="teste-painel-benchmark" aria-labelledby="benchmark-preview-title">
       <div class="test-feature-head">
         <span class="test-kicker font-1-xs">Prévia · novo painel de desempenho</span>
