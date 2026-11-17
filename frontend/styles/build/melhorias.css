@@ -37,6 +37,11 @@
 .upgrade-real-budget { gap: .5rem; margin-bottom: 1rem; }
 .upgrade-real-budget input { min-height: 3rem; font-size: 1rem; background: rgba(255,255,255,.025); border-color: var(--glass-border); border-radius: 1rem; }
 .upgrade-real-budget small { color: var(--cor-4); font: 400 .6875rem/1.6 var(--font-body); }
+.upgrade-real-criteria { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin: 0 0 1rem; list-style: none; }
+.upgrade-real-criteria li { padding: .375rem .625rem; border: 1px solid var(--glass-border); border-radius: 999px; color: var(--cor-5); font: 400 .6875rem/1.6 var(--font-body); }
+.upgrade-real-gain { color: var(--cor-5); font: 400 .75rem/1.6 var(--font-body); overflow-wrap: anywhere; }
+.upgrade-real-pending { color: var(--status-warning); font: 400 .6875rem/1.6 var(--font-body); }
+.upgrade-real-help summary > .ui-lottie { margin-left: auto; flex-shrink: 0; width: 1.25rem; height: 1.25rem; }
 .upgrade-real-filters { margin-bottom: .25rem; border: 1px solid var(--glass-border); border-radius: 1rem; }
 .upgrade-real-filters summary, .upgrade-real-help summary, .upgrade-real-cost-details summary { display: flex; align-items: center; gap: .75rem; min-height: 2.75rem; padding: .75rem; list-style: none; cursor: pointer; }
 .upgrade-real-panel summary::-webkit-details-marker { display: none; }

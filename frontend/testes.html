@@ -12,6 +12,8 @@
   <script type="module" src="./js/pages/test-price-history.js" defer></script>
   <script type="module" src="./js/pages/test-laboratorio.js" defer></script>
   <script type="module" src="./js/pages/test-montagem.js" defer></script>
+  <script type="module" src="./js/pages/test-onboarding.js" defer></script>
+  <link rel="stylesheet" href="./styles/paginas/test-onboarding.css">
   <link rel="icon" type="image/webp" href="./imgs/favicon.webp">
   <link rel="stylesheet" href="./styles/style.css">
   <noscript><link rel="stylesheet" href="./styles/componentes/no-script.css"></noscript>
@@ -58,6 +60,7 @@
       <a href="#teste-contato" aria-label="Contato">Contato</a>
       <a href="#teste-budget" aria-label="Budget">Budget</a>
       <a href="#teste-melhorias" aria-label="Melhorias">Melhorias</a>
+      <a href="#teste-tutoriais" aria-label="Tutoriais de boas-vindas">Tutoriais</a>
       <a href="#teste-desempenho" aria-label="Diagnóstico da API">Diagnóstico da API</a>
       <a href="#teste-componentes" aria-label="Outros controles">Outros controles</a>
     </nav>
@@ -269,12 +272,19 @@
           <fieldset class="test-upgrade-categories"><legend class="font-1-s">Peças que deseja avaliar</legend><label class="font-2-xs"><input type="checkbox" name="upgrade-category" value="processador" checked>Processador</label><label class="font-2-xs"><input type="checkbox" name="upgrade-category" value="placa_video">Placa de vídeo</label></fieldset>
         </div>
         <div class="test-upgrade-rank" role="group" aria-label="Critério das recomendações"><button type="button" class="is-active" aria-label="Melhor preço" aria-pressed="true">Melhor preço</button><button type="button" aria-label="Melhor desempenho" data-disabled-reason="Precisa de benchmarks comparáveis; ainda não integrado." disabled>Melhor desempenho</button></div>
-        <div class="test-actions"><button type="button" class="btn-primary" id="upgrade-search" aria-label="Buscar candidatas compatíveis para troca">Buscar candidatas</button></div>
+        <div class="test-actions"><button type="button" class="btn-primary" id="upgrade-search" aria-label="Buscar candidatas compatíveis para troca">Buscar candidatas</button><button type="button" class="btn-secondary" id="upgrade-open-panel" aria-label="Experimentar painel de melhorias">Experimentar painel de melhorias</button></div>
         <p class="test-feedback font-2-xs" id="upgrade-feedback" role="status" aria-live="polite">Registre um budget para testar a busca.</p>
         <div class="test-upgrade-preview" id="upgrade-preview" aria-live="polite"></div>
         <div class="test-candidates" id="upgrade-results" hidden></div>
       </div>
       <p class="test-muted font-2-xs">A troca altera somente a cópia exibida neste teste. Nada é gravado nas builds reais. Uma peça compatível não é necessariamente mais rápida; ganho real exige benchmarks comparáveis.</p>
+    </section>
+    <section class="test-feature" id="teste-tutoriais" aria-labelledby="test-onboarding-title">
+      <div class="test-feature-head"><span class="test-kicker font-1-xs">Primeiro acesso · duas propostas</span><h2 class="font-1-xl" id="test-onboarding-title">Boas-vindas à BOOSTio</h2><p class="font-2-s">Experimente as duas formas de apresentar o site a quem acabou de criar uma conta. São prévias: suas preferências e o tutorial atual não serão alterados.</p></div>
+      <div class="test-onboarding-options">
+        <article class="test-feature-panel glass-card"><span class="test-kicker font-1-xs">Opção A · apresentação curta</span><h3 class="font-1-l">O essencial, antes de começar</h3><p class="font-2-s">Três passos sobre seu conhecimento, as formas de montar e como cuidar do orçamento.</p><button type="button" class="btn-primary" data-preview-onboarding="curto" aria-label="Ver apresentação curta de boas-vindas">Ver apresentação</button></article>
+        <article class="test-feature-panel glass-card"><span class="test-kicker font-1-xs">Opção B · guia visual</span><h3 class="font-1-l">Conheça cada área na prática</h3><p class="font-2-s">Uma demonstração da interface com destaques para orçamento, montagem, compatibilidade e melhorias.</p><button type="button" class="btn-secondary" data-preview-onboarding="guiado" aria-label="Experimentar guia visual de boas-vindas">Experimentar guia</button></article>
+      </div>
     </section>
   </main>
   <dialog class="test-compare-dialog" id="compare-dialog" aria-labelledby="compare-dialog-title">

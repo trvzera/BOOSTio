@@ -75,8 +75,8 @@ function conteudoHistorico(registros, temHistorico, nomeLoja = "KaBuM!") {
   return '<dl class="price-history-stats">' + metricas.map(([rotulo, valor]) => '<div><dt>' + rotulo + '</dt><dd>' + moeda(valor) + '</dd></div>').join("") + '</dl>' +
     '<figure class="price-history-figure"><div class="price-history-plot" data-history-plot tabindex="0" role="group" aria-label="Gráfico de preços. Use as setas esquerda e direita para consultar os registros; Home e End para ir ao início ou ao fim; Escape para fechar o detalhe."><svg class="price-history-chart" viewBox="0 0 640 200" preserveAspectRatio="none" aria-hidden="true" focusable="false">' +
     '<path class="price-history-grid" d="M0 28H640 M0 100H640 M0 172H640"/>' +
-    '<path class="price-history-line" d="' + linha + '"/><circle class="price-history-point" cx="' + pontoFinal.x.toFixed(2) + '" cy="' + pontoFinal.y.toFixed(2) + '" r="4"/>' +
-    '<g data-history-marker visibility="hidden"><line class="price-history-guide" y1="12" y2="188"/><circle class="price-history-halo" r="10"/><circle class="price-history-active-point" r="5"/></g></svg>' +
+    '<path class="price-history-line" d="' + linha + '"/><ellipse class="price-history-point" cx="' + pontoFinal.x.toFixed(2) + '" cy="' + pontoFinal.y.toFixed(2) + '" rx="4" ry="4" data-history-radius="4"/>' +
+    '<g data-history-marker visibility="hidden"><line class="price-history-guide" y1="12" y2="188"/><ellipse class="price-history-halo" rx="10" ry="10" data-history-radius="10"/><ellipse class="price-history-active-point" rx="5" ry="5" data-history-radius="5"/></g></svg>' +
     '<div class="price-history-tooltip" data-history-tooltip aria-hidden="true" hidden><span data-history-date></span><strong data-history-price></strong></div></div>' +
     '<div class="price-history-dates" aria-hidden="true"><span>' + dataCurta.format(primeiro.instante) + '</span><span>' + (registros.length > 1 ? dataCurta.format(ultimo.instante) : '') + '</span></div>' +
     '<figcaption>' + (registros.length === 1 ? 'Há apenas um preço registrado neste período. Ainda não é possível mostrar uma tendência.' : 'Evolução dos preços registrados em ' + h(nomeLoja) + ', de ' + dataCurta.format(primeiro.instante) + ' a ' + dataCurta.format(ultimo.instante) + '. As datas sem registro não representam novas consultas.') + '</figcaption></figure>' +
@@ -100,7 +100,7 @@ function iniciarInspecaoHistorico(secao, registros) {
     const ponto = pontos[indice], registro = registros[indice];
     const data = dataCurta.format(registro.instante), preco = moeda(registro.preco);
     guia.setAttribute("x1",ponto.x); guia.setAttribute("x2",ponto.x);
-    marcador.querySelectorAll("circle").forEach(circulo => {
+    marcador.querySelectorAll("ellipse").forEach(circulo => {
       circulo.setAttribute("cx",ponto.x); circulo.setAttribute("cy",ponto.y);
     });
     marcador.setAttribute("visibility","visible");
@@ -121,6 +121,21 @@ function iniciarInspecaoHistorico(secao, registros) {
     tooltip.hidden = true; marcador.setAttribute("visibility","hidden");
     plot.classList.remove("is-inspecting"); plot.setAttribute("aria-label",rotulo);
   }
+  function ajustarMarcadores() {
+    const {width,height} = plot.querySelector("svg").getBoundingClientRect();
+    if (!width || !height) return;
+    // O traçado ocupa toda a largura; compense a escala para manter os pontos circulares em pixels.
+    plot.querySelectorAll("[data-history-radius]").forEach(ponto => {
+      const raio = Number(ponto.dataset.historyRadius);
+      ponto.setAttribute("rx",raio * 640 / width);
+      ponto.setAttribute("ry",raio * 200 / height);
+    });
+    if (!tooltip.hidden) mostrar(indiceAtual);
+  }
+  const observar = typeof ResizeObserver === "function" ? new ResizeObserver(ajustarMarcadores) : null;
+  observar?.observe(plot);
+  window.addEventListener("resize",ajustarMarcadores,opcoes);
+  ajustarMarcadores();
   function apontar(evento) {
     const r = plot.getBoundingClientRect();
     if (!r.width) return;
@@ -140,7 +155,7 @@ function iniciarInspecaoHistorico(secao, registros) {
     if (indice === undefined) return;
     evento.preventDefault(); mostrar(indice,true);
   },opcoes);
-  return () => controle.abort();
+  return () => { controle.abort(); observar?.disconnect(); };
 }
 
 export function historicoPrecosHtml(peca, agora = Date.now()) {

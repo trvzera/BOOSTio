@@ -5,7 +5,7 @@ import { planejamentoLocal } from "./planejamento.js";
 import { abrirDialogoBuild } from "./acoes-build.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { iniciarDetalhesAnimados, definirDetalheAberto } from "../components/animated-details.js";
-import { avaliarTrocaMelhoria, exigirTrocaMelhoria } from "./validar-melhoria.js";
+import { avaliarTrocaMelhoria, exigirTrocaMelhoria, resumoGanhoMelhoria } from "./validar-melhoria.js";
 import { AVISO_DUAL_CHANNEL, contextoMelhoriaRam, planejarMelhoriaRam } from './melhorias-ram.js';
 import { planejarMelhoriaDisco } from './melhorias-discos.js';
 import { atualizarValor, capturarValores, transicionarValores } from "../components/value-transition.js";
@@ -25,7 +25,8 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     throw new Error("Informe uma build, o catálogo e o callback para aplicar as alterações.");
 
   const original = structuredClone(build);
-  const categorias = new Set(["memoria_ram","ssd","hd"]);
+  const categorias = new Set(["processador","placa_video","memoria_ram","ssd","hd"].filter(id => itensCategoria(build,id).length));
+  if (!categorias.size) categorias.add("memoria_ram");
   const gruposAbertos = new Set();
   let trocas = new Map(), aplicando = false, aplicada = false, totalExibido;
   let memorias = new Map(), modoRam = 'adicionar';
@@ -41,16 +42,17 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     + '<button type="button" id="upgrade-tab-search" role="tab" aria-selected="true" aria-controls="upgrade-search" data-upgrade-tab="search" aria-label="Escolher peças para trocar">Escolher peças</button>'
     + '<button type="button" id="upgrade-tab-preview" role="tab" aria-selected="false" aria-controls="upgrade-preview" data-upgrade-tab="preview" tabindex="-1" aria-label="Revisar trocas selecionadas">Revisar trocas <span id="upgrade-real-count">0</span></button></div>'
     + '<div class="upgrade-real-workspace"><section class="upgrade-real-browser" id="upgrade-search" aria-label="Escolher peças para trocar">'
-    + '<div class="upgrade-real-pane-heading"><h3>Peças disponíveis</h3><span>Menor preço primeiro</span></div>'
+    + '<div class="upgrade-real-pane-heading"><h3>O próximo passo do seu PC</h3><span>Menor preço primeiro</span></div>'
     + '<div class="upgrade-real-browser-scroll upgrade-real-scroll" tabindex="0" role="region" aria-label="Orçamento, categorias e peças sugeridas">'
     + '<label class="planning-field upgrade-real-budget" for="upgrade-real-budget"><span>Quanto deseja investir nas trocas?</span>'
     + '<input id="upgrade-real-budget" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" value="'
-    + h(budgetInicial ?? "") + '" placeholder="Ex.: 1500" aria-label="Orçamento para novas peças em reais" aria-describedby="upgrade-real-budget-help"><small id="upgrade-real-budget-help">Valor para as peças novas, sem descontar as antigas e sem frete. Sem budget, você pode consultar as opções, mas precisa defini-lo antes de aplicar.</small></label>'
+    + h(budgetInicial ?? "") + '" placeholder="Ex.: 1500" aria-label="Orçamento para novas peças em reais" aria-describedby="upgrade-real-budget-help"><small id="upgrade-real-budget-help">Limite para a soma das peças novas. Não descontamos a venda das antigas. Frete à parte.</small></label>'
+    + '<ul class="upgrade-real-criteria" aria-label="Critérios das recomendações"><li>Ganho verificável</li><li>Soma dentro do orçamento</li><li>Conflitos conhecidos bloqueados</li></ul>'
     + '<details class="upgrade-real-filters" data-animated-details><summary><span>Peças que deseja melhorar</span><strong id="upgrade-real-category-count">3 selecionadas</strong><span class="upgrade-real-chevron" aria-hidden="true"></span></summary>'
     + '<fieldset class="upgrade-real-categories"><legend class="sr-only">Selecione uma ou mais categorias</legend>'
     + CATEGORIAS.map(categoria => '<label class="ui-check"><input type="checkbox" name="upgrade-real-category" value="' + categoria.id
       + '" ' + (categorias.has(categoria.id) ? 'checked' : '') + '>' + iconeAnimado("checkbox") + '<span>' + categoria.nome + '</span></label>').join("") + '</fieldset></details>'
-    + '<details class="upgrade-real-help" data-animated-details><summary>O que considerar antes de trocar<span class="upgrade-real-chevron" aria-hidden="true"></span></summary><p class="planning-help">As sugestões são ordenadas por preço, não por ganho de desempenho medido. Trocas inferiores nos dados comparados ou sem dados suficientes ficam bloqueadas. Na RAM e nos discos, você pode acrescentar unidades ou substituir as atuais. Expandir armazenamento aumenta a capacidade, não garante mais velocidade. CPU/GPU e outras categorias aguardam critérios de desempenho comparáveis.</p></details>'
+    + '<details class="upgrade-real-help" data-animated-details><summary>Como escolhemos as melhorias'+iconeAnimado("chevron")+'</summary><p class="planning-help">As sugestões são ordenadas por preço, não por ganho de desempenho medido em jogos. CPU e GPU exigem pontuações superiores em benchmarks da mesma fonte, teste, versão e data de referência. RAM e discos precisam oferecer um ganho verificável sem reduzir os demais critérios. Expandir armazenamento aumenta a capacidade, não garante mais velocidade. Outras categorias sem critérios comparáveis não são sugeridas. BIOS, conectores ou medidas ausentes continuam como conferências pendentes na prévia; não são uma confirmação de compatibilidade.</p></details>'
     + '<div class="upgrade-real-results" id="upgrade-real-results"></div></div></section>'
     + '<section class="upgrade-real-preview" id="upgrade-preview" aria-labelledby="upgrade-real-preview-title"><div class="upgrade-real-pane-heading"><h3 id="upgrade-real-preview-title" tabindex="-1">Sua prévia</h3><span>Antes de salvar</span></div>'
     + '<div class="upgrade-real-preview-scroll upgrade-real-scroll" tabindex="0" role="region" aria-label="Revisão das trocas e dos valores"><div id="upgrade-real-differences"></div><p class="planning-help" id="upgrade-real-apply-reason"></p></div></section></div>'
@@ -199,10 +201,11 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     if (build.travada) { resultados.innerHTML = '<p class="planning-help">' + MOTIVO_TRAVA + '</p>'; return; }
     if (!categorias.size) { resultados.innerHTML = '<p class="planning-help">Selecione uma ou mais categorias para consultar as peças.</p>'; return; }
     const limite = budget();
-    resultados.innerHTML = (limite == null ? '<p class="planning-help" role="note">Opções sem filtro de preço. Informe um budget para filtrar pelo valor e aplicar as alterações.</p>' : '')
-      + CATEGORIAS.filter(({id}) => categorias.has(id)).map(categoria => {
+    if (limite == null) { resultados.innerHTML = '<div class="upgrade-real-empty"><strong>Defina quanto pode investir</strong><p>Com esse valor, mostramos apenas melhorias que cabem no seu orçamento.</p></div>'; return; }
+    resultados.innerHTML = CATEGORIAS.filter(({id}) => categorias.has(id)).map(categoria => {
       const candidatas = [], conflitos = new Set(), comparacoesPendentes = new Set();
-      let foraDoBudget = 0, indisponiveis = 0, inferiores = 0, semComparacao = 0;
+      const detalhes = new Map();
+      let foraDoBudget = 0, indisponiveis = 0, inferiores = 0, semComparacao = 0, equivalentes = 0;
       for (const peca of catalogo) {
         if (peca.categoria !== categoria.id || categoria.id !== 'memoria_ram' && modoTroca(categoria.id) !== "adicionar" && peca.id === atual(original,categoria.id)?.id) continue;
         const preco = centavos(peca.preco);
@@ -210,6 +213,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
         const comparacao = categoria.id === 'memoria_ram' ? {permitida:true} : avaliarTrocaMelhoria(original,peca,catalogo,{modo:modoTroca(categoria.id)});
         if (!comparacao.permitida) {
           if (comparacao.codigo === "regressao") inferiores++;
+          else if (comparacao.codigo === "sem-ganho") equivalentes++;
           else if (comparacao.codigo !== "mesma-peca") { semComparacao++; comparacoesPendentes.add(comparacao.motivo); }
           continue;
         }
@@ -221,7 +225,12 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
           const outras = escolhidas(propostas);
           const ram = planejarMelhoriaRam(original,catalogo,propostaRam(rams));
           if (limite != null && outras.reduce((total,outra) => total + centavos(outra.preco)*quantidadeTroca(outra.categoria),ram.gastoCentavos) > limite) { foraDoBudget++; continue; }
-          simular(propostas,undefined,rams,{exigirBudget:false});
+          const simulacao = simular(propostas,undefined,rams);
+          const antesRam = categoria.id === "memoria_ram" ? informacoesRam(original,catalogo).capacidade : null;
+          const depoisRam = categoria.id === "memoria_ram" ? informacoesRam(simulacao.build,catalogo).capacidade : null;
+          detalhes.set(peca.id,{ganho:categoria.id === "memoria_ram"
+            ? depoisRam > antesRam ? "RAM total: de " + antesRam + " GB para " + depoisRam + " GB." : "Maior frequência ou menor latência, sem reduzir a capacidade."
+            : resumoGanhoMelhoria(comparacao),pendentes:simulacao.avaliacao.dicas.length});
           candidatas.push(peca);
         } catch (erro) { conflitos.add(erro.message); }
       }
@@ -229,6 +238,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
       const exclusoes = [foraDoBudget ? foraDoBudget + " opções excedem o budget combinado." : "",
         indisponiveis ? indisponiveis + " opções indisponíveis ou sem preço válido." : "",
         inferiores ? inferiores + " opções inferiores nos dados comparados foram ocultadas." : "",
+        equivalentes ? equivalentes + " opções equivalentes, sem ganho verificável, foram ocultadas." : "",
         semComparacao ? semComparacao + " opções sem comparação segura não são sugeridas." : ""].filter(Boolean).join(" ");
       const selecionada = categoria.id === 'memoria_ram' ? memorias.size > 0 : pecaPorId(categoria.id,trocas.get(categoria.id));
       const precoSelecionado = centavos(selecionada?.preco);
@@ -258,10 +268,15 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
         + (candidatas.length ? '<div class="upgrade-real-candidates">' + candidatas.map(peca => {
           const selecionada = categoria.id === 'memoria_ram' ? memorias.has(peca.id) : trocas.get(categoria.id) === peca.id;
           const acao = selecionada ? "Selecionada" : "Selecionar", preco = valorMonetario(centavos(peca.preco));
+          const detalhe = detalhes.get(peca.id);
           return '<button type="button" class="upgrade-real-candidate" data-upgrade-pick="' + h(peca.id)
             + '" data-upgrade-category="' + categoria.id + '" aria-pressed="' + selecionada
             + '" aria-label="' + h(nome(peca) + " · " + preco + " · " + (selecionada ? "Na prévia" : "Adicionar à prévia")) + '"><span class="upgrade-real-candidate-image">' + imagemPeca(peca) + '</span><span class="upgrade-real-candidate-copy"><strong>' + h(nome(peca))
-            + '</strong>' + (categoria.id === 'memoria_ram' ? '<span class="planning-help">' + h(peca.capacidade_gb) + ' GB · ' + h(peca.quantidade_pentes) + (Number(peca.quantidade_pentes) === 1 ? ' pente' : ' pentes') + ' · ' + h(peca.ddr) + ' · ' + h(peca.frequencia_mhz) + ' MHz</span>' : '') + '<span class="upgrade-real-candidate-price">' + h(preco) + '</span></span><span class="upgrade-real-candidate-action">' + acao + '</span></button>';
+            + '</strong><span class="upgrade-real-gain">' + h(detalhe.ganho) + '</span>'
+            + (categoria.id === 'memoria_ram' ? '<span class="planning-help">' + h(peca.capacidade_gb) + ' GB · ' + h(peca.quantidade_pentes) + (Number(peca.quantidade_pentes) === 1 ? ' pente' : ' pentes') + ' · ' + h(peca.ddr) + ' · ' + h(peca.frequencia_mhz) + ' MHz</span>' : '')
+            + '<span class="upgrade-real-candidate-price">' + h(preco) + '</span>'
+            + (detalhe.pendentes ? '<span class="upgrade-real-pending">Compatibilidade parcial · confira a prévia</span>' : '')
+            + '</span><span class="upgrade-real-candidate-action">' + acao + '</span></button>';
         }).join("") + '</div>' : '<p class="planning-help">' + h(motivoVazio) + '</p>')
         + (exclusoes ? '<p class="planning-help">' + h(exclusoes) + '</p>' : '')
         + (conflitos.size ? '<details class="upgrade-real-conflicts"><summary>Por que algumas opções não aparecem?</summary><ul>'
@@ -383,7 +398,8 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
     informar(budget() == null ? MOTIVO_BUDGET : "Budget atualizado para " + valorMonetario(budget()) + ". O total das trocas será validado junto.",budget() == null ? "error" : "info",{urgente:false,atraso:700});
   });
   dialogo.addEventListener("change",evento => {
-    if (aplicando) return;
+    // O orçamento já atualiza no input. Refazer o DOM no blur descartava o clique no dropdown seguinte.
+    if (aplicando || evento.target === campoBudget) return;
     const caixa = evento.target;
     if (caixa.name === "upgrade-real-category") {
       if (caixa.checked) categorias.add(caixa.value);
@@ -396,7 +412,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
       const categoria = caixa.dataset.upgradeDiskMode;
       modosDiscos.set(categoria,caixa.value); trocas.delete(categoria);quantidadesDiscos.set(categoria,1);
       informar('Modo de armazenamento atualizado. Selecione novamente o disco; as demais alterações foram preservadas.');
-    } else if (caixa !== campoBudget) return;
+    } else return;
     renderizar();
   });
   dialogo.addEventListener("click",async evento => {

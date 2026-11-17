@@ -32,6 +32,14 @@ test("sugestões mostram imagem, preço e seleção sem prometer ganho de desemp
   assert.match(css,/\.upgrade-real-candidate-image img \{[^}]*object-fit: contain/);
 });
 
+test("sugestões exigem orçamento válido e explicam ganho e conferências pendentes",() => {
+  assert.match(js,/if \(limite == null\) \{ resultados.innerHTML =[\s\S]*Defina quanto pode investir[\s\S]*return; \}/);
+  assert.match(js,/resumoGanhoMelhoria\(comparacao\)/);
+  assert.match(js,/class="upgrade-real-gain"/);
+  assert.match(js,/Compatibilidade parcial · confira a prévia/);
+  assert.match(js,/if \(aplicando \|\| evento.target === campoBudget\) return/);
+});
+
 test("categorias de melhorias usam o checkbox Lottie compartilhado e a cor primária",() => {
   assert.match(js,/CATEGORIAS\.map\(categoria => '<label class="ui-check"><input type="checkbox"/);
   assert.match(js,/iconeAnimado\("checkbox"\) \+ '<span>' \+ categoria\.nome/);
