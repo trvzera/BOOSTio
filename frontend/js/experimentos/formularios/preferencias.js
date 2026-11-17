@@ -1,4 +1,8 @@
-import { memoriaSugerida, perfisUso } from "./objetivos.js";
+import {
+  memoriaSugerida,
+  armazenamentoSugerido,
+  perfisUso,
+} from "./objetivos.js";
 
 export const prioridadesPreview = [
   ["desempenho", "Melhor desempenho"],
@@ -55,6 +59,11 @@ export function criteriosUso(tipo, respostas, valorComputador) {
     prioridades: uso?.prioridade,
     memoriaSugeridaGb: memoriaSugerida(respostas.objetivo, valorComputador),
     memoriaEscolhidaPeloUsuario: false,
+    armazenamentoSugeridoGb: armazenamentoSugerido(
+      respostas.objetivo,
+      valorComputador,
+    ),
+    armazenamentoEscolhidoPeloUsuario: false,
     video: uso?.gpu,
     monitor: uso?.monitor,
     painelMonitorPermitido: ["IPS", "Fast IPS", "VA", "Fast VA"],
@@ -69,7 +78,8 @@ export function criteriosUso(tipo, respostas, valorComputador) {
         }
       : {
           marcaNotebookPreferida: respostas.marca_notebook,
-          bateria: respostas.bateria,
+          telaPreferida: respostas.tela || "sem-preferencia",
+          telaFlexivel: true,
           restricoesApple: {
             minimoNotebook: 6000,
             focoJogosPermitido: false,

@@ -34,11 +34,32 @@ export const perfisUso = {
   },
   "edicao-video": {
     titulo: "Edição de vídeo",
-    descricao: "Editar vídeos, imagens e trabalhar com projetos maiores.",
+    descricao: "Montar vídeos, aplicar efeitos e exportar seus projetos.",
     minimo: 3500,
     ram: 32,
     prioridade:
       "Priorizamos processador, placa de vídeo dedicada, mais memória e SSD para os projetos. No monitor, qualidade de imagem e resolução vêm antes de uma taxa de atualização muito alta.",
+    gpu: "dedicada",
+    monitor: "imagem",
+  },
+  "edicao-imagens": {
+    titulo: "Edição de imagens",
+    descricao: "Tratar fotos, criar artes e trabalhar com imagens em camadas.",
+    minimo: 2500,
+    ram: 32,
+    prioridade:
+      "Priorizamos memória, SSD e um monitor com boa qualidade de imagem e cores. Edição simples pode usar o vídeo do processador; uma placa separada entra quando os programas e o orçamento justificarem.",
+    gpu: "conforme-orcamento",
+    monitor: "imagem",
+  },
+  "modelagem-3d": {
+    titulo: "Modelagem 3D",
+    descricao:
+      "Criar modelos, trabalhar com cenas e renderizar projetos em 3D.",
+    minimo: 3500,
+    ram: 32,
+    prioridade:
+      "Priorizamos processador, placa de vídeo dedicada, memória e SSD para as cenas. A escolha da GPU precisa considerar o programa e o renderizador usados; não basta olhar apenas a quantidade de memória da placa.",
     gpu: "dedicada",
     monitor: "imagem",
   },
@@ -80,7 +101,19 @@ export const opcoesUsoPreview = Object.entries(perfisUso).map(([chave, p]) => [
   p.descricao,
 ]);
 export const minimoUso = (objetivo) => perfisUso[objetivo]?.minimo ?? 2500;
+export const orcamentoInicialUso = (objetivo) =>
+  Math.max(3000, minimoUso(objetivo));
 export function memoriaSugerida(objetivo, orcamento) {
   const desejada = perfisUso[objetivo]?.ram ?? 16;
   return desejada === 32 && orcamento >= 5500 ? 32 : 16;
+}
+export function armazenamentoSugerido(objetivo, orcamento) {
+  return [
+    "edicao-video",
+    "edicao-imagens",
+    "modelagem-3d",
+    "programacao",
+  ].includes(objetivo) && orcamento >= 5500
+    ? 1024
+    : 512;
 }

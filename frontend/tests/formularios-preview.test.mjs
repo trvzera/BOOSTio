@@ -12,6 +12,7 @@ import {
 import {
   perfisUso,
   minimoUso,
+  orcamentoInicialUso,
 } from "../js/experimentos/formularios/objetivos.js";
 import { comprimentosDisponiveis } from "../js/experimentos/formularios/catalogo.js";
 import { motivoMarcaNotebook } from "../js/experimentos/formularios/preferencias.js";
@@ -37,6 +38,8 @@ const pc = (k) => perguntasPc.find((p) => p.chave === k);
 const valido = (tipo = "pc", extras = {}) => ({
   ...novasRespostasPreview(tipo),
   objetivo: "jogos",
+  orcamento: 5000,
+  modoReserva: "percentual",
   pecas: ["nenhuma"],
   perifericos: "sem-perifericos",
   prioridade_montagem: "custo_beneficio",
@@ -52,25 +55,33 @@ const resultado = (extras) => ({
   ...extras,
 });
 
-test("sete usos com prioridades distintas e mínimos especificados; orçamento inicial em 5000", () => {
+test("nove usos com prioridades distintas; orçamento inicial respeita o mínimo do perfil", () => {
   assert.deepEqual(Object.keys(perfisUso), [
     "jogos",
     "planilhas",
     "reunioes",
     "edicao-video",
+    "edicao-imagens",
+    "modelagem-3d",
     "programacao",
     "estudos",
     "todos",
   ]);
-  for (const u of ["jogos", "edicao-video", "programacao"])
+  for (const u of ["jogos", "edicao-video", "modelagem-3d", "programacao"])
     assert.equal(minimoUso(u), 3500);
-  for (const u of ["planilhas", "reunioes", "estudos", "todos"])
+  for (const u of [
+    "planilhas",
+    "reunioes",
+    "edicao-imagens",
+    "estudos",
+    "todos",
+  ])
     assert.equal(minimoUso(u), 2500);
-  assert.equal(novasRespostasPreview("pc").orcamento, 5000);
-  assert.equal(novasRespostasPreview("notebook").orcamento, 5000);
+  assert.equal(novasRespostasPreview("pc").orcamento, 3000);
+  assert.equal(novasRespostasPreview("notebook").orcamento, 3000);
   assert.equal(
     new Set(Object.values(perfisUso).map((p) => p.prioridade)).size,
-    7,
+    9,
   );
 });
 test("rascunhos e resumos são independentes; não geram recomendações reais", () => {
@@ -267,11 +278,30 @@ test("notebook não pergunta RAM nem sistema; memória deriva do uso e dos recur
       .memoriaSugeridaGb,
     16,
   );
-  const html = camposHtml(
-    perguntasNotebook.find((p) => p.tipo === "preferencias"),
-    { respostas: r, tipo: "notebook", id: (k) => "n-" + k, catalogo },
+  assert.deepEqual(
+    perguntasNotebook.map((p) => p.chave),
+    ["objetivo", "orcamento", "tela", "perifericos"],
   );
-  assert.doesNotMatch(html, /data-select="(?:memoria|sistema)"/);
+  const html = perguntasNotebook
+    .map((p) =>
+      camposHtml(p, {
+        respostas: r,
+        tipo: "notebook",
+        id: (k) => "n-" + k,
+        catalogo,
+      }),
+    )
+    .join("");
+  assert.doesNotMatch(
+    html,
+    /data-(?:select|answer)="(?:memoria|sistema|armazenamento|bateria|mobilidade)"/,
+  );
+  assert.equal(plano.criterios.armazenamentoSugeridoGb, 1024);
+  assert.equal(
+    montarPlanoPreview("notebook", { ...r, orcamento: 4000 }).criterios
+      .armazenamentoSugeridoGb,
+    512,
+  );
   assert.match(
     revisaoHtml({
       respostas: r,
@@ -329,5 +359,86 @@ test("falhas identificam a pergunta; falha genérica não atribui causa inventad
   assert.match(
     identificarErroFormulario(new Error("timeout")).message,
     /não informou qual resposta/,
+  );
+});
+
+test("reserva em reais permite 2500 para o PC e 500 para extras sem arredondar porcentagens", () => {
+  const r = {
+    ...novasRespostasPreview("pc"),
+    objetivo: "estudos",
+    perifericos: "todos-perifericos",
+    prioridade_montagem: "custo_beneficio",
+  };
+  const d = avaliarOrcamentoPreview("pc", r);
+  assert.equal(d.valido, true);
+  assert.equal(d.pc, 2500);
+  assert.equal(d.perifericos, 500);
+  assert.equal(percentualPreview(r, "pc"), null);
+  assert.equal(
+    avaliarOrcamentoPreview("pc", {
+      ...r,
+      modoReserva: "percentual",
+      percentualPerifericos: 20,
+    }).valido,
+    false,
+  );
+  assert.equal(
+    avaliarOrcamentoPreview("pc", { ...r, reservaPerifericosReais: 499 })
+      .valido,
+    false,
+  );
+  for (const reserva of [NaN, Infinity, -1, 0, 3000, 5000])
+    assert.equal(
+      avaliarOrcamentoPreview("pc", { ...r, reservaPerifericosReais: reserva })
+        .valido,
+      false,
+    );
+  const centavos = avaliarOrcamentoPreview("pc", {
+    ...r,
+    orcamento: 3000.02,
+    reservaPerifericosReais: 500.01,
+  });
+  assert.equal(centavos.pc, 2500.01);
+  assert.equal(centavos.perifericos, 500.01);
+  assert.equal(montarPlanoPreview("pc", r).devolverSobraPerifericosAoPc, false);
+  assert.equal(orcamentoInicialUso("estudos"), 3000);
+  assert.equal(orcamentoInicialUso("modelagem-3d"), 3500);
+});
+test("tela de notebook é preferência flexível; orçamento continua obrigatório", () => {
+  const plano = montarPlanoPreview(
+    "notebook",
+    valido("notebook", { objetivo: "edicao-imagens", tela: "grande" }),
+  );
+  assert.equal(plano.criterios.telaFlexivel, true);
+  assert.equal(plano.telaPreferida, "grande");
+  const adaptado = validarResultadoGeracao(
+    plano,
+    resultado({ tela: "equilibrada" }),
+  );
+  assert.equal(adaptado.valido, true);
+  assert.match(adaptado.avisos.join(" "), /tela foi adaptado/);
+  assert.throws(
+    () =>
+      validarResultadoGeracao(
+        plano,
+        resultado({ tela: "grande", precoComputador: 5001 }),
+      ),
+    (e) => e.codigo === "orcamento",
+  );
+});
+test("imagens admite vídeo integrado; vídeo e modelagem 3D exigem GPU dedicada no contrato", () => {
+  for (const uso of ["edicao-video", "modelagem-3d"]) {
+    const plano = montarPlanoPreview("pc", valido("pc", { objetivo: uso }));
+    assert.throws(
+      () => validarResultadoGeracao(plano, resultado({ placaVideo: null })),
+      (e) => e.codigo === "placa-video",
+    );
+  }
+  assert.equal(
+    validarResultadoGeracao(
+      montarPlanoPreview("pc", valido("pc", { objetivo: "edicao-imagens" })),
+      resultado({ placaVideo: null }),
+    ).valido,
+    true,
   );
 });

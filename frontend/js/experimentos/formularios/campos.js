@@ -1,7 +1,7 @@
 import { htmlSeguro as h, moeda } from "../../build/catalogo.js";
 import { iconeAnimado } from "../../components/ui.js";
 import { pecasPreview } from "./perguntas.js";
-import { minimoUso, perfisUso } from "./objetivos.js";
+import { minimoUso, orcamentoInicialUso, perfisUso } from "./objetivos.js";
 import {
   prioridadesPreview,
   marcasPreview,
@@ -133,7 +133,7 @@ export function orcamentoHtml(ctx) {
     d = avaliarOrcamentoPreview(tipo, r);
   return (
     '<div class="test-form-budget-presets">' +
-    [minimo, 5000, 8000]
+    [...new Set([minimo, orcamentoInicialUso(r.objetivo), 5000, 8000])]
       .map(
         (v) =>
           '<button type="button" class="btn-secondary" data-budget="' +
@@ -164,7 +164,7 @@ export function orcamentoHtml(ctx) {
     '" max="' +
     Math.max(20000, r.orcamento || 20000) +
     '" step="100" data-preview-budget-range aria-label="Ajustar limite de teste de cem em cem reais" value="' +
-    h(r.orcamento || 5000) +
+    h(r.orcamento || orcamentoInicialUso(r.objetivo)) +
     '">' +
     '<p class="test-form-help" id="' +
     id("minimum") +
@@ -242,25 +242,49 @@ export function redeHtml(ctx) {
 function reservaHtml(ctx) {
   const { respostas: r, id, tipo } = ctx;
   if (!precisaPerifericos(tipo, r)) return "";
+  const emValor = r.modoReserva === "valor";
   return (
+    selectHtml(
+      "modoReserva",
+      "Como deseja limitar os acessórios?",
+      [
+        ["valor", "Definir um valor em reais"],
+        ["percentual", "Reservar uma porcentagem do total"],
+      ],
+      ctx,
+    ) +
     '<label class="test-form-field" for="' +
-    id("percent") +
-    '">Porcentagem máxima para os acessórios novos<input id="' +
-    id("percent") +
-    '" data-number="percentualPerifericos" type="number" min="1" max="99" step="1" required value="' +
-    h(r.percentualPerifericos) +
+    id("reserve") +
+    '">' +
+    (emValor
+      ? "Valor máximo para os acessórios novos (R$)"
+      : "Porcentagem máxima para os acessórios novos") +
+    '<input id="' +
+    id("reserve") +
+    '" data-number="' +
+    (emValor ? "reservaPerifericosReais" : "percentualPerifericos") +
+    '" type="number" inputmode="decimal" min="' +
+    (emValor ? (tipo === "pc" ? 500 : 0.01) : 1) +
+    '" max="' +
+    (emValor ? 1000000 : 99) +
+    '" step="' +
+    (emValor ? "0.01" : "1") +
+    '" required value="' +
+    h(emValor ? r.reservaPerifericosReais : r.percentualPerifericos) +
     '" aria-describedby="' +
     id("allocation") +
     '"></label>' +
     '<p class="test-form-help" id="' +
     id("allocation") +
-    '" data-allocation></p><p class="test-form-help">Não precisamos gastar toda a reserva. O que sobrar fica com você e não aumenta o limite do computador.' +
+    '" data-allocation></p>' +
+    '<p class="test-form-help">Não precisamos gastar toda a reserva. O que sobrar fica com você e não aumenta o limite do computador.' +
     (tipo === "pc"
       ? " O mínimo atual para periféricos novos é R$ 500; o catálogo pode exigir mais."
       : " Escolha só os acessórios de que precisa.") +
     "</p>"
   );
 }
+
 function webcamHtml(ctx) {
   const r = ctx.respostas;
   if (!r.perifericos || r.perifericos === "sem-perifericos") return "";
@@ -380,29 +404,6 @@ export function camposHtml(pergunta, ctx) {
       '<p class="test-form-scroll-hint">' +
       iconeAnimado("arrow", "down") +
       "Role para ver todas as preferências.</p><div data-preview-appearance-form></div>"
-    );
-  if (pergunta.tipo === "preferencias")
-    return (
-      selectHtml(
-        "armazenamento",
-        "Espaço para arquivos e programas",
-        [
-          ["sem-preferencia", "Quero ajuda para escolher"],
-          ["512-gb", "SSD de pelo menos 512 GB"],
-          ["1-tb", "SSD de pelo menos 1 TB"],
-        ],
-        ctx,
-      ) +
-      selectHtml(
-        "bateria",
-        "Uso longe da tomada",
-        [
-          ["sem-preferencia", "Ainda não sei"],
-          ["priorizar", "Quero priorizar a duração da bateria"],
-          ["tomada", "Vou usar mais ligado à tomada"],
-        ],
-        ctx,
-      )
     );
   return (
     (pergunta.chave === "objetivo"

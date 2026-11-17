@@ -28,7 +28,7 @@ const orcamento = {
   etapa: "Orçamento",
   titulo: "Quanto você pode gastar?",
   descricao:
-    "Começamos em até R$ 5.000. Você pode mudar o valor. O mínimo depende do uso e vale para o computador, depois de separar os acessórios.",
+    "Para usos simples, começamos em R$ 3.000. Para os mais exigentes, respeitamos o mínimo de R$ 3.500. Você pode mudar o limite; os acessórios saem desse mesmo total.",
   tipo: "orcamento",
 };
 export const perguntasPc = [
@@ -85,24 +85,11 @@ export const perguntasNotebook = [
   objetivo(true),
   { ...orcamento },
   {
-    chave: "mobilidade",
-    etapa: "Mobilidade",
-    titulo: "Você vai levar o notebook com frequência?",
-    descricao:
-      "Peso, bateria e tamanho da tela fazem diferença ao transportar.",
-    tipo: "opcoes",
-    opcoes: [
-      ["fixo", "Vou usar mais em casa"],
-      ["ocasional", "Vou levar de vez em quando"],
-      ["diaria", "Vou levar todos os dias"],
-    ],
-  },
-  {
     chave: "tela",
     etapa: "Tela",
-    titulo: "Qual tamanho de tela combina com você?",
+    titulo: "Tem preferência de tamanho de tela?",
     descricao:
-      "Uma tela menor facilita o transporte; uma maior oferece mais espaço para trabalhar.",
+      "Vamos tentar seguir sua preferência. Se não houver um modelo adequado, podemos sugerir outro tamanho, sem ultrapassar o orçamento nem prejudicar o uso escolhido.",
     tipo: "opcoes",
     opcoes: [
       ["sem-preferencia", "Ainda não sei"],
@@ -123,17 +110,15 @@ export const perguntasNotebook = [
       ["escolher-extras", "Quero escolher acessórios externos"],
     ],
   },
-  {
-    chave: "preferencias",
-    etapa: "Preferências",
-    titulo: "O que mais importa na sua rotina?",
-    descricao:
-      "Definimos a memória conforme o uso e o orçamento. Você não precisa escolher quantos GB comprar. A preferência de marca fica na revisão final.",
-    tipo: "preferencias",
-  },
 ];
 export function novasRespostasPreview(tipo) {
-  const base = { orcamento: 5000, percentualPerifericos: 20 };
+  const base = {
+    orcamento: 3000,
+    orcamentoAlterado: false,
+    modoReserva: "valor",
+    reservaPerifericosReais: 500,
+    percentualPerifericos: 20,
+  };
   return tipo === "pc"
     ? {
         ...base,
@@ -149,8 +134,7 @@ export function novasRespostasPreview(tipo) {
     : {
         ...base,
         extrasNotebook: [],
-        armazenamento: "sem-preferencia",
-        bateria: "sem-preferencia",
+        tela: "sem-preferencia",
         marca_notebook: "sem-preferencia",
       };
 }

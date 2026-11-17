@@ -14,6 +14,7 @@ import {
   percentualPreview,
   perifericosPreview,
   webcamSolicitada,
+  precisaPerifericos,
 } from "./perifericos.js";
 import { comprimentosDisponiveis } from "./catalogo.js";
 
@@ -27,8 +28,26 @@ export class ErroGeracaoFormulario extends Error {
 }
 export function avaliarOrcamentoPreview(tipo, respostas) {
   const percentual = percentualPreview(respostas, tipo),
-    d = dividirOrcamento(respostas.orcamento, percentual),
+    emValor =
+      respostas.modoReserva === "valor" && precisaPerifericos(tipo, respostas),
     minimo = minimoUso(respostas.objetivo);
+  let d;
+  if (emValor) {
+    if (
+      !orcamentoValido(respostas.orcamento) ||
+      !orcamentoValido(respostas.reservaPerifericosReais) ||
+      respostas.reservaPerifericosReais >= respostas.orcamento
+    )
+      return {
+        valido: false,
+        minimo,
+        mensagem:
+          "Informe uma reserva em reais maior que zero e menor que o orçamento total.",
+      };
+    const total = Math.round(respostas.orcamento * 100),
+      reserva = Math.round(respostas.reservaPerifericosReais * 100);
+    d = { pc: (total - reserva) / 100, perifericos: reserva / 100 };
+  } else d = dividirOrcamento(respostas.orcamento, percentual);
   if (!d)
     return {
       valido: false,
@@ -36,14 +55,16 @@ export function avaliarOrcamentoPreview(tipo, respostas) {
         "Informe um orçamento válido e uma porcentagem inteira de 0 a 99.",
       minimo,
     };
-  const minimoPerifericos = tipo === "pc" && percentual > 0 ? 500 : 0;
-  const minimoTotal =
-    Math.ceil(
-      Math.max(
-        (minimo * 100) / (100 - percentual),
-        percentual ? (minimoPerifericos * 100) / percentual : 0,
-      ) * 100,
-    ) / 100;
+  const minimoPerifericos =
+    tipo === "pc" && precisaPerifericos(tipo, respostas) ? 500 : 0;
+  const minimoTotal = emValor
+    ? minimo + d.perifericos
+    : Math.ceil(
+        Math.max(
+          (minimo * 100) / (100 - percentual),
+          percentual ? (minimoPerifericos * 100) / percentual : 0,
+        ) * 100,
+      ) / 100;
   if (d.pc < minimo)
     return {
       valido: false,
@@ -180,7 +201,7 @@ export function montarPlanoPreview(tipo, respostas) {
           aparencia: normalizarAparencia(respostas.aparencia),
           rede: structuredClone(respostas.rede),
         }
-      : {}),
+      : { telaPreferida: respostas.tela || "sem-preferencia" }),
     webcam: {
       solicitada: extras.includes("webcam"),
       preferirFullHd: true,
@@ -192,6 +213,11 @@ export function montarPlanoPreview(tipo, respostas) {
         ? `O processador deve ser ${respostas.preferencia_processador.toUpperCase()}. Se inviável, devolver um erro identificado e não trocar a marca silenciosamente.`
         : "Escolher o processador conforme o objetivo e o orçamento.",
       "A aparência é flexível: tente cor, tamanho e estilo preferidos; se não houver combinação, use outra aparência compatível sem ultrapassar o orçamento.",
+      ...(tipo === "notebook"
+        ? [
+            "O tamanho da tela é uma preferência flexível. Memória e SSD devem ser definidos pelo uso e pelo orçamento; não rejeitar um notebook adequado apenas pelo tamanho da tela.",
+          ]
+        : []),
       "Não omitir peças obrigatórias, não ignorar incompatibilidades e não inventar preço, estoque ou fichas para atender uma preferência.",
     ],
   };
@@ -257,6 +283,16 @@ export function validarResultadoGeracao(plano, resultado) {
       "A configuração tem peças obrigatórias ausentes ou conflitos confirmados. Não será salva.",
     );
   const avisos = [];
+  if (
+    plano.tipo === "notebook" &&
+    plano.telaPreferida &&
+    plano.telaPreferida !== "sem-preferencia" &&
+    resultado.tela &&
+    resultado.tela !== plano.telaPreferida
+  )
+    avisos.push(
+      "O tamanho da tela foi adaptado para respeitar o uso e o orçamento. Não é uma incompatibilidade.",
+    );
   if (
     plano.tipo === "notebook" &&
     String(resultado.fabricanteNotebook || "")

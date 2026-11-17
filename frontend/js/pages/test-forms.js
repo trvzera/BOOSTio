@@ -4,7 +4,10 @@ import {
   pecasPreview,
   novasRespostasPreview,
 } from "../experimentos/formularios/perguntas.js";
-import { perfisUso } from "../experimentos/formularios/objetivos.js";
+import {
+  perfisUso,
+  orcamentoInicialUso,
+} from "../experimentos/formularios/objetivos.js";
 import { carregarCatalogoFormulario } from "../experimentos/formularios/catalogo.js";
 import {
   avaliarOrcamentoPreview,
@@ -52,7 +55,7 @@ function iniciarFormularioTeste(raiz, tipo) {
           " para acessórios · até " +
           moeda(d.pc) +
           " para o computador."
-        : "Informe uma porcentagem inteira de 1 a 99.";
+        : d.mensagem;
     if (divisao)
       divisao.textContent = d.valido
         ? "Até " +
@@ -149,6 +152,11 @@ function iniciarFormularioTeste(raiz, tipo) {
         respostas.orcamento = e.valueAsNumber;
         form.querySelector('[data-number="orcamento"]').value = e.value;
       }
+      if (
+        e.dataset.number === "orcamento" ||
+        e.hasAttribute("data-preview-budget-range")
+      )
+        respostas.orcamentoAlterado = true;
       if (e.dataset.number === "orcamento") {
         const range = form.querySelector("[data-preview-budget-range]");
         if (range) {
@@ -184,7 +192,16 @@ function iniciarFormularioTeste(raiz, tipo) {
         atualizarAvanco();
         return;
       }
-      if (e.dataset.select) respostas[e.dataset.select] = e.value;
+      if (e.dataset.select) {
+        respostas[e.dataset.select] = e.value;
+        if (e.dataset.select === "modoReserva") {
+          renderizar();
+          raiz
+            .querySelector('[data-select="modoReserva"]')
+            ?.focus({ preventScroll: true });
+          return;
+        }
+      }
       if (e.hasAttribute("data-webcam")) {
         respostas.incluirWebcam = e.checked;
         respostas.webcamAlterada = true;
@@ -209,6 +226,8 @@ function iniciarFormularioTeste(raiz, tipo) {
             delete respostas.pecasDetalhes[e.value];
         } else respostas[chave] = e.value;
         if (chave === "objetivo") {
+          if (!respostas.orcamentoAlterado)
+            respostas.orcamento = orcamentoInicialUso(e.value);
           if (tipo === "pc" && !respostas.webcamAlterada)
             respostas.incluirWebcam = e.value === "reunioes";
           raiz.querySelector("[data-preview-help-copy]").textContent =
