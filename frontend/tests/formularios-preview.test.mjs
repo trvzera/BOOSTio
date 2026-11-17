@@ -103,7 +103,8 @@ test("mínimo do computador é calculado depois da reserva e sobra não retorna 
   assert.match(
     validarEtapaPreview("pc", pc("perifericos"), {
       ...r,
-      percentualPerifericos: 5,
+      orcamento: 4000,
+      percentualPerifericos: 10,
     }),
     /500/,
   );
@@ -311,9 +312,9 @@ test("extras de notebook são opcionais, independentes dos periféricos do deskt
   const r = valido("notebook", {
     perifericos: "escolher-extras",
     extrasNotebook: ["mouse"],
-    percentualPerifericos: 5,
+    percentualPerifericos: 10,
   });
-  assert.equal(percentualPreview(r, "notebook"), 5);
+  assert.equal(percentualPreview(r, "notebook"), 10);
   assert.deepEqual(montarPlanoPreview("notebook", r).acessorios, ["mouse"]);
   const q = perguntasNotebook.find((p) => p.chave === "perifericos");
   assert.ok(validarEtapaPreview("notebook", q, { ...r, extrasNotebook: [] }));
@@ -459,6 +460,55 @@ test("edição de vídeos e imagens é uma opção única e prioriza 32 GB de RA
     assert.throws(
       () => validarResultadoGeracao(plano, resultado({ placaVideo: null })),
       (e) => e.codigo === "placa-video",
+    );
+  }
+});
+
+test("periféricos aceitam apenas 10% a 40%, inclusive nos planos de geração", () => {
+  for (const tipo of ["pc", "notebook"]) {
+    const r = valido(tipo, {
+      orcamento: 10000,
+      perifericos: tipo === "pc" ? "todos-perifericos" : "escolher-extras",
+      extrasNotebook: ["mouse"],
+    });
+    for (const percentualPerifericos of [10, 20, 40]) {
+      const dados = { ...r, percentualPerifericos };
+      assert.equal(avaliarOrcamentoPreview(tipo, dados).valido, true);
+      assert.equal(
+        montarPlanoPreview(tipo, dados).tetoPerifericos,
+        (10000 * percentualPerifericos) / 100,
+      );
+    }
+    for (const percentualPerifericos of [
+      0,
+      1,
+      9,
+      9.5,
+      40.5,
+      41,
+      99,
+      NaN,
+      Infinity,
+    ]) {
+      const dados = { ...r, percentualPerifericos };
+      assert.match(avaliarOrcamentoPreview(tipo, dados).mensagem, /10% e 40%/);
+      assert.throws(
+        () => montarPlanoPreview(tipo, dados),
+        (e) => e.codigo === "orcamento",
+      );
+    }
+    const q = (tipo === "pc" ? perguntasPc : perguntasNotebook).find(
+      (p) => p.chave === "perifericos",
+    );
+    const html = camposHtml(q, { tipo, respostas: r, id: (k) => k, catalogo });
+    assert.match(html, /min="10" max="40"/);
+    assert.equal(
+      avaliarOrcamentoPreview(tipo, {
+        ...r,
+        perifericos: "sem-perifericos",
+        percentualPerifericos: 99,
+      }).perifericos,
+      0,
     );
   }
 });

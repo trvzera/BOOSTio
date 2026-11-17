@@ -12,6 +12,8 @@ import {
   perifericosPreview,
   acessoriosNotebook,
   precisaPerifericos,
+  MINIMO_PERCENTUAL_PERIFERICOS,
+  MAXIMO_PERCENTUAL_PERIFERICOS,
 } from "./perifericos.js";
 import { avaliarOrcamentoPreview } from "./regras.js";
 
@@ -246,10 +248,14 @@ function reservaHtml(ctx) {
   return (
     '<label class="test-form-field" for="' +
     id("reserve") +
-    '">Porcentagem máxima para os acessórios novos' +
+    '">Porcentagem máxima para os acessórios novos (10% a 40%)' +
     '<input id="' +
     id("reserve") +
-    '" data-number="percentualPerifericos" type="number" inputmode="numeric" min="1" max="99" step="1" required value="' +
+    '" data-number="percentualPerifericos" type="number" inputmode="numeric" min="' +
+    MINIMO_PERCENTUAL_PERIFERICOS +
+    '" max="' +
+    MAXIMO_PERCENTUAL_PERIFERICOS +
+    '" step="1" required value="' +
     h(r.percentualPerifericos) +
     '" aria-describedby="' +
     id("allocation") +

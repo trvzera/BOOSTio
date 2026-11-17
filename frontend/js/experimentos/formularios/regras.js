@@ -15,6 +15,8 @@ import {
   perifericosPreview,
   webcamSolicitada,
   precisaPerifericos,
+  MINIMO_PERCENTUAL_PERIFERICOS,
+  MAXIMO_PERCENTUAL_PERIFERICOS,
 } from "./perifericos.js";
 import { comprimentosDisponiveis } from "./catalogo.js";
 
@@ -28,13 +30,23 @@ export class ErroGeracaoFormulario extends Error {
 }
 export function avaliarOrcamentoPreview(tipo, respostas) {
   const percentual = percentualPreview(respostas, tipo),
-    minimo = minimoUso(respostas.objetivo),
-    d = dividirOrcamento(respostas.orcamento, percentual);
+    minimo = minimoUso(respostas.objetivo);
+  if (
+    precisaPerifericos(tipo, respostas) &&
+    (!Number.isInteger(percentual) ||
+      percentual < MINIMO_PERCENTUAL_PERIFERICOS ||
+      percentual > MAXIMO_PERCENTUAL_PERIFERICOS)
+  )
+    return {
+      valido: false,
+      minimo,
+      mensagem: `Escolha uma porcentagem inteira entre ${MINIMO_PERCENTUAL_PERIFERICOS}% e ${MAXIMO_PERCENTUAL_PERIFERICOS}% do orçamento total para os periféricos.`,
+    };
+  const d = dividirOrcamento(respostas.orcamento, percentual);
   if (!d)
     return {
       valido: false,
-      mensagem:
-        "Informe um orçamento válido e uma porcentagem inteira de 0 a 99.",
+      mensagem: "Informe um orçamento válido para continuar.",
       minimo,
     };
   const minimoPerifericos =

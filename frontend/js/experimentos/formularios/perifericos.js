@@ -1,3 +1,6 @@
+export const MINIMO_PERCENTUAL_PERIFERICOS = 10;
+export const MAXIMO_PERCENTUAL_PERIFERICOS = 40;
+
 export const perifericosPreview = [
   ["monitor", "Monitor"],
   ["teclado", "Teclado"],
