@@ -24,9 +24,7 @@ export function precisaPerifericos(tipo, respostas) {
 }
 export function percentualPreview(respostas, tipo = "pc") {
   return precisaPerifericos(tipo, respostas)
-    ? respostas.modoReserva === "valor"
-      ? null
-      : respostas.percentualPerifericos
+    ? respostas.percentualPerifericos
     : 0;
 }
 export function webcamSolicitada(tipo, respostas) {

@@ -115,8 +115,6 @@ export function novasRespostasPreview(tipo) {
   const base = {
     orcamento: 3000,
     orcamentoAlterado: false,
-    modoReserva: "valor",
-    reservaPerifericosReais: 500,
     percentualPerifericos: 20,
   };
   return tipo === "pc"

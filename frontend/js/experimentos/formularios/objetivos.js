@@ -33,23 +33,13 @@ export const perfisUso = {
     webcam: true,
   },
   "edicao-video": {
-    titulo: "Edição de vídeo",
-    descricao: "Montar vídeos, aplicar efeitos e exportar seus projetos.",
+    titulo: "Edição de vídeos e imagens",
+    descricao: "Editar vídeos, tratar fotos, criar artes e aplicar efeitos.",
     minimo: 3500,
     ram: 32,
     prioridade:
-      "Priorizamos processador, placa de vídeo dedicada, mais memória e SSD para os projetos. No monitor, qualidade de imagem e resolução vêm antes de uma taxa de atualização muito alta.",
+      "Priorizamos 32 GB de memória RAM para trabalhar com vídeos, fotos em camadas e efeitos, além de processador, placa de vídeo dedicada e SSD. Essa memória é uma prioridade de escolha, respeitando o orçamento. No monitor, qualidade de imagem e resolução vêm antes de uma taxa de atualização muito alta.",
     gpu: "dedicada",
-    monitor: "imagem",
-  },
-  "edicao-imagens": {
-    titulo: "Edição de imagens",
-    descricao: "Tratar fotos, criar artes e trabalhar com imagens em camadas.",
-    minimo: 2500,
-    ram: 32,
-    prioridade:
-      "Priorizamos memória, SSD e um monitor com boa qualidade de imagem e cores. Edição simples pode usar o vídeo do processador; uma placa separada entra quando os programas e o orçamento justificarem.",
-    gpu: "conforme-orcamento",
     monitor: "imagem",
   },
   "modelagem-3d": {
@@ -104,16 +94,13 @@ export const minimoUso = (objetivo) => perfisUso[objetivo]?.minimo ?? 2500;
 export const orcamentoInicialUso = (objetivo) =>
   Math.max(3000, minimoUso(objetivo));
 export function memoriaSugerida(objetivo, orcamento) {
+  if (objetivo === "edicao-video") return 32;
   const desejada = perfisUso[objetivo]?.ram ?? 16;
   return desejada === 32 && orcamento >= 5500 ? 32 : 16;
 }
 export function armazenamentoSugerido(objetivo, orcamento) {
-  return [
-    "edicao-video",
-    "edicao-imagens",
-    "modelagem-3d",
-    "programacao",
-  ].includes(objetivo) && orcamento >= 5500
+  return ["edicao-video", "modelagem-3d", "programacao"].includes(objetivo) &&
+    orcamento >= 5500
     ? 1024
     : 512;
 }

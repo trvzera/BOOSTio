@@ -133,7 +133,8 @@ export function orcamentoHtml(ctx) {
     d = avaliarOrcamentoPreview(tipo, r);
   return (
     '<div class="test-form-budget-presets">' +
-    [...new Set([minimo, orcamentoInicialUso(r.objetivo), 5000, 8000])]
+    [3000, 5000, 8000]
+      .filter((v) => v >= minimo)
       .map(
         (v) =>
           '<button type="button" class="btn-secondary" data-budget="' +
@@ -242,42 +243,21 @@ export function redeHtml(ctx) {
 function reservaHtml(ctx) {
   const { respostas: r, id, tipo } = ctx;
   if (!precisaPerifericos(tipo, r)) return "";
-  const emValor = r.modoReserva === "valor";
   return (
-    selectHtml(
-      "modoReserva",
-      "Como deseja limitar os acessórios?",
-      [
-        ["valor", "Definir um valor em reais"],
-        ["percentual", "Reservar uma porcentagem do total"],
-      ],
-      ctx,
-    ) +
     '<label class="test-form-field" for="' +
     id("reserve") +
-    '">' +
-    (emValor
-      ? "Valor máximo para os acessórios novos (R$)"
-      : "Porcentagem máxima para os acessórios novos") +
+    '">Porcentagem máxima para os acessórios novos' +
     '<input id="' +
     id("reserve") +
-    '" data-number="' +
-    (emValor ? "reservaPerifericosReais" : "percentualPerifericos") +
-    '" type="number" inputmode="decimal" min="' +
-    (emValor ? (tipo === "pc" ? 500 : 0.01) : 1) +
-    '" max="' +
-    (emValor ? 1000000 : 99) +
-    '" step="' +
-    (emValor ? "0.01" : "1") +
-    '" required value="' +
-    h(emValor ? r.reservaPerifericosReais : r.percentualPerifericos) +
+    '" data-number="percentualPerifericos" type="number" inputmode="numeric" min="1" max="99" step="1" required value="' +
+    h(r.percentualPerifericos) +
     '" aria-describedby="' +
     id("allocation") +
     '"></label>' +
     '<p class="test-form-help" id="' +
     id("allocation") +
     '" data-allocation></p>' +
-    '<p class="test-form-help">Não precisamos gastar toda a reserva. O que sobrar fica com você e não aumenta o limite do computador.' +
+    '<p class="test-form-help">A porcentagem é sempre calculada sobre o orçamento total. Não precisamos gastar toda a reserva. O que sobrar fica com você e não aumenta o limite do computador.' +
     (tipo === "pc"
       ? " O mínimo atual para periféricos novos é R$ 500; o catálogo pode exigir mais."
       : " Escolha só os acessórios de que precisa.") +

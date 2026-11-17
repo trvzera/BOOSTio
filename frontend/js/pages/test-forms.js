@@ -27,6 +27,7 @@ import { ajustarGuiasConhecimento } from "../conta/preferencias-uso.js";
 import { iniciarIcones } from "../components/ui.js";
 
 // Somente laboratório: sem geração real, escrita na conta ou import do fluxo oficial.
+// Na integração, preservar a estrutura e o CSS do formulário oficial; não migrar este painel.
 function iniciarFormularioTeste(raiz, tipo) {
   const perguntas = tipo === "pc" ? perguntasPc : perguntasNotebook,
     id = (chave) => "preview-form-" + tipo + "-" + chave;
@@ -192,16 +193,7 @@ function iniciarFormularioTeste(raiz, tipo) {
         atualizarAvanco();
         return;
       }
-      if (e.dataset.select) {
-        respostas[e.dataset.select] = e.value;
-        if (e.dataset.select === "modoReserva") {
-          renderizar();
-          raiz
-            .querySelector('[data-select="modoReserva"]')
-            ?.focus({ preventScroll: true });
-          return;
-        }
-      }
+      if (e.dataset.select) respostas[e.dataset.select] = e.value;
       if (e.hasAttribute("data-webcam")) {
         respostas.incluirWebcam = e.checked;
         respostas.webcamAlterada = true;

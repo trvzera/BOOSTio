@@ -28,26 +28,8 @@ export class ErroGeracaoFormulario extends Error {
 }
 export function avaliarOrcamentoPreview(tipo, respostas) {
   const percentual = percentualPreview(respostas, tipo),
-    emValor =
-      respostas.modoReserva === "valor" && precisaPerifericos(tipo, respostas),
-    minimo = minimoUso(respostas.objetivo);
-  let d;
-  if (emValor) {
-    if (
-      !orcamentoValido(respostas.orcamento) ||
-      !orcamentoValido(respostas.reservaPerifericosReais) ||
-      respostas.reservaPerifericosReais >= respostas.orcamento
-    )
-      return {
-        valido: false,
-        minimo,
-        mensagem:
-          "Informe uma reserva em reais maior que zero e menor que o orçamento total.",
-      };
-    const total = Math.round(respostas.orcamento * 100),
-      reserva = Math.round(respostas.reservaPerifericosReais * 100);
-    d = { pc: (total - reserva) / 100, perifericos: reserva / 100 };
-  } else d = dividirOrcamento(respostas.orcamento, percentual);
+    minimo = minimoUso(respostas.objetivo),
+    d = dividirOrcamento(respostas.orcamento, percentual);
   if (!d)
     return {
       valido: false,
@@ -57,14 +39,13 @@ export function avaliarOrcamentoPreview(tipo, respostas) {
     };
   const minimoPerifericos =
     tipo === "pc" && precisaPerifericos(tipo, respostas) ? 500 : 0;
-  const minimoTotal = emValor
-    ? minimo + d.perifericos
-    : Math.ceil(
-        Math.max(
-          (minimo * 100) / (100 - percentual),
-          percentual ? (minimoPerifericos * 100) / percentual : 0,
-        ) * 100,
-      ) / 100;
+  const minimoTotal =
+    Math.ceil(
+      Math.max(
+        (minimo * 100) / (100 - percentual),
+        percentual ? (minimoPerifericos * 100) / percentual : 0,
+      ) * 100,
+    ) / 100;
   if (d.pc < minimo)
     return {
       valido: false,
