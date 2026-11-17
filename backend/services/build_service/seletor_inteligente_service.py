@@ -11,7 +11,7 @@ from models.modelos_pecas import MODELOS_PECAS
 from utils.aparencia import validar_aparencia
 from utils.validacoes import validacao_campos
 from utils.sockets import normalizar_socket
-from .planejamento_geracao import validar_minimos
+from .planejamento_geracao import validar_minimos, validar_percentual, ErroPlanejamentoBuild
 from services.validacoes_service.requisitos_armazenamento_service import RequisitosArmazenamentoService
 from .planejar_rede_service import PlanejarRedeService
 from .amostrar_catalogo_service import AmostrarCatalogoService
@@ -159,12 +159,11 @@ class SeletorInteligenteService:
         orcamento = validar_orcamento(dados["orcamento"])
         percentual = dados.get("percentual_perifericos", 0)
         
-        if type(percentual) is not int or not 0 <= percentual <= 99:
-            raise ValueError("A porcentagem para periféricos deve ser de 0 a 99")
+        validar_percentual(percentual)
         
         teto_pc, teto_perifericos = dividir_orcamento(orcamento, percentual)
         
-        validar_minimos(teto_pc, teto_perifericos, percentual)
+        validar_minimos(teto_pc, teto_perifericos, percentual, dados.get("utilidade"))
         
         margem = min(orcamento / 2, max(800, orcamento * 0.25))
         
@@ -210,6 +209,7 @@ class SeletorInteligenteService:
                 pools[tipo] = [p for conexao in PlanejarRedeService.conexoes(contexto["rede"])
                                if PlanejarRedeService.TIPOS.get(conexao.get("tipo")) == tipo
                                for p in PlanejarRedeService.opcoes(pools, conexao, contexto["proprias"])]
+        PreferenciasProcessadorService.exigir_catalogo(pools, contexto["preferencia_processador"], contexto["proprias"], contexto["detalhes_proprias"])
         return pools
 
     def _selecionar_por_benchmark(self, contexto, excluidas):
@@ -226,8 +226,9 @@ class SeletorInteligenteService:
             if tipo == "processador" and contexto["preferencia_processador"] != "sem-preferencia":
                 preferidas = [p for p in pecas if PreferenciasProcessadorService.marca(p, contexto["preferencia_processador"])]
                 if not preferidas:
-                    contexto["planejamento"]["flexibilizacoes"].append(
-                        "Marca de processador flexibilizada: sem alternativa adequada aos limites e à plataforma atual.")
+                    raise ErroPlanejamentoBuild("Não há plataforma da marca escolhida dentro dos limites recebidos. Revise a marca, as peças próprias ou o orçamento.",
+                                               "marca-processador", "Revise a marca do processador", "preferencias")
+                pecas = preferidas
             if tipo == "placa_video":
                 estimativas = contexto["planejamento"]["estimativas_cpu"]
                 cpus = contexto.get("cpus_candidatas", [])

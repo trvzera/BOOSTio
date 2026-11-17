@@ -1,5 +1,7 @@
-export const MINIMO_PERCENTUAL_PERIFERICOS = 10;
-export const MAXIMO_PERCENTUAL_PERIFERICOS = 40;
+export {
+  MINIMO_PERCENTUAL_PERIFERICOS,
+  MAXIMO_PERCENTUAL_PERIFERICOS,
+} from "../../build/orcamento-formulario.js";
 
 export const perifericosPreview = [
   ["monitor", "Monitor"],

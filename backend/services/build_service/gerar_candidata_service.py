@@ -122,7 +122,7 @@ def _validar_candidata_completa(build, catalogo, orcamento, percentual, proprias
 
 def perfil_revisa_investimento(utilidade):
   return PreferenciasPerifericosService.jogos(utilidade) or any(
-    termo in utilidade.casefold() for termo in ("pesado", "render", "3d"))
+    termo in utilidade.casefold() for termo in ("pesado", "render", "3d", "edição", "edicao", "programa"))
 
 
 def _ha_margem_para_melhorar(build, catalogo, teto_pc, proprias):

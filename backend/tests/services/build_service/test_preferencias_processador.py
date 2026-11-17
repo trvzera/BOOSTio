@@ -84,7 +84,7 @@ def test_preferencia_explicita_substitui_regra_de_jogos_e_chega_ao_prompt(marca,
     assert restricoes["processadores_ryzen_prioritarios"] == []
     if marca != "sem-preferencia":
         assert "não se aplica à placa de vídeo" in prompt
-        assert "explique o motivo na descrição" in prompt
+        assert "A marca escolhida é obrigatória" in prompt
 
 
 @pytest.mark.parametrize("marca", [None, "", "Intel", "nvidia", [], {}, True, 1])

@@ -27,9 +27,9 @@ class PlanejarOrcamentoComponentesService:
         if PreferenciasPerifericosService.jogos(uso):
             return 'jogos'
         texto = uso.casefold()
-        if any(t in texto for t in ('pesado', 'render', 'servidor', 'nas')):
+        if RequisitosUsoService.exige_gpu_dedicada(uso) or any(t in texto for t in ('pesado', 'render', 'servidor', 'nas', 'programa')):
             return 'trabalho-pesado'
-        if any(t in texto for t in ('estudo', 'casual', 'escritorio', 'escritório')):
+        if any(t in texto for t in ('estudo', 'casual', 'escritorio', 'escritório', 'planilha', 'reuni')):
             return 'leve'
         return 'equilibrado'
 

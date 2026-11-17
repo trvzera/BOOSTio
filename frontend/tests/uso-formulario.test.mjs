@@ -4,11 +4,11 @@ import { readFile } from 'node:fs/promises';
 import { opcoesUso, prioridadesUso, ajudaCategorias } from '../js/build/uso-formulario.js';
 import { feedbackGeracao } from '../js/build/generation-feedback.js';
 
-test('os cinco usos mantêm valores e explicam as prioridades sem promessa de resultado',()=>{
-  assert.deepEqual(opcoesUso.map(o=>o[0]),['estudos','jogos','trabalho-casual','trabalho-pesado','todos']);
+test('os oito usos mantêm valores e explicam as prioridades sem promessa de resultado',()=>{
+  assert.deepEqual(opcoesUso.map(o=>o[0]),['jogos','planilhas','reunioes','edicao-video','modelagem-3d','programacao','estudos','todos']);
   for(const [valor,,descricao]of opcoesUso){assert.ok(descricao.length>15);assert.ok(prioridadesUso[valor].length>70);}
-  assert.match(prioridadesUso.jogos,/placa de vídeo e o processador/);
-  assert.match(prioridadesUso['trabalho-pesado'],/memória para arquivos grandes/);
+  assert.match(prioridadesUso.jogos,/Placa de vídeo dedicada e processador/);
+  assert.match(prioridadesUso['edicao-video'],/32 GB de memória RAM/);
   assert.doesNotMatch(JSON.stringify(opcoesUso),/AAA|FPS/);
 });
 test('explicações do catálogo preservam limites em vez de garantir encaixe',()=>{

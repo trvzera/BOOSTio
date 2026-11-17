@@ -47,3 +47,17 @@ class PreferenciasProcessadorService:
         sockets.discard(None)
         return [p["id"] for p in catalogo.get("processador", []) if (cls.marca(p, preferencia) if preferencia else cls.ryzen(p))
                 and normalizar_socket(p.get("soquete")) in sockets]
+
+    @classmethod
+    def exigir_catalogo(cls, catalogo, preferencia, proprias=None, detalhes=None):
+        if preferencia not in ("intel", "amd"):
+            return
+        from .planejamento_geracao import ErroPlanejamentoBuild
+        if "processador" in (proprias or {}):
+            cpu = (detalhes or {}).get("processador", {}).get("especificacoes_confirmadas", {})
+            if not cls.marca(cpu, preferencia):
+                raise ErroPlanejamentoBuild("O processador próprio não confirma a marca escolhida. Revise a preferência ou a peça a reaproveitar; não trocaremos a CPU silenciosamente.", "marca-processador", "Revise a marca do processador", "preferencias")
+            return
+        catalogo["processador"] = [p for p in catalogo.get("processador", []) if cls.marca(p, preferencia)]
+        if not catalogo["processador"]:
+            raise ErroPlanejamentoBuild("Não encontramos processador da marca escolhida que atenda ao catálogo e aos limites recebidos. Revise a marca ou o orçamento.", "marca-processador", "Não encontramos uma opção da marca escolhida", "preferencias")

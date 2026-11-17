@@ -1,25 +1,13 @@
-export const opcoesUso = [
-  ["estudos","Estudos","Aulas, pesquisas, trabalhos e programas de estudo."],
-  ["jogos","Jogos","Jogar com boa qualidade de imagem e movimentos mais suaves."],
-  ["trabalho-casual","Trabalho casual","Planilhas, reuniões, e-mails e tarefas do dia a dia."],
-  ["trabalho-pesado","Trabalho pesado","Editar vídeos e imagens ou criar projetos em 3D."],
-  ["todos","Um pouco de tudo","Um computador equilibrado para estudar, trabalhar e jogar."],
-];
-
-export const prioridadesUso = {
-  estudos:"Vamos priorizar o processador e a memória para usar os programas de estudo, além de um SSD para abrir arquivos mais rápido. Uma placa de vídeo separada pode não ser necessária.",
-  jogos:"A placa de vídeo e o processador terão prioridade para jogar: a placa gera as imagens e o processador cuida das ações do jogo. Se incluir monitor, vamos buscar movimentos mais suaves, dentro do valor reservado.",
-  "trabalho-casual":"Vamos dar atenção ao processador, à memória e ao SSD para trabalhar com vários programas. Se incluir monitor, tamanho e espaço para organizar janelas também serão considerados.",
-  "trabalho-pesado":"Vamos priorizar processador para executar as tarefas, memória para arquivos grandes e armazenamento rápido para abrir seus projetos. A placa de vídeo ajuda nos programas de criação. No monitor, vamos considerar detalhes e cores.",
-  todos:"Vamos equilibrar processador, placa de vídeo, memória e armazenamento. A ideia é atender vários usos sem gastar demais em uma peça e deixar faltar em outra.",
-};
+import { perfisUso } from "./perfis-uso.js";
+export { opcoesUso } from "./perfis-uso.js";
+export const prioridadesUso = Object.fromEntries(Object.entries(perfisUso).map(([chave, perfil]) => [chave, perfil.prioridade]));
 
 export const orientacoesEtapas = {
   orcamento:"Este valor é o máximo da montagem. Vamos dividir o dinheiro entre as peças necessárias, sem ultrapassar o limite. Reserve também um valor para o frete, que não está incluído.",
   pecas:"Vamos manter suas peças e escolher o que falta. As ventoinhas inclusas no gabinete ou no resfriador também contam. Não sabe o nome da peça? Procure o modelo na caixa, na nota fiscal ou no produto.",
   perifericos:"Periféricos são os itens usados junto do PC, como monitor, teclado, mouse e fone. O percentual é um limite para os novos itens; não precisamos gastar tudo nem usar a sobra no PC.",
   rede:"O cabo liga o computador ao roteador. O adaptador permite usar Wi-Fi sem cabo. Escolha “Sim, incluir” se precisar comprar o acessório, ou “Não incluir” se já tiver o necessário.",
-  aparencia:"O gabinete é a caixa do computador. Escolha um visual de que gosta; vamos conferir o espaço das peças. Cor e estilo são preferências e podem limitar as opções dentro do orçamento.",
+  aparencia:"O gabinete é a caixa do computador. Escolha um visual de que gosta; vamos conferir o espaço das peças. Cor, tamanho e estilo são preferências flexíveis. Se não houver uma opção adequada, podemos adaptar o visual sem ultrapassar o orçamento nem ignorar a compatibilidade.",
 };
 
 export const ajudaCategorias = {
