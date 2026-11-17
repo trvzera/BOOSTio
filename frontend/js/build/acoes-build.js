@@ -9,7 +9,7 @@ import { dashboardBenchmarkHtml, iniciarDashboardBenchmark } from "../benchmark/
 import { catalogoBuilds } from "../api/build/builds.js";
 import { fetchComErro } from "../api/_shared/fetchComErro.js";
 import { compararCatalogosCompra } from "./compra-revalidacao.js";
-import { avaliarDisponibilidadeFps, avaliarDisponibilidadeBlender, avaliarReferenciaGpu } from "../benchmark/disponibilidade.js";
+import { avaliarDisponibilidadeFps, avaliarDisponibilidadeBlender } from "../benchmark/disponibilidade.js";
 
 export function avisoCompraHtml() {
   return '<p class="purchase-notice">A BOOSTio não vende, entrega ou processa pagamentos de peças e periféricos. Os links abrem lojas de terceiros, responsáveis pela venda e pelo atendimento da compra. Confira preço, estoque, frete, garantia e devolução diretamente na loja.</p>';
@@ -59,9 +59,7 @@ export function abrirBenchmark(build,catalogo,{publica = false} = {}) {
   const dispositivos = hardwareBlender(cpu,gpu);
   const disponibilidadeFps = avaliarDisponibilidadeFps(build,catalogo);
   const disponibilidadeBlender = avaliarDisponibilidadeBlender(build,catalogo);
-  const referencia = avaliarReferenciaGpu(build,catalogo);
-  const hardware = {...(disponibilidadeFps.permitido ? disponibilidadeFps.hardware : {motivo:disponibilidadeFps.motivo}),
-    ...(referencia.permitido ? {referenciaGpu:referencia.hardware} : {})};
+  const hardware = disponibilidadeFps.permitido ? disponibilidadeFps.hardware : {motivo:disponibilidadeFps.motivo};
   const dialogo = abrirDialogoBuild("Desempenho esperado",dashboardBenchmarkHtml({prefixo,titulo:build.titulo,
     cpu:cpu ? nomePeca(cpu) : null,gpu:gpu ? nomePeca(gpu) : null,memoria,verificarRequisitos:Boolean(buildId),dispositivos,disponibilidadeBlender}));
   dialogo.classList.add("benchmark-dialog");

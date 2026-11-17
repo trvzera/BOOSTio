@@ -149,3 +149,9 @@ test("referência GPU é explícita, omite CPU e exige confirmação do escopo n
   assert.match(html,/Referência apenas da GPU/);assert.match(html,/não representa o FPS da sua build/);
   assert.doesNotMatch(html,/FPS médio esperado/);
 });
+
+test("painel oficial mantém a consulta da build sem escolha de escopo",()=>{
+  const html=painelBenchmarkHtml({prefixo:"build-fps"});
+  assert.doesNotMatch(html,/data-benchmark-scope|data-gpu-reference-notice|O que deseja consultar\?|name="build-fps-scope"/);
+  assert.match(html,/id="build-fps-game"/);assert.match(html,/Ver desempenho/);
+});
