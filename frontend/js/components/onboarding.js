@@ -1,4 +1,4 @@
-import { preferenciasUso, tutorialPendente } from "../conta/preferencias-uso.js";
+import { preferenciasUso, tutorialPendente, nivelHardwareValido } from "../conta/preferencias-uso.js";
 import { perfilAtual } from "../conta/perfil.js";
 import { salvarPreferenciasDaConta } from "../conta/salvar-preferencias-uso.js";
 import { conteudoApresentacao } from "./onboarding-content.js";
@@ -52,11 +52,20 @@ export async function abrirTutorial({automatico = false} = {}) {
 
   const conteudo = () => conteudoApresentacao(passo,nivel);
 
+  function atualizarAvanco() {
+    const botao = dialogo.querySelector('[data-onboarding="avancar"]');
+    const faltaNivel = passo === 0 && !nivelHardwareValido(nivel);
+    botao.disabled = ocupado || faltaNivel;
+    if (faltaNivel) botao.dataset.disabledReason = "Escolha seu nível de conhecimento ou pule o tutorial.";
+    else delete botao.dataset.disabledReason;
+  }
+
   function desenhar() {
     dialogo.innerHTML = '<div class="onboarding-top"><span class="onboarding-progress">Conheça a BOOSTio · ' + (passo+1) + ' de 3</span><button type="button" class="build-action-close" data-onboarding="fechar" aria-label="Fechar tutorial">×</button></div>' +
       '<div class="onboarding-content">' + conteudo() + '</div><p class="onboarding-feedback" role="status" aria-live="polite"></p><div class="onboarding-actions"><button type="button" class="onboarding-skip" data-onboarding="pular" aria-label="Pular tutorial">Pular tutorial</button><div class="onboarding-steps">' +
       (passo ? '<button type="button" class="btn-secondary" data-onboarding="voltar" aria-label="Voltar ao passo anterior do tutorial">' + iconeAnimado("arrow","back") + 'Voltar</button>' : '') + '<button type="button" class="btn-primary" data-onboarding="avancar" aria-label="' + (passo === 2 ? 'Concluir tutorial' : 'Avançar no tutorial') + '">' + (passo === 2 ? 'Concluir' : 'Continuar') + iconeAnimado("arrow") + '</button></div></div>';
     iniciarIcones(dialogo);
+    atualizarAvanco();
     dialogo.querySelector("h2").focus({preventScroll:true});
     dialogo.querySelector(".onboarding-content").scrollTop = 0;
   }
@@ -72,13 +81,14 @@ export async function abrirTutorial({automatico = false} = {}) {
     });
   }
   dialogo.addEventListener("cancel",evento => { evento.preventDefault(); pular(); });
-  dialogo.addEventListener("change",evento => { if (evento.target.name === "onboarding-level") { nivel = evento.target.value || null; nivelAlterado = true; } });
+  dialogo.addEventListener("change",evento => { if (evento.target.name === "onboarding-level") { nivel = nivelHardwareValido(evento.target.value) ? evento.target.value : null; nivelAlterado = true; atualizarAvanco(); } });
   dialogo.addEventListener("click",async evento => {
     const acao = evento.target.closest("[data-onboarding]")?.dataset.onboarding;
     if (["pular","fechar"].includes(acao)) { pular(); return; }
     if (ocupado || !acao) return;
     if (acao === "voltar") { passo--; desenhar(); return; }
     if (acao !== "avancar") return;
+    if (!nivelHardwareValido(nivel)) { passo = 0; desenhar(); return; }
     if (passo < 2) { passo++; desenhar(); return; }
     ocupado = true;dialogo.setAttribute("aria-busy","true");
     dialogo.querySelectorAll('.onboarding-steps button').forEach(b => { b.dataset.disabledReason = "Aguarde a confirmação do salvamento."; b.disabled = true; });
@@ -93,6 +103,7 @@ export async function abrirTutorial({automatico = false} = {}) {
     } finally {
       ocupado = false;dialogo.removeAttribute("aria-busy");
       dialogo.querySelectorAll('.onboarding-steps button').forEach(b => { b.disabled = false; delete b.dataset.disabledReason; });
+      atualizarAvanco();
     }
   });
   const sessao = () => { if (!perfilAtual().auth || perfilAtual().usuario?.id !== usuarioId || automatico && !tutorialPendente(perfilAtual().usuario)) fechar(); };

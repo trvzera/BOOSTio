@@ -4,10 +4,12 @@ export const niveisHardware = [
   ["experiente", "Tenho experiência", "Já conheço as peças e sei avaliar a montagem de um computador."],
 ];
 
+export const nivelHardwareValido = nivel => niveisHardware.some(([valor]) => valor === nivel);
+
 export function preferenciasUso(usuario) {
   const valor = usuario?.preferencias_uso;
   return {
-    nivel_hardware:niveisHardware.some(([nivel]) => nivel === valor?.nivel_hardware) ? valor.nivel_hardware : null,
+    nivel_hardware:nivelHardwareValido(valor?.nivel_hardware) ? valor.nivel_hardware : null,
     tutorial:["pendente","concluido","pulado"].includes(valor?.tutorial) ? valor.tutorial : "nao-oferecido",
     versao_tutorial:Number.isInteger(valor?.versao_tutorial) ? valor.versao_tutorial : 1,
   };

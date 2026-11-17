@@ -3,13 +3,21 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { conteudoApresentacao, passosApresentacao } from "../js/components/onboarding-content.js";
 
-test("apresentação mantém três passos e nível opcional, sem presumir iniciante",() => {
+test("apresentação oferece três níveis sem selecionar um por padrão",() => {
   assert.equal(passosApresentacao.length,3);
   const html=conteudoApresentacao(0,null);
-  assert.match(html,/value="" checked/);
-  assert.doesNotMatch(html,/value="iniciante" checked/);
+  assert.doesNotMatch(html,/value=""|Não tenho preferência| checked/);
+  assert.equal((html.match(/type="radio"/g) || []).length,3);
   assert.match(html,/data-lottie="circledot"/);
   assert.match(html,/name="onboarding-level"/);
+  assert.match(html,/pule o tutorial/);
+});
+
+test("apresentação explica os testes e deixa a informação de conta separada dos cards",() => {
+  const html=conteudoApresentacao(1,"iniciante");
+  assert.match(html,/class="onboarding-requirements"/);
+  assert.match(html,/Testar build/);
+  assert.match(html,/jogos e no Blender/);
 });
 
 test("prévia reutiliza os mesmos textos e isola os identificadores",() => {
