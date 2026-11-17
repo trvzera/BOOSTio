@@ -89,7 +89,9 @@ test("prévia considera todas as peças antigas e distingue dicas, avisos e erro
   assert.match(js,/precosAntigos\.reduce\(/);
   assert.match(js,/verificacoes\("Conflitos encontrados",depois\.erros,"error"\)/);
   assert.match(js,/verificacoes\("Pontos de atenção",avisos,"warning"\)/);
-  assert.match(js,/verificacoes\("Dicas e conferências",depois\.dicas,"info"\)/);
+  assert.match(js,/verificacoes\("Dicas e conferências",resumo\.dicas,"info"\)/);
+  assert.match(js,/pendentes:resumirCompatibilidade\(simulacao\.avaliacao\)\.grupos\.length/);
+  assert.match(js,/verificacoes\("O que ainda precisa ser confirmado",resumo\.grupos\.map/);
   assert.match(js,/gasto > limite/);
   assert.match(js,/await aoAplicar\(confirmada\.build\)/);
 });

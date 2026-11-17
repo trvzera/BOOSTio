@@ -10,6 +10,7 @@ import { AVISO_DUAL_CHANNEL, contextoMelhoriaRam, planejarMelhoriaRam } from './
 import { planejarMelhoriaDisco } from './melhorias-discos.js';
 import { atualizarValor, capturarValores, transicionarValores } from "../components/value-transition.js";
 import { anunciarStatus } from "../components/status-messages.js";
+import { resumirCompatibilidade } from "./resumo-compatibilidade.js";
 
 const CATEGORIAS = categoriasCatalogo;
 const MOTIVO_TRAVA = "Destranque a build para buscar e aplicar melhorias.";
@@ -230,7 +231,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
           const depoisRam = categoria.id === "memoria_ram" ? informacoesRam(simulacao.build,catalogo).capacidade : null;
           detalhes.set(peca.id,{ganho:categoria.id === "memoria_ram"
             ? depoisRam > antesRam ? "RAM total: de " + antesRam + " GB para " + depoisRam + " GB." : "Maior frequência ou menor latência, sem reduzir a capacidade."
-            : resumoGanhoMelhoria(comparacao),pendentes:simulacao.avaliacao.dicas.length});
+            : resumoGanhoMelhoria(comparacao),pendentes:resumirCompatibilidade(simulacao.avaliacao).grupos.length});
           candidatas.push(peca);
         } catch (erro) { conflitos.add(erro.message); }
       }
@@ -328,6 +329,7 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
         + '</span><div class="upgrade-ram-quantity"><button type="button" class="upgrade-real-remove" data-upgrade-ram-quantity="' + h(id) + '" data-step="-1" aria-label="Diminuir quantidade de ' + h(nome(pecaPorId('memoria_ram',id))) + '">−</button><span aria-label="Quantidade de unidades ou kits">' + quantidade + '</span><button type="button" class="upgrade-real-remove" data-upgrade-ram-quantity="' + h(id) + '" data-step="1" aria-label="Adicionar mais uma unidade ou kit de ' + h(nome(pecaPorId('memoria_ram',id))) + '">' + iconeAnimado('plus') + '</button><button type="button" class="upgrade-real-remove" data-upgrade-ram-remove="' + h(id) + '" aria-label="Remover ' + h(nome(pecaPorId('memoria_ram',id))) + ' da prévia">' + iconeAnimado('trash') + '</button></div></div>').join('')
       + '<p class="planning-help"' + (erroRam ? ' data-tone="error"' : '') + '>' + h(erroRam || 'Depois: ' + ram.capacidadeGb + ' GB · ' + ram.pentes + ' de ' + ram.slots + (ram.slotsProvisorios ? ' pentes no limite provisório. ' : ' slots ocupados. ') + (modoRam === 'adicionar' ? 'As memórias atuais serão mantidas.' : 'As memórias atuais serão removidas da build.')) + '</p></article>' : '';
     const antes = avaliarBuild(base,catalogo), depois = avaliarBuild(proxima,catalogo);
+    const resumo = resumirCompatibilidade(depois);
     totalExibido = depois.preco;
     const delta = centavos(depois.preco) - centavos(antes.preco);
     const avisos = [...depois.avisos,...(depois.faltam.length ? ["Ainda faltam na build: " + depois.faltam.join(", ") + "."] : [])];
@@ -341,7 +343,8 @@ export function abrirMelhorias(build,catalogo,aoAplicar) {
       + '</dd></div><div><dt>Diferença no total</dt><dd>' + valorHtml("diferenca",(delta > 0 ? "+" : delta < 0 ? "−" : "") + valorMonetario(Math.abs(delta)),delta)
       + '</dd></div></dl><p class="planning-help">Quantidades são consideradas nos totais. Peças próprias ou sem cotação deixam o valor parcial. Economia não significa ganho de desempenho.</p></details>'
       + verificacoes("Conflitos encontrados",depois.erros,"error") + verificacoes("Pontos de atenção",avisos,"warning")
-      + verificacoes("Dicas e conferências",depois.dicas,"info")
+      + verificacoes("O que ainda precisa ser confirmado",resumo.grupos.map(grupo => grupo.titulo + ": " + grupo.mensagens.join(" ")),"warning")
+      + verificacoes("Dicas e conferências",resumo.dicas,"info")
       + (!depois.erros.length && !avisos.length ? '<p class="planning-help">Sem conflitos nas regras disponíveis. Dados ausentes não confirmam compatibilidade.</p>' : '');
     let motivo = build.travada ? MOTIVO_TRAVA : aplicando ? "Aguarde a aplicação das alterações." : !selecoes() ? "Adicione pelo menos uma candidata à prévia." : "";
     if (!motivo) { try { simular(trocas); } catch (erro) { motivo = erro.message; } }

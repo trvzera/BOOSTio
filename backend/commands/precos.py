@@ -59,9 +59,11 @@ def registrar_comandos_precos(app):
 
     @app.cli.command("catalogo-auditar")
     @click.option("--amostras", default=5, type=click.IntRange(0, 20), show_default=True)
-    def auditar(amostras):
+    @click.option("--detalhar", is_flag=True, help="Inclui cada peça e seus campos de compatibilidade ausentes.")
+    def auditar(amostras, detalhar):
         """Valida catálogo e arquivos locais, sem alterar dados ou consultar lojas."""
-        click.echo(json.dumps(AuditarCatalogoService().executar(amostras), ensure_ascii=False))
+        opcoes = {"detalhar": True} if detalhar else {}
+        click.echo(json.dumps(AuditarCatalogoService().executar(amostras, **opcoes), ensure_ascii=False))
 
     @app.cli.command("pecas-restaurar-links")
     def restaurar_links():
