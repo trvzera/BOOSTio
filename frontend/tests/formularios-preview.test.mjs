@@ -56,11 +56,10 @@ const resultado = (extras) => ({
   ...extras,
 });
 
-test("oito usos com prioridades distintas; orçamento inicial respeita o mínimo do perfil", () => {
+test("sete usos com prioridades distintas; orçamento inicial respeita o mínimo do perfil", () => {
   assert.deepEqual(Object.keys(perfisUso), [
     "jogos",
     "planilhas",
-    "reunioes",
     "edicao-video",
     "modelagem-3d",
     "programacao",
@@ -69,13 +68,13 @@ test("oito usos com prioridades distintas; orçamento inicial respeita o mínimo
   ]);
   for (const u of ["jogos", "edicao-video", "modelagem-3d", "programacao"])
     assert.equal(minimoUso(u), 3500);
-  for (const u of ["planilhas", "reunioes", "estudos", "todos"])
+  for (const u of ["planilhas", "estudos", "todos"])
     assert.equal(minimoUso(u), 2500);
   assert.equal(novasRespostasPreview("pc").orcamento, 3000);
   assert.equal(novasRespostasPreview("notebook").orcamento, 3000);
   assert.equal(
     new Set(Object.values(perfisUso).map((p) => p.prioridade)).size,
-    8,
+    7,
   );
 });
 test("rascunhos e resumos são independentes; não geram recomendações reais", () => {
@@ -326,7 +325,7 @@ test("extras de notebook são opcionais, independentes dos periféricos do deskt
 });
 test("webcam é respeitada como escolha opcional; não inventa disponibilidade no catálogo", () => {
   const r = valido("pc", {
-    objetivo: "reunioes",
+    objetivo: "planilhas",
     incluirWebcam: true,
     perifericos: "todos-perifericos",
   });
@@ -420,7 +419,7 @@ test("mínimos não criam atalhos extras de orçamento por objetivo", () => {
       minimoUso(objetivo) > 3000 ? [5000, 8000] : [3000, 5000, 8000],
     );
   }
-  assert.equal(orcamentoInicialUso("reunioes"), 3000);
+  assert.equal(orcamentoInicialUso("planilhas"), 3000);
 });
 test("tela de notebook é preferência flexível; orçamento continua obrigatório", () => {
   const plano = montarPlanoPreview(

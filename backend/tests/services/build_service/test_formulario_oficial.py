@@ -7,7 +7,7 @@ from services.build_service.preferencias_processador_service import Preferencias
 from services.build_service.prompt_build_service import criar_prompt, criar_prompt_correcao
 from services.validacoes_service.requisitos_uso_service import RequisitosUsoService
 
-@pytest.mark.parametrize("uso,minimo",[("Jogos",3500),("Planilhas",2500),("Reuniões",2500),("Edição de vídeos e imagens",3500),("Modelagem 3D",3500),("Programação",3500),("Estudos",2500),("Um pouco de tudo",2500)])
+@pytest.mark.parametrize("uso,minimo",[("Jogos",3500),("Planilhas",2500),("Reuniões",2500),("Planilhas e reuniões",2500),("Edição de vídeos e imagens",3500),("Modelagem 3D",3500),("Programação",3500),("Estudos",2500),("Um pouco de tudo",2500)])
 def test_minimo_depende_do_uso_e_e_aplicado_depois_dos_perifericos(uso,minimo):
     with pytest.raises(ErroPlanejamentoBuild) as erro:
         validar_minimos(Decimal(minimo)-Decimal(".01"),Decimal("1000"),20,uso)
@@ -53,7 +53,7 @@ from tests.services.build_service.test_criacao_build import app_build, cadastrar
 from models import BuildSalva
 
 
-@pytest.mark.parametrize("uso", ["Jogos", "Planilhas", "Reuniões", "Edição de vídeos e imagens", "Modelagem 3D", "Programação", "Estudos", "Um pouco de tudo"])
+@pytest.mark.parametrize("uso", ["Jogos", "Planilhas", "Reuniões", "Planilhas e reuniões", "Edição de vídeos e imagens", "Modelagem 3D", "Programação", "Estudos", "Um pouco de tudo"])
 def test_api_gera_e_salva_os_novos_usos_com_llm_simulada(app_build, mocker, uso):
     tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd"]
     if uso in ("Jogos", "Edição de vídeos e imagens", "Modelagem 3D"):
@@ -83,3 +83,13 @@ def test_api_rejeita_percentual_fora_da_faixa_sem_consumir_ia(app_build, mocker,
     llm.assert_not_called()
     with app_build.app_context():
         assert BuildSalva.query.count() == 0
+
+
+def test_planilhas_e_reunioes_priorizam_produtividade_e_chamadas_sem_gpu_obrigatoria():
+    uso="Planilhas e reuniões"
+    regras=RequisitosUsoService.prioridades(uso)
+    assert regras["perfil"]=="planilhas"
+    assert regras["memoria_alvo_gb"]==16
+    assert "fone com microfone" in regras["orientacao"]
+    assert "conexao estavel" in regras["orientacao"]
+    assert not RequisitosUsoService.exige_gpu_dedicada(uso)

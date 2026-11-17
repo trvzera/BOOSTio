@@ -11,25 +11,16 @@ export const perfisUso = {
     teclado: "mecanico",
   },
   planilhas: {
-    titulo: "Planilhas",
-    descricao: "Organizar dados, relatórios e trabalhar com várias janelas.",
+    titulo: "Planilhas e reuniões",
+    descricao:
+      "Organizar planilhas, participar de chamadas e trabalhar online.",
     minimo: 2500,
     ram: 16,
     prioridade:
-      "Priorizamos processador, memória para várias planilhas e SSD. Um monitor com espaço para janelas e um teclado com números à direita podem ajudar. Não exigimos placa de vídeo separada.",
+      "Priorizamos processador, memória e SSD para trabalhar com planilhas e programas abertos. Também consideramos um monitor com espaço para janelas, teclado numérico, conexão estável e fone com microfone para reuniões. Uma placa de vídeo separada pode não ser necessária.",
     gpu: "integrada-permitida",
     monitor: "espaco",
     teclado: "numerico",
-  },
-  reunioes: {
-    titulo: "Reuniões",
-    descricao: "Chamadas de vídeo, apresentações e trabalho online.",
-    minimo: 2500,
-    ram: 16,
-    prioridade:
-      "Damos atenção à câmera, ao microfone ou fone e à estabilidade nas chamadas. Processador, memória e SSD devem manter os programas abertos sem gastar com uma placa de vídeo desnecessária.",
-    gpu: "integrada-permitida",
-    monitor: "conforto",
     webcam: true,
   },
   "edicao-video": {

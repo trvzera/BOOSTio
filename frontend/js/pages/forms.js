@@ -4,7 +4,7 @@ import { normalizarRede, vincularRede } from "../build/rede.js";
 import { normalizarAparencia, aparenciaHtml, atualizarGuiaPorteGabinete } from "../build/aparencia.js";
 import { prioridadesUso, orientacoesEtapas } from "../build/uso-formulario.js";
 import { perguntas, exemplosPecas } from "../build/perguntas-formulario.js";
-import { minimoUso, orcamentoInicialUso } from "../build/perfis-uso.js";
+import { perfisUso, minimoUso, orcamentoInicialUso } from "../build/perfis-uso.js";
 import { comprimentosCabosCatalogo, validarCaboFormulario } from "../build/cabos-formulario.js";
 import { ajustarGuiasConhecimento } from "../conta/preferencias-uso.js";
 import { iniciarImagens } from "../build/imagens-produtos.js";
@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     alvo.innerHTML = (respostas.perifericos === "alguns-perifericos" ? '<fieldset class="peripheral-owned-list"><legend>Quais periféricos você já possui?</legend>' +
       listaPerifericos.map(([tipo,nome]) => '<div class="peripheral-owned" data-owned="' + tipo + '"><label class="ui-check"><input type="checkbox" data-owned-peripheral="' + tipo + '" ' + (proprios.includes(tipo) ? 'checked' : '') + '>' + iconeAnimado("checkbox") + '<span>' + nome + '</span></label>' + (proprios.includes(tipo) ? detalhePecaHtml(tipo,nome) : '') + '</div>').join("") + '</fieldset>' : '') +
       '<div class="peripheral-budget" id="peripheral-allocation" ' + (respostas.incluirPerifericos ? '' : 'hidden') + '><label for="peripheral-percent">Quanto reservar para monitor, teclado, mouse e fone?</label><div class="peripheral-percent-field"><input type="number" id="peripheral-percent" min="10" max="40" step="1" inputmode="numeric" aria-describedby="peripheral-budget-summary peripheral-budget-help" value="' + respostas.percentualPerifericos + '"><span aria-hidden="true">%</span></div><p id="peripheral-budget-summary" class="font-2-xs"></p><p id="peripheral-budget-help" class="font-2-xs">Reserve pelo menos R$ 500 para os periféricos novos; o catálogo pode exigir mais. Escolha de 10% a 40% do orçamento total. Essa é a parte máxima do seu dinheiro para esses itens. Não é preciso gastar tudo. Se sobrar, o dinheiro fica com você e não aumenta o limite das peças do computador.</p><p id="peripheral-budget-validation" class="form-budget-validation font-2-xs" role="status" aria-live="polite"></p></div>';
-    if (respostas.objetivo === "reunioes") alvo.insertAdjacentHTML("afterbegin",'<p class="planning-help font-2-xs">Para reuniões, considere uma webcam e um fone com microfone. Ainda não temos webcam disponível para compra no catálogo; esse item fica para compra separada e não entra no total da build.</p>');
+    if (perfisUso[respostas.objetivo]?.webcam) alvo.insertAdjacentHTML("afterbegin",'<p class="planning-help font-2-xs">Para reuniões, considere uma webcam e um fone com microfone. Ainda não temos webcam disponível para compra no catálogo; esse item fica para compra separada e não entra no total da build.</p>');
     alvo.querySelectorAll("[data-owned-peripheral]").forEach(input => input.addEventListener("change",() => {
       const escolhidos = new Set(respostas.perifericosProprios || []), tipo = input.dataset.ownedPeripheral;
       if (input.checked) escolhidos.add(tipo); else escolhidos.delete(tipo);

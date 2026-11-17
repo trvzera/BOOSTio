@@ -10,8 +10,8 @@ import {
 import { camposRede } from "../js/build/rede.js";
 import { orientacaoGeracaoSegura } from "../js/api/_shared/fetchComErro.js";
 
-test("oficial oferece os oito usos aprovados, sem fluxo de notebook", () => {
-  assert.equal(perguntas[0].opcoes.length, 8);
+test("oficial oferece os sete usos aprovados, sem fluxo de notebook", () => {
+  assert.equal(perguntas[0].opcoes.length, 7);
   assert.deepEqual(
     perguntas[0].opcoes.map((o) => o[0]),
     Object.keys(perfisUso),
@@ -24,7 +24,7 @@ test("oficial oferece os oito usos aprovados, sem fluxo de notebook", () => {
     assert.equal(avaliarOrcamentoGeracao(3499, 0, uso).valido, false);
     assert.equal(avaliarOrcamentoGeracao(3500, 0, uso).valido, true);
   }
-  for (const uso of ["planilhas", "reunioes", "estudos", "todos"]) {
+  for (const uso of ["planilhas", "estudos", "todos"]) {
     assert.equal(avaliarOrcamentoGeracao(2499, 0, uso).valido, false);
     assert.equal(avaliarOrcamentoGeracao(2500, 0, uso).valido, true);
   }

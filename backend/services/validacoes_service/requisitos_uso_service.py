@@ -39,7 +39,7 @@ class RequisitosUsoService:
                   "memoria_e_prioridade_nao_promessa_de_catalogo": True}
         return {**comuns, "orientacao": {
             "jogos": "Priorizar GPU, CPU e fluidez do monitor; teclado mecanico com switch identificado e mouse documentado.",
-            "planilhas": "Priorizar CPU, RAM, SSD e monitor com espaco para varias janelas; teclado numerico quando adequado.",
+            "planilhas": "Priorizar CPU, RAM, SSD e monitor com espaco para varias janelas; teclado numerico, conexao estavel e fone com microfone para reunioes. Webcam ainda nao disponivel no catalogo de compra.",
             "reunioes": "Priorizar CPU, RAM, SSD, conexao estavel e fone com microfone; webcam ainda nao disponivel no catalogo de compra.",
             "edicao-video": "Priorizar 32 GB de RAM, CPU, GPU dedicada e SSD; monitor com qualidade de imagem e cores, sem exceder o orcamento.",
             "modelagem-3d": "Priorizar CPU, GPU dedicada, RAM e SSD conforme o software e o renderizador; nao inferir desempenho apenas pela VRAM.",

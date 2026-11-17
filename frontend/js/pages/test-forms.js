@@ -221,14 +221,14 @@ function iniciarFormularioTeste(raiz, tipo) {
           if (!respostas.orcamentoAlterado)
             respostas.orcamento = orcamentoInicialUso(e.value);
           if (tipo === "pc" && !respostas.webcamAlterada)
-            respostas.incluirWebcam = e.value === "reunioes";
+            respostas.incluirWebcam = Boolean(perfisUso[e.value]?.webcam);
           raiz.querySelector("[data-preview-help-copy]").textContent =
             perfisUso[e.value].prioridade;
         }
         if (chave === "perifericos" && tipo === "pc") {
           if (e.value === "sem-perifericos") respostas.incluirWebcam = false;
           else if (
-            respostas.objetivo === "reunioes" &&
+            perfisUso[respostas.objetivo]?.webcam &&
             !respostas.webcamAlterada
           )
             respostas.incluirWebcam = true;
