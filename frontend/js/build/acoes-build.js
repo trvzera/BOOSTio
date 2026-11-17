@@ -4,11 +4,12 @@ import { itensSelecionados, itensCategoria, informacoesRam } from "./estado.js";
 import { avaliarBuild } from "./compatibilidade.js";
 import { normalizarRede, resumoRede } from "./rede.js";
 import { iniciarIcones } from "../components/ui.js";
-import { hardwareBenchmark, hardwareBlender } from "../benchmark/hardware.js";
+import { hardwareBlender } from "../benchmark/hardware.js";
 import { dashboardBenchmarkHtml, iniciarDashboardBenchmark } from "../benchmark/dashboard.js";
 import { catalogoBuilds } from "../api/build/builds.js";
 import { fetchComErro } from "../api/_shared/fetchComErro.js";
 import { compararCatalogosCompra } from "./compra-revalidacao.js";
+import { avaliarDisponibilidadeFps } from "../benchmark/disponibilidade.js";
 
 export function avisoCompraHtml() {
   return '<p class="purchase-notice">A BOOSTio não vende, entrega ou processa pagamentos de peças e periféricos. Os links abrem lojas de terceiros, responsáveis pela venda e pelo atendimento da compra. Confira preço, estoque, frete, garantia e devolução diretamente na loja.</p>';
@@ -56,11 +57,12 @@ export function abrirBenchmark(build,catalogo,{publica = false} = {}) {
   const prefixo = "build-benchmark";
   const memoria = ram.itens.length && ram.itens.every(({peca}) => Number.isInteger(peca?.capacidade_gb) && peca.capacidade_gb > 0) ? ram.capacidade : null;
   const dispositivos = hardwareBlender(cpu,gpu);
+  const disponibilidadeFps = avaliarDisponibilidadeFps(build,catalogo);
   const dialogo = abrirDialogoBuild("Desempenho esperado",dashboardBenchmarkHtml({prefixo,titulo:build.titulo,
     cpu:cpu ? nomePeca(cpu) : null,gpu:gpu ? nomePeca(gpu) : null,memoria,verificarRequisitos:Boolean(buildId),dispositivos}));
   dialogo.classList.add("benchmark-dialog");
   const limpar = iniciarDashboardBenchmark(dialogo.querySelector("[data-benchmark-dashboard]"),
-    {prefixo,hardware:hardwareBenchmark(cpu,gpu),dispositivos,buildId,publica});
+    {prefixo,hardware:disponibilidadeFps.permitido ? disponibilidadeFps.hardware : {motivo:disponibilidadeFps.motivo},dispositivos,buildId,publica});
   dialogo.addEventListener("close",limpar,{once:true});
   return dialogo;
 }

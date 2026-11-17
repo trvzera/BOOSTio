@@ -4,8 +4,8 @@ import { painelBenchmarkHtml } from "./painel.js";
 import { iniciarPainelBenchmark } from "./interface.js";
 import { painelBlenderHtml, iniciarPainelBlender } from "./blender.js";
 
-const vazio = (icone,titulo,descricao) => '<div class="benchmark-dashboard-empty-icon">' + iconeAnimado(icone)
-  + '</div><h4>' + titulo + '</h4><p>' + descricao + '</p><span class="benchmark-dashboard-waiting">Aguardando consulta</span>';
+const vazio = (icone,titulo,descricao,estado = "Aguardando consulta") => '<div class="benchmark-dashboard-empty-icon">' + iconeAnimado(icone)
+  + '</div><h4>' + titulo + '</h4><p>' + descricao + '</p><span class="benchmark-dashboard-waiting">' + estado + '</span>';
 
 export function dashboardBenchmarkHtml({prefixo = "build",titulo,cpu,gpu,memoria = null,verificarRequisitos = false,previa = false,dispositivos = {}} = {}) {
   const id = sufixo => h(prefixo + "-" + sufixo);
@@ -33,7 +33,9 @@ export function iniciarDashboardBenchmark(raiz,{prefixo = "build",hardware,dispo
   const fps = raiz.querySelector('[data-benchmark-pane="games"]');
   const blender = raiz.querySelector('[data-benchmark-pane="blender"]');
   fps.querySelector(".fpshq-panel").dataset.layout = "panel";
-  fps.querySelector(".fpshq-empty").innerHTML = vazio("gamepad","O próximo passo é dar o play.","Consulte o desempenho para ver a expectativa de FPS e comparar os ajustes gráficos.");
+  fps.querySelector(".fpshq-empty").innerHTML = hardware?.motivo
+    ? vazio("gamepad","FPS ainda não disponível para esta build","Revise os itens indicados antes de consultar. A aba Blender mostra os testes disponíveis para suas peças.","Revisar montagem")
+    : vazio("gamepad","O próximo passo é dar o play.","Consulte o desempenho para ver a expectativa de FPS e comparar os ajustes gráficos.");
   blender.querySelector("[data-blender-result]").innerHTML = '<div class="benchmark-dashboard-empty">' + vazio("microchip","Mais espaço para suas ideias.","A pontuação mostra quantas amostras a peça renderiza por minuto. CPU e GPU são avaliadas separadamente.") + '</div>';
   const pararFps = iniciarPainelBenchmark(fps,{prefixo:prefixo + "-fps",hardware,buildId,publica,cliente});
   const pararBlender = iniciarPainelBlender(blender,dispositivos,{prefixo:prefixo + "-blender",cliente});
