@@ -92,7 +92,7 @@ export const perguntasNotebook = [
       "Vamos tentar seguir sua preferência. Se não houver um modelo adequado, podemos sugerir outro tamanho, sem ultrapassar o orçamento nem prejudicar o uso escolhido.",
     tipo: "opcoes",
     opcoes: [
-      ["sem-preferencia", "Ainda não sei"],
+      ["sem-preferencia", "Sem preferência"],
       ["compacta", "Menor e fácil de levar", "Cerca de 13 a 14 polegadas."],
       ["equilibrada", "Tamanho intermediário", "Cerca de 15 a 16 polegadas."],
       ["grande", "Tela maior", "Cerca de 17 polegadas ou mais."],
