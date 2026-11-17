@@ -1,42 +1,333 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import { perguntasPc, perguntasNotebook, novasRespostasPreview, validarEtapaPreview, resumoFormularioPreview, percentualPreview } from '../js/experimentos/formularios.js';
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import {
+  perguntasPc,
+  perguntasNotebook,
+  novasRespostasPreview,
+  validarEtapaPreview,
+  resumoFormularioPreview,
+  percentualPreview,
+} from "../js/experimentos/formularios.js";
+import {
+  perfisUso,
+  minimoUso,
+} from "../js/experimentos/formularios/objetivos.js";
+import { comprimentosDisponiveis } from "../js/experimentos/formularios/catalogo.js";
+import { motivoMarcaNotebook } from "../js/experimentos/formularios/preferencias.js";
+import { webcamSolicitada } from "../js/experimentos/formularios/perifericos.js";
+import {
+  avaliarOrcamentoPreview,
+  montarPlanoPreview,
+  validarResultadoGeracao,
+  gerarComPreferenciasFlexiveis,
+  ErroGeracaoFormulario,
+  identificarErroFormulario,
+} from "../js/experimentos/formularios/regras.js";
+import {
+  camposHtml,
+  revisaoHtml,
+} from "../js/experimentos/formularios/campos.js";
+const catalogo = JSON.parse(
+  readFileSync(
+    new URL("../data/previa-formularios-catalogo.json", import.meta.url),
+  ),
+);
+const pc = (k) => perguntasPc.find((p) => p.chave === k);
+const valido = (tipo = "pc", extras = {}) => ({
+  ...novasRespostasPreview(tipo),
+  objetivo: "jogos",
+  pecas: ["nenhuma"],
+  perifericos: "sem-perifericos",
+  prioridade_montagem: "custo_beneficio",
+  ...extras,
+});
+const resultado = (extras) => ({
+  processador: { fabricante: "AMD" },
+  placaVideo: { modelo: "GPU de teste" },
+  precoComputador: 4000,
+  precoPerifericos: 0,
+  errosCompatibilidade: [],
+  pecasObrigatoriasAusentes: [],
+  ...extras,
+});
 
-const pc=chave=>perguntasPc.find(p=>p.chave===chave);
-test('prévia de desktop preserva as seis etapas; notebook tem perguntas de mobilidade e tela',()=>{
-  assert.deepEqual(perguntasPc.map(p=>p.chave),['objetivo','orcamento','pecas','perifericos','rede','aparencia']);
-  assert.ok(perguntasNotebook.some(p=>p.chave==='mobilidade'));
-  assert.ok(perguntasNotebook.some(p=>p.chave==='tela'));
-  assert.equal(perguntasNotebook.some(p=>['pecas','aparencia'].includes(p.chave)),false);
+test("sete usos com prioridades distintas e mínimos especificados; orçamento inicial em 5000", () => {
+  assert.deepEqual(Object.keys(perfisUso), [
+    "jogos",
+    "planilhas",
+    "reunioes",
+    "edicao-video",
+    "programacao",
+    "estudos",
+    "todos",
+  ]);
+  for (const u of ["jogos", "edicao-video", "programacao"])
+    assert.equal(minimoUso(u), 3500);
+  for (const u of ["planilhas", "reunioes", "estudos", "todos"])
+    assert.equal(minimoUso(u), 2500);
+  assert.equal(novasRespostasPreview("pc").orcamento, 5000);
+  assert.equal(novasRespostasPreview("notebook").orcamento, 5000);
+  assert.equal(
+    new Set(Object.values(perfisUso).map((p) => p.prioridade)).size,
+    7,
+  );
 });
-test('rascunhos são independentes e os resumos não alteram as respostas',()=>{
-  const a=novasRespostasPreview('pc'),b=novasRespostasPreview('pc'),n=novasRespostasPreview('notebook');
-  a.pecas.push('ssd');assert.deepEqual(b.pecas,[]);assert.equal(n.pecas,undefined);
-  const r=resumoFormularioPreview('pc',a);r.pecas.push('hd');
-  assert.deepEqual(a.pecas,['ssd']);assert.equal(r.previa,true);assert.equal(r.geracaoDisponivel,false);
+test("rascunhos e resumos são independentes; não geram recomendações reais", () => {
+  const a = novasRespostasPreview("pc"),
+    b = novasRespostasPreview("pc");
+  a.pecas.push("ssd");
+  assert.deepEqual(b.pecas, []);
+  const r = resumoFormularioPreview("pc", a);
+  r.pecas.push("hd");
+  assert.deepEqual(a.pecas, ["ssd"]);
+  assert.equal(r.geracaoDisponivel, false);
 });
-test('periféricos respeitam teto e mínimos; sobra não aumenta o limite do PC',()=>{
-  const r={...novasRespostasPreview('pc'),orcamento:8000,perifericos:'todos-perifericos',percentualPerifericos:10};
-  assert.equal(validarEtapaPreview('pc',pc('perifericos'),r),'');
-  assert.equal(percentualPreview(r),10);
-  assert.match(validarEtapaPreview('pc',pc('perifericos'),{...r,orcamento:3000}),/500/);
-  assert.match(validarEtapaPreview('pc',pc('perifericos'),{...r,orcamento:2500,percentualPerifericos:50}),/2.000/);
-  assert.match(validarEtapaPreview('pc',pc('perifericos'),{...r,percentualPerifericos:NaN}),/porcentagem/);
-  const propios={...r,perifericos:'alguns-perifericos',perifericosProprios:['monitor','teclado','mouse','headset']};
-  assert.equal(percentualPreview(propios),0);
-  assert.match(validarEtapaPreview('pc',pc('perifericos'),propios),/modelo/);
+test("mínimo do computador é calculado depois da reserva e sobra não retorna ao PC", () => {
+  let r = valido("pc", {
+    orcamento: 4000,
+    perifericos: "todos-perifericos",
+    percentualPerifericos: 20,
+  });
+  assert.equal(avaliarOrcamentoPreview("pc", r).valido, false);
+  r.orcamento = 5000;
+  const d = avaliarOrcamentoPreview("pc", r);
+  assert.equal(d.valido, true);
+  assert.equal(d.pc, 4000);
+  assert.equal(d.perifericos, 1000);
+  assert.match(
+    validarEtapaPreview("pc", pc("perifericos"), {
+      ...r,
+      percentualPerifericos: 5,
+    }),
+    /500/,
+  );
+  assert.match(
+    validarEtapaPreview("pc", pc("perifericos"), {
+      ...r,
+      percentualPerifericos: NaN,
+    }),
+    /porcentagem/,
+  );
+  const plano = montarPlanoPreview("pc", r);
+  assert.equal(plano.devolverSobraPerifericosAoPc, false);
+  assert.throws(
+    () =>
+      validarResultadoGeracao(
+        plano,
+        resultado({ precoComputador: 4500, precoPerifericos: 100 }),
+      ),
+    (e) => e.etapa === "orcamento",
+  );
 });
-test('etapas não permitem objetivo inválido, peça sem modelo ou cabo sem metragem',()=>{
-  const r=novasRespostasPreview('pc');
-  assert.match(validarEtapaPreview('pc',pc('objetivo'),r),/Escolha/);
-  assert.match(validarEtapaPreview('pc',pc('pecas'),{...r,pecas:['ssd']}),/modelo/);
-  assert.equal(validarEtapaPreview('pc',pc('pecas'),{...r,pecas:['nenhuma']}),'');
-  assert.match(validarEtapaPreview('pc',pc('rede'),{...r,rede:{tipo:'ambos',possuiAcessorio:false}}),/metros/);
-  assert.equal(validarEtapaPreview('pc',pc('rede'),{...r,rede:{tipo:'ambos',possuiAcessorio:false,comprimentoCaboM:20}}),'');
+test("cabos só aceitam comprimentos CAT6 com disponibilidade na amostra", () => {
+  assert.deepEqual(comprimentosDisponiveis(catalogo), [1, 5, 10]);
+  for (const metros of [0, 1.2, 2, 3, 20, 999])
+    assert.ok(
+      validarEtapaPreview(
+        "pc",
+        pc("rede"),
+        valido("pc", {
+          rede: {
+            tipo: "ambos",
+            possuiAcessorio: false,
+            comprimentoCaboM: metros,
+          },
+        }),
+        catalogo,
+      ),
+    );
+  for (const metros of [1, 5, 10])
+    assert.equal(
+      validarEtapaPreview(
+        "pc",
+        pc("rede"),
+        valido("pc", {
+          rede: {
+            tipo: "ambos",
+            possuiAcessorio: false,
+            comprimentoCaboM: metros,
+          },
+        }),
+        catalogo,
+      ),
+      "",
+    );
+  assert.ok(
+    validarEtapaPreview(
+      "pc",
+      pc("rede"),
+      valido("pc", { rede: { tipo: "cabo", possuiAcessorio: false } }),
+    ),
+  );
 });
-test('notebook não herda o mínimo de desktop nem promete disponibilidade por preço',()=>{
-  const q=perguntasNotebook.find(p=>p.chave==='orcamento');
-  assert.equal(validarEtapaPreview('notebook',q,{orcamento:1500}),'');
-  for(const valor of [0,NaN,Infinity,1000001])assert.ok(validarEtapaPreview('notebook',q,{orcamento:valor}));
-  assert.match(validarEtapaPreview('pc',pc('orcamento'),{orcamento:1500}),/2.000/);
+test("marca da CPU é obrigatória quando escolhida; preferência estética divergente só avisa", () => {
+  const plano = montarPlanoPreview(
+    "pc",
+    valido("pc", {
+      preferencia_processador: "amd",
+      aparencia: { cor: "branco", porte: "full-tower", estilo: "panoramico" },
+    }),
+  );
+  assert.equal(plano.criterios.fabricanteCpuObrigatorio, "amd");
+  assert.throws(
+    () =>
+      validarResultadoGeracao(
+        plano,
+        resultado({ processador: { fabricante: "Intel" } }),
+      ),
+    (e) => e.codigo === "marca-processador" && e.etapa === "revisao",
+  );
+  assert.throws(
+    () => validarResultadoGeracao(plano, resultado({ placaVideo: null })),
+    (e) => e.codigo === "placa-video" && e.etapa === "objetivo",
+  );
+  const r = validarResultadoGeracao(
+    plano,
+    resultado({
+      aparencia: { cor: "preto", porte: "mid-tower", estilo: "vidro" },
+    }),
+  );
+  assert.equal(r.valido, true);
+  assert.equal(r.avisos.length, 1);
+});
+test("aparência pode ser flexibilizada uma vez sem mudar marca, limite ou peças obrigatórias", async () => {
+  const plano = montarPlanoPreview(
+      "pc",
+      valido("pc", {
+        preferencia_processador: "amd",
+        aparencia: { cor: "branco" },
+      }),
+    ),
+    chamadas = [];
+  const r = await gerarComPreferenciasFlexiveis(plano, async (p) => {
+    chamadas.push(p);
+    if (chamadas.length === 1)
+      throw new ErroGeracaoFormulario("aparencia", "aparencia", "Sem a cor");
+    return resultado();
+  });
+  assert.equal(chamadas.length, 2);
+  assert.equal(chamadas[1].aparencia.cor, "sem-preferencia");
+  assert.equal(chamadas[1].limiteComputador, 5000);
+  assert.equal(chamadas[1].criterios.fabricanteCpuObrigatorio, "amd");
+  assert.ok(r.avisos.length);
+  assert.equal(plano.aparencia.cor, "branco");
+  await assert.rejects(
+    gerarComPreferenciasFlexiveis(plano, async () => {
+      throw new ErroGeracaoFormulario("orcamento", "orcamento", "Sem verba");
+    }),
+    /Sem verba/,
+  );
+  await assert.rejects(
+    gerarComPreferenciasFlexiveis(plano, async () =>
+      resultado({ pecasObrigatoriasAusentes: ["placa_video"] }),
+    ),
+    (e) => e.etapa === "pecas",
+  );
+  assert.throws(
+    () =>
+      validarResultadoGeracao(plano, {
+        precoComputador: 3000,
+        precoPerifericos: 0,
+      }),
+    (e) => e.codigo === "resposta-invalida",
+  );
+});
+test("Apple depende do uso e do valor reservado ao notebook, não do orçamento total", () => {
+  assert.ok(
+    motivoMarcaNotebook(
+      "apple",
+      { objetivo: "jogos", orcamento: 20000 },
+      20000,
+    ),
+  );
+  assert.ok(
+    motivoMarcaNotebook(
+      "apple",
+      { objetivo: "estudos", orcamento: 7000 },
+      5600,
+    ),
+  );
+  assert.equal(
+    motivoMarcaNotebook(
+      "apple",
+      { objetivo: "estudos", orcamento: 6000 },
+      6000,
+    ),
+    "",
+  );
+  assert.equal(motivoMarcaNotebook("lenovo", { objetivo: "jogos" }, 5000), "");
+});
+test("notebook não pergunta RAM nem sistema; memória deriva do uso e dos recursos disponíveis", () => {
+  const r = valido("notebook", { objetivo: "programacao", orcamento: 7000 });
+  const plano = montarPlanoPreview("notebook", r);
+  assert.equal(plano.criterios.memoriaSugeridaGb, 32);
+  assert.equal(
+    montarPlanoPreview("notebook", { ...r, orcamento: 4000 }).criterios
+      .memoriaSugeridaGb,
+    16,
+  );
+  const html = camposHtml(
+    perguntasNotebook.find((p) => p.tipo === "preferencias"),
+    { respostas: r, tipo: "notebook", id: (k) => "n-" + k, catalogo },
+  );
+  assert.doesNotMatch(html, /data-select="(?:memoria|sistema)"/);
+  assert.match(
+    revisaoHtml({
+      respostas: r,
+      tipo: "notebook",
+      id: (k) => "n-" + k,
+      catalogo,
+    }),
+    /Apple/,
+  );
+  assert.ok(perguntasNotebook.some((p) => p.chave === "perifericos"));
+});
+test("extras de notebook são opcionais, independentes dos periféricos do desktop", () => {
+  const r = valido("notebook", {
+    perifericos: "escolher-extras",
+    extrasNotebook: ["mouse"],
+    percentualPerifericos: 5,
+  });
+  assert.equal(percentualPreview(r, "notebook"), 5);
+  assert.deepEqual(montarPlanoPreview("notebook", r).acessorios, ["mouse"]);
+  const q = perguntasNotebook.find((p) => p.chave === "perifericos");
+  assert.ok(validarEtapaPreview("notebook", q, { ...r, extrasNotebook: [] }));
+  assert.equal(
+    montarPlanoPreview("notebook", { ...r, perifericos: "sem-perifericos" })
+      .tetoPerifericos,
+    0,
+  );
+});
+test("webcam é respeitada como escolha opcional; não inventa disponibilidade no catálogo", () => {
+  const r = valido("pc", {
+    objetivo: "reunioes",
+    incluirWebcam: true,
+    perifericos: "todos-perifericos",
+  });
+  assert.equal(webcamSolicitada("pc", r), true);
+  assert.ok(montarPlanoPreview("pc", r).acessorios.includes("webcam"));
+  assert.equal(
+    montarPlanoPreview("pc", r).webcam.cadastroCompraDisponivel,
+    false,
+  );
+  assert.equal(
+    webcamSolicitada("pc", { ...r, perifericos: "sem-perifericos" }),
+    false,
+  );
+});
+test("falhas identificam a pergunta; falha genérica não atribui causa inventada", () => {
+  const e = identificarErroFormulario({
+    codigo: "rede",
+    message: "Sem cabo válido",
+  });
+  assert.equal(e.etapa, "rede");
+  assert.equal(
+    identificarErroFormulario(new Error("timeout")).codigo,
+    "servico",
+  );
+  assert.match(
+    identificarErroFormulario(new Error("timeout")).message,
+    /não informou qual resposta/,
+  );
 });

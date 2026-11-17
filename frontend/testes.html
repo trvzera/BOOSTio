@@ -22,25 +22,11 @@
   <link rel="stylesheet" href="./styles/paginas/testes.css">
   <link rel="stylesheet" href="./styles/paginas/test-benchmark-panel.css">
   <link rel="stylesheet" href="./styles/paginas/equipe.css">
-  <meta name="description" content="Laboratório de interfaces da BOOSTio: testes de comparação de builds, orçamento, melhorias e desempenho esperado em jogos.">
+  <link rel="stylesheet" href="./styles/paginas/testes-base.css">
+  <meta name="description" content="Laboratório da BOOSTio: prévias de formulários para desktop e notebook, comparação de builds, orçamento, melhorias e desempenho.">
   <meta name="robots" content="noindex,nofollow">
   <link rel="preload" href="./fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="./fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
-  <style>
-    body.menu-test-page { height: auto; min-height: 100vh; color: var(--cor-6); overflow-x: clip; }
-    .test-logo { position: absolute; top: 28px; left: 32px; width: 110px; }
-    .test-main { display: block; max-width: 1100px; margin: auto; padding: 160px 32px 130px; }
-    .test-main h1 { max-width: 700px; font-size: clamp(2.3rem, 6vw, 4.8rem); line-height: 1.1; margin: 20px 0; }
-    .test-main > p { color: var(--cor-4); max-width: 680px; line-height: 1.8; }
-    .test-kicker { color: var(--cor-p1); letter-spacing: .08em; text-transform: uppercase; }
-    .test-panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 60px; }
-    .test-panel { border: 1px solid var(--cor-2); border-radius: 22px; padding: 28px; }
-    .test-panel p { color: var(--cor-4); margin: 12px 0 24px; }
-    .test-panel .btn-ghost { display: inline-block; }
-    @media(max-width: 700px) { .test-panels { grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: 32px; } }
-    @media(max-width: 600px) { .test-main { padding: var(--page-top) 16px 112px; } .test-panel { padding: 20px; } }
-    @media(prefers-reduced-motion: reduce) { .experimental-menu * { transition-duration: .01ms !important; transition-delay: 0ms !important; } }
-  </style>
 </head>
 
 <body class="menu-test-page" data-private-page>
@@ -72,7 +58,7 @@
       <div class="test-feature-head">
         <span class="test-kicker font-1-xs">Prévia · formulário de desktop</span>
         <h2 class="font-1-xl" id="test-form-pc-title">Vamos repensar sua montagem.</h2>
-        <p class="font-2-s">Uma versão de testes das perguntas atuais. Avance, volte e revise as respostas antes de decidirmos o que vai para o formulário oficial.</p>
+        <p class="font-2-s">Nova proposta de perguntas, usos e preferências. Avance, volte e revise as regras antes de decidirmos o que vai para o formulário oficial.</p>
       </div>
       <p class="test-form-notice font-2-xs">Somente uma prévia: não usa a IA, não cria builds e não altera os dados da sua conta. As respostas ficam nesta página e são descartadas ao recarregar.</p>
       <div data-form-preview="pc"></div>
@@ -81,7 +67,7 @@
       <div class="test-feature-head">
         <span class="test-kicker font-1-xs">Rascunho · formulário de notebook</span>
         <h2 class="font-1-xl" id="test-form-notebook-title">Um notebook para sua rotina.</h2>
-        <p class="font-2-s">Primeira proposta para entender uso, orçamento, mobilidade, tela e preferências. Podemos mudar as perguntas por aqui antes de integrar a busca por notebooks.</p>
+        <p class="font-2-s">Uma proposta para entender uso, orçamento, mobilidade, tela, acessórios e marca. A memória é sugerida pelo perfil de uso; esta prévia ainda não busca notebooks.</p>
       </div>
       <p class="test-form-notice font-2-xs">Esta prévia organiza suas preferências. Ainda não busca notebooks, não verifica modelos e não gera recomendações.</p>
       <div data-form-preview="notebook"></div>
