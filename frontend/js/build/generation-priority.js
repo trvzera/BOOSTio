@@ -28,7 +28,7 @@ export function preferenciasMontagemHtml(valorAtual, marcaAtual = "sem-preferenc
             ${iconeAnimado("circledot")}<span class="generation-choice-copy"><strong>${titulo}</strong></span>
           </label>`).join("")}
         </div>
-        <p id="generation-brand-help" class="generation-brand-help">Vamos priorizar essa marca quando ela combinar com suas peças e seu orçamento. A escolha vale para o processador, não para a placa de vídeo.</p>
+        <p id="generation-brand-help" class="generation-brand-help">Se escolher Intel ou AMD, o processador será dessa marca. Se a escolha não combinar com suas peças ou orçamento, pediremos para revisar. A escolha vale para o processador, não para a placa de vídeo.</p>
       </fieldset>
       <fieldset>
         <legend>O que você prefere priorizar?</legend>

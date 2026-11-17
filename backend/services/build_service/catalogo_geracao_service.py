@@ -13,6 +13,7 @@ from services.build_service.planejar_rede_service import PlanejarRedeService
 from services.build_service.preferencias_gabinete_service import PreferenciasGabineteService
 from services.build_service.planejamento_geracao import ErroPlanejamentoBuild, sugerir_total
 from services.build_service.preco_exibido_service import PrecoExibidoService
+from .preferencias_processador_service import PreferenciasProcessadorService
 
 logger = logging.getLogger("services.build_service.criar_build_service")
 
@@ -84,6 +85,8 @@ def gerar_catalogo(preco_maximo, reserva_perifericos=0, excluidas=(), referencia
     pecas = PrecoExibidoService.catalogo(modelo.listar_disponiveis_ate(teto, limite=200), teto)
     if pecas:
       fichas = [campos_catalogo({**item, "id": PrecoExibidoService.id_numerico(item)}) for item in pecas]
+      if modelo.__tablename__ == "processador" and preferencia_processador in ("intel", "amd"):
+        fichas = [p for p in fichas if PreferenciasProcessadorService.marca(p, preferencia_processador)]
       if modelo.__tablename__ == "monitor":
         fichas = [p for p in fichas if PreferenciasPerifericosService.painel_permitido(p)]
       if modelo.__tablename__ in ("cabo_rede", "adaptador_wifi") and rede:

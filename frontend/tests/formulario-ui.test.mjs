@@ -31,7 +31,8 @@ test("navegação usa Lotties direcionados e não depende mais do Font Awesome",
 test("periféricos têm etapa própria e opções já possuídas usam Lottie compartilhado", async () => {
   const forms = await readFile(new URL("../js/pages/forms.js",import.meta.url),"utf8");
   const css = await readFile(new URL("../styles/forms/orcamento.css",import.meta.url),"utf8");
-  assert.match(forms,/chave:"perifericos",etapa:"Periféricos"/);
+  const { perguntas } = await import("../js/build/perguntas-formulario.js");
+  assert.equal(perguntas.find(p=>p.chave === "perifericos").etapa,"Periféricos");
   assert.match(forms,/data-owned-peripheral=/);
   assert.match(forms,/iconeAnimado\("checkbox"\)/);
   assert.match(forms,/iniciarIcones\(conteudo\)/);

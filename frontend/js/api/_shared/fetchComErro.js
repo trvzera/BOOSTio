@@ -27,8 +27,8 @@ function diagnosticoSeguro(valor) {
 }
 
 export function orientacaoGeracaoSegura(valor) {
-  if (!valor || !["orcamento","perifericos","cor","aparencia","catalogo","compatibilidade","pecas","resposta"].includes(valor.motivo)
-    || !["orcamento","perifericos","aparencia","pecas","objetivo"].includes(valor.etapa)) return undefined;
+  if (!valor || !["orcamento","perifericos","cor","aparencia","catalogo","compatibilidade","pecas","resposta","marca-processador"].includes(valor.motivo)
+    || !["orcamento","perifericos","aparencia","pecas","objetivo","preferencias","rede"].includes(valor.etapa)) return undefined;
   const dados = {motivo:valor.motivo,etapa:valor.etapa};
   if (typeof valor.titulo === "string" && valor.titulo.trim() && valor.titulo.length <= 160) dados.titulo = valor.titulo;
   if (typeof valor.orcamentoSugerido === "number" && Number.isFinite(valor.orcamentoSugerido) && valor.orcamentoSugerido > 0 && valor.orcamentoSugerido <= 1000000)

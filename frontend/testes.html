@@ -12,31 +12,21 @@
   <script type="module" src="./js/pages/test-price-history.js" defer></script>
   <script type="module" src="./js/pages/test-laboratorio.js" defer></script>
   <script type="module" src="./js/pages/test-montagem.js" defer></script>
+  <script type="module" src="./js/pages/test-onboarding.js" defer></script>
+  <script type="module" src="./js/pages/test-forms.js" defer></script>
+  <link rel="stylesheet" href="./styles/paginas/test-forms.css">
+  <link rel="stylesheet" href="./styles/paginas/test-onboarding.css">
   <link rel="icon" type="image/webp" href="./imgs/favicon.webp">
   <link rel="stylesheet" href="./styles/style.css">
   <noscript><link rel="stylesheet" href="./styles/componentes/no-script.css"></noscript>
   <link rel="stylesheet" href="./styles/paginas/testes.css">
   <link rel="stylesheet" href="./styles/paginas/test-benchmark-panel.css">
   <link rel="stylesheet" href="./styles/paginas/equipe.css">
-  <meta name="description" content="Laboratório de interfaces da BOOSTio: testes de comparação de builds, orçamento, melhorias e desempenho esperado em jogos.">
+  <link rel="stylesheet" href="./styles/paginas/testes-base.css">
+  <meta name="description" content="Laboratório da BOOSTio: prévias de formulários para desktop e notebook, comparação de builds, orçamento, melhorias e desempenho.">
   <meta name="robots" content="noindex,nofollow">
   <link rel="preload" href="./fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="./fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
-  <style>
-    body.menu-test-page { height: auto; min-height: 100vh; color: var(--cor-6); overflow-x: clip; }
-    .test-logo { position: absolute; top: 28px; left: 32px; width: 110px; }
-    .test-main { display: block; max-width: 1100px; margin: auto; padding: 160px 32px 130px; }
-    .test-main h1 { max-width: 700px; font-size: clamp(2.3rem, 6vw, 4.8rem); line-height: 1.1; margin: 20px 0; }
-    .test-main > p { color: var(--cor-4); max-width: 680px; line-height: 1.8; }
-    .test-kicker { color: var(--cor-p1); letter-spacing: .08em; text-transform: uppercase; }
-    .test-panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 60px; }
-    .test-panel { border: 1px solid var(--cor-2); border-radius: 22px; padding: 28px; }
-    .test-panel p { color: var(--cor-4); margin: 12px 0 24px; }
-    .test-panel .btn-ghost { display: inline-block; }
-    @media(max-width: 700px) { .test-panels { grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: 32px; } }
-    @media(max-width: 600px) { .test-main { padding: var(--page-top) 16px 112px; } .test-panel { padding: 20px; } }
-    @media(prefers-reduced-motion: reduce) { .experimental-menu * { transition-duration: .01ms !important; transition-delay: 0ms !important; } }
-  </style>
 </head>
 
 <body class="menu-test-page" data-private-page>
@@ -49,6 +39,8 @@
     <h1 class="font-1-xxl">Experimente novos recursos</h1>
     <p class="font-2-s">Escolha uma prévia para experimentar o visual e as interações. Os exemplos abrem aqui mesmo, sem precisar sair desta página.</p>
     <nav class="lab-preview-nav" aria-label="Exemplos do laboratório">
+      <a href="#teste-formulario-pc" aria-label="Formulário de desktop">Formulário de desktop</a>
+      <a href="#teste-formulario-notebook" aria-label="Formulário de notebook">Formulário de notebook</a>
       <a href="#teste-painel-benchmark" aria-label="Painel de desempenho">Painel de desempenho</a>
       <a href="#teste-equipe" aria-label="Desenvolvedores">Desenvolvedores</a>
       <a href="#teste-montagem" aria-label="Preferências de montagem">Preferências de montagem</a>
@@ -58,9 +50,28 @@
       <a href="#teste-contato" aria-label="Contato">Contato</a>
       <a href="#teste-budget" aria-label="Budget">Budget</a>
       <a href="#teste-melhorias" aria-label="Melhorias">Melhorias</a>
+      <a href="#teste-tutoriais" aria-label="Tutoriais de boas-vindas">Tutoriais</a>
       <a href="#teste-desempenho" aria-label="Diagnóstico da API">Diagnóstico da API</a>
       <a href="#teste-componentes" aria-label="Outros controles">Outros controles</a>
     </nav>
+    <section class="test-feature" id="teste-formulario-pc" aria-labelledby="test-form-pc-title">
+      <div class="test-feature-head">
+        <span class="test-kicker font-1-xs">Prévia · formulário de desktop</span>
+        <h2 class="font-1-xl" id="test-form-pc-title">Vamos repensar sua montagem.</h2>
+        <p class="font-2-s">Nova proposta de perguntas, usos e preferências. Avance, volte e revise as regras antes de decidirmos o que vai para o formulário oficial.</p>
+      </div>
+      <p class="test-form-notice font-2-xs">Somente uma prévia: não usa a IA, não cria builds e não altera os dados da sua conta. As respostas ficam nesta página e são descartadas ao recarregar.</p>
+      <div data-form-preview="pc"></div>
+    </section>
+    <section class="test-feature" id="teste-formulario-notebook" aria-labelledby="test-form-notebook-title">
+      <div class="test-feature-head">
+        <span class="test-kicker font-1-xs">Rascunho · formulário de notebook</span>
+        <h2 class="font-1-xl" id="test-form-notebook-title">Um notebook para sua rotina.</h2>
+        <p class="font-2-s">Uma proposta mais curta: uso, orçamento, preferência de tela, acessórios e marca. Memória e armazenamento são sugeridos pelo uso e pelo orçamento; a tela é uma preferência flexível.</p>
+      </div>
+      <p class="test-form-notice font-2-xs">Aguardando notebooks no catálogo. Esta prévia organiza suas preferências, mas não busca modelos, não verifica ofertas e não gera recomendações.</p>
+      <div data-form-preview="notebook"></div>
+    </section>
     <section class="test-feature" id="teste-painel-benchmark" aria-labelledby="benchmark-preview-title">
       <div class="test-feature-head">
         <span class="test-kicker font-1-xs">Prévia · novo painel de desempenho</span>
@@ -269,12 +280,18 @@
           <fieldset class="test-upgrade-categories"><legend class="font-1-s">Peças que deseja avaliar</legend><label class="font-2-xs"><input type="checkbox" name="upgrade-category" value="processador" checked>Processador</label><label class="font-2-xs"><input type="checkbox" name="upgrade-category" value="placa_video">Placa de vídeo</label></fieldset>
         </div>
         <div class="test-upgrade-rank" role="group" aria-label="Critério das recomendações"><button type="button" class="is-active" aria-label="Melhor preço" aria-pressed="true">Melhor preço</button><button type="button" aria-label="Melhor desempenho" data-disabled-reason="Precisa de benchmarks comparáveis; ainda não integrado." disabled>Melhor desempenho</button></div>
-        <div class="test-actions"><button type="button" class="btn-primary" id="upgrade-search" aria-label="Buscar candidatas compatíveis para troca">Buscar candidatas</button></div>
+        <div class="test-actions"><button type="button" class="btn-primary" id="upgrade-search" aria-label="Buscar candidatas compatíveis para troca">Buscar candidatas</button><button type="button" class="btn-secondary" id="upgrade-open-panel" aria-label="Experimentar painel de melhorias">Experimentar painel de melhorias</button></div>
         <p class="test-feedback font-2-xs" id="upgrade-feedback" role="status" aria-live="polite">Registre um budget para testar a busca.</p>
         <div class="test-upgrade-preview" id="upgrade-preview" aria-live="polite"></div>
         <div class="test-candidates" id="upgrade-results" hidden></div>
       </div>
       <p class="test-muted font-2-xs">A troca altera somente a cópia exibida neste teste. Nada é gravado nas builds reais. Uma peça compatível não é necessariamente mais rápida; ganho real exige benchmarks comparáveis.</p>
+    </section>
+    <section class="test-feature" id="teste-tutoriais" aria-labelledby="test-onboarding-title">
+      <div class="test-feature-head"><span class="test-kicker font-1-xs">Primeiro acesso · apresentação curta</span><h2 class="font-1-xl" id="test-onboarding-title">Boas-vindas à BOOSTio</h2><p class="font-2-s">Experimente a apresentação escolhida para quem acabou de criar uma conta. Esta prévia não altera suas preferências.</p></div>
+      <div class="test-onboarding-options">
+        <article class="test-feature-panel glass-card"><span class="test-kicker font-1-xs">Apresentação curta</span><h3 class="font-1-l">O essencial, antes de começar</h3><p class="font-2-s">Três passos sobre seu conhecimento, as formas de montar e como cuidar do orçamento.</p><button type="button" class="btn-primary" data-preview-onboarding="curto" aria-label="Ver apresentação curta de boas-vindas">Ver apresentação</button></article>
+      </div>
     </section>
   </main>
   <dialog class="test-compare-dialog" id="compare-dialog" aria-labelledby="compare-dialog-title">

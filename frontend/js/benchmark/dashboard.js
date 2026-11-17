@@ -4,10 +4,10 @@ import { painelBenchmarkHtml } from "./painel.js";
 import { iniciarPainelBenchmark } from "./interface.js";
 import { painelBlenderHtml, iniciarPainelBlender } from "./blender.js";
 
-const vazio = (icone,titulo,descricao) => '<div class="benchmark-dashboard-empty-icon">' + iconeAnimado(icone)
-  + '</div><h4>' + titulo + '</h4><p>' + descricao + '</p><span class="benchmark-dashboard-waiting">Aguardando consulta</span>';
+const vazio = (icone,titulo,descricao,estado = "Aguardando consulta") => '<div class="benchmark-dashboard-empty-icon">' + iconeAnimado(icone)
+  + '</div><h4>' + titulo + '</h4><p>' + descricao + '</p><span class="benchmark-dashboard-waiting">' + estado + '</span>';
 
-export function dashboardBenchmarkHtml({prefixo = "build",titulo,cpu,gpu,memoria = null,verificarRequisitos = false,previa = false,dispositivos = {}} = {}) {
+export function dashboardBenchmarkHtml({prefixo = "build",titulo,cpu,gpu,memoria = null,verificarRequisitos = false,previa = false,dispositivos = {},disponibilidadeBlender} = {}) {
   const id = sufixo => h(prefixo + "-" + sufixo);
   const aba = (tipo,rotulo,icone,ativa) => '<button type="button" role="tab" data-benchmark-type="' + tipo
     + '" id="' + id("tab-" + tipo) + '" aria-controls="' + id("panel-" + tipo) + '" aria-selected="' + ativa + '" tabindex="' + (ativa ? 0 : -1) + '" aria-label="' + h(rotulo) + '">'
@@ -25,18 +25,20 @@ export function dashboardBenchmarkHtml({prefixo = "build",titulo,cpu,gpu,memoria
     + painelBenchmarkHtml({prefixo:prefixo + "-fps",memoria,verificarRequisitos,mostrarHardware:false}) + '</section>'
     + '<section data-benchmark-pane="blender" id="' + id("panel-blender") + '" role="tabpanel" aria-labelledby="' + id("tab-blender") + '" tabindex="0" hidden>'
     + '<div class="benchmark-dashboard-heading"><h3>E na hora de criar?</h3><p>Consulte a renderização de imagens e cenas 3D no Blender.</p></div>'
-    + painelBlenderHtml(dispositivos,{prefixo:prefixo + "-blender"}) + '</section>'
+    + painelBlenderHtml(dispositivos,{prefixo:prefixo + "-blender",disponibilidade:disponibilidadeBlender}) + '</section>'
     + '<p class="benchmark-dashboard-footnote">Nenhum teste é executado no seu computador. Os resultados dependem das fontes consultadas e podem variar conforme as peças e configurações.</p></div>';
 }
 
-export function iniciarDashboardBenchmark(raiz,{prefixo = "build",hardware,dispositivos = {},buildId = null,publica = false,cliente} = {}) {
+export function iniciarDashboardBenchmark(raiz,{prefixo = "build",hardware,dispositivos = {},disponibilidadeBlender,buildId = null,publica = false,cliente} = {}) {
   const fps = raiz.querySelector('[data-benchmark-pane="games"]');
   const blender = raiz.querySelector('[data-benchmark-pane="blender"]');
   fps.querySelector(".fpshq-panel").dataset.layout = "panel";
-  fps.querySelector(".fpshq-empty").innerHTML = vazio("gamepad","O próximo passo é dar o play.","Consulte o desempenho para ver a expectativa de FPS e comparar os ajustes gráficos.");
+  fps.querySelector(".fpshq-empty").innerHTML = hardware?.motivo
+    ? vazio("gamepad","FPS ainda não disponível para esta build","Revise os itens indicados antes de consultar. A aba Blender mostra os testes disponíveis para suas peças.","Revisar montagem")
+    : vazio("gamepad","O próximo passo é dar o play.","Consulte o desempenho para ver a expectativa de FPS e comparar os ajustes gráficos.");
   blender.querySelector("[data-blender-result]").innerHTML = '<div class="benchmark-dashboard-empty">' + vazio("microchip","Mais espaço para suas ideias.","A pontuação mostra quantas amostras a peça renderiza por minuto. CPU e GPU são avaliadas separadamente.") + '</div>';
   const pararFps = iniciarPainelBenchmark(fps,{prefixo:prefixo + "-fps",hardware,buildId,publica,cliente});
-  const pararBlender = iniciarPainelBlender(blender,dispositivos,{prefixo:prefixo + "-blender",cliente});
+  const pararBlender = iniciarPainelBlender(blender,dispositivos,{prefixo:prefixo + "-blender",cliente,disponibilidade:disponibilidadeBlender});
   const abas = [...raiz.querySelectorAll('[data-benchmark-type]')];
   const controle = new AbortController();
   function selecionar(aba,focar = false) {

@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded",() => {
   form.addEventListener("submit",async evento => {
     evento.preventDefault();if (ocupado) return;
     if (!usuarioId) { await carregar(); return; }
+    if (!form.reportValidity()) return;
     bloquear(true);feedback.textContent = "Salvando…";
     try {
       const escolhido = nivel.value || null;

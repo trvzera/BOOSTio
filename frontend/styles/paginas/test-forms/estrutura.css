@@ -1,0 +1,126 @@
+.test-form-notice {
+  padding: 14px 18px;
+  margin: 0 0 20px;
+  border: 1px dashed var(--glass-border);
+  border-radius: 14px;
+  color: var(--cor-4);
+  line-height: 1.65;
+}
+.test-form-shell {
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  overflow: hidden;
+  background: rgba(16, 17, 20, 0.75);
+  color: var(--cor-6);
+  font: 400 0.85rem/1.6 var(--font-body);
+}
+.test-form-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--glass-border);
+}
+.test-form-toolbar > span {
+  color: var(--cor-p1);
+}
+.test-form-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--glass-border);
+}
+.test-form-steps button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 6px 10px;
+  background: none;
+  border: 0;
+  border-radius: 10px;
+  color: var(--cor-4);
+  font: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+.test-form-steps button span {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+}
+.test-form-steps button[aria-current] {
+  color: var(--cor-p1);
+  background: #007bff12;
+}
+.test-form-steps button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.test-form-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+}
+.test-form-intro {
+  padding: 32px;
+}
+.test-form-intro .question-tag {
+  margin-bottom: 20px;
+}
+.test-form-intro h3 {
+  margin: 0 0 18px;
+  font-size: clamp(1.6rem, 3vw, 2.5rem);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  scroll-margin-top: 110px;
+}
+.test-form-intro > p {
+  color: var(--cor-4);
+  margin: 0;
+  line-height: 1.75;
+}
+.test-form-help-card {
+  margin-top: 28px;
+  padding: 18px;
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+}
+.test-form-help-card p {
+  margin-top: 8px;
+  color: var(--cor-4);
+}
+.test-form-answers {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 620px;
+  border-left: 1px solid var(--glass-border);
+}
+.test-form-scroll {
+  flex: 1;
+  min-height: 0;
+  padding: 28px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.test-form-scroll .appearance-examples {
+  max-height: none;
+  overflow: visible;
+}
+.test-form-scroll .appearance-cases {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.test-form-shell [hidden] {
+  display: none !important;
+}
+.test-form-shell :is(button, input, select, summary):focus-visible {
+  outline: 2px solid var(--cor-p1);
+  outline-offset: 3px;
+}

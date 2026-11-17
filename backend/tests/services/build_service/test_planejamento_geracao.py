@@ -7,8 +7,8 @@ from services.build_service.criar_build_service import CriarBuildService
 from services.build_service.erros_build import ErroGeracaoBuild
 
 
-@pytest.mark.parametrize("total,pct,motivo,sugerido", [(1, 0, "orcamento", 2000), (1999.99, 0, "orcamento", 2000),
-    (2000, 20, "orcamento", 2500), (5000, 1, "perifericos", 50000), (2500, 10, "perifericos", 5000)])
+@pytest.mark.parametrize("total,pct,motivo,sugerido", [(1, 0, "orcamento", 2500), (2499.99, 0, "orcamento", 2500),
+    (3000, 20, "orcamento", 3200), (4000, 10, "perifericos", 5000)])
 def test_limites_sao_por_subtotal_e_sugestao_respeita_os_dois_minimos(total, pct, motivo, sugerido):
     pc, perifericos = dividir_orcamento(total, pct)
     with pytest.raises(ErroPlanejamentoBuild) as erro:
@@ -17,7 +17,7 @@ def test_limites_sao_por_subtotal_e_sugestao_respeita_os_dois_minimos(total, pct
     assert erro.value.geracao["orcamentoSugerido"] == sugerido
 
 
-@pytest.mark.parametrize("total,pct", [(2000, 0), (2500, 20), (5000, 10), (8000, 20)])
+@pytest.mark.parametrize("total,pct", [(2500, 0), (3200, 20), (5000, 10), (8000, 20)])
 def test_aceita_os_limites_sem_exigir_gastar_o_total(total, pct):
     validar_minimos(*dividir_orcamento(total, pct), pct)
 

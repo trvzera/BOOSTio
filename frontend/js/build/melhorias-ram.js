@@ -73,6 +73,10 @@ export function planejarMelhoriaRam(build,catalogo,{modo = 'adicionar',itens = [
     throw new Error('A troca reduziria a capacidade atual ou passaria de vários pentes para apenas um.');
   if (modo === 'substituir' && lista.length === atuais.length && lista.every(nova=>atuais.some(atual=>atual.peca.id === nova.peca.id && atual.quantidade === nova.quantidade)))
     throw new Error('Essa proposta mantém as mesmas memórias. Para expandir esse modelo, escolha adicionar sem remover as atuais.');
+  if (modo === 'substituir' && atuais.length && capacidadeGb === somar(atuais,'capacidade')
+    && !lista.every(nova => atuais.every(atual => nova.frequencia > atual.frequencia
+      || latencia(nova.peca) != null && latencia(atual.peca) != null && latencia(nova.peca) < latencia(atual.peca) - 1e-12)))
+    throw new Error('A proposta é equivalente à RAM atual. Escolha mais capacidade, maior frequência ou menor latência sem reduzir os demais critérios.');
   proxima.componentes.memoria_ram = lista.map(i=>({id:i.peca.id,quantidade:i.quantidade}));
   if (proxima.compatibilidade) {
 

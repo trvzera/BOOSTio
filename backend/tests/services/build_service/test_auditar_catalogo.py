@@ -80,3 +80,47 @@ def test_auditoria_indica_especificacoes_ausentes_sem_tratar_zero_como_ausente(m
     assert resumo["camposTecnicosAusentes"]["posicoes_fans"] == 1
     assert resumo["amostrasTecnicas"][0]["id"] == "gabinete:1"
     assert not AuditarCatalogoService().executar(0)["categorias"]["gabinete"]["amostrasTecnicas"]
+
+
+def test_detalhamento_tecnico_inclui_todas_as_pecas_sem_limite_de_amostras(monkeypatch):
+    pecas = [{"id": f"fonte:{i}", "modelo": f"Fonte {i}", "potencia_w": 650} for i in range(25)]
+    monkeypatch.setattr("services.peca_service.auditar_catalogo_service.MODELOS_PECAS", [modelo("fonte", pecas)])
+    resultado = AuditarCatalogoService().executar(0, detalhar=True)
+    fonte = resultado["categorias"]["fonte"]
+    assert fonte["camposCompatibilidadeAusentes"]["conectores_alimentacao"] == 25
+    assert len(fonte["detalhesCompatibilidade"]) == 25
+    assert not fonte["amostrasTecnicas"]
+    assert len(resultado["verificacoesSemprePendentes"]) == 4
+    assert "detalhesCompatibilidade" not in AuditarCatalogoService().executar()["categorias"]["fonte"]
+
+
+def test_campos_condicionais_e_booleanos_nao_geram_falta_falsa():
+    falta = AuditarCatalogoService._ausente
+    assert not falta({"fans_inclusos": 0}, "fans_inclusos")
+    assert not falta({"videointegrado": False}, "videointegrado")
+    assert not falta({"quantidade_slots_m2": 0, "slots_m2": []}, "slots_m2")
+    assert not falta({"conectores_alimentacao": {}, "conectores_alimentacao_completos": True}, "conectores_alimentacao")
+    assert falta({"conectores_alimentacao": {}}, "conectores_alimentacao")
+    assert falta({"conectores_alimentacao_completos": False}, "conectores_alimentacao_completos")
+    assert not falta({"interface": "SATA", "formato": "2.5"}, "formato_m2")
+    assert not falta({"interface": "PCIe NVMe", "formato": "M.2 2280"}, "formato_m2")
+    assert falta({"interface": "PCIe NVMe", "formato": "M.2"}, "formato_m2")
+    assert falta({"altura_mm": " não informado "}, "altura_mm")
+    assert falta({"altura_mm": float("nan")}, "altura_mm")
+
+
+def test_cli_auditoria_detalhada(monkeypatch):
+    app = Flask(__name__)
+    registrar_comandos_precos(app)
+    monkeypatch.setattr(AuditarCatalogoService, "executar", lambda self, amostras, **kwargs: kwargs)
+    resultado = app.test_cli_runner().invoke(args=["catalogo-auditar", "--detalhar"])
+    assert resultado.exit_code == 0 and '"detalhar": true' in resultado.output
+
+
+def test_auditoria_distingue_referencia_de_chip_de_modelo_comercial(monkeypatch):
+    pecas = [{"id": "placa_video:1", "fabricante": "NVIDIA", "modelo": "GeForce RTX 4060"},
+             {"id": "placa_video:2", "fabricante": "ASUS", "modelo": "Dual GeForce RTX 4060 OC"}]
+    monkeypatch.setattr("services.peca_service.auditar_catalogo_service.MODELOS_PECAS", [modelo("placa_video", pecas)])
+    resultado = AuditarCatalogoService().executar(0, detalhar=True)["categorias"]["placa_video"]
+    assert resultado["quantidadeReferenciasGenericas"] == 1
+    assert resultado["referenciasGenericas"][0]["id"] == "placa_video:1"

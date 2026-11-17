@@ -317,3 +317,39 @@ def test_busca_valida_filtra_e_limita_resultados():
             service.executar({"q": q}, 1)
     assert len(service.executar({"q": " jogo "}, 1)["jogos"]) == 10
     assert api.buscar.call_args.kwargs["params"]["q"] == "jogo"
+
+
+def test_referencia_gpu_exige_escolha_explicita_e_nao_envia_cpu_ou_escopo_ao_provedor():
+    api = cliente(Mock(return_value=resposta(cpu=None)))
+    service = ConsultarBenchmarkService(api)
+    consulta = {k: v for k, v in CONSULTA.items() if k != "cpu"}
+    with pytest.raises(ValueError):
+        service.executar(consulta, 1)
+    api.buscar.assert_not_called()
+    resultado = service.executar({**consulta, "escopo": "gpu"}, 1)
+    assert resultado["escopo"] == "gpu"
+    assert "cpu" not in resultado["consulta"]
+    assert "cpu" not in api.buscar.call_args.kwargs["params"]
+    assert "escopo" not in api.buscar.call_args.kwargs["params"]
+    assert service.executar({**consulta, "escopo": "gpu"}, 2)["cache"] is True
+    # O cache sem CPU não pode ser confundido com uma combinação completa.
+    api.buscar.return_value = resposta()
+    assert service.executar(CONSULTA, 1)["escopo"] == "build"
+    assert api.buscar.call_count == 2
+
+
+@pytest.mark.parametrize("extra", [{"escopo": "outro"}, {"escopo": "gpu"}])
+def test_referencia_rejeita_escopo_invalido_ou_cpu_incluida(extra):
+    api = cliente()
+    with pytest.raises(ValueError):
+        ConsultarBenchmarkService(api).executar({**CONSULTA, **extra}, 1)
+    api.buscar.assert_not_called()
+
+
+@pytest.mark.parametrize("alteracao", [{"cpu": {"slug": "cpu-inferida"}}, {"gpu": {"slug": "outra"}}, {"game": {"slug": "outro"}}])
+def test_referencia_gpu_nao_aceita_troca_de_pecas_ou_cpu_inferida(alteracao):
+    api = cliente(Mock(return_value=resposta(**{"cpu": None, **alteracao})))
+    consulta = {k: v for k, v in CONSULTA.items() if k != "cpu"}
+    with pytest.raises(ErroBenchmark):
+        ConsultarBenchmarkService(api).executar({**consulta, "escopo": "gpu"}, 1)
+    assert not api.cache

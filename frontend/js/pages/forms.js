@@ -2,12 +2,14 @@ import "../header.js";
 import "../auth/auth.js";
 import { normalizarRede, vincularRede } from "../build/rede.js";
 import { normalizarAparencia, aparenciaHtml, atualizarGuiaPorteGabinete } from "../build/aparencia.js";
-import { iniciarRestricoesEstiloGabinete, carregarReferenciasGabinetes } from "../build/estilos-gabinete.js";
-import { opcoesUso, prioridadesUso, orientacoesEtapas } from "../build/uso-formulario.js";
+import { prioridadesUso, orientacoesEtapas } from "../build/uso-formulario.js";
+import { perguntas, exemplosPecas } from "../build/perguntas-formulario.js";
+import { perfisUso, minimoUso, orcamentoInicialUso } from "../build/perfis-uso.js";
+import { comprimentosCabosCatalogo, validarCaboFormulario } from "../build/cabos-formulario.js";
 import { ajustarGuiasConhecimento } from "../conta/preferencias-uso.js";
 import { iniciarImagens } from "../build/imagens-produtos.js";
 import { planejamentoLocal } from "../build/planejamento.js";
-import { orcamentoValido, dividirOrcamento, avaliarOrcamentoGeracao, MINIMO_PC_GERACAO } from "../build/orcamento-formulario.js";
+import { orcamentoValido, dividirOrcamento, avaliarOrcamentoGeracao } from "../build/orcamento-formulario.js";
 import { feedbackGeracao } from "../build/generation-feedback.js";
 import { confirmarPrioridadeMontagem, prioridadeMontagemValida } from "../build/generation-priority.js";
 import { carregarPerfil } from "../conta/perfil.js";
@@ -24,116 +26,20 @@ import {
   destruirAnimacao,
 } from "../components/lottie-controller.js";
 
-const perguntas = [
-  {
-    chave: "objetivo",
-    etapa: "Objetivo",
-    tag: "Etapa 01",
-    titulo: "Para que você vai usar o computador?",
-    descricao:
-      "Escolha o uso principal para direcionar a montagem ao que você mais precisa.",
-    opcoes: opcoesUso,
-  },
-  {
-    chave: "orcamento",
-    etapa: "Orçamento",
-    tag: "Etapa 02",
-    titulo: "Quanto você pode gastar no computador?",
-    descricao:
-      "Defina o limite de gasto. Reserve ao menos R$ 2.000 para o PC, além do valor para novos periféricos.",
-    opcoes: [
-      ["ate-3000", "Até R$ 3.000", "Configuração essencial e econômica."],
-      [
-        "3000-5000",
-        "Até R$ 5.000",
-        "Desempenho equilibrado para o dia a dia.",
-      ],
-      [
-        "5000-8000",
-        "Até R$ 8.000",
-        "Mais potência para jogos e tarefas exigentes.",
-      ],
-    ],
-  },
-  {
-    chave: "pecas",
-    etapa: "Suas peças",
-    tag: "Etapa 03",
-    titulo: "O que você já possui?",
-    descricao:
-      "Selecione as peças que vai reaproveitar e informe os modelos. Começando do zero? Marque a primeira opção.",
-    multipla: true,
-    opcoes: [
-      ["nenhuma", "Ainda não tenho peças"],
-      ["processador", "Processador", "Executa os programas e as tarefas."],
-      ["placa-mae", "Placa-mãe", "Conecta e organiza as peças do computador."],
-      ["placa-video", "Placa de vídeo", "Gera as imagens de jogos e programas."],
-      ["memoria", "Memória RAM", "Mantém os programas abertos em uso."],
-      ["ssd", "SSD", "Guarda arquivos e abre programas com rapidez."],
-      ["hd", "HD", "Guarda seus arquivos e programas."],
-      ["fonte", "Fonte", "Fornece energia às peças."],
-      ["gabinete", "Gabinete", "A caixa onde as peças ficam instaladas."],
-      ["cooler", "Resfriador a ar", "Air cooler · ajuda a resfriar o processador."],
-      ["water-cooler", "Resfriador a líquido", "Water cooler · resfria o processador com líquido."],
-      ["fans", "Ventoinhas (fans)", "Fazem o ar circular dentro do gabinete."],
-    ],
-  },
-  {
-    chave:"perifericos",etapa:"Periféricos",tag:"Etapa 04",
-    titulo:"Quer incluir periféricos na montagem?",
-    descricao:"Além da caixa do computador, você pode precisar de monitor, teclado, mouse e fone. Informe o que já possui e quanto reservar para o que faltar.",
-    opcoes:[
-      ["sem-perifericos","Não incluir periféricos novos","Vou montar apenas o computador."],
-      ["todos-perifericos","Preciso de todos","Incluir monitor, teclado, mouse e headset."],
-      ["alguns-perifericos","Já possuo alguns ou todos","Informe o que vai reaproveitar; incluímos somente o que faltar."],
-    ],
-  },
-  {
-    chave:"rede",etapa:"Conexão",tag:"Etapa 05",
-    titulo:"Como seu PC vai se conectar à internet?",
-    descricao:"Escolha Wi-Fi, cabo de internet ou os dois. Depois, diga se quer incluir os acessórios na montagem.",
-    opcoes:[],
-  },
-  {
-    chave:"aparencia",etapa:"Aparência",tag:"Etapa 06",
-    titulo:"Como você quer o visual do computador?",
-    descricao:"Escolha tamanho, estilo e cor, ou deixe sem preferência. As escolhas precisam caber no orçamento e combinar com as peças.",
-    opcoes:[],
-  },
-];
-
-const exemplosPecas = {
-  processador: "Ex.: AMD Ryzen 5 5600",
-  "placa-mae": "Ex.: ASUS TUF Gaming B550M-Plus",
-  "placa-video": "Ex.: GeForce RTX 4060 8 GB",
-  memoria: "Ex.: Kingston Fury 16 GB DDR4 3200 MHz",
-  ssd: "Ex.: Kingston NV2 1 TB NVMe",
-  hd: "Ex.: Seagate Barracuda 2 TB",
-  fonte: "Ex.: Corsair CV650 650 W",
-  gabinete: "Ex.: Montech Air 100",
-  cooler: "Ex.: DeepCool AK400",
-  "water-cooler": "Ex.: Corsair H100i",
-  fans: "Ex.: Kit 3 fans Rise Mode 120 mm",
-  monitor: "Ex.: LG UltraGear 24GN60R-B",
-  teclado: "Ex.: Redragon Kumara K552",
-  mouse: "Ex.: Logitech G203",
-  headset: "Ex.: HyperX Cloud II",
-  webcam: "Ex.: Logitech C920",
-  microfone: "Ex.: HyperX SoloCast",
-};
-
 document.addEventListener("DOMContentLoaded", async () => {
   const conteudo = document.querySelector("#question-content");
   const painel = document.querySelector("#question-info");
   const telaCompacta = window.matchMedia("(max-width: 850px)");
   await acompanharCarregamento(carregarPerfil().catch(() => null));
   const planejamento = planejamentoLocal();
-  const respostas = {rede:normalizarRede(),aparencia:normalizarAparencia()};
+  const respostas = {rede:normalizarRede(),aparencia:normalizarAparencia(),orcamento:"ate-3000",orcamentoPersonalizado:3000,orcamentoAlterado:false};
+  let cabosDisponiveis = [];
   let catalogoProprio;
   const carregarPecasProprias=()=>catalogoProprio??=catalogoBuilds().then(r=>r.pecas).catch(e=>{catalogoProprio=null;throw e;});
   if (planejamento.usarBudget && planejamento.budget != null) {
     respostas.orcamento = "personalizado";
     respostas.orcamentoPersonalizado = planejamento.budget;
+    respostas.orcamentoAlterado = true;
   }
   let indiceAtual = 0;
   let geracaoPergunta = 0;
@@ -199,6 +105,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       : [respostas[pergunta.chave]];
     const tipo = pergunta.multipla ? "checkbox" : "radio";
     return pergunta.opcoes
+      .filter(([valor]) => pergunta.chave !== "orcamento" || faixas[valor] >= minimoUso(respostas.objetivo))
       .map(([valor, titulo, descricao]) => {
         const selecionada = selecionadas.includes(valor);
         const atributosPeca = pergunta.chave === "pecas"
@@ -223,11 +130,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function rangeHtml() {
-    const recebido = respostas.orcamentoPersonalizado ?? 5000;
+    const recebido = respostas.orcamentoPersonalizado ?? orcamentoInicialUso(respostas.objetivo);
     const valor = Number.isFinite(recebido) ? recebido : "";
     const maximo = Math.max(20000,valor);
     const isActive = respostas.orcamento === "personalizado" ? "active" : "";
-    return `<div class="budget-range ${isActive}"><div><label class="font-1-m-b" for="budget-input">Orçamento personalizado (R$)</label><strong class="font-2-xs value-transition" id="budget-value"${valor === "" ? "" : ` data-value-number="${valor}"`}>${valor === "" ? "Informe um valor" : moeda.format(valor)}</strong></div><input id="budget-input" type="number" inputmode="decimal" min="2000" max="1000000" step="0.01" data-number-step="100" value="${valor}" aria-describedby="budget-help budget-validation"><input type="range" id="budget-range" min="2000" max="${Math.ceil(maximo / 100) * 100}" step="100" value="${Math.max(2000,Math.round(valor / 100) * 100)}" style="--range-progress: ${progressoRange(valor)}%" aria-label="Ajustar orçamento de cem em cem reais"><p id="budget-help" class="font-2-xs">Mínimo de R$ 2.000 para o PC. Controle e setas de R$ 100 em R$ 100. Digite para usar outro valor.</p><p id="budget-validation" class="form-budget-validation font-2-xs" role="status" aria-live="polite"></p></div>
+    return `<div class="budget-range ${isActive}"><div><label class="font-1-m-b" for="budget-input">Orçamento personalizado (R$)</label><strong class="font-2-xs value-transition" id="budget-value"${valor === "" ? "" : ` data-value-number="${valor}"`}>${valor === "" ? "Informe um valor" : moeda.format(valor)}</strong></div><input id="budget-input" type="number" inputmode="decimal" min="${minimoUso(respostas.objetivo)}" max="1000000" step="0.01" data-number-step="100" value="${valor}" aria-describedby="budget-help budget-validation"><input type="range" id="budget-range" min="${minimoUso(respostas.objetivo)}" max="${Math.ceil(maximo / 100) * 100}" step="100" value="${Math.max(minimoUso(respostas.objetivo),Math.round(valor / 100) * 100)}" style="--range-progress: ${progressoRange(valor)}%" aria-label="Ajustar orçamento de cem em cem reais"><p id="budget-help" class="font-2-xs">Mínimo de ${moeda.format(minimoUso(respostas.objetivo))} para o PC, depois da reserva dos periféricos. Controle e setas de R$ 100 em R$ 100. Digite para usar outro valor.</p><p id="budget-validation" class="form-budget-validation font-2-xs" role="status" aria-live="polite"></p></div>
       `;
   }
 
@@ -246,7 +153,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const proprios = respostas.perifericosProprios || [];
     alvo.innerHTML = (respostas.perifericos === "alguns-perifericos" ? '<fieldset class="peripheral-owned-list"><legend>Quais periféricos você já possui?</legend>' +
       listaPerifericos.map(([tipo,nome]) => '<div class="peripheral-owned" data-owned="' + tipo + '"><label class="ui-check"><input type="checkbox" data-owned-peripheral="' + tipo + '" ' + (proprios.includes(tipo) ? 'checked' : '') + '>' + iconeAnimado("checkbox") + '<span>' + nome + '</span></label>' + (proprios.includes(tipo) ? detalhePecaHtml(tipo,nome) : '') + '</div>').join("") + '</fieldset>' : '') +
-      '<div class="peripheral-budget" id="peripheral-allocation" ' + (respostas.incluirPerifericos ? '' : 'hidden') + '><label for="peripheral-percent">Quanto reservar para monitor, teclado, mouse e fone?</label><div class="peripheral-percent-field"><input type="number" id="peripheral-percent" min="1" max="99" step="1" inputmode="numeric" aria-describedby="peripheral-budget-summary peripheral-budget-help" value="' + respostas.percentualPerifericos + '"><span aria-hidden="true">%</span></div><p id="peripheral-budget-summary" class="font-2-xs"></p><p id="peripheral-budget-help" class="font-2-xs">Reserve pelo menos R$ 500 para os periféricos novos; o catálogo pode exigir mais. Essa é a parte máxima do seu dinheiro para esses itens. Não é preciso gastar tudo. Se sobrar, o dinheiro fica com você e não aumenta o limite das peças do computador.</p><p id="peripheral-budget-validation" class="form-budget-validation font-2-xs" role="status" aria-live="polite"></p></div>';
+      '<div class="peripheral-budget" id="peripheral-allocation" ' + (respostas.incluirPerifericos ? '' : 'hidden') + '><label for="peripheral-percent">Quanto reservar para monitor, teclado, mouse e fone?</label><div class="peripheral-percent-field"><input type="number" id="peripheral-percent" min="10" max="40" step="1" inputmode="numeric" aria-describedby="peripheral-budget-summary peripheral-budget-help" value="' + respostas.percentualPerifericos + '"><span aria-hidden="true">%</span></div><p id="peripheral-budget-summary" class="font-2-xs"></p><p id="peripheral-budget-help" class="font-2-xs">Reserve pelo menos R$ 500 para os periféricos novos; o catálogo pode exigir mais. Escolha de 10% a 40% do orçamento total. Essa é a parte máxima do seu dinheiro para esses itens. Não é preciso gastar tudo. Se sobrar, o dinheiro fica com você e não aumenta o limite das peças do computador.</p><p id="peripheral-budget-validation" class="form-budget-validation font-2-xs" role="status" aria-live="polite"></p></div>';
+    if (perfisUso[respostas.objetivo]?.webcam) alvo.insertAdjacentHTML("afterbegin",'<p class="planning-help font-2-xs">Para reuniões, considere uma webcam e um fone com microfone. Ainda não temos webcam disponível para compra no catálogo; esse item fica para compra separada e não entra no total da build.</p>');
     alvo.querySelectorAll("[data-owned-peripheral]").forEach(input => input.addEventListener("change",() => {
       const escolhidos = new Set(respostas.perifericosProprios || []), tipo = input.dataset.ownedPeripheral;
       if (input.checked) escolhidos.add(tipo); else escolhidos.delete(tipo);
@@ -274,18 +182,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     const divisao = dividirOrcamento(valor,percentual);
     const resumo = conteudo.querySelector("#peripheral-budget-summary");
     if (resumo) resumo.textContent = divisao
-      ? `Até ${moeda.format(divisao.perifericos)} para monitor, teclado, mouse e fone · até ${moeda.format(divisao.pc)} para as peças do computador e a conexão com a internet.` : "Informe quanto pode gastar e uma porcentagem de 1 a 99, sem casas decimais.";
-    const validacao = avaliarOrcamentoGeracao(valor,percentual);
+      ? `Até ${moeda.format(divisao.perifericos)} para monitor, teclado, mouse e fone · até ${moeda.format(divisao.pc)} para as peças do computador e a conexão com a internet.` : "Informe quanto pode gastar e uma porcentagem inteira entre 10% e 40%.";
+    const validacao = avaliarOrcamentoGeracao(valor,percentual,respostas.objetivo);
     const aviso = conteudo.querySelector("#peripheral-budget-validation, #budget-validation");
     if (aviso) aviso.textContent = validacao.valido ? "" : validacao.mensagem;
     const numero = conteudo.querySelector("#budget-input");
-    if (numero) numero.setAttribute("aria-invalid",String(!orcamentoValido(valor) || valor < MINIMO_PC_GERACAO));
+    if (numero) numero.setAttribute("aria-invalid",String(!orcamentoValido(valor) || valor < minimoUso(respostas.objetivo)));
     if (anunciar && resumo) anunciarStatus(resumo.textContent);
     conteudo.querySelector("#next-question").disabled = !podeAvancar();
   }
 
   function progressoRange(valor) {
-    return Number.isFinite(valor) ? Math.min(100,Math.max(0,(valor - MINIMO_PC_GERACAO) / (Math.max(20000,respostas.orcamentoPersonalizado || 0) - MINIMO_PC_GERACAO) * 100)) : 0;
+    return Number.isFinite(valor) ? Math.min(100,Math.max(0,(valor - minimoUso(respostas.objetivo)) / (Math.max(20000,respostas.orcamentoPersonalizado || 0) - minimoUso(respostas.objetivo)) * 100)) : 0;
   }
 
   function renderizarPergunta() {
@@ -317,13 +225,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <button type="button" class="btn-ghost" id="previous-question" aria-label="Voltar à etapa anterior" ${indiceAtual === 0 ? 'disabled data-disabled-reason="Você está na primeira etapa do formulário."' : ""}>${iconeAnimado("arrow","back")}<span>Voltar</span></button>
         <button type="button" class="btn-primary-form" id="next-question" aria-label="${rotuloAvancar}" ${podeAvancar() ? "" : "disabled"}><span>${rotuloAvancar}</span>${iconeAnimado("arrow")}</button>
       </div>`;
-    if (pergunta.chave === "rede") vincularRede(conteudo.querySelector("#form-network"),respostas.rede,{prefixo:"form-rede",aoRenderizar:raiz => {
-      iniciarControlesNumericos(raiz);
-      ajustarGuiasConhecimento(raiz);
-    },aoAlterar:rede => {
-      respostas.rede = rede;
-      conteudo.querySelector("#next-question").disabled = !podeAvancar();
-    }});
+    if (pergunta.chave === "rede") void renderizarRedeFormulario();
     if(pergunta.chave === "aparencia") void renderizarAparencia();
     if(pergunta.chave === "objetivo") atualizarPrioridadeUso();
     conteudo
@@ -361,29 +263,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     campo.innerHTML=aparenciaHtml(respostas.aparencia,[],{possuiGabinete:respostas.pecas?.includes("gabinete")});
     campo.setAttribute("aria-busy","false");
     iniciarImagens(campo);
-    const restricoes = iniciarRestricoesEstiloGabinete(campo);
-    let catalogo = [], referencias = [], pronto = false;
     const sincronizar=()=>{
       respostas.aparencia=normalizarAparencia({
         estilo:campo.querySelector('input[name="appearance-style"]:checked')?.value,
         porte:campo.querySelector('input[name="appearance-size"]:checked')?.value,
-        cor:campo.querySelector('input[name="appearance-color"]:checked').value,
+        cor:campo.querySelector('input[name="appearance-color"]:checked')?.value,
         gabinete_id:null,
       });
-      const validacao = restricoes?.atualizar(catalogo,respostas.aparencia,referencias,{pronto});
-      if (validacao?.alterado) respostas.aparencia.estilo = validacao.estilo;
       atualizarGuiaPorteGabinete(campo,respostas.aparencia.porte);
     };
     sincronizar();campo.addEventListener("change",sincronizar);
-    if (!restricoes) return;
-    try {
-      [catalogo,referencias] = await Promise.all([carregarPecasProprias(),carregarReferenciasGabinetes()]);
+  }
+
+  async function renderizarRedeFormulario() {
+    const campo=conteudo.querySelector("#form-network");
+    const desenhar=()=>{
       if (!campo.isConnected) return;
-      pronto = true;
-      sincronizar();
-    } catch {
-      if (campo.isConnected) restricoes.falhou();
-    }
+      vincularRede(campo,respostas.rede,{prefixo:"form-rede",comprimentosCabo:cabosDisponiveis,
+        aoRenderizar:raiz=>{iniciarControlesNumericos(raiz);ajustarGuiasConhecimento(raiz);},
+        aoAlterar:rede=>{respostas.rede=rede;atualizarAviso();}});
+      atualizarAviso();
+    };
+    const atualizarAviso=()=>{
+      const aviso=campo.querySelector("[data-cable-feedback]");
+      if (aviso) aviso.textContent=validarCaboFormulario(respostas.rede,cabosDisponiveis);
+      conteudo.querySelector("#next-question").disabled=!podeAvancar();
+      atualizarMenu();
+    };
+    desenhar();
+    try { cabosDisponiveis=comprimentosCabosCatalogo(await carregarPecasProprias());desenhar(); }
+    catch {if(campo.isConnected){const aviso=campo.querySelector("[data-cable-feedback]");if(aviso)aviso.textContent="Não conseguimos consultar os cabos. Tente novamente ou escolha comprar esse acessório separadamente.";}}
   }
 
   function vincularCamposDetalhesPecas() {
@@ -508,12 +417,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function etapaRespondida(indice) {
-    if (["rede","aparencia"].includes(perguntas[indice].chave)) return true;
-    if (perguntas[indice].chave === "orcamento") return orcamentoValido(valorOrcamento()) && valorOrcamento() >= MINIMO_PC_GERACAO;
+    if (perguntas[indice].chave === "aparencia") return true;
+    if (perguntas[indice].chave === "rede") return !validarCaboFormulario(respostas.rede,cabosDisponiveis);
+    if (perguntas[indice].chave === "orcamento") return avaliarOrcamentoGeracao(valorOrcamento(),respostas.incluirPerifericos ? respostas.percentualPerifericos : 0,respostas.objetivo).valido;
     if (perguntas[indice].chave === "perifericos") {
       if (!respostas.perifericos) return false;
       if (respostas.perifericos === "alguns-perifericos" && (!(respostas.perifericosProprios?.length) || !respostas.perifericosProprios.every(tipo => respostas.pecasDetalhes?.[tipo]?.trim()))) return false;
-      return avaliarOrcamentoGeracao(valorOrcamento(),respostas.incluirPerifericos ? respostas.percentualPerifericos : 0).valido;
+      return avaliarOrcamentoGeracao(valorOrcamento(),respostas.incluirPerifericos ? respostas.percentualPerifericos : 0,respostas.objetivo).valido;
     }
     const resposta = respostas[perguntas[indice].chave];
     if (!Array.isArray(resposta)) return Boolean(resposta);
@@ -555,9 +465,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       sincronizarCheckboxesLottie();
       sincronizarCamposDetalhesPecas();
     }
-    if (pergunta.chave === "objetivo") atualizarPrioridadeUso();
+    if (pergunta.chave === "objetivo") {
+      if (!respostas.orcamentoAlterado) {
+        const inicial=orcamentoInicialUso(respostas.objetivo);
+        respostas.orcamento=inicial===3000?"ate-3000":"personalizado";
+        respostas.orcamentoPersonalizado=inicial;
+      }
+      atualizarPrioridadeUso();
+    }
     if (pergunta.chave === "perifericos") renderizarCamposPerifericos();
     if (pergunta.chave === "orcamento") {
+      respostas.orcamentoAlterado = true;
       const valor = faixas[input.value];
       respostas.orcamentoPersonalizado = valor;
       conteudo.querySelector("#budget-input").value = valor;
@@ -573,6 +491,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function atualizarRange(evento) {
+    respostas.orcamentoAlterado = true;
     respostas.orcamentoPersonalizado = evento.target.valueAsNumber;
     respostas.orcamento = "personalizado";
     atualizarValor(conteudo.querySelector("#budget-value"),Number.isFinite(respostas.orcamentoPersonalizado) ? moeda.format(respostas.orcamentoPersonalizado) : "Informe um valor",respostas.orcamentoPersonalizado);
@@ -647,7 +566,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.querySelectorAll(".form-step").forEach(botao => botao.disabled = true);
     limparCheckboxesLottie();
     try {
-      const validacao = avaliarOrcamentoGeracao(valorOrcamento(),respostas.incluirPerifericos ? respostas.percentualPerifericos : 0);
+      const validacao = avaliarOrcamentoGeracao(valorOrcamento(),respostas.incluirPerifericos ? respostas.percentualPerifericos : 0,respostas.objetivo);
       if (!validacao.valido) throw Object.assign(new Error(validacao.mensagem),{status:400,geracao:{motivo:validacao.motivo,
         titulo:"Ajuste o orçamento antes de gerar",etapa:validacao.motivo === "perifericos" ? "perifericos" : "orcamento",orcamentoSugerido:validacao.minimoTotal}});
       const sessao = await buscarUsuarioLogado();
@@ -682,18 +601,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       gerando = false;
       document.querySelector("#questions").dataset.formState = "error";
       atualizarMenu();
-      conteudo.innerHTML = feedbackGeracao(erro,{total:valorOrcamento(),percentual:respostas.incluirPerifericos ? respostas.percentualPerifericos : 0,aparencia:respostas.aparencia}).html;
+      conteudo.innerHTML = feedbackGeracao(erro,{total:valorOrcamento(),percentual:respostas.incluirPerifericos ? respostas.percentualPerifericos : 0,aparencia:respostas.aparencia,objetivo:respostas.objetivo}).html;
       conteudo.querySelector("#tentar-gerar-build")?.addEventListener("click", mostrarGerando);
       conteudo.querySelector("#revisar-orcamento").addEventListener("click",() => navegarPara(1));
       conteudo.querySelectorAll("[data-generation-step]").forEach(botao => botao.addEventListener("click",() => {
         const indice = perguntas.findIndex(pergunta => pergunta.chave === botao.dataset.generationStep);
         if (indice >= 0) navegarPara(indice);
+        else if (botao.dataset.generationStep === "preferencias") confirmarGeracao();
       }));
       conteudo.querySelector("#generation-budget-form")?.addEventListener("submit",evento => {
         evento.preventDefault();
         const input = conteudo.querySelector("#generation-budget"), valor = input.valueAsNumber;
         if (!input.reportValidity()) return;
-        const validacao = avaliarOrcamentoGeracao(valor,respostas.incluirPerifericos ? respostas.percentualPerifericos : 0);
+        const validacao = avaliarOrcamentoGeracao(valor,respostas.incluirPerifericos ? respostas.percentualPerifericos : 0,respostas.objetivo);
         if (!validacao.valido) { conteudo.querySelector("#generation-budget-feedback").textContent = validacao.mensagem; return; }
         respostas.orcamento = "personalizado"; respostas.orcamentoPersonalizado = valor;
         mostrarGerando();

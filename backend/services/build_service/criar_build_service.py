@@ -14,7 +14,8 @@ from models import BuildSalva, Usuario
 from utils.validacoes import validacao_campos
 from utils.aparencia import validar_aparencia
 from services.validacoes_service.requisitos_armazenamento_service import RequisitosArmazenamentoService
-from .planejamento_geracao import validar_minimos
+from .planejamento_geracao import validar_minimos, validar_percentual
+from .preferencias_processador_service import PreferenciasProcessadorService
 
 logger = logging.getLogger(__name__)
 
@@ -35,8 +36,7 @@ class CriarBuildService:
 
     orcamento = validar_orcamento(dados["orcamento"])
     percentual = dados.get("percentual_perifericos", 0)
-    if type(percentual) is not int or not 0 <= percentual <= 99:
-      raise ValueError("A porcentagem para periféricos deve ser de 0 a 99")
+    validar_percentual(percentual)
     rede = dados.get("rede")
     if rede is None:
       rede = {}
@@ -46,7 +46,7 @@ class CriarBuildService:
     margem = min(orcamento / 2, max(800, orcamento * 0.25))
 
     teto_pc, teto_perifericos = dividir_orcamento(orcamento, percentual)
-    validar_minimos(teto_pc, teto_perifericos, percentual)
+    validar_minimos(teto_pc, teto_perifericos, percentual, dados.get("utilidade"))
     inicio_prompt = perf_counter()
     reparo = {}
     if selecao_inteligente:
@@ -59,10 +59,12 @@ class CriarBuildService:
       plano_perifericos = preparado["plano_perifericos"]
     else:
       catalogo = preparar_catalogo(dados, proprias, rede, aparencia, orcamento, margem, teto_pc, teto_perifericos)
+      detalhes_proprias = obter_detalhes_proprias(proprias)
+      PreferenciasProcessadorService.exigir_catalogo(catalogo, dados.get("preferencia_processador"), proprias, detalhes_proprias)
       validar_disponibilidade(catalogo, proprias, percentual)
       plano_perifericos = planejar_perifericos(catalogo, teto_perifericos, proprias, dados["utilidade"], aparencia["cor"], percentual)
-      detalhes_proprias = obter_detalhes_proprias(proprias)
       prompt = criar_prompt(dados, orcamento, margem, catalogo, percentual, detalhes_proprias, plano_perifericos)
+    PreferenciasProcessadorService.exigir_catalogo(catalogo, dados.get("preferencia_processador"), proprias, detalhes_proprias)
     logger.info("Geração: etapa=prompt duracao_ms=%d caracteres=%d", (perf_counter()-inicio_prompt)*1000, len(prompt))
     dados_build = gerar_candidata(usuario_id, prompt, modelo, catalogo, orcamento,
                                      percentual, proprias, detalhes_proprias, rede, tentativas_correcao,

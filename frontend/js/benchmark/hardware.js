@@ -167,10 +167,11 @@ export function hardwareBlender(cpu,gpu) {
       nomeCpu = "Intel Core " + (core ? "i" + m[1] + "-" : "Ultra " + m[1] + " ") + m[2].toUpperCase();
     }
   }
-  const modeloGpu = nome(gpu);
+  // O modelo comercial pode ser apenas "Dual OC"; o chip verificado fica em modelo_referencia.
+  const modeloGpu = gpu?.modelo_referencia ? nome({modelo:gpu.modelo_referencia}) : nome(gpu);
 
 
-  if (/\b(?:laptop|notebook|mobile|max-q|2048\s*sp)\b/i.test(modeloGpu)) return {cpu:nomeCpu,gpu:null};
+  if (/\b(?:laptop|notebook|mobile|max-q|2048\s*sp)\b/i.test(modeloGpu + " " + nome(gpu))) return {cpu:nomeCpu,gpu:null};
   const padraoNvidia = /\b(RTX|GTX|GT)\s*(\d{3,4})(?:\s*(TI(?:\s*SUPER)?|SUPER))?\b/gi;
   const padraoAmd = /\bRX\s*(\d{3,4})(?:\s*(XTX|XT|GRE))?\b/gi;
   const nvidias = identificadores(modeloGpu,padraoNvidia), amds = identificadores(modeloGpu,padraoAmd);

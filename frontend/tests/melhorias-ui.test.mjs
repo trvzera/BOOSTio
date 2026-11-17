@@ -32,6 +32,14 @@ test("sugestões mostram imagem, preço e seleção sem prometer ganho de desemp
   assert.match(css,/\.upgrade-real-candidate-image img \{[^}]*object-fit: contain/);
 });
 
+test("sugestões exigem orçamento válido e explicam ganho e conferências pendentes",() => {
+  assert.match(js,/if \(limite == null\) \{ resultados.innerHTML =[\s\S]*Defina quanto pode investir[\s\S]*return; \}/);
+  assert.match(js,/resumoGanhoMelhoria\(comparacao\)/);
+  assert.match(js,/class="upgrade-real-gain"/);
+  assert.match(js,/Compatibilidade parcial · confira a prévia/);
+  assert.match(js,/if \(aplicando \|\| evento.target === campoBudget\) return/);
+});
+
 test("categorias de melhorias usam o checkbox Lottie compartilhado e a cor primária",() => {
   assert.match(js,/CATEGORIAS\.map\(categoria => '<label class="ui-check"><input type="checkbox"/);
   assert.match(js,/iconeAnimado\("checkbox"\) \+ '<span>' \+ categoria\.nome/);
@@ -81,7 +89,9 @@ test("prévia considera todas as peças antigas e distingue dicas, avisos e erro
   assert.match(js,/precosAntigos\.reduce\(/);
   assert.match(js,/verificacoes\("Conflitos encontrados",depois\.erros,"error"\)/);
   assert.match(js,/verificacoes\("Pontos de atenção",avisos,"warning"\)/);
-  assert.match(js,/verificacoes\("Dicas e conferências",depois\.dicas,"info"\)/);
+  assert.match(js,/verificacoes\("Dicas e conferências",resumo\.dicas,"info"\)/);
+  assert.match(js,/pendentes:resumirCompatibilidade\(simulacao\.avaliacao\)\.grupos\.length/);
+  assert.match(js,/verificacoes\("O que ainda precisa ser confirmado",resumo\.grupos\.map/);
   assert.match(js,/gasto > limite/);
   assert.match(js,/await aoAplicar\(confirmada\.build\)/);
 });
