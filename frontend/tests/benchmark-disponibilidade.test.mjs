@@ -71,3 +71,27 @@ test("argumentos inválidos falham sem aprovar a build",()=>{
   for(const b of [null,{}, {componentes:[]}])assert.equal(avaliar(b).permitido,false);
   assert.equal(avaliarDisponibilidadeFps(base(),null).permitido,false);
 });
+
+import { avaliarDisponibilidadeBlender, avaliarReferenciaGpu } from "../js/benchmark/disponibilidade.js";
+test("Blender bloqueia RAM desconhecida e erros conhecidos antes de consultar CPU ou GPU",()=>{
+  const b=base();b.componentes.memoria_ram=[{proprio:"Minha RAM"}];
+  for(const tipo of ["cpu","gpu"]) {
+    assert.equal(avaliarDisponibilidadeBlender(b,catalogo)[tipo].codigo,"ram-nao-identificada");
+    assert.equal(avaliarDisponibilidadeBlender(base(),alterar("placa_mae",{socket:"AM5"}))[tipo].codigo,"incompativel");
+    assert.equal(avaliarDisponibilidadeBlender(base(),catalogo)[tipo].permitido,true);
+  }
+});
+test("Blender permite CPU sem GPU dedicada e não troca a GPU desconhecida",()=>{
+  const b=base();delete b.componentes.placa_video;
+  const r=avaliarDisponibilidadeBlender(b,catalogo);
+  assert.equal(r.cpu.permitido,true);assert.equal(r.gpu.permitido,false);
+  const desconhecida=avaliarDisponibilidadeBlender(base(),alterar("placa_video",{modelo:"Não identificada",modelo_referencia:null}));
+  assert.equal(desconhecida.cpu.permitido,true);assert.equal(desconhecida.gpu.codigo,"hardware-nao-suportado");
+  assert.equal(avaliarDisponibilidadeBlender(null,catalogo).cpu.permitido,false);
+});
+test("referência da GPU não depende de CPU identificada e não substitui a GPU",()=>{
+  const r=avaliarReferenciaGpu(base(),alterar("processador",{modelo:"Não identificado"}));
+  assert.deepEqual(r,{permitido:true,hardware:{gpu:"rtx-3060"}});
+  assert.equal(avaliarReferenciaGpu(base(),alterar("placa_video",{memoria_gb:8})).permitido,false);
+  assert.equal(avaliarReferenciaGpu(null,null).permitido,false);
+});

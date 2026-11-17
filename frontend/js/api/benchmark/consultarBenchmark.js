@@ -74,10 +74,16 @@ export function criarClienteBenchmark({requisitar = fetchComErro,timeoutMs = 450
         return dados;
       });
     },
-    consultar({game,cpu,gpu,res = "1080p",preset = "high"},opcoes) {
-      if (![game,cpu,gpu].every(v => typeof v === "string" && SLUG.test(v)) || !["1080p","1440p","4k"].includes(res) || !["low","medium","high","ultra"].includes(preset))
+    consultar({game,cpu,gpu,res = "1080p",preset = "high",escopo = "build"},opcoes) {
+      const somenteGpu = escopo === "gpu";
+      if (!["build","gpu"].includes(escopo) || somenteGpu && cpu !== undefined
+        || !(somenteGpu ? [game,gpu] : [game,cpu,gpu]).every(v => typeof v === "string" && SLUG.test(v)) || !["1080p","1440p","4k"].includes(res) || !["low","medium","high","ultra"].includes(preset))
         return Promise.reject(new Error("Selecione um jogo e modelos de CPU e GPU reconhecidos, com ajustes válidos."));
-      return enviar("fps",{game,cpu,gpu,res,preset},opcoes);
+      return enviar("fps",somenteGpu ? {game,gpu,res,preset,escopo} : {game,cpu,gpu,res,preset},opcoes).then(dados => {
+        if (somenteGpu && (dados.escopo !== "gpu" || dados.consulta?.cpu != null || dados.consulta?.gpu !== gpu || dados.consulta?.game !== game))
+          throw new Error("A fonte não confirmou uma referência isolada da GPU. Nenhum FPS da build foi estimado.");
+        return dados;
+      });
     },
     async buscarJogos(texto,opcoes) {
       const q = String(texto || "").trim();

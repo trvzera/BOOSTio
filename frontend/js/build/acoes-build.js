@@ -9,7 +9,7 @@ import { dashboardBenchmarkHtml, iniciarDashboardBenchmark } from "../benchmark/
 import { catalogoBuilds } from "../api/build/builds.js";
 import { fetchComErro } from "../api/_shared/fetchComErro.js";
 import { compararCatalogosCompra } from "./compra-revalidacao.js";
-import { avaliarDisponibilidadeFps } from "../benchmark/disponibilidade.js";
+import { avaliarDisponibilidadeFps, avaliarDisponibilidadeBlender, avaliarReferenciaGpu } from "../benchmark/disponibilidade.js";
 
 export function avisoCompraHtml() {
   return '<p class="purchase-notice">A BOOSTio não vende, entrega ou processa pagamentos de peças e periféricos. Os links abrem lojas de terceiros, responsáveis pela venda e pelo atendimento da compra. Confira preço, estoque, frete, garantia e devolução diretamente na loja.</p>';
@@ -58,11 +58,15 @@ export function abrirBenchmark(build,catalogo,{publica = false} = {}) {
   const memoria = ram.itens.length && ram.itens.every(({peca}) => Number.isInteger(peca?.capacidade_gb) && peca.capacidade_gb > 0) ? ram.capacidade : null;
   const dispositivos = hardwareBlender(cpu,gpu);
   const disponibilidadeFps = avaliarDisponibilidadeFps(build,catalogo);
+  const disponibilidadeBlender = avaliarDisponibilidadeBlender(build,catalogo);
+  const referencia = avaliarReferenciaGpu(build,catalogo);
+  const hardware = {...(disponibilidadeFps.permitido ? disponibilidadeFps.hardware : {motivo:disponibilidadeFps.motivo}),
+    ...(referencia.permitido ? {referenciaGpu:referencia.hardware} : {})};
   const dialogo = abrirDialogoBuild("Desempenho esperado",dashboardBenchmarkHtml({prefixo,titulo:build.titulo,
-    cpu:cpu ? nomePeca(cpu) : null,gpu:gpu ? nomePeca(gpu) : null,memoria,verificarRequisitos:Boolean(buildId),dispositivos}));
+    cpu:cpu ? nomePeca(cpu) : null,gpu:gpu ? nomePeca(gpu) : null,memoria,verificarRequisitos:Boolean(buildId),dispositivos,disponibilidadeBlender}));
   dialogo.classList.add("benchmark-dialog");
   const limpar = iniciarDashboardBenchmark(dialogo.querySelector("[data-benchmark-dashboard]"),
-    {prefixo,hardware:disponibilidadeFps.permitido ? disponibilidadeFps.hardware : {motivo:disponibilidadeFps.motivo},dispositivos,buildId,publica});
+    {prefixo,hardware,dispositivos,disponibilidadeBlender,buildId,publica});
   dialogo.addEventListener("close",limpar,{once:true});
   return dialogo;
 }

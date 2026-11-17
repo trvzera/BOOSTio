@@ -5,6 +5,7 @@ import { resultadoDesempenhoHtml,resolucoesHtml } from "./view.js";
 import { definirDetalheAberto,iniciarDetalhesAnimados } from "../components/animated-details.js";
 import { iniciarRequisitosBuild } from "./requisitos.js";
 import { motivoRequisitosFps } from "./disponibilidade.js";
+import { iniciarIcones } from "../components/ui.js";
 
 const MENSAGENS_CONSULTA = ["Consultando o desempenho esperado…","Aguardando os dados do jogo para as peças escolhidas…","A FPSHQ está demorando um pouco. A consulta continua em andamento…","Ainda estamos aguardando a resposta. Nenhuma nova consulta foi enviada…","O resultado aparecerá aqui quando a consulta terminar…"];
 const MENSAGENS_BUSCA = ["Buscando jogos…","Procurando na FPSHQ…","Organizando os resultados…","A FPSHQ pode levar alguns segundos…"];
@@ -26,6 +27,11 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
   const interfaces = localizar("#fpshq-layouts");
   const consulta = form.querySelector('button[type="submit"]');
   const requisitos = iniciarRequisitosBuild(raiz,{prefixo,buildId,cliente,publica});
+  const escopos = form.querySelector('[data-benchmark-scope]'), avisoGpu = form.querySelector('[data-gpu-reference-notice]');
+  const botaoRequisitos = form.querySelector('[data-check-build-requirements]');
+  let escopo = "build";
+  const hardwareAtual = () => escopo === "gpu" ? hardware.referenciaGpu : hardware;
+  if (escopos) { escopos.hidden = !hardware.referenciaGpu; iniciarIcones(escopos); }
   iniciarDetalhesAnimados(raiz);
 
   const aplicarInterface = opcao => {
@@ -53,14 +59,16 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
   }
   incluirJogos(JOGOS_INICIAIS);
   function controles() {
-    consulta.disabled = ocupado || Boolean(hardware.motivo); buscar.disabled = ocupado;
-    const motivo = hardware.motivo || (ocupado ? acaoAtual === "espera" ? "Aguarde o intervalo informado pelo provedor." : "Aguarde a consulta atual." : "");
+    consulta.disabled = ocupado || Boolean(hardwareAtual().motivo); buscar.disabled = ocupado;
+    const motivo = hardwareAtual().motivo || (ocupado ? acaoAtual === "espera" ? "Aguarde o intervalo informado pelo provedor." : "Aguarde a consulta atual." : "");
     if (motivo) consulta.dataset.disabledReason = motivo;
     else delete consulta.dataset.disabledReason;
-    consulta.textContent = acaoAtual === "consulta" ? "Consultando…" : "Ver desempenho";
-    consulta.setAttribute("aria-label",acaoAtual === "consulta" ? "Consultando desempenho esperado na FPSHQ" : "Ver desempenho esperado na FPSHQ");
+    consulta.textContent = acaoAtual === "consulta" ? "Consultando…" : escopo === "gpu" ? "Consultar referência da GPU" : "Ver desempenho";
+    consulta.setAttribute("aria-label",acaoAtual === "consulta" ? "Consultando desempenho esperado na FPSHQ" : escopo === "gpu" ? "Consultar referência da GPU na FPSHQ" : "Ver desempenho esperado na FPSHQ");
     buscar.textContent = acaoAtual === "busca" ? "Buscando…" : "Buscar";
     buscar.setAttribute("aria-label",acaoAtual === "busca" ? "Buscando jogos na FPSHQ" : "Buscar jogos na FPSHQ");
+    escopos?.querySelectorAll('input').forEach(input => { input.disabled = ocupado; });
+    if (botaoRequisitos) botaoRequisitos.hidden = escopo === "gpu";
     resultadosBusca.querySelectorAll("button").forEach(botao => { botao.disabled = ocupado; });
   }
   function mostrarAviso(mostrar) {
@@ -99,7 +107,12 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
     resultado.querySelector(".fpshq-resolutions").innerHTML = resolucoesHtml(dadosAtuais.matriz,evento.target.value);
   });
   form.addEventListener("change",evento => {
-    limparResultado(); informar(hardware.motivo || "");
+    if (evento.target.closest('[data-benchmark-scope]')) {
+      if (ocupado || !hardware.referenciaGpu) return;
+      escopo = evento.target.value === "gpu" ? "gpu" : "build";
+      avisoGpu.hidden = escopo !== "gpu"; requisitos?.limpar(); controles();
+    }
+    limparResultado(); informar(hardwareAtual().motivo || "");
     if (evento.target === jogo) {
       mostrarAviso(Boolean(jogo.value));
       atualizarFonte("https://fpshq.com/pt/games/" + jogo.value + "/");
@@ -107,7 +120,7 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
   });
   form.addEventListener("submit",async evento => {
     evento.preventDefault();
-    if (ocupado || hardware.motivo || !form.reportValidity()) return;
+    if (ocupado || hardwareAtual().motivo || !form.reportValidity()) return;
     if (typeof navigator !== "undefined" && navigator.onLine === false) {
       informar("Você está sem conexão com a internet. Reconecte-se e tente consultar o FPS novamente.","error");
       return;
@@ -116,7 +129,7 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
     ocupado = true; acaoAtual = "consulta"; controles(); resultado.hidden = true; resultado.setAttribute("aria-busy","true");
     mensagensEmSequencia(MENSAGENS_CONSULTA);
     try {
-      if (requisitos) {
+      if (requisitos && escopo === "build") {
         const ficha = await requisitos.verificar(jogo.value);
         if (!ativo || atual !== versao) return;
         const motivo = motivoRequisitosFps(ficha);
@@ -125,7 +138,7 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
           return;
         }
       }
-      const dados = await cliente.consultar({...hardware,game:jogo.value,res:res.value,preset:preset.value},{signal:controle.signal});
+      const dados = await cliente.consultar({...hardwareAtual(),...(escopo === "gpu" ? {escopo} : {}),game:jogo.value,res:res.value,preset:preset.value},{signal:controle.signal});
       clearInterval(rotacao);
       if (ativo && atual === versao) { renderizar(dados); informar(""); }
       ocupado = false; acaoAtual = "";

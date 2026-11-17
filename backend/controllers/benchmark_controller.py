@@ -44,7 +44,7 @@ def _executar_consulta(service, campos, chave):
 @benchmark_bp.get("/fps")
 @login_required
 def consultar_benchmark():
-    return _executar_consulta(ConsultarBenchmarkService(), ("game", "cpu", "gpu", "res", "preset"), "resultado")
+    return _executar_consulta(ConsultarBenchmarkService(), ("game", "cpu", "gpu", "res", "preset", "escopo"), "resultado")
 
 
 @benchmark_bp.get("/jogos")

@@ -129,3 +129,23 @@ test("dots acompanha apenas o estado do menu e a tela de erro evita retorno dupl
   assert.match(erro,/<button[^>]*id="error-back"[^>]*\bhidden/);
   assert.equal([...erro.matchAll(/Ir para o início<\/a>/g)].length,1);
 });
+
+test("referência GPU é explícita, omite CPU e exige confirmação do escopo na resposta",async()=>{
+  const chamadas=[];
+  const cliente=criarClienteBenchmark({requisitar:async rota=>{
+    chamadas.push(rota);return {resultado:{escopo:"gpu",consulta:{game:"valorant",gpu:"rtx-3060"}}};
+  }});
+  const {cpu,...gpu}=consulta;
+  await assert.rejects(cliente.consultar(gpu));assert.equal(chamadas.length,0);
+  await assert.rejects(cliente.consultar({...consulta,escopo:"gpu"}));assert.equal(chamadas.length,0);
+  await cliente.consultar({...gpu,escopo:"gpu"});
+  const params=new URL(chamadas[0],"https://qa.test").searchParams;
+  assert.equal(params.get("escopo"),"gpu");assert.equal(params.has("cpu"),false);
+  for(const resultado of [{escopo:"build",consulta:gpu},{escopo:"gpu",consulta},{escopo:"gpu",consulta:{...gpu,gpu:"outra"}}]) {
+    const c=criarClienteBenchmark({requisitar:async()=>({resultado})});
+    await assert.rejects(c.consultar({...gpu,escopo:"gpu"}),/referência isolada/);
+  }
+  const html=resultadoDesempenhoHtml({consulta:gpu,escopo:"gpu",jogo:"Valorant",fps:100,matriz:{},consultadoEm:1});
+  assert.match(html,/Referência apenas da GPU/);assert.match(html,/não representa o FPS da sua build/);
+  assert.doesNotMatch(html,/FPS médio esperado/);
+});
