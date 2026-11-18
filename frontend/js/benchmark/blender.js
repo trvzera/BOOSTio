@@ -12,14 +12,14 @@ export function mensagemFalhaBlender(erro) {
 
 export function painelBlenderHtml(dispositivos,{prefixo = "blender",disponibilidade} = {}) {
   const id = nome => h(prefixo + "-" + nome);
-  return '<section class="blender-panel" aria-label="Desempenho de renderização no Blender"><p class="planning-help">Consulte resultados públicos de uma peça, sem executar testes no seu computador.</p>' +
+  return '<section class="blender-panel" aria-label="Desempenho de renderização no Blender"><div class="blender-controls">' +
     '<form id="' + id("form") + '"><label class="test-field" for="' + id("device") + '">Dispositivo de renderização<select id="' + id("device") + '">' +
     Object.entries(disponibilidade || dispositivos).filter(([,valor]) => valor).map(([tipo]) => '<option value="' + tipo + '">' + tipo.toUpperCase() + ' · ' + h(dispositivos[tipo] || "Identificação a confirmar") + '</option>').join("") +
     '</select></label><button type="submit" class="btn-primary" aria-label="Consultar desempenho no Blender" ' +
     (!dispositivos.cpu && !dispositivos.gpu ? 'disabled data-disabled-reason="Não há CPU ou GPU com identificação cadastrada para o Blender."' : '') + '>Consultar Blender</button></form>' +
-    '<p class="test-feedback" data-blender-feedback role="status" aria-live="polite" id="' + id("feedback") + '">' + (!dispositivos.cpu && !dispositivos.gpu ? 'Identifique uma CPU ou GPU no catálogo para consultar seus resultados.' : '') + '</p>' +
-    '<div id="' + id("result") + '" data-blender-result aria-live="polite"></div><p class="planning-help">A pontuação representa renderização no Cycles, não FPS. CPU e GPU não são somadas. RAM, VRAM, drivers e a cena alteram o resultado real; a fonte pode agrupar variantes do mesmo nome.</p>' +
-    '<p class="fpshq-attribution">Fonte: <a href="https://opendata.blender.org/about/" target="_blank" rel="noopener noreferrer" aria-label="Ver metodologia do Blender Open Data em nova aba">Blender Open Data</a></p></section>';
+    '<p class="test-feedback" data-blender-feedback role="status" aria-live="polite" id="' + id("feedback") + '">' + (!dispositivos.cpu && !dispositivos.gpu ? 'Identifique uma CPU ou GPU no catálogo para consultar seus resultados.' : '') + '</p></div>' +
+    '<div class="blender-output"><div id="' + id("result") + '" data-blender-result aria-live="polite"></div><p class="planning-help">A pontuação representa renderização no Cycles, não FPS. CPU e GPU não são somadas. RAM, VRAM, drivers e a cena alteram o resultado real; a fonte pode agrupar variantes do mesmo nome.</p>' +
+    '<p class="fpshq-attribution">Fonte: <a href="https://opendata.blender.org/about/" target="_blank" rel="noopener noreferrer" aria-label="Ver metodologia do Blender Open Data em nova aba">Blender Open Data</a></p></div></section>';
 }
 
 export function iniciarPainelBlender(raiz,dispositivos,{cliente = criarClienteBenchmark(),prefixo = "blender",disponibilidade} = {}) {
