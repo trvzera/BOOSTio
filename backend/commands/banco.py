@@ -41,6 +41,12 @@ def registrar_comandos_banco(app):
             mensagem = str(erro) if isinstance(erro, ValueError) else "Falha ao preparar tokens de integração."
             raise click.ClickException(mensagem) from None
 
+    @app.cli.command("builds-legadas-migrar")
+    def migrar_builds_legadas():
+        """Copia as builds da tabela antiga para build_salva; pode rodar mais de uma vez."""
+        from models import BuildSalva
+        click.echo(json.dumps({"migradas": BuildSalva.migrar_legadas()}))
+
     @app.cli.command("historico-precos-preparar")
     def preparar_historico():
         """Cria somente o histórico; faça backup antes em bancos existentes."""

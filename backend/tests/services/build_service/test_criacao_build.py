@@ -16,7 +16,7 @@ from requests.exceptions import Timeout
 import pytest
 from flask import Flask
 
-from models import db, lm, Usuario, Build, BuildSalva
+from models import db, lm, Usuario, BuildSalva
 from models.build_salva import LimiteBuildsError
 from models.build_salva import MODELOS
 from controllers.build_controller import build_bp
@@ -181,8 +181,8 @@ def test_reverifica_limite_depois_da_llm_e_rollback_sem_orfa(app_build):
         for _ in range(3):
             CriarBuildManualService().executar(1, ESTADO)
         with pytest.raises(LimiteBuildsError):
-            BuildSalva.criar_limitada(1, ESTADO, gerada={"nome": "Resultado atrasado"})
-        assert Build.query.count() == 0
+            BuildSalva.criar_limitada(1, ESTADO)
+        assert BuildSalva.query.count() == 3
 
 
 @pytest.mark.parametrize("percentual", [-1, 100, 20.5, True, "20", None])
@@ -382,7 +382,7 @@ def test_geracao_rejeita_transferencia_de_sobra_antes_de_salvar(app_build, mocke
         assert "limite reservado para periféricos" in llm.call_args.args[0]
         assert llm.call_count == 2
     with app_build.app_context():
-        assert Build.query.count() == BuildSalva.query.count() == 0
+        assert BuildSalva.query.count() == 0
 
 
 def test_faltam_perifericos_na_resposta():
@@ -407,7 +407,7 @@ def test_conjunto_de_perifericos_inviavel_nao_consume_llm_nem_salva(app_build, m
     assert "reserva é de R$ 1000.00" in resposta.json["erro"]
     llm.assert_not_called()
     with app_build.app_context():
-        assert Build.query.count() == BuildSalva.query.count() == 0
+        assert BuildSalva.query.count() == 0
 
 
 def test_geracao_completa_fans_omitidas_antes_de_persistir(app_build, mocker):
@@ -432,10 +432,10 @@ def test_geracao_completa_fans_omitidas_antes_de_persistir(app_build, mocker):
     assert resposta.json["build"]["estado"]["componentes"]["fan"] == [{"id": 1, "quantidade": 3}]
     llm.assert_called_once()
     with app_build.app_context():
-        assert Build.query.count() == BuildSalva.query.count() == 1
+        assert BuildSalva.query.count() == 1
 
 
-def test_geracao_persiste_original_e_estado_em_uma_transacao(app_build, mocker, caplog):
+def test_geracao_persiste_o_estado_em_uma_transacao(app_build, mocker, caplog):
     caplog.set_level("INFO",logger="services.build_service.criar_build_service")
     tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "monitor", "teclado", "mouse", "fone"]
     with app_build.app_context():
@@ -451,7 +451,7 @@ def test_geracao_persiste_original_e_estado_em_uma_transacao(app_build, mocker, 
         assert resposta["estado"]["orcamento"] == 5000
         assert resposta["preco_total"] == 1000
         assert len(resposta["componentes"]) == 10
-        assert Build.query.count() == BuildSalva.query.count() == 1
+        assert BuildSalva.query.count() == 1
         assert "Teto para periféricos: R$ 1000.00" in llm.call_args.args[0]
         assert len(BuildSalva.listar_por_usuario(1)) == 1
         logs=[r.getMessage() for r in caplog.records if r.name=="services.build_service.criar_build_service"]
@@ -484,7 +484,7 @@ def test_geracao_8000_perifericos_10_rede_pendente_ou_comprada(app_build, mocker
     assert any(o["codigo"] == "rede-pendente" for o in build["compatibilidade"]["orientacoes"]) is not esperado
     llm.assert_called_once()
     with app_build.app_context():
-        assert Build.query.count() == BuildSalva.query.count() == 1
+        assert BuildSalva.query.count() == 1
 
 
 def test_geracao_rejeita_conflito_antes_de_gravar_build(app_build, mocker):
@@ -504,7 +504,7 @@ def test_geracao_rejeita_conflito_antes_de_gravar_build(app_build, mocker):
     assert resposta.json["codigo"] == "planejamento-invalido"
     llm.assert_not_called()
     with app_build.app_context():
-        assert Build.query.count() == BuildSalva.query.count() == 0
+        assert BuildSalva.query.count() == 0
 
 
 def test_contas_que_ja_excederam_limite_nao_perdem_builds(app_build):
@@ -531,7 +531,7 @@ def test_geracao_de_rede_preserva_opcao_sem_perifericos_e_criacao_limitada(app_b
         assert not resposta["estado"]["incluirPerifericos"]
         assert resposta["estado"]["percentualPerifericos"] == 0
         assert resposta["estado"]["componentes"]["cabo_rede"]["id"] == 1
-        assert Build.query.count() == BuildSalva.query.count() == 1
+        assert BuildSalva.query.count() == 1
         assert "# REDE" in llm.call_args.args[0]
 
 
@@ -563,7 +563,7 @@ def test_geracao_com_pecas_proprias_preserva_reserva_rede_e_extras(app_build, mo
         assert estado["componentes"]["processador"] == {"proprio": "Teste processador", "quantidade": 1}
         assert estado["componentes"]["monitor"] == {"proprio": "Meu monitor", "quantidade": 1}
         assert resultado["preco_total"] == 100 * len(novas)
-        assert Build.query.count() == 0 and BuildSalva.query.count() == 1
+        assert BuildSalva.query.count() == 1
         assert "PEÇAS QUE O USUÁRIO JÁ POSSUI" in llm.call_args.args[0]
         if not percentual:
             assert "Não inclua periféricos novos" in llm.call_args.args[0]
@@ -590,7 +590,7 @@ def test_pecas_proprias_reverificam_quota_apos_llm(app_build, mocker):
         with pytest.raises(LimiteBuildsError):
             CriarBuildService().executar(1, {**PEDIDO, "pecas_proprias": {"processador": "processador"}})
         llm.assert_called_once()
-        assert BuildSalva.query.count() == 3 and Build.query.count() == 0
+        assert BuildSalva.query.count() == 3
 
 
 def test_email_nao_verificado_bloqueia_todas_as_criacoes_sem_chamar_llm(app_build, mocker):
@@ -645,7 +645,7 @@ def test_ia_corrige_saida_invalida_antes_de_persistir(app_build, mocker, falha):
     assert "NOVO JSON COMPLETO" in llm.call_args.args[0]
     assert resposta.json["build"]["estado"]["componentes"]["placa_video"]["id"] == 1
     with app_build.app_context():
-        assert Build.query.count() == BuildSalva.query.count() == 1
+        assert BuildSalva.query.count() == 1
 
 
 def test_ia_revisa_omissao_de_fans_antes_de_salvar(app_build, mocker):
@@ -676,7 +676,7 @@ def test_ia_invalida_duas_vezes_nao_persiste_nem_repete_sem_limite(app_build, mo
     assert "Nenhuma build foi salva" in resposta.json["erro"]
     assert llm.call_count == 2
     with app_build.app_context():
-        assert Build.query.count() == BuildSalva.query.count() == 0
+        assert BuildSalva.query.count() == 0
 
 
 def test_revisao_reverifica_vaga_antes_de_gastar_outra_consulta(app_build, mocker):
@@ -694,7 +694,7 @@ def test_revisao_reverifica_vaga_antes_de_gastar_outra_consulta(app_build, mocke
     assert resposta.status_code == 409
     llm.assert_called_once()
     with app_build.app_context():
-        assert BuildSalva.query.count() == 3 and Build.query.count() == 0
+        assert BuildSalva.query.count() == 3
 
 
 def test_fallback_de_transporte_nao_inicia_outro_ciclo_de_correcao(app_build, mocker):
@@ -708,7 +708,7 @@ def test_fallback_de_transporte_nao_inicia_outro_ciclo_de_correcao(app_build, mo
     assert resposta.status_code == 502 and resposta.json["codigo"] == "geracao-invalida"
     assert llm.call_count == 3
     with app_build.app_context():
-        assert BuildSalva.query.count() == Build.query.count() == 0
+        assert BuildSalva.query.count() == 0
 
 
 @pytest.mark.parametrize("falha,status,codigo", [("timeout",504,"ia-timeout"),("conexao",503,"ia-indisponivel"),("limite",503,"ia-limite"),("http",502,"ia-provedor")])
@@ -730,7 +730,7 @@ def test_falha_do_provedor_nao_e_tratada_como_erro_do_usuario(app_build, mocker,
     if falha == "limite":
         assert resposta.headers["Retry-After"] == "45"
     with app_build.app_context():
-        assert BuildSalva.query.count() == Build.query.count() == 0
+        assert BuildSalva.query.count() == 0
 
 
 @pytest.mark.parametrize("valor", [{"valor": 5000}, [], "sem valor", 10**400])
@@ -812,7 +812,7 @@ def test_8000_um_pouco_de_tudo_revisa_pc_de_4000_e_salva_so_a_melhorada(app_buil
         resposta = CriarBuildService().executar(1, {**primeira, "orcamento": 8000, "percentual_perifericos": percentual})
         assert resposta["preco_total"] == esperado
         assert resposta["estado"]["componentes"]["placa_video"]["id"] == 2
-        assert BuildSalva.query.count() == Build.query.count() == 1
+        assert BuildSalva.query.count() == 1
         assert resposta["compatibilidade"]["erros"] == []
     assert llm.call_count == 2
     revisao = llm.call_args.args[0]
@@ -964,7 +964,7 @@ def test_api_rejeita_limites_minimos_sem_chamar_ia_ou_salvar(app_build, mocker, 
     llm.assert_not_called()
     catalogo.assert_not_called()
     with app_build.app_context():
-        assert Build.query.count() == BuildSalva.query.count() == 0
+        assert BuildSalva.query.count() == 0
 
 
 def test_api_aceita_novos_tetos_sem_impor_gasto_minimo(app_build, mocker):
@@ -1031,7 +1031,7 @@ def test_armazenamento_insuficiente_nunca_e_salvo(app_build, mocker):
         mocker.patch('services.build_service.gerar_candidata_service.LLMService.executar', return_value=resposta)
         with pytest.raises(ErroGeracaoBuild, match='armazenamento mínimo'):
             CriarBuildService().executar(1, {**PEDIDO, 'armazenamento_minimo_gb': 500})
-        assert BuildSalva.query.count() == Build.query.count() == 0
+        assert BuildSalva.query.count() == 0
 
 
 def test_geracao_inteligente_repara_excesso_sem_pedir_nova_resposta_ia(app_build, mocker):
@@ -1068,7 +1068,7 @@ def test_geracao_inteligente_repara_excesso_sem_pedir_nova_resposta_ia(app_build
         resposta_http=cliente.post('/build/',json=pedido)
         assert resposta_http.status_code==201, resposta_http.json
         assert resposta_http.json['build']['preco_total']==7950
-        assert BuildSalva.query.count()==Build.query.count()==1
+        assert BuildSalva.query.count()==1
         r={'build': salvar.call_args.args[1]}
         preparar.assert_called_once()
         antiga.assert_not_called()
@@ -1125,7 +1125,7 @@ def test_frontend_inteligente_preserva_prioridade_proprias_perifericos_e_rede(ap
     assert pedido['prioridade_montagem']==prioridade
     assert 'obrigatoriamente Ryzen' not in prompt
     with app_build.app_context():
-        assert BuildSalva.query.count()==1 and Build.query.count()==0
+        assert BuildSalva.query.count()==1
 
 
 def test_gerar_candidata_troca_perifericos_fora_do_plano_pela_melhor_combinacao(mocker):
