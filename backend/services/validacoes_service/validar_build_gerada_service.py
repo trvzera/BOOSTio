@@ -1,6 +1,6 @@
 from decimal import Decimal
 from math import isfinite
-from models import Build
+from models.build_salva import MULTIPLAS
 from utils.validacoes import validacao_campos
 from services.build_service.constantes_build import PERIFERICOS
 from services.build_service.custos_build_service import dividir_orcamento
@@ -36,7 +36,7 @@ def validar_build_gerada(build, catalogo, orcamento, percentual=0, proprias=None
     tipos.append(tipo)
     peca = pecas.get((tipo, componente["id"]))
     quantidade = componente.get("quantidade", 1)
-    if peca is None or type(quantidade) is not int or not 1 <= quantidade <= (64 if tipo in Build.QUANTIDADES else 1):
+    if peca is None or type(quantidade) is not int or not 1 <= quantidade <= (64 if tipo in MULTIPLAS else 1):
       raise ValueError("A IA escolheu uma peça ou quantidade inválida")
     valor = peca.get("preco")
     if isinstance(valor, bool) or not isinstance(valor, (int, float, Decimal)) or not isfinite(valor) or valor <= 0:

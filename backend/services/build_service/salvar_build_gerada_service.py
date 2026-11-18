@@ -1,4 +1,3 @@
-from models import Build
 from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 """Prepara o estado persistido, incluindo peças próprias."""
 from models import BuildSalva
@@ -37,7 +36,7 @@ def salvar_build(usuario_id, dados_build, proprias, rede, percentual, aparencia,
   componentes = {}
   for item in dados_build["componentes"]:
     selecao = {"id": item["id"], "quantidade": item["quantidade"]}
-    componentes[item["tipo"]] = [selecao] if item["tipo"] in Build.QUANTIDADES else selecao
+    componentes[item["tipo"]] = [selecao] if item["tipo"] in MULTIPLAS else selecao
   estado = validar_estado({
     "titulo": dados_build["nome"][:100], "descricao": dados_build["descricao"][:300],
     "orcamento": orcamento, "componentes": componentes, "rede": rede,
@@ -45,4 +44,4 @@ def salvar_build(usuario_id, dados_build, proprias, rede, percentual, aparencia,
     "incluirPerifericos": percentual > 0, "percentualPerifericos": percentual,
     "aparencia": aparencia,
   })
-  return AvaliarCompatibilidadeService().para_resposta(BuildSalva.criar_limitada(usuario_id, estado, gerada=dados_build))
+  return AvaliarCompatibilidadeService().para_resposta(BuildSalva.criar_limitada(usuario_id, estado))

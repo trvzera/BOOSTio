@@ -49,21 +49,18 @@ class BuildSalva(ModeloBase):
             raise ValueError("Usuário não encontrado")
         if not usuario.verificado:
             raise EmailNaoVerificadoError()
-        cls.migrar_geradas(usuario_id)
         cls.verificar_limite(usuario_id)
 
     @classmethod
-    def criar_limitada(cls, usuario_id, estado, gerada=None):
+    def criar_limitada(cls, usuario_id, estado):
         try:
             resultado = db.session.execute(update(Usuario).where(Usuario.id == usuario_id).values(id=Usuario.id))
             if resultado.rowcount != 1:
                 raise ValueError("Usuário não encontrado")
             if not db.session.get(Usuario, usuario_id).verificado:
                 raise EmailNaoVerificadoError()
-            cls.migrar_geradas(usuario_id, confirmar=False)
             cls.verificar_limite(usuario_id)
-            original = Build.criar_gerada(usuario_id, gerada, confirmar=False) if gerada else None
-            build = cls(usuario_id=usuario_id, estado=estado, build_original_id=original.id if original else None)
+            build = cls(usuario_id=usuario_id, estado=estado)
             db.session.add(build)
             db.session.commit()
             return build
@@ -73,10 +70,11 @@ class BuildSalva(ModeloBase):
 
 
     @classmethod
-    def migrar_geradas(cls, usuario_id, confirmar=True):
-        originais = Build.listar_por_usuario(usuario_id)
-        existentes = {item.build_original_id for item in cls.query.filter_by(usuario_id=usuario_id).all()}
-        for original in originais:
+    def migrar_legadas(cls):
+        """Copia para build_salva as builds da tabela antiga que ainda não foram copiadas."""
+        existentes = {item.build_original_id for item in cls.query.filter(cls.build_original_id.isnot(None)).all()}
+        migradas = 0
+        for original in Build.query.all():
             if original.id in existentes:
                 continue
             estado = {
@@ -91,19 +89,17 @@ class BuildSalva(ModeloBase):
                 item = {"id": peca.id, "quantidade": original.quantidade_de(tipo)}
                 estado["componentes"][tipo] = [item] if tipo in MULTIPLAS else item
             estado["incluirPerifericos"] = any(tipo in estado["componentes"] for tipo in ("monitor", "teclado", "mouse", "fone"))
-            db.session.add(cls(usuario_id=usuario_id, build_original_id=original.id, estado=estado))
-        db.session.flush()
-        if confirmar:
-            db.session.commit()
+            db.session.add(cls(usuario_id=original.usuario_id, build_original_id=original.id, estado=estado))
+            migradas += 1
+        db.session.commit()
+        return migradas
 
     @classmethod
     def listar_por_usuario(cls, usuario_id):
-        cls.migrar_geradas(usuario_id)
         return cls.query.filter_by(usuario_id=usuario_id).order_by(cls.criado_em.desc()).all()
 
     @classmethod
     def buscar(cls, usuario_id, identificador):
-        cls.migrar_geradas(usuario_id)
         if str(identificador).startswith("s-"):
             numero = str(identificador)[2:]
             return cls.query.filter_by(id=int(numero), usuario_id=usuario_id).first() if numero.isdigit() else None

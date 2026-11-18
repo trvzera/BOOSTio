@@ -44,42 +44,35 @@ def gerar_candidata(usuario_id, prompt, modelo, catalogo, orcamento,
         logger.info("Geração: etapa=perifericos_no_plano gasto_anterior=%.2f gasto_novo=%.2f reserva=%.2f",
                     ajuste_perifericos["gasto_anterior"], ajuste_perifericos["gasto_novo"], ajuste_perifericos["reserva"])
       build = PlanejarRedeService.completar(build, catalogo, rede, proprias)
-      teto_pc, _ = dividir_orcamento(orcamento, percentual)
+      teto_pc, teto_perifericos = dividir_orcamento(orcamento, percentual)
       build = CompletarVentilacaoService().executar(build, catalogo, teto_pc, proprias, detalhes_proprias, cor=cor)
+      pool_ajuste = catalogo_reparo if catalogo_reparo is not None else catalogo
+      def validar_no_pool(candidata):
+        candidata = CompletarVentilacaoService().executar(
+            candidata, pool_ajuste, teto_pc, proprias, detalhes_proprias, cor=cor)
+        return _validar_candidata_completa(candidata, pool_ajuste, orcamento, percentual, proprias,
+                                               detalhes_proprias, rede, aparencia or {"cor": cor}, armazenamento_minimo_gb, utilidade)
       try:
         validada = _validar_candidata_completa(build, catalogo, orcamento, percentual, proprias,
                                                     detalhes_proprias, rede, aparencia or {"cor": cor}, armazenamento_minimo_gb, utilidade)
       except ValueError as erro:
         if not ajustar_orcamento or codigo_falha(erro) != "orcamento":
           raise
-        pool_reparo = catalogo_reparo if catalogo_reparo is not None else catalogo
-        teto_pc, teto_perifericos = dividir_orcamento(orcamento, percentual)
-        def validar_reparo(candidata):
-          candidata = CompletarVentilacaoService().executar(
-              candidata, pool_reparo, teto_pc, proprias, detalhes_proprias, cor=cor)
-          return _validar_candidata_completa(candidata, pool_reparo, orcamento, percentual, proprias,
-                                                 detalhes_proprias, rede, aparencia or {"cor": cor}, armazenamento_minimo_gb, utilidade)
         reparo = AjustarOrcamentoBuildService().executar(
-            build, pool_reparo, orcamento, teto_pc, teto_perifericos, validar_reparo, proprias, cor)
+            build, pool_ajuste, orcamento, teto_pc, teto_perifericos, validar_no_pool, proprias, cor)
         if reparo is None:
           raise
-        catalogo = pool_reparo
+        catalogo = pool_ajuste
         validada = reparo["build"]
         validada["ajuste_orcamento"] = reparo["diagnostico"]
         logger.info("Geração: etapa=ajuste_orcamento economia=%.2f trocas=%d",
                     reparo["diagnostico"]["economia"], len(reparo["diagnostico"]["trocas"]))
       if revisar_investimento:
-        pool_melhoria = catalogo_reparo if catalogo_reparo is not None else catalogo
-        def validar_melhoria(candidata):
-          candidata = CompletarVentilacaoService().executar(
-              candidata, pool_melhoria, teto_pc, proprias, detalhes_proprias, cor=cor)
-          return _validar_candidata_completa(candidata, pool_melhoria, orcamento, percentual, proprias,
-                                                 detalhes_proprias, rede, aparencia or {"cor": cor}, armazenamento_minimo_gb, utilidade)
-        melhoria = MelhorarInvestimentoBuildService().executar(validada, pool_melhoria, teto_pc, proprias, validar_melhoria)
+        melhoria = MelhorarInvestimentoBuildService().executar(validada, pool_ajuste, teto_pc, proprias, validar_no_pool)
         if melhoria is not None:
           validada, trocas = melhoria
           validada["melhoria_investimento"] = {"trocas": trocas}
-          catalogo = pool_melhoria
+          catalogo = pool_ajuste
           logger.info("Geração: etapa=melhoria_investimento trocas=%d", len(trocas))
       resumo = resumo_custos(validada, catalogo)
 
@@ -127,7 +120,7 @@ def perfil_revisa_investimento(utilidade):
 
 def _ha_margem_para_melhorar(build, catalogo, teto_pc, proprias):
   gasto = Decimal(str(resumo_custos(build, catalogo)["pc"]))
-  if gasto >= teto_pc * Decimal("0.75"):
+  if gasto >= teto_pc * MelhorarInvestimentoBuildService.LIMIAR:
     return False
 
 
