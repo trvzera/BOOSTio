@@ -59,6 +59,8 @@ def test_sessao_e_propriedade_sao_obrigatorias(app_budget):
     resposta = cliente.put("/usuarios/1/budget", json={"budget": 5000, "usar_budget": True})
     assert resposta.status_code == 403
     assert cliente.get("/auth/me").json["usuario"]["budget"] is None
+    with app_budget.app_context():
+        assert db.session.get(Usuario, 1).budget is None
     assert cliente.get("/usuarios/").status_code == 405
 
 

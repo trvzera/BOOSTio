@@ -26,8 +26,8 @@ limiter = Limiter(
 
 
 @limiter.request_filter
-def administrador_sem_limite():
-    return usuario_atual_e_administrador()
+def isentar_geracao_de_build_do_administrador():
+    return request.endpoint == "build.criar_build" and usuario_atual_e_administrador()
 
 
 def configurar_limites(app, producao=False):

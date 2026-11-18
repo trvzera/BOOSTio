@@ -42,6 +42,11 @@
           <button type="button" class="password-toggle fa-eye-slash" data-target="password" aria-label="Mostrar senha" aria-pressed="false" aria-controls="password"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button>
         </div>
 
+        <div id="admin-factor" hidden>
+          <label class="font-1-s" for="admin-code">Digite o código de seis dígitos do seu aplicativo autenticador</label>
+          <input class="input-text" id="admin-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" disabled>
+          <a href="./login.html" class="font-1-s" aria-label="Voltar ao login">Voltar ao login</a>
+        </div>
         <p id="login-error" class="font-1-xs form-error" role="alert"></p>
         <button type="submit" class="btn-login" id="btn-sign-in" aria-label="Entrar na conta" disabled>Entrar</button>
         <a href="./esqueci-senha.html" id="forgot-password-link" class="font-1-s" aria-label="Esqueceu a sua senha? Recuperar senha">Esqueceu a sua senha?</a>

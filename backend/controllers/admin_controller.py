@@ -12,8 +12,12 @@ from services.admin_service.remover_oferta_service import RemoverOfertaService
 from services.admin_service.sugerir_pendencia_service import EnviarPendenciasParaIAService, listar_ids_para_ia
 from services.mercadolivre_service.controle_requisicoes_service import ErroMercadoLivre, OrcamentoRequisicoesEsgotado
 from utils.decorators import apenas_administrador
+from utils.limite_requisicoes import chave_usuario, limiter
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
+
+
+limite_alteracoes = limiter.shared_limit("30 per minute", scope="alteracoes-catalogo-admin", key_func=chave_usuario)
 
 
 def _responder(funcao):
@@ -55,6 +59,7 @@ def detalhar_pendencia(pendencia_id):
 
 
 @admin_bp.post("/pendencias/<int:pendencia_id>/aceitar")
+@limite_alteracoes
 @login_required
 @apenas_administrador
 def aceitar_pendencia(pendencia_id):
@@ -64,6 +69,7 @@ def aceitar_pendencia(pendencia_id):
 
 
 @admin_bp.post("/pendencias/<int:pendencia_id>/candidatos/descartar")
+@limite_alteracoes
 @login_required
 @apenas_administrador
 def descartar_candidato(pendencia_id):
@@ -83,6 +89,8 @@ def ids_para_ia():
 
 
 @admin_bp.post("/pendencias/enviar-ia")
+@limiter.limit("5 per minute", key_func=chave_usuario)
+@limite_alteracoes
 @login_required
 @apenas_administrador
 def enviar_pendencias_para_ia():
@@ -92,6 +100,7 @@ def enviar_pendencias_para_ia():
 
 
 @admin_bp.post("/pendencias/<int:pendencia_id>/rejeitar")
+@limite_alteracoes
 @login_required
 @apenas_administrador
 def rejeitar_pendencia(pendencia_id):
@@ -101,6 +110,7 @@ def rejeitar_pendencia(pendencia_id):
 
 
 @admin_bp.post("/ofertas/<int:oferta_id>/remover")
+@limite_alteracoes
 @login_required
 @apenas_administrador
 def remover_oferta(oferta_id):

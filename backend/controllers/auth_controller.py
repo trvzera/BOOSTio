@@ -18,6 +18,7 @@ auth_bp = Blueprint("auth",__name__,url_prefix='/auth')
 
 
 @auth_bp.get("/csrf")
+@limiter.limit("60 per minute")
 def obter_csrf():
     return jsonify({"csrf_token": token_csrf()}), 200
 
@@ -26,6 +27,43 @@ def obter_csrf():
 def nao_armazenar_sessao(resposta):
     resposta.headers["Cache-Control"] = "no-store"
     return resposta
+
+
+def iniciar_login(usuario):
+    session.clear()
+    if usuario.administrador is True:
+        session["desafio_admin"] = {"conta": usuario.get_id(), "expira": time.time() + 300}
+        return False
+    login_user(usuario)
+    return True
+
+
+def chave_desafio():
+    return session.get("desafio_admin", {}).get("conta") or chave_usuario()
+
+
+@auth_bp.post("/admin/confirmar")
+@limiter.limit("20 per minute")
+@limiter.limit("5 per 5 minutes", key_func=chave_desafio)
+def confirmar_admin():
+    from models import Usuario
+    from services.usuario_service.fator_admin_service import consumir_codigo
+
+    desafio = session.get("desafio_admin", {})
+    usuario = Usuario.buscar_por_sessao(desafio["conta"]) if desafio.get("expira", 0) > time.time() else None
+    if not usuario or not usuario.administrador:
+        return jsonify(erro="Entre novamente para iniciar a verificação."), 401
+    dados = request.get_json(silent=True)
+    try:
+        token = consumir_codigo(usuario, dados.get("codigo")) if isinstance(dados, dict) else None
+    except ValueError as erro:
+        return jsonify(erro=str(erro)), 503
+    if not token or usuario.get_id() != desafio["conta"] or not usuario.administrador or not usuario.ativo:
+        return jsonify(erro="Código inválido ou já utilizado. Confira o autenticador."), 403
+    session.clear()
+    session["admin_2fa"] = token
+    login_user(usuario)
+    return jsonify(mensagem="Identidade confirmada.")
 
 
 @auth_bp.post("/entrar")
@@ -38,10 +76,8 @@ def entrar_usuario():
         service = EntrarUsuarioService()
         usuario = service.executar(dados)
 
-        session.pop("confirmacao_google", None)
-        session.pop("confirmacao_google_pendente", None)
-        session.pop("vinculo_google_pendente", None)
-        login_user(usuario)
+        if not iniciar_login(usuario):
+            return jsonify(segundo_fator=True), 202
 
         return jsonify({
             "mensagem":"Usuario logado com sucesso",
@@ -58,6 +94,12 @@ def sair_usuario():
     session.pop("confirmacao_google", None)
     session.pop("confirmacao_google_pendente", None)
     session.pop("vinculo_google_pendente", None)
+    token = session.pop("admin_2fa", None)
+    if token and current_user.administrador:
+        from models import db, FatorAdmin
+        FatorAdmin.query.filter_by(usuario_id=current_user.id, sessao_hash=FatorAdmin.hash_sessao(token)).update(
+            {FatorAdmin.sessao_hash: None}, synchronize_session=False)
+        db.session.commit()
     logout_user()
     return jsonify({
         "mensagem":"Usuario deslogado com sucesso"
@@ -156,10 +198,10 @@ def callback_google():
             return redirect(f'{base_url}/pages/configuracoes.html')
 
         usuario = EntrarGoogleService().executar(dados_usuario)
-        session.pop("confirmacao_google", None)
-        login_user(usuario)
-
+        concluido = iniciar_login(usuario)
         base_url = current_app.config['FRONTEND_URL'].rstrip('/')
+        if not concluido:
+            return redirect(f'{base_url}/pages/login.html?etapa=autenticador')
         return redirect(f'{base_url}/pages/index.html')
     except ValueError as erro:
         base_url = current_app.config['FRONTEND_URL'].rstrip('/')

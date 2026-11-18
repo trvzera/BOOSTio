@@ -120,11 +120,17 @@ def test_referencia_gabinete_so_enriquece_amostra_se_disponivel_dentro_do_teto(a
 
 
 def test_administrador_nao_tem_limite_de_builds(app_build):
+    from models import FatorAdmin
+    token = "a" * 64
     with app_build.app_context():
+        db.session.add(FatorAdmin(usuario_id=1, segredo_cifrado=b"teste", ultimo_intervalo=0,
+                                  sessao_hash=FatorAdmin.hash_sessao(token)))
         db.session.get(Usuario, 1).administrador = True
         db.session.commit()
     cliente = app_build.test_client()
     autenticar(cliente)
+    with cliente.session_transaction() as sessao:
+        sessao["admin_2fa"] = token
     for _ in range(4):
         assert cliente.post("/build/manual", json=ESTADO).status_code == 201
     assert cliente.get("/build/").json["limite"] is None

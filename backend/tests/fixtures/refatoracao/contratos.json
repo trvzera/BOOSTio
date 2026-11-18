@@ -1,6 +1,6 @@
 {
-  "esquema:mysql": "bcc7e64a9b9a1b678bb3cc483c67657dc8c94655f0e953723bd5baeeb9e6941d",
-  "esquema:sqlite": "22b665c4e690c0abe9678a5c7daec2ddde9a7018a019a69d44c57e0cd4ec36c6",
+  "esquema:mysql": "93c351db30b2ce7a55329d4c33c28577cb38eec15c2a87d88ead24f5a5d85702",
+  "esquema:sqlite": "de52b724901aa56f03a2864b5cb336a76b8177fdbca042e3d0c5f377fccd027b",
   "prompt:custo_beneficio:0": "a448c2ed24338874d2a9775c55caf1a62abfb0ff7f880dca15fd22a8a8c6de99",
   "prompt:custo_beneficio:20": "8a258f5cd13f0fea4dbb05ae1dcca450c3298bbaddd3e099a5fde046832111da",
   "prompt:desempenho:0": "c89000102e0849bd40ed3a9a3021ce30178f3ca28547807ca4f2f7ae37da6c39",
