@@ -1,12 +1,12 @@
 import "../header.js";
 import "../auth/auth.js";
-import { carregarCatalogo, categorias, moeda, htmlSeguro as h, nomePeca, imagemPeca, ofertasPeca, destaquesFichaTecnica, gruposFichaTecnica, informacoesPreco } from "../build/catalogo.js";
-import { abrirBuild, guardarRascunho } from "../build/estado.js";
+import { carregarCatalogo, categorias, htmlSeguro as h, nomePeca, imagemPeca, ofertasPeca, gruposFichaTecnica, informacoesPreco } from "../build/catalogo.js";
+import { abrirBuild, guardarRascunho, itensCategoria, categoriasMultiplas } from "../build/estado.js";
 import { selecionarPecaCompativel } from "../build/compatibilidade.js";
 import { avisar, mostrarFalha } from "../build/interface.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { navegarPara } from "../components/page-loading.js";
-import { avisoCompraHtml, abrirCompraBuild } from "../build/acoes-build.js";
+import { avisoCompraHtml } from "../build/acoes-build.js";
 import { salvarAlteracaoLocal } from "../build/autosalvar.js";
 import { carregarCatalogoConta, carregarBuildConta, salvarBuildConta } from "../build/conta.js";
 import { ajudaCategorias } from "../build/uso-formulario.js";
@@ -21,49 +21,66 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const parametros = new URLSearchParams(location.search);
     const conta = parametros.get("build")?.startsWith("s-");
-    const catalogo = conta ? await carregarCatalogoConta() : await carregarCatalogo();
+    const catalogo = conta ? await carregarCatalogoConta({cache:"no-store"}) : await carregarCatalogo();
     const peca = catalogo.find((p) => p.id === parametros.get("id"));
     if (!peca) throw new Error("Peça não encontrada no catálogo.");
     const categoria = categorias.find((c) => c.id === peca.categoria);
     let build = conta ? await carregarBuildConta(parametros.get("build")) : abrirBuild(new URLSearchParams({ id: parametros.get("build") || "" }));
     if (!conta) guardarRascunho(build);
     const administrador = Boolean((await carregarPerfil().catch(() => null))?.usuario?.administrador);
-    const destaques = destaquesFichaTecnica(peca);
     const gruposTecnicos = gruposFichaTecnica(peca);
     const preco = informacoesPreco(peca,conta);
     if (conta && ofertasPeca(peca).some(o => o.marketplace)) {
       preco.rotulo = "Preço de referência da peça";
       preco.nota += " As ofertas das lojas podem ter valores diferentes.";
     }
-    let motivo = "";
-    try { selecionarPecaCompativel(build,peca,catalogo); } catch (erro) { motivo = erro.message; }
     document.title = nomePeca(peca) + " — BOOSTio";
     const categoriaVoltar = ["air_cooler","water_cooler"].includes(peca.categoria) ? "cooler"
       : ["ssd","hd"].includes(peca.categoria) ? "armazenamento" : ["cabo_rede","adaptador_wifi"].includes(peca.categoria) ? "rede" : peca.categoria;
-    main.innerHTML = '<header class="builder-heading"><a class="builder-back icon-back btn-ghost" data-page-back data-back-destination href="./pecas.html?' + new URLSearchParams({ categoria: categoriaVoltar, build: build.id }) +
-      '" aria-label="Voltar ao catálogo de ' + categoria.nome + '" title="Voltar à categoria">' + iconeAnimado("arrow","back") + '</a></header>' +
-      '<section class="product-detail-layout"><div class="product-detail-visual glass-card">' + imagemPeca(peca) + (peca.imagem ? "" : '<span class="font-2-xs summary-note">Imagem ainda não cadastrada</span>') + '</div>' +
-      '<div class="product-detail-copy"><span class="component-category font-1-xs">' + categoria.nome + '</span><h1 class="font-1-xl">' + h(nomePeca(peca)) +
-      '</h1>' + (ajudaCategorias[peca.categoria] ? '<p class="font-2-xs summary-note">' + h(ajudaCategorias[peca.categoria]) + '</p>' : '') + '<ul class="product-detail-highlights">' + destaques.map(([rotulo,valor]) => '<li class="font-2-xs"><span>' + h(rotulo) + '</span><strong>' + h(valor) + '</strong></li>').join("") +
-      '</ul><span class="summary-eyebrow font-1-xs">' + h(preco.rotulo) + '</span><strong class="summary-total font-1-xl">' + h(preco.valor) + '</strong><p class="font-2-xs summary-note">' + h(preco.nota) + '</p>' +
-      '<button type="button" id="add-product" class="btn-primary" aria-label="Adicionar à build: ' + h(nomePeca(peca)) + '" ' + (motivo ? 'disabled data-disabled-reason="' + h(motivo) + '"' : "") + '>' + iconeAnimado("plus") + 'Adicionar à build</button>' +
-      '<p class="font-2-xs summary-note">' + h(motivo || "Não encontramos novos problemas com as peças escolhidas nas verificações disponíveis. Quando faltar informação, confira com o fabricante.") + '</p></div></section>' +
-      '<section class="product-stores" aria-labelledby="stores-title"><h2 class="font-1-l" id="stores-title">Onde comprar</h2><p class="font-2-xs summary-note">Confira preço, estoque e o modelo exato na loja. As buscas não representam ofertas confirmadas.</p><div class="store-grid">' +
-      cartoesOfertasHtml(peca,{administrador}) + '</div></section>' +
-      historicoPrecosHtml(peca) +
-      '<section class="product-specifications glass-card" aria-labelledby="spec-title"><h2 class="font-1-l" id="spec-title">Informações técnicas</h2>' +
-      '<p class="font-2-xs summary-note product-specifications-note">Estas são as informações cadastradas deste modelo. Usamos esses dados para verificar sua montagem. Se uma informação estiver faltando, não podemos confirmar que as peças combinam nesse ponto. O consumo de energia é uma estimativa, não uma medição do computador ligado.</p>' +
-      gruposTecnicos.map((grupo, indice) => '<section class="product-specification-group" aria-labelledby="spec-group-' + indice + '"><h3 class="font-1-m-b" id="spec-group-' + indice + '">' + h(grupo.titulo) + '</h3><dl>' +
-        grupo.campos.map(([rotulo,valor]) => '<div><dt class="font-2-xs">' + h(rotulo) + '</dt><dd class="font-1-xs">' + h(valor) + '</dd></div>').join("") + '</dl></section>').join("") +
-      '</section>';
-    main.querySelector(".product-stores > p").insertAdjacentHTML("afterend",avisoCompraHtml());
+    const buildUrl = "./configuracao-build.html?" + new URLSearchParams({[conta ? "build_id" : "id"]:build.id});
+    const naBuild = itensCategoria(build,peca.categoria).some(item => item.id === peca.id);
+    const voltar = naBuild ? buildUrl : "./pecas.html?" + new URLSearchParams({categoria:categoriaVoltar,build:build.id});
+    const rotuloVoltar = naBuild ? "Voltar à build" : "Voltar ao catálogo";
+    const podeAdicionar = !naBuild || categoriasMultiplas.has(peca.categoria);
+    let motivo = "";
+    if (podeAdicionar) {
+      try { selecionarPecaCompativel(build,peca,catalogo); } catch (erro) { motivo = erro.message; }
+    }
+    const adicionar = naBuild ? "Adicionar mais" : "Adicionar à build";
+    const titulo = h(nomePeca(peca));
+    main.innerHTML = `
+      <header class="product-detail-heading">
+        <a class="builder-back font-1-xs" data-page-back data-back-destination href="${h(voltar)}" aria-label="${rotuloVoltar}">
+          ${iconeAnimado("arrow","back")}<span data-back-label>${rotuloVoltar}</span>
+        </a>
+        <span class="component-category font-1-xs">${h(categoria.nome)}</span>
+        <h1 class="font-1-xl">${titulo}</h1>
+      </header>
+      <div class="product-detail-layout">
+        <div class="product-detail-media">
+          <div class="product-detail-visual glass-card">${imagemPeca(peca)}${peca.imagem ? "" : '<span class="font-2-xs summary-note">Imagem ainda não cadastrada</span>'}</div>
+          ${podeAdicionar ? `<div class="product-detail-selection">
+            ${ajudaCategorias[peca.categoria] ? '<p class="font-2-xs summary-note">' + h(ajudaCategorias[peca.categoria]) + '</p>' : ""}
+            <button type="button" id="add-product" class="btn-primary" aria-label="${adicionar} ${titulo}" ${motivo ? 'disabled data-disabled-reason="' + h(motivo) + '"' : ""}>${iconeAnimado("plus")}${adicionar}</button>
+            ${motivo ? '<p class="font-2-xs summary-note">' + h(motivo) + '</p>' : ""}
+          </div>` : ""}
+        </div>
+        <section class="product-stores" aria-labelledby="stores-title">
+          <h2 class="font-1-l" id="stores-title">Onde comprar</h2>
+          <p class="font-2-xs summary-note">Confira preço, estoque, frete e o modelo exato na loja.</p>
+          <div class="store-grid">${cartoesOfertasHtml(peca,{administrador})}</div>
+          <p class="planning-help product-reference-price"><strong>${h(preco.rotulo)} · ${h(preco.valor)}</strong> ${h(preco.nota)}</p>
+          <details class="purchase-information"><summary class="font-2-xs">Sobre a compra nas lojas</summary>${avisoCompraHtml()}</details>
+        </section>
+        <section class="product-specifications glass-card" aria-labelledby="spec-title">
+          <h2 class="font-1-l" id="spec-title">Especificações técnicas</h2>
+          ${gruposTecnicos.map((grupo, indice) => '<section class="product-specification-group" aria-labelledby="spec-group-' + indice + '"><h3 class="font-1-xs" id="spec-group-' + indice + '">' + h(grupo.titulo) + '</h3><dl>' +
+            grupo.campos.map(([rotulo,valor]) => '<div><dt class="font-2-xs">' + h(rotulo) + '</dt><dd class="font-1-xs">' + h(valor) + '</dd></div>').join("") + '</dl></section>').join("")}
+          <p class="planning-help product-specifications-note">Se algum dado estiver ausente, consulte o fabricante. O consumo informado é uma estimativa.</p>
+        </section>
+        <div class="product-detail-history">${historicoPrecosHtml(peca)}</div>
+      </div>`;
     main.querySelectorAll(".store-logo").forEach(img => img.addEventListener("error",() => { img.hidden = true; img.nextElementSibling.hidden = false; },{once:true}));
-    main.querySelectorAll('.store-card').forEach((card,indice)=>card.querySelectorAll('a').forEach(link=>link.addEventListener('click',evento=>{
-      if (ofertasPeca(peca)[indice].marketplace) return;
-      evento.preventDefault();
-      try { abrirCompraBuild({...build,componentes:{[peca.categoria]:{id:peca.id,quantidade:1}}},catalogo,{loja:ofertasPeca(peca)[indice].codigo}); }
-      catch(erro) { avisar(erro.message); }
-    })));
     main.querySelectorAll("[data-remover-oferta]").forEach(botao => botao.addEventListener("click", async () => {
       if (!confirm("Remover esta oferta do site? Ela deixa de aparecer, de contar no preço e de ser atualizada.")) return;
       botao.disabled = true;
@@ -104,7 +121,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (seletor) seletor.onchange = carregarHistorico;
       carregarHistorico();
     }
-    main.querySelector("#add-product").onclick = async () => {
+    main.querySelector("#add-product")?.addEventListener("click", async () => {
       try {
         build = selecionarPecaCompativel(build, peca, catalogo);
         if (conta) await salvarBuildConta(build);
@@ -112,8 +129,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           const salvo = salvarAlteracaoLocal(build,catalogo);
           if (!salvo.salvo) { avisar(salvo.motivo); return; }
         }
-        navegarPara("./configuracao-build.html?" + new URLSearchParams({[conta ? "build_id" : "id"]:build.id}));
+        navegarPara(buildUrl);
       } catch (erro) { avisar(erro.message); }
-    };
+    });
   } catch (erro) { mostrarFalha(main, erro); }
 });

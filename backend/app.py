@@ -15,6 +15,7 @@ from controllers.usuario_controller import usuario_bp
 from controllers.auth_controller import auth_bp
 from controllers.mercadolivre_auth_controller import mercadolivre_auth_bp
 from controllers.email_controller import email_bp
+from controllers.discord_controller import discord_bp
 from controllers.benchmark_controller import benchmark_bp
 from controllers.build_controller import build_bp
 from controllers.saude_controller import saude_bp
@@ -59,6 +60,7 @@ configurar_oauth(app)
 
 app.register_blueprint(usuario_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(discord_bp)
 app.register_blueprint(mercadolivre_auth_bp)
 app.register_blueprint(email_bp)
 app.register_blueprint(benchmark_bp)

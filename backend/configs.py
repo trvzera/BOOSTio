@@ -17,6 +17,8 @@ def resolver_uri_banco(uri):
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY")
+    DISCORD_CLIENT_ID = os.getenv("DISCORD_CLIENT_ID")
+    DISCORD_CLIENT_SECRET = os.getenv("DISCORD_CLIENT_SECRET")
     ADMIN_2FA_CHAVE = os.getenv("ADMIN_2FA_CHAVE")
     MAX_CONTENT_LENGTH = 64 * 1024
     MAX_FORM_MEMORY_SIZE = 16 * 1024

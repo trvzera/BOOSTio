@@ -377,6 +377,13 @@
 }
 #google-link-fields:not([hidden]) { display: grid; gap: 1rem; padding-top: 1rem; }
 #google-link-fields > button { justify-self: start; }
+#discord-settings { scroll-margin-top: 100px; }
+.discord-settings-actions:has(button:not([hidden])) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
 #google-link-feedback:empty { display: none; }
 
 /* Ocultação deve prevalecer sobre o layout de botões e painéis. */

@@ -1,6 +1,6 @@
 import "../header.js";
 import "../auth/auth.js";
-import { carregarCatalogo,categoriasEditor,perifericos,acessoriosRede,moeda,htmlSeguro as h,nomePeca,imagemPeca,ofertasPeca } from "../build/catalogo.js";
+import { carregarCatalogo,categoriasEditor,perifericos,acessoriosRede,moeda,htmlSeguro as h,nomePeca,imagemPeca } from "../build/catalogo.js";
 import { abrirBuild,guardarRascunho,buildsLocais,itensCategoria,categoriasMultiplas,informacoesRam,informacoesArmazenamento,motivoSelecao,removerPeca,reduzirQuantidade,linkCompartilhado } from "../build/estado.js";
 import { avaliarBuild,selecionarPecaCompativel } from "../build/compatibilidade.js";
 import { informacoesFans, fluxoFan, temFansInclusas, planejamentoFans } from "../build/fans.js";
@@ -158,7 +158,7 @@ document.addEventListener("DOMContentLoaded",async () => {
     function selecionada(categoria,item) {
       const peca = catalogo.find(p => p.id === item.id), titulo = peca ? nomePeca(peca) : item.proprio || "Modelo não identificado";
       const detalhe = peca ? "./peca.html?" + new URLSearchParams({id:peca.id,build:build.id}) : "";
-      const oferta = peca ? ofertasPeca(peca)[0] : null, ram = categoria === "memoria_ram", multipla = categoriasMultiplas.has(categoria);
+      const ram = categoria === "memoria_ram", multipla = categoriasMultiplas.has(categoria);
       const slotsPlaca = categoria === "placa_mae" && peca ? [
         slotsRam(peca).provisorio ? "Até 2 pentes de RAM (limite provisório)" : slotsRam(peca).slots + " slots de RAM",
         peca.quantidade_slots_m2 != null && peca.quantidade_slots_m2 + " slots M.2",
@@ -179,8 +179,8 @@ document.addEventListener("DOMContentLoaded",async () => {
         imagemPeca(peca || {categoria}) + '</div><div class="component-copy">' +
         (peca ? '<a class="component-model font-1-m-b" href="' + detalhe + '" aria-label="Ver detalhes de ' + h(titulo) + '">' + h(titulo) + '</a>' : '<h3 class="component-model font-1-m-b">' + h(titulo) + '</h3>') +
         '<p>' + h(resumo) + '</p>' + (disponibilidade ? '<p class="component-availability">' + h(disponibilidade) + '</p>' : '') + '</div><div class="component-purchase">' +
-        (peca ? '<a class="component-buy btn-primary" href="' + h(oferta.url) + '" target="_blank" rel="noopener noreferrer" aria-label="' + (oferta.direta ? "Comprar" : "Buscar") + ' ' + h(titulo) + ' na ' + h(oferta.loja) + ' em uma nova aba">' +
-          iconeAnimado("cart") + (oferta.direta ? "Comprar" : "Buscar") + '</a><strong data-value-key="preco:' + chave + '"' + (cotacao ? ' data-value-number="' + peca.preco * item.quantidade + '"' : '') + '>' + (cotacao ? moeda(peca.preco * item.quantidade) : 'Preço a consultar') + '</strong>' : '<span class="font-2-xs">Já possuo</span>') +
+        (peca ? '<a class="component-buy btn-primary" href="' + detalhe + '" aria-label="Comprar ' + h(titulo) + '">' +
+          iconeAnimado("cart") + 'Comprar</a><strong data-value-key="preco:' + chave + '"' + (cotacao ? ' data-value-number="' + peca.preco * item.quantidade + '"' : '') + '>' + (cotacao ? moeda(peca.preco * item.quantidade) : 'Preço a consultar') + '</strong>' : '<span class="font-2-xs">Já possuo</span>') +
         '</div><button class="component-remove" type="button" data-remove="' + categoria + '" data-item="' + h(item.id || item.proprio) +
         '" aria-label="Remover ' + h(titulo) + '" title="Remover peça" ' + bloqueado(build.travada,trancada) + '>' + iconeAnimado("trash") + '</button></div>' +
         (multipla && peca ? '<div class="ram-controls"><span class="component-quantity"><strong data-value-key="quantidade:' + chave + '"' + (Number.isFinite(unidades) ? ' data-value-number="' + unidades + '"' : '') + '>' + unidades + '</strong> ' + nomeUnidades +
@@ -301,12 +301,14 @@ document.addEventListener("DOMContentLoaded",async () => {
         finally { if (botao.isConnected) botao.disabled = Boolean(motivoBenchmark(build,catalogo)); }
       };
       main.querySelector("#buy-configuration").onclick = () => { try { abrirCompraBuild(build,catalogo); } catch (erro) { avisar(erro.message); } };
-      main.querySelectorAll('.component-buy').forEach(link=>link.addEventListener('click',evento=>{
+      main.querySelectorAll(".component-model[href], .component-buy").forEach(link => link.addEventListener("click", async evento => {
+        if (!conta || evento.button !== 0 || evento.metaKey || evento.ctrlKey || evento.shiftKey || evento.altKey) return;
         evento.preventDefault();
-        const linha=link.closest('.component-selected'),remover=linha.querySelector('[data-remove]');
-        const categoria=remover.dataset.remove,id=remover.dataset.item;
-        try { abrirCompraBuild({...build,componentes:{[categoria]:itensCategoria(build,categoria).filter(i=>i.id===id)}},catalogo); }
-        catch(erro) { avisar(erro.message); }
+        try {
+          await filaSalvamento;
+          if (falhaSalvamento) throw falhaSalvamento;
+          navegarPara(link.href);
+        } catch (erro) { avisar(erro.message); }
       }));
       main.querySelector("#improve-configuration").onclick = () => {
         try {

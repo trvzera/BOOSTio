@@ -18,7 +18,6 @@
 .product-actions > * { min-width: 0; }
 .product-actions > .disabled-tip-anchor { padding: 0; }
 .product-actions > .disabled-tip-anchor > button { width: 100%; }
-.product-detail-layout { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
 .product-detail-layout > *, .product-card-body, .store-card, .store-brand > * { min-width: 0; }
 .product-price-history { width: 100%; box-sizing: border-box; }
 @media (max-width: 600px) {
@@ -87,7 +86,6 @@
   .build-summary, .compatibility-card, .product-specifications, .store-card { padding: 20px; }
   .summary-details .input-text, .catalog-toolbar .input-text { font-size: 1rem; }
   .product-detail-visual .component-placeholder { width: 100px; height: 100px; font-size: 1.4rem; }
-  .product-detail-highlights li { flex-wrap: wrap; gap: 4px 12px; }
   .product-specifications dl > div { grid-template-columns: minmax(0, 1fr); gap: 6px; }
   .store-card p { min-height: 0; }
   .ram-controls { padding: 16px; }

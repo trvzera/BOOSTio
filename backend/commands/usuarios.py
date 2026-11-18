@@ -11,6 +11,12 @@ from services.usuario_service.alterar_administrador_service import AlterarAdmini
 
 
 def registrar_comandos_usuarios(app):
+    @app.cli.command("usuarios-discord-preparar")
+    def preparar_discord():
+        """Adiciona as colunas e o índice do vínculo com o Discord."""
+        from migrations.discord_usuario import preparar_discord_usuario
+        click.echo(json.dumps({"colunas_adicionadas": preparar_discord_usuario()}))
+
     @app.cli.command("admin-2fa-preparar")
     def preparar_fatores():
         """Cria a tabela dos autenticadores em bancos existentes."""

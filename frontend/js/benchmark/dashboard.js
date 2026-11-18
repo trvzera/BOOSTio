@@ -18,14 +18,14 @@ export function dashboardBenchmarkHtml({prefixo = "build",titulo,cpu,gpu,memoria
     + '</p><h3>' + h(titulo || "Minha build") + '</h3></div>' + (previa ? '<span class="benchmark-dashboard-badge">Prévia</span>' : '') + '</header>'
     + '<dl class="benchmark-dashboard-hardware">' + item("Processador",cpu || "Não identificado") + item("Placa de vídeo",gpu || "Vídeo integrado / a confirmar")
     + item("Memória",memoria == null ? "Capacidade a confirmar" : memoria + " GB de RAM") + '</dl>'
-    + '<div class="builds-page-switch benchmark-dashboard-tabs" role="tablist" aria-label="Tipo de desempenho">' + aba("games","Jogos / FPS","gamepad",true)
+    + '<div class="benchmark-dashboard-workspace"><div class="builds-page-switch benchmark-dashboard-tabs" role="tablist" aria-label="Tipo de desempenho">' + aba("games","Jogos / FPS","gamepad",true)
     + aba("blender","Blender","microchip",false) + '</div>'
     + '<section data-benchmark-pane="games" id="' + id("panel-games") + '" role="tabpanel" aria-labelledby="' + id("tab-games") + '" tabindex="0">'
     + '<div class="benchmark-dashboard-heading"><h3>Como sua build pode rodar?</h3><p>Escolha o jogo e os ajustes que você pretende usar.</p></div>'
     + painelBenchmarkHtml({prefixo:prefixo + "-fps",memoria,verificarRequisitos,mostrarHardware:false}) + '</section>'
     + '<section data-benchmark-pane="blender" id="' + id("panel-blender") + '" role="tabpanel" aria-labelledby="' + id("tab-blender") + '" tabindex="0" hidden>'
     + '<div class="benchmark-dashboard-heading"><h3>E na hora de criar?</h3><p>Consulte a renderização de imagens e cenas 3D no Blender.</p></div>'
-    + painelBlenderHtml(dispositivos,{prefixo:prefixo + "-blender",disponibilidade:disponibilidadeBlender}) + '</section>'
+    + painelBlenderHtml(dispositivos,{prefixo:prefixo + "-blender",disponibilidade:disponibilidadeBlender}) + '</section></div>'
     + '<p class="benchmark-dashboard-footnote">Nenhum teste é executado no seu computador. Os resultados dependem das fontes consultadas e podem variar conforme as peças e configurações.</p></div>';
 }
 

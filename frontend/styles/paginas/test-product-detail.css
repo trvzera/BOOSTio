@@ -1,0 +1,29 @@
+.test-product-build {
+  padding: clamp(16px, 3vw, 28px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+}
+
+#test-price-history-preview [hidden] { display: none; }
+
+.test-product-build-component {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+}
+.test-product-build-image img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+.test-product-build-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+@media (max-width: 520px) {
+  .test-product-build-actions { grid-column: 1 / -1; }
+}
