@@ -3,6 +3,7 @@
 import "../header.js";
 import "./budget-perfil.js";
 import "./experiencia-perfil.js";
+import "./discord-perfil.js";
 import "../services-carousel.js";
 import { caminhoLogin } from "../auth/auth.js";
 import { carregarPerfil as buscarUsuarioLogado } from "../conta/perfil.js";

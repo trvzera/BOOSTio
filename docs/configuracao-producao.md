@@ -16,3 +16,15 @@ python -m flask --app app admin-2fa-configurar --email EMAIL_DO_ADMIN
 ```
 
 Publique frontend e API juntos. Cada login administrativo concluído substitui a sessão anterior. Em caso de perda do aparelho, um operador da VPS verifica a identidade do titular e repete o cadastro em terminal privado. A confirmação substitui o segredo e encerra as sessões da conta.
+
+### Conexão com o Discord
+
+No painel [Discord Developer Portal](https://discord.com/developers/applications), abra o aplicativo usado para OAuth2 e cadastre a URL de retorno da API em **OAuth2 → Redirects**. Para a produção da BOOSTio, use `https://api.boostio.com.br/auth/discord/callback`. Para desenvolvimento com a API local, use `http://127.0.0.1:5000/auth/discord/callback`, ou o endereço definido em `API_PUBLIC_URL` com o mesmo caminho.
+
+Defina `DISCORD_CLIENT_ID` e `DISCORD_CLIENT_SECRET` no ambiente da API com as credenciais OAuth2 do aplicativo. Em banco existente, execute a migração na imagem atualizada antes de publicar a API.
+
+```bash
+python -m flask --app app usuarios-discord-preparar
+```
+
+Em **Configurações → Discord**, autorize o acesso ao perfil básico. A BOOSTio guarda o ID e o nome de usuário da conta vinculada. Os tokens do Discord são descartados após a consulta ao perfil. O botão **Desconectar Discord** apaga o vínculo na BOOSTio. O usuário também pode gerenciar a autorização no Discord em **Configurações de usuário → Aplicativos autorizados**.

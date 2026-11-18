@@ -12,6 +12,8 @@ class Usuario(ModeloBase,UserMixin):
   ativo = db.Column(db.Boolean, default=True ,nullable= False)
   login_google = db.Column(db.Boolean,default=False,nullable = False)
   google_sub = db.Column(db.String(255), nullable=True, unique=True)
+  discord_id = db.Column(db.String(20), nullable=True, unique=True, index=True)
+  discord_username = db.Column(db.String(80), nullable=True)
   versao_sessao = db.Column(db.Integer, nullable=False, default=1, server_default="1")
   budget = db.Column(db.Numeric(12, 2), nullable=True)
   usar_budget = db.Column(db.Boolean, default=False, server_default=db.false(), nullable=False)
@@ -83,6 +85,8 @@ class Usuario(ModeloBase,UserMixin):
   def desativar(self):
     self.email = f"usuario_deletado_{self.id}@removido.local"
     self.senha = ""
+    self.discord_id = None
+    self.discord_username = None
     self.ativo = False
     self.versao_sessao = Usuario.versao_sessao + 1
     db.session.commit()

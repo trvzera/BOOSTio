@@ -94,6 +94,7 @@ def sair_usuario():
     session.pop("confirmacao_google", None)
     session.pop("confirmacao_google_pendente", None)
     session.pop("vinculo_google_pendente", None)
+    session.pop("vinculo_discord_pendente", None)
     token = session.pop("admin_2fa", None)
     if token and current_user.administrador:
         from models import db, FatorAdmin
