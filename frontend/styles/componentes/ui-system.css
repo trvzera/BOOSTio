@@ -11,7 +11,7 @@
   --text-caption: .75rem;
 }
 .builder-page, .menu-test-page { font-family: var(--font-body); }
-.builder-heading h1, .product-detail-copy h1 { font-family: var(--font-heading); }
+.builder-heading h1, .product-detail-heading h1 { font-family: var(--font-heading); }
 .component-empty h2 { font: 600 1.125rem/1.33 var(--font-heading); }
 :is(.btn-primary, .btn-primary-form, .btn-login, .btn-build-primary,
     .btn-secondary, .btn-ghost, .btn-login-secondary, .btn-build-ghost, .btn-danger, .component-buy, .btn-back) {
@@ -76,7 +76,7 @@
 .form-step.active .form-step-number { box-shadow: none; }
 .form-step.completed .form-step-number { color: var(--cor-p1); background: rgba(0,123,255,.08); border-color: rgba(0,123,255,.25); }
 :is(#signin-container, #login-container) { transform: none; }
-.product-price, .product-detail-copy .summary-total { color: var(--cor-6); }
+.product-price { color: var(--cor-6); }
 #build-page-h1 span, #text-about p span, .card-title {
   background: var(--brand-gradient); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }

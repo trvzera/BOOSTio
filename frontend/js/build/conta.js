@@ -3,8 +3,8 @@ import { normalizarBuild, categoriasMultiplas } from "./estado.js";
 import { carregarManifestoImagens, completarImagens } from "./imagens-produtos.js";
 
 let catalogoPendente;
-export function carregarCatalogoConta() {
-  catalogoPendente ??= Promise.all([catalogoBuilds(),carregarManifestoImagens()])
+export function carregarCatalogoConta({cache} = {}) {
+  catalogoPendente ??= Promise.all([catalogoBuilds({cache}),carregarManifestoImagens()])
     .then(([resposta,imagens]) => completarImagens(resposta.pecas,imagens)).catch(erro => {
     catalogoPendente = null;
     throw erro;

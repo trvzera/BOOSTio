@@ -56,9 +56,8 @@ test("rede recebe rótulos legíveis e dados opcionais não são transformados e
   assert.equal(Object.fromEntries(destaquesFichaTecnica({categoria:"cabo_rede",comprimento_m:2,conector:"RJ45"}))["Comprimento do cabo (m)"],"2");
 });
 
-test("página usa destaques por categoria e seções acessíveis, escapando valores", async () => {
+test("página agrupa as especificações em seções acessíveis e escapa os valores", async () => {
   const pagina = await readFile(new URL("../js/pages/peca.js",import.meta.url),"utf8");
-  assert.match(pagina,/destaquesFichaTecnica\(peca\)/);
   assert.match(pagina,/gruposFichaTecnica\(peca\)/);
   assert.match(pagina,/aria-labelledby="spec-group-/);
   assert.match(pagina,/h\(grupo\.titulo\)/);

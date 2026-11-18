@@ -49,12 +49,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     </article>`;
 
   detalhe.innerHTML = `
-    <header class="test-product-detail-heading">
+    <header class="product-detail-heading">
       <a class="builder-back font-1-xs" href="#teste-historico-precos" aria-label="Voltar à build de exemplo">${iconeAnimado("arrow", "back")}Voltar à build</a>
       <span class="component-category font-1-xs">Processador</span>
       <h3 class="font-1-xl" id="test-product-title" tabindex="-1">${nome}</h3>
     </header>
-    <div class="test-product-grid">
+    <div class="product-detail-layout">
       <div class="product-detail-visual glass-card">${imagemPeca(peca)}</div>
       <section class="product-stores" aria-labelledby="test-product-stores-title">
         <h4 class="font-1-l" id="test-product-stores-title">Onde comprar</h4>
