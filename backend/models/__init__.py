@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask import session
 from flask_login import LoginManager
 from flask_mail import Mail
 
@@ -14,6 +15,7 @@ from .base import ModeloBase
 from .peca import Peca
 from .perifericos import Periferico
 from .usuario import Usuario
+from .fator_admin import FatorAdmin
 from .preferencias_uso import PreferenciasUso
 from .fonte import Fonte
 from .processador import Processador
@@ -58,6 +60,8 @@ instalar_precos_derivados()
 @lm.user_loader
 def user_loader(id: str) -> Usuario | None:
     usuario = Usuario.buscar_por_sessao(id)
+    if usuario and usuario.administrador and not FatorAdmin.sessao_valida(usuario.id, session.get("admin_2fa")):
+        return None
     return usuario
 
 

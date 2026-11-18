@@ -2,7 +2,7 @@
 import "../header.js";
 import "../services-carousel.js";
 import "../auth/auth.js";
-import { login } from "../api/usuario/login.js";
+import { login, confirmarAdmin } from "../api/usuario/login.js";
 import { entrarComGoogle } from "../api/usuario/entrarComGoogle.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -40,15 +40,32 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     });
 
+    const fator = document.querySelector("#admin-factor");
+    const codigo = document.querySelector("#admin-code");
+    function mostrarAutenticador() {
+      fator.hidden = false;
+      codigo.disabled = false;
+      codigo.required = true;
+      emailInput.disabled = senhaInput.disabled = true;
+      emailInput.style.display = senhaInput.parentElement.style.display = "none";
+      senhaInput.value = "";
+      botaoEntrar.textContent = "Confirmar código";
+      botaoEntrar.setAttribute("aria-label", "Confirmar código");
+      codigo.focus();
+      validarFormulario();
+    }
+
     function validarFormulario() {
       const camposPreenchidos =
         emailInput.value.trim() !== "" && senhaInput.value !== "";
-      botaoEntrar.disabled = !camposPreenchidos;
+      botaoEntrar.disabled = fator.hidden ? !camposPreenchidos : !/^[0-9]{6}$/.test(codigo.value);
     }
 
     emailInput.addEventListener("input", validarFormulario);
     senhaInput.addEventListener("input", validarFormulario);
 
+    codigo.addEventListener("input", validarFormulario);
+    if (new URLSearchParams(location.search).get("etapa") === "autenticador") mostrarAutenticador();
     validarFormulario();
 
     formLogin.addEventListener("submit", async (e) => {
@@ -64,7 +81,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       botaoEntrar.dataset.busy = "true";
 
       try {
-        const resposta = await login(emailValue, senhaValue);
+        const resposta = fator.hidden ? await login(emailValue, senhaValue) : await confirmarAdmin(codigo.value);
+        if (resposta.segundo_fator) {
+          mostrarAutenticador();
+          return;
+        }
 
         if (resposta.mensagem) {
           window.location.href = "./index.html";
@@ -78,7 +99,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           "Não foi possível entrar. Tente novamente mais tarde.";
       } finally {
         delete botaoEntrar.dataset.busy;
-        botaoEntrar.disabled = false;
+        validarFormulario();
       }
     });
   } catch (erro) {

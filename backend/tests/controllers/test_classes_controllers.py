@@ -36,6 +36,7 @@ def test_contrato_de_urls_metodos_e_endpoints_preservado():
     esperadas = {
         ("/auth/csrf", "GET", "auth.obter_csrf"),
         ("/auth/entrar", "POST", "auth.entrar_usuario"),
+        ("/auth/admin/confirmar", "POST", "auth.confirmar_admin"),
         ("/auth/sair", "POST", "auth.sair_usuario"),
         ("/auth/me", "GET", "auth.teste_logado"),
         ("/auth/google/redirecionar", "GET", "auth.redirecionar_google"),

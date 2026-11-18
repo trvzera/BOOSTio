@@ -10,3 +10,10 @@ export async function login(email, senha) {
     }),
   });
 }
+
+export function confirmarAdmin(codigo) {
+  return fetchComErro("/auth/admin/confirmar", {
+    method: "POST",
+    body: JSON.stringify({ codigo }),
+  });
+}
