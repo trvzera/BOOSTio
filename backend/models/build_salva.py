@@ -159,7 +159,7 @@ class BuildSalva(ModeloBase):
             "id": f"s-{self.id}", "nome": self.estado["titulo"], "descricao": self.estado.get("descricao", ""),
             "criador": {"nome": nome_criador},
             "usuario_id": self.usuario_id, "criado_em": criado.isoformat(),
-            "preco_total": round(sum(item["preco"] * item["quantidade"] for item in componentes), 2),
+            "preco_total": round(sum((item["preco"] or 0) * item["quantidade"] for item in componentes), 2),
             "componentes": componentes, "estado": self.estado,
         }
 

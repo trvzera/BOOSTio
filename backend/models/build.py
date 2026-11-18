@@ -158,7 +158,7 @@ class Build(ModeloBase):
             "nome": self.nome,
             "usuario_id": self.usuario_id,
             "criado_em": criado_em.isoformat(),
-            "preco_total": round(sum(item["preco"] * item["quantidade"] for item in componentes), 2),
+            "preco_total": round(sum((item["preco"] or 0) * item["quantidade"] for item in componentes), 2),
             "componentes": componentes,
         }
 
