@@ -1,7 +1,7 @@
 import "../header.js";
 import "../auth/auth.js";
 import { carregarCatalogo, categorias, moeda, htmlSeguro as h, nomePeca, imagemPeca, ofertasPeca, destaquesFichaTecnica, gruposFichaTecnica, informacoesPreco } from "../build/catalogo.js";
-import { abrirBuild, guardarRascunho } from "../build/estado.js";
+import { abrirBuild, guardarRascunho, itensCategoria } from "../build/estado.js";
 import { selecionarPecaCompativel } from "../build/compatibilidade.js";
 import { avisar, mostrarFalha } from "../build/interface.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
@@ -40,8 +40,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.title = nomePeca(peca) + " — BOOSTio";
     const categoriaVoltar = ["air_cooler","water_cooler"].includes(peca.categoria) ? "cooler"
       : ["ssd","hd"].includes(peca.categoria) ? "armazenamento" : ["cabo_rede","adaptador_wifi"].includes(peca.categoria) ? "rede" : peca.categoria;
-    main.innerHTML = '<header class="builder-heading"><a class="builder-back icon-back btn-ghost" data-page-back data-back-destination href="./pecas.html?' + new URLSearchParams({ categoria: categoriaVoltar, build: build.id }) +
-      '" aria-label="Voltar ao catálogo de ' + categoria.nome + '" title="Voltar à categoria">' + iconeAnimado("arrow","back") + '</a></header>' +
+    const buildUrl = "./configuracao-build.html?" + new URLSearchParams({[conta ? "build_id" : "id"]:build.id});
+    const naBuild = itensCategoria(build,peca.categoria).some(item => item.id === peca.id);
+    const voltar = naBuild ? buildUrl : "./pecas.html?" + new URLSearchParams({categoria:categoriaVoltar,build:build.id});
+    const rotuloVoltar = naBuild ? "Voltar à build" : "Voltar ao catálogo";
+    main.innerHTML = '<header class="builder-heading"><a class="builder-back icon-back btn-ghost" data-page-back data-back-destination href="' + h(voltar) +
+      '" aria-label="' + rotuloVoltar + '" title="' + rotuloVoltar + '">' + iconeAnimado("arrow","back") + '</a></header>' +
       '<section class="product-detail-layout"><div class="product-detail-visual glass-card">' + imagemPeca(peca) + (peca.imagem ? "" : '<span class="font-2-xs summary-note">Imagem ainda não cadastrada</span>') + '</div>' +
       '<div class="product-detail-copy"><span class="component-category font-1-xs">' + categoria.nome + '</span><h1 class="font-1-xl">' + h(nomePeca(peca)) +
       '</h1>' + (ajudaCategorias[peca.categoria] ? '<p class="font-2-xs summary-note">' + h(ajudaCategorias[peca.categoria]) + '</p>' : '') + '<ul class="product-detail-highlights">' + destaques.map(([rotulo,valor]) => '<li class="font-2-xs"><span>' + h(rotulo) + '</span><strong>' + h(valor) + '</strong></li>').join("") +
@@ -112,7 +116,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           const salvo = salvarAlteracaoLocal(build,catalogo);
           if (!salvo.salvo) { avisar(salvo.motivo); return; }
         }
-        navegarPara("./configuracao-build.html?" + new URLSearchParams({[conta ? "build_id" : "id"]:build.id}));
+        navegarPara(buildUrl);
       } catch (erro) { avisar(erro.message); }
     };
   } catch (erro) { mostrarFalha(main, erro); }
