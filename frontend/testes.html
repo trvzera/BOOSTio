@@ -21,6 +21,7 @@
   <noscript><link rel="stylesheet" href="./styles/componentes/no-script.css"></noscript>
   <link rel="stylesheet" href="./styles/paginas/testes.css">
   <link rel="stylesheet" href="./styles/paginas/test-benchmark-panel.css">
+  <link rel="stylesheet" href="./styles/paginas/test-product-detail.css">
   <link rel="stylesheet" href="./styles/paginas/equipe.css">
   <link rel="stylesheet" href="./styles/paginas/testes-base.css">
   <meta name="description" content="Laboratório da BOOSTio: prévias de formulários para desktop e notebook, comparação de builds, orçamento, melhorias e desempenho.">
@@ -46,7 +47,7 @@
       <a href="#teste-montagem" aria-label="Preferências de montagem">Preferências de montagem</a>
       <a href="#teste-comparacao" aria-label="Comparação">Comparação</a>
       <a href="#teste-prontas" aria-label="Builds prontas">Builds prontas</a>
-      <a href="#teste-historico-precos" aria-label="Histórico de preços">Histórico de preços</a>
+      <a href="#teste-historico-precos" aria-label="Página da peça">Página da peça</a>
       <a href="#teste-contato" aria-label="Contato">Contato</a>
       <a href="#teste-budget" aria-label="Budget">Budget</a>
       <a href="#teste-melhorias" aria-label="Melhorias">Melhorias</a>
@@ -130,12 +131,18 @@
 
     <section class="test-feature" id="teste-historico-precos" aria-labelledby="test-price-history-title">
       <div class="test-feature-head">
-        <span class="test-kicker font-1-xs">Experimento · preços demonstrativos</span>
-        <h2 class="font-1-l" id="test-price-history-title">AMD Ryzen 5 5600</h2>
-        <p class="font-2-xs">Preços fictícios para avaliar o visual. Experimente os filtros e abra os registros; nenhuma loja é consultada neste exemplo.</p>
+        <h2 class="font-1-xl" id="test-price-history-title">Página da peça</h2>
+        <p class="font-2-s">Abra a peça a partir da build de exemplo. Os preços e o histórico desta prévia são ilustrativos.</p>
       </div>
-      <div id="test-price-history-preview"><p class="font-2-xs" role="status">Carregando exemplo de histórico…</p></div>
-      <noscript><p class="font-2-xs">Ative o JavaScript para visualizar o gráfico demonstrativo.</p></noscript>
+      <div id="test-price-history-preview">
+        <section class="test-product-build glass-card" aria-labelledby="test-product-build-title">
+          <h3 class="font-1-l" id="test-product-build-title" tabindex="-1">Build gamer AM4</h3>
+          <p class="font-2-xs" data-test-product-loading role="status">Carregando a peça de exemplo…</p>
+          <div data-test-product-component></div>
+        </section>
+        <section id="teste-peca-detalhes" aria-labelledby="test-product-title" hidden></section>
+      </div>
+      <noscript><p class="font-2-xs">Ative o JavaScript para experimentar a página de peça.</p></noscript>
     </section>
 
     <div class="test-panels" id="teste-componentes">
