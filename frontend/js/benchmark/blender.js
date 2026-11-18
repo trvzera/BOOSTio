@@ -10,26 +10,51 @@ export function mensagemFalhaBlender(erro) {
   return mensagem + (referencia.length ? " Referência: " + referencia.join(" · ") + "." : "");
 }
 
-export function painelBlenderHtml(dispositivos) {
+export function painelBlenderHtml(dispositivos,{prefixo = "blender",disponibilidade} = {}) {
+  const id = nome => h(prefixo + "-" + nome);
   return '<section class="blender-panel" aria-label="Desempenho de renderização no Blender"><p class="planning-help">Consulte resultados públicos de uma peça, sem executar testes no seu computador.</p>' +
-    '<form id="blender-form"><label class="test-field" for="blender-device">Dispositivo de renderização<select id="blender-device">' +
-    Object.entries(dispositivos).filter(([,nome]) => nome).map(([tipo,nome]) => '<option value="' + tipo + '">' + tipo.toUpperCase() + ' · ' + h(nome) + '</option>').join("") +
+    '<form id="' + id("form") + '"><label class="test-field" for="' + id("device") + '">Dispositivo de renderização<select id="' + id("device") + '">' +
+    Object.entries(disponibilidade || dispositivos).filter(([,valor]) => valor).map(([tipo]) => '<option value="' + tipo + '">' + tipo.toUpperCase() + ' · ' + h(dispositivos[tipo] || "Identificação a confirmar") + '</option>').join("") +
     '</select></label><button type="submit" class="btn-primary" aria-label="Consultar desempenho no Blender" ' +
     (!dispositivos.cpu && !dispositivos.gpu ? 'disabled data-disabled-reason="Não há CPU ou GPU com identificação cadastrada para o Blender."' : '') + '>Consultar Blender</button></form>' +
-    '<p class="test-feedback" role="status" aria-live="polite" id="blender-feedback">' + (!dispositivos.cpu && !dispositivos.gpu ? 'Identifique uma CPU ou GPU no catálogo para consultar seus resultados.' : '') + '</p>' +
-    '<div id="blender-result" aria-live="polite"></div><p class="planning-help">A pontuação representa renderização no Cycles, não FPS. CPU e GPU não são somadas. RAM, VRAM, drivers e a cena alteram o resultado real; a fonte pode agrupar variantes do mesmo nome.</p>' +
+    '<p class="test-feedback" data-blender-feedback role="status" aria-live="polite" id="' + id("feedback") + '">' + (!dispositivos.cpu && !dispositivos.gpu ? 'Identifique uma CPU ou GPU no catálogo para consultar seus resultados.' : '') + '</p>' +
+    '<div id="' + id("result") + '" data-blender-result aria-live="polite"></div><p class="planning-help">A pontuação representa renderização no Cycles, não FPS. CPU e GPU não são somadas. RAM, VRAM, drivers e a cena alteram o resultado real; a fonte pode agrupar variantes do mesmo nome.</p>' +
     '<p class="fpshq-attribution">Fonte: <a href="https://opendata.blender.org/about/" target="_blank" rel="noopener noreferrer" aria-label="Ver metodologia do Blender Open Data em nova aba">Blender Open Data</a></p></section>';
 }
 
-export function iniciarPainelBlender(raiz,dispositivos,{cliente = criarClienteBenchmark()} = {}) {
-  const form = raiz.querySelector("#blender-form"), feedback = raiz.querySelector("#blender-feedback"), resultado = raiz.querySelector("#blender-result");
+export function iniciarPainelBlender(raiz,dispositivos,{cliente = criarClienteBenchmark(),prefixo = "blender",disponibilidade} = {}) {
+  const form = raiz.querySelector("#" + prefixo + "-form"), feedback = raiz.querySelector("#" + prefixo + "-feedback"), resultado = raiz.querySelector("#" + prefixo + "-result");
   const botao = form.querySelector('button[type="submit"]'), controle = new AbortController();
+  const seletor = form.querySelector("select");
+  const semDados = new Map();
   let ativo = true, ocupado = false, espera = 0, timer;
+  const motivo = () => disponibilidade?.[seletor.value]?.permitido === false ? disponibilidade[seletor.value].motivo
+    : semDados.get(seletor.value) || (dispositivos[seletor.value] ? "" : "Identifique uma CPU ou GPU no catálogo para consultar seus resultados.");
+  function controles() {
+    const bloqueio = motivo() || (espera > 0 ? "Aguarde o intervalo solicitado pela fonte." : ocupado ? "Aguarde a consulta atual." : "");
+    botao.disabled = Boolean(bloqueio); seletor.disabled = ocupado;
+    if (bloqueio) botao.dataset.disabledReason = bloqueio;
+    else delete botao.dataset.disabledReason;
+  }
+  if (disponibilidade) {
+    const inicial = ["cpu","gpu"].find(tipo => disponibilidade[tipo]?.permitido);
+    if (inicial) seletor.value = inicial;
+  }
+  controles();
+  if (motivo()) { feedback.textContent = motivo(); feedback.dataset.tone = "warning"; }
+  seletor.addEventListener("change",() => {
+    resultado.replaceChildren(); feedback.textContent = motivo() || "Pronto para consultar " + seletor.value.toUpperCase() + ".";
+    feedback.dataset.tone = motivo() ? "warning" : "info"; controles();
+  },{signal:controle.signal});
   form.addEventListener("submit",async evento => {
     evento.preventDefault();
     const tipo = form.querySelector("select").value, dispositivo = dispositivos[tipo];
-    if (ocupado || espera || !dispositivo) return;
-    ocupado = true; botao.disabled = true; resultado.replaceChildren(); resultado.setAttribute("aria-busy","true");
+    if (ocupado || espera || motivo()) return;
+    if (typeof navigator !== "undefined" && navigator.onLine === false) {
+      feedback.textContent = "Você está sem conexão com a internet. Reconecte-se para consultar o Blender.";
+      feedback.dataset.tone = "error"; return;
+    }
+    ocupado = true; controles(); resultado.replaceChildren(); resultado.setAttribute("aria-busy","true");
     feedback.textContent = "Consultando Blender Open Data…"; feedback.dataset.tone = "info";
     try {
       const dados = await cliente.consultarBlender({dispositivo,tipo},{signal:controle.signal});
@@ -45,14 +70,14 @@ export function iniciarPainelBlender(raiz,dispositivos,{cliente = criarClienteBe
       if (!ativo) return;
       feedback.textContent = mensagemFalhaBlender(erro);
       feedback.dataset.tone = erro.codigo === "sem-dados" ? "warning" : "error";
+      if (erro.codigo === "sem-dados") semDados.set(tipo,"A fonte não encontrou resultados públicos para esta " + tipo.toUpperCase() + ". Consulte o outro dispositivo, se disponível. Nenhuma pontuação foi inventada.");
       if (erro.espera > 0) {
         espera = Math.min(erro.espera,3600);
-        botao.dataset.disabledReason = "Aguarde o intervalo solicitado pela fonte.";
-        timer = setInterval(() => { if (--espera <= 0) { clearInterval(timer); botao.disabled = false; } },1000);
+        timer = setInterval(() => { if (--espera <= 0) { clearInterval(timer); controles(); } },1000);
       }
     } finally {
       ocupado = false;
-      if (ativo) { resultado.setAttribute("aria-busy","false"); botao.disabled = espera > 0; }
+      if (ativo) { resultado.setAttribute("aria-busy","false"); controles(); }
     }
   });
   return () => { ativo = false; clearInterval(timer); controle.abort(); };

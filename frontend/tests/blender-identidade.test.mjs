@@ -88,3 +88,9 @@ test("resumo distingue comparação parcial de métodos diferentes",()=>{
   assert.equal(classificarRenderizacoes(mistura).comparavel,false);
   assert.match(resumirConsultaRenderizacoes(mistura).mensagem,/Versões ou métodos diferentes/);
 });
+
+test("Blender usa o chip verificado quando o nome comercial não o informa",()=>{
+  assert.equal(hardwareBlender(null,{modelo:"Dual OC",modelo_referencia:"GeForce RTX 4060 Ti",memoria_gb:8}).gpu,"NVIDIA GeForce RTX 4060 Ti");
+  assert.equal(hardwareBlender(null,{modelo:"Laptop",modelo_referencia:"GeForce RTX 4060 Ti",memoria_gb:8}).gpu,null);
+  assert.equal(hardwareBlender(null,{modelo:"Dual",modelo_referencia:"RTX 3060",memoria_gb:8}).gpu,null);
+});

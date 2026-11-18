@@ -121,3 +121,13 @@ def test_requisitos_autenticados_nao_dependem_de_fpshq(cliente_benchmark, mocker
     assert cliente_benchmark.get("/benchmark/requisitos?game=valorant&ram_gb=8&ram_gb=16").status_code == 400
     assert cliente_benchmark.get("/benchmark/requisitos?game=valorant&cpu=cpu").status_code == 400
     fps.assert_not_called()
+
+
+def test_referencia_gpu_tem_escopo_explicito_e_continua_privada(cliente_benchmark, mocker):
+    executar = mocker.patch("controllers.benchmark_controller.ConsultarBenchmarkService.executar", return_value={"escopo": "gpu"})
+    autenticar(cliente_benchmark)
+    resposta = cliente_benchmark.get("/benchmark/fps?game=valorant&gpu=rtx-3060&escopo=gpu")
+    assert resposta.status_code == 200
+    assert dict(executar.call_args.args[0]) == {"game": "valorant", "gpu": "rtx-3060", "escopo": "gpu"}
+    assert resposta.headers["Cache-Control"] == "no-store"
+    assert cliente_benchmark.get("/benchmark/fps?escopo=gpu&escopo=build").status_code == 400

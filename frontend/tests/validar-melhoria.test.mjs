@@ -12,6 +12,42 @@ const comparar = (peca,alteracoes = {},quantidade = 1) => {
   return avaliarTrocaMelhoria(base(peca,quantidade),candidata,[peca,candidata]);
 };
 
+// Pontuações fictícias para testar a regra, sem representar modelos reais.
+const cpu = {id:"processador:1",categoria:"processador",benchmark_multi_core:100,benchmark_single_thread:50,
+  benchmark_teste:"PassMark CPU Mark / Single Thread",benchmark_fonte:"https://example.org/cpu.csv",benchmark_versao:null};
+const gpu = {id:"placa_video:1",categoria:"placa_video",benchmark_g3d:100,memoria_gb:8,
+  benchmark_teste:"PassMark G2D / G3D",benchmark_fonte:"https://example.org/gpu.csv",benchmark_versao:null};
+
+test("CPU exige ganho e não aceita regressão em multi-core nem em single-thread",() => {
+  assert.equal(comparar(cpu,{benchmark_multi_core:200}).codigo,"melhoria");
+  assert.equal(comparar(cpu,{benchmark_single_thread:60}).permitida,true);
+  assert.equal(comparar(cpu,{benchmark_multi_core:200,benchmark_single_thread:49}).codigo,"regressao");
+  assert.equal(comparar(cpu,{preco:99999}).codigo,"sem-ganho");
+});
+
+test("GPU exige G3D superior sem reduzir VRAM; memória extra sozinha não comprova ganho",() => {
+  assert.equal(comparar(gpu,{benchmark_g3d:150}).codigo,"melhoria");
+  assert.equal(comparar(gpu,{benchmark_g3d:150,memoria_gb:4}).codigo,"regressao");
+  assert.equal(comparar(gpu,{memoria_gb:16}).codigo,"sem-ganho");
+});
+
+for (const peca of [cpu,gpu]) for (const alteracao of [
+  {benchmark_fonte:null},{benchmark_fonte:"https://outro.example/resultado"},{benchmark_versao:"outra"},
+  {benchmark_teste:"outro teste"},{benchmark_referencia_em:"2026-01-01"},
+]) test(peca.categoria + " recusa fontes/versões não comparáveis: " + JSON.stringify(alteracao),() => {
+  assert.equal(comparar(peca,alteracao).codigo,"dados-insuficientes");
+});
+
+test("scores ausentes ou inválidos não se tornam comparações de desempenho",() => {
+  for (const valor of [null,undefined,"",0,-1,Infinity,true,[],{}])
+    assert.equal(comparar(cpu,{benchmark_multi_core:valor}).codigo,"dados-insuficientes");
+  assert.match(comparar(cpu,{benchmark_multi_core:150}).motivo,/Não representa um ganho de FPS garantido/);
+});
+
+test("trocar SSD/RAM/HD por outro nome com as mesmas métricas não é melhoria",() => {
+  for (const peca of [ram,ssd,hd]) assert.equal(comparar(peca,{modelo:"Outro modelo"}).codigo,"sem-ganho");
+});
+
 for (const [nome,alteracoes] of [
   ["capacidade",{capacidade_gb:8}], ["frequência",{frequencia_mhz:2666}],
   ["pentes",{quantidade_pentes:1}], ["latência",{latencia:"CL22"}],
@@ -22,13 +58,13 @@ for (const [nome,alteracoes] of [
 test("RAM considera todas as unidades/kit atuais, não apenas a primeira",() => {
   assert.equal(comparar(ram,{capacidade_gb:16,quantidade_pentes:4},2).codigo,"regressao");
   assert.equal(comparar(ram,{capacidade_gb:32,quantidade_pentes:2},2).codigo,"regressao");
-  assert.equal(comparar(ram,{capacidade_gb:32,quantidade_pentes:4},2).permitida,true);
+  assert.equal(comparar(ram,{capacidade_gb:64,quantidade_pentes:4},2).permitida,true);
 });
 
 test("RAM compara CL relativo à frequência, permitindo CL maior sem latência pior",() => {
   assert.equal(comparar(ram,{frequencia_mhz:3600,latencia:"CL18"}).permitida,true);
   assert.equal(comparar(ram,{frequencia_mhz:3600,latencia:"CL20"}).codigo,"regressao");
-  assert.equal(comparar(ram,{latencia:"16-18-18-38"}).permitida,true);
+  assert.equal(comparar(ram,{latencia:"16-18-18-38"}).codigo,"sem-ganho");
 });
 
 test("modelos de RAM diferentes são comparados contra o mais exigente de cada critério",() => {
@@ -36,7 +72,7 @@ test("modelos de RAM diferentes são comparados contra o mais exigente de cada c
   const build = base(ram); build.componentes.memoria_ram.push({id:outra.id,quantidade:1});
   const nova = {...ram,id:"ram:3",capacidade_gb:32,quantidade_pentes:4,frequencia_mhz:3600,latencia:"CL18"};
   assert.equal(avaliarTrocaMelhoria(build,nova,[ram,outra,nova]).codigo,"regressao");
-  nova.latencia = "CL16";
+  nova.latencia = "CL16"; nova.capacidade_gb = 64;
   assert.equal(avaliarTrocaMelhoria(build,nova,[ram,outra,nova]).permitida,true);
 });
 
@@ -69,10 +105,10 @@ for (const [nome,alteracoes] of [
   assert.equal(comparar(hd,alteracoes).codigo,"regressao");
 });
 
-test("HD preserva o total de vários discos e permite troca equivalente nas métricas",() => {
+test("HD preserva o total de vários discos e exige ganho nas métricas",() => {
   assert.equal(comparar(hd,{capacidade_gb:2000},2).codigo,"regressao");
-  assert.equal(comparar(hd,{capacidade_gb:4000},2).permitida,true);
-  assert.equal(comparar(hd,{fabricante:"Outra marca",modelo:"Outra linha"}).permitida,true);
+  assert.equal(comparar(hd,{capacidade_gb:6000},2).permitida,true);
+  assert.equal(comparar(hd,{fabricante:"Outra marca",modelo:"Outra linha"}).codigo,"sem-ganho");
 });
 
 for (const valor of [null,undefined,0,-1,Infinity,NaN,"",true,false,[],[7000],{},"não informado"])

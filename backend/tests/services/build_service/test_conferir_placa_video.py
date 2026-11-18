@@ -23,9 +23,9 @@ def test_ryzen_g_nao_dispensa_placa_de_video_a_partir_de_4000():
         validar_build_gerada(build, catalogo, 8000, utilidade='Jogos')
 
 
-def test_abaixo_de_4000_jogos_ainda_aceita_video_integrado():
+def test_abaixo_de_3500_conferencia_isolada_ainda_aceita_video_integrado():
     build, catalogo = cenario()
-    assert validar_build_gerada(build, catalogo, 3999.99, utilidade='Jogos')['preco_total'] == 600
+    assert validar_build_gerada(build, catalogo, 3499.99, utilidade='Jogos')['preco_total'] == 600
 
 
 @pytest.mark.parametrize('uso', ['Estudos', 'Trabalho e estudo', 'Escritório', 'Um pouco de tudo'])

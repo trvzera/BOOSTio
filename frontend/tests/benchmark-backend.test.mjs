@@ -113,19 +113,45 @@ test("cache de reserva tem aviso visível sem precisar expandir os detalhes",() 
   assert.ok(html.includes('não foram atualizados'));
 });
 test("produção mantém cliente Python e diagnóstico direto fica restrito ao laboratório",async () => {
-  for (const arquivo of ["../js/build/acoes-build.js","../js/benchmark/interface.js"])
+  for (const arquivo of ["../js/build/acoes-build.js","../js/benchmark/dashboard.js","../js/benchmark/interface.js"])
     assert.doesNotMatch(await readFile(new URL(arquivo,import.meta.url),"utf8"),/experimentos\/fpshq|criarClienteFPSHQ/);
   const laboratorio = await readFile(new URL("../js/pages/test-benchmark.js",import.meta.url),"utf8");
   assert.match(laboratorio,/experimentos\/benchmark-diagnostico/);
   const acoes = await readFile(new URL("../js/build/acoes-build.js",import.meta.url),"utf8");
-  assert.match(acoes,/iniciarPainelBenchmark\(dialogo/);
+  assert.match(acoes,/iniciarDashboardBenchmark\(dialogo/);
   assert.doesNotMatch(acoes,/Estimativas de FPS em breve/);
 });
 test("dots acompanha apenas o estado do menu e a tela de erro evita retorno duplicado",async () => {
   const ui = await readFile(new URL("../js/components/ui.js",import.meta.url),"utf8");
-  assert.match(ui,/const alternavel = \[[^\]]*"dots"[^\]]*\]/);
+  assert.match(ui,/const alternavel = (?:radio \|\| )?\[[^\]]*"dots"[^\]]*\]/);
   assert.match(ui,/if \(!alternavel \|\| elemento\.dataset\.lottie === "profile"\)/);
   const erro = await readFile(new URL("../pages/erro.html",import.meta.url),"utf8");
   assert.match(erro,/<button[^>]*id="error-back"[^>]*\bhidden/);
   assert.equal([...erro.matchAll(/Ir para o início<\/a>/g)].length,1);
+});
+
+test("referência GPU é explícita, omite CPU e exige confirmação do escopo na resposta",async()=>{
+  const chamadas=[];
+  const cliente=criarClienteBenchmark({requisitar:async rota=>{
+    chamadas.push(rota);return {resultado:{escopo:"gpu",consulta:{game:"valorant",gpu:"rtx-3060"}}};
+  }});
+  const {cpu,...gpu}=consulta;
+  await assert.rejects(cliente.consultar(gpu));assert.equal(chamadas.length,0);
+  await assert.rejects(cliente.consultar({...consulta,escopo:"gpu"}));assert.equal(chamadas.length,0);
+  await cliente.consultar({...gpu,escopo:"gpu"});
+  const params=new URL(chamadas[0],"https://qa.test").searchParams;
+  assert.equal(params.get("escopo"),"gpu");assert.equal(params.has("cpu"),false);
+  for(const resultado of [{escopo:"build",consulta:gpu},{escopo:"gpu",consulta},{escopo:"gpu",consulta:{...gpu,gpu:"outra"}}]) {
+    const c=criarClienteBenchmark({requisitar:async()=>({resultado})});
+    await assert.rejects(c.consultar({...gpu,escopo:"gpu"}),/referência isolada/);
+  }
+  const html=resultadoDesempenhoHtml({consulta:gpu,escopo:"gpu",jogo:"Valorant",fps:100,matriz:{},consultadoEm:1});
+  assert.match(html,/Referência apenas da GPU/);assert.match(html,/não representa o FPS da sua build/);
+  assert.doesNotMatch(html,/FPS médio esperado/);
+});
+
+test("painel oficial mantém a consulta da build sem escolha de escopo",()=>{
+  const html=painelBenchmarkHtml({prefixo:"build-fps"});
+  assert.doesNotMatch(html,/data-benchmark-scope|data-gpu-reference-notice|O que deseja consultar\?|name="build-fps-scope"/);
+  assert.match(html,/id="build-fps-game"/);assert.match(html,/Ver desempenho/);
 });

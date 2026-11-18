@@ -29,7 +29,7 @@ test("artefatos locais são ignorados, fontes, testes e dados de runtime não",(
 });
 
 test("materiais históricos ficam juntos e fora das imagens de produção",()=>{
-  for(const pasta of ["brand","esbocos-site","anotacoes","termos-historicos"])
+  for(const pasta of ["brand","esbocos-site","termos-historicos"])
     assert.ok(existsSync(new URL("materiais/"+pasta+"/",raiz)),pasta);
   assert.match(readFileSync(new URL(".dockerignore",raiz),"utf8"),/^materiais$/m);
 });

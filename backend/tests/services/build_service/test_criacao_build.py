@@ -341,8 +341,8 @@ def test_teto_percentual_preserva_centavos_sem_arredondar_para_cima():
 def test_reserva_nao_pode_reduzir_pc_abaixo_do_minimo_antes_do_catalogo_e_llm(app_build, mocker):
     gerar_catalogo = mocker.patch("services.build_service.catalogo_geracao_service.gerar_catalogo", return_value={})
     llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar")
-    with app_build.app_context(), pytest.raises(ValueError, match="pelo menos R\$ 2000"):
-        CriarBuildService().executar(1, {**PEDIDO, "percentual_perifericos": 90})
+    with app_build.app_context(), pytest.raises(ValueError, match="pelo menos R\$ 3500"):
+        CriarBuildService().executar(1, {**PEDIDO, "percentual_perifericos": 40})
     gerar_catalogo.assert_not_called()
     llm.assert_not_called()
 
@@ -951,14 +951,17 @@ def test_api_rejeita_limites_minimos_sem_chamar_ia_ou_salvar(app_build, mocker, 
     assert resposta.status_code == 400
     assert resposta.json["codigo"] == "planejamento-invalido"
     assert resposta.json["geracao"]["motivo"] == motivo
-    assert resposta.json["geracao"]["orcamentoSugerido"] >= 2000
+    if percentual == 1:
+        assert "10% e 40%" in resposta.json["erro"]
+    else:
+        assert resposta.json["geracao"]["orcamentoSugerido"] >= 3500
     llm.assert_not_called()
     catalogo.assert_not_called()
     with app_build.app_context():
         assert Build.query.count() == BuildSalva.query.count() == 0
 
 
-def test_api_aceita_pc_2000_perifericos_500_como_tetos_sem_impor_gasto(app_build, mocker):
+def test_api_aceita_novos_tetos_sem_impor_gasto_minimo(app_build, mocker):
     tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "monitor", "teclado", "mouse", "fone"]
     with app_build.app_context():
         cadastrar_pecas(tipos)
@@ -966,7 +969,7 @@ def test_api_aceita_pc_2000_perifericos_500_como_tetos_sem_impor_gasto(app_build
         **PEDIDO, "componentes": [{"tipo": t, "id": 1, "quantidade": 1} for t in tipos]})
     cliente = app_build.test_client()
     autenticar(cliente)
-    resposta = cliente.post("/build/", json={**PEDIDO, "orcamento": 2500, "percentual_perifericos": 20})
+    resposta = cliente.post("/build/", json={**PEDIDO, "orcamento": 4500, "percentual_perifericos": 20})
     assert resposta.status_code == 201, resposta.json
     assert resposta.json["build"]["preco_total"] == 1000
     llm.assert_called_once()

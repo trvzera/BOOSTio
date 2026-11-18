@@ -3,6 +3,7 @@ from math import isfinite
 
 from utils.sockets import normalizar_socket
 from .preferencias_cores_service import PreferenciasCoresService
+from .preferencias_processador_service import PreferenciasProcessadorService
 
 
 class AmostraInteligenteService:
@@ -88,7 +89,7 @@ class AmostraInteligenteService:
         proporcao = Decimal(str(preco)) / Decimal(str(teto))
         return 'entrada' if proporcao <= Decimal('0.4') else 'intermediaria' if proporcao <= Decimal('0.7') else 'superior'
 
-    def executar(self, pecas, tipo, prioridade, teto, limite=12, cor='sem-preferencia'):
+    def executar(self, pecas, tipo, prioridade, teto, limite=12, cor='sem-preferencia', preferencia_processador='sem-preferencia'):
         pecas, removidas = self.pareto(pecas, tipo, cor)
         principal = self.ranking(pecas, tipo, prioridade)
         secundario = self.ranking(pecas, tipo, 'desempenho' if prioridade == 'custo_beneficio' else 'custo_beneficio')
@@ -96,6 +97,10 @@ class AmostraInteligenteService:
         def incluir(p):
             if len(escolhidas) < limite:
                 escolhidas.setdefault(p['id'], p)
+        if tipo == 'processador':
+            preferida = next((p for p in principal if PreferenciasProcessadorService.marca(p, preferencia_processador)), None)
+            if preferida:
+                incluir(preferida)
         if principal:
             incluir(principal[0])
         if tipo == 'processador':
@@ -118,6 +123,8 @@ class AmostraInteligenteService:
             incluir(a)
             incluir(b)
         amostra = self.ranking(list(escolhidas.values()), tipo, prioridade)
+        if tipo == 'processador' and preferencia_processador in ('intel', 'amd'):
+            amostra.sort(key=lambda p: not PreferenciasProcessadorService.marca(p, preferencia_processador))
         return amostra, {'dominadas': removidas, 'elegiveis': len(pecas),
                          'plataformas_elegiveis': sorted({s for p in pecas if (s := normalizar_socket(p.get('soquete')))}),
                          'plataformas_representadas': sorted({s for p in amostra if (s := normalizar_socket(p.get('soquete')))}),

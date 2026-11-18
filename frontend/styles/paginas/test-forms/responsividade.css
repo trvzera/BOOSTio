@@ -1,0 +1,47 @@
+@media (max-width: 800px) {
+  .test-form-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .test-form-intro {
+    padding: 24px;
+  }
+  .test-form-answers {
+    height: 600px;
+    border-left: 0;
+    border-top: 1px solid var(--glass-border);
+  }
+  .test-form-scroll {
+    padding: 22px;
+  }
+  .test-form-steps {
+    padding: 12px 16px;
+    gap: 4px;
+  }
+  .test-form-steps button {
+    gap: 5px;
+    padding: 4px 6px;
+  }
+}
+@media (max-width: 400px) {
+  .test-form-intro,
+  .test-form-toolbar {
+    padding: 18px;
+  }
+  .test-form-scroll {
+    padding: 16px;
+  }
+  .test-form-navigation {
+    padding: 14px;
+  }
+  .test-form-navigation button {
+    padding: 12px 14px;
+  }
+  .test-form-scroll .appearance-cases {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .test-form-choice.ui-check {
+    transition: none;
+  }
+}

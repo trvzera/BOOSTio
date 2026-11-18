@@ -5,6 +5,7 @@ const NUMERO = valor => valor == null || !["number","string"].includes(typeof va
   || !Number.isFinite(Number(valor)) || Number(valor) <= 0 ? null : Number(valor);
 const bloquear = (codigo,motivo) => ({permitida:false,codigo,motivo});
 const desconhecida = motivo => bloquear("dados-insuficientes",motivo);
+const equivalente = () => bloquear("sem-ganho","As especificações comparadas são equivalentes às atuais. Não há melhoria comprovada para recomendar essa troca.");
 const regrediu = criterio => bloquear("regressao","A troca reduziria " + criterio + ". Escolha uma peça equivalente ou superior nesse critério.");
 const ddr = valor => /^DDR[1-9]$/.test(String(valor).replace(/[\s-]/g,"").toUpperCase())
   ? String(valor).replace(/[\s-]/g,"").toUpperCase() : null;
@@ -56,8 +57,11 @@ export function avaliarTrocaMelhoria(build,candidata,catalogo,{modo = "substitui
       return desconhecida("Faltam dados de " + rotulo + " para comparar as peças com segurança.");
     const antes = somar ? valores.reduce((total,valor) => total + valor,0) : Math.max(...valores);
     if (!Number.isFinite(antes)) return desconhecida("Os valores atuais de " + rotulo + " não são válidos para comparar.");
+    if (nova > antes) ganhos.push({criterio:rotulo,antes,depois:nova});
     return nova < antes ? regrediu(rotulo + " (de " + antes + " para " + nova + ")") : null;
   }
+  const ganhos = [];
+  const aprovar = motivo => ganhos.length ? {permitida:true,codigo:"melhoria",motivo,ganhos} : equivalente();
 
   if (categoria === "memoria_ram") {
     const geracao = ddr(candidata.ddr), anteriores = atuais.map(({peca}) => ddr(peca.ddr));
@@ -77,7 +81,12 @@ export function avaliarTrocaMelhoria(build,candidata,catalogo,{modo = "substitui
       if (novaCl / novaFrequencia > antesCl / antesFrequencia + 1e-12)
         return regrediu("a resposta da RAM ao aumentar a latência CAS relativa à frequência");
     }
-    return {permitida:true,codigo:"sem-regressao",motivo:"Sem redução de capacidade, frequência ou pentes e sem aumento da latência CAS calculada."};
+    if (atuais.every(({peca}) => novaCl / novaFrequencia < cl(peca.latencia) / NUMERO(peca.frequencia_mhz) - 1e-12))
+      ganhos.push({criterio:"latência da RAM em ns",antes:Math.max(...atuais.map(({peca}) => 2000 * cl(peca.latencia) / NUMERO(peca.frequencia_mhz))),depois:2000 * novaCl / novaFrequencia});
+    // Acrescentar pentes por si só não comprova uma melhora de desempenho.
+    const ganhoReal = ganhos.filter(ganho => ganho.criterio !== "a quantidade total de pentes");
+    ganhos.splice(0,ganhos.length,...ganhoReal);
+    return aprovar("Mais capacidade, frequência ou menor latência, sem redução nos demais critérios comparados.");
   }
   if (categoria === "ssd" || categoria === "hd") {
     const erro = minimo("capacidade_gb","a capacidade total de armazenamento em GB",{somar:true})
@@ -87,10 +96,24 @@ export function avaliarTrocaMelhoria(build,candidata,catalogo,{modo = "substitui
         : minimo("velocidade_rpm","a rotação informada do HD em RPM")
           || minimo("memoria_cache_mb","o cache informado do HD em MB"));
     if (erro) return erro;
-    return {permitida:true,codigo:"sem-regressao",motivo:"Sem redução da capacidade total nem das velocidades/especificações de armazenamento comparadas."};
+    return aprovar("Ganho nas especificações de armazenamento comparadas, sem reduzir a capacidade total nem as demais métricas.");
   }
-  if (categoria === "processador" || categoria === "placa_video")
-    return desconhecida("O catálogo ainda não tem benchmarks comparáveis de CPU/GPU para garantir que esta troca não é inferior. Preço e especificações isoladas não comprovam desempenho.");
+  if (categoria === "processador" || categoria === "placa_video") {
+    const teste = categoria === "processador" ? "PassMark CPU Mark / Single Thread" : "PassMark G2D / G3D";
+    const origem = peca => typeof peca.benchmark_fonte === "string" && peca.benchmark_fonte.trim();
+    if (!origem(candidata) || candidata.benchmark_teste !== teste || atuais.some(({peca}) =>
+      peca.benchmark_teste !== teste || !origem(peca) || origem(peca) !== origem(candidata)
+      || (peca.benchmark_versao ?? null) !== (candidata.benchmark_versao ?? null)
+      || (peca.benchmark_referencia_em ?? null) !== (candidata.benchmark_referencia_em ?? null)))
+      return desconhecida("Faltam benchmarks comparáveis: mesmo teste, fonte, versão e data de referência. Preço, nome e especificações isoladas não comprovam desempenho.");
+    const erro = categoria === "processador"
+      ? minimo("benchmark_multi_core","pontuação de processamento com vários núcleos") || minimo("benchmark_single_thread","pontuação de processamento por núcleo")
+      : minimo("benchmark_g3d","pontuação gráfica 3D") || minimo("memoria_gb","memória da placa de vídeo em GB");
+    if (erro) return erro;
+    // VRAM extra com a mesma pontuação não comprova ganho no processamento gráfico.
+    if (categoria === "placa_video" && !ganhos.some(g => g.criterio === "pontuação gráfica 3D")) return equivalente();
+    return {...aprovar("Pontuação superior no mesmo benchmark, sem reduzir as demais métricas comparadas. Não representa um ganho de FPS garantido."),teste,fonte:candidata.benchmark_fonte};
+  }
   return desconhecida("Ainda faltam critérios comparáveis desta categoria para descartar uma piora. Esta troca não será sugerida como melhoria.");
 }
 
@@ -98,4 +121,13 @@ export function exigirTrocaMelhoria(build,candidata,catalogo,opcoes) {
   const avaliacao = avaliarTrocaMelhoria(build,candidata,catalogo,opcoes);
   if (!avaliacao.permitida) throw new Error(avaliacao.motivo);
   return avaliacao;
+}
+
+export function resumoGanhoMelhoria(avaliacao) {
+  if (!avaliacao?.permitida) return "";
+  if (avaliacao.codigo === "expansao") return "Mais espaço, mantendo os discos atuais.";
+  if (avaliacao.codigo === "adicao") return "Acrescenta uma peça à categoria vazia.";
+  const numero = new Intl.NumberFormat("pt-BR",{maximumFractionDigits:2});
+  return (avaliacao.ganhos || []).map(({criterio,antes,depois}) =>
+    criterio + ": de " + numero.format(antes) + " para " + numero.format(depois)).join(" · ");
 }

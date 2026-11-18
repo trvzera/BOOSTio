@@ -3,6 +3,7 @@ import { itensCategoria } from "../build/estado.js";
 import { pecaCompativel, selecionarPecaCompativel } from "../build/compatibilidade.js";
 import { avaliarTrocaMelhoria, exigirTrocaMelhoria } from "../build/validar-melhoria.js";
 import { iconeAnimado, iniciarIcones } from "../components/ui.js";
+import { abrirMelhorias } from "../build/melhorias.js";
 
 const CATEGORIAS = [
   { id:"processador", nome:"Processador" },
@@ -117,6 +118,21 @@ export function iniciarTesteMelhorias({builds,catalogo,valorBudget,informar}) {
     if (!resultados.hidden) buscar();
   }));
   document.querySelector("#upgrade-search").addEventListener("click",buscar);
+  document.querySelector("#upgrade-open-panel")?.addEventListener("click",() => {
+    const copia = structuredClone(simulada);
+    copia.travada = false;
+    copia.orcamento = valorBudget();
+    const painel = abrirMelhorias(copia,catalogo,async proxima => {
+      original = structuredClone(proxima);
+      simulada = structuredClone(proxima);
+      trocas.clear(); resultados.hidden = true;
+      renderizarPrevia();
+      informar(feedback,"Prévia atualizada. Nenhuma alteração foi enviada ao servidor.","success");
+    });
+    const campo = painel.querySelector("#upgrade-real-budget");
+    campo.value = valorBudget() ?? "";
+    campo.dispatchEvent(new Event("input",{bubbles:true}));
+  });
   resultados.addEventListener("click",evento => {
     const botao = evento.target.closest("[data-upgrade-pick]");
     if (!botao) return;

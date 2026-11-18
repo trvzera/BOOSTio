@@ -7,6 +7,7 @@ import { perfilLoading } from "../js/components/page-loading.js";
 import { ofertasPeca } from "../js/build/catalogo.js";
 import { destinoAnterior, rotuloVoltar } from "../js/components/navigation-back.js";
 import { avisoFreteHtml } from "../js/build/acoes-build.js";
+import { dashboardBenchmarkHtml } from "../js/benchmark/dashboard.js";
 
 test("destaque dos Termos usa o azul acessível também sobre o fundo em paisagem",async()=>{
   const css=await readFile(new URL('../styles/paginas/termos.css',import.meta.url),'utf8');
@@ -106,16 +107,16 @@ test("seletores de montagem e desempenho registram os quatro novos Lotties com a
 
 test("montagem e benchmark usam os ícones correspondentes sem alterar ações e rótulos",async () => {
   const builds = await readFile(new URL("../js/pages/builds-conta.js",import.meta.url),"utf8");
-  const acoes = await readFile(new URL("../js/build/acoes-build.js",import.meta.url),"utf8");
+  const acoes = dashboardBenchmarkHtml();
   const css = await readFile(new URL("../styles/build/recursos.css",import.meta.url),"utf8");
   for (const [nome,rotulo] of [["handsparkle","Formulário inteligente"],["normalhand","Montagem manual"]])
     assert.ok(builds.includes('iconeAnimado("' + nome + '") + \'<strong>' + rotulo + '</strong>'));
-  assert.match(acoes,/iconeAnimado\("microchip"\) \+ '<span>Blender · Renderização<\/span>/);
+  assert.match(acoes,/data-lottie="microchip"/);
   const jogos = acoes.match(/<button\b[^>]*data-benchmark-type="games"[^>]*>/)?.[0];
   assert.ok(jogos);
   assert.doesNotMatch(jogos,/\bdisabled(?:\s|=|>)/);
-  assert.match(jogos,/aria-label="Selecionar teste de desempenho em jogos"/);
-  assert.match(acoes,/iconeAnimado\("gamepad"\) \+ '<span>Jogos · FPS<\/span>/);
+  assert.match(jogos,/aria-label="Jogos \/ FPS"/);
+  assert.match(acoes,/data-lottie="gamepad"/);
   assert.match(css,/\.build-create-option:is\(:hover,:focus-visible\)/);
   assert.match(css,/\.build-create-option > \.ui-lottie \{[^}]*color: var\(--cor-p1\)/);
   assert.match(css,/span:not\(\.build-create-option-action\):not\(\.ui-lottie\)/);

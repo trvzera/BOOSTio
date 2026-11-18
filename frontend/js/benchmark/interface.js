@@ -4,6 +4,7 @@ import { htmlSeguro as h } from "../build/catalogo.js";
 import { resultadoDesempenhoHtml,resolucoesHtml } from "./view.js";
 import { definirDetalheAberto,iniciarDetalhesAnimados } from "../components/animated-details.js";
 import { iniciarRequisitosBuild } from "./requisitos.js";
+import { motivoRequisitosFps } from "./disponibilidade.js";
 
 const MENSAGENS_CONSULTA = ["Consultando o desempenho esperado…","Aguardando os dados do jogo para as peças escolhidas…","A FPSHQ está demorando um pouco. A consulta continua em andamento…","Ainda estamos aguardando a resposta. Nenhuma nova consulta foi enviada…","O resultado aparecerá aqui quando a consulta terminar…"];
 const MENSAGENS_BUSCA = ["Buscando jogos…","Procurando na FPSHQ…","Organizando os resultados…","A FPSHQ pode levar alguns segundos…"];
@@ -53,7 +54,9 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
   incluirJogos(JOGOS_INICIAIS);
   function controles() {
     consulta.disabled = ocupado || Boolean(hardware.motivo); buscar.disabled = ocupado;
-    if (hardware.motivo) consulta.dataset.disabledReason = hardware.motivo;
+    const motivo = hardware.motivo || (ocupado ? acaoAtual === "espera" ? "Aguarde o intervalo informado pelo provedor." : "Aguarde a consulta atual." : "");
+    if (motivo) consulta.dataset.disabledReason = motivo;
+    else delete consulta.dataset.disabledReason;
     consulta.textContent = acaoAtual === "consulta" ? "Consultando…" : "Ver desempenho";
     consulta.setAttribute("aria-label",acaoAtual === "consulta" ? "Consultando desempenho esperado na FPSHQ" : "Ver desempenho esperado na FPSHQ");
     buscar.textContent = acaoAtual === "busca" ? "Buscando…" : "Buscar";
@@ -96,7 +99,7 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
     resultado.querySelector(".fpshq-resolutions").innerHTML = resolucoesHtml(dadosAtuais.matriz,evento.target.value);
   });
   form.addEventListener("change",evento => {
-    limparResultado(); informar("");
+    limparResultado(); informar(hardware.motivo || "");
     if (evento.target === jogo) {
       mostrarAviso(Boolean(jogo.value));
       atualizarFonte("https://fpshq.com/pt/games/" + jogo.value + "/");
@@ -105,6 +108,10 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
   form.addEventListener("submit",async evento => {
     evento.preventDefault();
     if (ocupado || hardware.motivo || !form.reportValidity()) return;
+    if (typeof navigator !== "undefined" && navigator.onLine === false) {
+      informar("Você está sem conexão com a internet. Reconecte-se e tente consultar o FPS novamente.","error");
+      return;
+    }
     const atual = ++versao;
     ocupado = true; acaoAtual = "consulta"; controles(); resultado.hidden = true; resultado.setAttribute("aria-busy","true");
     mensagensEmSequencia(MENSAGENS_CONSULTA);
@@ -112,8 +119,9 @@ export function iniciarPainelBenchmark(raiz,{prefixo = "fpshq",hardware = REFERE
       if (requisitos) {
         const ficha = await requisitos.verificar(jogo.value);
         if (!ativo || atual !== versao) return;
-        if (ficha?.ram.atendeMinimo === false || ficha?.impedimentosMinimos?.length) {
-          informar(ficha.ram.atendeMinimo === false ? "A RAM da build está abaixo do mínimo deste jogo. Nenhum FPS foi consultado." : "A build não atende a um dos requisitos mínimos verificados. Nenhum FPS foi consultado.","error");
+        const motivo = motivoRequisitosFps(ficha);
+        if (motivo) {
+          informar(motivo,"error");
           return;
         }
       }

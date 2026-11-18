@@ -13,6 +13,7 @@ from services.build_service.planejar_rede_service import PlanejarRedeService
 from services.build_service.preferencias_gabinete_service import PreferenciasGabineteService
 from services.build_service.planejamento_geracao import ErroPlanejamentoBuild, sugerir_total
 from services.build_service.preco_exibido_service import PrecoExibidoService
+from .preferencias_processador_service import PreferenciasProcessadorService
 
 logger = logging.getLogger("services.build_service.criar_build_service")
 
@@ -23,13 +24,13 @@ def preparar_catalogo(dados, proprias, rede, aparencia, orcamento, margem, teto_
     excluidas.update(("ssd", "hd"))
   if {"air_cooler", "water_cooler"} & excluidas:
     excluidas.update(("air_cooler", "water_cooler"))
-  acessorio_rede = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
-  excluidas.update({"adaptador_wifi", "cabo_rede"} - ({acessorio_rede} if rede.get("possuiAcessorio") is False else set()))
+  excluidas.update({"adaptador_wifi", "cabo_rede"} - PlanejarRedeService.categorias(rede))
   inicio_catalogo = perf_counter()
   catalogo = gerar_catalogo(min(orcamento - margem, teto_pc), teto_perifericos, excluidas,
-                                aparencia["gabinete_id"] if "gabinete" not in proprias else None, dados["utilidade"], cor=aparencia["cor"], aparencia=aparencia, rede=rede)
-  if acessorio_rede and rede.get("possuiAcessorio") is False:
-    catalogo[acessorio_rede] = PlanejarRedeService.opcoes(catalogo, rede, proprias)
+                                aparencia["gabinete_id"] if "gabinete" not in proprias else None, dados["utilidade"], cor=aparencia["cor"], aparencia=aparencia, rede=rede, preferencia_processador=dados.get("preferencia_processador"))
+  for conexao in PlanejarRedeService.conexoes(rede):
+    for acessorio_rede in PlanejarRedeService.categorias(conexao):
+      catalogo[acessorio_rede] = PlanejarRedeService.opcoes(catalogo, conexao, proprias)
   logger.info("Geração: etapa=catalogo duracao_ms=%d categorias=%d", (perf_counter()-inicio_catalogo)*1000, len(catalogo))
   return catalogo
 
@@ -74,7 +75,7 @@ def campos_catalogo(dados):
   }
 
 
-def gerar_catalogo(preco_maximo, reserva_perifericos=0, excluidas=(), referencia_gabinete=None, utilidade="", cor="sem-preferencia", aparencia=None, rede=None):
+def gerar_catalogo(preco_maximo, reserva_perifericos=0, excluidas=(), referencia_gabinete=None, utilidade="", cor="sem-preferencia", aparencia=None, rede=None, preferencia_processador=None):
   catalogo = {}
   for modelo in MODELOS_PECAS:
     periferico = modelo.__tablename__ in PERIFERICOS
@@ -84,12 +85,14 @@ def gerar_catalogo(preco_maximo, reserva_perifericos=0, excluidas=(), referencia
     pecas = PrecoExibidoService.catalogo(modelo.listar_disponiveis_ate(teto, limite=200), teto)
     if pecas:
       fichas = [campos_catalogo({**item, "id": PrecoExibidoService.id_numerico(item)}) for item in pecas]
+      if modelo.__tablename__ == "processador" and preferencia_processador in ("intel", "amd"):
+        fichas = [p for p in fichas if PreferenciasProcessadorService.marca(p, preferencia_processador)]
       if modelo.__tablename__ == "monitor":
         fichas = [p for p in fichas if PreferenciasPerifericosService.painel_permitido(p)]
       if modelo.__tablename__ in ("cabo_rede", "adaptador_wifi") and rede:
         fichas = PlanejarRedeService.opcoes({modelo.__tablename__: fichas}, rede)
       if fichas:
-        catalogo[modelo.__tablename__] = AmostrarCatalogoService().executar(modelo.__tablename__, fichas, utilidade=utilidade, cor=cor)
+        catalogo[modelo.__tablename__] = AmostrarCatalogoService().executar(modelo.__tablename__, fichas, utilidade=utilidade, cor=cor, preferencia_processador=preferencia_processador)
 
 
         amostra = catalogo[modelo.__tablename__]

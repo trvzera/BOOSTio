@@ -4,7 +4,7 @@ const numero = (valor,maximo) => valor !== null && valor !== "" && Number.isFini
 export function normalizarRede(valor = {}) {
   if (!valor || typeof valor !== "object") valor = {};
   return {
-    tipo:["cabo","wifi"].includes(valor.tipo) ? valor.tipo : "indefinido",
+    tipo:["cabo","wifi","ambos"].includes(valor.tipo) ? valor.tipo : "indefinido",
     possuiAcessorio:typeof valor.possuiAcessorio === "boolean" ? valor.possuiAcessorio : null,
     velocidadeMbps:numero(valor.velocidadeMbps,100000),
     comprimentoCaboM:numero(valor.comprimentoCaboM,1000),
@@ -15,7 +15,7 @@ export function normalizarRede(valor = {}) {
 export function resumoRede(valor) {
   const rede = normalizarRede(valor);
   if (rede.tipo === "indefinido") return "Conexão ainda não definida";
-  const meio = rede.tipo === "cabo" ? "Cabo Ethernet" : "Wi-Fi";
+  const meio = rede.tipo === "ambos" ? "Wi-Fi e cabo Ethernet" : rede.tipo === "cabo" ? "Cabo Ethernet" : "Wi-Fi";
   const acessorio = rede.possuiAcessorio === true ? "já possuo o necessário" : rede.possuiAcessorio === false ? "incluir acessório" : "acessório a confirmar";
   return meio + " · " + acessorio;
 }
@@ -25,7 +25,7 @@ export function custoRede(valor) {
 export function selecionarAcessorioRede(valor,opcao) {
   const rede = normalizarRede(valor);
   const [tipo,situacao] = String(opcao).split(":");
-  if (!["cabo","wifi"].includes(tipo) || !["incluir","possuo","confirmar"].includes(situacao))
+  if (!["cabo","wifi","ambos"].includes(tipo) || !["incluir","possuo","confirmar"].includes(situacao))
     return normalizarRede({...rede,tipo:"indefinido",possuiAcessorio:null});
   return normalizarRede({...rede,tipo,possuiAcessorio:situacao === "confirmar" ? null : situacao === "possuo",
     ...(rede.tipo !== tipo ? {comprimentoCaboM:null,custoPrevisto:null} : {})});
@@ -41,6 +41,9 @@ export function vincularRedeBuild(container,valor,{bloqueado = false,aoAlterar =
     ["wifi:incluir","Adaptador Wi-Fi"],
     ["wifi:possuo","Wi-Fi integrado ou adaptador — já possuo"],
     ["wifi:confirmar","Adaptador Wi-Fi — a confirmar"],
+    ["ambos:incluir","Wi-Fi e cabo de rede"],
+    ["ambos:possuo","Wi-Fi e cabo — já possuo os dois"],
+    ["ambos:confirmar","Wi-Fi e cabo — a confirmar"],
   ];
   container.innerHTML = '<label class="planning-field" for="build-network-accessory"><span class="sr-only">Wi-Fi / Rede</span><select id="build-network-accessory"' +
     (bloqueado ? ' disabled data-disabled-reason="Destranque a build para alterar o acessório de rede."' : '') + '>' +
@@ -57,24 +60,24 @@ function ajudaWifi() {
 
 export function redeFormulario(valor = {}) {
   const rede = normalizarRede(valor);
-  return {...rede,velocidadeMbps:rede.tipo === "wifi" && rede.possuiAcessorio === false ? 500 : null};
+  return {...rede,velocidadeMbps:["wifi","ambos"].includes(rede.tipo) && rede.possuiAcessorio === false ? 500 : null};
 }
-export function camposRede(valor,{prefixo = "rede",bloqueado = false} = {}) {
+export function camposRede(valor,{prefixo = "rede",bloqueado = false,comprimentosCabo = null} = {}) {
   const rede = normalizarRede(valor), disabled = bloqueado ? ' disabled data-disabled-reason="Destranque a build para alterar a conexão."' : "";
   const op = (valor,atual,texto) => '<option value="' + valor + '"' + (atual === valor ? " selected" : "") + '>' + texto + '</option>';
   const campo = (chave,texto,input) => '<label class="planning-field" for="' + prefixo + '-' + chave + '"><span>' + texto + '</span>' + input + '</label>';
   const input = (chave,maximo,placeholder) => '<input id="' + prefixo + '-' + chave + '" data-network="' + chave + '" type="number" min="0.01" max="' + maximo + '" step="any" inputmode="decimal" value="' + h(rede[chave] ?? "") + '" placeholder="' + placeholder + '"' + disabled + '>';
   return '<div class="network-fields">' +
-    campo("tipo","Como você pretende conectar o PC?",'<select id="' + prefixo + '-tipo" data-network="tipo"' + disabled + '>' + op("indefinido",rede.tipo,"Ainda não sei") + op("cabo",rede.tipo,"Cabo de rede") + op("wifi",rede.tipo,"Wi-Fi (sem fio)") + '</select>') +
+    campo("tipo","Como você pretende conectar o PC?",'<select id="' + prefixo + '-tipo" data-network="tipo"' + disabled + '>' + op("indefinido",rede.tipo,"Ainda não sei") + op("cabo",rede.tipo,"Cabo de rede") + op("wifi",rede.tipo,"Wi-Fi (sem fio)") + op("ambos",rede.tipo,"Wi-Fi e cabo de rede") + '</select>') +
     (rede.tipo === "indefinido" ? '<p class="planning-help">Você pode decidir depois. Essa escolha não altera a conclusão da build.</p>' :
-      campo("possuiAcessorio",rede.tipo === "wifi" ? "Quer incluir um adaptador Wi-Fi na montagem?" : "Quer incluir um cabo de rede na montagem?",'<select id="' + prefixo + '-possuiAcessorio" data-network="possuiAcessorio"' + disabled + '>' + op("confirmar",rede.possuiAcessorio === null ? "confirmar" : String(rede.possuiAcessorio),"Vou decidir depois") + op("false",String(rede.possuiAcessorio),rede.tipo === "cabo" ? "Sim, incluir um cabo de rede" : "Sim, incluir um adaptador Wi-Fi") + op("true",String(rede.possuiAcessorio),rede.tipo === "cabo" ? "Não incluir — já tenho um cabo" : "Não incluir — já tenho Wi-Fi no PC") + '</select>') +
-      (rede.tipo === "cabo" && rede.possuiAcessorio === false ? campo("comprimentoCaboM","Quantos metros de cabo você precisa?",input("comprimentoCaboM",1000,"Ex.: 10")) + '<p class="planning-help">Meça o caminho do roteador até o computador, incluindo curvas, para escolher um cabo que chegue até ele.</p>' : "") +
-      (rede.tipo === "wifi" ? '<p class="planning-help" data-network-wifi-help data-knowledge-beginner>' + ajudaWifi() + '</p>' : "") +
+      campo("possuiAcessorio",rede.tipo === "ambos" ? "Quer incluir o adaptador Wi-Fi e o cabo na montagem?" : rede.tipo === "wifi" ? "Quer incluir um adaptador Wi-Fi na montagem?" : "Quer incluir um cabo de rede na montagem?",'<select id="' + prefixo + '-possuiAcessorio" data-network="possuiAcessorio"' + disabled + '>' + op("confirmar",rede.possuiAcessorio === null ? "confirmar" : String(rede.possuiAcessorio),"Vou decidir depois") + op("false",String(rede.possuiAcessorio),rede.tipo === "ambos" ? "Sim, incluir Wi-Fi e cabo" : rede.tipo === "cabo" ? "Sim, incluir um cabo de rede" : "Sim, incluir um adaptador Wi-Fi") + op("true",String(rede.possuiAcessorio),rede.tipo === "ambos" ? "Não incluir — já tenho os dois" : rede.tipo === "cabo" ? "Não incluir — já tenho um cabo" : "Não incluir — já tenho Wi-Fi no PC") + '</select>') +
+      (["cabo","ambos"].includes(rede.tipo) && rede.possuiAcessorio === false ? campo("comprimentoCaboM",comprimentosCabo === null ? "Quantos metros de cabo você precisa?" : "Comprimento do cabo de rede CAT6",comprimentosCabo === null ? input("comprimentoCaboM",1000,"Ex.: 10") : '<select id="' + prefixo + '-comprimentoCaboM" data-network="comprimentoCaboM"' + disabled + '>' + op("",rede.comprimentoCaboM ?? "","Escolha um comprimento disponível") + comprimentosCabo.map(m=>op(m,rede.comprimentoCaboM,m + " m")).join("") + '</select>') + '<p class="planning-help">Meça o caminho do roteador até o computador, incluindo curvas, para escolher um cabo que chegue até ele.</p><p class="planning-help" data-cable-feedback role="status"></p>' : "") +
+      (["wifi","ambos"].includes(rede.tipo) ? '<p class="planning-help" data-network-wifi-help data-knowledge-beginner>' + ajudaWifi() + '</p>' : "") +
       (rede.possuiAcessorio === false ? '<p class="planning-help">Se não houver um acessório adequado no catálogo, avisaremos para você comprar esse item separadamente.</p>' : "")) + '</div>';
 }
-export function vincularRede(container,valor,{prefixo = "rede",bloqueado = false,aoRenderizar = () => {},aoAlterar = () => {}} = {}) {
+export function vincularRede(container,valor,{prefixo = "rede",bloqueado = false,comprimentosCabo = null,aoRenderizar = () => {},aoAlterar = () => {}} = {}) {
   let rede = redeFormulario(valor);
-  const desenhar = () => { container.innerHTML = camposRede(rede,{prefixo,bloqueado}); aoRenderizar(container); };
+  const desenhar = () => { container.innerHTML = camposRede(rede,{prefixo,bloqueado,comprimentosCabo}); aoRenderizar(container); };
   desenhar();
   const alterar = evento => {
     const chave = evento.target.dataset.network;

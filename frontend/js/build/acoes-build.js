@@ -3,14 +3,13 @@ import { cartoesOfertasHtml } from "./ofertas-peca.js";
 import { itensSelecionados, itensCategoria, informacoesRam } from "./estado.js";
 import { avaliarBuild } from "./compatibilidade.js";
 import { normalizarRede, resumoRede } from "./rede.js";
-import { iconeAnimado, iniciarIcones } from "../components/ui.js";
-import { hardwareBenchmark, hardwareBlender } from "../benchmark/hardware.js";
-import { painelBenchmarkHtml } from "../benchmark/painel.js";
-import { iniciarPainelBenchmark } from "../benchmark/interface.js";
-import { painelBlenderHtml, iniciarPainelBlender } from "../benchmark/blender.js";
+import { iniciarIcones } from "../components/ui.js";
+import { hardwareBlender } from "../benchmark/hardware.js";
+import { dashboardBenchmarkHtml, iniciarDashboardBenchmark } from "../benchmark/dashboard.js";
 import { catalogoBuilds } from "../api/build/builds.js";
 import { fetchComErro } from "../api/_shared/fetchComErro.js";
 import { compararCatalogosCompra } from "./compra-revalidacao.js";
+import { avaliarDisponibilidadeFps, avaliarDisponibilidadeBlender } from "../benchmark/disponibilidade.js";
 
 export function avisoCompraHtml() {
   return '<p class="purchase-notice">A BOOSTio não vende, entrega ou processa pagamentos de peças e periféricos. Os links abrem lojas de terceiros, responsáveis pela venda e pelo atendimento da compra. Confira preço, estoque, frete, garantia e devolução diretamente na loja.</p>';
@@ -55,27 +54,18 @@ export function abrirBenchmark(build,catalogo,{publica = false} = {}) {
   const peca = categoria => catalogo.find(p => p.id === itensCategoria(build,categoria)[0]?.id);
   const cpu = peca("processador"), gpu = peca("placa_video"), ram = informacoesRam(build,catalogo);
   const buildId = /^(?:s-)?[1-9][0-9]{0,17}$/.test(String(build.id)) ? String(build.id) : null;
-  const prefixo = "build-fpshq";
-  const dialogo = abrirDialogoBuild("Desempenho esperado",'<p class="planning-help">' + h(build.titulo) + '</p>' +
-    '<div class="benchmark-type-picker" role="group" aria-label="Escolha o tipo de teste"><button type="button" class="btn-secondary" data-benchmark-type="games" aria-pressed="false" aria-label="Selecionar teste de desempenho em jogos">' + iconeAnimado("gamepad") + '<span>Jogos · FPS</span></button><button type="button" class="btn-secondary" data-benchmark-type="blender" aria-pressed="false" aria-label="Selecionar teste de renderização no Blender">' + iconeAnimado("microchip") + '<span>Blender · Renderização</span></button></div><div data-benchmark-content><p class="planning-help">Escolha qual desempenho deseja consultar. Nenhum teste é executado no seu computador.</p></div>');
+  const prefixo = "build-benchmark";
+  const memoria = ram.itens.length && ram.itens.every(({peca}) => Number.isInteger(peca?.capacidade_gb) && peca.capacidade_gb > 0) ? ram.capacidade : null;
+  const dispositivos = hardwareBlender(cpu,gpu);
+  const disponibilidadeFps = avaliarDisponibilidadeFps(build,catalogo);
+  const disponibilidadeBlender = avaliarDisponibilidadeBlender(build,catalogo);
+  const hardware = disponibilidadeFps.permitido ? disponibilidadeFps.hardware : {motivo:disponibilidadeFps.motivo};
+  const dialogo = abrirDialogoBuild("Desempenho esperado",dashboardBenchmarkHtml({prefixo,titulo:build.titulo,
+    cpu:cpu ? nomePeca(cpu) : null,gpu:gpu ? nomePeca(gpu) : null,memoria,verificarRequisitos:Boolean(buildId),dispositivos,disponibilidadeBlender}));
   dialogo.classList.add("benchmark-dialog");
-  let limpar;
-  dialogo.querySelectorAll("[data-benchmark-type]").forEach(botao => botao.addEventListener("click",() => {
-    if (botao.disabled || botao.getAttribute("aria-pressed") === "true") return;
-    limpar?.();
-    dialogo.querySelectorAll("[data-benchmark-type]").forEach(outro => outro.setAttribute("aria-pressed",String(outro === botao)));
-    const conteudo = dialogo.querySelector("[data-benchmark-content]");
-    if (botao.dataset.benchmarkType === "games") {
-      const memoria = ram.itens.length && ram.itens.every(({peca}) => Number.isInteger(peca?.capacidade_gb) && peca.capacidade_gb > 0) ? ram.capacidade : null;
-      conteudo.innerHTML = painelBenchmarkHtml({prefixo,hardware:nomePeca(cpu) + " · " + (gpu ? nomePeca(gpu) : "Vídeo integrado"),memoria,verificarRequisitos:Boolean(buildId)});
-      limpar = iniciarPainelBenchmark(dialogo,{prefixo,hardware:hardwareBenchmark(cpu,gpu),buildId,publica});
-    } else {
-      const dispositivos = hardwareBlender(cpu,gpu);
-      conteudo.innerHTML = painelBlenderHtml(dispositivos);
-      limpar = iniciarPainelBlender(dialogo,dispositivos);
-    }
-  }));
-  dialogo.addEventListener("close",() => limpar?.(),{once:true});
+  const limpar = iniciarDashboardBenchmark(dialogo.querySelector("[data-benchmark-dashboard]"),
+    {prefixo,hardware,dispositivos,disponibilidadeBlender,buildId,publica});
+  dialogo.addEventListener("close",limpar,{once:true});
   return dialogo;
 }
 export function abrirCompraBuild(build,catalogo,{publica = false,loja,recarregar} = {}) {
@@ -128,8 +118,9 @@ export function conteudoCompra(build,catalogo,comparacao,loja) {
     +(indisponivel ? '<p class="planning-help" data-tone="warning">Referência indisponível ou sem preço/estoque confirmado no catálogo. Confira separadamente as ofertas de outras lojas, quando disponíveis.</p>' : '')
     + linksCompra(peca,loja,indisponivel) + '</article>').join("");
   const rede = normalizarRede(build.rede);
-  const extra = build.incluirRede && rede.tipo !== "indefinido" && rede.possuiAcessorio === false &&
-    !itens.some(({categoria}) => categoria === (rede.tipo === "cabo" ? "cabo_rede" : "adaptador_wifi")) ? '<div class="benchmark-empty"><strong>Acessório de rede a incluir</strong><p>' + h(resumoRede(rede)) + (rede.comprimentoCaboM ? ' · ' + rede.comprimentoCaboM + ' m' : '') + '. Escolha um produto com as especificações necessárias na loja. Esse acessório ainda não tem oferta cadastrada.</p></div>' : '';
+  const conexoes = rede.tipo === "ambos" ? [{...rede,tipo:"cabo"},{...rede,tipo:"wifi",comprimentoCaboM:null}] : [rede];
+  const extra = conexoes.map(rede => build.incluirRede && rede.tipo !== "indefinido" && rede.possuiAcessorio === false &&
+    !itens.some(({categoria}) => categoria === (rede.tipo === "cabo" ? "cabo_rede" : "adaptador_wifi")) ? '<div class="benchmark-empty"><strong>Acessório de rede a incluir</strong><p>' + h(resumoRede(rede)) + (rede.comprimentoCaboM ? ' · ' + rede.comprimentoCaboM + ' m' : '') + '. Escolha um produto com as especificações necessárias na loja. Esse acessório ainda não tem oferta cadastrada.</p></div>' : '').join("");
   return '<div class="purchase-totals"><div><span>Total de referência'+(comparacao.parcial?' (parcial)':'')+'</span><strong>'+moeda(comparacao.depois/100)+'</strong></div><p>Total anterior: '+moeda(comparacao.antes/100)
     +(comparacao.diferenca!=null?' · diferença: '+(comparacao.diferenca>0?'+':comparacao.diferenca<0?'−':'')+moeda(Math.abs(comparacao.diferenca)/100):' · diferença completa indisponível')+'</p></div><p class="purchase-total-note">Sem frete. Os valores são referências do catálogo; cada loja pode ter um preço diferente.</p><div class="build-purchase-list">'+linhas+'</div>'+extra;
 }

@@ -66,3 +66,7 @@ envie uma mensagem de teste em um canal comum, edite e exclua. Verifique os dois
 eventos no canal privado. Não espere conteúdo anterior de mensagens enviadas
 antes de iniciar o bot ou que saíram do cache. Confira que alterações em
 canais privados da equipe não são copiadas para os registros.
+
+## Fotos de setups
+
+O BOTio reage com 🔥 às mensagens com anexos de imagem de pessoas no canal `1570588343807516733`. Não reage a texto, vídeos, bots, DMs ou outros canais. Não baixa nem armazena as imagens. `DISCORD_SETUPS_CHANNEL_ID` permite alterar o canal; vazio desativa. Reinicie o bot após atualizar. Mantenha Message Content Intent ativado no Discord Developer Portal e permita Ver canal, Ler histórico de mensagens e Adicionar reações ao bot nesse canal.

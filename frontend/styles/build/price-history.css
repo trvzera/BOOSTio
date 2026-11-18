@@ -18,10 +18,22 @@
 .price-history-stats dt { margin-bottom: 6px; color: var(--cor-4); font: 400 .75rem/1.5 var(--font-body); }
 .price-history-stats dd { margin: 0; overflow-wrap: anywhere; font: 500 clamp(1rem,2vw,1.375rem)/1.5 var(--font-heading); font-variant-numeric: tabular-nums; }
 .price-history-figure { margin: 0; }
+.price-history-plot { position: relative; min-width: 0; cursor: crosshair; border-radius: 8px; }
+.price-history-plot:focus-visible { outline: 2px solid var(--text-accent); outline-offset: 6px; }
 .price-history-chart { display: block; width: 100%; height: 180px; overflow: visible; }
 .price-history-grid { fill: none; stroke: var(--glass-border); stroke-dasharray: 3 5; vector-effect: non-scaling-stroke; }
 .price-history-line { fill: none; stroke: var(--cor-p1); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .price-history-point { fill: var(--cor-p1); }
+.price-history-guide { stroke: var(--text-accent); stroke-width: 1; stroke-dasharray: 3 4; vector-effect: non-scaling-stroke; opacity: .65; }
+.price-history-halo { fill: var(--cor-p1); opacity: .2; }
+.price-history-active-point { fill: var(--cor-p1); stroke: var(--cor-6); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.price-history-line { transition: filter .16s ease; }
+.is-inspecting .price-history-line { filter: drop-shadow(0 0 3px #007bff66); }
+.price-history-tooltip { position: absolute; z-index: 1; display: grid; gap: 4px; max-width: calc(100% - 16px); padding: 10px 14px; border: 1px solid var(--glass-border); border-radius: 12px; background: #111318; box-shadow: 0 8px 24px #0006; pointer-events: none; font: 400 .75rem/1.5 var(--font-body); }
+.price-history-tooltip[hidden] { display: none; }
+.price-history-tooltip span { color: var(--cor-4); }
+.price-history-tooltip strong { color: var(--cor-6); font: 500 .9375rem/1.5 var(--font-heading); font-variant-numeric: tabular-nums; white-space: nowrap; }
+@media(prefers-reduced-motion:reduce) { .price-history-line { transition: none; } }
 .price-history-dates { display: flex; justify-content: space-between; gap: 12px; margin-block: 8px 16px; color: var(--cor-4); font: 400 .75rem/1.5 var(--font-body); }
 .price-history-figure figcaption { max-width: 75ch; }
 .price-history-records { margin-top: var(--espacamento-20); border-top: 1px solid var(--glass-border); }

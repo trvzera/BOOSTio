@@ -1,5 +1,9 @@
-export const MINIMO_PC_GERACAO = 2000;
+import { minimoUso } from "./perfis-uso.js";
+
+export const MINIMO_PC_GERACAO = 2500;
 export const MINIMO_PERIFERICOS_GERACAO = 500;
+export const MINIMO_PERCENTUAL_PERIFERICOS = 10;
+export const MAXIMO_PERCENTUAL_PERIFERICOS = 40;
 
 export function orcamentoValido(valor) {
   return typeof valor === "number" && Number.isFinite(valor) && valor > 0 && valor <= 1000000 &&
@@ -14,12 +18,14 @@ export function dividirOrcamento(total, percentual) {
 }
 
 
-export function avaliarOrcamentoGeracao(total, percentual = 0) {
+export function avaliarOrcamentoGeracao(total, percentual = 0, objetivo) {
+  if (percentual !== 0 && (!Number.isInteger(percentual) || percentual < MINIMO_PERCENTUAL_PERIFERICOS || percentual > MAXIMO_PERCENTUAL_PERIFERICOS)) return {valido:false,motivo:"perifericos",mensagem:"Escolha uma porcentagem inteira entre 10% e 40% do orçamento total para os periféricos."};
+  const minimo = objetivo ? minimoUso(objetivo) : MINIMO_PC_GERACAO;
   const divisao = dividirOrcamento(total, percentual);
-  if (!divisao) return {valido:false,motivo:"orcamento",mensagem:"Informe um orçamento válido e uma porcentagem inteira de 0 a 99."};
-  const minimoTotal = Math.ceil(Math.max(MINIMO_PC_GERACAO * 100 / (100 - percentual), percentual ? MINIMO_PERIFERICOS_GERACAO * 100 / percentual : 0) / 100) * 100;
-  if (divisao.pc < MINIMO_PC_GERACAO) return {valido:false,motivo:"orcamento",minimoTotal,...divisao,
-    mensagem:"Reserve pelo menos R$ 2.000 para o PC, depois de descontar os periféricos."};
+  if (!divisao) return {valido:false,motivo:"orcamento",mensagem:"Informe um orçamento válido, positivo e com no máximo duas casas decimais."};
+  const minimoTotal = Math.ceil(Math.max(minimo * 100 / (100 - percentual), percentual ? MINIMO_PERIFERICOS_GERACAO * 100 / percentual : 0) * 100) / 100;
+  if (divisao.pc < minimo) return {valido:false,motivo:"orcamento",minimoTotal,...divisao,
+    mensagem:`Reserve pelo menos ${minimo.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})} para o PC, depois de descontar os periféricos.`};
   if (percentual && divisao.perifericos < MINIMO_PERIFERICOS_GERACAO) return {valido:false,motivo:"perifericos",minimoTotal,...divisao,
     mensagem:"Reserve pelo menos R$ 500 para periféricos novos. O conjunto do catálogo pode exigir mais."};
   return {valido:true,minimoTotal,...divisao};

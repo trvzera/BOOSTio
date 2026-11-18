@@ -82,5 +82,5 @@ export function iniciarRequisitosBuild(raiz,{prefixo,buildId,cliente,publica = f
   }
   const aoVerificar = () => { if (!botao.disabled && jogo.reportValidity()) verificar(jogo.value).catch(() => {}); };
   botao.addEventListener("click",aoVerificar); jogo.addEventListener("change",limpar);
-  return {verificar,destruir() { ativo = false; limpar(); botao.removeEventListener("click",aoVerificar); jogo.removeEventListener("change",limpar); }};
+  return {verificar,limpar,destruir() { ativo = false; limpar(); botao.removeEventListener("click",aoVerificar); jogo.removeEventListener("change",limpar); }};
 }

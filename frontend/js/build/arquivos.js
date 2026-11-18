@@ -75,7 +75,7 @@ function validarMetadados(build) {
     if (!objeto(rede)) falhar("Rede inválida.");
     const campos = ["tipo","possuiAcessorio","velocidadeMbps","comprimentoCaboM","custoPrevisto"];
     if (Object.keys(rede).some(c => !campos.includes(c))) falhar("Campo de rede inválido.");
-    if (tem(rede,"tipo") && !["indefinido","cabo","wifi"].includes(rede.tipo)) falhar("Tipo de rede inválido.");
+    if (tem(rede,"tipo") && !["indefinido","cabo","wifi","ambos"].includes(rede.tipo)) falhar("Tipo de rede inválido.");
     if (tem(rede,"possuiAcessorio") && rede.possuiAcessorio !== null && typeof rede.possuiAcessorio !== "boolean")
       falhar("possuiAcessorio deve ser booleano ou null.");
     for (const [campo,maximo] of [["velocidadeMbps",100000],["comprimentoCaboM",1000],["custoPrevisto",100000]]) {

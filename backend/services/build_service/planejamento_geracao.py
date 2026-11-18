@@ -1,6 +1,8 @@
 from decimal import Decimal, ROUND_CEILING
 
-MINIMO_PC = Decimal("2000")
+from services.validacoes_service.requisitos_uso_service import RequisitosUsoService
+
+MINIMO_PC = Decimal("2500")
 MINIMO_PERIFERICOS = Decimal("500")
 
 
@@ -24,13 +26,22 @@ class RecusaModeloBuild(ValueError):
         super().__init__("A IA não encontrou uma configuração válida para o pedido.")
 
 
-def validar_minimos(pc, perifericos, percentual):
-    sugerido = sugerir_total(percentual)
-    if pc < MINIMO_PC:
+def validar_percentual(percentual):
+    if type(percentual) is not int or percentual != 0 and not 10 <= percentual <= 40:
+        raise ErroPlanejamentoBuild("Escolha uma porcentagem inteira entre 10% e 40% do orçamento total para os periféricos, ou 0 se não comprar novos periféricos.",
+                                   "perifericos", "A porcentagem deve ficar entre 10% e 40%", "perifericos")
+    return percentual
+
+
+def validar_minimos(pc, perifericos, percentual, utilidade=None):
+    validar_percentual(percentual)
+    minimo = Decimal(str(RequisitosUsoService.minimo_pc(utilidade)))
+    sugerido = sugerir_total(percentual, minimo_pc=minimo)
+    if pc < minimo:
         raise ErroPlanejamentoBuild(
-            f"Reserve pelo menos R$ {MINIMO_PC:.2f} para as peças do PC, depois de descontar os periféricos. "
-            f"O valor disponível para o PC é R$ {pc:.2f}. Esse mínimo não garante uma montagem para todos os objetivos.",
-            "orcamento", "O valor disponível para o PC está abaixo do mínimo", "orcamento", sugerido)
+            f"Reserve pelo menos R$ {minimo:.2f} para as peças do PC para este uso, depois de descontar os periféricos. "
+            f"O valor disponível para o PC é R$ {pc:.2f}. Esse mínimo não garante todas as opções do catálogo.",
+            "orcamento", "O valor disponível para o PC está abaixo do mínimo do uso", "orcamento", sugerido)
     if percentual and perifericos < MINIMO_PERIFERICOS:
         raise ErroPlanejamentoBuild(
             f"A reserva para periféricos novos deve ser de pelo menos R$ {MINIMO_PERIFERICOS:.2f}. "

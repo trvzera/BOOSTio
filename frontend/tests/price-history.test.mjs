@@ -1,10 +1,31 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { normalizarHistoricoPrecos, filtrarHistoricoPrecos, historicoPrecosHtml } from "../js/build/price-history.js";
+import { normalizarHistoricoPrecos, filtrarHistoricoPrecos, historicoPrecosHtml, indiceHistoricoMaisProximo } from "../js/build/price-history.js";
 import { fichaTecnica } from "../js/build/catalogo.js";
 
 const agora = Date.parse("2026-11-02T12:00:00Z");
 const registro = (data, preco, extras = {}) => ({data, preco, loja:"kabum", ...extras});
+
+test("hover escolhe a data mais próxima, respeitando intervalos irregulares e limites", () => {
+  const registros = [0,2,20,23].map(instante => ({instante,preco:500}));
+  for (const [instante,indice] of [[-100,0],[0,0],[1,0],[2,1],[10,1],[19,2],[22,3],[100,3]]) {
+    assert.equal(indiceHistoricoMaisProximo(registros,instante),indice);
+  }
+  assert.equal(indiceHistoricoMaisProximo([],0),-1);
+  assert.equal(indiceHistoricoMaisProximo(registros,NaN),-1);
+  assert.equal(indiceHistoricoMaisProximo([{instante:20}],100),0);
+});
+
+test("gráfico oferece marcador e tooltip sem perder a tabela acessível", () => {
+  const html = historicoPrecosHtml({historico_precos:[registro("2026-11-01",500),registro("2026-11-02",700)]},agora);
+  assert.match(html,/data-history-plot tabindex="0" role="group"/);
+  assert.match(html,/data-history-marker visibility="hidden"/);
+  assert.match(html,/data-history-tooltip[^>]*hidden/);
+  assert.match(html,/data-history-date/);
+  assert.match(html,/data-history-price/);
+  assert.match(html,/Use as setas esquerda e direita/);
+  assert.match(html,/<table>/);
+});
 
 test("histórico ausente não transforma preço atual ou demonstrativo em cotações anteriores", () => {
   for (const historico_precos of [undefined, null, {}, "texto", []]) {

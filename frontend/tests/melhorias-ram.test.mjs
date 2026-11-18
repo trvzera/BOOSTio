@@ -10,6 +10,11 @@ const catalogo = [placa,ram,outra,kit];
 const base = () => ({titulo:'QA',componentes:{placa_mae:{id:placa.id,quantidade:1},memoria_ram:[{id:ram.id,quantidade:1}]},compatibilidade:{erros:[{codigo:'ram-slots',mensagem:'Diagnóstico anterior'}]}});
 const propor = (itens,modo='adicionar',build=base(),pecas=catalogo) => planejarMelhoriaRam(build,pecas,{modo,itens});
 
+test('substituição equivalente não é recomendada só por ser outro modelo',()=>{
+  const equivalente={...ram,id:'memoria_ram:igual'};
+  assert.throws(()=>propor([{id:equivalente.id,quantidade:1}],'substituir',base(),[placa,ram,equivalente]),/equivalente/);
+});
+
 test('RAM pode acrescentar o mesmo modelo sem remover a atual e cobra somente a compra',()=>{
   const build=base(),antes=structuredClone(build);
   const resultado=propor([{id:ram.id,quantidade:1}],'adicionar',build);
@@ -34,7 +39,8 @@ test('kits contam pentes por kit e capacidade por item, sem multiplicar GB pelos
 
 test('substituir é explícito e pode usar dois pentes em lugar de quatro sem reduzir capacidade',()=>{
   const build=base();build.componentes.memoria_ram[0].quantidade=4;
-  const resultado=propor([{id:kit.id,quantidade:1}],'substituir',build);
+  const melhorKit={...kit,frequencia_mhz:3600};
+  const resultado=propor([{id:kit.id,quantidade:1}],'substituir',build,[placa,ram,outra,melhorKit]);
   assert.deepEqual(resultado.build.componentes.memoria_ram,[{id:kit.id,quantidade:1}]);
   assert.equal(resultado.pentes,2);assert.equal(resultado.capacidadeGb,32);
   assert.throws(()=>propor([{id:ram.id,quantidade:1}],'substituir',build),/reduziria/);

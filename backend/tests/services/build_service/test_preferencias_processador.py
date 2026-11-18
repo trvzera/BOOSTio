@@ -7,6 +7,8 @@ import pytest
 from services.build_service.amostrar_catalogo_service import AmostrarCatalogoService
 from services.build_service.preferencias_processador_service import PreferenciasProcessadorService as CPUs
 from services.build_service.criar_build_service import CriarBuildService
+from services.validacoes_service.validar_pedido_build_service import validar_preferencia_processador
+from models import Usuario
 
 
 CATALOGO = {
@@ -69,3 +71,44 @@ def test_prompt_informa_prioridade_e_excecoes_sem_afirmar_superioridade_universa
     dados["utilidade"] = "Estudos"
     prompt = criar_prompt(dados, 8000, 2000, CATALOGO)
     assert '"processadores_ryzen_prioritarios": []' in prompt
+
+
+@pytest.mark.parametrize("marca,ids", [("intel", [1]), ("amd", [2]), ("sem-preferencia", [])])
+def test_preferencia_explicita_substitui_regra_de_jogos_e_chega_ao_prompt(marca, ids):
+    dados = dict(nome="PC", descricao="Teste", utilidade="Jogos", preferencia_processador=marca)
+    prompt = criar_prompt(dados, 8000, 2000, CATALOGO, preferencia_neutra=True)
+    pedido = json.loads(prompt.split("# PEDIDO\n")[1].split("\n")[0])
+    restricoes = json.loads(prompt.split("# RESTRIÇÕES CALCULADAS PELO SERVIDOR\n")[1].split("\n")[0])
+    assert pedido["preferencia_processador"] == marca
+    assert restricoes["processadores_marca_preferida"] == ids
+    assert restricoes["processadores_ryzen_prioritarios"] == []
+    if marca != "sem-preferencia":
+        assert "não se aplica à placa de vídeo" in prompt
+        assert "A marca escolhida é obrigatória" in prompt
+
+
+@pytest.mark.parametrize("marca", [None, "", "Intel", "nvidia", [], {}, True, 1])
+def test_marca_invalida_rejeitada_antes_de_acessar_usuario(marca, mocker):
+    buscar = mocker.patch.object(Usuario, "buscar_por_id")
+    with pytest.raises(ValueError, match="preferência de processador"):
+        CriarBuildService().executar(1, dict(nome="PC", descricao="Teste", utilidade="Jogos",
+                                           orcamento=8000, preferencia_processador=marca))
+    buscar.assert_not_called()
+
+
+def test_preferencia_nao_recompra_cpu_nem_forca_socket_em_placa_propria():
+    assert validar_preferencia_processador({}) == "sem-preferencia"
+    propria = {"placa_mae": {"especificacoes_confirmadas": {"socket": "AM4"}}}
+    assert CPUs.ids_prioritarios(CATALOGO, "Jogos", propria, preferencia="intel") == []
+    assert CPUs.ids_prioritarios(CATALOGO, "Estudos", propria, preferencia="amd") == [2]
+    assert CPUs.ids_prioritarios(CATALOGO, "Estudos", {"processador": {}}, preferencia="intel") == []
+
+
+@pytest.mark.parametrize("marca", ["intel", "amd"])
+def test_amostra_preserva_opcoes_da_marca_em_faixas_de_preco_sem_excluir_fallback(marca):
+    outras = [{"id": i, "fabricante": "Outra", "modelo": str(i), "soquete": "AM4", "preco": 100+i*50} for i in range(1, 40)]
+    preferidas = [{"id": 40+i, "fabricante": marca.upper(), "modelo": str(i), "soquete": "LGA1700" if marca == "intel" else "AM4", "preco": preco} for i, preco in enumerate([700, 1200, 1800])]
+    amostra = AmostrarCatalogoService().executar("processador", outras + preferidas, utilidade="Estudos", preferencia_processador=marca)
+    assert {40, 41, 42} <= {p["id"] for p in amostra}
+    assert any(p["fabricante"] == "Outra" for p in amostra)
+    assert len(amostra) == 12

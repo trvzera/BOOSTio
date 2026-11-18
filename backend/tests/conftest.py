@@ -1,5 +1,5 @@
 import pytest
-from compat_oferta import instalar as _instalar_compat_oferta
+from .compat_oferta import instalar as _instalar_compat_oferta
 
 _instalar_compat_oferta()
 from models import Usuario

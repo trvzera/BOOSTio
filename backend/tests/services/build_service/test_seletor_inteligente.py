@@ -35,27 +35,42 @@ def ids(dados):
     return [p['id'] for p in SeletorInteligenteService().executar(dados)['componentes_selecionados']]
 
 
+def test_marca_restringe_cpu_sem_aplicar_a_gpu_e_nao_troca_silenciosamente(banco):
+    intel = inserir(500, 10000, fabricante="Intel", soquete="LGA1700")
+    amd = inserir(600, 15000, fabricante="AMD")
+    gpu = inserir(300, 8000, gpu=True, fabricante="NVIDIA")
+    dados = dict(orcamento=4000, prioridade_montagem="desempenho")
+    assert ids({**dados, "preferencia_processador": "intel"}) == [intel, gpu]
+    assert ids({**dados, "preferencia_processador": "amd"}) == [amd, gpu]
+    assert set(ids({**dados, "preferencia_processador": "sem-preferencia"})) == {intel, amd, gpu}
+    db.session.query(Processador).filter_by(fabricante="Intel").delete()
+    db.session.commit()
+    with pytest.raises(ValueError,match="marca escolhida"):
+        SeletorInteligenteService().executar({**dados, "preferencia_processador": "intel"})
+
+
+
 @pytest.mark.parametrize('gpu', [False, True])
 def test_desempenho_e_custo_beneficio_ordenam_por_metricas_distintas(banco, gpu):
     barato = inserir(500, 10000, gpu)
     rapido = inserir(1000, 15000, gpu)
-    dados = dict(orcamento=2000, prioridade_montagem='desempenho')
+    dados = dict(orcamento=2500, prioridade_montagem='desempenho')
     assert ids(dados) == [rapido, barato]
     assert ids({**dados, 'prioridade_montagem': 'custo_beneficio'}) == [barato, rapido]
-    assert ids(dict(orcamento=2000, preferencias='custo-beneficio')) == [barato, rapido]
+    assert ids(dict(orcamento=2500, preferencias='custo-beneficio')) == [barato, rapido]
 
 
 @pytest.mark.parametrize('gpu', [False, True])
 def test_filtros_excluem_preco_invalido_esgotado_sem_benchmark_e_outro_teste(banco, gpu):
     valido = inserir(1000, 15000, gpu)
-    for preco, score, extras in [(1201, 50000, {}), (0, 20000, {}), (-1, 20000, {}),
+    for preco, score, extras in [(1701, 50000, {}), (0, 20000, {}), (-1, 20000, {}),
                                   (500, None, {}), (500, 0, {}), (500, -10, {}),
                                   (500, 20000, {'esgotado': True}),
                                   (500, 20000, {'benchmark_teste': 'Outro teste'}),
                                   (500, 20000, {'benchmark_versao': '10'}),
                                   (500, 20000, {'benchmark_teste': None})]:
         inserir(preco, score, gpu, **extras)
-    assert ids(dict(orcamento=2000, preferencias='desempenho')) == [valido]
+    assert ids(dict(orcamento=2500, preferencias='desempenho')) == [valido]
 
 
 def test_categoria_limite_e_desempate_deterministico(banco):
@@ -63,7 +78,7 @@ def test_categoria_limite_e_desempate_deterministico(banco):
     b = inserir(500, 10000)
     menor = inserir(250, 5000)
     inserir(100, 50000, gpu=True)
-    dados = dict(orcamento=Decimal('2000'), preferencias='desempenho', categoria='processador',
+    dados = dict(orcamento=Decimal('2500'), preferencias='desempenho', categoria='processador',
                  limite=1)
     assert ids(dados) == [a]
     assert ids({**dados, 'limite': 2}) == [a, menor]
@@ -84,7 +99,7 @@ def test_validacao_antes_de_acessar_banco(dados):
 def test_lista_cpu_gpu_sem_pontuacao_minima_e_nao_altera_banco(banco):
     cpu = inserir(500, 12000)
     gpu = inserir(500, 30000, gpu=True)
-    assert ids(dict(orcamento=2000, preferencias='desempenho')) == [cpu, gpu]
+    assert ids(dict(orcamento=2500, preferencias='desempenho')) == [cpu, gpu]
     assert Processador.query.count() == PlacaVideo.query.count() == 1
     assert Processador.query.one().preco == 500
     assert PlacaVideo.query.one().benchmark_g3d == 30000
@@ -98,9 +113,9 @@ def test_teto_usa_margem_da_montagem_em_vez_do_orcamento_total(banco):
 
 
 def test_reserva_perifericos_limita_pc_sem_transferir_sobra(banco):
-    dentro = inserir(2000, 10000)
-    inserir(2000.01, 50000)
-    assert ids(dict(orcamento=5000, percentual_perifericos=60, preferencias='desempenho')) == [dentro]
+    dentro = inserir(3000, 10000)
+    inserir(3000.01, 50000)
+    assert ids(dict(orcamento=5000, percentual_perifericos=40, preferencias='desempenho')) == [dentro]
 
 
 @pytest.mark.parametrize('dados', [
@@ -120,8 +135,8 @@ def test_custo_beneficio_ordena_pontos_por_real_antes_de_aplicar_limite(banco, g
     alto = inserir(1000, 15000, gpu)
     melhor = inserir(800, 20000, gpu)
     intermediario = inserir(500, 10000, gpu)
-    inserir(1201, 100000, gpu)
-    resultado = ids(dict(orcamento=2000, prioridade_montagem='custo_beneficio', limite=3))
+    inserir(1701, 100000, gpu)
+    resultado = ids(dict(orcamento=2500, prioridade_montagem='custo_beneficio', limite=3))
     assert resultado == [melhor, intermediario, alto]
 
 
@@ -130,7 +145,7 @@ def test_empate_custo_beneficio_prioriza_menor_preco_depois_id(banco, gpu):
     alto = inserir(1000, 20000, gpu)
     primeiro = inserir(500, 10000, gpu)
     segundo = inserir(500, 10000, gpu)
-    resultado = ids(dict(orcamento=2000, prioridade_montagem='custo_beneficio', limite=3))
+    resultado = ids(dict(orcamento=2500, prioridade_montagem='custo_beneficio', limite=3))
     assert resultado == [primeiro, segundo, alto]
 
 
@@ -419,7 +434,7 @@ def test_reserva_independente_de_perifericos_nao_recebe_teto_do_pc(banco):
     campos = dict(conexao='HDMI', tamanho_polegadas=24, resolucao='1920x1080', taxa_atualizacao_hz=60, tipo_painel='IPS')
     barato = salvar_modelo(Monitor, 1000, **campos)
     caro = salvar_modelo(Monitor, 3000, **campos)
-    r = ids(dict(orcamento=10000, percentual_perifericos=75, utilidade='Jogos', prioridade_montagem='desempenho'))
+    r = ids(dict(orcamento=10000, percentual_perifericos=40, utilidade='Jogos', prioridade_montagem='desempenho'))
     assert {barato, caro} <= set(r)
 
 

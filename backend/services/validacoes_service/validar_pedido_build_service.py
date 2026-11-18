@@ -23,7 +23,7 @@ def validar_orcamento(valor):
 
 
 def validar_rede(rede):
-  if not isinstance(rede, dict) or rede.get("tipo", "indefinido") not in ("wifi", "cabo", "indefinido"):
+  if not isinstance(rede, dict) or rede.get("tipo", "indefinido") not in ("wifi", "cabo", "ambos", "indefinido"):
     raise ValueError("Dados de rede inválidos")
   if rede.get("possuiAcessorio") is not None and type(rede["possuiAcessorio"]) is not bool:
     raise ValueError("Informe se já possui o acessório de rede")
@@ -38,6 +38,13 @@ def validar_prioridade_montagem(dados):
   if prioridade not in ("custo_beneficio", "desempenho"):
     raise ValueError("A prioridade da montagem deve ser custo_beneficio ou desempenho")
   return prioridade
+
+
+def validar_preferencia_processador(dados):
+  marca = dados.get("preferencia_processador", "sem-preferencia")
+  if marca not in ("sem-preferencia", "intel", "amd"):
+    raise ValueError("A preferência de processador deve ser intel, amd ou sem-preferencia")
+  return marca
 
 
 def validar_textos_pedido(dados):

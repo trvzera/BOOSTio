@@ -1,0 +1,1131 @@
+{
+  "fonte": "banco local, leitura sem alterações",
+  "data": "16/11/2026",
+  "pecas": [
+    {
+      "id": "gabinete:1",
+      "categoria": "gabinete",
+      "fabricante": "Cooler Master",
+      "modelo": "MasterBox Q300L",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:2",
+      "categoria": "gabinete",
+      "fabricante": "Cooler Master",
+      "modelo": "MasterBox TD500",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:3",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Galaxy Glass M Mini",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:4",
+      "categoria": "gabinete",
+      "fabricante": "Liketec",
+      "modelo": "MAD Rock Black",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:5",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Prisma Glass 01",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": false
+    },
+    {
+      "id": "gabinete:6",
+      "categoria": "gabinete",
+      "fabricante": "Liketec",
+      "modelo": "Zeus V3",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": false
+    },
+    {
+      "id": "gabinete:7",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Galaxy Glass",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:8",
+      "categoria": "gabinete",
+      "fabricante": "Liketec",
+      "modelo": "Matrix V2",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:9",
+      "categoria": "gabinete",
+      "fabricante": "Husky",
+      "modelo": "Dome 10",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:10",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Glass 06X",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:11",
+      "categoria": "gabinete",
+      "fabricante": "Cooler Master",
+      "modelo": "MasterBox NR200",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:12",
+      "categoria": "gabinete",
+      "fabricante": "Cooler Master",
+      "modelo": "MasterBox MB520",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:13",
+      "categoria": "gabinete",
+      "fabricante": "Liketec",
+      "modelo": "Dasha V2",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:14",
+      "categoria": "gabinete",
+      "fabricante": "K-mex",
+      "modelo": "Aquário Cg-02kv Com Monitor",
+      "porte_referencia": null,
+      "estilo_referencia": "panoramico",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:15",
+      "categoria": "gabinete",
+      "fabricante": "Liketec",
+      "modelo": "Hurricane",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": false
+    },
+    {
+      "id": "gabinete:16",
+      "categoria": "gabinete",
+      "fabricante": "PCYES",
+      "modelo": "Kauri Black Vulcan",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:17",
+      "categoria": "gabinete",
+      "fabricante": "KALKAN",
+      "modelo": "Saga",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:18",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Wave White",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "branco"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:19",
+      "categoria": "gabinete",
+      "fabricante": "Husky",
+      "modelo": "Dome 210",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:20",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Z3 Glass",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:21",
+      "categoria": "gabinete",
+      "fabricante": "Duex",
+      "modelo": "Aquario",
+      "porte_referencia": null,
+      "estilo_referencia": "panoramico",
+      "disponivel": false
+    },
+    {
+      "id": "gabinete:22",
+      "categoria": "gabinete",
+      "fabricante": "Concordia",
+      "modelo": "Pz-LED Com Tela Frontal",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:23",
+      "categoria": "gabinete",
+      "fabricante": "Aerocool",
+      "modelo": "Cylon",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:24",
+      "categoria": "gabinete",
+      "fabricante": "Hayom",
+      "modelo": "Gabinete Gamer Preto Aquário",
+      "porte_referencia": null,
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:25",
+      "categoria": "gabinete",
+      "fabricante": "KALKAN",
+      "modelo": "Midgard Lite Wind",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:26",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Galaxy Glass Standard V2",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:27",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Wave Black",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": false
+    },
+    {
+      "id": "gabinete:28",
+      "categoria": "gabinete",
+      "fabricante": "Hyte",
+      "modelo": "Y70 Touch Infinite",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:29",
+      "categoria": "gabinete",
+      "fabricante": "Lian Li",
+      "modelo": "O11 Dynamic",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:30",
+      "categoria": "gabinete",
+      "fabricante": "Husky",
+      "modelo": "Dome 110",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": false
+    },
+    {
+      "id": "gabinete:31",
+      "categoria": "gabinete",
+      "fabricante": "Redragon",
+      "modelo": "Wideload Pro",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:32",
+      "categoria": "gabinete",
+      "fabricante": "Liketec",
+      "modelo": "Cygnus Dark",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:33",
+      "categoria": "gabinete",
+      "fabricante": "Redragon",
+      "modelo": "Wideload Extreme",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:34",
+      "categoria": "gabinete",
+      "fabricante": "Liketec",
+      "modelo": "Quest",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:35",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Galaxy Full Glass X Mid Tower",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:36",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "X5 Glass",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:37",
+      "categoria": "gabinete",
+      "fabricante": "PCYES",
+      "modelo": "Velyr Black Vulcan",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:38",
+      "categoria": "gabinete",
+      "fabricante": "1StPlayer",
+      "modelo": "GM7",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:39",
+      "categoria": "gabinete",
+      "fabricante": "HYRAX",
+      "modelo": "HGB210",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:40",
+      "categoria": "gabinete",
+      "fabricante": "Deepcool",
+      "modelo": "Matrexx 55",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:41",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "X4 Glass",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:42",
+      "categoria": "gabinete",
+      "fabricante": "HYRAX",
+      "modelo": "HGB750",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:43",
+      "categoria": "gabinete",
+      "fabricante": "NZXT",
+      "modelo": "H5 Flow",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": false
+    },
+    {
+      "id": "gabinete:44",
+      "categoria": "gabinete",
+      "fabricante": "Corsair",
+      "modelo": "2000D",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:45",
+      "categoria": "gabinete",
+      "fabricante": "KALKAN",
+      "modelo": "Midgard Lite",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:46",
+      "categoria": "gabinete",
+      "fabricante": "Liketec",
+      "modelo": "Mad Rock",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:47",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Glass 06X Frost",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:48",
+      "categoria": "gabinete",
+      "fabricante": "K-mex",
+      "modelo": "Mesh Cg-02c5",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:49",
+      "categoria": "gabinete",
+      "fabricante": "Hayom",
+      "modelo": "Com 4 Fan",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:50",
+      "categoria": "gabinete",
+      "fabricante": "Husky",
+      "modelo": "Dome 100",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:51",
+      "categoria": "gabinete",
+      "fabricante": "Vinik",
+      "modelo": "Gamer Vinik Murk Mid Tower Lateral Acrílico - Ggmacbk",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:52",
+      "categoria": "gabinete",
+      "fabricante": "Brazil PC",
+      "modelo": "N110matx, Mini Tower, Micro-ATX, Sem Fonte, Preto",
+      "porte_referencia": "mini-tower",
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:53",
+      "categoria": "gabinete",
+      "fabricante": "Pixxo",
+      "modelo": "Gamer Cg200b Preto Pixxo",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:54",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Office Rise Mode X1 White, Mini Tower, M-ATX, Sem FANs, Branco - RM-GA-OFX1-FW",
+      "porte_referencia": "mini-tower",
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "branco"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:55",
+      "categoria": "gabinete",
+      "fabricante": "Liketec",
+      "modelo": "Gamer Liketec Heydar Dark, Mid Tower, ATX, Lateral e Frontal em Vidro Temperado, Sem Fan ,Preto - LC-CB-HEYDAR",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:56",
+      "categoria": "gabinete",
+      "fabricante": "Hayom",
+      "modelo": "Gamer Hayom GB1724, Mid Tower, ATX, Lateral em Vidro Temperado, Sem FANs, Preto - GB1724",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "vidro",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:57",
+      "categoria": "gabinete",
+      "fabricante": "Fortrek",
+      "modelo": "Office Fortrek Go22 Premium Preto",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:58",
+      "categoria": "gabinete",
+      "fabricante": "KALKAN",
+      "modelo": "Gamer Kalkan Avalon, Mid Tower, Lateral em Vidro, Micro ATX, Preto - KLK00036",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "vidro",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:59",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Gamer Rise Mode Glass 06X, Mid Tower, ATX, Lateral em Vidro Fumê e Frontal em Vidro Temperado, Sem FANs, Preto",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:60",
+      "categoria": "gabinete",
+      "fabricante": "Hayom",
+      "modelo": "Gamer Hayom Gb1749, 4 Fans RGB, Atx/M-atx, Lateral E Frontal Em Vidro Temperado, Preto",
+      "porte_referencia": null,
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:61",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Gamer Rise Mode Crystal Glass 01, Mid Tower, Lateral e Frontal em vidro, Preto - RM-CA-CY-01-FB",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:62",
+      "categoria": "gabinete",
+      "fabricante": "Hayom",
+      "modelo": "Gamer HAYOM GB1727, Mid Tower, Lateral em Vidro, com 3X Fans, Preto - GB.17.10.27",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "vidro",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:63",
+      "categoria": "gabinete",
+      "fabricante": "Liketec",
+      "modelo": "Gamer Liketec Storm, Mid Tower, Rainbow, ATX, Lateral em Vidro Temperado 3 Ventoinhas, Preto - LC-MT-STORM-208",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "vidro",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:64",
+      "categoria": "gabinete",
+      "fabricante": "K-mex",
+      "modelo": "Gm-02ck Slim, Micro ATX, USB, Com Fonte E Cabo",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:65",
+      "categoria": "gabinete",
+      "fabricante": "Hayom",
+      "modelo": "Gamer Hayom GB1792, Mid Tower, ATX, Lateral e frontal em Vidro Temperado, com Cooler Fan, Preto - GB1792",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:66",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Gamer Rise Mode Crystal Glass 01, Mid Tower, Lateral e Frontal em vidro, Sem FANs, Branco - RM-CA-CY-01-FW",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "branco"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:67",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Gamer Rise Mode X1, Mid Tower, ATX, Lateral em Vidro Temperado, Sem FANs, Preto - RM-X1-01-FB",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "vidro",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:68",
+      "categoria": "gabinete",
+      "fabricante": "HYRAX",
+      "modelo": "Gamer Hyrax Tower HGB215, Mid Tower, Atx, Lateral Em Vidro Temperado, Preto - HGB215B",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "vidro",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:69",
+      "categoria": "gabinete",
+      "fabricante": "BRX",
+      "modelo": "Gamer Brx R31w, Mid Tower, Vidro, Matx, Com 3 Fans, Branco",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "branco"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:70",
+      "categoria": "gabinete",
+      "fabricante": "Duex",
+      "modelo": "Gamer Duex Aquário, Mid-Tower, Lateral e Frontal De Vidro, Preto - Dxj270-2",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:71",
+      "categoria": "gabinete",
+      "fabricante": "Outros",
+      "modelo": "Gamer Aquário C3tech Mt-g720bk - Vidro Temperado - Até 7 Fans - Micro Atx - Preto",
+      "porte_referencia": null,
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:72",
+      "categoria": "gabinete",
+      "fabricante": "Mymax",
+      "modelo": "Gamer Kyrios Micro Atx 3 Fans Rbg Branco Mymax",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "branco"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:73",
+      "categoria": "gabinete",
+      "fabricante": "G-fire",
+      "modelo": "Gamer Aquário M-atx Preto G-fire Usb Tipo C - Vidro, Sem Fonte/fans, Cg300b",
+      "porte_referencia": null,
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:74",
+      "categoria": "gabinete",
+      "fabricante": "G-fire",
+      "modelo": "Gamer Aquário M-atx - Usb Tipo C - Branco G-fire- Vidro, Sem Fonte/fans, Cg300w",
+      "porte_referencia": null,
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "branco"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:75",
+      "categoria": "gabinete",
+      "fabricante": "K-mex",
+      "modelo": "Atx Cx-2d67 Sem Fonte Preto Baias 4/5.25 + 1/3.5 Ext",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:76",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Gamer Rise Mode Zeus Glass 01, Mid Tower, Led Frontal customizável, Lateral em Vidro, Sem FANs, Preto - RM-CA-",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "vidro",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:77",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Gamer Rise Mode Galaxy Glass M Mini, M-ATX, Lateral e Frontal em Vidro Temperado, Sem FANs, Preto - RM-GA-GGMN",
+      "porte_referencia": null,
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:78",
+      "categoria": "gabinete",
+      "fabricante": "KALKAN",
+      "modelo": "Gamer Kalkan Midgard, Mid Tower, Micro-ATX, Lateral em Vidro Temperado, Sem FANs, Preto - KLK00039",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "vidro",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": false
+    },
+    {
+      "id": "gabinete:79",
+      "categoria": "gabinete",
+      "fabricante": "Hayom",
+      "modelo": "Gamer Hayom Gb1787, Mini Tower, Vidro Temperado, M-atx, Com 3 Fans, Sem Fonte, Preto",
+      "porte_referencia": "mini-tower",
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:80",
+      "categoria": "gabinete",
+      "fabricante": "K-mex",
+      "modelo": "Micro Atx Usb 2.0 C/ Fonte Padrão Atx Preto - Gm-09nx",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:81",
+      "categoria": "gabinete",
+      "fabricante": "Mymax",
+      "modelo": "Gamer Kyrios Micro Atx 3 Fans Rbg Preto Mymax Mymax",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:82",
+      "categoria": "gabinete",
+      "fabricante": "Outros",
+      "modelo": "C3tech Micro-ATX, Mt-200bk, C/fte 200w",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:83",
+      "categoria": "gabinete",
+      "fabricante": "Onepower",
+      "modelo": "Gamer ONE POWER Fractal, Mid Tower, M-ATX, Lateral em Vidro Temperado, Sem FANs, Branco - CC-201W",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "vidro",
+      "cor_referencia": [
+        "branco"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:84",
+      "categoria": "gabinete",
+      "fabricante": "PCYES",
+      "modelo": "Gamer PCyes Forcefield Mini White Ghost - Gffmnwg",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "branco"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:85",
+      "categoria": "gabinete",
+      "fabricante": "Hayom",
+      "modelo": "Gamer Hayom, Mid Tower, RGB, ATX, Lateral em Vidro Temperado, 3x Cooler Fan RGB, Preto - GB1710",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "vidro",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:86",
+      "categoria": "gabinete",
+      "fabricante": "Liketec",
+      "modelo": "Gamer Liketec Madness Small, Mini Tower, Micro-ATX, Lateral e Frontal em Vidro Curvo, Sem Fans, Preto - LK-MAD",
+      "porte_referencia": "mini-tower",
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:87",
+      "categoria": "gabinete",
+      "fabricante": "Husky",
+      "modelo": "Gamer Husky Dome 100, Mid Tower, ATX, Lateral e Frontal em Vidro, Sem FANs, Branco - HGN100BR",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "branco"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:88",
+      "categoria": "gabinete",
+      "fabricante": "HYRAX",
+      "modelo": "Gamer Hyrax Tower HGB230, Mid Tower, ATX, Lateral Em Vidro Temperado, Preto - HGB230B",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "vidro",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:89",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Gamer Rise Mode Crystal Glass 02, Mid Tower, Lateral e Frontal em vidro, Sem FANs, Branco - RM-CA-CY-02-FW",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "branco"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:90",
+      "categoria": "gabinete",
+      "fabricante": "HYRAX",
+      "modelo": "Gamer Hyrax HGB320, Mini Tower, M-ATX, Frontal e Lateral em Vidro Temperado, Sem FANs, Preto - HGB320B",
+      "porte_referencia": "mini-tower",
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:91",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Gamer Rise Mode X1, Mid Tower, M-ATX, Lateral em Vidro Temperado, Sem FANs, Branco - RM-X1-01-FW",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": "vidro",
+      "cor_referencia": [
+        "branco"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:92",
+      "categoria": "gabinete",
+      "fabricante": "K-mex",
+      "modelo": "Cm-3l22, Micro Atx, Usb 2.0, Preto",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:93",
+      "categoria": "gabinete",
+      "fabricante": "PCFort",
+      "modelo": "Gamer Pcfort Lines Mid Tower ATX RGB Vidro Temperado 3 Fans Preto",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:94",
+      "categoria": "gabinete",
+      "fabricante": "BRAZILPC",
+      "modelo": "Matx Brazilpc Gamer Aquario Bpc-240 Preto Com 4 Cooler Arco Iris Sem Fonte",
+      "porte_referencia": null,
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:95",
+      "categoria": "gabinete",
+      "fabricante": "MSI",
+      "modelo": "M100p Pro Shield Mid Tower C/1 Fan Preto",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:96",
+      "categoria": "gabinete",
+      "fabricante": "Rise Mode",
+      "modelo": "Gamer Rise Mode Galaxy Glass M Mini M-ATX Lateral e Frontal em Vidro Temperado Sem FANs Branco - RM-GA-GGMN-FW",
+      "porte_referencia": null,
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "branco"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:97",
+      "categoria": "gabinete",
+      "fabricante": "Outros",
+      "modelo": "Gamer Ninja Akyra X3, Mid Tower, Vidro Temperado, M-atx, Com 3 Fans, Sem Fonte, Preto, Gn-cs-mab3fakyra",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:98",
+      "categoria": "gabinete",
+      "fabricante": "HYRAX",
+      "modelo": "Gamer Hyrax Tower HGB330, Mini Tower, M-atx, Frontal E Lateral Em Vidro Temperado, Preto - HGB330B",
+      "porte_referencia": "mini-tower",
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:99",
+      "categoria": "gabinete",
+      "fabricante": "BRX",
+      "modelo": "Gamer Brx Xtreme Glacier, Mini Tower,  Lateral E Frontal De Vidro, Com 3 Fans, Preto, R41b",
+      "porte_referencia": "mini-tower",
+      "estilo_referencia": "panoramico",
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:100",
+      "categoria": "gabinete",
+      "fabricante": "BRX",
+      "modelo": "Gamer Brx Tower Black R31b",
+      "porte_referencia": null,
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": true
+    },
+    {
+      "id": "gabinete:101",
+      "categoria": "gabinete",
+      "fabricante": "Cooler Master",
+      "modelo": "MasterBox 520 Black",
+      "porte_referencia": "mid-tower",
+      "estilo_referencia": null,
+      "cor_referencia": [
+        "preto"
+      ],
+      "fonte_cor_referencia": "nome_cadastrado",
+      "disponivel": false
+    }
+  ]
+}

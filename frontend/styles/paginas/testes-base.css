@@ -1,0 +1,74 @@
+/* Estrutura exclusiva da página do laboratório. */
+body.menu-test-page {
+  height: auto;
+  min-height: 100vh;
+  color: var(--cor-6);
+  overflow-x: clip;
+}
+.test-logo {
+  position: absolute;
+  top: 28px;
+  left: 32px;
+  width: 110px;
+}
+.test-main {
+  display: block;
+  max-width: 1100px;
+  margin: auto;
+  padding: 160px 32px 130px;
+}
+.test-main h1 {
+  max-width: 700px;
+  font-size: clamp(2.3rem, 6vw, 4.8rem);
+  line-height: 1.1;
+  margin: 20px 0;
+}
+.test-main > p {
+  color: var(--cor-4);
+  max-width: 680px;
+  line-height: 1.8;
+}
+.test-kicker {
+  color: var(--cor-p1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.test-panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 60px;
+}
+.test-panel {
+  border: 1px solid var(--cor-2);
+  border-radius: 22px;
+  padding: 28px;
+}
+.test-panel p {
+  color: var(--cor-4);
+  margin: 12px 0 24px;
+}
+.test-panel .btn-ghost {
+  display: inline-block;
+}
+@media (max-width: 700px) {
+  .test-panels {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    margin-top: 32px;
+  }
+}
+@media (max-width: 600px) {
+  .test-main {
+    padding: var(--page-top) 16px 112px;
+  }
+  .test-panel {
+    padding: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .experimental-menu * {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}

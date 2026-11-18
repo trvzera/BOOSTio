@@ -1,6 +1,7 @@
 import math
 from collections import Counter
 from pathlib import Path
+from types import SimpleNamespace
 from urllib.parse import urlparse
 
 from models.modelos_pecas import MODELOS_PECAS
@@ -9,6 +10,33 @@ from services.preco_service.validar_link_service import ValidarLinkService
 
 
 class AuditarCatalogoService:
+    # Campos das conferências atuais e da ampliação da montagem (como formato da RAM).
+    # Cobertura não é aprovação; parte dos campos depende da conexão/posição usada.
+    CAMPOS_COMPATIBILIDADE = {
+        "processador": ("soquete", "videointegrado", "cooler", "consumo_energia"),
+        "placa_mae": ("socket", "tipo_memoria", "formato", "quantidade_slots_ram", "memoria_maxima_gb",
+                      "quantidade_slots_m2", "quantidade_portas_sata", "slots_m2", "topologia_armazenamento_verificada",
+                      "conectores_alimentacao", "conectores_alimentacao_completos", "consumo_energia"),
+        "memoria_ram": ("ddr", "frequencia_mhz", "capacidade_gb", "quantidade_pentes", "latencia", "formato", "consumo_energia"),
+        "placa_video": ("comprimento_mm", "altura_mm", "espessura_mm", "slots_ocupados", "consumo_energia",
+                        "conectores_alimentacao", "conectores_alimentacao_completos", "cabos_pcie_independentes_minimos"),
+        "fonte": ("potencia_w", "formato", "comprimento_mm", "conectores_alimentacao", "conectores_alimentacao_completos", "cabos_pcie_independentes"),
+        "gabinete": ("formatos_placa_mae", "tamanho_max_gpu_mm", "tamanho_max_altura_gpu_mm", "tamanho_max_espessura_gpu_mm",
+                     "slots_expansao", "tamanho_max_cooler_mm", "tamanho_max_fonte_mm", "formatos_fonte", "fans_inclusos",
+                     "quantidade_max_fans", "posicoes_fans", "baias_25", "baias_35", "configuracoes_baias", "limites_radiador_mm"),
+        "ssd": ("capacidade_gb", "interface", "formato", "formato_m2", "consumo_energia"),
+        "hd": ("capacidade_gb", "interface", "formato", "consumo_energia"),
+        "fan": ("tamanho_mm", "quantidade", "consumo_energia"),
+        "air_cooler": ("compatibilidade", "altura_mm", "consumo_energia"),
+        "water_cooler": ("compatibilidade", "tamanho_radiador_mm", "comprimento_radiador_mm", "largura_radiador_mm",
+                         "espessura_radiador_mm", "espessura_fan_mm", "quantidade_fans", "tamanho_fan_mm", "consumo_energia"),
+    }
+    VERIFICACOES_FIXAS = (
+        {"codigo": "suporte-cpu-bios", "titulo": "Suporte ao modelo da CPU e BIOS", "arquivo": "services/validacoes_service/avaliar_compatibilidade_service.py"},
+        {"codigo": "ram-perfis", "titulo": "Perfis e estabilidade da RAM", "arquivo": "services/validacoes_service/avaliar_compatibilidade_service.py"},
+        {"codigo": "radiador-posicao", "titulo": "Espessura e interferências do radiador", "arquivo": "services/validacoes_service/encaixe_fisico.py"},
+        {"codigo": "gpu-interferencias", "titulo": "Espaço completo da GPU", "arquivo": "services/validacoes_service/encaixe_fisico.py"},
+    )
     CAMPOS_TECNICOS = {
         "processador": ("soquete", "videointegrado", "cooler"),
         "placa_mae": ("socket", "tipo_memoria", "quantidade_slots_ram", "memoria_maxima_gb",
@@ -24,34 +52,55 @@ class AuditarCatalogoService:
         "mouse": ("conexao", "dpi_max"), "teclado": ("conexao", "layout"),
         "fone": ("conexao", "microfone", "resposta_frequencia"),
         "monitor": ("conexao", "resolucao", "taxa_atualizacao_hz"),
+        "memoria_ram": ("capacidade_gb", "ddr", "frequencia_mhz", "quantidade_pentes", "latencia", "formato"),
+        "ssd": ("capacidade_gb", "interface", "formato", "formato_m2"),
+        "hd": ("capacidade_gb", "interface", "formato"),
+        "fonte": ("potencia_w", "formato", "comprimento_mm", "conectores_alimentacao"),
+        "adaptador_wifi": ("interface", "padrao_wifi", "velocidade_mbps"),
+        "cabo_rede": ("categoria_cabo", "comprimento_m", "conector"),
     }
 
-    def executar(self, amostras=5):
+    def executar(self, amostras=5, *, detalhar=False):
         if type(amostras) is not int or not 0 <= amostras <= 20:
             raise ValueError("Informe de 0 a 20 amostras por categoria")
+        if type(detalhar) is not bool:
+            raise ValueError("Informe detalhar como booleano")
         categorias = {}
         obrigatorias = {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"}
         for modelo in MODELOS_PECAS:
-            categorias[modelo.__tablename__] = self._auditar_categoria(modelo, amostras)
+            categorias[modelo.__tablename__] = self._auditar_categoria(modelo, amostras, detalhar=detalhar)
         sem_oferta = [c for c in obrigatorias if not categorias.get(c, {}).get("disponiveisComPreco")]
         if not any(categorias.get(c, {}).get("disponiveisComPreco") for c in ("ssd", "hd")):
             sem_oferta.append("armazenamento")
         return {"somenteLeitura": True, "categorias": categorias,
+                "verificacoesSemprePendentes": list(self.VERIFICACOES_FIXAS),
+                "escopoTecnico": "Contagem de campos ausentes das conferências atuais e da ampliação da montagem, não certificação de compatibilidade. Campos condicionais dependem da build. Inclui todas as peças cadastradas, inclusive sem oferta/publicação. Ausência de campos monitorados não significa que todas as relações entre as peças foram implementadas.",
                 "categoriasObrigatoriasSemOferta": sorted(sem_oferta),
                 "temOfertasNasCategoriasObrigatorias": not sem_oferta,
                 "aviso": "Oferta por categoria não garante uma combinação compatível ou dentro do orçamento. Fotos remotas, estoque e preços não foram consultados em tempo real."}
 
-    def _auditar_categoria(self, modelo, amostras):
+    def _auditar_categoria(self, modelo, amostras, *, detalhar=False):
         pecas = [p.to_catalogo() for p in modelo.mostrar_pecas()]
         contagens = Counter(p.get("part_number") for p in pecas if p.get("part_number"))
         pendencias, utilizaveis = [], 0
         tecnicas = []
+        compatibilidade = []
         imagens = locais = medidas = 0
+        genericas = []
         for p in pecas:
-            ausentes = [campo for campo in self.CAMPOS_TECNICOS.get(modelo.__tablename__, ())
-                        if p.get(campo) is None or p.get(campo) == "" or p.get(campo) == []]
+            if modelo.__tablename__ == "placa_video":
+                from services.especificacoes_service.converter_referencias_gpu_service import ConverterReferenciasGpuService
+                if ConverterReferenciasGpuService.generica(SimpleNamespace(fabricante=p.get("fabricante") or "",
+                        modelo=p.get("modelo") or "", modelo_referencia=p.get("modelo_referencia"))):
+                    genericas.append({"id": p["id"], "fabricante": p.get("fabricante"), "modelo": p.get("modelo")})
+            ausentes = [campo for campo in self.CAMPOS_TECNICOS.get(modelo.__tablename__, ()) if self._ausente(p, campo)]
+            campos_compatibilidade = [campo for campo in self.CAMPOS_COMPATIBILIDADE.get(modelo.__tablename__, ()) if self._ausente(p, campo)]
+            if campos_compatibilidade:
+                compatibilidade.append({"id": p["id"], "fabricante": p.get("fabricante"), "modelo": p.get("modelo"),
+                                        "part_number": p.get("part_number"), "campos": campos_compatibilidade})
             if ausentes:
-                tecnicas.append({"id": p["id"], "part_number": p.get("part_number"), "campos": ausentes})
+                tecnicas.append({"id": p["id"], "fabricante": p.get("fabricante"), "modelo": p.get("modelo"),
+                                 "part_number": p.get("part_number"), "campos": ausentes})
             motivos = []
             preco = p.get("preco")
             valido = type(preco) in (int, float) and math.isfinite(preco) and preco > 0
@@ -85,7 +134,27 @@ class AuditarCatalogoService:
             "amostras": pendencias[:amostras],
             "camposTecnicosAusentes": dict(Counter(c for p in tecnicas for c in p["campos"])),
             "amostrasTecnicas": tecnicas[:amostras],
+            "camposCompatibilidadeAusentes": dict(Counter(c for p in compatibilidade for c in p["campos"])),
+            "pecasComDadosCompatibilidadeAusentes": len(compatibilidade),
+            **({"quantidadeReferenciasGenericas": len(genericas), "referenciasGenericas": genericas if detalhar else genericas[:amostras]} if modelo.__tablename__ == "placa_video" else {}),
+            **({"detalhesCompatibilidade": compatibilidade, "detalhesTecnicos": tecnicas} if detalhar else {}),
         }
+
+    @staticmethod
+    def _ausente(peca, campo):
+        valor = peca.get(campo)
+        if campo == "formato_m2":
+            from services.validacoes_service.armazenamento import conexao_disco, formato_m2
+            return formato_m2(peca) is None if conexao_disco(peca) in ("m2", "m2-sata") else False
+        if campo == "slots_m2" and valor == [] and peca.get("quantidade_slots_m2") == 0:
+            return False
+        if campo == "conectores_alimentacao" and valor == {} and peca.get("conectores_alimentacao_completos") is True:
+            return False
+        if campo in ("topologia_armazenamento_verificada", "conectores_alimentacao_completos"):
+            return valor is not True
+        if isinstance(valor, float) and not math.isfinite(valor):
+            return True
+        return valor is None or valor == [] or valor == {} or isinstance(valor, str) and valor.strip().casefold() in ("", "n/a", "não informado", "desconhecido")
 
     @staticmethod
     def _verificar_imagem(imagem, motivos):

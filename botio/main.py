@@ -16,6 +16,7 @@ from commands import register_commands
 from movement import send_movement
 from member_count import sync_member_count
 from message_logs import log_edit, log_delete, log_bulk_delete
+from setups import react_to_setup
 
 log = logging.getLogger("botio")
 
@@ -23,11 +24,11 @@ log = logging.getLogger("botio")
 class Botio(discord.Client):
     def __init__(self, guild_id, role_id, *, connector=None, welcome_store=None,
                  announcements_channel_id=None, movement_channel_id=None, member_count_channel_id=None,
-                 message_log_channel_id=None):
+                 message_log_channel_id=None, setups_channel_id=None):
         intents = discord.Intents.none()
         intents.guilds = True
         intents.members = True
-        if message_log_channel_id:
+        if message_log_channel_id or setups_channel_id:
             intents.guild_messages = True
             intents.message_content = True
         super().__init__(intents=intents, connector=connector, max_messages=1000,
@@ -40,6 +41,7 @@ class Botio(discord.Client):
         self.movement_channel_id = movement_channel_id
         self.member_count_channel_id = member_count_channel_id
         self.message_log_channel_id = message_log_channel_id
+        self.setups_channel_id = setups_channel_id
         self.tree = register_commands(self)
 
     async def setup_hook(self):
@@ -139,6 +141,9 @@ class Botio(discord.Client):
             self.welcome_store.forget(self.guild_id, member.id)
             await send_movement(self, member, joined=False)
 
+    async def on_message(self, message):
+        await react_to_setup(self, message)
+
     async def on_raw_message_edit(self, payload):
         await log_edit(self, payload)
 
@@ -193,7 +198,7 @@ class Botio(discord.Client):
 
 
 async def run_bot(token, guild_id, role_id, announcements_channel_id=None, movement_channel_id=None,
-                  member_count_channel_id=None, message_log_channel_id=None):
+                  member_count_channel_id=None, message_log_channel_id=None, setups_channel_id=None):
     # Acrescenta as autoridades confiáveis do certifi às do sistema.
     # Mantém a verificação do certificado e do hostname habilitada.
     context = ssl.create_default_context()
@@ -201,7 +206,7 @@ async def run_bot(token, guild_id, role_id, announcements_channel_id=None, movem
     connector = aiohttp.TCPConnector(ssl=context)
     async with Botio(guild_id, role_id, connector=connector, announcements_channel_id=announcements_channel_id,
                      movement_channel_id=movement_channel_id, member_count_channel_id=member_count_channel_id,
-                     message_log_channel_id=message_log_channel_id) as bot:
+                     message_log_channel_id=message_log_channel_id, setups_channel_id=setups_channel_id) as bot:
         await bot.start(token)
 
 
@@ -222,14 +227,15 @@ def main():
         movement_id = int(os.getenv("DISCORD_MOVEMENT_CHANNEL_ID") or "0") or None
         member_count_id = int(os.getenv("DISCORD_MEMBER_COUNT_CHANNEL_ID") or "0") or None
         message_log_id = int(os.getenv("DISCORD_MESSAGE_LOG_CHANNEL_ID") or "0") or None
+        setups_id = int(os.getenv("DISCORD_SETUPS_CHANNEL_ID", "1570588343807516733") or "0") or None
         if any(value is not None and value <= 0 for value in (guild_id, role_id, announcements_id, movement_id,
-                                                             member_count_id, message_log_id)):
+                                                             member_count_id, message_log_id, setups_id)):
             raise ValueError
     except (KeyError, ValueError):
         raise SystemExit("Preencha os IDs de servidor, cargo e canais com números positivos válidos.") from None
     try:
         asyncio.run(run_bot(token, guild_id, role_id, announcements_id, movement_id, member_count_id,
-                            message_log_id))
+                            message_log_id, setups_id))
     except KeyboardInterrupt:
         pass
 

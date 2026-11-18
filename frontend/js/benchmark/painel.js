@@ -1,9 +1,9 @@
 import { htmlSeguro as h } from "../build/catalogo.js";
 
-export function painelBenchmarkHtml({prefixo = "fpshq",hardware = "",memoria = null,verificarRequisitos = false} = {}) {
+export function painelBenchmarkHtml({prefixo = "fpshq",hardware = "",memoria = null,verificarRequisitos = false,mostrarHardware = true} = {}) {
   const id = nome => h(prefixo + "-" + nome);
   return '<section class="fpshq-panel benchmark-panel" data-layout="cards" aria-label="Consulta de desempenho esperado">'
-    + '<p class="fpshq-hardware">' + h(hardware) + (memoria != null ? '<span data-benchmark-ram>' + h(memoria) + ' GB de RAM · não avaliada na estimativa</span>' : verificarRequisitos ? '<span data-benchmark-ram>Capacidade total de RAM a confirmar</span>' : '') + '</p>'
+    + (mostrarHardware ? '<p class="fpshq-hardware">' + h(hardware) + (memoria != null ? '<span data-benchmark-ram>' + h(memoria) + ' GB de RAM · não avaliada na estimativa</span>' : verificarRequisitos ? '<span data-benchmark-ram>Capacidade total de RAM a confirmar</span>' : '') + '</p>' : '')
     + '<div class="fpshq-workspace"><div class="fpshq-controls"><form id="' + id("test-form") + '">'
     + '<div class="test-field-row fpshq-fields"><label class="test-field" for="' + id("game") + '">Jogo<select id="' + id("game") + '" required></select></label>'
     + '<label class="test-field" for="' + id("resolution") + '">Resolução<select id="' + id("resolution") + '"><option value="1080p">1080p</option><option value="1440p">1440p</option><option value="4k">4K</option></select></label>'
@@ -19,5 +19,6 @@ export function painelBenchmarkHtml({prefixo = "fpshq",hardware = "",memoria = n
     + '<div id="' + id("empty") + '" class="fpshq-empty"><span>O resultado aparece aqui</span></div>'
     + '<div id="' + id("result") + '" class="fpshq-result" hidden aria-live="polite" aria-atomic="true"></div>'
     + '<aside id="' + id("notice") + '" class="fpshq-notice" aria-label="Limitações do desempenho esperado" hidden><p>Expectativa de CPU/GPU, não uma medição do seu PC.</p><details class="fpshq-disclosure fpshq-limitations" data-animated-details><summary>O que pode influenciar?</summary><p>' + (verificarRequisitos ? 'A capacidade de RAM é verificada separadamente na build salva. CPU, GPU, VRAM e os demais requisitos ainda não estão validados.' : 'RAM e requisitos mínimos do jogo ainda não foram verificados.') + ' Modelo das peças, drivers, temperatura, energia e programas em segundo plano podem alterar o resultado.</p><p>Rede pode causar lag, mas não equivale necessariamente a queda de FPS. Nenhum teste é executado na sua máquina.</p></details></aside>'
+    + '<details class="fpshq-disclosure" data-animated-details><summary>E se a fonte não reconhecer minhas peças?</summary><p>Confira o modelo no cadastro. A fonte pode não ter dados para a peça ou para essa combinação de jogo e ajustes. Não substituímos suas peças por outros modelos.</p><p>Para medir no PC que você já possui, execute o jogo e use um contador de FPS ou uma ferramenta como o <a href="https://github.com/GameTechDev/PresentMon" target="_blank" rel="noopener noreferrer" aria-label="Conhecer o PresentMon para Windows em nova aba">PresentMon para Windows (abre em nova aba)</a>. A BOOSTio não captura essas medições automaticamente. Uma montagem que ainda não existe só pode ter desempenho estimado.</p></details>'
     + '<p class="fpshq-attribution">Fonte: <a id="' + id("source") + '" href="https://fpshq.com/pt/api/" target="_blank" rel="noopener noreferrer" aria-label="FPSHQ — ver fonte em nova aba">FPSHQ</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" aria-label="Ver licença CC BY 4.0 em nova aba">CC BY 4.0</a></p></div></div></section>';
 }

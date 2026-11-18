@@ -19,8 +19,9 @@ export function resultadoDesempenhoHtml(dados,prefixo = "fpshq") {
   const valor = dados.intervalo ? dados.intervalo.map(numero).join("–") : numero(dados.fps);
   return '<div class="fpshq-result-heading"><h3 class="font-1-l">' + h(dados.jogo) + '</h3><span class="font-2-xs">'
     + h(resolucao) + ' <span aria-hidden="true">·</span> ' + h(qualidade) + '</span></div>'
+    + (dados.escopo === "gpu" ? '<p class="fpshq-reference-notice"><strong>Referência apenas da GPU</strong> Não considera a CPU nem as demais peças. Este número não representa o FPS da sua build.</p>' : '')
     + (dados.desatualizado ? '<p class="fpshq-cache-notice" role="status">A FPSHQ não respondeu agora. Exibindo a última consulta válida, de ' + h(new Date(dados.consultadoEm).toLocaleString('pt-BR')) + '; estes dados não foram atualizados.</p>' : '')
-    + '<dl class="fpshq-metrics"><div><dt>FPS médio esperado</dt><dd>' + valor + '<small> FPS</small></dd></div>'
+    + '<dl class="fpshq-metrics"><div><dt>' + (dados.escopo === "gpu" ? 'FPS de referência da GPU' : 'FPS médio esperado') + '</dt><dd>' + valor + '<small> FPS</small></dd></div>'
     + '<div><dt>1% low</dt><dd>' + numero(dados.low1) + (dados.low1 == null ? '' : '<small> FPS</small>') + '</dd></div></dl>'
     + '<section class="fpshq-alternatives" aria-label="Comparar ajustes"><h4>Comparar ajustes</h4>'
     + '<fieldset class="fpshq-quality-tabs"><legend class="sr-only">Qualidade gráfica da comparação</legend>'

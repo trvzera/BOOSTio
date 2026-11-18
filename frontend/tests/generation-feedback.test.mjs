@@ -5,11 +5,11 @@ import { feedbackGeracao } from "../js/build/generation-feedback.js";
 import { fetchComErro, orientacaoGeracaoSegura } from "../js/api/_shared/fetchComErro.js";
 
 test("geração exige teto mínimo do PC e reserva mínima, sem impor gasto mínimo",() => {
-  for(const [total,pct,motivo,minimo] of [[1,0,"orcamento",2000],[1999.99,0,"orcamento",2000],[2000,20,"orcamento",2500],[5000,1,"perifericos",50000],[2500,10,"perifericos",5000]]) {
+  for(const [total,pct,motivo,minimo] of [[1,0,"orcamento",2500],[2499.99,0,"orcamento",2500],[3000,20,"orcamento",3125],[4000,10,"perifericos",5000]]) {
     const r=avaliarOrcamentoGeracao(total,pct);
     assert.equal(r.valido,false);assert.equal(r.motivo,motivo);assert.equal(r.minimoTotal,minimo);
   }
-  for(const [total,pct] of [[2000,0],[2500,20],[5000,10],[8000,20]])assert.equal(avaliarOrcamentoGeracao(total,pct).valido,true);
+  for(const [total,pct] of [[2500,0],[3200,20],[5000,10],[8000,20]])assert.equal(avaliarOrcamentoGeracao(total,pct).valido,true);
   assert.equal(avaliarOrcamentoGeracao(5000,100).valido,false);
 });
 test("orientação aceita apenas campos públicos conhecidos e valores monetários limitados",() => {

@@ -1,0 +1,144 @@
+{
+  "verificadoEm": "2026-11-17",
+  "fonte": "Amostra do banco local; não representa estoque ou preços em tempo real.",
+  "cabos": [
+    {
+      "metros": 1.0,
+      "categoria": "CAT6",
+      "disponivel": true
+    },
+    {
+      "metros": 2.0,
+      "categoria": "CAT6",
+      "disponivel": false
+    },
+    {
+      "metros": 3.0,
+      "categoria": "CAT6",
+      "disponivel": false
+    },
+    {
+      "metros": 5.0,
+      "categoria": "CAT6",
+      "disponivel": true
+    },
+    {
+      "metros": 10.0,
+      "categoria": "CAT6",
+      "disponivel": true
+    }
+  ],
+  "perifericos": {
+    "teclado": {
+      "cadastrados": 101,
+      "comPrecoEEstoque": 95,
+      "mecanicos": 46,
+      "mecanicosComSwitch": 31,
+      "exemplos": [
+        {
+          "fabricante": "Rise Mode",
+          "modelo": "GM1 White",
+          "switch": "Outemu Brown"
+        },
+        {
+          "fabricante": "Machenike",
+          "modelo": "K500B-B87",
+          "switch": "Brown"
+        },
+        {
+          "fabricante": "Rise Mode",
+          "modelo": "GM1 Black",
+          "switch": "Outemu Brown"
+        }
+      ]
+    },
+    "mouse": {
+      "cadastrados": 101,
+      "comPrecoEEstoque": 93,
+      "sensorInformado": 43,
+      "exemplos": [
+        {
+          "fabricante": "Rise Mode",
+          "modelo": "G2 Black RGB",
+          "sensor": "Óptico"
+        },
+        {
+          "fabricante": "Rise Mode",
+          "modelo": "Laser Pro Black RGB",
+          "sensor": "Laser"
+        },
+        {
+          "fabricante": "Rise Mode",
+          "modelo": "G1 Pro White RGB",
+          "sensor": "Óptico"
+        }
+      ]
+    },
+    "monitor": {
+      "cadastrados": 100,
+      "comPrecoEEstoque": 93,
+      "semPainel": 47,
+      "hz144OuMais": 69,
+      "exemplos": [
+        {
+          "fabricante": "Concordia",
+          "modelo": "24 H238G",
+          "tipo_painel": "IPS",
+          "taxa_atualizacao_hz": 144,
+          "resolucao": "1920x1080"
+        },
+        {
+          "fabricante": "Husky",
+          "modelo": "Boreal 25",
+          "tipo_painel": "IPS",
+          "taxa_atualizacao_hz": 144,
+          "resolucao": "1920x1080"
+        },
+        {
+          "fabricante": "HQ",
+          "modelo": "IPS",
+          "tipo_painel": "IPS",
+          "taxa_atualizacao_hz": 180,
+          "resolucao": "1920x1080"
+        }
+      ]
+    },
+    "fone": {
+      "cadastrados": 101,
+      "comPrecoEEstoque": 92,
+      "exemplos": [
+        {
+          "fabricante": "C3Tech",
+          "modelo": "Voicer Comfort, Microfone Flexível, Volume Integrado, P2, Preto - PH-60BK",
+          "tipo": "Headset",
+          "microfone": 1
+        },
+        {
+          "fabricante": "K-mex",
+          "modelo": "FONE OFFICE CONECTOR P3 K-MEX  ARS-7600",
+          "tipo": "Headset",
+          "microfone": 1
+        },
+        {
+          "fabricante": "Hp",
+          "modelo": "DHE-8009, P3, Driver 40mm, Preto - 194R3AA",
+          "tipo": "Headset",
+          "microfone": 1
+        }
+      ]
+    }
+  },
+  "webcam": {
+    "cadastrados": 0,
+    "compraIntegrada": false
+  },
+  "alertas": [
+    {
+      "mensagem": "O Redragon Karura está marcado como mecânico no banco local. O fabricante o lista como membrana; excluído dos exemplos mecânicos desta prévia.",
+      "fonte": "https://www.redragon.com.br/teclados-membrana"
+    },
+    {
+      "mensagem": "RGB e DPI isolados não comprovam qualidade. Switches, sensores, painel e microfone precisam de fichas confiáveis."
+    }
+  ]
+}

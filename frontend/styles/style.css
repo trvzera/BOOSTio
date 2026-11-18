@@ -47,6 +47,7 @@
 @import "./componentes/glass.css";
 @import "./build/recursos.css";
 @import "./componentes/benchmark.css";
+@import "./componentes/benchmark-dashboard.css";
 @import "./build/comparacao.css";
 @import "./build/prontas.css";
 @import "./build/melhorias.css";

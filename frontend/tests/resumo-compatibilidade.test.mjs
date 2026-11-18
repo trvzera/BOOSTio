@@ -8,6 +8,16 @@ import { completarMedidas } from "../js/build/medidas-fisicas.js";
 import { fichaTecnica } from "../js/build/catalogo.js";
 
 const base = {erros: [], avisos: [], dicas: [], faltam: []};
+
+test("orientações gerais não viram pendências de compatibilidade",() => {
+  const dicas = ["Fluxo sugerido: entrada pela frente e saída pelo topo.", "Pode misturar marcas de fans, conferindo as conexões."];
+  const resumo = resumirCompatibilidade({...base,dicas});
+  assert.equal(resumo.grupos.length,0);
+  assert.deepEqual(resumo.dicas,dicas);
+  const faltante = resumirCompatibilidade({...base,dicas:[...dicas,"Faltam medidas para confirmar o encaixe da placa de vídeo no gabinete."]});
+  assert.equal(faltante.grupos.length,1);
+  assert.equal(faltante.grupos[0].id,"video");
+});
 const diagnostico = {status: "nao_verificado", rotulo: "Compatibilidade não totalmente verificada", naoVerificado: [
   {codigo: "placa_video-medida", mensagem: "Falta confirmar comprimento."},
   {codigo: "gpu-altura", mensagem: "Falta confirmar altura."},

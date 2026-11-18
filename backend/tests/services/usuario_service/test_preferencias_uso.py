@@ -63,7 +63,7 @@ def test_contas_antigas_nao_recebem_tutorial_automatico_e_persistem_preferencia(
     assert usuario["preferencias_uso"]["nivel_hardware"] == "iniciante"
     assert usuario["preferencias_uso"]["tutorial"] == "concluido"
     assert usuario["budget"] == 5000 and usuario["usar_budget"]
-    outro.put("/usuarios/1/preferencias-uso", json={"nivel_hardware": None})
+    assert outro.put("/usuarios/1/preferencias-uso", json={"nivel_hardware": None}).status_code == 400
     assert outro.get("/auth/me").json["usuario"]["preferencias_uso"]["tutorial"] == "concluido"
     with app_experiencia.app_context():
         assert "preferencias_uso" not in db.session.get(Usuario, 1).to_dict()
@@ -92,10 +92,23 @@ def test_csrf_e_necessario_sem_restringir_consulta(app_experiencia):
 def test_falha_de_gravacao_nao_mente_sobre_conclusao(app_experiencia, mocker):
     c = app_experiencia.test_client(); autenticar(c)
     mocker.patch.object(db.session, "commit", side_effect=SQLAlchemyError("erro interno"))
-    r = c.put("/usuarios/1/preferencias-uso", json={"tutorial": "concluido"})
+    r = c.put("/usuarios/1/preferencias-uso", json={"tutorial": "concluido", "nivel_hardware": "iniciante"})
     assert r.status_code == 500 and "erro interno" not in r.text
     mocker.stopall()
     assert c.get("/auth/me").json["usuario"]["preferencias_uso"]["tutorial"] == "nao-oferecido"
+
+
+def test_concluir_exige_nivel_e_pular_sem_escolher_mantem_neutro(app_experiencia):
+    c = app_experiencia.test_client(); autenticar(c)
+    for dados in ({"tutorial": "concluido"}, {"tutorial": "concluido", "nivel_hardware": None}, {"nivel_hardware": None}):
+        assert c.put("/usuarios/1/preferencias-uso", json=dados).status_code == 400
+    r = c.put("/usuarios/1/preferencias-uso", json={"tutorial": "pulado", "nivel_hardware": None})
+    assert r.status_code == 200
+    assert r.json["usuario"]["preferencias_uso"]["nivel_hardware"] is None
+    assert r.json["usuario"]["preferencias_uso"]["tutorial"] == "pulado"
+    assert c.put("/usuarios/1/preferencias-uso", json={"tutorial": "concluido"}).status_code == 400
+    r = c.put("/usuarios/1/preferencias-uso", json={"tutorial": "concluido", "nivel_hardware": "experiente"})
+    assert r.status_code == 200
 
 
 def test_preparacao_cria_so_tabela_nova_sem_alterar_usuarios(app_experiencia):

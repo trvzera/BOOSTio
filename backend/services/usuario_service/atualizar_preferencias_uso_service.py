@@ -15,6 +15,13 @@ class AtualizarPreferenciasUsoService:
         usuario = Usuario.buscar_por_id(usuario_id)
         if usuario is None:
             return None
+        preferencia = usuario.preferencias_uso
+        nivel_final = dados.get("nivel_hardware", preferencia.nivel_hardware if preferencia else None)
+        tutorial_final = dados.get("tutorial", preferencia.tutorial if preferencia else "nao-oferecido")
+        if tutorial_final == "concluido" and nivel_final not in self.NIVEIS:
+            raise ValueError("Escolha seu nível de conhecimento para concluir o tutorial ou pule para decidir depois.")
+        if "nivel_hardware" in dados and nivel_final is None and tutorial_final != "pulado":
+            raise ValueError("Para decidir seu nível depois, pule o tutorial.")
         if usuario.preferencias_uso is None:
             usuario.preferencias_uso = PreferenciasUso(tutorial="nao-oferecido")
         if "nivel_hardware" in dados:

@@ -1,5 +1,5 @@
 from .selecionar_plataforma_service import selecionar_placas_mae, selecionar_memorias, aplicar_teto, ficha_catalogo, id_numerico
-from services.validacoes_service.validar_pedido_build_service import validar_orcamento, validar_rede, validar_textos_pedido, pecas_proprias
+from services.validacoes_service.validar_pedido_build_service import validar_orcamento, validar_rede, validar_textos_pedido, validar_preferencia_processador, pecas_proprias
 from services.build_service.custos_build_service import dividir_orcamento
 from services.build_service.contexto_build_service import obter_detalhes_proprias
 from services.build_service.catalogo_geracao_service import validar_disponibilidade, planejar_perifericos
@@ -11,7 +11,7 @@ from models.modelos_pecas import MODELOS_PECAS
 from utils.aparencia import validar_aparencia
 from utils.validacoes import validacao_campos
 from utils.sockets import normalizar_socket
-from .planejamento_geracao import validar_minimos
+from .planejamento_geracao import validar_minimos, validar_percentual, ErroPlanejamentoBuild
 from services.validacoes_service.requisitos_armazenamento_service import RequisitosArmazenamentoService
 from .planejar_rede_service import PlanejarRedeService
 from .amostrar_catalogo_service import AmostrarCatalogoService
@@ -20,6 +20,7 @@ from .amostra_inteligente_service import AmostraInteligenteService
 from .planejar_orcamento_componentes_service import PlanejarOrcamentoComponentesService
 from .planejar_armazenamento_service import PlanejarArmazenamentoService
 from .ajustar_orcamento_build_service import AjustarOrcamentoBuildService
+from .preferencias_processador_service import PreferenciasProcessadorService
 from .preco_exibido_service import PrecoExibidoService
 
 
@@ -108,6 +109,7 @@ class SeletorInteligenteService:
         
         validacao_campos(dados, ["orcamento"])
         armazenamento = RequisitosArmazenamentoService.validar_parametro(dados.get("armazenamento_minimo_gb"))
+        marca = validar_preferencia_processador(dados)
         prioridade = dados.get("prioridade_montagem", dados.get("preferencias"))
 
         if prioridade == "custo-beneficio":
@@ -143,7 +145,7 @@ class SeletorInteligenteService:
         proprias = pecas_proprias(dados.get("pecas_proprias", {}))
         teto_peca, teto_perifericos = self._planejar_orcamento(dados)
         
-        return {"prioridade": prioridade, "limite": limite, "categoria": categoria,
+        return {"prioridade": prioridade, "preferencia_processador": marca, "limite": limite, "categoria": categoria,
                 "rede": rede, "aparencia": aparencia, "proprias": proprias,
                 "teto_peca": teto_peca, "teto_perifericos": teto_perifericos,
                 "utilidade": utilidade, "armazenamento_minimo_gb": armazenamento,
@@ -157,12 +159,11 @@ class SeletorInteligenteService:
         orcamento = validar_orcamento(dados["orcamento"])
         percentual = dados.get("percentual_perifericos", 0)
         
-        if type(percentual) is not int or not 0 <= percentual <= 99:
-            raise ValueError("A porcentagem para periféricos deve ser de 0 a 99")
+        validar_percentual(percentual)
         
         teto_pc, teto_perifericos = dividir_orcamento(orcamento, percentual)
         
-        validar_minimos(teto_pc, teto_perifericos, percentual)
+        validar_minimos(teto_pc, teto_perifericos, percentual, dados.get("utilidade"))
         
         margem = min(orcamento / 2, max(800, orcamento * 0.25))
         
@@ -178,11 +179,8 @@ class SeletorInteligenteService:
         
         rede = contexto["rede"]
         
-        acessorio = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
-        
-        excluidas.update({"adaptador_wifi", "cabo_rede"} - (
-            {acessorio} if rede.get("possuiAcessorio") is False else set()))
-        
+        excluidas.update({"adaptador_wifi", "cabo_rede"} - PlanejarRedeService.categorias(rede))
+
         if contexto["categoria"] is not None:
             excluidas.update(m.__tablename__ for m in MODELOS_PECAS
                      if m.__tablename__ != contexto["categoria"])
@@ -208,7 +206,10 @@ class SeletorInteligenteService:
             pools[modelo.__tablename__] = PrecoExibidoService.catalogo(pecas, teto)
         for tipo in ("cabo_rede", "adaptador_wifi"):
             if contexto["rede"]:
-                pools[tipo] = PlanejarRedeService.opcoes(pools, contexto["rede"], contexto["proprias"])
+                pools[tipo] = [p for conexao in PlanejarRedeService.conexoes(contexto["rede"])
+                               if PlanejarRedeService.TIPOS.get(conexao.get("tipo")) == tipo
+                               for p in PlanejarRedeService.opcoes(pools, conexao, contexto["proprias"])]
+        PreferenciasProcessadorService.exigir_catalogo(pools, contexto["preferencia_processador"], contexto["proprias"], contexto["detalhes_proprias"])
         return pools
 
     def _selecionar_por_benchmark(self, contexto, excluidas):
@@ -222,6 +223,12 @@ class SeletorInteligenteService:
             if tipo == "processador":
                 pecas = self._filtrar_plataformas(contexto, pecas)
             pecas = aplicar_teto(contexto, tipo, pecas)
+            if tipo == "processador" and contexto["preferencia_processador"] != "sem-preferencia":
+                preferidas = [p for p in pecas if PreferenciasProcessadorService.marca(p, contexto["preferencia_processador"])]
+                if not preferidas:
+                    raise ErroPlanejamentoBuild("Não há plataforma da marca escolhida dentro dos limites recebidos. Revise a marca, as peças próprias ou o orçamento.",
+                                               "marca-processador", "Revise a marca do processador", "preferencias")
+                pecas = preferidas
             if tipo == "placa_video":
                 estimativas = contexto["planejamento"]["estimativas_cpu"]
                 cpus = contexto.get("cpus_candidatas", [])
@@ -233,7 +240,8 @@ class SeletorInteligenteService:
             teto_faixas = max([teto_faixas, *[p["preco"] for p in pecas]])
             amostra, diagnostico = AmostraInteligenteService().executar(
                 pecas, tipo, contexto["prioridade"], teto_faixas,
-                contexto["limites"][tipo], contexto["aparencia"]["cor"])
+                contexto["limites"][tipo], contexto["aparencia"]["cor"],
+                preferencia_processador=contexto["preferencia_processador"])
             diagnostico["sem_benchmark"] = tipo in contexto["fallbacks_benchmark"]
             contexto["amostragem"][tipo] = diagnostico
             if tipo == "processador":
@@ -334,10 +342,9 @@ class SeletorInteligenteService:
     @staticmethod
     def _ajustar_acessorio_rede(catalogo, contexto, excluidas):
         rede = contexto["rede"]
-        acessorio = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
-        
-        if acessorio and acessorio not in excluidas and rede.get("possuiAcessorio") is False:
-            catalogo[acessorio] = PlanejarRedeService.opcoes(catalogo, rede, contexto["proprias"])
+        for conexao in PlanejarRedeService.conexoes(rede):
+            for acessorio in PlanejarRedeService.categorias(conexao) - excluidas:
+                catalogo[acessorio] = PlanejarRedeService.opcoes(catalogo, conexao, contexto["proprias"])
 
     @staticmethod
     def _formatar_catalogo(catalogo):

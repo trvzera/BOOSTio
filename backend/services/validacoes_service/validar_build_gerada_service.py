@@ -65,21 +65,21 @@ def validar_build_gerada(build, catalogo, orcamento, percentual=0, proprias=None
   RequisitosUsoService.validar_gpu(utilidade if utilidade is not None else build["utilidade"], finais)
   ConferirPlacaVideoService.validar(utilidade if utilidade is not None else build["utilidade"], orcamento, finais)
   rede = rede or {}
-  acessorio = {"wifi": "adaptador_wifi", "cabo": "cabo_rede"}.get(rede.get("tipo"))
   escolhidos_rede = set(tipos) & {"adaptador_wifi", "cabo_rede"}
   if "cabo_rede" in escolhidos_rede and rede.get("comprimentoCaboM"):
     item = next(c for c in build["componentes"] if c["tipo"] == "cabo_rede")
     comprimento = pecas[("cabo_rede", item["id"])].get("comprimento_m")
     if type(comprimento) in (int, float, Decimal) and isfinite(comprimento) and comprimento < rede["comprimentoCaboM"]:
       raise ValueError("O cabo de rede sugerido é menor que o comprimento solicitado. Escolha outro cabo cadastrado, respeitando o teto do PC.")
-  plano_rede = PlanejarRedeService.executar(catalogo, rede, proprias)
-  esperado_rede = {acessorio} if plano_rede["tipo"] and not plano_rede["pendente"] else set()
+  planos_rede = PlanejarRedeService.planos(catalogo, rede, proprias)
+  esperado_rede = {p["tipo"] for p in planos_rede if p["tipo"] and not p["pendente"]}
   if escolhidos_rede != esperado_rede:
     raise ValueError("A IA não respeitou a escolha de conexão da build")
-  if esperado_rede:
-    item_rede = next(c for c in build["componentes"] if c["tipo"] == acessorio)
-    if item_rede["id"] not in plano_rede["ids_permitidos"]:
-      raise ValueError("O acessório de rede não atende ao comprimento ou à velocidade solicitada. Escolha um dos IDs permitidos no planejamento de rede.")
+  for plano_rede in planos_rede:
+    if plano_rede["tipo"] in esperado_rede:
+      item_rede = next(c for c in build["componentes"] if c["tipo"] == plano_rede["tipo"])
+      if item_rede["id"] not in plano_rede["ids_permitidos"]:
+        raise ValueError("O acessório de rede não atende ao comprimento ou à velocidade solicitada. Escolha um dos IDs permitidos no planejamento de rede.")
   if percentual and not PERIFERICOS <= finais:
     raise ValueError("A IA não incluiu os periféricos solicitados. Tente novamente.")
   if not {"processador", "placa_mae", "memoria_ram", "fonte", "gabinete"} <= finais or not {"ssd", "hd"} & finais:

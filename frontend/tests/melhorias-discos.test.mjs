@@ -67,7 +67,7 @@ test("substituição que corrige excesso de discos não mantém o erro antigo de
   const build=base();build.componentes.ssd[0].quantidade=2;
   build.compatibilidade.erros=[{codigo:"discos-m2",mensagem:"Diagnóstico anterior: excede M.2"}];
   const mb={...placa,quantidade_slots_m2:1};
-  const melhor={...ssd,id:"maior",capacidade_gb:2000,preco:800};
+  const melhor={...ssd,id:"maior",capacidade_gb:4000,preco:800};
   const resultado=planejarMelhoriaDisco(build,melhor,[mb,ssd,melhor],{modo:"substituir"});
   assert.deepEqual(resultado.componentes.ssd,[{id:melhor.id,quantidade:1}]);
   assert.deepEqual(resultado.compatibilidade.erros,[]);

@@ -24,7 +24,11 @@ class ConsultarBenchmarkService:
             return self._consultar(dados, usuario_id)
 
     def _consultar(self, dados, usuario_id):
-        consulta = {chave: dados.get(chave) for chave in ("game", "cpu", "gpu")}
+        escopo = dados.get("escopo", "build")
+        if escopo not in ("build", "gpu") or escopo == "gpu" and "cpu" in dados:
+            raise ValueError("Selecione a combinação da build ou uma referência da GPU sem CPU.")
+        campos = ("game", "gpu") if escopo == "gpu" else ("game", "cpu", "gpu")
+        consulta = {chave: dados.get(chave) for chave in campos}
         if not all(isinstance(valor, str) and SLUG.fullmatch(valor) for valor in consulta.values()):
             raise ValueError("Informe IDs válidos do jogo, processador e placa de vídeo.")
         consulta.update(res=dados.get("res", "1080p"), preset=dados.get("preset", "high"))
@@ -37,9 +41,11 @@ class ConsultarBenchmarkService:
             return resposta
         bruto = resposta["dados"]
 
-        for chave in ("game", "cpu", "gpu"):
+        for chave in campos:
             if not isinstance(bruto.get(chave), dict) or bruto[chave].get("slug") != consulta[chave]:
                 raise ErroBenchmark("O provedor não confirmou os modelos exatos solicitados.", "resposta")
+        if escopo == "gpu" and bruto.get("cpu") is not None:
+            raise ErroBenchmark("O provedor incluiu uma CPU em uma referência solicitada apenas para a GPU.", "resposta")
 
         if str(bruto.get("res", "")).lower() != consulta["res"] or bruto.get("preset") != consulta["preset"]:
             raise ErroBenchmark("O provedor retornou ajustes diferentes dos solicitados.", "resposta")
@@ -55,6 +61,7 @@ class ConsultarBenchmarkService:
         linhas = {res: matriz.get(res, matriz.get(res.lower())) for res in ("1080p", "1440p", "4K")}
 
         resultado = {
+            "escopo": escopo,
             "consulta": consulta, "jogo": str(bruto["game"].get("name") or consulta["game"])[:180],
             "fps": fps, "low1": numero(bruto.get("low1")), "intervalo": intervalo,
             "origem": bruto.get("source") if bruto.get("source") in ("measured", "model") else "unknown",

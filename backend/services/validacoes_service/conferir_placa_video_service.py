@@ -8,7 +8,7 @@ class ConferirPlacaVideoService:
     """Em jogos e trabalho pesado, a partir deste orçamento a build precisa de placa de vídeo dedicada,
     mesmo com processador de vídeo integrado (Ryzen G)."""
 
-    ORCAMENTO_MINIMO = Decimal("4000")
+    ORCAMENTO_MINIMO = Decimal("3500")
 
     @staticmethod
     def uso_exige(utilidade):

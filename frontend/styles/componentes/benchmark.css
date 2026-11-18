@@ -42,6 +42,8 @@
 .fpshq-layouts input:checked + span { color: var(--cor-p1); background: #007bff12; }
 .fpshq-layouts input:focus-visible + span { outline: 2px solid var(--cor-p1); outline-offset: 2px; }
 .fpshq-controls, .fpshq-output { min-width: 0; }
+.fpshq-reference-notice { margin: 0 0 20px; padding: 14px 16px; border: 1px solid var(--glass-border); border-left: 3px solid var(--cor-p1); border-radius: 12px; color: var(--cor-6); font: inherit; line-height: 1.6; }
+.fpshq-reference-notice strong { display: block; color: var(--cor-p1); margin-bottom: 6px; }
 .fpshq-empty { display: none; }
 .fpshq-empty p { margin: 8px 0 0; color: var(--cor-4); }
 .fpshq-hardware { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 0; }

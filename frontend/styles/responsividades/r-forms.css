@@ -136,6 +136,12 @@
 .appearance-case:has(input:checked), .appearance-swatch:has(input:checked) { border-color: var(--cor-p1); background: rgba(0,123,255,.07); }
 .appearance-case:focus-within, .appearance-swatch:focus-within { outline: 2px solid var(--cor-p1); outline-offset: 2px; }
 .appearance-case:hover, .appearance-swatch:hover { border-color: var(--cor-p1); }
+.appearance-case:has(input:disabled) { cursor: not-allowed; border-color: var(--glass-border); background: rgba(255,255,255,.015); }
+.appearance-case:has(input:disabled) :is(.appearance-case-media,.appearance-case-name,.appearance-case-description) { opacity: .45; }
+.appearance-case-availability { color: var(--status-warning); font: 400 .75rem/1.6 var(--font-body); text-align: center; }
+.appearance-style-help { color: var(--text-secondary); line-height: 1.8; }
+.appearance-style-feedback { padding: 12px; border: 1px solid var(--status-warning); border-radius: 12px; color: var(--cor-6); line-height: 1.8; }
+.appearance-style-feedback[hidden] { display: none; }
 .appearance-case-media { display: grid; place-items: center; width: 100%; min-width: 0; }
 .appearance-case-image { justify-self: center; width: 5rem; height: 5rem; object-fit: contain; }
 .appearance-case-name { color: var(--cor-6); text-align: center; overflow-wrap: break-word; font: 500 .8125rem/1.45 var(--font-heading); }

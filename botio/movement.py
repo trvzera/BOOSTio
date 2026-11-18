@@ -20,6 +20,7 @@ async def send_movement(client, member, *, joined):
         return
     embed = discord.Embed(title="📥 Membro entrou" if joined else "📤 Membro saiu",
                           color=0x0088FF if joined else 0x747F8D)
+    embed.set_thumbnail(url=member.display_avatar.url)
     embed.add_field(name="Username", value=discord.utils.escape_markdown(member.name), inline=True)
     embed.add_field(name="Apelido no servidor", value=discord.utils.escape_markdown(member.nick or "Não definido"), inline=True)
     embed.add_field(name="ID do usuário", value=str(member.id), inline=True)

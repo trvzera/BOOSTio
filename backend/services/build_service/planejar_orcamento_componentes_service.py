@@ -1,3 +1,4 @@
+from services.build_service.planejar_rede_service import PlanejarRedeService
 from decimal import Decimal, ROUND_DOWN
 
 from utils.memorias import normalizar_ddr
@@ -26,9 +27,9 @@ class PlanejarOrcamentoComponentesService:
         if PreferenciasPerifericosService.jogos(uso):
             return 'jogos'
         texto = uso.casefold()
-        if any(t in texto for t in ('pesado', 'render', 'servidor', 'nas')):
+        if RequisitosUsoService.exige_gpu_dedicada(uso) or any(t in texto for t in ('pesado', 'render', 'servidor', 'nas', 'programa')):
             return 'trabalho-pesado'
-        if any(t in texto for t in ('estudo', 'casual', 'escritorio', 'escritório')):
+        if any(t in texto for t in ('estudo', 'casual', 'escritorio', 'escritório', 'planilha', 'reuni')):
             return 'leve'
         return 'equilibrado'
 
@@ -111,8 +112,7 @@ class PlanejarOrcamentoComponentesService:
             if confirmado < contexto['armazenamento_minimo_gb']:
                 pendencias.append('O armazenamento próprio não confirma a capacidade mínima pedida; revise o reaproveitamento.')
         rede = contexto['rede']
-        acessorio = {'wifi': 'adaptador_wifi', 'cabo': 'cabo_rede'}.get(rede.get('tipo'))
-        if acessorio and rede.get('possuiAcessorio') is False and acessorio not in proprias:
+        for acessorio in PlanejarRedeService.categorias(rede) - set(proprias):
             if pools.get(acessorio):
                 total += min(self.preco(p) for p in pools[acessorio])
             else:
