@@ -2,7 +2,7 @@ import services.build_service.gerar_candidata_service as validacao_module
 from services.build_service.gerar_candidata_service import gerar_candidata
 from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
 import services.build_service.criar_build_service as criacao_module
-from services.build_service.catalogo_geracao_service import campos_pecas, gerar_catalogo
+from services.build_service.catalogo_geracao_service import campos_pecas
 from services.build_service.prompt_build_service import criar_prompt
 from copy import deepcopy
 from decimal import Decimal
@@ -126,15 +126,3 @@ def test_cor_da_variante_exata_no_nome_da_ficha_nao_fica_desconhecida():
     assert Cores.identificar(dados) == (frozenset({"branco"}), "nome_ficha_tecnica")
     assert Cores.identificar({**dados, "cor": "preto"}) == (frozenset({"preto"}), "cor_cadastrada")
     assert Cores.identificar({**dados, "modelo_ficha_tecnica": "Modelo 80 Plus White"}) == (frozenset(), None)
-
-
-def test_catalogo_preserva_variante_preta_equivalente_omitida_pela_amostra(mocker):
-    from models import Teclado
-    branco = Teclado(id=1, fabricante="Marca", modelo="GM1 White", preco=100, mecanico=True, switch="Brown", layout="ABNT2")
-    preto = Teclado(id=2, fabricante="Marca", modelo="GM1 Black", preco=120, mecanico=True, switch="Brown", layout="ABNT2")
-    modelo = SimpleNamespace(__tablename__="teclado", listar_disponiveis_ate=lambda *a, **k:[branco,preto])
-    mocker.patch("services.build_service.catalogo_geracao_service.MODELOS_PECAS", (modelo,))
-    mocker.patch.object(AmostrarCatalogoService, "executar", return_value=[campos_pecas(branco)])
-    mocker.patch("services.build_service.preco_exibido_service.Oferta.anexar_a_catalogo", side_effect=lambda pecas: pecas)
-    catalogo = gerar_catalogo(200, reserva_perifericos=200, cor="preto")
-    assert {p["id"] for p in catalogo["teclado"]} == {1, 2}

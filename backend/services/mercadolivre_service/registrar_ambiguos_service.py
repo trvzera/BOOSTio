@@ -10,7 +10,7 @@ from .controle_requisicoes_service import ErroMercadoLivre, OrcamentoRequisicoes
 MAX_CATALOGOS = 3
 
 
-def _json_exato(valor):
+def json_exato(valor):
     if isinstance(valor, Decimal):
         return str(valor)
     raise ValueError('JSON inválido')
@@ -38,7 +38,7 @@ class RegistrarAmbiguosMercadoLivreService:
                         'price': oferta['preco'], 'currency_id': 'BRL', 'site_id': 'MLB',
                         'condition': 'new', 'available_quantity': oferta['quantidade_disponivel']}
             bruto = json.loads(json.dumps({'origem': 'catalogo', 'catalogo': produto, 'anuncio': linha_ml},
-                                          default=_json_exato, allow_nan=False))
+                                          default=json_exato, allow_nan=False))
             titulo = (normal.titulo or produto.get('name') or '').strip()[:255]
             if not titulo:
                 continue

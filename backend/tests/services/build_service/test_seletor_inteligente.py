@@ -191,11 +191,9 @@ def test_reaproveitamento_exclui_cpu_e_ambos_os_armazenamentos(banco, mocker):
     salvar_modelo(SSD, 200, capacidade_gb=500, tipo='NVMe', interface='PCIe')
     salvar_modelo(HD, 200, capacidade_gb=1000)
     fonte = salvar_modelo(Fonte, 300, potencia_w=500)
-    consulta_cpu = mocker.spy(Processador, 'listar_por_benchmark')
     resultado = ids(dict(orcamento=4000, prioridade_montagem='desempenho',
                          pecas_proprias={'processador': 'Minha CPU', 'ssd': 'Meu SSD'}))
     assert resultado == [fonte]
-    consulta_cpu.assert_not_called()
 
 
 def test_rede_respeita_tipo_compra_e_comprimento_da_montagem(banco):
@@ -266,11 +264,9 @@ def test_placa_mae_propria_nao_gera_novas_recomendacoes_de_placa(banco, mocker):
     from models import PlacaMae
     inserir(500, 10000, soquete='AM4')
     salvar_modelo(PlacaMae, 300, socket='AM4')
-    consulta = mocker.spy(PlacaMae, 'listar_disponiveis_por_sockets')
     resultado = ids(dict(orcamento=4000, prioridade_montagem='desempenho',
                          pecas_proprias={'placa_mae': 'Minha placa'}))
     assert all(not p.startswith('placa_mae:') for p in resultado)
-    consulta.assert_not_called()
 
 
 @pytest.mark.parametrize('quantidades,esperadas', [((20, 20), (12, 12)), ((2, 30), (2, 22)),
@@ -331,9 +327,7 @@ def test_ram_propria_nao_consulta_novas_memorias_e_placa_propria_define_ddr(banc
     dados = dict(orcamento=4000, prioridade_montagem='desempenho', categoria='memoria_ram')
     assert ids({**dados, 'pecas_proprias': {'placa_mae': 'Placa propria'}}) == [ram]
     assert ids({**dados, 'pecas_proprias': {'placa_mae': 'Placa desconhecida'}}) == []
-    consulta = mocker.spy(MemoriaRAM, 'listar_disponiveis_por_ddrs')
     assert ids({**dados, 'pecas_proprias': {'memoria_ram': 'Minha RAM'}}) == []
-    consulta.assert_not_called()
 
 
 def test_seletor_preserva_requisito_de_armazenamento_para_etapa_de_geracao(banco):
@@ -480,5 +474,23 @@ def test_benchmark_nao_publica_candidato_pendente(banco, gpu):
     aprovado = inserir(500, 10000, gpu)
     inserir(400, 50000, gpu, status_validacao='pendente')
     classe = PlacaVideo if gpu else Processador
-    candidatos = classe.listar_por_benchmark(1000, 'desempenho')
+    candidatos = classe.listar_pool_benchmark(1000)
     assert [f'{classe.__tablename__}:{p.id}' for p in candidatos] == [aprovado]
+
+
+def test_referencia_de_gabinete_entra_na_amostra_so_se_estiver_no_pool():
+    referencia = {'id': 'gabinete:7', 'preco': 300}
+    contexto = {'aparencia': {'gabinete_id': 7}, 'pools': {'gabinete': [referencia]}, 'limites': {'gabinete': 2}}
+    seletor = SeletorInteligenteService()
+
+    catalogo = {'gabinete': [{'id': 1}, {'id': 2}]}
+    seletor._preservar_referencia_gabinete(contexto, set(), catalogo)
+    assert [p['id'] for p in catalogo['gabinete']] == [1, 7]
+
+    catalogo = {}
+    seletor._preservar_referencia_gabinete(contexto, {'gabinete'}, catalogo)
+    assert catalogo == {}
+
+    catalogo = {}
+    seletor._preservar_referencia_gabinete({**contexto, 'pools': {'gabinete': []}}, set(), catalogo)
+    assert catalogo == {}

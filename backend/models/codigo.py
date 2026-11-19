@@ -1,5 +1,5 @@
 from . import db
-from .base import ModeloBase
+from .base import ModeloBase, venceu
 from datetime import datetime, timedelta, timezone
 
 class Codigo(ModeloBase):
@@ -69,10 +69,7 @@ class Codigo(ModeloBase):
     return atualizados == 1
 
   def esta_expirado(self):
-    expiracao = self.data_expiracao
-    if expiracao.tzinfo is None:
-      expiracao = expiracao.replace(tzinfo=timezone.utc)
-    return expiracao <= datetime.now(timezone.utc)
+    return venceu(self.data_expiracao)
 
   @staticmethod
   def buscar_codigo_recente(usuario_id:int):

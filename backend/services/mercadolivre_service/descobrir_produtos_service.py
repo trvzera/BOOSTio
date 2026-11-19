@@ -1,14 +1,14 @@
-from .paginacao_descoberta_service import iterar_paginas, avancar_cursor, LimitePaginas
 """Descobre anúncios oficiais e os envia à fila, sem matching ou publicação."""
 import json
 from copy import deepcopy
 import logging
 import re
 from datetime import datetime, timezone
-from decimal import Decimal
 from sqlalchemy.exc import SQLAlchemyError
 from models import db, ProdutoPendente, ExecucaoDescoberta
 from models.modelos_pecas import MODELOS_PECAS
+from .paginacao_descoberta_service import iterar_paginas, avancar_cursor, LimitePaginas
+from .registrar_ambiguos_service import json_exato
 from .buscar_ofertas_mercado_livre_service import BuscarOfertasMercadoLivreService
 from .controle_requisicoes_service import ControleRequisicoesService, OrcamentoRequisicoesEsgotado, ErroMercadoLivre
 from .normalizar_produto_service import DOMINIOS
@@ -143,12 +143,8 @@ class DescobrirProdutosService:
             titulo = linha.get('title')
         if not isinstance(titulo, str) or not 1 <= len(titulo.strip()) <= 255:
             raise ValueError('Título inválido')
-        def _decimal_json(valor):
-            if isinstance(valor, Decimal):
-                return str(valor)
-            raise ValueError('JSON inválido')
         bruto = json.loads(json.dumps({'origem': origem, 'catalogo': produto, 'anuncio': linha},
-                                    default=_decimal_json, allow_nan=False))
+                                    default=json_exato, allow_nan=False))
         return dict(loja='mercado_livre', produto_id_loja=normal['produto_id_loja'],
                     vendedor_id=normal['vendedor_id'], titulo=titulo.strip(), url=normal['url'],
                     categoria_sugerida=categoria, dados_originais=bruto,

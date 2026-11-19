@@ -3,8 +3,8 @@ import re
 from html.parser import HTMLParser
 from urllib.parse import urlsplit
 
-import requests
 
+from .baixar_imagem_segura import baixar_imagem_segura
 from services.preco_service.validar_link_service import ValidarLinkService
 from services.preco_service.buscar_pagina_kabum_service import BuscarPaginaKabumService
 
@@ -38,33 +38,11 @@ class _MetadadosProduto(HTMLParser):
 
 
 class BuscarImagemKabumService:
-    TAMANHO_MAXIMO = 5 * 1024 * 1024
-
     def executar(self, url):
         ValidarLinkService().executar(url)
         codigo = self._codigo(url)
         imagem = self._imagem_do_anuncio(BuscarPaginaKabumService().executar(url), codigo)
-        resposta_imagem = requests.get(imagem, timeout=(10, 30), stream=True,
-                                      allow_redirects=False,
-                                      headers={"User-Agent": "Mozilla/5.0", "Referer": "https://www.kabum.com.br/"})
-        resposta_imagem.raise_for_status()
-        if resposta_imagem.is_redirect:
-            raise ValueError("A imagem redirecionou para outro endereço")
-        tipo = resposta_imagem.headers.get("Content-Type", "").split(";", 1)[0].lower()
-        extensoes = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}
-        if tipo not in extensoes:
-            raise ValueError("A resposta do anúncio não é uma imagem suportada")
-        partes = []
-        tamanho = 0
-        for bloco in resposta_imagem.iter_content(64 * 1024):
-            tamanho += len(bloco)
-            if tamanho > self.TAMANHO_MAXIMO:
-                raise ValueError("Imagem do anúncio maior que 5 MB")
-            partes.append(bloco)
-        conteudo = b"".join(partes)
-        if not self._imagem_valida(conteudo, tipo):
-            raise ValueError("O arquivo retornado não corresponde ao formato da imagem")
-        return conteudo, extensoes[tipo]
+        return baixar_imagem_segura(imagem, "do anúncio", headers={"Referer": "https://www.kabum.com.br/"})
 
     @staticmethod
     def _codigo(url):
@@ -131,9 +109,3 @@ class BuscarImagemKabumService:
                 and not partes.username and not partes.password and partes.port in (None, 443)
                 and (partes.path.startswith(f"/produtos/fotos/{codigo}/")
                      or partes.path.startswith(f"/produtos/fotos/sync_mirakl/{codigo}/")))
-
-    @staticmethod
-    def _imagem_valida(conteudo, tipo):
-        return (tipo == "image/jpeg" and conteudo.startswith(b"\xff\xd8\xff")
-                or tipo == "image/png" and conteudo.startswith(b"\x89PNG\r\n\x1a\n")
-                or tipo == "image/webp" and conteudo.startswith(b"RIFF") and conteudo[8:12] == b"WEBP")

@@ -3,9 +3,7 @@ from services.build_service.gerar_candidata_service import perfil_revisa_investi
 from services.build_service.salvar_build_gerada_service import salvar_build
 from services.validacoes_service.validar_pedido_build_service import validar_orcamento, validar_rede, validar_prioridade_montagem, validar_preferencia_processador, validar_textos_pedido, pecas_proprias
 from services.build_service.custos_build_service import dividir_orcamento
-from services.build_service.contexto_build_service import obter_detalhes_proprias
-from services.build_service.catalogo_geracao_service import preparar_catalogo, validar_disponibilidade, planejar_perifericos
-from services.build_service.prompt_build_service import criar_prompt
+from .seletor_inteligente_service import SeletorInteligenteService
 from services.build_service.conferir_pecas_proprias_service import ConferirPecasPropriasService
 import logging
 from time import perf_counter
@@ -22,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 class CriarBuildService:
 
-  def executar(self, usuario_id, dados, modelo="gemini-3.5-flash-lite", tentativas_correcao=1, *, selecao_inteligente=False):
+  def executar(self, usuario_id, dados, modelo="gemini-3.5-flash-lite", tentativas_correcao=1):
     validacao_campos(dados, ["nome", "descricao", "utilidade", "orcamento"])
     validar_textos_pedido(dados)
     validar_preferencia_processador(dados)
@@ -43,32 +41,21 @@ class CriarBuildService:
     validar_rede(rede)
     proprias = pecas_proprias(dados.get("pecas_proprias", {}))
     ConferirPecasPropriasService.executar(proprias)
-    margem = min(orcamento / 2, max(800, orcamento * 0.25))
 
     teto_pc, teto_perifericos = dividir_orcamento(orcamento, percentual)
     validar_minimos(teto_pc, teto_perifericos, percentual, dados.get("utilidade"))
     inicio_prompt = perf_counter()
-    reparo = {}
-    if selecao_inteligente:
-      from .seletor_inteligente_service import SeletorInteligenteService
-      preparado = SeletorInteligenteService().preparar_geracao(dados)
-      catalogo = preparado["catalogo"]
-      detalhes_proprias = preparado["detalhes_proprias"]
-      prompt = preparado["prompt"]
-      reparo = {"ajustar_orcamento": True, "catalogo_reparo": preparado["catalogo_reparo"]}
-      plano_perifericos = preparado["plano_perifericos"]
-    else:
-      catalogo = preparar_catalogo(dados, proprias, rede, aparencia, orcamento, margem, teto_pc, teto_perifericos)
-      detalhes_proprias = obter_detalhes_proprias(proprias)
-      PreferenciasProcessadorService.exigir_catalogo(catalogo, dados.get("preferencia_processador"), proprias, detalhes_proprias)
-      validar_disponibilidade(catalogo, proprias, percentual)
-      plano_perifericos = planejar_perifericos(catalogo, teto_perifericos, proprias, dados["utilidade"], aparencia["cor"], percentual)
-      prompt = criar_prompt(dados, orcamento, margem, catalogo, percentual, detalhes_proprias, plano_perifericos)
+    preparado = SeletorInteligenteService().preparar_geracao(dados)
+    catalogo = preparado["catalogo"]
+    detalhes_proprias = preparado["detalhes_proprias"]
+    prompt = preparado["prompt"]
+    plano_perifericos = preparado["plano_perifericos"]
     PreferenciasProcessadorService.exigir_catalogo(catalogo, dados.get("preferencia_processador"), proprias, detalhes_proprias)
     logger.info("Geração: etapa=prompt duracao_ms=%d caracteres=%d", (perf_counter()-inicio_prompt)*1000, len(prompt))
     dados_build = gerar_candidata(usuario_id, prompt, modelo, catalogo, orcamento,
                                      percentual, proprias, detalhes_proprias, rede, tentativas_correcao,
                                      revisar_investimento=perfil_revisa_investimento(dados["utilidade"]), cor=aparencia["cor"], aparencia=aparencia,
                                      armazenamento_minimo_gb=armazenamento_minimo, utilidade=dados["utilidade"],
-                                     plano_perifericos=plano_perifericos, **reparo)
+                                     plano_perifericos=plano_perifericos,
+                                     ajustar_orcamento=True, catalogo_reparo=preparado["catalogo_reparo"])
     return salvar_build(usuario_id, dados_build, proprias, rede, percentual, aparencia, orcamento)

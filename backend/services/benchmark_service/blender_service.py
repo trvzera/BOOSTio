@@ -8,7 +8,6 @@ import time
 
 import requests
 
-from utils.decorators import exceto_administrador
 from .fpshq_service import ErroBenchmark, FpshqService
 
 logger = logging.getLogger(__name__)
@@ -100,13 +99,7 @@ class BlenderService:
                 "metodo": escolhido["Compute Type"], "score": escolhido["Median Score"], "quantidade": escolhido["Number of Benchmarks"],
                 "unidade": "amostras/min", "url": self.URL + "?" + requests.compat.urlencode({"device_name": escolhido["Device Name"], "blender_version": escolhido["Blender Version"], "group_by": "device_name"})}
 
-    @exceto_administrador
-    def _fila_do_usuario(self, agora, usuario_id):
-        usuario = self.usuarios.setdefault(str(usuario_id), deque())
-        self.usuarios.move_to_end(str(usuario_id))
-        while usuario and agora - usuario[0] >= 60:
-            usuario.popleft()
-        return usuario
+    _fila_do_usuario = FpshqService._fila_do_usuario
 
     def _limitar(self, agora, usuario_id):
         if agora < self.bloqueado_ate:

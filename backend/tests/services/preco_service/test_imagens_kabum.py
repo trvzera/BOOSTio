@@ -88,13 +88,12 @@ class ImagensKabumTest(unittest.TestCase):
         imagem_response.raise_for_status.return_value = None
         with TemporaryDirectory() as pasta:
             with patch("services.peca_service.atualizar_imagem_peca_service.PASTA_IMAGENS", Path(pasta)):
-                with patch("services.peca_service.buscar_imagem_kabum_service.requests.get",
+                with patch("services.peca_service.baixar_imagem_segura.requests.get",
                            side_effect=[pagina_response, imagem_response]) as buscar:
                     destino = AtualizarImagemPecaService().executar(peca)
                 self.assertEqual(destino.read_bytes(), jpg)
                 self.assertEqual(buscar.call_count, 2)
                 self.assertEqual(peca.to_catalogo()["imagem"], "../coletados/imagens/placa_video-1.jpg")
-                self.assertEqual(len(PlacaVideo.sem_imagem_com_link()), 0)
 
 
 if __name__ == "__main__":

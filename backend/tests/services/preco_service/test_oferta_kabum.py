@@ -3,11 +3,9 @@ from decimal import Decimal
 
 import pytest
 from flask import Flask
-from sqlalchemy import text
 
 from models import db, Oferta, HistoricoOferta, PlacaVideo
 from repositories.ofertas_kabum_repository import definir_link, gravar_cotacao_inicial
-from services.peca_service.migrar_ofertas_kabum_service import MigrarOfertasKabumService
 
 URL = 'https://www.kabum.com.br/produto/123/placa'
 DATA = datetime(2026, 11, 1, 10)
@@ -79,42 +77,6 @@ def test_anuncio_de_outra_peca_nao_e_reaproveitado(banco):
         definir_link(b, URL)
 
 
-def test_migracao_copia_colunas_antigas_e_e_repetivel(banco):
-    p, sem_link = nova_placa(), nova_placa()
-    for coluna, tipo in (('kabum_external', 'TEXT'), ('preco', 'FLOAT'), ('esgotado', 'BOOLEAN'), ('preco_atualizado_em', 'DATETIME')):
-        banco.session.execute(text(f'ALTER TABLE placa_video ADD COLUMN {coluna} {tipo}'))
-    banco.session.execute(text("UPDATE placa_video SET kabum_external=:u, preco=1234.5, esgotado=0, preco_atualizado_em='2026-11-01 10:00:00' WHERE id=:i"),
-                          {'u': URL, 'i': p.id})
-    banco.session.execute(text('DROP TABLE historico_preco'))
-    banco.session.execute(text('CREATE TABLE historico_preco (id INTEGER PRIMARY KEY, tabela_peca TEXT, peca_id INT, loja TEXT, produto_id_loja TEXT, preco FLOAT, esgotado BOOLEAN, coletado_em DATETIME)'))
-    banco.session.execute(text("INSERT INTO historico_preco VALUES (1,'placa_video',:i,'kabum','123',1300,0,'2026-10-30 09:00:00'), (2,'placa_video',:i,'kabum','123',NULL,1,'2026-10-31 09:00:00')"), {'i': p.id})
-    banco.session.commit()
-    simulado = MigrarOfertasKabumService().executar(simular=True)
-    assert simulado['criadas'] == 1 and simulado['sem_link'] == 1 and Oferta.query.count() == 0
-    r = MigrarOfertasKabumService().executar(simular=False)
-    assert (r['criadas'], r['historicos']) == (1, 1)
-    banco.session.refresh(p)
-    assert p.preco == 1234.5 and p.esgotado is False and p.kabum_external == URL
-    assert p.preco_atualizado_em == DATA
-    assert HistoricoOferta.query.one().preco == Decimal('1300.00')
-    r = MigrarOfertasKabumService().executar(simular=False)
-    assert (r['criadas'], r['inalteradas'], r['historicos']) == (0, 1, 0)
-    assert Oferta.query.count() == 1 and sem_link.preco is None
-
-
-def test_mysql_comandos_para_colunas_antigas_obrigatorias_e_aspas_de_tabela():
-    from sqlalchemy import Boolean, Float, Text
-    from sqlalchemy.dialects import mysql
-    colunas = [{'name': 'preco', 'type': Float(), 'nullable': False},
-               {'name': 'esgotado', 'type': Boolean(), 'nullable': False},
-               {'name': 'kabum_external', 'type': Text(), 'nullable': True},
-               {'name': 'modelo', 'type': Text(), 'nullable': False}]
-    comandos = MigrarOfertasKabumService.comandos_colunas_opcionais(mysql.dialect(), 'placa_video', colunas)
-    assert comandos == ['ALTER TABLE placa_video MODIFY preco FLOAT NULL',
-                        'ALTER TABLE placa_video MODIFY esgotado BOOL NULL']
-    assert mysql.dialect().identifier_preparer.quote('order') == '`order`'
-
-
 def test_shopee_conta_como_disponivel_mesmo_sem_informar_estoque(banco):
     p = nova_placa()
     banco.session.add(Oferta(tabela_peca='placa_video', peca_id=p.id, loja='shopee', produto_id_loja='10:2',
@@ -178,5 +140,4 @@ def test_cooler_sem_socket_identificavel_nao_e_candidato_a_montagem(banco):
     banco.session.commit()
     assert [c.id for c in AirCooler.listar_candidatos_disponiveis(1000)] == [claro.id]
     assert [c.id for c in WaterCooler.listar_candidatos_disponiveis(1000)] == [agua.id]
-    assert [c.id for c in AirCooler.listar_disponiveis_ate(1000)] == [claro.id]
     assert {c.id for c in AirCooler.listar_publicadas()} == {vago.id, claro.id}

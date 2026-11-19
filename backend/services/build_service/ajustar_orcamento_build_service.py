@@ -1,9 +1,9 @@
 from copy import deepcopy
 from decimal import Decimal
-from math import isfinite
 import re
 
 from utils.memorias import normalizar_ddr
+from .amostra_inteligente_service import AmostraInteligenteService
 from .preferencias_cores_service import PreferenciasCoresService
 
 
@@ -13,11 +13,7 @@ class AjustarOrcamentoBuildService:
     MAX_OPCOES = 12
     MAX_ESTADOS = 256
 
-    @staticmethod
-    def numero(valor):
-        if isinstance(valor, bool) or not isinstance(valor, (int, float, Decimal)) or not isfinite(valor):
-            return None
-        return Decimal(str(valor))
+    numero = staticmethod(AmostraInteligenteService.numero)
 
     @classmethod
     def custos(cls, build, catalogo):
