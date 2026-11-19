@@ -1,38 +1,10 @@
-from services.build_service.constantes_build import CAMPOS_PECAS, PERIFERICOS
-import logging
-from time import perf_counter
 from decimal import Decimal
 
-from models.build_salva import MODELOS
-from models.modelos_pecas import MODELOS_PECAS
+from services.build_service.constantes_build import CAMPOS_PECAS, PERIFERICOS
 from services.build_service.planejar_perifericos_service import PlanejarPerifericosService
-from services.build_service.amostrar_catalogo_service import AmostrarCatalogoService
-from services.build_service.preferencias_perifericos_service import PreferenciasPerifericosService
 from services.build_service.preferencias_cores_service import PreferenciasCoresService
-from services.build_service.planejar_rede_service import PlanejarRedeService
 from services.build_service.preferencias_gabinete_service import PreferenciasGabineteService
 from services.build_service.planejamento_geracao import ErroPlanejamentoBuild, sugerir_total
-from services.build_service.preco_exibido_service import PrecoExibidoService
-from .preferencias_processador_service import PreferenciasProcessadorService
-
-logger = logging.getLogger("services.build_service.criar_build_service")
-
-
-def preparar_catalogo(dados, proprias, rede, aparencia, orcamento, margem, teto_pc, teto_perifericos):
-  excluidas = set(proprias)
-  if {"ssd", "hd"} & excluidas:
-    excluidas.update(("ssd", "hd"))
-  if {"air_cooler", "water_cooler"} & excluidas:
-    excluidas.update(("air_cooler", "water_cooler"))
-  excluidas.update({"adaptador_wifi", "cabo_rede"} - PlanejarRedeService.categorias(rede))
-  inicio_catalogo = perf_counter()
-  catalogo = gerar_catalogo(min(orcamento - margem, teto_pc), teto_perifericos, excluidas,
-                                aparencia["gabinete_id"] if "gabinete" not in proprias else None, dados["utilidade"], cor=aparencia["cor"], aparencia=aparencia, rede=rede, preferencia_processador=dados.get("preferencia_processador"))
-  for conexao in PlanejarRedeService.conexoes(rede):
-    for acessorio_rede in PlanejarRedeService.categorias(conexao):
-      catalogo[acessorio_rede] = PlanejarRedeService.opcoes(catalogo, conexao, proprias)
-  logger.info("Geração: etapa=catalogo duracao_ms=%d categorias=%d", (perf_counter()-inicio_catalogo)*1000, len(catalogo))
-  return catalogo
 
 
 def validar_disponibilidade(catalogo, proprias, percentual):
@@ -73,49 +45,3 @@ def campos_catalogo(dados):
     campo: float(valor) if isinstance(valor, Decimal) else valor for campo in CAMPOS_PECAS
     if (valor := dados.get(campo)) is not None
   }
-
-
-def gerar_catalogo(preco_maximo, reserva_perifericos=0, excluidas=(), referencia_gabinete=None, utilidade="", cor="sem-preferencia", aparencia=None, rede=None, preferencia_processador=None):
-  catalogo = {}
-  for modelo in MODELOS_PECAS:
-    periferico = modelo.__tablename__ in PERIFERICOS
-    if modelo.__tablename__ in excluidas or (periferico and not reserva_perifericos):
-      continue
-    teto = reserva_perifericos if periferico else preco_maximo
-    pecas = PrecoExibidoService.catalogo(modelo.listar_disponiveis_ate(teto, limite=200), teto)
-    if pecas:
-      fichas = [campos_catalogo({**item, "id": PrecoExibidoService.id_numerico(item)}) for item in pecas]
-      if modelo.__tablename__ == "processador" and preferencia_processador in ("intel", "amd"):
-        fichas = [p for p in fichas if PreferenciasProcessadorService.marca(p, preferencia_processador)]
-      if modelo.__tablename__ == "monitor":
-        fichas = [p for p in fichas if PreferenciasPerifericosService.painel_permitido(p)]
-      if modelo.__tablename__ in ("cabo_rede", "adaptador_wifi") and rede:
-        fichas = PlanejarRedeService.opcoes({modelo.__tablename__: fichas}, rede)
-      if fichas:
-        catalogo[modelo.__tablename__] = AmostrarCatalogoService().executar(modelo.__tablename__, fichas, utilidade=utilidade, cor=cor, preferencia_processador=preferencia_processador)
-
-
-        amostra = catalogo[modelo.__tablename__]
-        variantes = []
-        for selecionada in list(amostra):
-          for variante in PreferenciasCoresService.alternativas_equivalentes(selecionada, fichas, cor)[:1]:
-            if variante not in amostra and variante not in variantes:
-              variantes.append(variante)
-        amostra.extend(variantes[:3])
-        if modelo.__tablename__ == "gabinete" and aparencia:
-          for destaque in PreferenciasGabineteService.destaques(fichas, aparencia):
-            if destaque not in amostra:
-              amostra.append(destaque)
-  if referencia_gabinete is not None and "gabinete" not in excluidas:
-    referencia = MODELOS["gabinete"].buscar_por_id(referencia_gabinete)
-    precificada = PrecoExibidoService.catalogo([referencia], preco_maximo) if referencia else []
-    if referencia and precificada and referencia.publicavel and referencia.ficha_montagem_validada is not False:
-      peca = campos_catalogo({**precificada[0], "id": referencia.id})
-      if peca.get("esgotado") is False:
-        amostra = catalogo.setdefault("gabinete", [])
-        if not any(item["id"] == referencia_gabinete for item in amostra):
-          if len(amostra) >= 12:
-            amostra[-1] = peca
-          else:
-            amostra.append(peca)
-  return catalogo

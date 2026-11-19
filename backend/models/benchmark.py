@@ -10,13 +10,6 @@ class BenchmarkMixin:
     benchmark_referencia_em = db.Column(db.Date, nullable=True)
 
     @classmethod
-    def listar_por_benchmark(cls, preco_maximo, prioridade, limite=12):
-        pontuacao = getattr(cls, cls.BENCHMARK_CAMPO)
-        criterio = pontuacao / cls.preco if prioridade == "custo_beneficio" else pontuacao
-        return (cls._consulta_benchmark(preco_maximo)
-                .order_by(criterio.desc(), cls.preco.asc(), cls.id.asc()).limit(limite).all())
-
-    @classmethod
     def listar_pool_benchmark(cls, preco_maximo):
         return cls._consulta_benchmark(preco_maximo).order_by(cls.preco.asc(), cls.id.asc()).all()
 

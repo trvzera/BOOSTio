@@ -1,6 +1,6 @@
 from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
 from services.validacoes_service.validar_pedido_build_service import validar_rede
-from services.build_service.catalogo_geracao_service import campos_pecas, gerar_catalogo
+from services.build_service.catalogo_geracao_service import campos_pecas
 from services.build_service.prompt_build_service import criar_prompt
 from services.build_service.constantes_build import PERIFERICOS
 import json
@@ -59,11 +59,7 @@ class CriarBuildPerifericosTest(unittest.TestCase):
             taxa_atualizacao_hz=144,
             tipo_painel="IPS",
         )
-        modelo = SimpleNamespace(__tablename__="monitor", listar_disponiveis_ate=lambda *args, **kwargs: [monitor])
-        with patch("services.build_service.catalogo_geracao_service.MODELOS_PECAS", (modelo,)), \
-             patch("services.build_service.preco_exibido_service.Oferta.anexar_a_catalogo", side_effect=lambda pecas: pecas):
-            catalogo = gerar_catalogo(1000, reserva_perifericos=1000)
-        self.assertEqual(json.loads(json.dumps(catalogo))["monitor"][0]["tamanho_polegadas"], 23.8)
+        self.assertEqual(json.loads(json.dumps(campos_pecas(monitor)))["tamanho_polegadas"], 23.8)
 
     def test_catalogo_nao_omite_especificacoes_da_cpu_usadas_para_o_objetivo(self):
         from models import Processador

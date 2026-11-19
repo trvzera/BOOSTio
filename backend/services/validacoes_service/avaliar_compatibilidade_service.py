@@ -1,8 +1,8 @@
 from services.build_service.planejar_rede_service import PlanejarRedeService
-import math
 import re
 
 from models.build_salva import MODELOS
+from utils.validacoes import numero_nao_negativo
 from utils.sockets import normalizar_socket, suporte_socket_cooler
 from .encaixe_fisico import avaliar_medidas
 from .armazenamento import avaliar_armazenamento
@@ -10,14 +10,7 @@ from .conectores import avaliar_conectores
 from services.build_service.preferencias_gabinete_service import PreferenciasGabineteService
 
 
-def numero(valor):
-    if valor is None or isinstance(valor, bool) or valor == "":
-        return None
-    try:
-        valor = float(valor)
-        return valor if math.isfinite(valor) and valor >= 0 else None
-    except (ValueError, TypeError):
-        return None
+numero = numero_nao_negativo
 
 
 def texto(valor):

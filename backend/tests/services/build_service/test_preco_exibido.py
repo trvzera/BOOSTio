@@ -4,7 +4,6 @@ import pytest
 from flask import Flask
 
 from models import db, Oferta, PlacaVideo
-from services.build_service.catalogo_geracao_service import gerar_catalogo
 from services.build_service.preco_exibido_service import PrecoExibidoService
 
 AGORA = datetime(2026, 11, 13, 12, 0)
@@ -57,11 +56,3 @@ def test_preco_exibido_acima_do_teto_sai_da_geracao(banco):
     shopee_nao_conferida(peca, 600)
     assert PrecoExibidoService.catalogo([db.session.get(PlacaVideo, peca.id)], teto=1000) == []
     assert len(PrecoExibidoService.catalogo([db.session.get(PlacaVideo, peca.id)], teto=1300)) == 1
-
-
-def test_catalogo_da_geracao_usa_o_preco_que_o_site_mostra(banco):
-    cara = gpu(1248.90, codigo=1062024)
-    shopee_nao_conferida(cara, 600)
-    barata = gpu(900, codigo=1062025)
-    catalogo = gerar_catalogo(1000)
-    assert [(p['id'], p['preco']) for p in catalogo['placa_video']] == [(barata.id, 900.0)]

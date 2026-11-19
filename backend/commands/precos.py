@@ -40,17 +40,6 @@ def registrar_comandos_precos(app):
             raise click.ClickException(str(erro) if isinstance(erro, ValueError) else "Falha ao registrar credenciais no banco") from None
         click.echo("Credenciais OAuth registradas com segurança.")
 
-    @app.cli.command("mercadolivre-tokens-transferir")
-    @click.option("--arquivo", required=True, type=click.Path(exists=True, dir_okay=False))
-    @click.option("--remover-arquivo", is_flag=True, help="Remove o arquivo após verificar os tokens no banco.")
-    def transferir_tokens_mercado_livre(arquivo, remover_arquivo):
-        from services.mercadolivre_service.transferir_tokens_mercado_livre_service import TransferirTokensMercadoLivreService
-        try:
-            resultado = TransferirTokensMercadoLivreService().executar(arquivo, remover_arquivo=remover_arquivo)
-            click.echo(json.dumps(resultado, ensure_ascii=False))
-        except (ValueError, SQLAlchemyError, OSError):
-            raise click.ClickException("Transferência interrompida; confira esquema, chave, identidade e arquivo. A origem não é usada automaticamente.") from None
-
     @app.cli.command("pecas-complementares")
     @click.option("--simular", is_flag=True, help="Lista o lote sem gravar dados nem consultar lojas.")
     def complementares(simular):
@@ -69,17 +58,6 @@ def registrar_comandos_precos(app):
     def restaurar_links():
         """Repõe links conhecidos da seed sem sobrescrever os links atuais."""
         click.echo(json.dumps(RestaurarLinksKabumService().executar(), ensure_ascii=False))
-
-    @app.cli.command("ofertas-kabum-migrar")
-    @click.option("--aplicar", is_flag=True, help="Grava as ofertas; sem esta opção, apenas simula e conta.")
-    def migrar_ofertas_kabum(aplicar):
-        """Copia link, preço e estoque das peças para a oferta da KaBuM (colunas antigas ficam intactas)."""
-        from services.peca_service.migrar_ofertas_kabum_service import MigrarOfertasKabumService
-        try:
-            resumo = MigrarOfertasKabumService().executar(simular=not aplicar)
-        except SQLAlchemyError as erro:
-            raise click.ClickException("Não foi possível migrar as ofertas no banco.") from erro
-        click.echo(json.dumps(resumo, ensure_ascii=False))
 
     @app.cli.command("precos-migrar")
     def migrar():

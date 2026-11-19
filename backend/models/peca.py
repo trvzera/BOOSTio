@@ -131,10 +131,6 @@ class Peca(ModeloBase):
     return cls.query.filter(cls.kabum_external.isnot(None), cls.kabum_external != "").all()
 
   @classmethod
-  def sem_imagem_com_link(cls):
-    return cls.query.filter(cls.imagem_url.is_(None), cls.kabum_external.isnot(None), cls.kabum_external != "").all()
-
-  @classmethod
   def sem_imagem_com_fonte(cls):
     """Sem foto e com anúncio da KaBuM, vínculo com o catálogo do Mercado Livre ou oferta da Shopee."""
     from . import Oferta, VinculoMercadoLivre
@@ -221,14 +217,6 @@ class Peca(ModeloBase):
   @classmethod
   def listar_por_link_kabum(cls, url):
     return cls.query.filter(cls.kabum_external == url).all()
-
-  @classmethod
-  def listar_disponiveis_ate(cls, preco_maximo: float, limite: int = 30):
-    pecas = cls.listar_candidatos_disponiveis(preco_maximo)
-    if len(pecas) <= limite:
-      return pecas
-    return [pecas[indice * (len(pecas) - 1) // (limite - 1)] for indice in range(limite)]
-
 
   @classmethod
   def listar_candidatos_disponiveis(cls, preco_maximo):

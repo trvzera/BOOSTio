@@ -4,7 +4,7 @@ from models import db
 from sqlalchemy.exc import SQLAlchemyError
 from smtplib import SMTPException, SMTPAuthenticationError, SMTPRecipientsRefused
 from email_validator import EmailNotValidError
-from utils.decorators import apenas_proprio_usuario
+from utils.decorators import apenas_proprio_usuario, tratar_erros
 from utils.limite_requisicoes import limiter, chave_usuario
 
 from services.email_service.enviar_codigo_email_service import EnviarEmailService
@@ -54,15 +54,7 @@ def enviar_email(usuario_id):
 @limiter.limit("25 per hour", key_func=chave_usuario)
 @login_required
 @apenas_proprio_usuario
+@tratar_erros()
 def conferir_email(usuario_id):
-  try:
-    dados = request.get_json() or {}
-    service = VerificarCodigoEmail()
-    usuario = service.executar_para_usuario(usuario_id,dados)
-    return jsonify({
-      "mensagem":"Email verificado com sucesso",
-      "usuario": usuario
-    }),200
-
-  except ValueError as e:
-    return jsonify({"erro": str(e)}),400
+  usuario = VerificarCodigoEmail().executar_para_usuario(usuario_id, request.get_json() or {})
+  return jsonify({"mensagem": "Email verificado com sucesso", "usuario": usuario}),200

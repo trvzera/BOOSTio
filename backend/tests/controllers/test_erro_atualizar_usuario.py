@@ -13,7 +13,7 @@ def test_falha_ao_atualizar_usuario_faz_rollback_e_retorna_500(mocker):
     app = Flask(__name__)
 
     with app.test_request_context(json={"nome": "Gustavo"}):
-        resposta, status = unwrap(atualizar_usuario)(1)
+        resposta, status = unwrap(atualizar_usuario, stop=lambda f: 'mensagem_banco' in f.__code__.co_freevars)(1)
 
     assert status == 500
     assert resposta.json == {"erro": "Erro ao atualizar o usuario no banco de dados"}

@@ -1,16 +1,9 @@
-import math
 from functools import lru_cache
+from utils.validacoes import numero_nao_negativo
 from .armazenamento import avaliar_baias
 
 
-def n(valor):
-    if valor is None or isinstance(valor, bool) or valor == "":
-        return None
-    try:
-        valor = float(valor)
-        return valor if math.isfinite(valor) and valor >= 0 else None
-    except (ValueError, TypeError):
-        return None
+n = numero_nao_negativo
 
 
 def inteiro(valor, minimo=0):

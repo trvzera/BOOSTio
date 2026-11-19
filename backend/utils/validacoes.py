@@ -1,3 +1,17 @@
+import math
+
+
+
+def numero_nao_negativo(valor):
+  """Converte para float; devolve None se vazio, booleano, infinito, negativo ou não numérico."""
+  if valor is None or isinstance(valor, bool) or valor == "":
+    return None
+  try:
+    valor = float(valor)
+    return valor if math.isfinite(valor) and valor >= 0 else None
+  except (ValueError, TypeError):
+    return None
+
 
 def validacao_campos(dados: dict, campos_obrigatorios: list[str]):
   if not isinstance(dados, dict):

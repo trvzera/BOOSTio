@@ -2,10 +2,10 @@ from services.peca_service.consultar_historico_precos_service import ConsultarHi
 from flask import Blueprint,request,jsonify
 from flask_login import login_required,current_user
 from utils.limite_requisicoes import limiter, chave_usuario
-from models import db
 from models.build_salva import LimiteBuildsError, EmailNaoVerificadoError
-from utils.decorators import usuario_atual_e_administrador
+from utils.decorators import tratar_erros, usuario_atual_e_administrador
 from sqlalchemy.exc import SQLAlchemyError
+from models import db
 from requests.exceptions import RequestException, HTTPError, Timeout, ConnectionError
 
 from services.build_service.listar_builds_service import ListarBuildService
@@ -27,6 +27,10 @@ from services.llm_service.reservar_chamada_service import CotaGlobalIAError, Con
 
 build_bp = Blueprint("build",__name__,url_prefix='/build')
 
+# Erros da geração por IA: a rota deixa passar e os handlers abaixo montam a resposta.
+ERROS_DA_GERACAO = (LimiteBuildsError, EmailNaoVerificadoError, ErroGeracaoBuild, ErroPlanejamentoBuild,
+                    GeracaoEmAndamentoError, CotaGlobalIAError, ControleIAIndisponivelError, RequestException)
+
 
 @build_bp.errorhandler(EmailNaoVerificadoError)
 def verificar_email_antes_de_criar(erro):
@@ -38,14 +42,65 @@ def limite_builds(erro):
   return jsonify({"erro": str(erro), "codigo": "limite-builds", "limite": 3}),409
 
 
+@build_bp.errorhandler(GeracaoEmAndamentoError)
+def geracao_em_andamento(erro):
+  return jsonify({"erro": str(erro), "codigo": "geracao-em-andamento"}),409
+
+
+@build_bp.errorhandler(CotaGlobalIAError)
+def cota_global_ia(erro):
+  resposta = jsonify({"erro": str(erro), "codigo": "ia-cota-global"})
+  resposta.headers["Retry-After"] = str(erro.espera)
+  return resposta,429
+
+
+@build_bp.errorhandler(ControleIAIndisponivelError)
+def controle_ia_indisponivel(_erro):
+  return jsonify({"erro": "A geração está temporariamente indisponível. Tente novamente mais tarde.", "codigo": "ia-controle-indisponivel"}),503
+
+
+@build_bp.errorhandler(ErroGeracaoBuild)
+def geracao_invalida(erro):
+  return jsonify({"erro": str(erro), "codigo": "geracao-invalida", "geracao": erro.geracao}),502
+
+
+@build_bp.errorhandler(ErroPlanejamentoBuild)
+def planejamento_invalido(erro):
+  return jsonify({"erro": str(erro), "codigo": "planejamento-invalido", "geracao": erro.geracao}),400
+
+
+@build_bp.errorhandler(Timeout)
+def ia_timeout(_erro):
+  return jsonify({"erro": "A IA demorou demais para responder. Suas respostas foram preservadas; tente novamente em alguns instantes.", "codigo": "ia-timeout"}),504
+
+
+@build_bp.errorhandler(ConnectionError)
+def ia_indisponivel(_erro):
+  return jsonify({"erro": "Não foi possível acessar o serviço de montagem. Tente novamente em alguns instantes.", "codigo": "ia-indisponivel"}),503
+
+
+@build_bp.errorhandler(HTTPError)
+def ia_http(erro):
+  if erro.response is not None and erro.response.status_code == 429:
+    resposta = jsonify({"erro": "O serviço de montagem atingiu um limite temporário. Aguarde alguns instantes e tente novamente.", "codigo": "ia-limite"})
+    espera = espera_do_provedor(erro)
+    if espera:
+      resposta.headers["Retry-After"] = espera
+    return resposta,503
+  return jsonify({"erro": "O serviço de montagem está indisponível agora. Tente novamente mais tarde.", "codigo": "ia-provedor"}),502
+
+
+@build_bp.errorhandler(RequestException)
+def ia_provedor(_erro):
+  return jsonify({"erro": "Não foi possível consultar o serviço de montagem. Tente novamente em alguns instantes.", "codigo": "ia-provedor"}),502
+
+
 @build_bp.get("/")
 @login_required
+@tratar_erros(status_valor=404)
 def mostrar_builds():
-  try:
-    builds = ListarBuildService().executar(current_user.id)
-    return jsonify({"builds": builds, "limite": None if usuario_atual_e_administrador() else 3}),200
-  except ValueError as e:
-    return jsonify({"erro": str(e)}),404
+  builds = ListarBuildService().executar(current_user.id)
+  return jsonify({"builds": builds, "limite": None if usuario_atual_e_administrador() else 3}),200
 
 
 @build_bp.post("/")
@@ -53,56 +108,18 @@ def mostrar_builds():
 @limiter.limit("60 per day")
 @limiter.limit("10 per day", key_func=chave_usuario)
 @login_required
+@tratar_erros("Erro ao salvar a build", mensagem_inesperada="Erro ao gerar a build", repassar=ERROS_DA_GERACAO)
 def criar_build():
-  try:
-    dados = request.get_json(silent=True)
+  dados = request.get_json(silent=True)
 
-    if not isinstance(dados, dict):
-      return jsonify({"erro": "Envie um objeto JSON válido"}),400
+  if not isinstance(dados, dict):
+    return jsonify({"erro": "Envie um objeto JSON válido"}),400
 
-    usuario_id = current_user.id
-    build = GerarBuildService().executar(usuario_id, dados)
-    builds = ListarBuildService().executar(usuario_id)
+  usuario_id = current_user.id
+  build = GerarBuildService().executar(usuario_id, dados)
+  builds = ListarBuildService().executar(usuario_id)
 
-    return jsonify({"mensagem": "Build criada com sucesso", "build": build, "builds": builds}),201
-  except (LimiteBuildsError, EmailNaoVerificadoError):
-    raise
-  except GeracaoEmAndamentoError as erro:
-    return jsonify({"erro": str(erro), "codigo": "geracao-em-andamento"}),409
-  except CotaGlobalIAError as erro:
-    resposta = jsonify({"erro": str(erro), "codigo": "ia-cota-global"})
-    resposta.headers["Retry-After"] = str(erro.espera)
-    return resposta,429
-  except ControleIAIndisponivelError:
-    return jsonify({"erro": "A geração está temporariamente indisponível. Tente novamente mais tarde.", "codigo": "ia-controle-indisponivel"}),503
-  except ErroGeracaoBuild as erro:
-    return jsonify({"erro": str(erro), "codigo": "geracao-invalida", "geracao": erro.geracao}),502
-  except ErroPlanejamentoBuild as erro:
-    return jsonify({"erro": str(erro), "codigo": "planejamento-invalido", "geracao": erro.geracao}),400
-  except ValueError as e:
-    return jsonify({"erro": str(e)}),400
-
-  except Timeout:
-    return jsonify({"erro": "A IA demorou demais para responder. Suas respostas foram preservadas; tente novamente em alguns instantes.", "codigo": "ia-timeout"}),504
-  except ConnectionError:
-    return jsonify({"erro": "Não foi possível acessar o serviço de montagem. Tente novamente em alguns instantes.", "codigo": "ia-indisponivel"}),503
-  except HTTPError as erro:
-    if erro.response is not None and erro.response.status_code == 429:
-      resposta = jsonify({"erro": "O serviço de montagem atingiu um limite temporário. Aguarde alguns instantes e tente novamente.", "codigo": "ia-limite"})
-      espera = espera_do_provedor(erro)
-      if espera:
-        resposta.headers["Retry-After"] = espera
-      return resposta,503
-    return jsonify({"erro": "O serviço de montagem está indisponível agora. Tente novamente mais tarde.", "codigo": "ia-provedor"}),502
-  except RequestException:
-    return jsonify({"erro": "Não foi possível consultar o serviço de montagem. Tente novamente em alguns instantes.", "codigo": "ia-provedor"}),502
-
-  except SQLAlchemyError:
-    db.session.rollback()
-    return jsonify({"erro": "Erro ao salvar a build"}),500
-
-  except Exception:
-    return jsonify({"erro": "Erro ao gerar a build"}),500
+  return jsonify({"mensagem": "Build criada com sucesso", "build": build, "builds": builds}),201
 
 
 @build_bp.get("/catalogo/<categoria>/<int:peca_id>/ofertas/<int:oferta_id>/historico-precos")
@@ -153,78 +170,46 @@ def catalogo_build():
 
 @build_bp.post("/manual")
 @login_required
+@tratar_erros("Erro ao salvar a build", repassar=LimiteBuildsError)
 def criar_build_manual():
-  try:
-    return jsonify({"build": CriarBuildManualService().executar(current_user.id, request.get_json(silent=True))}),201
-  except LimiteBuildsError:
-    raise
-  except ValueError as erro:
-    return jsonify({"erro": str(erro)}),400
-  except SQLAlchemyError:
-    db.session.rollback()
-    return jsonify({"erro": "Erro ao salvar a build"}),500
+  return jsonify({"build": CriarBuildManualService().executar(current_user.id, request.get_json(silent=True))}),201
 
 
 @build_bp.get("/<build_id>")
 @login_required
+@tratar_erros(status_valor=404)
 def buscar_build(build_id):
-  try:
-    build = BuscarBuildService().executar(current_user.id, build_id)
-    return jsonify({"build": build}),200
-  except ValueError as e:
-    return jsonify({"erro": str(e)}),404
+  return jsonify({"build": BuscarBuildService().executar(current_user.id, build_id)}),200
 
 
 @build_bp.put("/<build_id>")
 @login_required
+@tratar_erros("Erro ao atualizar a build")
 def atualizar_build(build_id):
-  try:
-    return jsonify({"build": AtualizarBuildService().executar(current_user.id, build_id, request.get_json(silent=True))}),200
-  except ValueError as erro:
-    return jsonify({"erro": str(erro)}),400
-  except SQLAlchemyError:
-    db.session.rollback()
-    return jsonify({"erro": "Erro ao atualizar a build"}),500
+  return jsonify({"build": AtualizarBuildService().executar(current_user.id, build_id, request.get_json(silent=True))}),200
 
 
 @build_bp.post("/<build_id>/duplicar")
 @login_required
+@tratar_erros("Erro ao duplicar a build", repassar=LimiteBuildsError)
 def duplicar_build(build_id):
-  try:
-    return jsonify({"build": DuplicarBuildService().executar(current_user.id, build_id)}),201
-  except LimiteBuildsError:
-    raise
-  except ValueError as erro:
-    return jsonify({"erro": str(erro)}),400
-  except SQLAlchemyError:
-    db.session.rollback()
-    return jsonify({"erro": "Erro ao duplicar a build"}),500
+  return jsonify({"build": DuplicarBuildService().executar(current_user.id, build_id)}),201
 
 
 @build_bp.post("/<build_id>/setup-atual")
 @login_required
+@tratar_erros("Erro ao definir o setup atual", status_valor=404)
 def definir_setup_atual(build_id):
-  try:
-    DefinirSetupAtualService().executar(current_user.id, build_id)
-    return jsonify({"builds": ListarBuildService().executar(current_user.id)}),200
-  except ValueError as erro:
-    return jsonify({"erro": str(erro)}),404
-  except SQLAlchemyError:
-    db.session.rollback()
-    return jsonify({"erro": "Erro ao definir o setup atual"}),500
+  DefinirSetupAtualService().executar(current_user.id, build_id)
+  return jsonify({"builds": ListarBuildService().executar(current_user.id)}),200
 
 
 @build_bp.delete("/<build_id>")
 @login_required
+@tratar_erros("Erro ao excluir a build")
 def excluir_build(build_id):
-  try:
-    ExcluirBuildService().executar(current_user.id, build_id)
-    return "",204
-  except ValueError as erro:
-    return jsonify({"erro": str(erro)}),400
-  except SQLAlchemyError:
-    db.session.rollback()
-    return jsonify({"erro": "Erro ao excluir a build"}),500
+  ExcluirBuildService().executar(current_user.id, build_id)
+  return "",204
 
 
 @build_bp.get("/<build_id>/publica")
@@ -241,13 +226,6 @@ def buscar_build_publica(build_id):
 
 @build_bp.post("/<build_id>/copiar-publica")
 @login_required
+@tratar_erros("Não foi possível salvar a cópia. Tente novamente.", status_valor=404, repassar=(LimiteBuildsError, EmailNaoVerificadoError))
 def copiar_build_publica(build_id):
-  try:
-    return jsonify({"build": CopiarBuildPublicaService().executar(current_user.id, build_id)}),201
-  except (LimiteBuildsError, EmailNaoVerificadoError):
-    raise
-  except ValueError as erro:
-    return jsonify({"erro": str(erro)}),404
-  except SQLAlchemyError:
-    db.session.rollback()
-    return jsonify({"erro": "Não foi possível salvar a cópia. Tente novamente."}),500
+  return jsonify({"build": CopiarBuildPublicaService().executar(current_user.id, build_id)}),201

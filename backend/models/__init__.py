@@ -39,7 +39,6 @@ from .build import Build
 from .build_salva import BuildSalva
 from .token_recuperacao import TokenRecuperacao
 from .consulta_preco import ConsultaPreco, ControleColeta
-from .historico_preco import HistoricoPreco
 from .oferta import Oferta
 from .produto_pendente import ProdutoPendente
 from .execucao_descoberta import ExecucaoDescoberta
@@ -70,5 +69,5 @@ __all__ = [
     'Processador','PlacaMae','PlacaVideo','MemoriaRAM','SSD','HD',
     'Gabinete','WaterCooler','AirCooler','Fan','Fone','Teclado','Mouse','Monitor',
     'PlacaRede','CaboRede','RevisaoIdentidadePeca','FichaTecnicaCatalogo','RevisaoFichaTecnica',
-    'Codigo','TokenRecuperacao','Build','BuildSalva','ConsultaPreco','ControleColeta','HistoricoPreco','Oferta','ProdutoPendente','ExecucaoDescoberta','EstadoCatalogo','TokenIntegracao','VinculoMercadoLivre','HistoricoOferta','IdentidadeFabricante','AutorizacaoMercadoLivre'
+    'Codigo','TokenRecuperacao','Build','BuildSalva','ConsultaPreco','ControleColeta','Oferta','ProdutoPendente','ExecucaoDescoberta','EstadoCatalogo','TokenIntegracao','VinculoMercadoLivre','HistoricoOferta','IdentidadeFabricante','AutorizacaoMercadoLivre'
 ]
