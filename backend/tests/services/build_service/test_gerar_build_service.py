@@ -10,7 +10,7 @@ from services.build_service.erros_build import ErroGeracaoBuild
 
 def preparar(mocker, respostas):
     trava = mocker.patch("services.build_service.gerar_build_service.BloquearGeracaoService.executar", return_value=nullcontext())
-    criar = mocker.patch("services.build_service.criar_build_service.CriarBuildService.executar", side_effect=respostas)
+    criar = mocker.patch("services.build_service.fluxo_geracao_service.FluxoGeracaoService.executar", side_effect=respostas)
     return trava, criar
 
 

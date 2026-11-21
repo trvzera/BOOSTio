@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 from services.build_service.melhorar_investimento_build_service import MelhorarInvestimentoBuildService
-from services.build_service.gerar_candidata_service import gerar_candidata
+from tests.services.build_service.apoio_geracao import gerar_candidata
 
 
 def catalogo():

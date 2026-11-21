@@ -2,7 +2,7 @@ from services.validacoes_service.validar_pedido_build_service import validar_tex
 import pytest
 from flask import Flask
 
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 from services.usuario_service.criar_usuario_service import CriarUsuarioService
 from services.usuario_service.entrar_usuario_service import EntrarUsuarioService
 from utils.validacoes import validacao_campos

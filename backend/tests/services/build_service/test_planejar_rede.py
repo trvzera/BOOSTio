@@ -1,7 +1,7 @@
 import services.build_service.gerar_candidata_service as validacao_module
-from services.build_service.gerar_candidata_service import gerar_candidata
+from tests.services.build_service.apoio_geracao import gerar_candidata
 from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
-import services.build_service.criar_build_service as criacao_module
+import services.build_service.fluxo_geracao_service as criacao_module
 from services.build_service.prompt_build_service import criar_prompt
 from copy import deepcopy
 from unittest.mock import patch
@@ -9,7 +9,7 @@ from unittest.mock import patch
 import pytest
 
 from services.build_service.planejar_rede_service import PlanejarRedeService as Rede
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
 

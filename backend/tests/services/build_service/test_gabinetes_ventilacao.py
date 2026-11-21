@@ -1,4 +1,4 @@
-from services.build_service.catalogo_geracao_service import campos_pecas
+from services.build_service.fichas_catalogo import campos_pecas
 """Fichas compartilhadas com JS; sem rede, escrita ou migração do banco real."""
 import json
 from pathlib import Path
@@ -7,7 +7,7 @@ import pytest
 
 from models import Gabinete
 from utils.medidas_fisicas import completar_medidas
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 from services.validacoes_service.encaixe_fisico import avaliar_fans, encaixe_radiador
 from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 

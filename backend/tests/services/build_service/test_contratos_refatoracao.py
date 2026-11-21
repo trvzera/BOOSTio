@@ -8,7 +8,7 @@ from pathlib import Path
 from sqlalchemy.schema import CreateTable, CreateIndex
 from sqlalchemy.dialects import mysql, sqlite
 from models import db
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 from services.peca_service.popular_pecas_service import PopularPecasService
 
 REFERENCIA = Path(__file__).parents[2] / 'fixtures' / 'refatoracao' / 'contratos.json'

@@ -6,7 +6,7 @@ import pytest
 
 from services.build_service.amostrar_catalogo_service import AmostrarCatalogoService
 from services.build_service.preferencias_processador_service import PreferenciasProcessadorService as CPUs
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 from services.validacoes_service.validar_pedido_build_service import validar_preferencia_processador
 from models import Usuario
 
@@ -91,7 +91,7 @@ def test_preferencia_explicita_substitui_regra_de_jogos_e_chega_ao_prompt(marca,
 def test_marca_invalida_rejeitada_antes_de_acessar_usuario(marca, mocker):
     buscar = mocker.patch.object(Usuario, "buscar_por_id")
     with pytest.raises(ValueError, match="preferência de processador"):
-        CriarBuildService().executar(1, dict(nome="PC", descricao="Teste", utilidade="Jogos",
+        FluxoGeracaoService().executar(1, dict(nome="PC", descricao="Teste", utilidade="Jogos",
                                            orcamento=8000, preferencia_processador=marca))
     buscar.assert_not_called()
 

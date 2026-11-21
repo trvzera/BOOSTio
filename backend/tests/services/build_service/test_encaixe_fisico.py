@@ -1,5 +1,5 @@
 from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
-from services.build_service.catalogo_geracao_service import campos_pecas
+from services.build_service.fichas_catalogo import campos_pecas
 from services.build_service.constantes_build import CAMPOS_PECAS
 from services.validacoes_service.validar_estado_build_service import validar_estado
 import json
@@ -10,7 +10,7 @@ import pytest
 from models import Gabinete, AirCooler
 from utils.medidas_fisicas import completar_medidas
 from services.validacoes_service.encaixe_fisico import avaliar_fans, encaixe_radiador
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 
 
