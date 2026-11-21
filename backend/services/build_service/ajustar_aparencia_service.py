@@ -6,7 +6,7 @@ from .completar_ventilacao_service import CompletarVentilacaoService
 from .preferencias_cores_service import PreferenciasCoresService
 from .preferencias_gabinete_service import PreferenciasGabineteService
 
-logger = logging.getLogger("services.build_service.criar_build_service")
+logger = logging.getLogger("services.build_service.fluxo_geracao_service")
 
 def ajustar_aparencia(build, catalogo, orcamento, percentual, proprias, detalhes, rede, aparencia):
   atual = build

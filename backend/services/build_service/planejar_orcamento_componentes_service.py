@@ -33,23 +33,23 @@ class PlanejarOrcamentoComponentesService:
             return 'leve'
         return 'equilibrado'
 
-    def executar(self, contexto, pools):
-        pc = Decimal(str(contexto['teto_pc']))
-        absoluto = Decimal(str(contexto['teto_peca']))
-        perfil = self.perfil(contexto['utilidade'])
+    def executar(self, pedido, pools):
+        pc = Decimal(str(pedido["teto_pc"]))
+        absoluto = Decimal(str(pedido["teto_peca"]))
+        perfil = self.perfil(pedido["utilidade"])
         avisos = []
-        reserva, pendencias = self._reserva_basica(contexto, pools)
+        reserva, pendencias = self._reserva_basica(pedido, pools)
         avisos.extend(pendencias)
         gpu_minimo = min((self.preco(p) for p in pools.get('placa_video', [])), default=Decimal(0))
-        propria_gpu = 'placa_video' in contexto['proprias']
-        exige_gpu = (perfil == 'jogos' or RequisitosUsoService.exige_gpu_dedicada(contexto['utilidade'])) and not propria_gpu
+        propria_gpu = 'placa_video' in pedido["proprias"]
+        exige_gpu = (perfil == 'jogos' or RequisitosUsoService.exige_gpu_dedicada(pedido["utilidade"])) and not propria_gpu
         estimativas = {}
         cpus = pools.get('processador', [])
-        cpu_propria = contexto['detalhes_proprias'].get('processador', {}).get('especificacoes_confirmadas')
+        cpu_propria = pedido["detalhes_proprias"].get('processador', {}).get('especificacoes_confirmadas')
         if cpu_propria:
             cpus = [{**cpu_propria, 'id': 'proprio', 'preco': 0}]
         for cpu in cpus:
-            plataforma = self._plataforma_minima(cpu, contexto, pools)
+            plataforma = self._plataforma_minima(cpu, pedido, pools)
             if plataforma is None:
                 estimativas[cpu['id']] = None
                 continue
@@ -74,10 +74,10 @@ class PlanejarOrcamentoComponentesService:
                 pesos['processador'] -= Decimal('.02')
                 pesos['placa_video'] += Decimal('.04')
                 pesos['plataforma'] -= Decimal('.02')
-            if contexto['prioridade'] == 'custo_beneficio':
+            if pedido["prioridade"] == 'custo_beneficio':
                 pesos['processador'] *= Decimal('.90')
                 pesos['placa_video'] *= Decimal('.90')
-            if 'processador' in contexto['proprias'] and perfil == 'jogos':
+            if 'processador' in pedido["proprias"] and perfil == 'jogos':
                 pesos['placa_video'] += Decimal('.08')
             tetos = {tipo: float(min(absoluto, (pc * peso).quantize(Decimal('.01'), rounding=ROUND_DOWN)))
                      for tipo, peso in pesos.items() if tipo != 'plataforma'}
@@ -89,9 +89,9 @@ class PlanejarOrcamentoComponentesService:
                 'meta_plataforma': plataforma_alvo, 'tetos_sugeridos': tetos,
                 'estimativas_cpu': estimativas, 'avisos': avisos, 'flexibilizacoes': []}
 
-    def _reserva_basica(self, contexto, pools):
+    def _reserva_basica(self, pedido, pools):
         total, pendencias = Decimal(0), []
-        proprias = contexto['proprias']
+        proprias = pedido["proprias"]
         for tipo in ('fonte', 'gabinete'):
             if tipo in proprias:
                 continue
@@ -101,17 +101,17 @@ class PlanejarOrcamentoComponentesService:
             else:
                 pendencias.append(f'Sem {tipo} disponível para estimar o custo mínimo do conjunto.')
         if not {'ssd', 'hd'} & proprias.keys():
-            referencia = PlanejarArmazenamentoService().executar(pools, contexto['armazenamento_minimo_gb'] or 1)
+            referencia = PlanejarArmazenamentoService().executar(pools, pedido["armazenamento_minimo_gb"] or 1)
             if referencia:
                 total += Decimal(str(referencia['custo']))
             else:
                 pendencias.append('Sem armazenamento com capacidade conhecida para estimar o requisito solicitado.')
-        elif contexto['armazenamento_minimo_gb'] is not None:
+        elif pedido["armazenamento_minimo_gb"] is not None:
             confirmado = sum((Decimal(str(d.get('especificacoes_confirmadas', {}).get('capacidade_gb') or 0))
-                              for tipo, d in contexto['detalhes_proprias'].items() if tipo in ('ssd', 'hd')), Decimal(0))
-            if confirmado < contexto['armazenamento_minimo_gb']:
+                              for tipo, d in pedido["detalhes_proprias"].items() if tipo in ('ssd', 'hd')), Decimal(0))
+            if confirmado < pedido["armazenamento_minimo_gb"]:
                 pendencias.append('O armazenamento próprio não confirma a capacidade mínima pedida; revise o reaproveitamento.')
-        rede = contexto['rede']
+        rede = pedido["rede"]
         for acessorio in PlanejarRedeService.categorias(rede) - set(proprias):
             if pools.get(acessorio):
                 total += min(self.preco(p) for p in pools[acessorio])
@@ -119,8 +119,8 @@ class PlanejarOrcamentoComponentesService:
                 pendencias.append('Sem acessório de rede adequado para estimar o custo mínimo.')
         return total, pendencias
 
-    def _plataforma_minima(self, cpu, contexto, pools):
-        detalhes = contexto['detalhes_proprias']
+    def _plataforma_minima(self, cpu, pedido, pools):
+        detalhes = pedido["detalhes_proprias"]
         placa_propria = detalhes.get('placa_mae', {}).get('especificacoes_confirmadas')
         placas = [{**placa_propria, 'preco': 0}] if placa_propria else pools.get('placa_mae', [])
         socket = normalizar_socket(cpu.get('soquete'))
@@ -129,7 +129,7 @@ class PlanejarOrcamentoComponentesService:
             if not socket or normalizar_socket(placa.get('socket')) != socket:
                 continue
             ddr = normalizar_ddr(placa.get('tipo_memoria'))
-            if 'memoria_ram' in contexto['proprias']:
+            if 'memoria_ram' in pedido["proprias"]:
                 ram = detalhes.get('memoria_ram', {}).get('especificacoes_confirmadas', {})
                 if ram and ddr and normalizar_ddr(ram.get('ddr')) != ddr:
                     continue
@@ -143,7 +143,7 @@ class PlanejarOrcamentoComponentesService:
         if not pares:
             return None
         cooler = Decimal(0)
-        if not cpu.get('cooler') and not {'air_cooler', 'water_cooler'} & contexto['proprias'].keys():
+        if not cpu.get('cooler') and not {'air_cooler', 'water_cooler'} & pedido["proprias"].keys():
             opcoes = [p for tipo in ('air_cooler', 'water_cooler') for p in pools.get(tipo, [])
                       if suporte_socket_cooler(cpu.get('soquete'), p) is not False]
             if not opcoes:

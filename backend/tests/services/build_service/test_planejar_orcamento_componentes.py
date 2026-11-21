@@ -5,7 +5,7 @@ from services.build_service.planejar_orcamento_componentes_service import Planej
 
 def contexto(**extras):
     return {**dict(teto_pc=8000, teto_peca=6000, utilidade='Jogos', prioridade='desempenho',
-                   proprias={}, detalhes_proprias={}, armazenamento_minimo_gb=500, rede={}), **extras}
+                                proprias={}, detalhes_proprias={}, armazenamento_minimo_gb=500, rede={}), **extras}
 
 
 def pools():

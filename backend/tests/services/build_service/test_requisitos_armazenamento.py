@@ -4,7 +4,7 @@ import json
 import pytest
 
 from models import Usuario
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 from services.validacoes_service.requisitos_armazenamento_service import RequisitosArmazenamentoService as Requisitos
 from services.build_service.seletor_inteligente_service import SeletorInteligenteService
 
@@ -13,7 +13,7 @@ from services.build_service.seletor_inteligente_service import SeletorInteligent
 def test_parametro_invalido_rejeitado_antes_de_acessar_banco(valor, mocker):
     buscar = mocker.patch.object(Usuario, 'buscar_por_id')
     with pytest.raises(ValueError, match='armazenamento mínimo'):
-        CriarBuildService().executar(1, dict(nome='PC', descricao='Teste', utilidade='Jogos', orcamento=8000,
+        FluxoGeracaoService().executar(1, dict(nome='PC', descricao='Teste', utilidade='Jogos', orcamento=8000,
                                            armazenamento_minimo_gb=valor))
     with pytest.raises(ValueError, match='armazenamento mínimo'):
         SeletorInteligenteService().executar(dict(orcamento=8000, prioridade_montagem='desempenho',

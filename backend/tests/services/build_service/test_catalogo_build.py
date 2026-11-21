@@ -1,10 +1,10 @@
-from services.build_service.catalogo_geracao_service import campos_pecas
+from services.build_service.fichas_catalogo import campos_pecas
 from datetime import datetime, timedelta, timezone
 
 import pytest
 
 from models import PlacaVideo, CaboRede
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 
 
 def test_catalogo_publico_expoe_estilo_e_porte_sem_inventar_por_atx(mocker):

@@ -1,10 +1,10 @@
-from services.build_service.gerar_candidata_service import gerar_candidata
-from services.build_service.gerar_candidata_service import perfil_revisa_investimento
+from tests.services.build_service.apoio_geracao import gerar_candidata
+from services.build_service.pedido_build import perfil_revisa_investimento
 from services.build_service.erros_build import ErroGeracaoBuild
 from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
-import services.build_service.criar_build_service as criacao_module
+import services.build_service.fluxo_geracao_service as criacao_module
 from services.build_service.custos_build_service import dividir_orcamento
-from services.build_service.catalogo_geracao_service import campos_pecas
+from services.build_service.fichas_catalogo import campos_pecas
 from services.build_service.prompt_build_service import criar_prompt
 from services.build_service.constantes_build import PERIFERICOS
 from services.build_service.atualizar_build_service import atualizar_estado
@@ -21,7 +21,7 @@ from models.build_salva import LimiteBuildsError
 from models.build_salva import MODELOS
 from controllers.build_controller import build_bp
 from services.build_service.criar_build_manual_service import CriarBuildManualService
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 from services.build_service.duplicar_build_service import DuplicarBuildService
 from services.llm_service.reservar_chamada_service import CotaGlobalIAError, ControleIAIndisponivelError
 
@@ -170,7 +170,7 @@ def test_reverifica_limite_depois_da_llm_e_rollback_sem_orfa(app_build):
 def test_rejeita_percentual_invalido_antes_da_llm(app_build, mocker, percentual):
     llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar")
     with app_build.app_context(), pytest.raises(ValueError, match="porcentagem"):
-        CriarBuildService().executar(1, {**PEDIDO, "percentual_perifericos": percentual})
+        FluxoGeracaoService().executar(1, {**PEDIDO, "percentual_perifericos": percentual})
     llm.assert_not_called()
 
 
@@ -200,7 +200,7 @@ def test_revisao_do_investimento_alto_e_limitada_e_usa_custos_calculados(mocker)
     segunda = deepcopy(primeira)
     segunda["componentes"][0]["id"] = 2
     llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=[primeira, segunda])
-    mocker.patch("services.build_service.criar_build_service.BuildSalva.verificar_espaco")
+    mocker.patch("services.build_service.fluxo_geracao_service.BuildSalva.verificar_espaco")
     resultado = gerar_candidata(1, "Pedido", "teste", catalogo, 20000, 0, {}, {}, {}, revisar_investimento=True)
     assert resultado["preco_total"] == 18100
     assert llm.call_count == 2
@@ -216,7 +216,7 @@ def test_revisao_de_investimento_nao_descarta_primeira_build_valida(mocker, erro
     primeira["componentes"] = [i for i in primeira["componentes"] if i["tipo"] not in PERIFERICOS]
     catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": 18000})
     llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=[primeira, erro])
-    mocker.patch("services.build_service.criar_build_service.BuildSalva.verificar_espaco")
+    mocker.patch("services.build_service.fluxo_geracao_service.BuildSalva.verificar_espaco")
     resultado = gerar_candidata(1, "Pedido", "teste", catalogo, 20000, 0, {}, {}, {}, revisar_investimento=True)
     assert resultado["preco_total"] == 900
     assert llm.call_count == 2
@@ -326,10 +326,10 @@ def test_teto_percentual_preserva_centavos_sem_arredondar_para_cima():
 
 
 def test_reserva_nao_pode_reduzir_pc_abaixo_do_minimo_antes_do_catalogo_e_llm(app_build, mocker):
-    preparar = mocker.patch("services.build_service.criar_build_service.SeletorInteligenteService.preparar_geracao")
+    preparar = mocker.patch("services.build_service.fluxo_geracao_service.SeletorInteligenteService.preparar_geracao")
     llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar")
     with app_build.app_context(), pytest.raises(ValueError, match="pelo menos R\$ 3500"):
-        CriarBuildService().executar(1, {**PEDIDO, "percentual_perifericos": 40})
+        FluxoGeracaoService().executar(1, {**PEDIDO, "percentual_perifericos": 40})
     preparar.assert_not_called()
     llm.assert_not_called()
 
@@ -419,29 +419,24 @@ def test_geracao_completa_fans_omitidas_antes_de_persistir(app_build, mocker):
 @pytest.fixture
 def catalogo_do_banco(mocker):
     """Monta o catálogo com todas as peças cadastradas, sem o filtro de benchmark do seletor inteligente."""
-    from services.build_service.contexto_build_service import obter_detalhes_proprias
     from services.build_service.prompt_build_service import criar_prompt
-    from services.build_service.catalogo_geracao_service import planejar_perifericos
-    from services.build_service.custos_build_service import dividir_orcamento
-    from services.validacoes_service.validar_pedido_build_service import pecas_proprias
+    from services.build_service.planejamento_geracao import planejar_perifericos
+    from services.build_service.pedido_build import para_prompt
 
-    def preparar(self, dados):
-        proprias = pecas_proprias(dados.get("pecas_proprias", {}))
-        percentual, orcamento = dados.get("percentual_perifericos", 0), dados["orcamento"]
-        _, teto_perifericos = dividir_orcamento(orcamento, percentual)
+    def preparar(self, pedido):
         catalogo = {tipo: [campos_pecas(p) for p in modelo.query.all()] for tipo, modelo in MODELOS.items()
-                    if tipo not in proprias and (percentual or tipo not in PERIFERICOS)}
+                    if tipo not in pedido["proprias"] and (pedido["percentual"] or tipo not in PERIFERICOS)}
         catalogo = {tipo: pecas for tipo, pecas in catalogo.items() if pecas}
-        detalhes = obter_detalhes_proprias(proprias)
-        plano = planejar_perifericos(catalogo, teto_perifericos, proprias, dados["utilidade"], dados["aparencia"]["cor"], percentual)
-        margem = min(orcamento / 2, max(800, orcamento * 0.25))
-        return {"catalogo": catalogo, "detalhes_proprias": detalhes, "plano_perifericos": plano, "catalogo_reparo": catalogo,
-                "prompt": criar_prompt(dados, orcamento, margem, catalogo, percentual, detalhes, plano)}
-    mocker.patch("services.build_service.criar_build_service.SeletorInteligenteService.preparar_geracao", preparar)
+        plano = planejar_perifericos(catalogo, pedido["teto_perifericos"], pedido["proprias"], pedido["utilidade"],
+                                     pedido["aparencia"]["cor"], pedido["percentual"])
+        prompt = criar_prompt(para_prompt(pedido), pedido["orcamento"], pedido["margem"], catalogo, pedido["percentual"],
+                              pedido["detalhes_proprias"], plano)
+        return {"catalogo": catalogo, "catalogo_reparo": catalogo, "prompt": prompt, "plano_perifericos": plano}
+    mocker.patch("services.build_service.fluxo_geracao_service.SeletorInteligenteService.preparar_geracao", preparar)
 
 
 def test_geracao_persiste_o_estado_em_uma_transacao(app_build, mocker, caplog, catalogo_do_banco):
-    caplog.set_level("INFO",logger="services.build_service.criar_build_service")
+    caplog.set_level("INFO",logger="services.build_service.fluxo_geracao_service")
     tipos = ["processador", "placa_mae", "memoria_ram", "fonte", "gabinete", "ssd", "monitor", "teclado", "mouse", "fone"]
     with app_build.app_context():
         cadastrar_pecas(tipos)
@@ -450,7 +445,7 @@ def test_geracao_persiste_o_estado_em_uma_transacao(app_build, mocker, caplog, c
             "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos],
         })
         preferencia={"estilo":"vidro","porte":"mid-tower","cor":"branco","gabinete_id":1}
-        resposta = CriarBuildService().executar(1, {**PEDIDO, "percentual_perifericos": 20,"aparencia":preferencia})
+        resposta = FluxoGeracaoService().executar(1, {**PEDIDO, "percentual_perifericos": 20,"aparencia":preferencia})
         assert resposta["estado"]["aparencia"] == preferencia
         assert resposta["estado"]["percentualPerifericos"] == 20
         assert resposta["estado"]["orcamento"] == 5000
@@ -459,7 +454,7 @@ def test_geracao_persiste_o_estado_em_uma_transacao(app_build, mocker, caplog, c
         assert BuildSalva.query.count() == 1
         assert "Teto para periféricos: R$ 1000.00" in llm.call_args.args[0]
         assert len(BuildSalva.listar_por_usuario(1)) == 1
-        logs=[r.getMessage() for r in caplog.records if r.name=="services.build_service.criar_build_service"]
+        logs=[r.getMessage() for r in caplog.records if r.name=="services.build_service.fluxo_geracao_service"]
         assert all(any(f"etapa={etapa}" in linha for linha in logs) for etapa in ("prompt","llm","validada"))
         assert not any("componentes" in linha or "PC gerado" in linha or "@" in linha for linha in logs)
 
@@ -530,7 +525,7 @@ def test_geracao_de_rede_preserva_opcao_sem_perifericos_e_criacao_limitada(app_b
         llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value={
             **PEDIDO, "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in tipos],
         })
-        resposta = CriarBuildService().executar(1, {**PEDIDO, "rede": rede})
+        resposta = FluxoGeracaoService().executar(1, {**PEDIDO, "rede": rede})
         assert resposta["estado"]["rede"] == rede
         assert resposta["estado"]["incluirRede"]
         assert not resposta["estado"]["incluirPerifericos"]
@@ -543,7 +538,7 @@ def test_geracao_de_rede_preserva_opcao_sem_perifericos_e_criacao_limitada(app_b
 def test_orcamento_nao_aceita_fracao_de_centavo(app_build, mocker):
     llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar")
     with app_build.app_context(), pytest.raises(ValueError, match="casas decimais"):
-        CriarBuildService().executar(1, {**PEDIDO, "orcamento": 5000.001})
+        FluxoGeracaoService().executar(1, {**PEDIDO, "orcamento": 5000.001})
     llm.assert_not_called()
 
 
@@ -559,7 +554,7 @@ def test_geracao_com_pecas_proprias_preserva_reserva_rede_e_extras(app_build, mo
         llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value={
             **PEDIDO, "componentes": [{"tipo": tipo, "id": 1, "quantidade": 1} for tipo in novas],
         })
-        resultado = CriarBuildService().executar(1, {**PEDIDO, "pecas_proprias": proprias, "rede": rede,
+        resultado = FluxoGeracaoService().executar(1, {**PEDIDO, "pecas_proprias": proprias, "rede": rede,
                                                   "percentual_perifericos": percentual})
         estado = resultado["estado"]
         assert estado["percentualPerifericos"] == percentual
@@ -593,7 +588,7 @@ def test_pecas_proprias_reverificam_quota_apos_llm(app_build, mocker):
 
         llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=ocupar_ultima_vaga)
         with pytest.raises(LimiteBuildsError):
-            CriarBuildService().executar(1, {**PEDIDO, "pecas_proprias": {"processador": "processador"}})
+            FluxoGeracaoService().executar(1, {**PEDIDO, "pecas_proprias": {"processador": "processador"}})
         llm.assert_called_once()
         assert BuildSalva.query.count() == 3
 
@@ -814,7 +809,7 @@ def test_8000_um_pouco_de_tudo_revisa_pc_de_4000_e_salva_so_a_melhorada(app_buil
     next(i for i in segunda["componentes"] if i["tipo"] == "placa_video")["id"] = 2
     llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=[primeira, segunda])
     with app_build.app_context():
-        resposta = CriarBuildService().executar(1, {**primeira, "orcamento": 8000, "percentual_perifericos": percentual})
+        resposta = FluxoGeracaoService().executar(1, {**primeira, "orcamento": 8000, "percentual_perifericos": percentual})
         assert resposta["preco_total"] == esperado
         assert resposta["estado"]["componentes"]["placa_video"]["id"] == 2
         assert BuildSalva.query.count() == 1
@@ -872,7 +867,7 @@ def test_fim_da_cota_na_revisao_preserva_build_que_ja_era_valida(mocker, erro):
     build["componentes"] = [i for i in build["componentes"] if i["tipo"] not in PERIFERICOS]
     catalogo["processador"].append({**catalogo["processador"][0], "id": 2, "preco": 2000})
     llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=[build, erro])
-    mocker.patch("services.build_service.criar_build_service.BuildSalva.verificar_espaco")
+    mocker.patch("services.build_service.fluxo_geracao_service.BuildSalva.verificar_espaco")
     resultado = gerar_candidata(1, "Pedido", "teste", catalogo, 8000, 0, {}, {}, {}, revisar_investimento=True)
     assert resultado["preco_total"] == 900 and llm.call_count == 2
 
@@ -902,7 +897,7 @@ def test_uso_misto_com_gpu_propria_e_perifericos_melhora_so_as_compras_pendentes
     next(i for i in segunda["componentes"] if i["tipo"] == "processador")["id"] = 2
     llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=[primeira, segunda])
     with app_build.app_context():
-        resposta = CriarBuildService().executar(1, {**primeira, "orcamento": 8000, "percentual_perifericos": 20,
+        resposta = FluxoGeracaoService().executar(1, {**primeira, "orcamento": 8000, "percentual_perifericos": 20,
                                                    "pecas_proprias": {"placa_video": "placa_video"}})
         assert resposta["preco_total"] == 6400
         assert resposta["estado"]["componentes"]["placa_video"] == {"proprio": "placa_video", "quantidade": 1}
@@ -934,7 +929,7 @@ def test_gpu_pode_ser_avaliada_quando_cpu_com_video_integrado_deixa_margem(mocke
     segunda = deepcopy(build)
     segunda["componentes"].append({"tipo": "placa_video", "id": 1, "quantidade": 1})
     llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", side_effect=[build, segunda])
-    mocker.patch("services.build_service.criar_build_service.BuildSalva.verificar_espaco")
+    mocker.patch("services.build_service.fluxo_geracao_service.BuildSalva.verificar_espaco")
     resultado = gerar_candidata(1, "Pedido", "teste", catalogo, 8000, 0, {}, {}, {}, revisar_investimento=True)
     assert resultado["preco_total"] == 3900 and llm.call_count == 2
     assert any(i["tipo"] == "placa_video" for i in resultado["componentes"])
@@ -955,7 +950,7 @@ def test_fallback_sem_revisoes_nao_gasta_uma_chamada_extra(mocker):
     (2000, 20, "orcamento"), (5000, 1, "perifericos")])
 def test_api_rejeita_limites_minimos_sem_chamar_ia_ou_salvar(app_build, mocker, total, percentual, motivo):
     llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar")
-    catalogo = mocker.patch("services.build_service.criar_build_service.SeletorInteligenteService.preparar_geracao")
+    catalogo = mocker.patch("services.build_service.fluxo_geracao_service.SeletorInteligenteService.preparar_geracao")
     cliente = app_build.test_client()
     autenticar(cliente)
     resposta = cliente.post("/build/", json={**PEDIDO, "orcamento": total, "percentual_perifericos": percentual})
@@ -1017,7 +1012,7 @@ def test_requisito_armazenamento_aciona_correcao_antes_de_salvar(app_build, mock
         db.session.commit()
         llm = mocker.patch('services.build_service.gerar_candidata_service.LLMService.executar',
                            side_effect=[primeira, segunda])
-        resultado = CriarBuildService().executar(1, {**PEDIDO, 'armazenamento_minimo_gb': 500})
+        resultado = FluxoGeracaoService().executar(1, {**PEDIDO, 'armazenamento_minimo_gb': 500})
         assert resultado['estado']['componentes']['ssd'][0]['id'] == 2
         assert BuildSalva.query.count() == 1
         assert llm.call_count == 2
@@ -1035,7 +1030,7 @@ def test_armazenamento_insuficiente_nunca_e_salvo(app_build, mocker):
         db.session.commit()
         mocker.patch('services.build_service.gerar_candidata_service.LLMService.executar', return_value=resposta)
         with pytest.raises(ErroGeracaoBuild, match='armazenamento mínimo'):
-            CriarBuildService().executar(1, {**PEDIDO, 'armazenamento_minimo_gb': 500})
+            FluxoGeracaoService().executar(1, {**PEDIDO, 'armazenamento_minimo_gb': 500})
         assert BuildSalva.query.count() == 0
 
 
@@ -1095,7 +1090,7 @@ def test_reparo_sem_alternativa_segura_ainda_usa_correcao_limitada(app_build, mo
         llm=mocker.patch('services.build_service.gerar_candidata_service.LLMService.executar',return_value=resposta)
         with pytest.raises(ErroGeracaoBuild):
             gerar_candidata(1,'Pedido','teste',catalogo,5000,0,{}, {},{},
-                                               ajustar_orcamento=True,catalogo_reparo=catalogo)
+                                               catalogo_reparo=catalogo)
         assert llm.call_count == 2
         assert BuildSalva.query.count() == 0
 
@@ -1136,7 +1131,7 @@ def test_gerar_candidata_troca_perifericos_fora_do_plano_pela_melhor_combinacao(
         catalogo[tipo].append({**catalogo[tipo][0], "id": 2, "preco": preco})
     plano = {"viavel": True, "teto": 300, "combinacoes": [
         {"total": 270, "componentes": [{"tipo": tipo, "id": 2, "quantidade": 1} for tipo in precos]}]}
-    mocker.patch("services.build_service.criar_build_service.BuildSalva.verificar_espaco")
+    mocker.patch("services.build_service.fluxo_geracao_service.BuildSalva.verificar_espaco")
     llm = mocker.patch("services.build_service.gerar_candidata_service.LLMService.executar", return_value=deepcopy(build))
     sem_plano = gerar_candidata(1, "Pedido", "teste", catalogo, 1500, 20, {}, {}, {})
     com_plano = gerar_candidata(1, "Pedido", "teste", catalogo, 1500, 20, {}, {}, {}, plano_perifericos=plano)

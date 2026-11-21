@@ -3,7 +3,7 @@ from models import Processador, PlacaMae
 from utils.sockets import normalizar_socket
 from utils.memorias import normalizar_ddr
 from .constantes_build import PERIFERICOS
-from .catalogo_geracao_service import campos_catalogo
+from .fichas_catalogo import campos_catalogo
 from .preferencias_cores_service import PreferenciasCoresService
 
 
@@ -12,11 +12,11 @@ def id_numerico(identificador):
 
 
 def aplicar_teto(contexto, tipo, pecas):
-    absoluto = contexto["teto_perifericos"] if tipo in PERIFERICOS else contexto["teto_peca"]
+    absoluto = contexto["pedido"]["teto_perifericos"] if tipo in PERIFERICOS else contexto["pedido"]["teto_peca"]
     teto = contexto["planejamento"]["tetos_sugeridos"].get(tipo, absoluto)
     dentro = [p for p in pecas if Decimal(str(p["preco"])) <= Decimal(str(teto))]
     if dentro:
-        cor = contexto["aparencia"]["cor"]
+        cor = contexto["pedido"]["aparencia"]["cor"]
         if cor != "sem-preferencia" and not any(PreferenciasCoresService.prioridade(p, cor) <= 1 for p in dentro):
             preferidas = [p for p in pecas if PreferenciasCoresService.prioridade(p, cor) <= 1]
             if preferidas:
@@ -45,7 +45,7 @@ def ficha_catalogo(peca):
 def selecionar_placas_mae(contexto, selecionados):
     sockets = _sockets_processadores(contexto, selecionados)
     grupos = {s: [] for s in sockets}
-    propria_ram = contexto["detalhes_proprias"].get("memoria_ram", {}).get("especificacoes_confirmadas", {})
+    propria_ram = contexto["pedido"]["detalhes_proprias"].get("memoria_ram", {}).get("especificacoes_confirmadas", {})
     ddr_proprio = normalizar_ddr(propria_ram.get("ddr"))
     for p in contexto["pools"].get("placa_mae", []):
         if ddr_proprio and normalizar_ddr(p.get("tipo_memoria")) != ddr_proprio:
@@ -57,7 +57,7 @@ def selecionar_placas_mae(contexto, selecionados):
 
 
 def selecionar_memorias(contexto, placas):
-    nome_proprio = contexto["proprias"].get("placa_mae")
+    nome_proprio = contexto["pedido"]["proprias"].get("placa_mae")
     if nome_proprio:
         placa = PlacaMae.buscar_por_nome(nome_proprio)
         valores = [placa.tipo_memoria] if placa else []
@@ -75,7 +75,7 @@ def selecionar_memorias(contexto, placas):
 def _amostrar_grupos(contexto, tipo, grupos):
     for grupo, pecas in grupos.items():
         pecas = aplicar_teto(contexto, tipo, pecas)
-        pecas.sort(key=lambda p: (PreferenciasCoresService.prioridade(p, contexto["aparencia"]["cor"]),
+        pecas.sort(key=lambda p: (PreferenciasCoresService.prioridade(p, contexto["pedido"]["aparencia"]["cor"]),
                                   p["preco"], id_numerico(p["id"])))
         grupos[grupo] = pecas
     escolhidas = _distribuir_vagas(grupos, contexto["limites"][tipo])
@@ -83,12 +83,12 @@ def _amostrar_grupos(contexto, tipo, grupos):
 
 
 def _sockets_processadores(contexto, selecionados):
-    nome_proprio = contexto["proprias"].get("processador")
+    nome_proprio = contexto["pedido"]["proprias"].get("processador")
     if nome_proprio:
         cpu = Processador.buscar_por_nome(nome_proprio)
         valores = [cpu.soquete] if cpu else []
     elif contexto["categoria"] in ("placa_mae", "memoria_ram"):
-        valores = [cpu.get("soquete") for cpu in contexto.get("cpus_candidatas", [])]
+        valores = [cpu.get("soquete") for cpu in contexto["cpus_candidatas"]]
     else:
         valores = [p.get("soquete") for p in selecionados if p["categoria"] == "processador"]
     return sorted({socket for valor in valores if (socket := normalizar_socket(valor))})

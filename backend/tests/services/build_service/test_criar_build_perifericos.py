@@ -1,6 +1,6 @@
 from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
 from services.validacoes_service.validar_pedido_build_service import validar_rede
-from services.build_service.catalogo_geracao_service import campos_pecas
+from services.build_service.fichas_catalogo import campos_pecas
 from services.build_service.prompt_build_service import criar_prompt
 from services.build_service.constantes_build import PERIFERICOS
 import json
@@ -9,7 +9,7 @@ from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 
 
 class CriarBuildPerifericosTest(unittest.TestCase):

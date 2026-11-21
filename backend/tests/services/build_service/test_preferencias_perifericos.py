@@ -6,7 +6,7 @@ import pytest
 from models import Monitor
 from services.build_service.preferencias_perifericos_service import PreferenciasPerifericosService as Regras
 from services.build_service.amostrar_catalogo_service import AmostrarCatalogoService
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 from services.build_service.planejar_perifericos_service import PlanejarPerifericosService
 
 

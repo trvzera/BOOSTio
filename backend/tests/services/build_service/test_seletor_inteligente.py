@@ -5,6 +5,7 @@ import pytest
 
 from models import db, Processador, PlacaVideo
 from services.build_service.seletor_inteligente_service import SeletorInteligenteService
+from services.build_service.pedido_build import validar_pedido
 
 
 @pytest.fixture
@@ -57,7 +58,7 @@ def test_desempenho_e_custo_beneficio_ordenam_por_metricas_distintas(banco, gpu)
     dados = dict(orcamento=2500, prioridade_montagem='desempenho')
     assert ids(dados) == [rapido, barato]
     assert ids({**dados, 'prioridade_montagem': 'custo_beneficio'}) == [barato, rapido]
-    assert ids(dict(orcamento=2500, preferencias='custo-beneficio')) == [barato, rapido]
+    assert ids(dict(orcamento=2500, prioridade_montagem='custo_beneficio')) == [barato, rapido]
 
 
 @pytest.mark.parametrize('gpu', [False, True])
@@ -70,7 +71,7 @@ def test_filtros_excluem_preco_invalido_esgotado_sem_benchmark_e_outro_teste(ban
                                   (500, 20000, {'benchmark_versao': '10'}),
                                   (500, 20000, {'benchmark_teste': None})]:
         inserir(preco, score, gpu, **extras)
-    assert ids(dict(orcamento=2500, preferencias='desempenho')) == [valido]
+    assert ids(dict(orcamento=2500, prioridade_montagem='desempenho')) == [valido]
 
 
 def test_categoria_limite_e_desempate_deterministico(banco):
@@ -78,7 +79,7 @@ def test_categoria_limite_e_desempate_deterministico(banco):
     b = inserir(500, 10000)
     menor = inserir(250, 5000)
     inserir(100, 50000, gpu=True)
-    dados = dict(orcamento=Decimal('2500'), preferencias='desempenho', categoria='processador',
+    dados = dict(orcamento=Decimal('2500'), prioridade_montagem='desempenho', categoria='processador',
                  limite=1)
     assert ids(dados) == [a]
     assert ids({**dados, 'limite': 2}) == [a, menor]
@@ -86,10 +87,10 @@ def test_categoria_limite_e_desempate_deterministico(banco):
 
 
 @pytest.mark.parametrize('dados', [None, [], {}, {'orcamento': 1000},
-    *({'orcamento': v, 'preferencias': 'desempenho'} for v in [None, True, 0, -1, 2000.001, float('nan'), float('inf')]),
-    {'orcamento': 1000, 'preferencias': []},
-    {'orcamento': 1000, 'preferencias': 'desempenho', 'limite': True},
-    {'orcamento': 1000, 'preferencias': 'desempenho', 'categoria': 'fonte'},
+    *({'orcamento': v, 'prioridade_montagem': 'desempenho'} for v in [None, True, 0, -1, 2000.001, float('nan'), float('inf')]),
+    {'orcamento': 1000, 'prioridade_montagem': []},
+    {'orcamento': 1000, 'prioridade_montagem': 'desempenho', 'limite': True},
+    {'orcamento': 1000, 'prioridade_montagem': 'desempenho', 'categoria': 'fonte'},
 ])
 def test_validacao_antes_de_acessar_banco(dados):
     with pytest.raises(ValueError):
@@ -99,7 +100,7 @@ def test_validacao_antes_de_acessar_banco(dados):
 def test_lista_cpu_gpu_sem_pontuacao_minima_e_nao_altera_banco(banco):
     cpu = inserir(500, 12000)
     gpu = inserir(500, 30000, gpu=True)
-    assert ids(dict(orcamento=2500, preferencias='desempenho')) == [cpu, gpu]
+    assert ids(dict(orcamento=2500, prioridade_montagem='desempenho')) == [cpu, gpu]
     assert Processador.query.count() == PlacaVideo.query.count() == 1
     assert Processador.query.one().preco == 500
     assert PlacaVideo.query.one().benchmark_g3d == 30000
@@ -109,20 +110,20 @@ def test_teto_usa_margem_da_montagem_em_vez_do_orcamento_total(banco):
     dentro = inserir(3000, 10000)
     inserir(3000.01, 50000)
     inserir(4000, 60000)
-    assert ids(dict(orcamento=4000, preferencias='desempenho')) == [dentro]
+    assert ids(dict(orcamento=4000, prioridade_montagem='desempenho')) == [dentro]
 
 
 def test_reserva_perifericos_limita_pc_sem_transferir_sobra(banco):
     dentro = inserir(3000, 10000)
     inserir(3000.01, 50000)
-    assert ids(dict(orcamento=5000, percentual_perifericos=40, preferencias='desempenho')) == [dentro]
+    assert ids(dict(orcamento=5000, percentual_perifericos=40, prioridade_montagem='desempenho')) == [dentro]
 
 
 @pytest.mark.parametrize('dados', [
-    dict(orcamento=1999, preferencias='desempenho'),
-    dict(orcamento=2500, percentual_perifericos=30, preferencias='desempenho'),
-    dict(orcamento=3000, percentual_perifericos=10, preferencias='desempenho'),
-    *(dict(orcamento=5000, percentual_perifericos=p, preferencias='desempenho')
+    dict(orcamento=1999, prioridade_montagem='desempenho'),
+    dict(orcamento=2500, percentual_perifericos=30, prioridade_montagem='desempenho'),
+    dict(orcamento=3000, percentual_perifericos=10, prioridade_montagem='desempenho'),
+    *(dict(orcamento=5000, percentual_perifericos=p, prioridade_montagem='desempenho')
       for p in [True, '20', -1, 100, 20.5]),
 ])
 def test_mesmas_validacoes_de_orcamento_da_montagem_antes_da_consulta(dados):
@@ -411,15 +412,15 @@ def test_preparar_geracao_usa_plano_calculado_e_prompt_neutro_sem_gravar(banco):
     salvar_modelo(Fonte, 300, potencia_w=650)
     salvar_modelo(Gabinete, 200, formato='ATX', formatos_placa_mae='ATX')
     salvar_modelo(SSD, 300, capacidade_gb=500, tipo='NVMe', interface='PCIe')
-    pedido = dict(nome='PC', descricao='Teste', utilidade='Jogos', orcamento=8000,
-                  prioridade_montagem='desempenho', armazenamento_minimo_gb=500)
+    pedido = validar_pedido(dict(nome='PC', descricao='Teste', utilidade='Jogos', orcamento=8000,
+                                 prioridade_montagem='desempenho', armazenamento_minimo_gb=500))
     r = SeletorInteligenteService().preparar_geracao(pedido)
-    assert 'dê preferência a AMD Ryzen' not in r['prompt']
-    assert '"planejamento_componentes"' in r['prompt']
-    assert '"armazenamento_minimo_gb": 500' in r['prompt']
-    assert isinstance(r['catalogo']['processador'][0]['id'], int)
-    assert r['catalogo']['processador'][0]['benchmark_multi_core'] == 15000
-    assert r['catalogo']['processador'][0]['benchmark_teste'].startswith('PassMark')
+    assert 'dê preferência a AMD Ryzen' not in r["prompt"]
+    assert '"planejamento_componentes"' in r["prompt"]
+    assert '"armazenamento_minimo_gb": 500' in r["prompt"]
+    assert isinstance(r["catalogo"]['processador'][0]['id'], int)
+    assert r["catalogo"]['processador'][0]['benchmark_multi_core'] == 15000
+    assert r["catalogo"]['processador'][0]['benchmark_teste'].startswith('PassMark')
     assert BuildSalva.query.count() == 0
 
 
@@ -480,8 +481,10 @@ def test_benchmark_nao_publica_candidato_pendente(banco, gpu):
 
 def test_referencia_de_gabinete_entra_na_amostra_so_se_estiver_no_pool():
     referencia = {'id': 'gabinete:7', 'preco': 300}
-    contexto = {'aparencia': {'gabinete_id': 7}, 'pools': {'gabinete': [referencia]}, 'limites': {'gabinete': 2}}
+    pedido = validar_pedido(dict(orcamento=8000, aparencia={'gabinete_id': 7}))
     seletor = SeletorInteligenteService()
+    contexto = seletor._novo_contexto(pedido, {'gabinete': 2}, None)
+    contexto['pools'] = {'gabinete': [referencia]}
 
     catalogo = {'gabinete': [{'id': 1}, {'id': 2}]}
     seletor._preservar_referencia_gabinete(contexto, set(), catalogo)
@@ -492,5 +495,6 @@ def test_referencia_de_gabinete_entra_na_amostra_so_se_estiver_no_pool():
     assert catalogo == {}
 
     catalogo = {}
-    seletor._preservar_referencia_gabinete({**contexto, 'pools': {'gabinete': []}}, set(), catalogo)
+    contexto['pools'] = {'gabinete': []}
+    seletor._preservar_referencia_gabinete(contexto, set(), catalogo)
     assert catalogo == {}

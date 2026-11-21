@@ -3,7 +3,7 @@ from flask import Flask
 
 from models import db, PlacaVideo, Processador
 from services.build_service.conferir_pecas_proprias_service import ConferirPecasPropriasService
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 from services.build_service.planejamento_geracao import ErroPlanejamentoBuild
 
 
@@ -55,5 +55,5 @@ def test_geracao_nao_chama_a_ia_quando_a_peca_propria_nao_e_reconhecida(banco, m
     pedido = dict(nome='PC', descricao='Jogos', utilidade='Jogos', orcamento=6000,
                   pecas_proprias={'placa_video': 'RTX 4060', 'monitor': 'LG UltraGear 24GN60R-B'})
     with pytest.raises(ErroPlanejamentoBuild, match='Não reconhecemos'):
-        CriarBuildService().executar(1, pedido)
+        FluxoGeracaoService().executar(1, pedido)
     llm.assert_not_called()
