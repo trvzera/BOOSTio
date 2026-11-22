@@ -12,11 +12,12 @@ def id_numerico(identificador):
 
 
 def aplicar_teto(contexto, tipo, pecas):
-    absoluto = contexto["pedido"]["teto_perifericos"] if tipo in PERIFERICOS else contexto["pedido"]["teto_peca"]
+    pedido = contexto["pedido"]
+    absoluto = pedido["teto_perifericos"] if tipo in PERIFERICOS else pedido["teto_peca"]
     teto = contexto["planejamento"]["tetos_sugeridos"].get(tipo, absoluto)
     dentro = [p for p in pecas if Decimal(str(p["preco"])) <= Decimal(str(teto))]
     if dentro:
-        cor = contexto["pedido"]["aparencia"]["cor"]
+        cor = pedido["aparencia"]["cor"]
         if cor != "sem-preferencia" and not any(PreferenciasCoresService.prioridade(p, cor) <= 1 for p in dentro):
             preferidas = [p for p in pecas if PreferenciasCoresService.prioridade(p, cor) <= 1]
             if preferidas:

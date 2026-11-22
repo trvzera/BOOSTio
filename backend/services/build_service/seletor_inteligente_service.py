@@ -90,9 +90,10 @@ class SeletorInteligenteService:
         return selecionados, excluidas
 
     def _avisar_benchmark(self, contexto):
+        pedido = contexto["pedido"]
         for modelo in self.MODELOS_BENCHMARK:
             tipo = modelo.__tablename__
-            if tipo in contexto["pedido"]["proprias"]:
+            if tipo in pedido["proprias"]:
                 continue
             if tipo in contexto["fallbacks_benchmark"]:
                 contexto["planejamento"]["avisos"].append(
@@ -131,15 +132,14 @@ class SeletorInteligenteService:
 
     @staticmethod
     def _categorias_excluidas(contexto):
-        excluidas = set(contexto["pedido"]["proprias"])
-        
+        pedido = contexto["pedido"]
+        excluidas = set(pedido["proprias"])
+
         for grupo in ({"ssd", "hd"}, {"air_cooler", "water_cooler"}):
             if grupo & excluidas:
                 excluidas.update(grupo)
-        
-        rede = contexto["pedido"]["rede"]
-        
-        excluidas.update({"adaptador_wifi", "cabo_rede"} - PlanejarRedeService.categorias(rede))
+
+        excluidas.update({"adaptador_wifi", "cabo_rede"} - PlanejarRedeService.categorias(pedido["rede"]))
 
         if contexto["categoria"] is not None:
             excluidas.update(m.__tablename__ for m in MODELOS_PECAS
@@ -147,10 +147,11 @@ class SeletorInteligenteService:
         return excluidas
 
     def _carregar_pools(self, contexto):
+        pedido = contexto["pedido"]
         pools = {}
         for modelo in MODELOS_PECAS:
             periferico = modelo.__tablename__ in PERIFERICOS
-            teto = contexto["pedido"]["teto_perifericos"] if periferico else contexto["pedido"]["teto_peca"]
+            teto = pedido["teto_perifericos"] if periferico else pedido["teto_peca"]
             if not teto:
                 continue
             pecas = (modelo.listar_pool_benchmark(teto) if modelo in self.MODELOS_BENCHMARK
@@ -164,43 +165,31 @@ class SeletorInteligenteService:
                     contexto["fallbacks_benchmark"].add(modelo.__tablename__)
             pools[modelo.__tablename__] = PrecoExibidoService.catalogo(pecas, teto)
         for tipo in ("cabo_rede", "adaptador_wifi"):
-            if contexto["pedido"]["rede"]:
-                pools[tipo] = [p for conexao in PlanejarRedeService.conexoes(contexto["pedido"]["rede"])
+            if pedido["rede"]:
+                pools[tipo] = [p for conexao in PlanejarRedeService.conexoes(pedido["rede"])
                                if PlanejarRedeService.TIPOS.get(conexao.get("tipo")) == tipo
-                               for p in PlanejarRedeService.opcoes(pools, conexao, contexto["pedido"]["proprias"])]
-        PreferenciasProcessadorService.exigir_catalogo(pools, contexto["pedido"]["preferencia_processador"], contexto["pedido"]["proprias"], contexto["pedido"]["detalhes_proprias"])
+                               for p in PlanejarRedeService.opcoes(pools, conexao, pedido["proprias"])]
+        PreferenciasProcessadorService.exigir_catalogo(pools, pedido["preferencia_processador"],
+                                                       pedido["proprias"], pedido["detalhes_proprias"])
         return pools
 
     def _selecionar_por_benchmark(self, contexto, excluidas):
+        """Escolhe as candidatas de processador e de placa de vídeo, nesta ordem: o que sobra para a
+        placa de vídeo depende dos processadores candidatos."""
+        pedido = contexto["pedido"]
         selecionados = []
         for modelo in self.MODELOS_BENCHMARK:
             tipo = modelo.__tablename__
             dependencia = tipo == "processador" and contexto["categoria"] in ("placa_mae", "memoria_ram")
-            if tipo in contexto["pedido"]["proprias"] or (tipo in excluidas and not dependencia):
+            if tipo in pedido["proprias"] or (tipo in excluidas and not dependencia):
                 continue
-            pecas = contexto["pools"].get(tipo, [])
-            if tipo == "processador":
-                pecas = self._filtrar_plataformas(contexto, pecas)
-            pecas = aplicar_teto(contexto, tipo, pecas)
-            if tipo == "processador" and contexto["pedido"]["preferencia_processador"] != "sem-preferencia":
-                preferidas = [p for p in pecas if PreferenciasProcessadorService.marca(p, contexto["pedido"]["preferencia_processador"])]
-                if not preferidas:
-                    raise ErroPlanejamentoBuild("Não há plataforma da marca escolhida dentro dos limites recebidos. Revise a marca, as peças próprias ou o orçamento.",
-                                               "marca-processador", "Revise a marca do processador", "preferencias")
-                pecas = preferidas
-            if tipo == "placa_video":
-                estimativas = contexto["planejamento"]["estimativas_cpu"]
-                cpus = contexto["cpus_candidatas"]
-                ids = [p["id"] for p in cpus] or (["proprio"] if "processador" in contexto["pedido"]["proprias"] else [])
-                reservas = [estimativas[i]["disponivel_gpu"] for i in ids if estimativas.get(i)]
-                if reservas:
-                    pecas = [p for p in pecas if p["preco"] <= max(reservas)]
-            teto_faixas = contexto["planejamento"]["tetos_sugeridos"].get(tipo, contexto["pedido"]["teto_peca"])
+            pecas = (self._candidatas_processador(contexto) if tipo == "processador"
+                     else self._candidatas_placa_video(contexto))
+            teto_faixas = contexto["planejamento"]["tetos_sugeridos"].get(tipo, pedido["teto_peca"])
             teto_faixas = max([teto_faixas, *[p["preco"] for p in pecas]])
             amostra, diagnostico = AmostraInteligenteService().executar(
-                pecas, tipo, contexto["pedido"]["prioridade"], teto_faixas,
-                contexto["limites"][tipo], contexto["pedido"]["aparencia"]["cor"],
-                preferencia_processador=contexto["pedido"]["preferencia_processador"])
+                pecas, tipo, pedido["prioridade"], teto_faixas, contexto["limites"][tipo],
+                pedido["aparencia"]["cor"], preferencia_processador=pedido["preferencia_processador"])
             diagnostico["sem_benchmark"] = tipo in contexto["fallbacks_benchmark"]
             contexto["amostragem"][tipo] = diagnostico
             if tipo == "processador":
@@ -209,6 +198,29 @@ class SeletorInteligenteService:
                 selecionados.extend(amostra)
         return selecionados
 
+    def _candidatas_processador(self, contexto):
+        """Processadores que cabem na plataforma, no teto de preço e na marca pedida."""
+        marca = contexto["pedido"]["preferencia_processador"]
+        pecas = self._filtrar_plataformas(contexto, contexto["pools"].get("processador", []))
+        pecas = aplicar_teto(contexto, "processador", pecas)
+        if marca == "sem-preferencia":
+            return pecas
+        preferidas = [p for p in pecas if PreferenciasProcessadorService.marca(p, marca)]
+        if not preferidas:
+            raise ErroPlanejamentoBuild("Não há plataforma da marca escolhida dentro dos limites recebidos. Revise a marca, as peças próprias ou o orçamento.",
+                                       "marca-processador", "Revise a marca do processador", "preferencias")
+        return preferidas
+
+    def _candidatas_placa_video(self, contexto):
+        """Placas de vídeo que cabem no teto e no que sobra para a GPU depois de cada processador candidato."""
+        pedido = contexto["pedido"]
+        pecas = aplicar_teto(contexto, "placa_video", contexto["pools"].get("placa_video", []))
+        estimativas = contexto["planejamento"]["estimativas_cpu"]
+        ids = [p["id"] for p in contexto["cpus_candidatas"]] or (["proprio"] if "processador" in pedido["proprias"] else [])
+        reservas = [estimativas[i]["disponivel_gpu"] for i in ids if estimativas.get(i)]
+        if reservas:
+            pecas = [p for p in pecas if p["preco"] <= max(reservas)]
+        return pecas
 
     def _filtrar_plataformas(self, contexto, pecas):
         propria = contexto["pedido"]["detalhes_proprias"].get("placa_mae", {}).get("especificacoes_confirmadas", {})
@@ -228,10 +240,8 @@ class SeletorInteligenteService:
             return [p for p in pecas if estimativas.get(p["id"]) is None]
         return pecas
 
-
     def _selecionar_demais_pecas(self, contexto, excluidas, selecionados):
-        aparencia, rede = contexto["pedido"]["aparencia"], contexto["pedido"]["rede"]
-        
+        pedido = contexto["pedido"]
         catalogo = {}
         especiais = {"processador", "placa_video", "placa_mae", "memoria_ram"}
         for tipo, pecas in contexto["pools"].items():
@@ -242,13 +252,14 @@ class SeletorInteligenteService:
             fichas = [ficha_catalogo(p) for p in aplicar_teto(contexto, tipo, pecas)]
             if fichas:
                 catalogo[tipo] = AmostrarCatalogoService().executar(
-                    tipo, fichas, contexto["limites"][tipo], contexto["pedido"]["utilidade"], cor=aparencia["cor"])[:contexto["limites"][tipo]]
+                    tipo, fichas, contexto["limites"][tipo], pedido["utilidade"],
+                    cor=pedido["aparencia"]["cor"])[:contexto["limites"][tipo]]
         self._preservar_referencia_gabinete(contexto, excluidas, catalogo)
         self._preservar_armazenamento(contexto, excluidas, catalogo)
 
         placas = []
         precisa_placas = "placa_mae" not in excluidas
-        precisa_ddr = "memoria_ram" not in excluidas and "placa_mae" not in contexto["pedido"]["proprias"]
+        precisa_ddr = "memoria_ram" not in excluidas and "placa_mae" not in pedido["proprias"]
         if precisa_placas or precisa_ddr:
             placas = selecionar_placas_mae(contexto, selecionados)
         if precisa_placas and placas:
@@ -262,10 +273,20 @@ class SeletorInteligenteService:
             catalogo[tipo] = list({p["id"]: p for p in itens}.values())[:contexto["limites"][tipo]]
         return self._formatar_catalogo(catalogo)
 
+    @staticmethod
+    def _garantir_na_amostra(catalogo, tipo, peca, limite):
+        """Põe a peça na amostra da categoria. Se a amostra já estiver cheia, tira a última para abrir espaço."""
+        amostra = catalogo.setdefault(tipo, [])
+        if any(p["id"] == id_numerico(peca["id"]) for p in amostra):
+            return
+        if len(amostra) >= limite:
+            amostra.pop()
+        amostra.append(ficha_catalogo(peca))
 
     def _preservar_armazenamento(self, contexto, excluidas, catalogo):
-        minimo = contexto["pedido"]["armazenamento_minimo_gb"]
-        if minimo is None or {"ssd", "hd"} & contexto["pedido"]["proprias"].keys():
+        pedido = contexto["pedido"]
+        minimo = pedido["armazenamento_minimo_gb"]
+        if minimo is None or {"ssd", "hd"} & pedido["proprias"].keys():
             return
         pools = {tipo: contexto["pools"].get(tipo, []) for tipo in ("ssd", "hd") if tipo not in excluidas}
         referencia = PlanejarArmazenamentoService().executar(pools, minimo)
@@ -275,13 +296,8 @@ class SeletorInteligenteService:
         itens = []
         for item in referencia["itens"]:
             tipo, peca = item["tipo"], item["peca"]
-            amostra = catalogo.setdefault(tipo, [])
-            ident = id_numerico(peca["id"])
-            if not any(p["id"] == ident for p in amostra):
-                if len(amostra) >= contexto["limites"][tipo]:
-                    amostra.pop()
-                amostra.append(ficha_catalogo(peca))
-            itens.append({"tipo": tipo, "id": ident, "quantidade": item["quantidade"]})
+            self._garantir_na_amostra(catalogo, tipo, peca, contexto["limites"][tipo])
+            itens.append({"tipo": tipo, "id": id_numerico(peca["id"]), "quantidade": item["quantidade"]})
         contexto["planejamento"]["armazenamento_referencia"] = {
             "itens": itens, "capacidade_total_gb": referencia["capacidade_total_gb"], "custo": referencia["custo"]}
 
@@ -291,19 +307,14 @@ class SeletorInteligenteService:
             return
         peca = next((p for p in contexto["pools"].get("gabinete", []) if id_numerico(p["id"]) == referencia), None)
         if peca:
-            amostra = catalogo.setdefault("gabinete", [])
-            if not any(p["id"] == referencia for p in amostra):
-                if len(amostra) >= contexto["limites"]["gabinete"]:
-                    amostra.pop()
-                amostra.append(ficha_catalogo(peca))
-
+            self._garantir_na_amostra(catalogo, "gabinete", peca, contexto["limites"]["gabinete"])
 
     @staticmethod
     def _ajustar_acessorio_rede(catalogo, contexto, excluidas):
-        rede = contexto["pedido"]["rede"]
-        for conexao in PlanejarRedeService.conexoes(rede):
+        pedido = contexto["pedido"]
+        for conexao in PlanejarRedeService.conexoes(pedido["rede"]):
             for acessorio in PlanejarRedeService.categorias(conexao) - excluidas:
-                catalogo[acessorio] = PlanejarRedeService.opcoes(catalogo, conexao, contexto["pedido"]["proprias"])
+                catalogo[acessorio] = PlanejarRedeService.opcoes(catalogo, conexao, pedido["proprias"])
 
     @staticmethod
     def _formatar_catalogo(catalogo):
