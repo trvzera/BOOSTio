@@ -27,7 +27,7 @@ def test_fallback_permitido_preserva_tentativa_unica_e_sem_novo_ciclo_de_correca
     trava, criar = preparar(mocker, [HTTPError(response=resposta), {"id":"s-2"}])
     assert GerarBuildService().executar(7, {}) == {"id":"s-2"}
     assert criar.call_count == 2
-    assert criar.call_args.kwargs == {"modelo":"gemini-3.8-flash","tentativas_correcao":0}
+    assert criar.call_args.kwargs == {"modelo":"gemini-flash-lite-latest","tentativas_correcao":0}
     trava.assert_called_once_with(7)
 
 

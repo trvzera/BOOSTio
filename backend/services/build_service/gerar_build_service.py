@@ -21,5 +21,5 @@ class GerarBuildService:
     @staticmethod
     def _fallback(usuario_id, dados):
         return FluxoGeracaoService().executar(
-            usuario_id, dados, modelo="gemini-3.8-flash", tentativas_correcao=0,
+            usuario_id, dados, modelo="gemini-flash-lite-latest", tentativas_correcao=0,
         )
