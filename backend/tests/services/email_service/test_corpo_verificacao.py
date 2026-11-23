@@ -7,6 +7,8 @@ from flask_mail import Message
 from models import mail
 from services.email_service.enviar_codigo_email_service import EnviarEmailService
 
+LINK = "https://boostio.example/pages/verificar-email.html#token=token-assinado"
+
 
 @pytest.fixture
 def app_email():
@@ -19,32 +21,32 @@ def app_email():
 def test_mensagem_multipart_tem_codigo_expiracao_e_instrucao_sem_rastreamento(app_email):
     with app_email.app_context():
         msg = Message(subject="Seu código de verificação — BOOSTio", recipients=["qa@example.test"])
-        EnviarEmailService._monta_mensagem(msg, "001234", "Giovanni")
+        EnviarEmailService._monta_mensagem(msg, "001234", "Giovanni", LINK)
         mime = message_from_bytes(msg.as_bytes())
     assert {parte.get_content_type() for parte in mime.walk()} >= {"multipart/alternative", "text/plain", "text/html"}
     for corpo in (msg.body, msg.html):
         assert "001234" in corpo and "5 minutos" in corpo and "Giovanni" in corpo
         assert "não solicitou" in corpo and "Não compartilhe" in corpo
-        assert "mais recente" in corpo
+        assert "mais recente" in corpo and LINK in corpo
     assert 'lang="pt-BR"' in msg.html
-    assert "<img" not in msg.html and "<script" not in msg.html and "https://" not in msg.html
+    assert "<img" not in msg.html and "<script" not in msg.html and msg.html.count("https://") == 1
 
 
 def test_nome_e_escapado_e_codigo_nunca_aceita_html(app_email):
     with app_email.app_context():
         msg = Message()
-        EnviarEmailService._monta_mensagem(msg, "123456", '<img src=x onerror="alert(1)">')
+        EnviarEmailService._monta_mensagem(msg, "123456", '<img src=x onerror="alert(1)">', LINK)
         assert "<img" not in msg.html
         assert "&lt;img" in msg.html
         for codigo in ("<script>", "12345", "1234567", "١٢٣٤٥٦", 123456, None):
             with pytest.raises(ValueError, match="Código"):
-                EnviarEmailService._monta_mensagem(msg, codigo)
+                EnviarEmailService._monta_mensagem(msg, codigo, "", LINK)
 
 
 def test_html_usa_paleta_da_boostio_e_codigo_sem_fonte_monoespacada(app_email):
     with app_email.app_context():
         msg = Message()
-        EnviarEmailService._monta_mensagem(msg, "001234", "QA")
+        EnviarEmailService._monta_mensagem(msg, "001234", "QA", LINK)
     for cor in ("#000000", "#1c1c1e", "#3a3a3c", "#007bff", "#e5e5ea"):
         assert cor in msg.html
     assert "font-family:Lexend,Arial,Helvetica,sans-serif" in msg.html

@@ -3,17 +3,18 @@ import assert from "node:assert/strict";
 import { iniciarFluxoVerificacaoEmail } from "../js/components/verification-flow.js";
 
 const drenar=()=>new Promise(r=>setImmediate(r));
-function ambiente(t,{enviar=async()=>{},confirmar=async()=>({usuario:{verificado:true}}),aoConfirmar=()=>{}}={}) {
+function ambiente(t,{enviar=async()=>{},confirmar=async()=>({usuario:{verificado:true}}),aoConfirmar=()=>{},consultarUsuario}={}) {
   let tempo=100000,focos=0,ativo;
   const elemento=()=>({value:"",textContent:"",disabled:false,isConnected:true,handlers:{},
     addEventListener(e,h){this.handlers[e]=h;},setAttribute(k,v){this[k]=v;},focus(){focos++;ativo=this;}});
   const inputs=Array.from({length:6},elemento),classes=new Set();
-  const elementos=Object.fromEntries(["btn-send-code","btn-confirm-code","verify-email-error","verify-email-status","verify-email-target"].map(id=>["#"+id,elemento()]));
-  const modal={querySelector:s=>elementos[s],querySelectorAll:()=>inputs,addEventListener(){},
+  const elementos=Object.fromEntries(["btn-send-code","btn-confirm-code","verify-email-error","verify-email-status","verify-email-target","verify-email-gmail"].map(id=>["#"+id,elemento()]));
+  const janela = new EventTarget();
+  const modal={querySelector:s=>elementos[s],querySelectorAll:()=>inputs,addEventListener(){},ownerDocument:{defaultView:janela},
     classList:{add:c=>classes.add(c),remove:c=>classes.delete(c),contains:c=>classes.has(c)}};
-  const fluxo=iniciarFluxoVerificacaoEmail({modal,enviar,confirmar,aoConfirmar,agora:()=>tempo});
+  const fluxo=iniciarFluxoVerificacaoEmail({modal,enviar,confirmar,aoConfirmar,consultarUsuario,agora:()=>tempo});
   t.after(()=>fluxo.destruir());
-  return {fluxo,inputs,elementos,modal,focos:()=>focos,ativo:()=>ativo,avancar:ms=>tempo+=ms,
+  return {fluxo,inputs,elementos,modal,janela,focos:()=>focos,ativo:()=>ativo,avancar:ms=>tempo+=ms,
     digitar(codigo){inputs[0].value=codigo;inputs[0].handlers.input();}};
 }
 const usuario={id:1,email:"teste@example.test",verificado:false};
@@ -76,4 +77,47 @@ test("resposta de destino anterior não altera a verificação de outro e-mail",
   envios[0].resolve();await drenar();assert.equal(a.inputs[0].disabled,true);
   envios[1].resolve();await drenar();assert.equal(a.inputs[0].disabled,false);
   assert.equal(a.elementos["#verify-email-target"].textContent,"novo@example.test");
+});
+
+test("oferece busca no Gmail após enviar o código a um endereço Gmail", async t => {
+  let terminarEnvio;
+  const a = ambiente(t, { enviar: () => new Promise(resolve => { terminarEnvio = resolve; }) });
+  const link = a.elementos["#verify-email-gmail"];
+
+  a.fluxo.abrir({ ...usuario, email: "pessoa@gmail.com" });
+  assert.equal(link.hidden, true);
+  terminarEnvio();
+  await drenar();
+
+  assert.equal(link.hidden, false);
+  const url = new URL(link.href);
+  assert.equal(url.origin, "https://mail.google.com");
+  assert.equal(decodeURIComponent(url.hash), '#search/in:anywhere from:no-reply@boostio.com.br subject:"Seu código de verificação" newer_than:1d');
+
+  a.fluxo.abrir(usuario);
+  terminarEnvio();
+  await drenar();
+  assert.equal(link.hidden, true);
+});
+
+test("ao voltar de outra aba, reconhece a confirmação do e-mail da mesma conta", async t => {
+  let perfil = { ...usuario, verificado: true, id: 2 };
+  let confirmacoes = 0;
+  const a = ambiente(t, {
+    consultarUsuario: async () => ({ usuario: perfil }),
+    aoConfirmar: () => { confirmacoes++; },
+  });
+
+  a.fluxo.abrir(usuario);
+  await drenar();
+  a.janela.dispatchEvent(new Event("focus"));
+  await drenar();
+  assert.equal(a.modal.classList.contains("open"), true);
+  assert.equal(confirmacoes, 0);
+
+  perfil = { ...usuario, verificado: true };
+  a.janela.dispatchEvent(new Event("focus"));
+  await drenar();
+  assert.equal(a.modal.classList.contains("open"), false);
+  assert.equal(confirmacoes, 1);
 });

@@ -6,6 +6,7 @@ import { criarUsuario } from "../api/usuario/criarUsuario.js";
 import { entrarComGoogle } from "../api/usuario/entrarComGoogle.js";
 import { enviarEmailVerificar } from "../api/email/enviarEmailVerificar.js";
 import { conferirEmailVerificar } from "../api/email/conferirEmailVerificar.js";
+import { buscarUsuarioLogado } from "../api/usuario/buscarUsuarioLogado.js";
 import { iniciarFluxoVerificacaoEmail } from "../components/verification-flow.js";
 import {
   registrarAnimacao,
@@ -199,6 +200,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const modalVerificacao = document.querySelector("#verify-email-modal");
     const fluxoVerificacao = iniciarFluxoVerificacaoEmail({
       modal:modalVerificacao,enviar:enviarEmailVerificar,confirmar:conferirEmailVerificar,
+      consultarUsuario:buscarUsuarioLogado,
       aoConfirmar:()=>{ window.location.href="./index.html"; },
     });
     const abrirModalVerificacao=usuario=>fluxoVerificacao.abrir(usuario);

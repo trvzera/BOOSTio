@@ -1,6 +1,6 @@
 
 export const paginas = new Set([
-  "index.html", "login.html", "signin.html", "esqueci-senha.html", "reset-senha.html",
+  "index.html", "login.html", "signin.html", "esqueci-senha.html", "reset-senha.html", "verificar-email.html",
   "formulario.html", "builds.html", "configuracoes.html", "configuracoes-prontas.html",
   "configuracao-build.html", "pecas.html", "peca.html", "sobre.html", "termos.html", "erro.html", "testes.html", "admin.html",
 ]);

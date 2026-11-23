@@ -14,7 +14,7 @@ export const linksAutenticado = [
 ];
 export const paginasPublicas = new Set([
   "", "index.html", "termos.html", "sobre.html", "contato.html",
-  "login.html", "signin.html", "esqueci-senha.html", "reset-senha.html", "erro.html",
+  "login.html", "signin.html", "esqueci-senha.html", "reset-senha.html", "verificar-email.html", "erro.html",
 ]);
 export function paginaPrivada(pagina,busca = '') {
   pagina = nomePagina(pagina);

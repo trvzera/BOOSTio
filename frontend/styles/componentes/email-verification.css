@@ -91,6 +91,17 @@
 .email-verification-feedback > p[role="status"] { color: var(--text-accent); }
 .email-verification-feedback > .form-error { padding: .625rem .75rem; border: 1px solid rgba(255,59,48,.22); border-radius: .75rem; background: var(--status-error-bg); color: var(--status-error); }
 .email-verification-feedback > p:empty { display: none; }
+.email-verification-gmail[hidden] { display: none; }
+.email-verification .email-verification-gmail:not([hidden]) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  margin-bottom: var(--espacamento-20);
+  color: var(--text-accent);
+  font: 500 .875rem/1.5 var(--font-heading);
+  text-decoration: none;
+}
 .email-verification-actions { margin-top: var(--espacamento-12); }
 .email-verification-actions > button, .email-verification-actions > .disabled-tip-anchor, .email-verification-actions > .disabled-tip-anchor > button { width: 100%; }
 .email-verification-actions .btn-primary { font: 500 .875rem/1.5 var(--font-heading); }
@@ -99,6 +110,19 @@
 .email-verification-resend .btn-ghost { min-width: 8rem; padding: .625rem .75rem; font: 400 .75rem/1.5 var(--font-heading); }
 .email-verification-resend > .disabled-tip-anchor { padding: 0; }
 .email-verification .email-verification-delivery-tip { margin-top: var(--espacamento-8); font-size: .75rem; }
+.email-verification-page {
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  padding: var(--espacamento-16);
+}
+.email-verification-page .email-verification { width: min(100%, 30rem); border: 1px solid var(--glass-border); }
+.email-verification-page .email-verification > h1 { font: 500 clamp(1.375rem, 5vw, 1.75rem)/1.3 var(--font-heading); }
+.email-verification-page .email-verification > p { margin-top: var(--espacamento-12); }
+.email-verification-page .email-verification > p:empty { display: none; }
+.email-verification-page .email-verification > .form-error { color: var(--status-error); }
+.email-verification-page .email-verification > :is(button, a) { margin-top: var(--espacamento-20); }
+.email-verification-page .email-verification > [hidden] { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .email-verification-overlay, .email-verification, .email-verification .code-input { transition: none; }
 }

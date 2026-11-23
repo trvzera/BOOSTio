@@ -1,23 +1,125 @@
-Copyright (c) 2026 Gustavo Azevedo e colaboradores do BOOSTio. All Rights Reserved.
+BOOSTio — TODOS OS DIREITOS RESERVADOS
 
-Este código-fonte é disponibilizado publicamente apenas para visualização.
-Nenhuma licença é concedida. Sem autorização prévia e por escrito dos titulares,
-é proibido usar, copiar, modificar, mesclar, publicar, distribuir, sublicenciar,
-vender ou criar obras derivadas deste software, no todo ou em parte, para
-qualquer finalidade, comercial ou não.
+Copyright © 2026 Giovanni Trivellato, Gustavo Azevedo.
+Todos os direitos reservados.
 
-O software é fornecido "no estado em que se encontra", sem garantia de qualquer
-tipo. Os titulares não respondem por danos decorrentes do seu uso.
+1. Material abrangido
+
+Este aviso se aplica ao material original da BOOSTio incluído neste
+repositório, como código-fonte, elementos de interface, design, textos,
+documentação, animações, imagens, vídeos, logotipos e demais elementos da
+identidade visual, na medida em que sejam protegidos e pertençam aos
+respectivos titulares.
+
+2. Repositório público para portfólio
+
+O repositório é disponibilizado para consulta e apresentação do trabalho
+em portfólio. A publicação do material e o acesso a ele não concedem uma
+licença pública para reutilizá-lo. O link do repositório oficial pode ser
+compartilhado como referência.
+
+3. Usos que exigem autorização
+
+Salvo nos casos permitidos pela legislação aplicável, pelos Termos de
+Serviço do GitHub ou por uma licença específica, é necessária autorização
+prévia e por escrito dos respectivos titulares para:
+
+- Copiar, reproduzir, traduzir, modificar, adaptar ou criar obras derivadas
+  do material, integralmente ou em parte.
+- Extrair ou reutilizar código, textos, imagens, animações ou outros
+  elementos protegidos em outro projeto, produto, serviço, trabalho escolar
+  ou portfólio.
+- Republicar, redistribuir, espelhar, hospedar, disponibilizar para download
+  ou distribuir versões modificadas do material.
+- Vender, sublicenciar, alugar ou explorar comercialmente o material,
+  inclusive quando incorporado a um produto ou serviço de terceiros.
+- Usar o nome, o logotipo ou a identidade visual da BOOSTio para identificar
+  outro projeto ou sugerir autoria, afiliação ou endosso da BOOSTio ou de
+  seus autores.
+
+As restrições se aplicam a usos comerciais e não comerciais. Dar crédito,
+alterar nomes ou modificar partes do material não substitui a autorização.
+Devem ser preservados os avisos de autoria e de direitos autorais nas cópias
+autorizadas, conforme os termos da autorização ou licença aplicável.
+
+4. Permissões do GitHub e materiais de terceiros
+
+A visualização, os forks na própria plataforma e demais usos permitidos
+pelos Termos de Serviço do GitHub seguem esses termos. As exceções e
+limitações previstas na legislação aplicável são preservadas.
+
+Bibliotecas, fontes, bases de dados e outros materiais de terceiros seguem
+suas próprias licenças e avisos de atribuição. Consulte os avisos incluídos
+nos respectivos arquivos e diretórios.
+
+5. Solicitações de autorização e garantias
+
+Solicite autorização aos respectivos titulares pelos canais de contato
+divulgados pela BOOSTio, indicando o material e a finalidade pretendida.
+Uma autorização se limita ao uso descrito e às condições nela previstas.
+
+O material é disponibilizado no estado em que se encontra e sem garantias,
+na medida permitida pela legislação aplicável.
 
 ---
 
-Copyright (c) 2026 Gustavo Azevedo and the BOOSTio contributors. All Rights Reserved.
+BOOSTio — ALL RIGHTS RESERVED
 
-This source code is made publicly available for viewing purposes only.
-No license is granted. Without prior written permission from the copyright
-holders, you may not use, copy, modify, merge, publish, distribute, sublicense,
-sell, or create derivative works from this software, in whole or in part, for
-any purpose, commercial or non-commercial.
+Copyright © 2026 Giovanni Trivellato, Gustavo Azevedo.
+All rights reserved.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. THE COPYRIGHT
-HOLDERS SHALL NOT BE LIABLE FOR ANY DAMAGES ARISING FROM ITS USE.
+1. Covered material
+
+This notice applies to original BOOSTio material included in this
+repository, such as source code, interface elements, design, text,
+documentation, animations, images, videos, logos, and other visual identity
+elements, to the extent protected and owned by the respective rights holders.
+
+2. Public portfolio repository
+
+This repository is made available for viewing and showcasing the work as
+a portfolio. Publication and access do not grant a public license to reuse
+the material. The link to the official repository may be shared as a
+reference.
+
+3. Uses requiring permission
+
+Except as permitted by applicable law, GitHub's Terms of Service, or a
+specific license, prior written permission from the respective rights
+holders is required to:
+
+- Copy, reproduce, translate, modify, adapt, or create derivative works
+  from the material, in whole or in part.
+- Extract or reuse code, text, images, animations, or other protected
+  elements in another project, product, service, academic assignment, or
+  portfolio.
+- Republish, redistribute, mirror, host, offer downloads of, or distribute
+  modified versions of the material.
+- Sell, sublicense, rent, or commercially exploit the material, including
+  as part of a third-party product or service.
+- Use the BOOSTio name, logo, or visual identity to identify another project
+  or imply authorship, affiliation, or endorsement by BOOSTio or its authors.
+
+The restrictions apply to commercial and non-commercial uses. Giving credit,
+changing names, or modifying parts of the material does not replace permission.
+Authorship and copyright notices must be retained on authorized copies in
+accordance with the applicable permission or license terms.
+
+4. GitHub permissions and third-party materials
+
+Viewing, in-platform forks, and other uses permitted by GitHub's Terms of
+Service are governed by those terms. Exceptions and limitations under
+applicable law are preserved.
+
+Third-party libraries, fonts, datasets, and other materials are governed by
+their own licenses and attribution notices. See the notices included in
+the corresponding files and directories.
+
+5. Permission requests and warranties
+
+Request permission from the respective rights holders through the contact
+channels listed by BOOSTio, identifying the material and intended use.
+Any permission is limited to the use and conditions it specifies.
+
+The material is provided as is and without warranties to the extent
+permitted by applicable law.

@@ -7,6 +7,7 @@ import "./discord-perfil.js";
 import "../services-carousel.js";
 import { caminhoLogin } from "../auth/auth.js";
 import { carregarPerfil as buscarUsuarioLogado } from "../conta/perfil.js";
+import { buscarUsuarioLogado as consultarSessao } from "../api/usuario/buscarUsuarioLogado.js";
 import { atualizarUsuario } from "../api/usuario/atualizarUsuario.js";
 import { deletarUsuario } from "../api/usuario/deletarUsuario.js";
 import { fetchComErro } from "../api/_shared/fetchComErro.js";
@@ -257,6 +258,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const modalVerificacao = document.querySelector("#verify-email-modal");
     const fluxoVerificacao = iniciarFluxoVerificacaoEmail({
       modal:modalVerificacao,enviar:enviarEmailVerificar,confirmar:conferirEmailVerificar,
+      consultarUsuario:consultarSessao,
       aoConfirmar:resposta=>{
         usuarioAtual=resposta.usuario;atualizarPillVerificado(true);
         showToast("E-mail verificado com sucesso.",true);

@@ -14,7 +14,8 @@ from services.email_service.verificar_codigo_email_service import VerificarCodig
 @pytest.fixture
 def usuario():
     app = Flask(__name__)
-    app.config.update(SQLALCHEMY_DATABASE_URI="sqlite:///:memory:")
+    app.config.update(SQLALCHEMY_DATABASE_URI="sqlite:///:memory:",
+                      SECRET_KEY="apenas-testes", FRONTEND_URL="https://boostio.example")
     db.init_app(app)
     mail.init_app(app)
     with app.app_context():
