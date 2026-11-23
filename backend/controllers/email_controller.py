@@ -9,6 +9,7 @@ from utils.limite_requisicoes import limiter, chave_usuario
 
 from services.email_service.enviar_codigo_email_service import EnviarEmailService
 from services.email_service.verificar_codigo_email_service import VerificarCodigoEmail
+from services.email_service.link_verificacao_email_service import LinkVerificacaoEmailService
 
 email_bp = Blueprint("email",__name__,url_prefix='/email')
 
@@ -58,3 +59,13 @@ def enviar_email(usuario_id):
 def conferir_email(usuario_id):
   usuario = VerificarCodigoEmail().executar_para_usuario(usuario_id, request.get_json() or {})
   return jsonify({"mensagem": "Email verificado com sucesso", "usuario": usuario}),200
+
+
+@email_bp.post("/verificar/link")
+@limiter.limit("30 per hour")
+@tratar_erros(mensagem_banco="Não foi possível confirmar o e-mail agora. Tente novamente.")
+def confirmar_link_email():
+  dados = request.get_json(silent=True)
+  token = dados.get("token") if isinstance(dados, dict) else None
+  LinkVerificacaoEmailService().confirmar(token)
+  return jsonify({"mensagem": "E-mail confirmado com sucesso."}), 200

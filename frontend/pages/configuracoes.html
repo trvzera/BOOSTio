@@ -218,11 +218,12 @@
             <h2 id="verify-email-title">Confirme <span>seu e-mail</span></h2>
             <button type="button" class="ui-close-button email-verification-close" id="btn-close-verification" aria-label="Fechar verificação de e-mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
           </header>
-          <p id="verify-email-description" class="email-verification-description">Use o código de 6 dígitos para confirmar o endereço da sua conta.</p>
+          <p id="verify-email-description" class="email-verification-description">Abra a mensagem da BOOSTio e toque em Verificar meu e-mail. Você também pode digitar o código recebido aqui.</p>
           <div class="email-verification-recipient">
             <span>Seu e-mail</span>
             <strong id="verify-email-target">seu e-mail</strong>
           </div>
+          <a id="verify-email-gmail" class="btn-ghost email-verification-gmail" target="_blank" rel="noopener noreferrer" aria-label="Abrir Gmail em uma nova aba" hidden>Abrir Gmail</a>
           <div class="email-verification-code-heading"><span id="verify-email-code-label">Código de verificação</span><span>6 dígitos</span></div>
           <div class="code-inputs" id="code-inputs" role="group" aria-labelledby="verify-email-code-label" aria-describedby="verify-email-code-help">
             <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" autocomplete="one-time-code" data-index="0" aria-label="Primeiro dígito do código" disabled>
@@ -238,7 +239,6 @@
             <p id="verify-email-status" role="status" aria-live="polite" aria-atomic="true"></p>
             <p id="verify-email-error" class="form-error" role="alert"></p>
           </div>
-          <a id="verify-email-gmail" class="email-verification-gmail" target="_blank" rel="noopener noreferrer" aria-label="Abrir busca no Gmail em uma nova aba" hidden>Abrir Gmail</a>
           <div class="modal-actions email-verification-actions">
             <button type="button" class="btn-primary" id="btn-confirm-code" aria-label="Confirmar código de verificação" disabled>Confirmar código</button>
           </div>

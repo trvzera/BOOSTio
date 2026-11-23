@@ -3,13 +3,15 @@ import { iniciarCodigoVerificacao } from "./verification-code.js";
 const buscaGmail = 'in:anywhere from:no-reply@boostio.com.br subject:"Seu código de verificação" newer_than:1d';
 const urlGmail = `https://mail.google.com/mail/u/0/#search/${encodeURIComponent(buscaGmail)}`;
 
-export function iniciarFluxoVerificacaoEmail({modal,enviar,confirmar,aoConfirmar,agora=Date.now}) {
+export function iniciarFluxoVerificacaoEmail({modal,enviar,confirmar,aoConfirmar,consultarUsuario,agora=Date.now}) {
   const inputs=[...modal.querySelectorAll(".code-input")];
   const enviarBtn=modal.querySelector("#btn-send-code"),confirmarBtn=modal.querySelector("#btn-confirm-code");
   const erro=modal.querySelector("#verify-email-error"),status=modal.querySelector("#verify-email-status");
   const abrirGmail = modal.querySelector("#verify-email-gmail");
   abrirGmail.href = urlGmail;
   const alvo=modal.querySelector("#verify-email-target"),automaticos=new Set();
+  const janela = modal.ownerDocument?.defaultView;
+  let consulta;
   let usuario,chave="",enviando=false,conferindo=false,enviado=false,concluido=false,ultimoCodigo="",proximoEnvio=0,expiraEm=0,timer,revisao=0;
   const aberto=()=>modal.classList.contains("open");
   const codigo=()=>inputs.map(i=>i.value).join("");
@@ -38,7 +40,7 @@ export function iniciarFluxoVerificacaoEmail({modal,enviar,confirmar,aoConfirmar
       if(versao!==revisao)return;
       enviado=true;expiraEm=agora()+5*60*1000;ultimoCodigo="";
       inputs.forEach(i=>i.value="");proximoEnvio=agora()+30000;
-      status.textContent="Código enviado. Confira sua caixa de entrada.";
+      status.textContent="E-mail enviado. Confira sua caixa de entrada.";
     } catch(e) {
       if(versao!==revisao)return;
       erro.textContent=e.message||"Não foi possível enviar o código. Tente novamente.";
@@ -56,13 +58,36 @@ export function iniciarFluxoVerificacaoEmail({modal,enviar,confirmar,aoConfirmar
     conferindo=true;ultimoCodigo=valor;erro.textContent="";status.textContent="Verificando o código…";atualizar();
     try {
       const resposta=await confirmar(atual.id,valor);
-      if(versao!==revisao)return;
-      concluido=true;fechar();await aoConfirmar(resposta);
+      if(versao!==revisao||concluido)return;
+      await concluir(resposta);
     } catch(e) {
-      if(versao!==revisao)return;
+      if(versao!==revisao||concluido)return;
       erro.textContent=e.message||"Não foi possível verificar o código. Tente novamente.";
       status.textContent="";
     } finally { if(versao===revisao){conferindo=false;atualizar();if(!concluido)focar();} }
+  }
+  async function concluir(resposta) {
+    concluido = true;
+    fechar();
+    await aoConfirmar(resposta);
+  }
+  async function verificarAoVoltar() {
+    if (!aberto() || !enviado || concluido || conferindo || consulta) return;
+    const versao = revisao;
+    consulta = new AbortController();
+    const pendente = consulta;
+    try {
+      const resposta = await consultarUsuario({ signal: pendente.signal });
+      const atual = resposta.usuario;
+      if (versao === revisao && aberto() && !concluido && atual?.verificado
+          && atual.id === usuario.id && atual.email === usuario.email) {
+        await concluir(resposta);
+      }
+    } catch {
+      // A confirmação pelo código continua disponível se a consulta falhar.
+    } finally {
+      if (consulta === pendente) consulta = null;
+    }
   }
   function fechar() { clearInterval(timer);modal.classList.remove("open"); }
   function abrir(atual) {
@@ -79,5 +104,11 @@ export function iniciarFluxoVerificacaoEmail({modal,enviar,confirmar,aoConfirmar
   enviarBtn.addEventListener("click",()=>void enviarCodigo());
   confirmarBtn.addEventListener("click",()=>void conferirCodigo(true));
   modal.addEventListener("click",e=>{if(e.target===modal)fechar();});
-  return {abrir,fechar,destruir(){revisao++;clearInterval(timer);}};
+  if (consultarUsuario) janela?.addEventListener("focus", verificarAoVoltar);
+  return {abrir,fechar,destruir(){
+    revisao++;
+    clearInterval(timer);
+    consulta?.abort();
+    janela?.removeEventListener("focus", verificarAoVoltar);
+  }};
 }

@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
 from smtplib import SMTPAuthenticationError, SMTPRecipientsRefused, SMTPException
+from urllib.parse import parse_qs, urlsplit
 
 from flask import Flask
 
@@ -19,6 +20,7 @@ class TestCodigosEmail(unittest.TestCase):
         app.config.update(
             TESTING=True,
             SECRET_KEY="segredo-apenas-para-testes",
+            FRONTEND_URL="https://boostio.example",
             SQLALCHEMY_DATABASE_URI=f"sqlite:///{Path(self.temporario.name) / 'teste.db'}",
         )
         db.init_app(app)
@@ -67,6 +69,51 @@ class TestCodigosEmail(unittest.TestCase):
         self.assertRegex(codigo, r"^[0-9]{6}$")
         self.assertEqual(self.conferir(codigo).status_code, 200)
         self.assertEqual(self.conferir(codigo).status_code, 400)
+        self.assertEqual(self.cliente.post(
+            "/email/verificar/link", json={"token": self.token_do_email()}, headers=self.cabecalhos,
+        ).status_code, 400)
+
+    def token_do_email(self):
+        mensagem = self.enviados.call_args.args[0]
+        endereco = next(linha for linha in mensagem.body.splitlines() if linha.startswith("https://"))
+        url = urlsplit(endereco)
+        self.assertEqual(url.netloc, "boostio.example")
+        self.assertEqual(url.path, "/pages/verificar-email.html")
+        self.assertFalse(url.query)
+        return parse_qs(url.fragment)["token"][0]
+
+    def test_link_confirma_sem_login_apenas_via_post_e_consume_codigo(self):
+        self.assertEqual(self.enviar().status_code, 200)
+        navegador = self.cliente.application.test_client()
+        token = self.token_do_email()
+        rota = "/email/verificar/link"
+        self.assertEqual(navegador.get(rota).status_code, 405)
+        self.assertEqual(navegador.post(rota, json={"token": token}).status_code, 403)
+        self.assertFalse(Usuario.buscar_por_id(self.usuario_id).verificado)
+        with navegador.session_transaction() as sessao:
+            sessao["csrf_token"] = self.cabecalhos["X-CSRF-Token"]
+        self.assertEqual(navegador.post(rota, json={"token": token + "x"}, headers=self.cabecalhos).status_code, 400)
+        self.assertEqual(navegador.post(rota, json={"token": token}, headers=self.cabecalhos).status_code, 200)
+        self.assertTrue(Usuario.buscar_por_id(self.usuario_id).verificado)
+        with navegador.session_transaction() as sessao:
+            self.assertNotIn("_user_id", sessao)
+        self.assertEqual(navegador.post(rota, json={"token": token}, headers=self.cabecalhos).status_code, 400)
+        self.assertEqual(self.conferir(Codigo.buscar_codigo_recente(self.usuario_id).codigo).status_code, 400)
+
+    def test_link_anterior_e_expirado_nao_confirmam(self):
+        self.assertEqual(self.enviar().status_code, 200)
+        antigo = self.token_do_email()
+        registro = Codigo.buscar_codigo_recente(self.usuario_id)
+        registro.criado_em -= timedelta(seconds=31)
+        db.session.commit()
+        self.assertEqual(self.enviar().status_code, 200)
+        rota = "/email/verificar/link"
+        self.assertEqual(self.cliente.post(rota, json={"token": antigo}, headers=self.cabecalhos).status_code, 400)
+        registro = Codigo.buscar_codigo_recente(self.usuario_id)
+        registro.data_expiracao = datetime.now(timezone.utc) - timedelta(seconds=1)
+        db.session.commit()
+        self.assertEqual(self.cliente.post(rota, json={"token": self.token_do_email()}, headers=self.cabecalhos).status_code, 400)
+        self.assertFalse(Usuario.buscar_por_id(self.usuario_id).verificado)
 
     def test_erro_smtp_nao_expoe_detalhes_do_provedor(self):
         for erro, status in ((SMTPAuthenticationError(535,b"detalhe-interno"),503),

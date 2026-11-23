@@ -66,6 +66,7 @@ def test_contrato_de_urls_metodos_e_endpoints_preservado():
         ("/build/<build_id>/copiar-publica", "POST", "build.copiar_build_publica"),
         ("/email/verificar/enviar/<int:usuario_id>", "POST", "email.enviar_email"),
         ("/email/verificar/conferir/<int:usuario_id>", "POST", "email.conferir_email"),
+        ("/email/verificar/link", "POST", "email.confirmar_link_email"),
         ("/benchmark/fps", "GET", "benchmark.consultar_benchmark"),
         ("/benchmark/jogos", "GET", "benchmark.buscar_jogos"),
         ("/benchmark/blender", "GET", "benchmark.consultar_blender"),
