@@ -131,7 +131,7 @@ class TestLimitesRequisicoes(unittest.TestCase):
         self.assertEqual(executar.call_count, 10)
 
     @patch("controllers.build_controller.ListarBuildService.executar", return_value=[])
-    @patch("services.build_service.criar_build_service.CriarBuildService.executar", return_value={"id": "teste"})
+    @patch("services.build_service.fluxo_geracao_service.FluxoGeracaoService.executar", return_value={"id": "teste"})
     def test_geracao_ia_limita_usuario(self, criar, listar):
         with self.cliente.session_transaction() as sessao:
             sessao["_user_id"] = "1"

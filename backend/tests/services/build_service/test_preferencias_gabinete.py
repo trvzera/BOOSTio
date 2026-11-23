@@ -1,14 +1,14 @@
 import services.build_service.ajustar_aparencia_service as validacao_module
 from services.build_service.ajustar_aparencia_service import ajustar_aparencia
 from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
-import services.build_service.criar_build_service as criacao_module
+import services.build_service.fluxo_geracao_service as criacao_module
 from copy import deepcopy
 
 import pytest
 
 from services.build_service.preferencias_gabinete_service import PreferenciasGabineteService as Gabinete
 from services.build_service.preferencias_cores_service import PreferenciasCoresService as Cores
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 
 
 @pytest.mark.parametrize("modelo,esperado", [

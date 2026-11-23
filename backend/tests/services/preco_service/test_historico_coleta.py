@@ -6,9 +6,8 @@ import requests
 from flask import Flask
 from sqlalchemy import event
 
-from models import db, PlacaVideo, ConsultaPreco, ControleColeta, HistoricoPreco, HistoricoOferta, Oferta
+from models import db, PlacaVideo, ConsultaPreco, ControleColeta, HistoricoOferta, Oferta
 from commands.banco import registrar_comandos_banco
-from migrations.historico_precos import preparar_historico_precos
 from services.peca_service import atualizar_precos_service as coleta
 from services.preco_service.buscar_preco_kabum_service import BuscarPrecoKabumService
 
@@ -141,17 +140,6 @@ def test_link_trocado_durante_rede_nao_grava_cotacao_antiga(banco,mocker):
     mocker.patch.object(BuscarPrecoKabumService,'executar',side_effect=trocar)
     r=coleta.AtualizarPrecosService().executar(intervalo=0)
     assert r['ignoradas']==1 and HistoricoOferta.query.count()==0 and p.preco==100
-
-
-def test_migracao_cria_so_historico_preserva_pecas_e_e_repetivel(banco):
-    app,p=banco
-    ident=p.id
-    db.session.remove();HistoricoPreco.__table__.drop(db.engine)
-    assert preparar_historico_precos()['criada'] is True
-    assert preparar_historico_precos()['criada'] is False
-    assert PlacaVideo.buscar_por_id(ident).preco==100
-    r=app.test_cli_runner().invoke(args=['historico-precos-preparar'])
-    assert r.exit_code==0,r.output
 
 
 def test_sem_tabela_interrompe_antes_de_consultar_loja(banco,mocker):

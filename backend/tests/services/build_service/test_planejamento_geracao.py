@@ -3,7 +3,7 @@ from services.build_service.custos_build_service import dividir_orcamento
 from decimal import Decimal
 import pytest
 from services.build_service.planejamento_geracao import validar_minimos, sugerir_total, ErroPlanejamentoBuild, RecusaModeloBuild, orientar_falha
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 from services.build_service.erros_build import ErroGeracaoBuild
 
 

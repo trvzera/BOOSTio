@@ -4,7 +4,7 @@ import json
 from unittest.mock import patch
 import pytest
 from models import BuildSalva
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 from utils.aparencia import validar_aparencia
 
 
@@ -30,7 +30,7 @@ def test_preferencia_opcional_persistida_sem_exigir_peca():
 def test_preferencia_invalida_nao_chega_a_llm():
     with patch("services.build_service.gerar_candidata_service.LLMService.executar") as llm:
         with pytest.raises(ValueError):
-            CriarBuildService().executar(1,{"nome":"PC","descricao":"Teste","utilidade":"Estudos","orcamento":5000,"aparencia":{"cor":"azul"}})
+            FluxoGeracaoService().executar(1,{"nome":"PC","descricao":"Teste","utilidade":"Estudos","orcamento":5000,"aparencia":{"cor":"azul"}})
         llm.assert_not_called()
 
 

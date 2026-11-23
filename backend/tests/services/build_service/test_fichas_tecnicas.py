@@ -1,4 +1,4 @@
-from services.build_service.catalogo_geracao_service import campos_pecas
+from services.build_service.fichas_catalogo import campos_pecas
 """Mesma identidade/medidas do demo JS, sem tocar o banco real ou fazer rede."""
 import json
 from pathlib import Path
@@ -7,7 +7,7 @@ import pytest
 
 from models import Gabinete, PlacaMae, WaterCooler
 from utils.medidas_fisicas import completar_medidas, manifesto
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 from services.validacoes_service.avaliar_compatibilidade_service import AvaliarCompatibilidadeService
 from services.validacoes_service.encaixe_fisico import avaliar_fans, encaixe_radiador, encaixe_cooler_placa
 

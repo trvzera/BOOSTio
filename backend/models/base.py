@@ -1,6 +1,12 @@
 from datetime import datetime,timezone
 from . import db
 
+def venceu(data):
+  if data.tzinfo is None:
+    data = data.replace(tzinfo=timezone.utc)
+  return data <= datetime.now(timezone.utc)
+
+
 class ModeloBase(db.Model):
   __abstract__ = True
   id = db.Column(db.Integer,primary_key = True)
@@ -15,7 +21,4 @@ class ModeloBase(db.Model):
     db.session.add(self)
     db.session.commit()
 
-  def deletar(self) -> None:
-    db.session.delete(self)
-    db.session.commit()
 

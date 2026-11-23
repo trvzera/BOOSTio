@@ -33,14 +33,11 @@ A sequência de aprovação, busca de ofertas, worker e análise por IA está no
 | Comando | Para que serve |
 | --- | --- |
 | `banco-preparar` | Cria as tabelas e aplica as migrações em SQLite/banco novo. Não coleta preço. |
-| `banco-atualizar-mysql` | Migração de benchmarks para um MySQL existente (simula; `--aplicar` grava). Script: `deploy/atualizar_banco_mysql.sh`. |
-| `ofertas-kabum-migrar` | **Novo:** copia link, preço e estoque da KaBuM das peças para a tabela de ofertas. Script: `deploy/migrar_ofertas_kabum.sh`. |
 | `marketplaces-fila-preparar` | Cria as duas tabelas da fila de marketplaces. |
 | `mercadolivre-ofertas-preparar` | Cria as tabelas de ofertas do Mercado Livre. |
 | `mercadolivre-vinculos-criterio-preparar` | Amplia a coluna `criterio` de `vinculo_mercado_livre` para 100 caracteres, só no MySQL (simula; `--aplicar` grava). |
 | `mercadolivre-vinculos-preparar`, `mercadolivre-identidades-preparar`, `mercadolivre-autorizacao-preparar` | Criam as tabelas de vínculos, de MPNs revisados e de autorização do Mercado Livre. |
 | `integracoes-tokens-preparar` | Cria a tabela de tokens das integrações. |
-| `historico-precos-preparar` | Cria a tabela do histórico antigo de preços. |
 | `catalogo-preparar` | Prepara as tabelas do catálogo automatizado (pendências, validação das peças). |
 | `catalogo-tecnico-preparar` | Ajusta as tabelas de peças para aceitar ficha técnica sem preço. |
 | `dataset-pecas-preparar` | Prepara a importação do dataset público de peças. |
@@ -81,7 +78,6 @@ A sequência de aprovação, busca de ofertas, worker e análise por IA está no
 | --- | --- |
 | `mercadolivre-conectar` | Gera um link de uso único (10 min) para autorizar a conta. Não compartilhe. |
 | `mercadolivre-tokens-configurar` | Registra o par de tokens OAuth sem mostrá-lo. |
-| `mercadolivre-tokens-transferir` | Move tokens de um arquivo antigo para o banco. |
 | `mercadolivre-validar` | Confere configuração, tabelas e tokens, sem rede e sem gravar. |
 
 ## 6. Qualidade e diagnóstico (só leitura, ou simulam)

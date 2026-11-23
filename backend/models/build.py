@@ -1,9 +1,8 @@
-from datetime import timezone
-
 from models import db, ModeloBase
 
 
 class Build(ModeloBase):
+    """Tabela antiga das builds geradas. Só é lida para migrar e excluir; builds novas ficam em build_salva."""
     __tablename__ = "build"
  
     usuario_id = db.Column(db.Integer, db.ForeignKey("usuario.id"), nullable=False)
@@ -106,70 +105,6 @@ class Build(ModeloBase):
             return 1 if getattr(self, f"{campo}_id") else 0
         return getattr(self, atributo) or 0
  
-    @classmethod
-    def criar_gerada(cls, usuario_id: int, dados: dict, confirmar=True) -> "Build":
-        componentes = dados["componentes"]
-        por_tipo = {item["tipo"]: item for item in componentes}
-        if len(por_tipo) != len(componentes):
-            raise ValueError("A build contém categorias de peças repetidas")
-        if set(por_tipo) - set(cls.CAMPOS_PECAS):
-            raise ValueError("A build contém uma categoria inválida")
-        obrigatorias = ("processador", "placa_mae", "memoria_ram", "fonte", "gabinete")
-        if any(tipo not in por_tipo for tipo in obrigatorias) or not ({"ssd", "hd"} & por_tipo.keys()):
-            raise ValueError("A build gerada não contém todas as peças obrigatórias")
-        if any(item["quantidade"] != 1 for tipo, item in por_tipo.items() if tipo not in cls.QUANTIDADES):
-            raise ValueError("Quantidade inválida para uma peça da build")
-
-        build = cls(usuario_id=usuario_id, nome=dados["nome"][:100])
-        for tipo, item in por_tipo.items():
-            setattr(build, f"{tipo}_id", item["id"])
-            if tipo in cls.QUANTIDADES:
-                setattr(build, cls.QUANTIDADES[tipo], item["quantidade"])
-        db.session.add(build)
-        db.session.flush()
-        if confirmar:
-            db.session.commit()
-        return build
-
-    def to_dict(self, incluir_links: bool = False) -> dict:
-        criado_em = self.criado_em
-        if criado_em.tzinfo is None:
-            criado_em = criado_em.replace(tzinfo=timezone.utc)
-        componentes = [
-            {
-                "tipo": tipo,
-                "id": peca.id,
-                "nome": f"{peca.fabricante} {peca.modelo}",
-                "preco": peca.preco,
-                "quantidade": self.quantidade_de(tipo),
-                **({
-                    "fabricante": peca.fabricante,
-                    "modelo": peca.modelo,
-                    "link": peca.kabum_external,
-                    "imagem": peca.imagem_url,
-                    "esgotado": peca.esgotado,
-                } if incluir_links else {}),
-            }
-            for tipo in self.CAMPOS_PECAS
-            if (peca := getattr(self, tipo)) is not None
-        ]
-        return {
-            "id": self.id,
-            "nome": self.nome,
-            "usuario_id": self.usuario_id,
-            "criado_em": criado_em.isoformat(),
-            "preco_total": round(sum(item["preco"] * item["quantidade"] for item in componentes), 2),
-            "componentes": componentes,
-        }
-
-    @classmethod
-    def listar_por_usuario(cls, usuario_id: int) -> list["Build"]:
-        return cls.query.filter_by(usuario_id=usuario_id).order_by(cls.criado_em.desc()).all()
-
-    @classmethod
-    def buscar_por_id(cls, build_id: int) -> "Build | None":
-        return db.session.get(cls, build_id)
-
     @classmethod
     def buscar_por_id_e_usuario(cls, build_id: int, usuario_id: int) -> "Build | None":
         return cls.query.filter_by(id=build_id, usuario_id=usuario_id).first()

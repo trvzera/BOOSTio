@@ -7,7 +7,7 @@ import pytest
 from requests.exceptions import Timeout
 
 from models import Usuario
-from services.build_service.criar_build_service import CriarBuildService
+from services.build_service.fluxo_geracao_service import FluxoGeracaoService
 from services.build_service.gerar_build_service import GerarBuildService
 
 
@@ -29,7 +29,7 @@ def test_cliente_antigo_mantem_compatibilidade():
 def test_prioridade_invalida_rejeitada_antes_de_acessar_banco(valor, mocker):
     buscar = mocker.patch.object(Usuario, 'buscar_por_id')
     with pytest.raises(ValueError, match='prioridade da montagem'):
-        CriarBuildService().executar(1, dict(nome='PC', descricao='Teste', utilidade='Jogos',
+        FluxoGeracaoService().executar(1, dict(nome='PC', descricao='Teste', utilidade='Jogos',
                                            orcamento=8000, prioridade_montagem=valor))
     buscar.assert_not_called()
 
@@ -38,7 +38,7 @@ def test_prioridade_invalida_rejeitada_antes_de_acessar_banco(valor, mocker):
 def test_fallback_preserva_prioridade_selecionada(prioridade, mocker):
     mocker.patch('services.build_service.gerar_build_service.BloquearGeracaoService.executar',
                  return_value=nullcontext())
-    criar = mocker.patch.object(CriarBuildService, 'executar', side_effect=[Timeout(), {'id': 1}])
+    criar = mocker.patch.object(FluxoGeracaoService, 'executar', side_effect=[Timeout(), {'id': 1}])
     dados = dict(prioridade_montagem=prioridade)
     assert GerarBuildService().executar(7, dados) == {'id': 1}
     assert criar.call_args_list[0].args[1]['prioridade_montagem'] == prioridade

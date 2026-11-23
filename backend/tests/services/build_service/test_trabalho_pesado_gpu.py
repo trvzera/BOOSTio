@@ -2,7 +2,7 @@ from copy import deepcopy
 
 import pytest
 
-from services.build_service.gerar_candidata_service import gerar_candidata
+from tests.services.build_service.apoio_geracao import gerar_candidata
 from services.build_service.prompt_build_service import criar_prompt
 from services.validacoes_service.requisitos_uso_service import RequisitosUsoService
 from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
