@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificar e-mail — BOOSTio</title>
+  <meta name="description" content="Confirme o endereço de e-mail da sua conta BOOSTio.">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="referrer" content="no-referrer">
+  <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
+  <link rel="preload" href="../fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../styles/style.css">
+  <script type="module" src="../js/pages/verificar-email.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#confirmacao-email" aria-label="Pular para o conteúdo principal">Pular para o conteúdo principal</a>
+  <main id="confirmacao-email" class="email-verification-page" tabindex="-1">
+    <section class="email-verification" aria-labelledby="confirmacao-titulo">
+      <h1 id="confirmacao-titulo">Confirme seu e-mail</h1>
+      <p id="confirmacao-status" role="status">Confirme que este endereço pertence à sua conta BOOSTio.</p>
+      <p id="confirmacao-erro" class="form-error" role="alert"></p>
+      <button id="confirmar-email" class="btn-primary" type="button" aria-label="Confirmar e-mail" hidden>Confirmar e-mail</button>
+      <a id="continuar-boostio" class="btn-ghost" href="./index.html" aria-label="Voltar à BOOSTio">Voltar à BOOSTio</a>
+      <noscript><p>Ative o JavaScript ou informe o código recebido na tela de verificação.</p></noscript>
+    </section>
+  </main>
+</body>
+</html>
