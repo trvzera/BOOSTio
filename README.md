@@ -11,11 +11,24 @@
     <a href="#sobre">Sobre</a> ·
     <a href="#funcionalidades">Funcionalidades</a> ·
     <a href="#arquitetura">Arquitetura</a> ·
-    <a href="#documentação">Documentação</a>
+    <a href="#documentação">Documentação</a> ·
+    <a href="#direitos-autorais--copyright">Direitos autorais / Copyright</a>
   </p>
 </div>
 
 ---
+
+## Direitos autorais / Copyright
+
+**Todos os direitos reservados.** Este repositório é público para consulta como
+portfólio. Copiar, modificar, republicar, redistribuir ou reutilizar o material
+original exige autorização escrita dos titulares, observadas as permissões
+dos Termos de Serviço do GitHub e da legislação aplicável. [Aviso completo em português](LICENSE)
+
+**All rights reserved.** This repository is public for portfolio viewing.
+Copying, modifying, republishing, redistributing, or reusing the original
+material requires written permission from the rights holders, subject to
+GitHub's Terms of Service and applicable law. [Full notice in English](LICENSE)
 
 ## Sobre
 
