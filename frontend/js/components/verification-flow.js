@@ -1,15 +1,20 @@
 import { iniciarCodigoVerificacao } from "./verification-code.js";
 
+const buscaGmail = 'in:anywhere from:no-reply@boostio.com.br subject:"Seu código de verificação" newer_than:1d';
+const urlGmail = `https://mail.google.com/mail/u/0/#search/${encodeURIComponent(buscaGmail)}`;
 
 export function iniciarFluxoVerificacaoEmail({modal,enviar,confirmar,aoConfirmar,agora=Date.now}) {
   const inputs=[...modal.querySelectorAll(".code-input")];
   const enviarBtn=modal.querySelector("#btn-send-code"),confirmarBtn=modal.querySelector("#btn-confirm-code");
   const erro=modal.querySelector("#verify-email-error"),status=modal.querySelector("#verify-email-status");
+  const abrirGmail = modal.querySelector("#verify-email-gmail");
+  abrirGmail.href = urlGmail;
   const alvo=modal.querySelector("#verify-email-target"),automaticos=new Set();
   let usuario,chave="",enviando=false,conferindo=false,enviado=false,concluido=false,ultimoCodigo="",proximoEnvio=0,expiraEm=0,timer,revisao=0;
   const aberto=()=>modal.classList.contains("open");
   const codigo=()=>inputs.map(i=>i.value).join("");
   function atualizar() {
+    abrirGmail.hidden = !enviado || !/@(?:gmail|googlemail)\.com$/i.test(usuario?.email);
     const segundos=Math.max(0,Math.ceil((proximoEnvio-agora())/1000));
     enviarBtn.disabled=enviando||conferindo||concluido||segundos>0;
     enviarBtn.textContent=enviando?"Enviando…":segundos?"Reenviar em "+segundos+"s":automaticos.has(chave)?"Reenviar código":"Enviar código";

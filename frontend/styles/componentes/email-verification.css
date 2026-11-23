@@ -91,6 +91,15 @@
 .email-verification-feedback > p[role="status"] { color: var(--text-accent); }
 .email-verification-feedback > .form-error { padding: .625rem .75rem; border: 1px solid rgba(255,59,48,.22); border-radius: .75rem; background: var(--status-error-bg); color: var(--status-error); }
 .email-verification-feedback > p:empty { display: none; }
+.email-verification-gmail:not([hidden]) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--text-accent);
+  font: 500 .8125rem/1.5 var(--font-body);
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
 .email-verification-actions { margin-top: var(--espacamento-12); }
 .email-verification-actions > button, .email-verification-actions > .disabled-tip-anchor, .email-verification-actions > .disabled-tip-anchor > button { width: 100%; }
 .email-verification-actions .btn-primary { font: 500 .875rem/1.5 var(--font-heading); }
