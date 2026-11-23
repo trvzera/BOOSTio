@@ -129,13 +129,14 @@ function iniciarFormularioTeste(raiz, tipo) {
             throw new ErroGeracaoFormulario("resposta", p.chave, problema);
         }
         if (etapa < perguntas.length) {
+          tocarSom?.("avancar");
           etapa++;
           renderizar({ focar: true });
-          tocarSom?.("avancar");
           return;
         }
         const plano = montarPlanoPreview(tipo, respostas),
           resultado = raiz.querySelector("[data-form-result]");
+        tocarSom?.("finalizar");
         resultado.hidden = false;
         resultado.innerHTML =
           '<h4 tabindex="-1">Prévia concluída</h4><p>As respostas e as regras estão prontas para avaliação. Nenhuma chamada à IA foi enviada, nenhuma build foi criada e nada foi salvo na conta.</p><details class="test-form-summary"><summary>Ver dados e instruções do teste</summary><pre></pre></details>';
@@ -145,7 +146,6 @@ function iniciarFormularioTeste(raiz, tipo) {
           2,
         );
         resultado.querySelector("h4").focus();
-        tocarSom?.("finalizar");
       } catch (e) {
         mostrarErro(e);
       }
@@ -257,7 +257,10 @@ function iniciarFormularioTeste(raiz, tipo) {
       }
       atualizarAvanco();
     });
-    if (focar) raiz.querySelector("h3").focus();
+    if (focar) {
+      raiz.querySelector(".test-form-layout").classList.add("test-form-layout-enter");
+      raiz.querySelector("h3").focus();
+    }
   }
   raiz.addEventListener("click", (evento) => {
     const b = evento.target.closest("button");
