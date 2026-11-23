@@ -21,6 +21,7 @@ import {
 import { painelFormularioHtml } from "../experimentos/formularios/painel.js";
 import { redeHtml } from "../experimentos/formularios/campos.js";
 import { prepararAparenciaPreview } from "../experimentos/formularios/aparencia.js";
+import { criarSonsFormulario } from "../experimentos/formularios/sons.js";
 import { redeFormulario } from "../build/rede.js";
 import { moeda, htmlSeguro as h } from "../build/catalogo.js";
 import { ajustarGuiasConhecimento } from "../conta/preferencias-uso.js";
@@ -29,6 +30,7 @@ import { iniciarIcones } from "../components/ui.js";
 // Somente laboratório: sem geração real, escrita na conta ou import do fluxo oficial.
 // Na integração, preservar a estrutura e o CSS do formulário oficial; não migrar este painel.
 function iniciarFormularioTeste(raiz, tipo) {
+  const tocarSom = tipo === "pc" ? criarSonsFormulario() : null;
   const perguntas = tipo === "pc" ? perguntasPc : perguntasNotebook,
     id = (chave) => "preview-form-" + tipo + "-" + chave;
   let respostas = novasRespostasPreview(tipo),
@@ -129,6 +131,7 @@ function iniciarFormularioTeste(raiz, tipo) {
         if (etapa < perguntas.length) {
           etapa++;
           renderizar({ focar: true });
+          tocarSom?.("avancar");
           return;
         }
         const plano = montarPlanoPreview(tipo, respostas),
@@ -142,6 +145,7 @@ function iniciarFormularioTeste(raiz, tipo) {
           2,
         );
         resultado.querySelector("h4").focus();
+        tocarSom?.("finalizar");
       } catch (e) {
         mostrarErro(e);
       }
