@@ -1,3 +1,6 @@
+@media (max-width: 600px), (hover: none) and (pointer: coarse) {
+  .email-verification .email-verification-gmail:not([hidden]) { display: none; }
+}
 @media (max-width: 600px) {
   .email-verification { padding: var(--espacamento-20); border-radius: 1.25rem; }
   .email-verification-heading { gap: var(--espacamento-8); padding-inline-end: calc(44px + var(--espacamento-8)); }
