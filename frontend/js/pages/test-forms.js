@@ -110,7 +110,12 @@ function iniciarFormularioTeste(raiz, tipo) {
       "</button>";
     alvo.querySelector("h4").focus();
   }
-  function renderizar({ focar = false } = {}) {
+  function animarPergunta(sentido = "avancar") {
+    const layout = raiz.querySelector(".test-form-layout");
+    layout.dataset.formDirection = sentido;
+    layout.classList.add("test-form-layout-enter");
+  }
+  function renderizar({ focar = false, sentido } = {}) {
     raiz.innerHTML = painelFormularioHtml(contexto(), perguntas, etapa);
     prepararAparenciaPreview(raiz, respostas, id);
     iniciarIcones(raiz);
@@ -258,7 +263,7 @@ function iniciarFormularioTeste(raiz, tipo) {
       atualizarAvanco();
     });
     if (focar) {
-      raiz.querySelector(".test-form-layout").classList.add("test-form-layout-enter");
+      animarPergunta(sentido);
       raiz.querySelector("h3").focus();
     }
   }
@@ -268,20 +273,24 @@ function iniciarFormularioTeste(raiz, tipo) {
     if (b.hasAttribute("data-form-reset")) {
       respostas = novasRespostasPreview(tipo);
       etapa = 0;
-      renderizar({ focar: true });
+      renderizar({ focar: true, sentido: "voltar" });
     }
     if (b.hasAttribute("data-form-back")) {
       etapa--;
-      renderizar({ focar: true });
+      renderizar({ focar: true, sentido: "voltar" });
     }
     if (b.hasAttribute("data-form-step")) {
-      etapa = Number(b.dataset.formStep);
-      renderizar({ focar: true });
+      const destino = Number(b.dataset.formStep);
+      if (destino === etapa) return;
+      etapa = destino;
+      renderizar({ focar: true, sentido: "voltar" });
     }
     if (b.dataset.formRevisit) {
       const i = perguntas.findIndex((p) => p.chave === b.dataset.formRevisit);
-      etapa = i < 0 ? perguntas.length : i;
-      renderizar({ focar: true });
+      const destino = i < 0 ? perguntas.length : i;
+      const sentido = destino < etapa ? "voltar" : "avancar";
+      etapa = destino;
+      renderizar({ focar: true, sentido });
     }
     if (b.dataset.budget) {
       const input = raiz.querySelector('[data-number="orcamento"]');
@@ -293,6 +302,14 @@ function iniciarFormularioTeste(raiz, tipo) {
     mostrarErro(e.detail),
   );
   renderizar();
+  const controleTransicao = raiz.parentElement.querySelector("#test-form-transition");
+  if (controleTransicao) {
+    raiz.dataset.formTransition = controleTransicao.value;
+    controleTransicao.addEventListener("change", () => {
+      raiz.dataset.formTransition = controleTransicao.value;
+      animarPergunta();
+    });
+  }
   void carregarCatalogoFormulario()
     .then((d) => {
       catalogo = d;

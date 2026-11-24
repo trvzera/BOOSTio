@@ -62,7 +62,15 @@
         <p class="font-2-s">Nova proposta de perguntas, usos e preferências. Avance, volte e revise as regras antes de decidirmos o que vai para o formulário oficial.</p>
       </div>
       <p class="test-form-notice font-2-xs">Somente uma prévia: não usa a IA, não cria builds e não altera os dados da sua conta. As respostas ficam nesta página e são descartadas ao recarregar.</p>
-      <div data-form-preview="pc"></div>
+      <div class="test-form-transition-control">
+        <label class="font-1-xs" for="test-form-transition">Transição entre perguntas</label>
+        <select id="test-form-transition" class="input-text font-2-xs">
+          <option value="deslize" selected>Deslize lateral</option>
+          <option value="fade">Fade</option>
+          <option value="desfoque">Desfoque suave</option>
+        </select>
+      </div>
+      <div data-form-preview="pc" data-form-transition="deslize"></div>
     </section>
     <section class="test-feature" id="teste-formulario-notebook" aria-labelledby="test-form-notebook-title">
       <div class="test-feature-head">
