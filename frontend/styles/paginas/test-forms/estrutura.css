@@ -68,10 +68,10 @@
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
 }
 :root:not([data-reduced-motion="true"]) .test-form-layout-enter {
-  animation: test-form-question-fade 180ms ease-out;
+  animation: test-form-question-fade 320ms ease-out;
 }
 @keyframes test-form-question-fade {
-  from { opacity: 0.45; }
+  from { opacity: 0.12; }
   to { opacity: 1; }
 }
 .test-form-intro {
