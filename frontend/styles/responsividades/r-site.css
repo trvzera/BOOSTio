@@ -8,6 +8,7 @@ body {
   height: auto;
   min-height: 100vh;
   min-height: 100svh;
+  padding-inline: env(safe-area-inset-left, 0px) env(safe-area-inset-right, 0px);
 }
 img, video { max-width: 100%; }
 input, select, textarea, fieldset { min-width: 0; }

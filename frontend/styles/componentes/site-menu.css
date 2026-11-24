@@ -9,10 +9,10 @@
   background: rgba(0, 0, 0, .12);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
-  -webkit-mask-image: linear-gradient(#000 55%, transparent);
-  mask-image: linear-gradient(#000 55%, transparent);
+  -webkit-mask-image: linear-gradient(#000 calc(env(safe-area-inset-top, 0px) + 48px), transparent);
+  mask-image: linear-gradient(#000 calc(env(safe-area-inset-top, 0px) + 48px), transparent);
 }
-.site-brand { position: fixed; top: max(30px, env(safe-area-inset-top, 0px)); left: max(var(--page-gutter, 32px), env(safe-area-inset-left, 0px)); width: 100px; z-index: 1000; }
+.site-brand { position: fixed; top: calc(30px + env(safe-area-inset-top, 0px)); left: calc(var(--page-gutter, 32px) + env(safe-area-inset-left, 0px)); width: 100px; z-index: 1000; }
 .site-brand img { display: block; width: 100%; height: auto; }
 .site-menu { position: fixed; right: max(28px, env(safe-area-inset-right, 0px)); bottom: max(28px, env(safe-area-inset-bottom, 0px)); z-index: 1000; font-family: var(--font-heading); }
 .site-menu[hidden] { display: none; }
@@ -40,14 +40,14 @@
 .site-menu-divider { height: 1px; margin: 6px 12px; background: var(--cor-2); }
 .site-menu-logout { color: var(--status-error); }
 @media (max-width: 760px) {
-  .site-brand { left: max(16px, env(safe-area-inset-left, 0px)); }
+  .site-brand { left: calc(16px + env(safe-area-inset-left, 0px)); }
   .site-menu { right: max(16px, env(safe-area-inset-right, 0px)); bottom: max(16px, env(safe-area-inset-bottom, 0px)); }
   .site-menu-toggle { width: 60px; height: 60px; }
 }
 @media (max-height: 840px) { .site-menu-panel { padding: 10px; } .site-menu-group { gap: 2px; } .site-menu-link { min-height: 44px; padding-block: 8px; } }
 @media (prefers-reduced-motion: reduce) { .site-menu *, .site-menu *::before { transition: none !important; } }
 
-.site-profile { position: fixed; top: max(10px, env(safe-area-inset-top, 0px)); right: max(var(--page-gutter, 32px), env(safe-area-inset-right, 0px)); z-index: 1001; }
+.site-profile { position: fixed; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(var(--page-gutter, 32px) + env(safe-area-inset-right, 0px)); z-index: 1001; }
 .profile-toggle { display: grid; place-items: center; width: 60px; height: 60px; padding: 0; background: transparent; border: 0; border-radius: 50%; color: var(--cor-4); cursor: pointer; }
 .profile-toggle .ui-lottie { width: 60px; height: 60px; }
 .profile-toggle .ui-icon-fallback { display: inline-grid; width: 28px; height: 28px; }
