@@ -19,3 +19,9 @@ export function caminhoComparacao(caminho) {
 export function paginaDoSite(caminho) {
   return paginas.has(nomePagina(caminho));
 }
+
+export function paginaDeTestesLocal({ protocol, hostname, pathname }) {
+  return ["http:", "https:"].includes(protocol)
+    && ["127.0.0.1", "localhost", "[::1]"].includes(hostname)
+    && nomePagina(pathname) === "testes.html";
+}

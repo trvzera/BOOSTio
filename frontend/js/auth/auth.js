@@ -6,13 +6,14 @@ import { acompanharCarregamento } from "../components/page-loading.js";
 import { verificarEspacoBuild } from "../api/build/builds.js";
 import { idCompartilhamentoPublico, consumirRetornoPublico } from '../components/sessao-publica.js';
 import { mostrarFalhaSessao, limparFalhaSessao } from "../components/session-feedback.js";
-import { nomePagina } from "../components/page-routes.js";
+import { nomePagina, paginaDeTestesLocal } from "../components/page-routes.js";
 import { tutorialPendente } from "../conta/preferencias-uso.js";
 
 const paginaAtual = nomePagina(location.pathname);
+const testesLocais = paginaDeTestesLocal(location);
 const publica = paginaAtual === 'configuracao-build.html' && idCompartilhamentoPublico(location.search);
 const privada = paginaPrivada(paginaAtual,location.search);
-if (publica) document.body.removeAttribute('data-private-page');
+if (publica || testesLocais) document.body.removeAttribute('data-private-page');
 function bloquearConteudo() {
   if (!privada) return;
   document.body.dataset.sessionState = "checking";
@@ -62,11 +63,13 @@ async function conferirSessao() {
     if (privada) mostrarFalhaSessao(erro,conferirSessao);
   }
 }
-const iniciarVerificacao = () => acompanharCarregamento(conferirSessao());
-if (document.readyState === "loading") document.addEventListener("DOMContentLoaded",iniciarVerificacao,{once:true});
-else iniciarVerificacao();
-window.addEventListener("pagehide",bloquearConteudo);
-window.addEventListener("pageshow",e => { if (e.persisted) { limparPerfil(); conferirSessao(); } });
+if (!testesLocais) {
+  const iniciarVerificacao = () => acompanharCarregamento(conferirSessao());
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded",iniciarVerificacao,{once:true});
+  else iniciarVerificacao();
+  window.addEventListener("pagehide",bloquearConteudo);
+  window.addEventListener("pageshow",e => { if (e.persisted) { limparPerfil(); conferirSessao(); } });
+}
 document.addEventListener("click",async e => {
   if (!e.target.closest("#btn-logout")) return;
   e.preventDefault();

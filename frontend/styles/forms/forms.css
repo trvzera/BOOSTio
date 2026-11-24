@@ -7,6 +7,20 @@
   padding-bottom: 80px;
   position: relative;
   overflow-x: clip;
+  isolation: isolate;
+}
+.form-background {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  visibility: hidden;
+  pointer-events: none;
+}
+:root:not([data-reduced-motion="true"]) .form-background[data-playing] {
+  visibility: visible;
 }
 #forms-page { height: 100%; min-height: 0; }
 #forms-page-container {

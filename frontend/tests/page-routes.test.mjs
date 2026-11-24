@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {paginas,nomePagina,caminhoComparacao} from "../js/components/page-routes.js";
+import {paginas,nomePagina,caminhoComparacao,paginaDeTestesLocal} from "../js/components/page-routes.js";
 import {paginaPrivada,redirecionamentoSessao} from "../js/components/navigation-config.js";
 import {linkDaPaginaAtual} from "../js/components/navigation-current.js";
 import {destinoAnterior,destinoBuild,rotuloVoltar} from "../js/components/navigation-back.js";
@@ -22,6 +22,15 @@ test("URLs limpas mantêm a autenticação, o retorno público e a proteção do
   assert.equal(redirecionamentoSessao("/login",true),"index.html");
   assert.equal(paginaPrivada("/configuracao-build","?compartilhar_id=s-3"),false);
   assert.equal(paginaPrivada("/configuracao-build","?compartilhar_id=invalido"),true);
+});
+test("somente o laboratório em loopback pode abrir sem a consulta de sessão", () => {
+  for (const url of ["http://127.0.0.1:5501/testes.html", "http://localhost:5500/frontend/testes.html", "http://[::1]:5500/testes"]) {
+    assert.equal(paginaDeTestesLocal(new URL(url)), true, url);
+  }
+  for (const url of ["https://boostio.example/testes", "https://localhost.example/testes.html", "http://127.0.0.1:5501/pages/formulario.html"]) {
+    assert.equal(paginaDeTestesLocal(new URL(url)), false, url);
+  }
+  assert.equal(redirecionamentoSessao("/testes", false), "login.html");
 });
 test("menu atual e retorno contextual aceitam origem limpa e destino legado",() => {
   assert.equal(linkDaPaginaAtual("/pages/builds.html","https://boostio.example/builds?filtro=teste"),true);

@@ -1,0 +1,16 @@
+{
+  "id": "./",
+  "name": "BOOSTio",
+  "short_name": "BOOSTio",
+  "description": "Planeje seu computador, confira a compatibilidade das peças e organize seu orçamento.",
+  "lang": "pt-BR",
+  "start_url": "./pages/index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#101114",
+  "theme_color": "#101114",
+  "icons": [
+    { "src": "imgs/icone-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "imgs/icone-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

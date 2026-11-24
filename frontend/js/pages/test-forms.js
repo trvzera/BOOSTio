@@ -21,6 +21,8 @@ import {
 import { painelFormularioHtml } from "../experimentos/formularios/painel.js";
 import { redeHtml } from "../experimentos/formularios/campos.js";
 import { prepararAparenciaPreview } from "../experimentos/formularios/aparencia.js";
+import { criarSonsFormulario } from "../components/form-sounds.js";
+import { criarFundoFormulario } from "../components/form-background.js";
 import { redeFormulario } from "../build/rede.js";
 import { moeda, htmlSeguro as h } from "../build/catalogo.js";
 import { ajustarGuiasConhecimento } from "../conta/preferencias-uso.js";
@@ -29,12 +31,19 @@ import { iniciarIcones } from "../components/ui.js";
 // Somente laboratório: sem geração real, escrita na conta ou import do fluxo oficial.
 // Na integração, preservar a estrutura e o CSS do formulário oficial; não migrar este painel.
 function iniciarFormularioTeste(raiz, tipo) {
+  const reproduzirFundo = criarFundoFormulario(raiz.parentElement.querySelector("[data-form-background]"));
+  const tocarSom = tipo === "pc" ? criarSonsFormulario() : null;
   const perguntas = tipo === "pc" ? perguntasPc : perguntasNotebook,
     id = (chave) => "preview-form-" + tipo + "-" + chave;
   let respostas = novasRespostasPreview(tipo),
     etapa = 0,
     catalogo;
   const contexto = () => ({ respostas, tipo, id, catalogo });
+
+  function reproduzirEfeitos(efeito) {
+    tocarSom?.(efeito);
+    reproduzirFundo();
+  }
   function atualizarAvanco() {
     const problema =
       etapa === perguntas.length
@@ -108,7 +117,12 @@ function iniciarFormularioTeste(raiz, tipo) {
       "</button>";
     alvo.querySelector("h4").focus();
   }
-  function renderizar({ focar = false } = {}) {
+  function animarPergunta(sentido = "avancar") {
+    const layout = raiz.querySelector(".test-form-layout");
+    layout.dataset.formDirection = sentido;
+    layout.classList.add("test-form-layout-enter");
+  }
+  function renderizar({ focar = false, sentido } = {}) {
     raiz.innerHTML = painelFormularioHtml(contexto(), perguntas, etapa);
     prepararAparenciaPreview(raiz, respostas, id);
     iniciarIcones(raiz);
@@ -127,12 +141,14 @@ function iniciarFormularioTeste(raiz, tipo) {
             throw new ErroGeracaoFormulario("resposta", p.chave, problema);
         }
         if (etapa < perguntas.length) {
+          reproduzirEfeitos("avancar");
           etapa++;
           renderizar({ focar: true });
           return;
         }
         const plano = montarPlanoPreview(tipo, respostas),
           resultado = raiz.querySelector("[data-form-result]");
+        reproduzirEfeitos("finalizar");
         resultado.hidden = false;
         resultado.innerHTML =
           '<h4 tabindex="-1">Prévia concluída</h4><p>As respostas e as regras estão prontas para avaliação. Nenhuma chamada à IA foi enviada, nenhuma build foi criada e nada foi salvo na conta.</p><details class="test-form-summary"><summary>Ver dados e instruções do teste</summary><pre></pre></details>';
@@ -253,7 +269,10 @@ function iniciarFormularioTeste(raiz, tipo) {
       }
       atualizarAvanco();
     });
-    if (focar) raiz.querySelector("h3").focus();
+    if (focar) {
+      animarPergunta(sentido);
+      raiz.querySelector("h3").focus();
+    }
   }
   raiz.addEventListener("click", (evento) => {
     const b = evento.target.closest("button");
@@ -261,20 +280,24 @@ function iniciarFormularioTeste(raiz, tipo) {
     if (b.hasAttribute("data-form-reset")) {
       respostas = novasRespostasPreview(tipo);
       etapa = 0;
-      renderizar({ focar: true });
+      renderizar({ focar: true, sentido: "voltar" });
     }
     if (b.hasAttribute("data-form-back")) {
       etapa--;
-      renderizar({ focar: true });
+      renderizar({ focar: true, sentido: "voltar" });
     }
     if (b.hasAttribute("data-form-step")) {
-      etapa = Number(b.dataset.formStep);
-      renderizar({ focar: true });
+      const destino = Number(b.dataset.formStep);
+      if (destino === etapa) return;
+      etapa = destino;
+      renderizar({ focar: true, sentido: "voltar" });
     }
     if (b.dataset.formRevisit) {
       const i = perguntas.findIndex((p) => p.chave === b.dataset.formRevisit);
-      etapa = i < 0 ? perguntas.length : i;
-      renderizar({ focar: true });
+      const destino = i < 0 ? perguntas.length : i;
+      const sentido = destino < etapa ? "voltar" : "avancar";
+      etapa = destino;
+      renderizar({ focar: true, sentido });
     }
     if (b.dataset.budget) {
       const input = raiz.querySelector('[data-number="orcamento"]');
@@ -286,6 +309,14 @@ function iniciarFormularioTeste(raiz, tipo) {
     mostrarErro(e.detail),
   );
   renderizar();
+  const controleTransicao = raiz.parentElement.querySelector("#test-form-transition");
+  if (controleTransicao) {
+    raiz.dataset.formTransition = controleTransicao.value;
+    controleTransicao.addEventListener("change", () => {
+      raiz.dataset.formTransition = controleTransicao.value;
+      animarPergunta();
+    });
+  }
   void carregarCatalogoFormulario()
     .then((d) => {
       catalogo = d;

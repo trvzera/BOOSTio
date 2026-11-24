@@ -21,6 +21,8 @@ import { iconeAnimado, iniciarIcones } from "../components/ui.js";
 import { iniciarControlesNumericos } from "../components/number-stepper.js";
 import { atualizarValor } from "../components/value-transition.js";
 import { anunciarStatus, cancelarAnuncioStatus } from "../components/status-messages.js";
+import { criarSonsFormulario } from "../components/form-sounds.js";
+import { criarFundoFormulario } from "../components/form-background.js";
 import {
   registrarAnimacao,
   destruirAnimacao,
@@ -30,6 +32,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const conteudo = document.querySelector("#question-content");
   const painel = document.querySelector("#question-info");
   const telaCompacta = window.matchMedia("(max-width: 850px)");
+  const tocarSom = criarSonsFormulario();
+  const reproduzirFundo = criarFundoFormulario(document.querySelector("[data-form-background]"));
   await acompanharCarregamento(carregarPerfil().catch(() => null));
   const planejamento = planejamentoLocal();
   const respostas = {rede:normalizarRede(),aparencia:normalizarAparencia(),orcamento:"ate-3000",orcamentoPersonalizado:3000,orcamentoAlterado:false};
@@ -524,7 +528,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const pararMensagens = () => clearInterval(mensagensGeracao);
   window.addEventListener("pagehide",pararMensagens);
   function avancar() {
-    if (gerando || !podeAvancar()) return;
+    if (gerando || confirmando || !podeAvancar()) return;
+    tocarSom("avancar");
+    reproduzirFundo();
     if (indiceAtual === perguntas.length - 1) {
       confirmarGeracao();
       return;
@@ -569,6 +575,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       const validacao = avaliarOrcamentoGeracao(valorOrcamento(),respostas.incluirPerifericos ? respostas.percentualPerifericos : 0,respostas.objetivo);
       if (!validacao.valido) throw Object.assign(new Error(validacao.mensagem),{status:400,geracao:{motivo:validacao.motivo,
         titulo:"Ajuste o orçamento antes de gerar",etapa:validacao.motivo === "perifericos" ? "perifericos" : "orcamento",orcamentoSugerido:validacao.minimoTotal}});
+      tocarSom("finalizar");
+      reproduzirFundo();
       const sessao = await buscarUsuarioLogado();
       if (!sessao.auth) throw Object.assign(new Error("Entre na sua conta para salvar a build."),{status:401});
       await verificarEspacoBuild();

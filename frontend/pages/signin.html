@@ -6,15 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Criar conta — BOOSTio</title>
   <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="../imgs/apple-touch-icon.png">
+  <meta name="theme-color" content="#101114">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="BOOSTio">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <link rel="stylesheet" href="../styles/style.css">
   <noscript><link rel="stylesheet" href="../styles/componentes/no-script.css"></noscript>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
   <meta name="description" content="Crie sua conta BOOSTio para salvar configurações de computadores, organizar seu budget e planejar melhorias no seu setup.">
   <meta name="robots" content="noindex,follow">
-  <link rel="preload" href="../fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/Lexend%5Bwght%5D.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
-  <script type="module" src="../js/pages/loading.js" defer></script>
-  <script type="module" src="../js/pages/signin.js" defer></script>
+  <script type="module" src="../js/pages/loading.js"></script>
+  <script type="module" src="../js/pages/signin.js"></script>
 </head>
 
 <body class="sign-up-page-body">
@@ -133,7 +139,7 @@
           <span>Seu e-mail</span>
           <strong id="verify-email-target">seu e-mail</strong>
         </div>
-        <a id="verify-email-gmail" class="btn-ghost email-verification-gmail" target="_blank" rel="noopener noreferrer" aria-label="Abrir Gmail em uma nova aba" hidden>Abrir Gmail</a>
+        <a id="verify-email-gmail" class="btn-ghost email-verification-gmail" href="https://mail.google.com/" target="_blank" rel="noopener noreferrer" aria-label="Abrir Gmail em uma nova aba" hidden>Abrir Gmail</a>
         <div class="email-verification-code-heading"><span id="verify-email-code-label">Código de verificação</span><span>6 dígitos</span></div>
         <div class="code-inputs" id="code-inputs" role="group" aria-labelledby="verify-email-code-label" aria-describedby="verify-email-code-help">
           <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="code-input" autocomplete="one-time-code" data-index="0" aria-label="Primeiro dígito do código" disabled>

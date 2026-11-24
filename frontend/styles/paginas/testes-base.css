@@ -4,6 +4,7 @@ body.menu-test-page {
   min-height: 100vh;
   color: var(--cor-6);
   overflow-x: clip;
+  isolation: isolate;
 }
 .test-logo {
   position: absolute;
