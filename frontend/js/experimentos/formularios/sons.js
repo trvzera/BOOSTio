@@ -1,45 +1,22 @@
 const efeitos = {
-  avancar: { url: new URL("../../../audios/avancarFORMS.wav", import.meta.url).href, volume: 1 },
-  finalizar: { url: new URL("../../../audios/finalizarBUILD.wav", import.meta.url).href, volume: 1 },
+  avancar: new URL("../../../audios/avancarFORMS.wav", import.meta.url).href,
+  finalizar: new URL("../../../audios/finalizarBUILD.wav", import.meta.url).href,
 };
 
 export function criarSonsFormulario() {
-  let contexto;
-  try {
-    contexto = new AudioContext();
-  } catch {
-    return () => {};
-  }
-
   const sons = new Map();
-  for (const [efeito, { url, volume }] of Object.entries(efeitos)) {
-    const ganho = contexto.createGain();
-    ganho.gain.value = volume;
-    ganho.connect(contexto.destination);
-
-    const som = { ganho, buffer: null };
-    som.carregamento = fetch(url)
-      .then(async (resposta) => {
-        if (resposta.ok) som.buffer = await contexto.decodeAudioData(await resposta.arrayBuffer());
-      })
-      .catch(() => {});
-    sons.set(efeito, som);
+  for (const [efeito, url] of Object.entries(efeitos)) {
+    const audio = new Audio(url);
+    audio.preload = "auto";
+    sons.set(efeito, audio);
   }
 
   return function tocar(efeito) {
-    const som = sons.get(efeito);
-    if (contexto.state !== "running") void contexto.resume().catch(() => {});
-
-    function reproduzir() {
-      if (!som.buffer) return;
-      const fonte = contexto.createBufferSource();
-      fonte.buffer = som.buffer;
-      fonte.connect(som.ganho);
-      fonte.addEventListener("ended", () => fonte.disconnect(), { once: true });
-      fonte.start();
-    }
-
-    if (som.buffer) reproduzir();
-    else void som.carregamento.then(reproduzir);
+    const principal = sons.get(efeito);
+    const audio = principal.paused && !principal.error ? principal : new Audio(principal.src);
+    audio.currentTime = 0;
+    void audio.play().catch((erro) => {
+      console.warn("Falha ao reproduzir o som do formulário.", erro);
+    });
   };
 }
