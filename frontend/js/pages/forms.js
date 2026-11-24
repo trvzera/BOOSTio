@@ -383,23 +383,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     estadosCheckbox.clear();
   }
 
-  async function iniciarCheckboxesLottie(geracao) {
-    for (const input of conteudo.querySelectorAll('input[name="pecas"]')) {
-      if (geracao !== geracaoPergunta) return;
+  function iniciarCheckboxesLottie(geracao) {
+    const checkboxes = [...conteudo.querySelectorAll('input[name="pecas"]')];
+    return Promise.all(checkboxes.map(async (input) => {
       const id = `check-${input.value}`;
       estadosCheckbox.set(id, input.checked);
       const animacao = await registrarAnimacao(id, "../lottie/checkbox.json");
-      if (!animacao) continue;
+      if (!animacao) return;
       if (geracao !== geracaoPergunta) {
         destruirAnimacao(id, animacao);
         return;
       }
       animacoesCheckbox.set(id, animacao);
-      animacao.addEventListener("DOMLoaded", () => {
+      const pronto = () => {
+        if (geracao !== geracaoPergunta) return;
         animacao.goToAndStop(input.checked ? animacao.totalFrames - 1 : 0, true);
         input.nextElementSibling.querySelector(".choice-control").classList.add("lottie-ready");
-      });
-    }
+      };
+      if (animacao.isLoaded) pronto();
+      else animacao.addEventListener("DOMLoaded", pronto);
+    }));
   }
 
   function sincronizarCheckboxesLottie() {
