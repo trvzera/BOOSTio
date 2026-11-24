@@ -22,16 +22,16 @@ import { painelFormularioHtml } from "../experimentos/formularios/painel.js";
 import { redeHtml } from "../experimentos/formularios/campos.js";
 import { prepararAparenciaPreview } from "../experimentos/formularios/aparencia.js";
 import { criarSonsFormulario } from "../components/form-sounds.js";
+import { criarFundoFormulario } from "../components/form-background.js";
 import { redeFormulario } from "../build/rede.js";
 import { moeda, htmlSeguro as h } from "../build/catalogo.js";
 import { ajustarGuiasConhecimento } from "../conta/preferencias-uso.js";
 import { iniciarIcones } from "../components/ui.js";
-import { movimentoReduzido } from "../components/motion-preference.js";
 
 // Somente laboratório: sem geração real, escrita na conta ou import do fluxo oficial.
 // Na integração, preservar a estrutura e o CSS do formulário oficial; não migrar este painel.
 function iniciarFormularioTeste(raiz, tipo) {
-  const videoFundo = raiz.parentElement.querySelector("[data-form-background]");
+  const reproduzirFundo = criarFundoFormulario(raiz.parentElement.querySelector("[data-form-background]"));
   const tocarSom = tipo === "pc" ? criarSonsFormulario() : null;
   const perguntas = tipo === "pc" ? perguntasPc : perguntasNotebook,
     id = (chave) => "preview-form-" + tipo + "-" + chave;
@@ -40,17 +40,9 @@ function iniciarFormularioTeste(raiz, tipo) {
     catalogo;
   const contexto = () => ({ respostas, tipo, id, catalogo });
 
-  if (videoFundo) {
-    videoFundo.addEventListener("playing", () => videoFundo.setAttribute("data-playing", ""));
-    for (const evento of ["pause", "ended", "error"]) {
-      videoFundo.addEventListener(evento, () => videoFundo.removeAttribute("data-playing"));
-    }
-  }
   function reproduzirEfeitos(efeito) {
     tocarSom?.(efeito);
-    if (!videoFundo || movimentoReduzido()) return;
-    videoFundo.currentTime = 0;
-    void videoFundo.play().catch(() => {});
+    reproduzirFundo();
   }
   function atualizarAvanco() {
     const problema =
