@@ -21,7 +21,7 @@ import {
 import { painelFormularioHtml } from "../experimentos/formularios/painel.js";
 import { redeHtml } from "../experimentos/formularios/campos.js";
 import { prepararAparenciaPreview } from "../experimentos/formularios/aparencia.js";
-import { criarSonsFormulario } from "../experimentos/formularios/sons.js";
+import { criarSonsFormulario } from "../components/form-sounds.js";
 import { redeFormulario } from "../build/rede.js";
 import { moeda, htmlSeguro as h } from "../build/catalogo.js";
 import { ajustarGuiasConhecimento } from "../conta/preferencias-uso.js";
