@@ -6,6 +6,19 @@
   color: var(--cor-4);
   line-height: 1.65;
 }
+.test-form-background {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  visibility: hidden;
+  pointer-events: none;
+}
+:root:not([data-reduced-motion="true"]) .test-form-background[data-playing] {
+  visibility: visible;
+}
 .test-form-transition-control {
   display: flex;
   align-items: center;
@@ -81,10 +94,13 @@
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
 }
 :root:not([data-reduced-motion="true"]) .test-form-layout-enter {
-  animation: var(--test-form-transition, test-form-question-fade) 320ms ease-out;
+  animation: var(--test-form-transition, test-form-question-fade) var(--test-form-transition-duration, 320ms) ease-out;
 }
 [data-form-transition="deslize"] { --test-form-transition: test-form-question-slide; }
-[data-form-transition="desfoque"] { --test-form-transition: test-form-question-blur; }
+[data-form-transition="desfoque"] {
+  --test-form-transition: test-form-question-blur;
+  --test-form-transition-duration: 480ms;
+}
 .test-form-layout[data-form-direction="voltar"] { --test-form-slide-offset: -20px; }
 @keyframes test-form-question-fade {
   from { opacity: 0.12; }

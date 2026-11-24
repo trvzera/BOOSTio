@@ -56,6 +56,7 @@
       <a href="#teste-componentes" aria-label="Outros controles">Outros controles</a>
     </nav>
     <section class="test-feature" id="teste-formulario-pc" aria-labelledby="test-form-pc-title">
+      <video class="test-form-background" data-form-background src="./video/fundoFORMS.webm" preload="auto" muted playsinline aria-hidden="true" tabindex="-1"></video>
       <div class="test-feature-head">
         <span class="test-kicker font-1-xs">Prévia · formulário de desktop</span>
         <h2 class="font-1-xl" id="test-form-pc-title">Vamos repensar sua montagem.</h2>
@@ -65,12 +66,12 @@
       <div class="test-form-transition-control">
         <label class="font-1-xs" for="test-form-transition">Transição entre perguntas</label>
         <select id="test-form-transition" class="input-text font-2-xs">
-          <option value="deslize" selected>Deslize lateral</option>
+          <option value="deslize">Deslize lateral</option>
           <option value="fade">Fade</option>
-          <option value="desfoque">Desfoque suave</option>
+          <option value="desfoque" selected>Desfoque suave</option>
         </select>
       </div>
-      <div data-form-preview="pc" data-form-transition="deslize"></div>
+      <div data-form-preview="pc" data-form-transition="desfoque"></div>
     </section>
     <section class="test-feature" id="teste-formulario-notebook" aria-labelledby="test-form-notebook-title">
       <div class="test-feature-head">

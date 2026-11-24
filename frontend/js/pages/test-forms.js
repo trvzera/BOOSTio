@@ -26,10 +26,12 @@ import { redeFormulario } from "../build/rede.js";
 import { moeda, htmlSeguro as h } from "../build/catalogo.js";
 import { ajustarGuiasConhecimento } from "../conta/preferencias-uso.js";
 import { iniciarIcones } from "../components/ui.js";
+import { movimentoReduzido } from "../components/motion-preference.js";
 
 // Somente laboratório: sem geração real, escrita na conta ou import do fluxo oficial.
 // Na integração, preservar a estrutura e o CSS do formulário oficial; não migrar este painel.
 function iniciarFormularioTeste(raiz, tipo) {
+  const videoFundo = raiz.parentElement.querySelector("[data-form-background]");
   const tocarSom = tipo === "pc" ? criarSonsFormulario() : null;
   const perguntas = tipo === "pc" ? perguntasPc : perguntasNotebook,
     id = (chave) => "preview-form-" + tipo + "-" + chave;
@@ -37,6 +39,19 @@ function iniciarFormularioTeste(raiz, tipo) {
     etapa = 0,
     catalogo;
   const contexto = () => ({ respostas, tipo, id, catalogo });
+
+  if (videoFundo) {
+    videoFundo.addEventListener("playing", () => videoFundo.setAttribute("data-playing", ""));
+    for (const evento of ["pause", "ended", "error"]) {
+      videoFundo.addEventListener(evento, () => videoFundo.removeAttribute("data-playing"));
+    }
+  }
+  function reproduzirEfeitos(efeito) {
+    tocarSom?.(efeito);
+    if (!videoFundo || movimentoReduzido()) return;
+    videoFundo.currentTime = 0;
+    void videoFundo.play().catch(() => {});
+  }
   function atualizarAvanco() {
     const problema =
       etapa === perguntas.length
@@ -134,14 +149,14 @@ function iniciarFormularioTeste(raiz, tipo) {
             throw new ErroGeracaoFormulario("resposta", p.chave, problema);
         }
         if (etapa < perguntas.length) {
-          tocarSom?.("avancar");
+          reproduzirEfeitos("avancar");
           etapa++;
           renderizar({ focar: true });
           return;
         }
         const plano = montarPlanoPreview(tipo, respostas),
           resultado = raiz.querySelector("[data-form-result]");
-        tocarSom?.("finalizar");
+        reproduzirEfeitos("finalizar");
         resultado.hidden = false;
         resultado.innerHTML =
           '<h4 tabindex="-1">Prévia concluída</h4><p>As respostas e as regras estão prontas para avaliação. Nenhuma chamada à IA foi enviada, nenhuma build foi criada e nada foi salvo na conta.</p><details class="test-form-summary"><summary>Ver dados e instruções do teste</summary><pre></pre></details>';
