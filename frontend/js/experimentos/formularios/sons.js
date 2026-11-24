@@ -1,6 +1,6 @@
 const efeitos = {
-  avancar: new URL("../../../audios/avancar-formulario-suave.mp3?v=2", import.meta.url).href,
-  finalizar: new URL("../../../audios/concluir-formulario-suave.mp3?v=2", import.meta.url).href,
+  avancar: new URL("../../../audios/avancar-formulario-suave.mp3?v=3", import.meta.url).href,
+  finalizar: new URL("../../../audios/concluir-formulario-suave.mp3?v=3", import.meta.url).href,
 };
 
 export function criarSonsFormulario() {
