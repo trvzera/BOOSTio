@@ -1,6 +1,6 @@
 const efeitos = {
-  avancar: { url: new URL("../../../audios/avancarFORMS.wav", import.meta.url).href, volume: 0.33 },
-  finalizar: { url: new URL("../../../audios/finalizarBUILD.wav", import.meta.url).href, volume: 0.50 },
+  avancar: { url: new URL("../../../audios/avancarFORMS.wav", import.meta.url).href, volume: 0.38 },
+  finalizar: { url: new URL("../../../audios/finalizarBUILD.wav", import.meta.url).href, volume: 0.56 },
 };
 
 export function criarSonsFormulario() {
