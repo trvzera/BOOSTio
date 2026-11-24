@@ -10,6 +10,7 @@ from repositories.controle_catalogo_repository import RepositorioControleCatalog
 from services.marketplace_service.controle_requisicoes_service import agora_utc
 from services.marketplace_service.processar_fila_service import ProcessarFilaMarketplaceService, LOJAS
 from services.marketplace_service.executores_service import executores_disponiveis
+from services.marketplace_service.atualizar_precos_marketplace_service import LOJAS as LOJAS_PRECOS
 from models.modelos_pecas import MODELOS_PECAS
 from services.catalogo_service.pendencias_montagem_service import pendencias_para_montagem
 
@@ -70,7 +71,7 @@ def registrar_comandos_marketplaces(app):
         click.echo(json.dumps(RepositorioFilaMarketplace().resumo()))
 
     @app.cli.command('marketplaces-precos-atualizar')
-    @click.option('--loja', type=click.Choice([*LOJAS, 'todas']), default='todas', show_default=True)
+    @click.option('--loja', type=click.Choice([*LOJAS_PRECOS, 'todas']), default='todas', show_default=True)
     @click.option('--horas', type=click.IntRange(0, 720), default=20, show_default=True,
                   help='Só consulta ofertas não consultadas nas últimas N horas; permite repetir ou retomar sem refazer.')
     @click.option('--limite', type=click.IntRange(1), default=None, help='Máximo de ofertas por loja.')
@@ -81,13 +82,34 @@ def registrar_comandos_marketplaces(app):
         from services.marketplace_service.atualizar_precos_marketplace_service import AtualizarPrecosMarketplaceService
         try:
             resumos = [AtualizarPrecosMarketplaceService().executar(l, horas=horas, limite=limite, simular=simular)
-                       for l in (LOJAS if loja == 'todas' else (loja,))]
+                       for l in (LOJAS_PRECOS if loja == 'todas' else (loja,))]
         except SQLAlchemyError:
             db.session.rollback()
             raise click.ClickException('Falha ao gravar os preços; nada do lote em andamento foi confirmado') from None
         except ValueError as erro:
             raise click.ClickException(str(erro)) from None
         click.echo(json.dumps(resumos, ensure_ascii=False))
+
+    @app.cli.command('gigantec-ligar')
+    @click.option('--arquivo', type=click.Path(exists=True, dir_okay=False), default=None,
+                  help='Lê um CSV (ou .gz) salvo em vez de baixar o feed de GIGANTEC_FEED_URL.')
+    @click.option('--limite', type=click.IntRange(1), default=None, help='Máximo de peças a ligar.')
+    @click.option('--aplicar', is_flag=True, help='Grava as ofertas; sem esta opção só simula e mostra o que ligaria.')
+    def ligar_gigantec(arquivo, limite, aplicar):
+        """Liga itens do feed da Gigantec a peças que já existem (MPN e marca iguais). Não cadastra peça nova."""
+        from models import db
+        from services.gigantec_service.feed_service import FeedGigantecService
+        from services.gigantec_service.associar_feed_service import AssociarFeedGigantecService
+        try:
+            itens = FeedGigantecService(arquivo=arquivo).itens()
+            resumo = AssociarFeedGigantecService().executar(itens, simular=not aplicar, limite=limite)
+        except SQLAlchemyError:
+            db.session.rollback()
+            raise click.ClickException('Falha ao gravar as ofertas; confira o banco') from None
+        except ValueError as erro:
+            raise click.ClickException(str(erro)) from None
+        resumo['detalhes'] = resumo['detalhes'][:50]
+        click.echo(json.dumps(resumo, ensure_ascii=False))
 
     @app.cli.command('marketplaces-enfileirar-ofertas')
     @click.option('--loja', type=click.Choice(LOJAS), required=True)

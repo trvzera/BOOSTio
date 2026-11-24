@@ -65,3 +65,6 @@ testes.html
 /database/icecat/fichas/
 /database/icecat/*.lock
 /generated_images/
+
+# amostra do feed da Gigantec (Awin), só para desenvolvimento
+backend/data/gigantec-amostra*

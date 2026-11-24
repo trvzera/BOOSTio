@@ -21,6 +21,7 @@ from services.llm_service.reservar_chamada_service import CotaGlobalIAError, Con
 from services.validacoes_service.validar_build_gerada_service import validar_build_gerada
 from services.validacoes_service.requisitos_armazenamento_service import RequisitosArmazenamentoService
 from .ajustar_aparencia_service import ajustar_aparencia
+from .ajustar_memoria_aos_slots_service import AjustarMemoriaAosSlotsService
 from .ajustar_orcamento_build_service import AjustarOrcamentoBuildService
 from .ajustar_perifericos_ao_plano_service import AjustarPerifericosAoPlanoService
 from .completar_ventilacao_service import CompletarVentilacaoService
@@ -86,6 +87,7 @@ def completar_build(build, pedido, catalogo, plano_perifericos):
     logger.info("Geração: etapa=perifericos_no_plano gasto_anterior=%.2f gasto_novo=%.2f reserva=%.2f",
                 ajuste["gasto_anterior"], ajuste["gasto_novo"], ajuste["reserva"])
   build = PlanejarRedeService.completar(build, catalogo, pedido["rede"], pedido["proprias"])
+  build = AjustarMemoriaAosSlotsService().executar(build, catalogo, pedido["proprias"], pedido["detalhes_proprias"])
   return CompletarVentilacaoService().executar(build, catalogo, pedido["teto_pc"], pedido["proprias"],
                                                pedido["detalhes_proprias"], cor=pedido["aparencia"]["cor"])
 

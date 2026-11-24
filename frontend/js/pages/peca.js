@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     iniciarHistoricoPrecos(main, peca);
     if (conta) {
       let seletor = null, consultaHistorico = 0;
-      const lojasHistorico = ["kabum", "mercado_livre", "shopee"].filter(l => (peca.ofertas || []).some(o => o.loja === l));
+      const lojasHistorico = ["kabum", "mercado_livre", "shopee", "gigantec"].filter(l => (peca.ofertas || []).some(o => o.loja === l));
       if (lojasHistorico.length) {
         main.querySelector("[data-price-history]").insertAdjacentHTML("beforebegin", '<div class="planning-help planning-field"><label for="history-offer">Histórico por loja</label><select id="history-offer" class="input-text"><option value="todas">' + h(nomesLojas.todas) + '</option>' +
           lojasHistorico.map(l => '<option value="' + l + '">' + h(nomesLojas[l]) + '</option>').join("") + '</select></div>');

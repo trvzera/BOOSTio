@@ -6,7 +6,7 @@ from utils.identidade_peca import assinatura_peca
 from models.modelos_pecas import MODELOS_PECAS
 
 
-LOJAS = ('kabum', 'mercado_livre', 'shopee')
+LOJAS = ('kabum', 'mercado_livre', 'shopee', 'gigantec')
 LIMITE_LINHAS = 3000
 
 
@@ -49,6 +49,8 @@ class ConsultarHistoricoPrecosService:
         if oferta.loja == 'mercado_livre':
             vinculo = VinculoMercadoLivre.buscar(categoria, peca_id)
             valido = vinculo is not None and vinculo.assinatura_peca == assinatura_peca(peca) and vinculo.especificacoes_compativeis(peca)
+        elif oferta.loja == 'gigantec':
+            valido = True
         else:
             valido = oferta.shopee_validada(peca)
         if not valido:
@@ -70,7 +72,7 @@ class ConsultarHistoricoPrecosService:
         if oferta.loja == 'mercado_livre':
             vinculo = VinculoMercadoLivre.buscar(peca.__tablename__, peca.id)
             return vinculo is not None and vinculo.assinatura_peca == assinatura_peca(peca) and vinculo.especificacoes_compativeis(peca)
-        return oferta.loja == 'kabum' or oferta.shopee_validada(peca)
+        return oferta.loja in ('kabum', 'gigantec') or oferta.shopee_validada(peca)
 
     def _historico_por_loja(self, peca, loja):
         if loja != 'todas' and loja not in LOJAS:

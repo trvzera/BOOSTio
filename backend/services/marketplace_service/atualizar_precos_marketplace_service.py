@@ -8,15 +8,17 @@ from services.mercadolivre_service.buscar_ofertas_mercado_livre_service import B
 from services.mercadolivre_service.controle_requisicoes_service import ErroMercadoLivre
 from services.mercadolivre_service.token_mercado_livre_service import TokenMercadoLivreService
 from services.shopee_service.cliente_service import ClienteShopeeService
+from services.gigantec_service.feed_service import FeedGigantecService
 
-LOJAS = ('mercado_livre', 'shopee')
+LOJAS = ('mercado_livre', 'shopee', 'gigantec')
 ITENS_POR_CHAMADA = 20
 
 
 class AtualizarPrecosMarketplaceService:
-    def __init__(self, cliente_ml=None, cliente_shopee=None, token=None):
+    def __init__(self, cliente_ml=None, cliente_shopee=None, token=None, feed_gigantec=None):
         self.cliente_ml = cliente_ml
         self.cliente_shopee = cliente_shopee
+        self.feed_gigantec = feed_gigantec
         self.token = token
 
     def executar(self, loja, *, horas=20, limite=None, simular=False):
@@ -29,6 +31,8 @@ class AtualizarPrecosMarketplaceService:
         try:
             if loja == 'mercado_livre':
                 self._mercado_livre(ofertas, agora, resumo, simular)
+            elif loja == 'gigantec':
+                self._gigantec(ofertas, agora, resumo, simular)
             else:
                 self._shopee(ofertas, agora, resumo, simular)
         except FalhaMarketplace as erro:
@@ -85,6 +89,21 @@ class AtualizarPrecosMarketplaceService:
             self._gravar(oferta, nos[0].get('priceMin'), None if ativo else True, agora, resumo, simular)
             if posicao % ITENS_POR_CHAMADA == 0 and not simular:
                 Oferta.confirmar_coletas()
+
+    def _gigantec(self, ofertas, agora, resumo, simular):
+        if not ofertas:
+            return
+        itens = (self.feed_gigantec or FeedGigantecService()).itens()
+        for oferta in ofertas:
+            item = itens.get(oferta.produto_id_loja)
+            if item is None:
+                # Saiu do feed: mantém o último preço, mas fica esgotado.
+                resumo['ausentes'] += 1
+                self._gravar(oferta, oferta.preco, True, agora, resumo, simular)
+            else:
+                self._gravar(oferta, item['preco'], not item['disponivel'], agora, resumo, simular)
+                if not simular and item['url_afiliado'] != oferta.url_afiliado:
+                    oferta.url_afiliado = item['url_afiliado']
 
     @staticmethod
     def _preco_valido(valor):
