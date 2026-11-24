@@ -1,8 +1,18 @@
+import logging
 import os
+import random
+import time
 
 import requests
+from requests.exceptions import ConnectionError, HTTPError
 
 from .reservar_chamada_service import ReservarChamadaService
+
+logger = logging.getLogger(__name__)
+
+TENTATIVAS = 2                          # no máximo duas chamadas ao mesmo modelo
+STATUS_TEMPORARIOS = (500, 502, 503, 504)   # falhas do provedor que costumam passar sozinhas
+ESPERA_SEGUNDOS = 2
 
 class RespostaLLMInvalida(ValueError):
   pass
@@ -21,16 +31,25 @@ class LLMService:
     if reservar_cota:
       ReservarChamadaService().executar()
 
-    resposta = requests.post(
-      f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent",
-      headers={"x-goog-api-key": chave},
-      json={
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"responseMimeType": "application/json", "maxOutputTokens": 8192},
-      },
-      timeout=90,
-    )
-    resposta.raise_for_status()
+    for tentativa in range(1, TENTATIVAS + 1):
+      try:
+        resposta = requests.post(
+          f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent",
+          headers={"x-goog-api-key": chave},
+          json={
+            "contents": [{"parts": [{"text": prompt}]}],
+            "generationConfig": {"responseMimeType": "application/json", "maxOutputTokens": 8192},
+          },
+          timeout=90,
+        )
+        resposta.raise_for_status()
+        break
+      except (HTTPError, ConnectionError) as erro:
+        status = erro.response.status_code if isinstance(erro, HTTPError) and erro.response is not None else None
+        logger.warning("IA: modelo=%s tentativa=%d status=%s", modelo, tentativa, status or type(erro).__name__)
+        if tentativa == TENTATIVAS or not (isinstance(erro, ConnectionError) or status in STATUS_TEMPORARIOS):
+          raise
+        time.sleep(ESPERA_SEGUNDOS + random.random())
     return self._ler_resposta(resposta)
 
   @staticmethod
