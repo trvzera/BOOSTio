@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://boostio.com.br/sitemap.xml

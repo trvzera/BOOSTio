@@ -13,7 +13,7 @@ test("cada página tem título e descrição próprios, idioma e atalho para o c
   for (const url of arquivos) {
     const html = await ler(url), titulo = html.match(/<title>([^<]+)<\/title>/)?.[1];
     const descricao = html.match(/<meta name="description" content="([^"]+)"/)?.[1];
-    assert.match(html,/<html lang="pt-BR">/,url.pathname);
+    assert.match(html,/<html\b[^>]*\blang="pt-BR"[^>]*>/,url.pathname);
     assert.ok(titulo?.includes("BOOSTio"),url.pathname);
     assert.ok(descricao?.length > 30,url.pathname);
     assert.ok(!titulos.has(titulo),titulo); assert.ok(!descricoes.has(descricao),descricao);
@@ -51,7 +51,7 @@ test("atalho de acessibilidade só fica visível com foco de teclado",async () =
 test("fontes originais são antecipadas sem alterar a família e imagens reservam espaço",async () => {
   for (const url of arquivos) {
     const html = await ler(url);
-    for (const fonte of ["Lexend[wght].woff2","Poppins-Regular.woff2"]) {
+    for (const fonte of ["Lexend%5Bwght%5D.woff2","Poppins-Regular.woff2"]) {
       const tag = [...html.matchAll(/<link\b[^>]*>/g)].map(m=>m[0]).find(t=>t.includes(fonte));
       assert.ok(tag?.includes('rel="preload"') && tag.includes('as="font"') && tag.includes("crossorigin"),url.pathname);
       await access(new URL(tag.match(/href="([^"]+)"/)[1],url));

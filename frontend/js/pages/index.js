@@ -17,8 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (movimentoReduzido() || navigator.connection?.saveData || document.hidden || !visiveis.has(video)) {
         video.pause();
       } else if (video.paused) {
-        const source = video.querySelector("source[data-src]");
-        if (source) { source.src = source.dataset.src; source.removeAttribute("data-src"); video.load(); }
+        if (!video.hasAttribute("src")) video.src = video.dataset.src;
         video.play().catch(() => {});
       }
     });
@@ -43,10 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   observarMovimento(reduzido => {
     if (reduzido) videos.forEach(video => {
       video.pause();
-      video.querySelectorAll("source[src]").forEach(source => {
-        source.dataset.src = source.getAttribute("src");
-        source.removeAttribute("src");
-      });
+      video.removeAttribute("src");
       video.load();
     });
     atualizarReproducao();

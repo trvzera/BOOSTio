@@ -5,15 +5,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Laboratório de recursos — BOOSTio</title>
-  <script type="module" src="./js/pages/loading.js" defer></script>
-  <script type="module" src="./js/pages/testes.js" defer></script>
-  <script type="module" src="./js/pages/test-benchmark.js" defer></script>
-  <script type="module" src="./js/pages/test-benchmark-panel.js" defer></script>
-  <script type="module" src="./js/pages/test-price-history.js" defer></script>
-  <script type="module" src="./js/pages/test-laboratorio.js" defer></script>
-  <script type="module" src="./js/pages/test-montagem.js" defer></script>
-  <script type="module" src="./js/pages/test-onboarding.js" defer></script>
-  <script type="module" src="./js/pages/test-forms.js" defer></script>
+  <script type="module" src="./js/pages/loading.js"></script>
+  <script type="module" src="./js/pages/testes.js"></script>
+  <script type="module" src="./js/pages/test-benchmark.js"></script>
+  <script type="module" src="./js/pages/test-benchmark-panel.js"></script>
+  <script type="module" src="./js/pages/test-price-history.js"></script>
+  <script type="module" src="./js/pages/test-laboratorio.js"></script>
+  <script type="module" src="./js/pages/test-montagem.js"></script>
+  <script type="module" src="./js/pages/test-onboarding.js"></script>
+  <script type="module" src="./js/pages/test-forms.js"></script>
   <link rel="stylesheet" href="./styles/paginas/test-forms.css">
   <link rel="stylesheet" href="./styles/paginas/test-onboarding.css">
   <link rel="icon" type="image/webp" href="./imgs/favicon.webp">
@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="./styles/paginas/testes-base.css">
   <meta name="description" content="Laboratório da BOOSTio: prévias de formulários para desktop e notebook, comparação de builds, orçamento, melhorias e desempenho.">
   <meta name="robots" content="noindex,nofollow">
-  <link rel="preload" href="./fonts/Lexend[wght].woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./fonts/Lexend%5Bwght%5D.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="./fonts/Poppins-Regular.woff2" as="font" type="font/woff2" crossorigin>
 </head>
 
@@ -140,7 +140,7 @@
           <p class="font-2-xs" data-test-product-loading role="status">Carregando a peça de exemplo…</p>
           <div data-test-product-component></div>
         </section>
-        <section id="teste-peca-detalhes" aria-labelledby="test-product-title" hidden></section>
+        <div id="teste-peca-detalhes" role="region" aria-labelledby="test-product-title" hidden></div>
       </div>
       <noscript><p class="font-2-xs">Ative o JavaScript para experimentar a página de peça.</p></noscript>
     </section>
@@ -188,7 +188,7 @@
           <div class="fpshq-controls">
             <form id="fpshq-test-form">
               <div class="test-field-row fpshq-fields">
-                <label class="test-field font-1-s" for="fpshq-game">Jogo<select id="fpshq-game" required></select></label>
+                <label class="test-field font-1-s" for="fpshq-game">Jogo<select id="fpshq-game" required><option value="">Selecione um jogo</option></select></label>
                 <label class="test-field font-1-s" for="fpshq-resolution">Resolução<select id="fpshq-resolution"><option value="1080p">1080p</option><option value="1440p">1440p</option><option value="4k">4K</option></select></label>
                 <label class="test-field font-1-s" for="fpshq-preset">Qualidade gráfica<select id="fpshq-preset"><option value="low">Baixa</option><option value="medium">Média</option><option value="high" selected>Alta</option><option value="ultra">Ultra</option></select></label>
               </div>
@@ -242,7 +242,7 @@
       </div>
       <div class="test-feature-panel glass-card">
         <div class="test-compare-launch"><div><strong class="font-1-m-b">Minhas builds</strong><p class="font-2-xs" id="compare-available">Carregando builds de teste…</p></div><button type="button" class="btn-primary" id="compare-button" aria-label="Comparar builds" data-disabled-reason="São necessárias pelo menos duas builds." disabled>Comparar builds</button></div>
-        <div id="compare-build-list" class="test-compare-build-list" aria-label="Builds disponíveis para comparação"></div>
+        <div id="compare-build-list" class="test-compare-build-list" role="group" aria-label="Builds disponíveis para comparação"></div>
         <label class="test-demo-toggle font-2-xs" for="compare-third"><input type="checkbox" id="compare-third"><span>Mostrar terceira build demonstrativa</span></label>
       </div>
     </section>
@@ -270,7 +270,7 @@
         <div class="test-actions"><button type="button" class="btn-primary" id="budget-save" aria-label="Guardar budget neste teste">Guardar budget neste teste</button></div>
         <p class="test-feedback font-2-xs" id="budget-feedback" role="status" aria-live="polite">Nenhum valor registrado nesta sessão.</p>
         <label class="test-budget-consent font-2-xs" for="budget-use-new"><input type="checkbox" id="budget-use-new" disabled aria-describedby="budget-optin-help"><span><strong>Usar este budget nas novas configurações</strong><small id="budget-optin-help">Ao iniciar outra montagem, o formulário poderá usar esse valor como limite inicial. Você poderá ajustá-lo para cada build.</small></span></label>
-        <div class="test-budget-preview"><span class="test-placement-label font-1-xs">Prévia · nova configuração</span><label class="test-field font-1-s" for="budget-new-build-input">Orçamento desta build <output id="budget-new-build-value" for="budget-new-build-input">R$ 0,00</output><input id="budget-new-build-input" type="range" min="0" max="10000" step="50" value="0"></label><p class="font-2-xs" id="budget-new-build-preview" role="status" aria-live="polite">Sem budget aplicado automaticamente.</p></div>
+        <div class="test-budget-preview"><span class="test-placement-label font-1-xs">Prévia · nova configuração</span><div class="test-field font-1-s"><label for="budget-new-build-input">Orçamento desta build</label><output id="budget-new-build-value" for="budget-new-build-input">R$ 0,00</output><input id="budget-new-build-input" type="range" min="0" max="10000" step="50" value="0"></div><p class="font-2-xs" id="budget-new-build-preview" role="status" aria-live="polite">Sem budget aplicado automaticamente.</p></div>
       </div>
       <p class="test-muted font-2-xs test-footnote">Somente demonstração: o valor e a escolha são guardados nesta sessão, não no perfil nem no backend.</p>
     </section>
