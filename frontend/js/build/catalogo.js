@@ -91,6 +91,7 @@ export function imagemPeca(peca, classe = "") {
 export const marketplaces = {
   mercado_livre: {nome:"Mercado Livre", vendedor:"Vendedor ", dominios:["mercadolivre.com.br","www.mercadolivre.com.br","produto.mercadolivre.com.br"]},
   shopee: {nome:"Shopee", vendedor:"Loja ", dominios:["shopee.com.br","www.shopee.com.br","s.shopee.com.br","shope.ee"]},
+  gigantec: {nome:"Gigantec", vendedor:"Gigantec", semVendedor:true, dominios:["www.awin1.com","www.gigantec.com.br"]},
 };
 
 export function ofertasPeca(peca) {
@@ -126,7 +127,7 @@ export function ofertasPeca(peca) {
     const mp = marketplaces[oferta.loja];
     if (!Number.isSafeInteger(oferta.id) || oferta.id <= 0 || vistas.has(oferta.id)
         || typeof oferta.preco !== "number" || !Number.isFinite(oferta.preco) || oferta.preco <= 0
-        || typeof oferta.vendedor_id !== "string" || !/^\d+$/.test(oferta.vendedor_id)
+        || typeof oferta.vendedor_id !== "string" || !(mp.semVendedor ? oferta.vendedor_id === "" : /^\d+$/.test(oferta.vendedor_id))
         || typeof oferta.atualizadoEm !== "string" || !Number.isFinite(Date.parse(oferta.atualizadoEm))) return [];
     try {
       const url = new URL(oferta.url);

@@ -105,6 +105,11 @@ def aplicar_ofertas_loja(peca,loja,ofertas,agora):
             afiliado = dados.get('url_afiliado')
             if afiliado and validar_url_shopee(afiliado, afiliado=True):
                 registro.url_afiliado = afiliado
+        if loja == 'gigantec':
+            from utils.url_gigantec import validar_url_gigantec
+            afiliado = dados.get('url_afiliado')
+            if afiliado and validar_url_gigantec(afiliado, afiliado=True):
+                registro.url_afiliado = afiliado
         registro.consultado_em = agora
         db.session.flush()
         ultimo=HistoricoOferta.ultimo(registro.id,bloquear=True)

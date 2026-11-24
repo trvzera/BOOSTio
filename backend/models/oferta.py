@@ -2,6 +2,7 @@ from . import db, ModeloBase
 from utils.medidas_fisicas import produto_kabum
 from .modelos_pecas import MODELOS_PECAS
 from utils.url_shopee import validar_url_shopee
+from utils.url_gigantec import validar_url_gigantec
 
 
 class Oferta(ModeloBase):
@@ -227,6 +228,7 @@ class Oferta(ModeloBase):
         for peca, referencia in zip(pecas, referencias):
             peca['ofertas'] = [*peca.get('ofertas', []), *por_peca.get(referencia, [])]
         cls._anexar_shopee(fichas, referencias)
+        cls._anexar_gigantec(fichas, referencias)
         return pecas
 
     @classmethod
@@ -249,6 +251,14 @@ class Oferta(ModeloBase):
                 fichas[(oferta.tabela_peca, oferta.peca_id)]['ofertas'].append(dados)
 
     @classmethod
+    def _anexar_gigantec(cls, fichas, referencias):
+        for oferta in cls.query.filter(cls.loja == 'gigantec', cls.ativa.is_(True),
+                cls._das_pecas(referencias)).order_by(cls.preco, cls.id).all():
+            dados = oferta.para_exibicao()
+            if dados is not None:
+                fichas[(oferta.tabela_peca, oferta.peca_id)]['ofertas'].append(dados)
+
+    @classmethod
     def _anexar_kabum(cls, pecas, referencias):
         fichas = dict(zip(referencias, pecas))
         for oferta in cls.query.filter(cls.loja == 'kabum', cls.ativa.is_(True),
@@ -260,7 +270,7 @@ class Oferta(ModeloBase):
     @classmethod
     def buscar_para_peca(cls, oferta_id, categoria, peca_id):
         return cls.query.filter_by(id=oferta_id, tabela_peca=categoria, peca_id=peca_id,
-                                   ativa=True).filter(cls.loja.in_(('mercado_livre', 'shopee'))).first()
+                                   ativa=True).filter(cls.loja.in_(('mercado_livre', 'shopee', 'gigantec'))).first()
 
     def shopee_validada(self, peca, pendencia=None):
         from . import ProdutoPendente
@@ -284,6 +294,10 @@ class Oferta(ModeloBase):
                 if produto_kabum(self.url) != self.produto_id_loja:
                     return None
                 url_compra = self.url
+            elif self.loja == 'gigantec':
+                if not validar_url_gigantec(self.url):
+                    return None
+                url_compra = self.url_afiliado if validar_url_gigantec(self.url_afiliado, afiliado=True) else self.url
             elif self.loja == 'shopee':
                 if (not validar_url_shopee(self.url) or
                         url.path != '/product/' + self.produto_id_loja.replace(':', '/')):
@@ -307,5 +321,5 @@ class Oferta(ModeloBase):
         return {'id': self.id, 'loja': self.loja, 'produto_id_loja': self.produto_id_loja,
                 'vendedor_id': self.vendedor_id, 'vendedor_nome': self.vendedor_nome,
                 'url': url_compra, 'preco': float(self.preco),
-                'esgotado': bool(self.esgotado) if self.loja == 'kabum' else self.esgotado,
+                'esgotado': bool(self.esgotado) if self.loja in ('kabum', 'gigantec') else self.esgotado,
                 'atualizadoEm': coleta.replace(tzinfo=timezone.utc).isoformat(timespec='seconds')}
