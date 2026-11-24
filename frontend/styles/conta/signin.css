@@ -263,3 +263,62 @@
 #forgot-password-link:hover {
   opacity: 0.7;
 }
+
+#login-container [hidden] {
+  display: none !important;
+}
+
+#login-container[data-login-step="authenticator"] {
+  padding: clamp(1.25rem, 5vw, 2rem);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  background: var(--cor-1);
+}
+
+#login-container[data-login-step="authenticator"] > img {
+  width: 8rem;
+}
+
+[data-login-step="authenticator"] #login-title {
+  margin-bottom: .75rem;
+  color: var(--cor-6);
+  font: 600 clamp(1.25rem, 5vw, 1.5rem)/1.35 var(--font-heading);
+}
+
+[data-login-step="authenticator"] #login-form {
+  gap: .875rem;
+  margin: 0;
+}
+
+#admin-factor {
+  display: grid;
+  width: 100%;
+  gap: .5rem;
+}
+
+#admin-code-help {
+  margin-bottom: .75rem;
+  color: var(--cor-4);
+  font: 400 .875rem/1.6 var(--font-body);
+  text-align: center;
+}
+
+#admin-factor label {
+  color: var(--cor-5);
+  font: 500 .8125rem/1.5 var(--font-heading);
+}
+
+#admin-code {
+  text-align: center;
+  font: 500 1.25rem/1.4 var(--font-heading);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .35em;
+}
+
+#admin-factor-back {
+  display: inline-grid;
+  min-height: 44px;
+  place-items: center;
+  color: var(--cor-p1);
+  font-size: .875rem;
+}

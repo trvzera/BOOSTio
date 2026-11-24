@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Entrar na conta — BOOSTio</title>
   <link rel="icon" type="image/webp" href="../imgs/favicon.webp">
   <link rel="manifest" href="../manifest.webmanifest">
@@ -40,30 +40,31 @@
       <h1 id="login-title" class="font-1-l">Bem-vindo(a) de volta!</h1>
 
       <form id="login-form" method="post">
-        <label class="sr-only" for="email">Seu e-mail</label>
-        <input type="email" name="email" autocomplete="username" placeholder="Seu e-mail" class="input-text" id="email" required>
-        <div class="password-input-wrapper">
+        <label class="sr-only" for="email" data-login-first-step>Seu e-mail</label>
+        <input type="email" name="email" autocomplete="username" placeholder="Seu e-mail" class="input-text" id="email" required data-login-first-step>
+        <div class="password-input-wrapper" data-login-first-step>
           <label class="sr-only" for="password">Sua senha</label>
           <input type="password" name="password" autocomplete="current-password" placeholder="Sua senha" class="input-text" id="password" required aria-describedby="login-error">
           <button type="button" class="password-toggle fa-eye-slash" data-target="password" aria-label="Mostrar senha" aria-pressed="false" aria-controls="password"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button>
         </div>
 
         <div id="admin-factor" hidden>
-          <label class="font-1-s" for="admin-code">Digite o código de seis dígitos do seu aplicativo autenticador</label>
-          <input class="input-text" id="admin-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" disabled>
-          <a href="./login.html" class="font-1-s" aria-label="Voltar ao login">Voltar ao login</a>
+          <p id="admin-code-help">Abra o aplicativo autenticador e digite o código de 6 dígitos da BOOSTio.</p>
+          <label for="admin-code">Código do autenticador</label>
+          <input class="input-text" id="admin-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" aria-describedby="admin-code-help login-error" disabled>
         </div>
         <p id="login-error" class="font-1-xs form-error" role="alert"></p>
         <button type="submit" class="btn-login" id="btn-sign-in" aria-label="Entrar na conta" disabled>Entrar</button>
-        <a href="./esqueci-senha.html" id="forgot-password-link" class="font-1-s" aria-label="Esqueceu a sua senha? Recuperar senha">Esqueceu a sua senha?</a>
+        <a href="./esqueci-senha.html" id="forgot-password-link" class="font-1-s" aria-label="Esqueceu a sua senha? Recuperar senha" data-login-first-step>Esqueceu a sua senha?</a>
+        <a href="./login.html" id="admin-factor-back" class="font-1-s" aria-label="Voltar ao login" hidden>Voltar ao login</a>
       </form>
-      <div class="login-divider">
+      <div class="login-divider" data-login-first-step>
         <span class="login-line"></span>
         <p class="font-1-s">Ou se preferir</p>
         <span class="login-line"></span>
       </div>
-      <a href="#" class="btn-login-secondary" id="btn-google-login" aria-label="Entrar com Google">Entrar com Google</a>
-      <p id="login-description" class="font-2-xs">Ainda não tem uma conta? <a href="./signin.html" aria-label="Criar conta na BOOSTio">Criar conta</a></p>
+      <a href="#" class="btn-login-secondary" id="btn-google-login" aria-label="Entrar com Google" data-login-first-step>Entrar com Google</a>
+      <p id="login-description" class="font-2-xs" data-login-first-step>Ainda não tem uma conta? <a href="./signin.html" aria-label="Criar conta na BOOSTio">Criar conta</a></p>
     </div>
   </main>
 </body>

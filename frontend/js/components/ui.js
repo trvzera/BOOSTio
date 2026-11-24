@@ -10,7 +10,8 @@ const arquivos = {
   gamepad:"gamepad.json", microchip:"microchip.json", handsparkle:"handsparkle.json", normalhand:"normalhand.json",
   lock:"buildLock.json", visibility:"buildPublic.json", pencil:"buildPencil.json", clone:"buildClone.json", copy:"buildCopy.json", download:"buildDownload.json",
 };
-const alternativas = {plus:"+",trash:"×",cart:"↗",import:"→",arrow:"→",chevron:"⌄",checkbox:"✓",
+const setaEstatica = caminho => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + caminho + '"/></svg>';
+const alternativas = {plus:"+",trash:"×",cart:"↗",import:"→",arrow:setaEstatica("M4 12h15m-6-6 6 6-6 6"),chevron:setaEstatica("m6 9 6 6 6-6"),checkbox:"✓",
   toggle:'<svg viewBox="0 0 28 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="26" height="14" rx="7"/><circle cx="8" cy="8" r="4.5" fill="currentColor" stroke="none"/></svg>',
   lock:"▣",visibility:"◉",pencil:"✎",clone:"▢",copy:"⧉",download:"↓",
   dots:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="20" cy="12" r="2"/></svg>',
@@ -96,8 +97,8 @@ export function iniciarIcones(raiz = document) {
       }
       const pronto = () => {
         if (!elemento.isConnected) return;
-        elemento.setAttribute("data-ready","");
         animacao.goToAndStop(invertido || alternavel && aberto() ? animacao.totalFrames - 1 : 0,true);
+        elemento.setAttribute("data-ready","");
       };
       animacao.isLoaded ? pronto() : animacao.addEventListener("DOMLoaded",pronto);
       ativos.set(elemento,{animacao,limpar:() => {

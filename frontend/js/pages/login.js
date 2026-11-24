@@ -43,14 +43,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     const fator = document.querySelector("#admin-factor");
     const codigo = document.querySelector("#admin-code");
     function mostrarAutenticador() {
+      document.querySelector("#login-container").dataset.loginStep = "authenticator";
+      document.querySelector("#login-title").textContent = "Confirme sua identidade";
+      document.querySelectorAll("[data-login-first-step]").forEach(elemento => {
+        elemento.hidden = true;
+      });
+      document.querySelector("#admin-factor-back").hidden = false;
       fator.hidden = false;
       codigo.disabled = false;
       codigo.required = true;
       emailInput.disabled = senhaInput.disabled = true;
-      emailInput.style.display = senhaInput.parentElement.style.display = "none";
       senhaInput.value = "";
       botaoEntrar.textContent = "Confirmar código";
       botaoEntrar.setAttribute("aria-label", "Confirmar código");
+      botaoEntrar.dataset.disabledReason = "Digite os seis dígitos do aplicativo autenticador.";
       codigo.focus();
       validarFormulario();
     }
@@ -58,7 +64,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     function validarFormulario() {
       const camposPreenchidos =
         emailInput.value.trim() !== "" && senhaInput.value !== "";
-      botaoEntrar.disabled = fator.hidden ? !camposPreenchidos : !/^[0-9]{6}$/.test(codigo.value);
+      const preenchido = fator.hidden ? camposPreenchidos : /^[0-9]{6}$/.test(codigo.value);
+      botaoEntrar.disabled = botaoEntrar.dataset.busy === "true" || !preenchido;
     }
 
     emailInput.addEventListener("input", validarFormulario);
@@ -70,6 +77,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     formLogin.addEventListener("submit", async (e) => {
       e.preventDefault();
+      if (botaoEntrar.disabled) return;
 
       erroTexto.style.display = "none";
       erroTexto.textContent = "";

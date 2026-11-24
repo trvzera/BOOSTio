@@ -8,7 +8,7 @@ test("todas as páginas usam viewport móvel e o stylesheet compartilhado", asyn
   const pages = await readdir(new URL("pages/", frontend));
   for (const page of pages.filter(name => name.endsWith(".html"))) {
     const html = await readFile(new URL("pages/" + page, frontend), "utf8");
-    assert.match(html, /<meta\s+name="viewport"\s+content="width=device-width,\s*initial-scale=1\.0"/i, page);
+    assert.match(html, /<meta\s+name="viewport"\s+content="width=device-width,\s*initial-scale=1\.0,\s*viewport-fit=cover"/i, page);
     assert.match(html, /href="\.\.\/styles\/style\.css"/, page);
   }
 });

@@ -61,7 +61,7 @@ export async function abrirTutorial({automatico = false} = {}) {
   }
 
   function desenhar() {
-    dialogo.innerHTML = '<div class="onboarding-top"><span class="onboarding-progress">Conheça a BOOSTio · ' + (passo+1) + ' de 3</span><button type="button" class="build-action-close" data-onboarding="fechar" aria-label="Fechar tutorial">×</button></div>' +
+    dialogo.innerHTML = '<div class="onboarding-top"><span class="onboarding-progress">Tutorial da BOOSTio · Etapa ' + (passo+1) + ' de 3</span><button type="button" class="build-action-close" data-onboarding="fechar" aria-label="Fechar tutorial">×</button></div>' +
       '<div class="onboarding-content">' + conteudo() + '</div><p class="onboarding-feedback" role="status" aria-live="polite"></p><div class="onboarding-actions"><button type="button" class="onboarding-skip" data-onboarding="pular" aria-label="Pular tutorial">Pular tutorial</button><div class="onboarding-steps">' +
       (passo ? '<button type="button" class="btn-secondary" data-onboarding="voltar" aria-label="Voltar ao passo anterior do tutorial">' + iconeAnimado("arrow","back") + 'Voltar</button>' : '') + '<button type="button" class="btn-primary" data-onboarding="avancar" aria-label="' + (passo === 2 ? 'Concluir tutorial' : 'Avançar no tutorial') + '">' + (passo === 2 ? 'Concluir' : 'Continuar') + iconeAnimado("arrow") + '</button></div></div>';
     iniciarIcones(dialogo);

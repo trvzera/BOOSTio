@@ -96,12 +96,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     return texto ? `<details class="usage-priority" data-knowledge-guide data-knowledge-beginner open><summary class="font-1-xs">${titulo}</summary><p${pergunta.chave === "objetivo" ? ' id="usage-priority-copy" aria-live="polite"' : ""} class="font-2-xs">${texto}</p></details>` : "";
   }
 
-  function posicionarAcessoManual() {
-    const acesso = document.querySelector("#questions .manual-build");
-    const destino = telaCompacta.matches ? conteudo.querySelector(".question-options-scroll") : painel;
-    if (acesso && destino) destino.append(acesso);
+  function posicionarComplementos() {
+    const opcoes = conteudo.querySelector(".question-options-scroll");
+    const acesso = painel.querySelector(".manual-build") || opcoes?.querySelector(".manual-build");
+    const guia = conteudo.querySelector("[data-knowledge-guide]") || painel.querySelector("[data-knowledge-guide]");
+    const destinoAcesso = telaCompacta.matches ? opcoes : painel;
+    const destinoGuia = telaCompacta.matches ? opcoes : painel.querySelector(".question-intro");
+    if (guia && destinoGuia && guia.parentElement !== destinoGuia) destinoGuia.append(guia);
+    if (acesso && destinoAcesso && acesso.parentElement !== destinoAcesso) destinoAcesso.append(acesso);
   }
-  telaCompacta.addEventListener("change", posicionarAcessoManual);
+  telaCompacta.addEventListener("change", posicionarComplementos);
 
   function opcoesHtml(pergunta) {
     const selecionadas = pergunta.multipla
@@ -253,12 +257,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     iniciarControlesNumericos(conteudo);
     iniciarIcones(conteudo);
-    posicionarAcessoManual();
     ajustarGuiasConhecimento(conteudo);
+    posicionarComplementos();
   }
 
   function atualizarPrioridadeUso() {
-    const texto=conteudo.querySelector("#usage-priority-copy");
+    const texto=document.getElementById("usage-priority-copy");
     if(texto)texto.textContent=prioridadesUso[respostas.objetivo]||"Escolha um uso para entender como vamos selecionar as peças, respeitando seu limite de gasto.";
   }
 
@@ -383,23 +387,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     estadosCheckbox.clear();
   }
 
-  async function iniciarCheckboxesLottie(geracao) {
-    for (const input of conteudo.querySelectorAll('input[name="pecas"]')) {
-      if (geracao !== geracaoPergunta) return;
+  function iniciarCheckboxesLottie(geracao) {
+    const checkboxes = [...conteudo.querySelectorAll('input[name="pecas"]')];
+    return Promise.all(checkboxes.map(async (input) => {
       const id = `check-${input.value}`;
       estadosCheckbox.set(id, input.checked);
       const animacao = await registrarAnimacao(id, "../lottie/checkbox.json");
-      if (!animacao) continue;
+      if (!animacao) return;
       if (geracao !== geracaoPergunta) {
         destruirAnimacao(id, animacao);
         return;
       }
       animacoesCheckbox.set(id, animacao);
-      animacao.addEventListener("DOMLoaded", () => {
+      const pronto = () => {
+        if (geracao !== geracaoPergunta) return;
         animacao.goToAndStop(input.checked ? animacao.totalFrames - 1 : 0, true);
         input.nextElementSibling.querySelector(".choice-control").classList.add("lottie-ready");
-      });
-    }
+      };
+      if (animacao.isLoaded) pronto();
+      else animacao.addEventListener("DOMLoaded", pronto);
+    }));
   }
 
   function sincronizarCheckboxesLottie() {

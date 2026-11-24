@@ -1,13 +1,27 @@
 let lottiePromise = null;
+const dadosPorUrl = new Map();
 
 function carregarLottie() {
   if (!lottiePromise) {
-    lottiePromise =
-      import("https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/+esm").then(
-        (mod) => mod.default,
-      );
+    // A distribuição SVG Light do lottie-web 5.13.0 expõe o player globalmente.
+    lottiePromise = import("../vendor/lottie-web/lottie_light.min.js")
+      .then(() => globalThis.lottie);
   }
   return lottiePromise;
+}
+
+function carregarDados(path) {
+  const url = new URL(path, document.baseURI).href;
+  if (!dadosPorUrl.has(url)) {
+    dadosPorUrl.set(url, fetch(url).then(resposta => {
+      if (!resposta.ok) throw new Error(`Não foi possível carregar a animação (${resposta.status}).`);
+      return resposta.json();
+    }).catch(erro => {
+      dadosPorUrl.delete(url);
+      throw erro;
+    }));
+  }
+  return dadosPorUrl.get(url);
 }
 
 const animacoesCarregadas = new Map();
@@ -20,14 +34,16 @@ export async function registrarAnimacao(id, path, opcoes = {}) {
     return null;
   }
 
-  const lottie = await carregarLottie();
+  const [lottie, dados] = await Promise.all([carregarLottie(), carregarDados(path)]);
+  if (!container.isConnected || document.getElementById(id) !== container) return null;
 
   const animacao = lottie.loadAnimation({
     container,
     renderer: "svg",
     loop: false,
     autoplay: false,
-    path,
+    // Cada instância pode alterar seus dados internos durante a renderização.
+    animationData: structuredClone(dados),
     ...opcoes,
   });
 
