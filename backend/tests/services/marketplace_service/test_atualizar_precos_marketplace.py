@@ -4,6 +4,7 @@ from decimal import Decimal
 import pytest
 from flask import Flask
 
+from commands.marketplaces import registrar_comandos_marketplaces
 from models import db, Oferta, HistoricoOferta, VinculoMercadoLivre
 from services.marketplace_service.atualizar_precos_marketplace_service import AtualizarPrecosMarketplaceService
 from services.mercadolivre_service.controle_requisicoes_service import ErroMercadoLivre
@@ -152,3 +153,21 @@ def test_shopee_sem_retorno_mantem_oferta_e_periodo_encerrado_marca_esgotada(ban
 def test_marketplace_invalido():
     with pytest.raises(ValueError):
         AtualizarPrecosMarketplaceService().executar('kabum')
+
+
+def test_falha_de_uma_loja_nao_impede_as_outras_e_o_comando_termina_com_erro(monkeypatch):
+    app = Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    db.init_app(app)
+    registrar_comandos_marketplaces(app)
+
+    def executar(self, loja, **opcoes):
+        if loja == 'mercado_livre':
+            raise ValueError('reautorize a aplicação')
+        return {'loja': loja}
+
+    monkeypatch.setattr(AtualizarPrecosMarketplaceService, 'executar', executar)
+    resultado = app.test_cli_runner().invoke(args=['marketplaces-precos-atualizar'])
+    assert resultado.exit_code == 1
+    assert '"loja": "shopee"' in resultado.output and '"loja": "gigantec"' in resultado.output
+    assert 'mercado_livre: reautorize a aplicação' in resultado.output

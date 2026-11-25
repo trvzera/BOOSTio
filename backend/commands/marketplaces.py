@@ -80,15 +80,20 @@ def registrar_comandos_marketplaces(app):
         """Reconsulta o preço das ofertas ativas pelo identificador do anúncio e grava o histórico."""
         from models import db
         from services.marketplace_service.atualizar_precos_marketplace_service import AtualizarPrecosMarketplaceService
-        try:
-            resumos = [AtualizarPrecosMarketplaceService().executar(l, horas=horas, limite=limite, simular=simular)
-                       for l in (LOJAS_PRECOS if loja == 'todas' else (loja,))]
-        except SQLAlchemyError:
-            db.session.rollback()
-            raise click.ClickException('Falha ao gravar os preços; nada do lote em andamento foi confirmado') from None
-        except ValueError as erro:
-            raise click.ClickException(str(erro)) from None
+        resumos, falhas = [], []
+        # Cada loja é independente: a credencial vencida de uma não pode impedir o preço das outras.
+        for l in (LOJAS_PRECOS if loja == 'todas' else (loja,)):
+            try:
+                resumos.append(AtualizarPrecosMarketplaceService().executar(l, horas=horas, limite=limite, simular=simular))
+            except SQLAlchemyError:
+                db.session.rollback()
+                falhas.append(f'{l}: falha ao gravar os preços; nada do lote em andamento foi confirmado')
+            except ValueError as erro:
+                db.session.rollback()
+                falhas.append(f'{l}: {erro}')
         click.echo(json.dumps(resumos, ensure_ascii=False))
+        if falhas:
+            raise click.ClickException(' | '.join(falhas))
 
     @app.cli.command('gigantec-ligar')
     @click.option('--arquivo', type=click.Path(exists=True, dir_okay=False), default=None,
