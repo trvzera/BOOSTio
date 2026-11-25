@@ -68,8 +68,9 @@ class AtualizarPrecosMarketplaceService:
             return None
         try:
             ofertas = cliente.executar(vinculo.catalogo_id, access_token=token)['ofertas']
-        except ErroMercadoLivre as erro:
-            if erro.status in (401, 403, 429) or erro.status >= 500:
+        except (ErroMercadoLivre, FalhaMarketplace) as erro:
+            # O controle de requisições entrega o bloqueio como FalhaMarketplace, que também é ValueError.
+            if erro.status in (401, 403, 429) or (erro.status or 0) >= 500:
                 raise FalhaMarketplace(erro.status) from None
             return None
         except ValueError:

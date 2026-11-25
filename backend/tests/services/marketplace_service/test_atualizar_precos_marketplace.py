@@ -7,6 +7,7 @@ from flask import Flask
 from commands.marketplaces import registrar_comandos_marketplaces
 from models import db, Oferta, HistoricoOferta, VinculoMercadoLivre
 from services.marketplace_service.atualizar_precos_marketplace_service import AtualizarPrecosMarketplaceService
+from services.marketplace_service.erros import FalhaMarketplace
 from services.mercadolivre_service.controle_requisicoes_service import ErroMercadoLivre
 
 
@@ -124,10 +125,11 @@ def test_preco_invalido_nao_altera_a_oferta(banco):
     assert servico.executar('mercado_livre')['invalidas'] == 1 and oferta.preco == Decimal('100.00')
 
 
-def test_acesso_negado_interrompe_sem_perder_o_que_ja_foi_gravado(banco):
+@pytest.mark.parametrize('falha', [ErroMercadoLivre(403), FalhaMarketplace(403)])
+def test_acesso_negado_interrompe_sem_perder_o_que_ja_foi_gravado(banco, falha):
     vincular()
     criar('mercado_livre', 'MLB1', '100.00')
-    servico, _ = servico_ml(erro=ErroMercadoLivre(403))
+    servico, _ = servico_ml(erro=falha)
     assert servico.executar('mercado_livre')['interrompido'] == 'HTTP 403'
 
 
