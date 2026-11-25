@@ -12,7 +12,6 @@ from services.marketplace_service.controle_requisicoes_service import agora_utc
 from services.shopee_service.normalizar_produto_service import derivar_modelo, limpar_titulo
 from utils.identidade_peca import assinatura_peca, assinatura_documento
 
-LOTE = 50
 # Candidato com menos que isso é outra peça: não vale o tempo de quem revisa.
 PERCENTUAL_MINIMO_REVISAO = 60
 # O feed não traz categoria. O título da Gigantec começa pelo tipo da peça, então ele decide em quais categorias procurar.
@@ -42,15 +41,9 @@ class AssociarFeedGigantecService:
         if limite:
             escolhidas = dict(list(escolhidas.items())[:limite])
         resumo['ligadas'] = len(escolhidas)
-        if not simular and not ControleColeta.bloquear():
-            raise ValueError('Prepare o controle de coleta com mercadolivre-ofertas-preparar')
         modelos = {m.__tablename__: m for m in MODELOS_PECAS}
-        for posicao, ((tabela, peca_id), (item, assinatura)) in enumerate(escolhidas.items(), 1):
+        for (tabela, peca_id), (item, assinatura) in escolhidas.items():
             self._gravar(modelos[tabela], peca_id, item, assinatura, simular, resumo)
-            if not simular and posicao % LOTE == 0:
-                db.session.commit()
-        if not simular:
-            db.session.commit()
         return resumo
 
     def _escolher(self, itens, resumo):
@@ -110,8 +103,11 @@ class AssociarFeedGigantecService:
                     continue
 
     def _gravar(self, modelo, peca_id, item, assinatura, simular, resumo):
+        # Cada oferta tem a própria transação: o rollback de um item não pode desfazer os anteriores.
+        db.session.rollback()
+        if not simular and not ControleColeta.bloquear():
+            raise ValueError('Prepare o controle de coleta com mercadolivre-ofertas-preparar')
         try:
-            db.session.rollback()
             peca = modelo.buscar_por_id(peca_id)
             if peca is None or assinatura_peca(peca) != assinatura:
                 raise ValueError('Peça mudou durante a leitura do feed')
@@ -122,6 +118,8 @@ class AssociarFeedGigantecService:
             propostas = aplicar_ofertas_loja(peca, 'gigantec', [oferta], agora_utc())
             if simular:
                 db.session.rollback()
+            else:
+                db.session.commit()
         except ValueError as erro:
             db.session.rollback()
             resumo['conflitos'] += 1

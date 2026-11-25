@@ -174,3 +174,16 @@ def test_administrador_aceita_a_pendencia_e_a_oferta_so_aparece_apos_a_proxima_a
     AtualizarPrecosMarketplaceService(feed_gigantec=FeedFalso({'7': item('7', '640.00')})).executar('gigantec')
     oferta = Oferta.query.one()
     assert oferta.preco == Decimal('640.00') and oferta.para_exibicao()['preco'] == 640.0
+
+
+def test_aplicar_salva_todas_as_ofertas_e_nao_so_a_ultima(banco, tmp_path):
+    outra = Processador(fabricante='AMD', modelo='Ryzen 5 5600', part_number='100-100000927BOX', soquete='AM4',
+                        nucleo=6, thread=12, clockbase=3.5, clockmax=4.4, consumo_energia=65, status_validacao='aprovado')
+    db.session.add(outra)
+    db.session.commit()
+    itens = feed(tmp_path, linha('10', 'Processador AMD Ryzen 5 5500', '500', '100-100000457BOX'),
+                 linha('11', 'Processador AMD Ryzen 5 5600', '700', '100-100000927BOX')).itens()
+    resumo = AssociarFeedGigantecService().executar(itens, simular=False)
+    db.session.rollback()
+    assert resumo['criadas'] == 2
+    assert Oferta.query.filter_by(loja='gigantec').count() == 2 and HistoricoOferta.query.count() == 2
