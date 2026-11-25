@@ -1,7 +1,9 @@
 """Preparação e diagnóstico da fonte técnica, sem criar peças diretamente."""
 import json
+import sqlite3
 
 import click
+from sqlalchemy.exc import SQLAlchemyError
 from defusedxml.common import DefusedXmlException
 from xml.etree.ElementTree import ParseError
 from services.icecat_service.indice_icecat_service import IndiceIcecatService
@@ -44,6 +46,23 @@ def registrar_comandos_icecat(app):
             click.echo(json.dumps(resultado, ensure_ascii=False, default=str))
         except (ValueError, OSError, ParseError, DefusedXmlException):
             raise click.ClickException('Consulta não concluída; confira acesso Icecat, índice e ficha') from None
+
+    @app.cli.command('icecat-descobrir-codigos')
+    @click.option('--categoria', default='placa_mae', show_default=True, type=click.Choice(['placa_mae']))
+    @click.option('--marca', default='asus', show_default=True, type=click.Choice(['asus']))
+    @click.option('--indice', envvar='ICECAT_INDICE', required=True, type=click.Path(dir_okay=False))
+    @click.option('--aplicar', is_flag=True, help='Grava os códigos únicos em identidade_fabricante; sem esta opção só simula.')
+    def descobrir_codigos(categoria, marca, indice, aplicar):
+        """Busca o código do fabricante, pelo nome do modelo, nas peças sem código."""
+        from services.icecat_service.descobrir_codigos_icecat_service import DescobrirCodigosIcecatService
+        try:
+            resumo = DescobrirCodigosIcecatService(indice).executar(categoria=categoria, marca=marca, simular=not aplicar)
+        except SQLAlchemyError:
+            raise click.ClickException('Falha no banco; nada foi gravado') from None
+        except (ValueError, OSError, sqlite3.Error) as erro:
+            raise click.ClickException(str(erro)) from None
+        resumo['detalhes'], resumo['revisao'] = resumo['detalhes'][:20], resumo['revisao'][:20]
+        click.echo(json.dumps(resumo, ensure_ascii=False))
 
     @app.cli.command('icecat-completar-pecas')
     @click.option('--categoria', required=True, type=click.Choice([m.__tablename__ for m in MODELOS_PECAS]))

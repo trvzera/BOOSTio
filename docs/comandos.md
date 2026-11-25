@@ -91,6 +91,7 @@ A sequência de aprovação, busca de ofertas, worker e análise por IA está no
 | `catalogo-especificacoes-preencher`, `catalogo-fichas-originais` | Completam e conferem fichas usando dados já coletados. |
 | `catalogo-gpus-converter-referencias`, `catalogo-identificadores-separar` | Correções pontuais de GPUs genéricas e de códigos (MPN, referência, ID da loja). |
 | `icecat-completar-pecas` | Completa campos vazios das peças recusadas por ficha incompleta com a ficha do Icecat (`--categoria`, `--limite`, `--depois-id`; simula, `--aplicar` grava) e libera a marca de ficha de montagem. |
+| `icecat-descobrir-codigos` | Procura na Icecat, pelo nome do modelo (sem a cor), o código do fabricante das placas-mãe ASUS que não têm nenhum. Código único vira proposta; vários códigos ou o mesmo código em peças diferentes vão para revisão. Padrão só simula; `--aplicar` grava os códigos únicos em `identidade_fabricante` (exige `mercadolivre-identidades-preparar`), sem alterar o `part_number`. |
 | `icecat-consultar`, `icecat-indice-preparar` | Consulta uma ficha do Icecat para diagnóstico; monta o índice local. |
 | `fabricantes-consultar` | Consulta páginas oficiais de fabricantes e mostra as evidências. |
 
