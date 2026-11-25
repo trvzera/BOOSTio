@@ -4,7 +4,8 @@ from decimal import Decimal
 import pytest
 from flask import Flask
 
-from models import db, Processador, ControleColeta, Oferta, HistoricoOferta
+from models import db, Processador, ControleColeta, Oferta, HistoricoOferta, ProdutoPendente
+from services.admin_service.aceitar_pendencia_service import AceitarPendenciaService
 from services.gigantec_service.associar_feed_service import AssociarFeedGigantecService
 from services.gigantec_service.feed_service import FeedGigantecService
 from services.marketplace_service.atualizar_precos_marketplace_service import AtualizarPrecosMarketplaceService
@@ -89,7 +90,7 @@ def test_simular_nao_grava_e_aplicar_cria_so_para_mpn_e_marca_iguais(banco, tmp_
                  linha('3', 'Outro produto qualquer', '50', 'ZZZ-999'),
                  linha('4', 'Sem código', '50', '')).itens()
     simulado = AssociarFeedGigantecService().executar(itens, simular=True)
-    assert (simulado['ligadas'], simulado['criadas'], simulado['sem_correspondencia'], simulado['sem_mpn'], simulado['indisponiveis']) == (1, 1, 1, 1, 1)
+    assert (simulado['ligadas'], simulado['criadas'], simulado['sem_correspondencia'], simulado['sem_mpn'], simulado['indisponiveis']) == (1, 1, 2, 1, 1)
     assert Oferta.query.count() == 0
     real = AssociarFeedGigantecService().executar(itens, simular=False)
     assert real['criadas'] == 1
@@ -135,3 +136,41 @@ def test_oferta_aparece_na_exibicao_com_link_afiliado(banco):
     assert dados['url'].startswith('https://www.awin1.com/') and dados['esgotado'] is False
     oferta.url = 'https://falso.com/p'
     assert oferta.para_exibicao() is None
+
+
+def duas_versoes(cpu):
+    gemea = Processador(fabricante='AMD', modelo='Ryzen 5 5500', part_number='100-100000457WOF', soquete='AM4',
+                        nucleo=6, thread=12, clockbase=3.6, clockmax=4.2, consumo_energia=65, status_validacao='aprovado')
+    db.session.add(gemea)
+    db.session.commit()
+    return gemea
+
+
+def test_ambiguo_vai_para_a_lista_de_revisao_e_nao_vira_oferta(banco, tmp_path):
+    duas_versoes(banco)
+    itens = feed(tmp_path, linha('7', 'Processador AMD Ryzen 5 5500 AM4 3.6GHz 6 Cores 12 Threads', '650', '')).itens()
+    simulado = AssociarFeedGigantecService().executar(itens, simular=True)
+    assert (simulado['ligadas'], simulado['para_revisao']) == (0, 1)
+    assert ProdutoPendente.query.count() == 0
+    real = AssociarFeedGigantecService().executar(itens, simular=False)
+    assert (real['ligadas'], real['para_revisao']) == (0, 1)
+    pendente = ProdutoPendente.query.one()
+    assert (pendente.loja, pendente.produto_id_loja, pendente.status, pendente.categoria_sugerida) == ('gigantec', '7', 'em_revisao', 'processador')
+    assert len(pendente.candidatos) == 2 and Oferta.query.count() == 0
+    assert AssociarFeedGigantecService().executar(itens, simular=False)['para_revisao'] == 0
+    assert ProdutoPendente.query.count() == 1
+
+
+def test_administrador_aceita_a_pendencia_e_a_oferta_so_aparece_apos_a_proxima_atualizacao(banco, tmp_path):
+    gemea = duas_versoes(banco)
+    itens = feed(tmp_path, linha('7', 'Processador AMD Ryzen 5 5500 AM4 3.6GHz 6 Cores 12 Threads', '650', '')).itens()
+    AssociarFeedGigantecService().executar(itens, simular=False)
+    pendente = ProdutoPendente.query.one()
+    resultado = AceitarPendenciaService().executar(pendente.id, 1, f'processador:{gemea.id}')
+    assert resultado['pendencia']['status'] == 'importado'
+    oferta = Oferta.query.one()
+    assert (oferta.peca_id, oferta.preco, oferta.loja) == (gemea.id, Decimal('650.00'), 'gigantec')
+    assert oferta.consultado_em is None and oferta.para_exibicao() is None
+    AtualizarPrecosMarketplaceService(feed_gigantec=FeedFalso({'7': item('7', '640.00')})).executar('gigantec')
+    oferta = Oferta.query.one()
+    assert oferta.preco == Decimal('640.00') and oferta.para_exibicao()['preco'] == 640.0

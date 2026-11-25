@@ -1,6 +1,8 @@
 from datetime import datetime, timezone
 
-from models import ProdutoPendente
+from decimal import Decimal
+
+from models import db, Oferta, ProdutoPendente
 from services.marketplace_service.gravar_ofertas_service import atualizar_ofertas_validadas
 from services.catalogo_service.produto_normalizado import ProdutoNormalizado
 from services.mercadolivre_service.controle_requisicoes_service import ControleRequisicoesService
@@ -26,13 +28,13 @@ class AceitarPendenciaService:
             raise LookupError("Pendência não encontrada")
         if pendencia.status not in ("pendente", "em_revisao"):
             raise ConflitoPendencia("Esta pendência já foi decidida")
-        if pendencia.loja not in ("shopee", "mercado_livre"):
+        if pendencia.loja not in ("shopee", "mercado_livre", "gigantec"):
             raise ConflitoPendencia("Esta loja não tem aceite pelo painel")
         peca = self._peca_candidata(pendencia, referencia_peca)
         revisao = {"acao": "aceitar", "peca": referencia_peca, "administrador_id": administrador_id,
                    "origem": origem, "em": datetime.now(timezone.utc).replace(tzinfo=None).isoformat()}
-        propostas = (self._aceitar_shopee if pendencia.loja == "shopee" else self._aceitar_mercado_livre)(
-            pendencia, peca, revisao)
+        aceitar = {"shopee": self._aceitar_shopee, "gigantec": self._aceitar_gigantec}.get(pendencia.loja, self._aceitar_mercado_livre)
+        propostas = aceitar(pendencia, peca, revisao)
         return {"pendencia": apresentar_pendencia(ProdutoPendente.buscar_por_id(pendencia_id)), "ofertas": propostas}
 
     @staticmethod
@@ -41,6 +43,20 @@ class AceitarPendenciaService:
         _, oferta = NormalizarProdutoShopeeService().executar(pendencia.dados_originais["anuncio"], peca.__tablename__)
         return atualizar_ofertas_validadas(peca, "shopee", [(oferta, produto)], assinatura_peca(peca),
                                            simular=False, revisao_manual=revisao)
+
+    @staticmethod
+    def _aceitar_gigantec(pendencia, peca, revisao):
+        item = pendencia.dados_originais["item"]
+        produto = ProdutoNormalizado(**pendencia.dados_originais["normalizado"])
+        oferta = dict(produto_id_loja=item["id"], vendedor_id="", url=item["url"], url_afiliado=item["url_afiliado"],
+                      preco=Decimal(item["preco"]), esgotado=False)
+        propostas = atualizar_ofertas_validadas(peca, "gigantec", [(oferta, produto)], assinatura_peca(peca),
+                                                simular=False, revisao_manual=revisao)
+        # O preço da pendência pode ser antigo: a oferta só aparece depois da próxima atualização diária do feed.
+        registro = Oferta.buscar_unica_por_anuncio("gigantec", item["id"])
+        registro.consultado_em = None
+        db.session.commit()
+        return propostas
 
     def _aceitar_mercado_livre(self, pendencia, peca, revisao):
         self._recusar_peca_ja_vinculada_a_outro_catalogo(pendencia, peca)

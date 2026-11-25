@@ -1,7 +1,7 @@
 
 import { formatarReal } from "../utils/formatarMoeda.js";
 
-const lojas = {mercado_livre: "Mercado Livre", shopee: "Shopee"};
+const lojas = {mercado_livre: "Mercado Livre", shopee: "Shopee", gigantec: "Gigantec"};
 const situacoes = {em_revisao: "Em revisão", pendente: "Pendente", rejeitado: "Rejeitada", importado: "Aceita"};
 const categorias = {
   processador: "Processador", placa_mae: "Placa-mãe", placa_video: "Placa de vídeo", memoria_ram: "Memória RAM",

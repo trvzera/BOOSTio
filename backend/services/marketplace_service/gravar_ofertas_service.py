@@ -139,8 +139,8 @@ def atualizar_ofertas_validadas(peca, loja, itens, assinatura, *, simular, desat
                     raise ValueError('Associação mudou durante a consulta')
         agora = datetime.now(timezone.utc).replace(tzinfo=None)
         propostas = aplicar_ofertas_loja(peca, loja, [oferta for oferta, _ in itens], agora)
-        if loja == 'shopee':
-            _registrar_vinculos_shopee(peca, itens, agora, revisao_manual)
+        if loja in ('shopee', 'gigantec'):
+            _registrar_vinculos(loja, peca, itens, agora, revisao_manual)
         if desativar_ausentes:
             propostas += _desativar_ausentes(peca, loja, {produto.id_externo for _, produto in itens})
         if simular:
@@ -155,15 +155,15 @@ def atualizar_ofertas_validadas(peca, loja, itens, assinatura, *, simular, desat
         raise
 
 
-def _registrar_vinculos_shopee(peca, itens, agora, revisao_manual=None):
+def _registrar_vinculos(loja, peca, itens, agora, revisao_manual=None):
     from dataclasses import asdict
     from models import ProdutoPendente
     from utils.identidade_peca import assinatura_peca, assinatura_tecnica
     for oferta, produto in itens:
-        registro = Oferta.buscar_unica_por_anuncio('shopee', produto.id_externo)
-        pendente = ProdutoPendente.buscar_por_anuncio('shopee', produto.id_externo)
+        registro = Oferta.buscar_unica_por_anuncio(loja, produto.id_externo)
+        pendente = ProdutoPendente.buscar_por_anuncio(loja, produto.id_externo)
         if pendente is None:
-            pendente = ProdutoPendente(loja='shopee', produto_id_loja=produto.id_externo,
+            pendente = ProdutoPendente(loja=loja, produto_id_loja=produto.id_externo,
                 vendedor_id=oferta['vendedor_id'], titulo=produto.titulo, url=produto.fonte,
                 categoria_sugerida=produto.categoria, dados_originais={'normalizado': asdict(produto)}, coletado_em=agora)
             db.session.add(pendente)
